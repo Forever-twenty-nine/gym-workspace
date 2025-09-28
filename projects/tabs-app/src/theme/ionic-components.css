@@ -1,0 +1,212 @@
+/* ============================================================================
+ * IONIC COMPONENTS - GLOBAL OVERRIDES
+ * ============================================================================ */
+
+
+
+/* Buttons Primary Outline */
+/* html.md ion-button[fill="outline"][color="primary"]{} */
+/* html.ios ion-button[fill="outline"][color="primary"]{} */
+/* esto si pisa los estilos de ionic: */
+/* html.md ion-button[color="primary"][fill="solid"]::part(native){
+  background: blue !important;
+} */
+
+ion-button.button-large{
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+html.md ion-button[fill="clean"][color="primary"],
+html.ios ion-button[fill="clean"][color="primary"] {
+  --color: var(--ion-color-primary);
+  --background: transparent;
+  --padding-end: 8px;
+  --padding-start: 8px;
+}
+
+
+ion-spinner {
+  width: 18px;
+  height: 18px;
+}
+
+
+ion-toobar.gym-bg-transparent{
+  --background: red !important;
+}
+
+
+ ion-card {
+   border-radius: var(--app-border-radius-md);
+   box-shadow: var(--app-shadow-light);
+   margin: var(--app-spacing-md);
+ }
+
+ ion-card-title {
+   color: var(--ion-color-primary);
+   font-weight: 600;
+ }
+
+
+ /* Items - Configuración global */
+ ion-item {
+  --background: rgba(255, 255, 255, 0.1);
+   --border-radius: var(--app-border-radius-sm);
+   --padding-start: var(--app-spacing-md);
+   --padding-end: var(--app-spacing-md);
+   transition: all 0.3s ease;
+ }
+
+ /* Inputs y selects */
+ ion-input,
+ ion-select {
+   --padding-start: 0;
+ }
+
+ /* Progress bars */
+ ion-progress-bar {
+   border-radius: 3px;
+ }
+
+ /* Chips */
+ ion-chip {
+   font-size: 0.8rem;
+ }
+
+ /* Icons */
+ ion-icon {
+   font-size: 2rem;
+ }
+
+ /* Buttons - Configuración global */
+ ion-button[expand="block"] {
+   margin-top: var(--app-spacing-sm);
+ }
+
+ ion-button[disabled] {
+   opacity: 0.6;
+ }
+
+
+ /* Avatar - Configuración global */
+ ion-avatar {
+   width: 40px;
+   height: 40px;
+   background: var(--ion-color-light);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+
+ ion-avatar ion-icon {
+   font-size: 24px;
+   color: var(--ion-color-medium);
+ }
+
+
+ /* Badges - Configuración global */
+ ion-badge {
+   margin-right: var(--app-spacing-xs);
+ }
+
+ /* Toolbar - Configuración global */
+ ion-toolbar.transparent {
+   --background: transparent;
+   --border-color: transparent;
+   --color: white;
+ }
+
+ /* Titles - Configuración global */
+ ion-title.centered {
+   font-weight: 600;
+   text-align: center;
+ }
+
+ /* Card titles responsive */
+ @media (max-width: 768px) {
+   ion-card-title.large {
+     font-size: 1.8rem !important;
+   }
+ }
+
+
+
+ ion-item.ion-invalid ion-input {
+   --border-color: var(--ion-color-danger);
+ }
+
+ ion-item.ion-valid ion-input {
+   --border-color: var(--ion-color-success);
+ }
+
+
+
+ /* Estilos base comunes para todas las tabs */
+ ion-tab-bar {
+   --background: var(--ion-color-light);
+   --color: var(--ion-color-medium);
+ }
+
+ ion-tab-button {
+   --color: var(--ion-color-medium);
+   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+ }
+
+ ion-tab-button.tab-selected {
+   --color: var(--ion-color-primary);
+ }
+
+ /* Estados especiales de tabs */
+ ion-tab-button.tab-hidden {
+   opacity: 0;
+   transform: scale(0.8);
+   pointer-events: none;
+ }
+
+ /* Colores específicos por tipo de tab */
+ ion-tab-button[tab="dashboard"] {
+   --color-selected: var(--ion-color-primary);
+ }
+
+ ion-tab-button[tab="entrenamientos"] {
+   --color-selected: var(--ion-color-success);
+ }
+
+ ion-tab-button[tab="progreso"] {
+   --color-selected: var(--ion-color-tertiary);
+ }
+
+ ion-tab-button[tab="nutricion"] {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ ion-tab-button[tab="comunidad"] {
+   --color-selected: var(--ion-color-secondary);
+ }
+
+ ion-tab-button[tab="clientes"] {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ ion-tab-button[tab="perfil"] {
+   --color-selected: var(--ion-color-primary);
+ }
+
+ /* Variantes de color para diferentes roles */
+ .tabs-entrenador ion-tab-bar {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ .tabs-entrenador ion-tab-button {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ .tabs-entrenador ion-tab-button.tab-selected {
+   --color: var(--ion-color-warning);
+ }
+
+ .tabs-gimnasio ion-tab-button.tab-selected {
+   --color: var(--ion-color-primary);
+ }

@@ -3,5 +3,34 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "gym-library": {
+      "projectType": "library",
+      "root": "projects/gym-library",
+      "sourceRoot": "projects/gym-library/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/gym-library/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/gym-library/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "tsConfig": "projects/gym-library/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "e1ae8285-c3e7-4d13-8c77-7d7d0b14a299"
   }
 }

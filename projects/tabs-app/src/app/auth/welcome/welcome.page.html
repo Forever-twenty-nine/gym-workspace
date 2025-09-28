@@ -1,0 +1,47 @@
+<ion-content [fullscreen]="true" class="ion-padding" style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
+
+  <!-- bg gradient -->
+  <div class="fixed inset-0 bg-gradient-to-b from-transparent via-black/70 to-black/90 pointer-events-none z-0"></div>
+
+  <!-- content -->
+  <div class="z-10 p-2 relative flex items-end justify-center min-h-dvh -mt-4 -mb-4">
+
+    <div class="pb-8">
+      <img src="/assets/images/logo.png" width="100" height="100" alt="Fondo" class="mb-6" />
+      <h1 class="font-heading text-4xl text-white font-semibold mb-4">
+        <span class="text-[var(--brand-primary-color)]">
+          Entrenamientos</span>
+        diseñados sólo para ti!
+      </h1>
+      <p class="text-base text-white mb-8">
+        Sigue un plan personalizado adaptado a tus objetivos, nivel fitnes y preferencias!
+      </p>
+      <ion-button
+        expand="block"
+        fill="solid"
+        size="large"
+        shape="round"
+        color="primary"
+        (click)="goToRegister()"
+        class="mb-6">
+        Regístrate
+      </ion-button>
+      <div class="flex gap-2 items-center justify-center">
+        <p class="text-white text-center">
+          ¿Tenes una cuenta?
+        </p>
+        <ion-button
+          expand="block"
+          fill="clean"
+          size="default"
+          shape="round"
+          color="primary"
+          (click)="goToLogin()"
+          class="!mt-0">
+          Iniciar Sesión
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

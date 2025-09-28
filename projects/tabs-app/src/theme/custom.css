@@ -1,0 +1,271 @@
+:root {
+
+  /* Espaciado común */
+  --app-spacing-xs: 4px;
+  --app-spacing-sm: 8px;
+  --app-spacing-md: 16px;
+  --app-spacing-lg: 24px;
+  --app-spacing-xl: 32px;
+
+  /* Bordes y radio */
+  --app-border-radius-sm: 8px;
+  --app-border-radius-md: 12px;
+  --app-border-radius-lg: 16px;
+
+  /* Sombras */
+  --app-shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --app-shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --app-shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+
+
+
+
+
+
+/* ============================================================================
+ * AUTHENTICATION STYLES
+ * ============================================================================ */
+
+/* Cards de autenticación */
+/* .auth-card {
+  box-shadow: var(--app-shadow-medium);
+}
+
+.auth-card.onboarding {
+  box-shadow: var(--app-shadow-heavy);
+} */
+
+/* Botones de autenticación */
+/* .login-button,
+.register-button {
+  margin-top: var(--app-spacing-lg);
+  --border-radius: var(--app-border-radius-sm);
+  font-weight: 600;
+  transition: all 0.3s ease;
+} */
+
+/* .register-button.onboarding {
+  margin-top: 1.5rem;
+  --border-radius: var(--app-border-radius-md);
+  --background: var(--ion-color-primary);
+  --background-hover: var(--ion-color-primary-shade);
+  height: 48px;
+} */
+
+/* .register-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  --background: var(--ion-color-medium) !important;
+} */
+
+/* Estados de validación en formularios */
+.item-valid {
+  --border-color: var(--ion-color-success);
+  --border-width: 2px;
+  --border-style: solid;
+}
+
+.item-invalid {
+  --border-color: var(--ion-color-danger);
+  --border-width: 2px;
+  --border-style: solid;
+}
+
+
+
+/* Items específicos de onboarding */
+.onboarding-item {
+  --border-radius: var(--app-border-radius-md);
+  --padding-start: var(--app-spacing-md);
+  --padding-end: var(--app-spacing-md);
+  margin-bottom: 1rem;
+}
+
+/* ============================================================================
+ * DASHBOARD STYLES
+ * ============================================================================ */
+
+/* Contenedores de dashboard */
+.dashboard-container {
+  padding: var(--app-spacing-md);
+}
+
+/* Tarjetas de estadísticas */
+.stat-card {
+  text-align: center;
+  padding: var(--app-spacing-md);
+  margin-bottom: var(--app-spacing-sm);
+  border-radius: var(--app-border-radius-md);
+  box-shadow: var(--app-shadow-light);
+}
+
+.stat-card ion-card-content {
+  padding: var(--app-spacing-sm);
+}
+
+.stat-card ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+}
+
+.stat-card ion-icon {
+  font-size: 2rem;
+  margin-bottom: var(--app-spacing-sm);
+}
+
+.stat-card h2 {
+  margin: var(--app-spacing-sm) 0 var(--app-spacing-xs) 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}
+
+/* Contenido de estadísticas con layout flex */
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: var(--app-spacing-md);
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-info h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+.stat-info p {
+  margin: var(--app-spacing-xs) 0 0 0;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+}
+
+/* Barras de progreso */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--ion-color-light);
+  border-radius: 4px;
+  margin-top: var(--app-spacing-sm);
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: var(--ion-color-success);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ============================================================================
+ * ENTRENAMIENTOS STYLES
+ * ============================================================================ */
+
+/* Estilos específicos para la sección de entrenamientos */
+.entrenamientos-card ion-card-title {
+  color: var(--ion-color-primary);
+  font-weight: 600;
+}
+
+/* ============================================================================
+ * TABS STYLES
+ * ============================================================================ */
+
+
+/* ============================================================================
+ * ANIMATIONS
+ * ============================================================================ */
+
+/* Animaciones suaves para transiciones */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Transiciones comunes */
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+/* ============================================================================
+ * RESPONSIVE DESIGN
+ * ============================================================================ */
+
+/* Tablet y pantallas medianas */
+@media (max-width: 768px) {
+  ion-card {
+    margin: 10px;
+  }
+
+  .dashboard-container {
+    padding: var(--app-spacing-sm);
+  }
+
+  .stat-card {
+    padding: var(--app-spacing-sm);
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .stat-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .stat-info h2 {
+    font-size: 1.2rem;
+  }
+
+  ion-card {
+    margin: var(--app-spacing-sm);
+  }
+}
+
+/* ============================================================================
+ * UTILITY CLASSES
+ * ============================================================================ */
+
+/* Espaciado */
+/* .m-xs { margin: var(--app-spacing-xs); }
+.m-sm { margin: var(--app-spacing-sm); }
+.m-md { margin: var(--app-spacing-md); }
+.m-lg { margin: var(--app-spacing-lg); }
+.m-xl { margin: var(--app-spacing-xl); }
+
+.p-xs { padding: var(--app-spacing-xs); }
+.p-sm { padding: var(--app-spacing-sm); }
+.p-md { padding: var(--app-spacing-md); }
+.p-lg { padding: var(--app-spacing-lg); }
+.p-xl { padding: var(--app-spacing-xl); } */
+
+/* Bordes */
+/* .rounded-sm { border-radius: var(--app-border-radius-sm); }
+.rounded-md { border-radius: var(--app-border-radius-md); }
+.rounded-lg { border-radius: var(--app-border-radius-lg); } */
+
+/* Sombras */
+/* .shadow-light { box-shadow: var(--app-shadow-light); }
+.shadow-medium { box-shadow: var(--app-shadow-medium); }
+.shadow-heavy { box-shadow: var(--app-shadow-heavy); } */

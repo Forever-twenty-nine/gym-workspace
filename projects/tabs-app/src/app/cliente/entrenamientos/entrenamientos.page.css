@@ -1,0 +1,25 @@
+/* 
+ * Entrenamientos Page Styles
+ * Los estilos comunes ahora están centralizados en global.css
+ * Aquí solo van estilos específicos de esta página
+ */
+
+.entrenamientos-container {
+  padding: 16px;
+}
+
+.entrenamiento-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.button-container {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.button-container ion-button {
+  flex: 1;
+}

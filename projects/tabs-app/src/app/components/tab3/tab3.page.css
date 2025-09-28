@@ -1,0 +1,14 @@
+/* 
+ * Tab3 Component Styles
+ * Los estilos comunes ahora están centralizados en global.css
+ * Aquí solo van estilos específicos de este componente
+ */
+
+.profile-content {
+  padding: 20px;
+}
+
+.logout-button {
+  margin-top: 40px;
+  --border-radius: var(--app-border-radius-sm);
+}

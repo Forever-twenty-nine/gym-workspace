@@ -1,0 +1,13 @@
+/* 
+ * Gimnasio Users Page Styles
+ * Los estilos comunes ahora están centralizados en global.css
+ * Aquí solo van estilos específicos de esta página
+ */
+
+.users-container {
+  padding: 16px 0;
+}
+
+.status-badge {
+  margin-left: 8px;
+}

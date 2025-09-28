@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mi Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Mi Dashboard</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Información del cliente -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title class="">Información Personal</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-avatar slot="start">
+          <ion-icon name="person-outline"></ion-icon>
+        </ion-avatar>
+        <ion-label>
+          <h3>{{ nombreCliente() }}</h3>
+          <p>Cliente</p>
+        </ion-label>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Objetivo actual -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Objetivo Actual</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-icon name="stats-chart-outline" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{ objetivoActual() }}</h3>
+        </ion-label>
+        <ion-chip slot="end" color="success">
+          Activo
+        </ion-chip>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Rutinas recientes -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Rutinas Asignadas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let rutina of rutinasAsignadas()" button (click)="verRutina(rutina)">
+          <ion-icon
+            [name]="rutina.completada ? 'checkmark-circle-outline' : 'time-outline'"
+            [color]="rutina.completada ? 'success' : 'warning'"
+            slot="start">
+          </ion-icon>
+          <ion-label>
+            <h3>{{ rutina.nombre }}</h3>
+          </ion-label>
+          <ion-chip
+            slot="end"
+            [color]="rutina.completada ? 'success' : 'warning'">
+            {{ rutina.completada ? 'Completada' : 'Pendiente' }}
+          </ion-chip>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

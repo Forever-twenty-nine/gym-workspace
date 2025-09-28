@@ -1,0 +1,109 @@
+
+:root{
+
+
+
+/* ============================================================================
+ * 1) Light Theme - Brand : https: //ionicframework.com/docs/theming/color-generator
+ * ============================================================================ */
+--brand-primary-color: #7ebc08;
+--brand-primary-shade: #6ca208;
+--brand-primary-tint: #96cf2a;
+--brand-secondary-color: #8e967b;
+--brand-tertiary-color: #50e3c2;
+--brand-success-color: #2dd36f;
+--brand-warning-color: #fecc28;
+--brand-danger-color: #eb445a;
+--brand-light-color: #f4f5f8;
+--brand-medium-color: #92949c;
+--brand-dark-color: #222428;
+
+
+
+
+
+
+/* ============================================================================
+ * 2) Light Theme - Ionic
+ * ============================================================================ */
+
+  /* 2.a) - Ionic Color Variables */
+  --ion-color-primary: var(--brand-primary-color);
+  --ion-color-primary-rgb: 126, 188, 8;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: var(--brand-primary-shade);
+  --ion-color-primary-tint: var(--brand-primary-tint);
+
+  --ion-color-secondary: var(--brand-secondary-color);
+  --ion-color-tertiary: var(--brand-tertiary-color);
+  --ion-color-success: var(--brand-success-color);
+  --ion-color-warning: var(--brand-warning-color);
+  --ion-color-danger: var(--brand-danger-color);
+  --ion-color-light: var(--brand-light-color);
+  --ion-color-medium: var(--brand-medium-color);
+  --ion-color-dark: var(--brand-dark-color);
+
+
+  /* 2.b) - Ionic Global Variables - solo se definen una vez porque en dark no es necesario cambiarlo */
+  --ion-font-family: 'Manrope', 'Helvetica Neue', sans-serif;
+  --ion-padding: 16px;
+    /* ⚠️ Revisar estas variables https: //ionicframework.com/docs/theming/advanced */
+    /* --ion-statusbar-padding: 50px;
+    --ion-safe-area-top: 50px;
+    --ion-safe-area-bottom: 0px;
+    --ion-safe-area-left: 0px;
+    --ion-safe-area-right: 0px; */
+
+    /* https: //ionicframework.com/docs/theming/themes#application-colors */
+    /* --ion-background-color: blue;
+    --ion-text-color: yellow; */
+    /* --ion-backdrop-color: red; */
+    /* --ion-backdrop-opacity: green; */
+    /* --ion-overlay-background-color: blue; ETC */
+
+}
+
+
+
+
+
+.dark {
+  /* ============================================================================
+   * 3) - Dark Theme - Brand
+   * ============================================================================ */
+  --brand-primary-color: #b3ed10;
+  --brand-primary-shade: #94c30d;
+  --brand-primary-tint: #cbf53c;
+  --brand-secondary-color: #8e967b;
+  --brand-tertiary-color: #61f2d0;
+  --brand-success-color: #00ff9d;
+  --brand-warning-color: #ffd860;
+  --brand-danger-color: #ff5a5f;
+  --brand-light-color: #1e1e1e;
+  --brand-medium-color: #3a3a3a;
+  --brand-dark-color: #000000;
+
+
+  /* ============================================================================
+   * 4) - Dark Theme - Ionic
+   * ============================================================================ */
+  --ion-color-primary: var(--brand-primary-color);
+  --ion-color-primary-rgb: 126, 188, 8;
+  --ion-color-primary-contrast: #000000;
+  --ion-color-primary-contrast-rgb: 0, 0, 0;
+  --ion-color-primary-shade: var(--brand-primary-shade);
+  --ion-color-primary-tint: var(--brand-primary-tint);
+
+  --ion-color-secondary: var(--brand-secondary-color);
+  --ion-color-tertiary: var(--brand-tertiary-color);
+  --ion-color-success: var(--brand-success-color);
+  --ion-color-warning: var(--brand-warning-color);
+  --ion-color-danger: var(--brand-danger-color);
+  --ion-color-light: var(--brand-light-color);
+  --ion-color-medium: var(--brand-medium-color);
+  --ion-color-dark: var(--brand-dark-color);
+}
+
+
+

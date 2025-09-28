@@ -1,0 +1,62 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* 1) Importing Fonts
+* ---------------------------------------------------------------------------- */
+/* Import Core Ionic first */
+ @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
+
+ /* 2) Ionic Styles
+ * ---------------------------------------------------------------------------- */
+ /* Import Core Ionic first */
+ @import "@ionic/angular/css/core.css";
+ @import "@ionic/angular/css/normalize.css";
+ @import "@ionic/angular/css/structure.css";
+ /* @import "@ionic/angular/css/typography.css"; - Pisa Tailwind */
+ @import "@ionic/angular/css/display.css";
+ /* Optional Ionic */
+ @import "@ionic/angular/css/padding.css";
+ @import "@ionic/angular/css/float-elements.css";
+ @import "@ionic/angular/css/text-alignment.css";
+ @import "@ionic/angular/css/text-transformation.css";
+ @import "@ionic/angular/css/flex-utils.css";
+
+
+ /* 3) Ionic - Angular .dark class
+ * ---------------------------------------------------------------------------- */
+ @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+ /* 4) Variables del proyecto que reemplan las de Ionic
+ * ---------------------------------------------------------------------------- */
+ @import "./theme/variables.css";
+
+
+
+ /* 5) Ionic Components
+ * ---------------------------------------------------------------------------- */
+@import "./theme/ionic-components.css";
+
+
+ /* 6) Tailwind Styles (no pisa los estilos de ionic a no ser que se use "!"antes de la clase)
+ * ---------------------------------------------------------------------------- */
+ @import "tailwindcss";
+
+ @theme{
+  /* Creando clases de tailwind */
+  --font-heading: 'Exo', system-ui, sans-serif;
+ }
+
+ /* 7) Custom Styles
+ * ---------------------------------------------------------------------------- */
+ @import "./theme/custom.css";
+
