@@ -8,9 +8,9 @@
     <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
       <h2 class="text-xl font-bold text-gray-800">
         @if (isCreating) {
-        ➕ Crear {{ modalType | titlecase }}
+          ➕ Crear {{ modalType | titlecase }}
         } @else {
-        ✏️ Editar {{ modalType | titlecase }}
+          ✏️ Editar {{ modalType | titlecase }}
         }
       </h2>
       <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110" (click)="onClose()"
@@ -34,150 +34,150 @@
             </label>
 
             @switch (field.type) {
-            <!-- Input de texto -->
-            @case ('text') {
-            <input [type]="field.inputType || 'text'" [formControlName]="field.name"
-              [placeholder]="field.placeholder || ''" [min]="field.min || null" [step]="field.step || null"
-              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
-              [class.border-red-300]="form?.get(field.name)?.invalid && form?.get(field.name)?.touched"
-              [class.focus:ring-red-500]="form?.get(field.name)?.invalid && form?.get(field.name)?.touched">
+              <!-- Input de texto -->
+              @case ('text') {
+                <input [type]="field.inputType || 'text'" [formControlName]="field.name"
+                  [placeholder]="field.placeholder || ''" [min]="field.min || null" [step]="field.step || null"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
+                  [class.border-red-300]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+                  [class.focus:ring-red-500]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
 
-            <!-- Mensaje de error -->
-            @if (form?.get(field.name)?.invalid && form?.get(field.name)?.touched) {
-            <p class="mt-1 text-xs text-red-600">
-              @if (form?.get(field.name)?.errors?.['required']) {
-              Este campo es obligatorio
-              }
-            </p>
-            }
-            }
-
-            <!-- Textarea -->
-            @case ('textarea') {
-            <textarea [formControlName]="field.name" [placeholder]="field.placeholder || ''" [rows]="field.rows || 3"
-              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400 resize-none"></textarea>
-            }
-
-            <!-- Select -->
-            @case ('select') {
-            <select [formControlName]="field.name"
-              class="w-full px-4 py-3 border text-black border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
-              [class.border-red-300]="form?.get(field.name)?.invalid && form?.get(field.name)?.touched"
-              [class.focus:ring-red-500]="form?.get(field.name)?.invalid && form?.get(field.name)?.touched">
-              <option value="">{{ field.placeholder }}</option>
-              @for (option of field.options || []; track option.value) {
-              <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-
-            <!-- Mensaje de error -->
-            @if (form?.get(field.name)?.invalid && form?.get(field.name)?.touched) {
-            <p class="mt-1 text-xs text-red-600">
-              @if (form?.get(field.name)?.errors?.['required']) {
-              Debes seleccionar una opción
-              }
-            </p>
-            }
-            }
-
-            <!-- Checkbox -->
-            @case ('checkbox') {
-            <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 cursor-pointer">
-              <input type="checkbox" [formControlName]="field.name"
-                class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
-              <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
-            </label>
-            }
-
-            <!-- Días de la semana -->
-            @case ('dias-semana') {
-            <div class="grid grid-cols-3 md:grid-cols-7 gap-2">
-              @for (dia of diasSemanaOptions; track dia.value) {
-              <label class="flex items-center text-sm">
-                <input type="checkbox" [checked]="form?.get('DiasSemana')?.value?.includes(dia.value)"
-                  (change)="onToggleDiaSemana($event, dia.value)"
-                  class="mr-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <span class="text-xs">{{ dia.label.slice(0, 3) }}</span>
-              </label>
-              }
-            </div>
-            }
-
-            <!-- Selección de ejercicios -->
-            @case ('ejercicios-selector') {
-            <div class="border border-gray-300 rounded-xl max-h-60 overflow-y-auto bg-white shadow-inner">
-              @if (ejercicios.length > 0) {
-              @for (ejercicio of ejercicios; track ejercicio.id) {
-              <label
-                class="flex items-center p-4 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
-                <input type="checkbox" [checked]="isEjercicioSelected(ejercicio.id)"
-                  (change)="onToggleEjercicio(ejercicio.id)"
-                  class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <div class="flex-1">
-                  <div class="flex justify-between items-center">
-                    <h4 class="font-medium text-gray-800">{{ ejercicio.nombre }}</h4>
-                    <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                      {{ ejercicio.series }}x{{ ejercicio.repeticiones }}
-                    </span>
-                  </div>
-                  <p class="text-sm text-gray-600 mt-1">
-                    @if (ejercicio.peso && ejercicio.peso > 0) {
-                    <span>{{ ejercicio.peso }}kg • </span>
-                    }
-                    @if (ejercicio.serieSegundos && ejercicio.serieSegundos > 0) {
-                    <span>{{ ejercicio.serieSegundos }}s • </span>
-                    }
-                    @if (ejercicio.descansoSegundos) {
-                    <span>Descanso: {{ ejercicio.descansoSegundos }}s</span>
+                <!-- Mensaje de error -->
+                @if (form.get(field.name)?.invalid && form.get(field.name)?.touched) {
+                  <p class="mt-1 text-xs text-red-600">
+                    @if (form.get(field.name)?.errors?.['required']) {
+                      Este campo es obligatorio
                     }
                   </p>
+                }
+              }
+
+              <!-- Textarea -->
+              @case ('textarea') {
+                <textarea [formControlName]="field.name" [placeholder]="field.placeholder || ''" [rows]="field.rows || 3"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400 resize-none"></textarea>
+              }
+
+              <!-- Select -->
+              @case ('select') {
+                <select [formControlName]="field.name"
+                  class="w-full px-4 py-3 border text-black border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
+                  [class.border-red-300]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+                  [class.focus:ring-red-500]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+                  <option value="">{{ field.placeholder }}</option>
+                  @for (option of field.options || []; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+
+                <!-- Mensaje de error -->
+                @if (form.get(field.name)?.invalid && form.get(field.name)?.touched) {
+                  <p class="mt-1 text-xs text-red-600">
+                    @if (form.get(field.name)?.errors?.['required']) {
+                      Debes seleccionar una opción
+                    }
+                  </p>
+                }
+              }
+
+              <!-- Checkbox -->
+              @case ('checkbox') {
+                <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 cursor-pointer">
+                  <input type="checkbox" [formControlName]="field.name"
+                    class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
+                  <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
+                </label>
+              }
+
+              <!-- Días de la semana -->
+              @case ('dias-semana') {
+                <div class="grid grid-cols-3 md:grid-cols-7 gap-2">
+                  @for (dia of diasSemanaOptions; track dia.value) {
+                    <label class="flex items-center text-sm">
+                      <input type="checkbox" [checked]="form.get('DiasSemana')?.value?.includes(dia.value)"
+                        (change)="onToggleDiaSemana($event, dia.value)"
+                        class="mr-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                      <span class="text-xs">{{ dia.label.slice(0, 3) }}</span>
+                    </label>
+                  }
                 </div>
-              </label>
               }
-              } @else {
-              <div class="p-4 text-center text-gray-500">
-                <p class="text-sm">No hay ejercicios disponibles</p>
-                <p class="text-xs text-gray-400 mt-1">Crea algunos ejercicios primero</p>
-              </div>
+
+              <!-- Selección de ejercicios -->
+              @case ('ejercicios-selector') {
+                <div class="border border-gray-300 rounded-xl max-h-60 overflow-y-auto bg-white shadow-inner">
+                  @if (ejercicios.length > 0) {
+                    @for (ejercicio of ejercicios; track ejercicio.id) {
+                      <label
+                        class="flex items-center p-4 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
+                        <input type="checkbox" [checked]="isEjercicioSelected(ejercicio.id)"
+                          (change)="onToggleEjercicio(ejercicio.id)"
+                          class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <div class="flex-1">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ ejercicio.nombre }}</h4>
+                            <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                              {{ ejercicio.series }}x{{ ejercicio.repeticiones }}
+                            </span>
+                          </div>
+                          <p class="text-sm text-gray-600 mt-1">
+                            @if (ejercicio.peso && ejercicio.peso > 0) {
+                              <span>{{ ejercicio.peso }}kg • </span>
+                            }
+                            @if (ejercicio.serieSegundos && ejercicio.serieSegundos > 0) {
+                              <span>{{ ejercicio.serieSegundos }}s • </span>
+                            }
+                            @if (ejercicio.descansoSegundos) {
+                              <span>Descanso: {{ ejercicio.descansoSegundos }}s</span>
+                            }
+                          </p>
+                        </div>
+                      </label>
+                    }
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay ejercicios disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">Crea algunos ejercicios primero</p>
+                    </div>
+                  }
+                </div>
+
+                <!-- Resumen de ejercicios seleccionados -->
+                @if (selectedEjercicios.length > 0) {
+                  <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                    <h4 class="text-sm font-semibold text-blue-800 mb-3">📋 Ejercicios seleccionados ({{ selectedEjercicios.length }}):</h4>
+                    <div class="flex flex-wrap gap-2">
+                      @for (ejercicioId of selectedEjercicios; track ejercicioId) {
+                        @if (getEjercicioById(ejercicioId); as ejercicio) {
+                          <span class="inline-flex items-center px-3 py-2 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors duration-150">
+                            {{ ejercicio.nombre }}
+                            <button type="button" (click)="onToggleEjercicio(ejercicioId)"
+                              class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none hover:scale-110 transition-transform duration-150">
+                              ✕
+                            </button>
+                          </span>
+                        }
+                      }
+                    </div>
+                  </div>
+                }
               }
-            </div>
 
-            <!-- Resumen de ejercicios seleccionados -->
-            @if (selectedEjercicios.length > 0) {
-            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-              <h4 class="text-sm font-semibold text-blue-800 mb-3">📋 Ejercicios seleccionados ({{ selectedEjercicios.length }}):</h4>
-              <div class="flex flex-wrap gap-2">
-                @for (ejercicioId of selectedEjercicios; track ejercicioId) {
-                @if (getEjercicioById(ejercicioId); as ejercicio) {
-                <span class="inline-flex items-center px-3 py-2 text-xs bg-blue-100 text-blue-800 rounded-full hover:bg-blue-200 transition-colors duration-150">
-                  {{ ejercicio.nombre }}
-                  <button type="button" (click)="onToggleEjercicio(ejercicioId)"
-                    class="ml-2 text-blue-600 hover:text-blue-800 focus:outline-none hover:scale-110 transition-transform duration-150">
-                    ✕
-                  </button>
-                </span>
-                }
-                }
-              </div>
-            </div>
-            }
-            }
-
-            <!-- Estados de rutina -->
-            @case ('rutina-estados') {
-            <div class="space-y-3">
-              <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-200 cursor-pointer">
-                <input type="checkbox" formControlName="activa"
-                  class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
-                <span class="text-sm font-semibold text-gray-700">✅ Rutina Activa</span>
-              </label>
-              <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-green-300 transition-all duration-200 cursor-pointer">
-                <input type="checkbox" formControlName="completado"
-                  class="mr-3 h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded-md">
-                <span class="text-sm font-semibold text-gray-700">✓ Completado</span>
-              </label>
-            </div>
-            }
+              <!-- Estados de rutina -->
+              @case ('rutina-estados') {
+                <div class="space-y-3">
+                  <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-blue-300 transition-all duration-200 cursor-pointer">
+                    <input type="checkbox" formControlName="activa"
+                      class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
+                    <span class="text-sm font-semibold text-gray-700">✅ Rutina Activa</span>
+                  </label>
+                  <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-green-300 transition-all duration-200 cursor-pointer">
+                    <input type="checkbox" formControlName="completado"
+                      class="mr-3 h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded-md">
+                    <span class="text-sm font-semibold text-gray-700">✓ Completado</span>
+                  </label>
+                </div>
+              }
             }
           </div>
           }
