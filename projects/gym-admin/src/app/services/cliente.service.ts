@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
-import { Cliente } from '@gym-library/models/cliente.model';
+import { Cliente } from 'gym-library';
 import { 
   Firestore, 
   collection, 

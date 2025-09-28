@@ -15,6 +15,12 @@ export * from './lib/models/entrenador.model';
 export * from './lib/models/ejercicio.model';
 export * from './lib/models/rutina.model';
 export * from './lib/models/invitacion.model';
+export * from './lib/models/environment.model';
+/*
+ * environments
+ */
+export * from './lib/environments/environment';
+export * from './lib/environments/environment.prod';
 
 
 export * from './lib/gym-library';

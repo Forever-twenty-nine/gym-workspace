@@ -6,7 +6,7 @@
     "outDir": "./out-tsc/app",
     "types": [],
     "paths": {
-      "@gym-library/*": ["../../projects/gym-library/src/lib/*"]
+      "gym-library": ["../../dist/gym-library"]
     }
   },
   "include": [
