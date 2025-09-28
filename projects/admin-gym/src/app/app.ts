@@ -6,7 +6,7 @@ import { EjercicioService } from './services/ejercicio.service';
 import { UserService } from './services/user.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina } from './models/rutina.model';
-import { Rol } from './enums/rol.enum';
+import { Rol } from '../../../gym-library/src/lib/enums/rol.enum';
 import { CommonModule } from '@angular/common';
 /** 
  * Interfaz para la configuración de campos del formulario dinámico

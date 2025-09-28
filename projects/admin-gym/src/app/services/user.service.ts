@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, inject, computed } from '@angular/core';
-import { User } from '../models/user.model';
+import { User } from '@gym-library/models/user.model';
 import { Firestore } from '@angular/fire/firestore';
 import { collection, getDocs, addDoc, doc, deleteDoc, DocumentData, onSnapshot } from 'firebase/firestore';
 

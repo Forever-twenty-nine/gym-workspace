@@ -11,7 +11,7 @@ import {
   QuerySnapshot,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { Ejercicio } from '../models/ejercicio.model';
+import { Ejercicio } from '@gym-library/models/ejercicio.model';
 
 @Injectable({ providedIn: 'root' })
 export class EjercicioService {

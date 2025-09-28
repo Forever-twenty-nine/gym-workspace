@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, inject } from "@angular/core";
-import { Rutina } from "../models/rutina.model";
+import { Rutina } from "@gym-library/models/rutina.model";
 import { 
   Firestore, 
   collection, 
