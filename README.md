@@ -26,32 +26,72 @@ Librería Angular que contiene modelos, enums y utilidades compartidas entre las
 - **Propósito**: Mantener consistencia de tipos y estructuras de datos
 - **Ubicación**: `projects/gym-library/`
 
+## 🚀 Desarrollo
 
-### Construcción del Proyecto
-Para construir el proyecto ejecuta:
+Este es un **multi-repositorio** que contiene tres proyectos independientes. Cada proyecto tiene sus propias dependencias y configuraciones.
 
+### 📦 Instalación de Dependencias
 
+Para instalar todas las dependencias de todos los proyectos:
 
-
-
-
-Esto compilará tu proyecto y almacenará los artefactos de construcción en el directorio `dist/`. Por defecto, la construcción de producción optimiza tu aplicación para rendimiento y velocidad.
-
-### Desarrollo por Aplicación
-
-#### Gym Admin (Web)
 ```bash
-ng serve gym-admin
+npm run install:all
 ```
 
-#### Tabs App (Móvil)
+O instalar individualmente:
 ```bash
-ng serve tabs-app
+# Workspace principal (solo para la librería)
+npm install
+
+# Proyecto gym-admin
+cd projects/gym-admin && npm install
+
+# Proyecto tabs-app  
+cd projects/tabs-app && npm install
 ```
 
-#### Construcción de la Librería
+### 🛠️ Desarrollo por Aplicación
+
+#### 🏢 Gym Admin (Aplicación Web)
 ```bash
+# Opción 1: Usando script del workspace
+npm run gym-admin:serve
+
+# Opción 2: Desde el directorio del proyecto
+cd projects/gym-admin
+npm run start
+```
+
+#### 📱 Tabs App (Aplicación Móvil)
+```bash
+# Opción 1: Usando script del workspace
+npm run tabs-app:serve
+
+# Opción 2: Desde el directorio del proyecto
+cd projects/tabs-app
+ionic serve
+```
+
+#### 📚 Gym Library (Librería Compartida)
+```bash
+# Opción 1: Usando script del workspace
+npm run library:build
+
+# Opción 2: Desde la raíz del workspace
 ng build gym-library
+```
+
+### 🔨 Construcción de Proyectos
+
+```bash
+# Gym Admin
+npm run gym-admin:build
+
+# Tabs App
+npm run tabs-app:build
+
+# Gym Library
+npm run library:build
 ```
 
 ## 🧪 Pruebas
@@ -80,14 +120,20 @@ Angular CLI no incluye un framework de testing e2e por defecto. Puedes elegir un
 
 ### Comandos Específicos para Móvil
 ```bash
-# Servir en modo desarrollo
-ionic serve
+# Servir en modo desarrollo (desde workspace)
+npm run tabs-app:serve
 
 # Sincronizar con plataformas nativas
-npx cap sync
+npm run tabs-app:sync
 
-# Abrir en Android Studio
-npx cap open android
+# Ejecutar en Android
+npm run tabs-app:android
+
+# O desde el directorio del proyecto:
+cd projects/tabs-app
+ionic serve
+ionic cap sync
+ionic cap run android
 ```
 
 ## 🏗️ Arquitectura del Proyecto

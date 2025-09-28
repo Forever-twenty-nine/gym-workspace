@@ -6,7 +6,17 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "gym-admin:serve": "cd projects/gym-admin && npm run start",
+    "gym-admin:build": "cd projects/gym-admin && npm run build",
+    "gym-admin:test": "cd projects/gym-admin && npm run test",
+    "tabs-app:serve": "cd projects/tabs-app && ionic serve",
+    "tabs-app:build": "cd projects/tabs-app && ionic build",
+    "tabs-app:android": "cd projects/tabs-app && ionic cap run android",
+    "tabs-app:sync": "cd projects/tabs-app && ionic cap sync",
+    "library:build": "ng build gym-library",
+    "library:test": "ng test gym-library",
+    "install:all": "npm install && cd projects/gym-admin && npm install && cd ../tabs-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {
     "overrides": [
