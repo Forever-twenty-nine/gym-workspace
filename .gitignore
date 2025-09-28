@@ -46,7 +46,7 @@ Thumbs.db
 # PROJECT-SPECIFIC IGNORES
 # ==============================================
 
-# Ionic/Capacitor (tabs-app)
+# Ionic/Capacitor (gym-app)
 # ---------------------------------------------
 *~
 *.sw[mnpcod]
@@ -76,7 +76,7 @@ $RECYCLE.BIN/
 # Additional IDE files
 *.sublime-project
 
-# Android (tabs-app/android)
+# Android (gym-app/android)
 # ---------------------------------------------
 # Built application files
 *.apk

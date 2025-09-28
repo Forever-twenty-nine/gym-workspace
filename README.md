@@ -11,13 +11,13 @@ Aplicación web para administradores de gimnasios construida con Angular 20 y Fi
 - **Servicios**: ClienteService, EjercicioService, RutinaService, UserService
 - **Ubicación**: `projects/gym-admin/`
 
-### 📱 **tabs-app** - Aplicación Móvil Híbrida
+### 📱 **gym-app** - Aplicación Móvil Híbrida
 Aplicación móvil multiplataforma desarrollada con Ionic y Capacitor para clientes y entrenadores:
 - **Tecnologías**: Ionic 8, Angular 20, Capacitor 7, Firebase
 - **Plataformas**: Android (incluye configuración nativa)
 - **Módulos**: Auth, Cliente, Entrenador, Gimnasio
 - **Características**: Autenticación, gestión de rutinas, seguimiento de progreso
-- **Ubicación**: `projects/tabs-app/`
+- **Ubicación**: `projects/gym-app/`
 
 ### 📚 **gym-library** - Librería Compartida
 Librería Angular que contiene modelos, enums y utilidades compartidas entre las aplicaciones:
@@ -46,8 +46,8 @@ npm install
 # Proyecto gym-admin
 cd projects/gym-admin && npm install
 
-# Proyecto tabs-app  
-cd projects/tabs-app && npm install
+# Proyecto gym-app  
+cd projects/gym-app && npm install
 ```
 
 ### 🛠️ Desarrollo por Aplicación
@@ -62,13 +62,13 @@ cd projects/gym-admin
 npm run start
 ```
 
-#### 📱 Tabs App (Aplicación Móvil)
+#### 📱 Gym App (Aplicación Móvil)
 ```bash
 # Opción 1: Usando script del workspace
-npm run tabs-app:serve
+npm run gym-app:serve
 
 # Opción 2: Desde el directorio del proyecto
-cd projects/tabs-app
+cd projects/gym-app
 ionic serve
 ```
 
@@ -87,8 +87,8 @@ ng build gym-library
 # Gym Admin
 npm run gym-admin:build
 
-# Tabs App
-npm run tabs-app:build
+# Gym App
+npm run gym-app:build
 
 # Gym Library
 npm run library:build
@@ -110,7 +110,7 @@ ng e2e
 
 Angular CLI no incluye un framework de testing e2e por defecto. Puedes elegir uno que se adapte a tus necesidades.
 
-## 📱 Desarrollo Móvil (Tabs App)
+## 📱 Desarrollo Móvil (Gym App)
 
 ### Prerrequisitos
 - Node.js y npm
@@ -121,16 +121,16 @@ Angular CLI no incluye un framework de testing e2e por defecto. Puedes elegir un
 ### Comandos Específicos para Móvil
 ```bash
 # Servir en modo desarrollo (desde workspace)
-npm run tabs-app:serve
+npm run gym-app:serve
 
 # Sincronizar con plataformas nativas
-npm run tabs-app:sync
+npm run gym-app:sync
 
 # Ejecutar en Android
-npm run tabs-app:android
+npm run gym-app:android
 
 # O desde el directorio del proyecto:
-cd projects/tabs-app
+cd projects/gym-app
 ionic serve
 ionic cap sync
 ionic cap run android
@@ -142,7 +142,7 @@ ionic cap run android
 gym-workspace/
 ├── projects/
 │   ├── gym-admin/          # 🏢 Aplicación web de administración
-│   ├── tabs-app/           # 📱 Aplicación móvil híbrida
+│   ├── gym-app/            # 📱 Aplicación móvil híbrida
 │   └── gym-library/        # 📚 Librería compartida
 ├── package.json            # Dependencias del workspace
 └── angular.json           # Configuración de Angular CLI
