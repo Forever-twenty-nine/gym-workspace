@@ -7,28 +7,29 @@ import { UserService } from './services/user.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol } from 'gym-library';
 import { CommonModule } from '@angular/common';
-/** 
- * Interfaz para la configuración de campos del formulario dinámico
-  */
-interface FormFieldConfig {
-  name: string;
-  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'dias-semana' | 'ejercicios-selector' | 'rutina-estados';
-  label: string;
-  icon: string;
-  placeholder?: string;
-  colSpan?: number;
-  inputType?: string;
-  min?: number;
-  step?: number;
-  rows?: number;
-  options?: { value: any; label: string }[];
-  checkboxLabel?: string;
-}
+
+// Importar los nuevos componentes
+import { UsuariosCardComponent } from './components/usuarios-card/usuarios-card.component';
+import { ClientesCardComponent } from './components/clientes-card/clientes-card.component';
+import { RutinasCardComponent } from './components/rutinas-card/rutinas-card.component';
+import { EjerciciosCardComponent } from './components/ejercicios-card/ejercicios-card.component';
+import { LogsSectionComponent } from './components/logs-section/logs-section.component';
+import { ModalFormComponent, FormFieldConfig } from './components/modal-form/modal-form.component';
+
 
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, ReactiveFormsModule],
+  imports: [ 
+    CommonModule, 
+    ReactiveFormsModule,
+    UsuariosCardComponent,
+    ClientesCardComponent,
+    RutinasCardComponent,
+    EjerciciosCardComponent,
+    LogsSectionComponent,
+    ModalFormComponent
+  ],
   templateUrl: './app.html'
 })
 export class App {
@@ -525,6 +526,18 @@ export class App {
       const newDays = currentDays.filter((d: number) => d !== diaValue);
       form.patchValue({ DiasSemana: newDays });
     }
+  }
+
+  /**
+   * Método adaptador para el modal component
+   */
+  onToggleDiaSemana(eventData: { event: Event; value: string }) {
+    // Convertir el valor de string a número ya que los días están numerados
+    const diaMap: Record<string, number> = {
+      'L': 1, 'M': 2, 'X': 3, 'J': 4, 'V': 5, 'S': 6, 'D': 0
+    };
+    const diaValue = diaMap[eventData.value];
+    this.toggleDiaSemana(eventData.event, diaValue);
   }
 
   /**

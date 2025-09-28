@@ -1,0 +1,60 @@
+<div class="p-6 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+  <h2 class="font-bold text-gray-800 mb-4 text-lg flex items-center gap-2">📋 Rutinas</h2>
+  <div class="space-y-3">
+    <button class="w-full px-4 py-3 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+      [class]="canCreateRutina ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-400 cursor-not-allowed'"
+      [disabled]="!canCreateRutina" (click)="onCreateRutina()"
+      [title]="canCreateRutina ? 'Crear rutina' : validationMessage">
+      @if (canCreateRutina) {
+      ➕ Crear rutina
+      } @else {
+      ⚠️ Sin usuarios suficientes
+      }
+    </button>
+
+    <!-- Mensaje de validación -->
+    @if (!canCreateRutina) {
+    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+      <div class="flex items-center gap-2">
+        <span class="text-amber-500">⚠️</span>
+        <p class="text-xs text-amber-700 font-medium">{{ validationMessage }}</p>
+      </div>
+    </div>
+    }
+
+    <!-- Lista de rutinas -->
+    <div class="border border-gray-200 rounded-xl bg-gray-50 max-h-80 overflow-y-auto">
+      @for (rutina of rutinas; track rutina.id) {
+      <div class="px-4 py-3 border-b border-gray-200 last:border-b-0 hover:bg-white transition-colors duration-150">
+        <div class="flex justify-between items-center">
+          <div>
+            <h4 class="font-medium text-gray-800">{{ rutina.nombre }}</h4>
+            <p class="text-sm text-gray-600">
+              👤 {{ getClienteName(rutina.clienteId || '') }}
+            </p>
+            <p class="text-xs text-gray-500">
+              🏃‍♂️ {{ getEntrenadorName(rutina.entrenadorId || '') }}
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <button class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-all duration-150 hover:scale-110"
+              (click)="onEditRutina(rutina)" title="Editar">
+              ✏️
+            </button>
+            <button class="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 rounded-lg transition-all duration-150 hover:scale-110"
+              (click)="onDeleteRutina(rutina.id)" title="Eliminar">
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+      } @empty {
+      <div class="px-4 py-8 text-center text-gray-500">
+        <div class="text-4xl mb-2">📋</div>
+        <p class="text-sm font-medium">No hay rutinas creadas</p>
+        <p class="text-xs text-gray-400 mt-1">Crea planes de entrenamiento</p>
+      </div>
+      }
+    </div>
+  </div>
+</div>
