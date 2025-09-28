@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "admin-gym": {
+    "gym-admin": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -53,10 +53,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "admin-gym:build:production"
+              "buildTarget": "gym-admin:build:production"
             },
             "development": {
-              "buildTarget": "admin-gym:build:development"
+              "buildTarget": "gym-admin:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -4,12 +4,12 @@ Este repositorio contiene un monorepo de Angular que incluye múltiples aplicaci
 
 ## 📋 Contenido del Repositorio
 
-### 🏢 **admin-gym** - Panel de Administración Web
+### 🏢 **gym-admin** - Panel de Administración Web
 Aplicación web para administradores de gimnasios construida con Angular 20 y Firebase. Incluye:
 - **Tecnologías**: Angular 20, Firebase/Firestore, TailwindCSS
 - **Características**: Gestión de clientes, rutinas, ejercicios y entrenadores
 - **Servicios**: ClienteService, EjercicioService, RutinaService, UserService
-- **Ubicación**: `projects/admin-gym/`
+- **Ubicación**: `projects/gym-admin/`
 
 ### 📱 **tabs-app** - Aplicación Móvil Híbrida
 Aplicación móvil multiplataforma desarrollada con Ionic y Capacitor para clientes y entrenadores:
@@ -39,9 +39,9 @@ Esto compilará tu proyecto y almacenará los artefactos de construcción en el 
 
 ### Desarrollo por Aplicación
 
-#### Admin Gym (Web)
+#### Gym Admin (Web)
 ```bash
-ng serve admin-gym
+ng serve gym-admin
 ```
 
 #### Tabs App (Móvil)
@@ -95,7 +95,7 @@ npx cap open android
 ```
 gym-workspace/
 ├── projects/
-│   ├── admin-gym/          # 🏢 Aplicación web de administración
+│   ├── gym-admin/          # 🏢 Aplicación web de administración
 │   ├── tabs-app/           # 📱 Aplicación móvil híbrida
 │   └── gym-library/        # 📚 Librería compartida
 ├── package.json            # Dependencias del workspace
