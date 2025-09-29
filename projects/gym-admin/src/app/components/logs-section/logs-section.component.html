@@ -1,13 +1,12 @@
 <section class="p-6 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
-  <h2 class="font-bold text-gray-800 mb-4 text-lg flex items-center gap-2">📜 Logs del Sistema</h2>
+  <h2 class="font-bold text-gray-800 mb-4 text-lg flex items-center gap-2">Logs del Sistema</h2>
   <div class="border border-gray-200 rounded-xl bg-gray-50 max-h-72 overflow-y-auto">
-    @for (log of logs; track $index) {
+    @for (log of logs(); track trackByIndex($index)) {
     <div class="px-4 py-3 border-b border-gray-200 last:border-b-0 hover:bg-white transition-colors duration-150">
       <p class="text-sm text-gray-700 font-mono">{{ log }}</p>
     </div>
     } @empty {
     <div class="px-4 py-8 text-center text-gray-500">
-      <div class="text-4xl mb-2">📜</div>
       <p class="text-sm font-medium">No hay logs disponibles</p>
       <p class="text-xs text-gray-400 mt-1">Las actividades aparecerán aquí</p>
     </div>

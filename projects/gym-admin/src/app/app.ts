@@ -1,5 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { ClienteService } from './services/cliente.service';
 import { RutinaService } from './services/rutina.service';
 import { EjercicioService } from './services/ejercicio.service';
@@ -8,11 +7,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Rutina, Rol } from 'gym-library';
 import { CommonModule } from '@angular/common';
 
-// Importar los nuevos componentes
-import { UsuariosCardComponent } from './components/usuarios-card/usuarios-card.component';
-import { ClientesCardComponent } from './components/clientes-card/clientes-card.component';
-import { RutinasCardComponent } from './components/rutinas-card/rutinas-card.component';
-import { EjerciciosCardComponent } from './components/ejercicios-card/ejercicios-card.component';
+// Importar componentes
+import { GenericCardComponent, CardConfig } from './components/shared/generic-card/generic-card.component';
 import { LogsSectionComponent } from './components/logs-section/logs-section.component';
 import { ModalFormComponent, FormFieldConfig } from './components/modal-form/modal-form.component';
 
@@ -23,54 +19,84 @@ import { ModalFormComponent, FormFieldConfig } from './components/modal-form/mod
   imports: [ 
     CommonModule, 
     ReactiveFormsModule,
-    UsuariosCardComponent,
-    ClientesCardComponent,
-    RutinasCardComponent,
-    EjerciciosCardComponent,
+    GenericCardComponent,
     LogsSectionComponent,
     ModalFormComponent
   ],
-  templateUrl: './app.html'
+  templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App {
-  /**
-  * Servicios
-  */
-  private clienteService = inject(ClienteService);
-  private rutinaService = inject(RutinaService);
-  private ejercicioService = inject(EjercicioService);
-  private userService = inject(UserService);
-  private fb = inject(FormBuilder);
+  // Servicios inyectados
+  private readonly clienteService = inject(ClienteService);
+  private readonly rutinaService = inject(RutinaService);
+  private readonly ejercicioService = inject(EjercicioService);
+  private readonly userService = inject(UserService);
+  private readonly fb = inject(FormBuilder);
 
-  /**
-   * Clientes
-   */
-  clientes = this.clienteService.obtenerClientes();
-  rutinas = this.rutinaService.obtenerRutinas();
-  ejercicios = this.ejercicioService.obtenerEjercicios();
-  usuarios = this.userService.users;
+  // Signals reactivas para datos
+  readonly clientes = this.clienteService.obtenerClientes();
+  readonly rutinas = this.rutinaService.obtenerRutinas();
+  readonly ejercicios = this.ejercicioService.obtenerEjercicios();
+  readonly usuarios = this.userService.users;
 
-  constructor() {
-    // Componente inicializado
-  }
+  // Configuraciones simples para los cards
+  readonly usuariosCardConfig: CardConfig = {
+    title: 'Usuarios',
+    createButtonText: 'Crear Usuario',
+    createButtonColor: 'blue',
+    emptyStateTitle: 'No hay usuarios creados',
+    displayField: 'nombre',
+    showCounter: true,
+    counterColor: 'blue'
+  };
 
-  // Logs locales como señal mutable
-  logs = signal<string[]>([]);
+  readonly clientesCardConfig: CardConfig = {
+    title: 'Clientes',
+    createButtonText: 'Crear Cliente',
+    createButtonColor: 'green',
+    emptyStateTitle: 'No hay clientes registrados',
+    displayField: 'gimnasioId',
+    showCounter: true,
+    counterColor: 'green'
+  };
 
-  // Estado del modal
-  isModalOpen = signal(false);
-  modalData = signal<any>(null);
-  modalType = signal<string>('');
-  editForm = signal<FormGroup | null>(null);
-  isLoading = signal(false);
-  isCreating = signal(false);
-  selectedEjercicios = signal<string[]>([]);
+  readonly rutinasCardConfig: CardConfig = {
+    title: 'Rutinas',
+    createButtonText: 'Crear Rutina',
+    createButtonColor: 'purple',
+    emptyStateTitle: 'No hay rutinas creadas',
+    displayField: 'nombre',
+    showCounter: true,
+    counterColor: 'purple'
+  };
 
-  /**
-   * Conjunto (Map) reactivo de rutinas indexado por id.
-   * Ejemplo de uso: `conjuntoRutinas().get(rutinaId)`
-   */
-  conjuntoRutinas = computed(() => {
+  readonly ejerciciosCardConfig: CardConfig = {
+    title: 'Ejercicios',
+    createButtonText: 'Crear Ejercicio',
+    createButtonColor: 'orange',
+    emptyStateTitle: 'No hay ejercicios creados',
+    displayField: 'nombre',
+    showCounter: true,
+    counterColor: 'orange'
+  };
+
+
+
+
+
+  // Signals para el estado del componente
+  readonly logs = signal<string[]>([]);
+  readonly isModalOpen = signal(false);
+  readonly modalData = signal<any>(null);
+  readonly modalType = signal<string>('');
+  readonly editForm = signal<FormGroup | null>(null);
+  readonly isLoading = signal(false);
+  readonly isCreating = signal(false);
+  readonly selectedEjercicios = signal<string[]>([]);
+
+  // Computed signal para rutinas indexadas por ID
+  readonly conjuntoRutinas = computed(() => {
     const m = new Map<string, Rutina>();
     for (const r of this.rutinas()) {
       if (r?.id) m.set(r.id, r as Rutina);
@@ -144,7 +170,7 @@ export class App {
   async addSampleRutina() {
 
     if (!this.canCreateRutina()) {
-      this.log(`❌ ${this.getRutinaValidationMessage()}`);
+      this.log(`Error: ${this.getRutinaValidationMessage()}`);
       return;
     }
 
@@ -370,7 +396,7 @@ export class App {
     const originalData = this.modalData();
 
     if (!form || !originalData) {
-      this.log('❌ Formulario inválido o datos faltantes');
+      this.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
@@ -381,18 +407,18 @@ export class App {
       const entrenadorId = form.get('entrenadorId')?.value;
 
       if (!clienteId) {
-        this.log('❌ Debes seleccionar un cliente para la rutina');
+        this.log('Error: Debes seleccionar un cliente para la rutina');
         return;
       }
 
       if (!entrenadorId) {
-        this.log('❌ Debes seleccionar un entrenador para la rutina');
+        this.log('Error: Debes seleccionar un entrenador para la rutina');
         return;
       }
     }
 
     if (!form.valid) {
-      this.log('❌ Por favor, completa todos los campos obligatorios');
+      this.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -410,31 +436,31 @@ export class App {
       switch (type) {
         case 'usuario':
           await this.userService.addUser(updatedData);
-          this.log(`✅ Usuario ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
+          this.log(`Usuario ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
           break;
 
         case 'cliente':
           await this.clienteService.guardarCliente(updatedData);
-          this.log(`✅ Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.id}`);
+          this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.id}`);
           break;
 
         case 'rutina':
           await this.rutinaService.guardarRutina(updatedData);
           const clienteNombre = updatedData.clienteId ? this.getClienteName(updatedData.clienteId) : 'Sin cliente';
           const entrenadorNombre = updatedData.entrenadorId ? this.getEntrenadorName(updatedData.entrenadorId) : 'Sin entrenador';
-          this.log(`✅ Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
+          this.log(`Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
           break;
 
         case 'ejercicio':
           await this.ejercicioService.guardarEjercicio(updatedData);
-          this.log(`✅ Ejercicio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
+          this.log(`Ejercicio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
           break;
       }
 
       this.closeModal();
     } catch (error) {
       console.error('Error al guardar:', error);
-      this.log(`❌ Error al guardar los cambios: ${error}`);
+      this.log(`Error al guardar los cambios: ${error}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -497,16 +523,12 @@ export class App {
     return '';
   }
 
-  /**
-   * �🏢 Obtiene los roles disponibles
-   */
+  // Obtiene los roles disponibles
   getRolesDisponibles() {
     return Object.values(Rol);
   }
 
-  /**
-   * 📅 Maneja el toggle de días de la semana en rutinas
-   */
+  // Maneja el toggle de días de la semana en rutinas
   toggleDiaSemana(event: Event, diaValue: number) {
     const checkbox = event.target as HTMLInputElement;
     const form = this.editForm();
@@ -540,9 +562,7 @@ export class App {
     this.toggleDiaSemana(eventData.event, diaValue);
   }
 
-  /**
-   * 🏋️ Maneja la selección/deselección de ejercicios para rutinas
-   */
+  // Maneja la selección/deselección de ejercicios para rutinas
   toggleEjercicio(ejercicioId: string) {
     const current = this.selectedEjercicios();
 
@@ -555,23 +575,17 @@ export class App {
     }
   }
 
-  /**
-   * 🔍 Verifica si un ejercicio está seleccionado
-   */
+  // Verifica si un ejercicio está seleccionado
   isEjercicioSelected(ejercicioId: string): boolean {
     return this.selectedEjercicios().includes(ejercicioId);
   }
 
-  /**
-   * 🏋️ Obtiene los detalles de un ejercicio por ID
-   */
+  // Obtiene los detalles de un ejercicio por ID
   getEjercicioById(ejercicioId: string) {
     return this.ejercicios().find(e => e.id === ejercicioId);
   }
 
-  /**
-   * 🔧 Obtiene la configuración de campos del formulario según el tipo de modal
-   */
+  // Obtiene la configuración de campos del formulario según el tipo de modal
   getFormFields(): FormFieldConfig[] {
     const type = this.modalType();
 
@@ -582,7 +596,6 @@ export class App {
             name: 'nombre',
             type: 'text',
             label: 'Nombre',
-            icon: '📝',
             placeholder: 'Nombre del usuario',
             colSpan: 2
           },
@@ -591,7 +604,6 @@ export class App {
             type: 'text',
             inputType: 'email',
             label: 'Email',
-            icon: '📧',
             placeholder: 'email@ejemplo.com',
             colSpan: 2
           },
@@ -599,7 +611,6 @@ export class App {
             name: 'role',
             type: 'select',
             label: 'Rol',
-            icon: '👥',
             placeholder: 'Seleccionar rol',
             options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
             colSpan: 1
@@ -608,7 +619,6 @@ export class App {
             name: 'gimnasioId',
             type: 'text',
             label: 'Gimnasio ID',
-            icon: '🏢',
             placeholder: 'ID del gimnasio',
             colSpan: 1
           }
@@ -620,7 +630,6 @@ export class App {
             name: 'gimnasioId',
             type: 'text',
             label: 'Gimnasio ID',
-            icon: '🏢',
             placeholder: 'ID del gimnasio',
             colSpan: 1
           },
@@ -628,7 +637,6 @@ export class App {
             name: 'activo',
             type: 'checkbox',
             label: 'Estado',
-            icon: '✅',
             checkboxLabel: 'Cliente Activo',
             colSpan: 1
           },
@@ -636,7 +644,6 @@ export class App {
             name: 'objetivo',
             type: 'textarea',
             label: 'Objetivo',
-            icon: '🎯',
             placeholder: 'Objetivo del cliente...',
             rows: 3,
             colSpan: 2
@@ -649,7 +656,6 @@ export class App {
             name: 'nombre',
             type: 'text',
             label: 'Nombre de la Rutina',
-            icon: '📋',
             placeholder: 'Nombre de la rutina',
             colSpan: 2
           },
@@ -657,7 +663,6 @@ export class App {
             name: 'clienteId',
             type: 'select',
             label: 'Cliente',
-            icon: '👤',
             placeholder: 'Seleccionar cliente',
             options: this.getClientesDisponibles().map(cliente => ({
               value: cliente.uid,
@@ -669,7 +674,6 @@ export class App {
             name: 'entrenadorId',
             type: 'select',
             label: 'Entrenador',
-            icon: '🏃‍♂️',
             placeholder: 'Seleccionar entrenador',
             options: this.getEntrenadoresDisponibles().map(entrenador => ({
               value: entrenador.uid,
@@ -681,21 +685,18 @@ export class App {
             name: 'estados',
             type: 'rutina-estados',
             label: 'Estados',
-            icon: '⚙️',
             colSpan: 2
           },
           {
             name: 'DiasSemana',
             type: 'dias-semana',
             label: 'Días de la Semana',
-            icon: '📅',
             colSpan: 2
           },
           {
             name: 'ejercicios',
             type: 'ejercicios-selector',
             label: `Ejercicios (${this.selectedEjercicios().length} seleccionados)`,
-            icon: '🏋️',
             colSpan: 2
           }
         ];
@@ -706,7 +707,6 @@ export class App {
             name: 'nombre',
             type: 'text',
             label: 'Nombre del Ejercicio',
-            icon: '🏋️',
             placeholder: 'Nombre del ejercicio',
             colSpan: 2
           },
@@ -714,7 +714,6 @@ export class App {
             name: 'descripcion',
             type: 'textarea',
             label: 'Descripción',
-            icon: '📝',
             placeholder: 'Descripción del ejercicio...',
             rows: 2,
             colSpan: 2
@@ -724,7 +723,6 @@ export class App {
             type: 'text',
             inputType: 'number',
             label: 'Series',
-            icon: '🔢',
             placeholder: 'Número de series',
             min: 1,
             colSpan: 1
@@ -734,7 +732,6 @@ export class App {
             type: 'text',
             inputType: 'number',
             label: 'Repeticiones',
-            icon: '🔁',
             placeholder: 'Repeticiones por serie',
             min: 1,
             colSpan: 1
@@ -744,7 +741,6 @@ export class App {
             type: 'text',
             inputType: 'number',
             label: 'Peso (kg)',
-            icon: '⚖️',
             placeholder: 'Peso en kilogramos',
             min: 0,
             step: 0.5,
@@ -755,7 +751,6 @@ export class App {
             type: 'text',
             inputType: 'number',
             label: 'Duración de Serie (seg)',
-            icon: '⏱️',
             placeholder: 'Duración por serie',
             min: 0,
             colSpan: 1
@@ -765,7 +760,6 @@ export class App {
             type: 'text',
             inputType: 'number',
             label: 'Descanso (seg)',
-            icon: '😴',
             placeholder: 'Tiempo de descanso entre series',
             min: 0,
             colSpan: 2
@@ -777,9 +771,7 @@ export class App {
     }
   }
 
-  /**
-   * 🧹 Limpia campos undefined de un objeto
-   */
+  // Limpia campos undefined de un objeto
   private cleanUndefinedFields(obj: any): any {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(obj)) {

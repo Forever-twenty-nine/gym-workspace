@@ -1,50 +1,57 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6 space-y-8">
 
   <div class="flex items-center justify-between">
-    <h1 class="text-3xl font-bold text-white drop-shadow-lg">🏋️ Admin Gym - Test de Servicios</h1>
+    <h1 class="text-3xl font-bold text-white drop-shadow-lg">Admin Gym - Test de Servicios</h1>
   </div>
 
   <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
     <!-- Usuarios -->
-    <app-usuarios-card 
-      [usuarios]="usuarios()"
-      (createUsuario)="addSampleUsuario()"
-      (editUsuario)="openDetailsModal($event, 'usuario')"
-      (deleteUsuario)="deleteUsuario($event)">
-    </app-usuarios-card>
+    <app-generic-card
+      [config]="usuariosCardConfig"
+      [items]="usuarios()"
+      [idField]="'uid'"
+      (create)="addSampleUsuario()"
+      (edit)="openDetailsModal($event, 'usuario')"
+      (delete)="deleteUsuario($event)">
+    </app-generic-card>
 
     <!-- Clientes -->
-    <app-clientes-card 
-      [clientes]="clientes()"
-      (createCliente)="addSampleCliente()"
-      (editCliente)="openDetailsModal($event, 'cliente')"
-      (deleteCliente)="deleteCliente($event)">
-    </app-clientes-card>
+    <app-generic-card
+      [config]="clientesCardConfig"
+      [items]="clientes()"
+      [idField]="'id'"
+      (create)="addSampleCliente()"
+      (edit)="openDetailsModal($event, 'cliente')"
+      (delete)="deleteCliente($event)">
+    </app-generic-card>
 
     <!-- Rutinas -->
-    <app-rutinas-card 
-      [rutinas]="rutinas()"
-      [usuarios]="usuarios()"
-      [canCreateRutina]="canCreateRutina()"
+    <app-generic-card
+      [config]="rutinasCardConfig"
+      [items]="rutinas()"
+      [idField]="'id'"
+      [canCreate]="canCreateRutina()"
       [validationMessage]="getRutinaValidationMessage()"
-      (createRutina)="addSampleRutina()"
-      (editRutina)="openDetailsModal($event, 'rutina')"
-      (deleteRutina)="deleteRutina($event)">
-    </app-rutinas-card>
+      (create)="addSampleRutina()"
+      (edit)="openDetailsModal($event, 'rutina')"
+      (delete)="deleteRutina($event)">
+    </app-generic-card>
 
     <!-- Ejercicios -->
-    <app-ejercicios-card 
-      [ejercicios]="ejercicios()"
-      (createEjercicio)="addSampleEjercicio()"
-      (editEjercicio)="openDetailsModal($event, 'ejercicio')"
-      (deleteEjercicio)="deleteEjercicio($event)">
-    </app-ejercicios-card>
+    <app-generic-card
+      [config]="ejerciciosCardConfig"
+      [items]="ejercicios()"
+      [idField]="'id'"
+      (create)="addSampleEjercicio()"
+      (edit)="openDetailsModal($event, 'ejercicio')"
+      (delete)="deleteEjercicio($event)">
+    </app-generic-card>
   </section>
 
   <!-- Logs -->
   <app-logs-section [logs]="logs()"></app-logs-section>
 
-  <!-- 📝 Modal de edición -->
+  <!-- Modal de edición -->
   <app-modal-form
     [isOpen]="isModalOpen()"
     [modalType]="modalType()"
@@ -60,3 +67,4 @@
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
 </div>
+
