@@ -4,7 +4,7 @@ import { RutinaService } from './services/rutina.service';
 import { EjercicioService } from './services/ejercicio.service';
 import { UserService } from './services/user.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Rutina, Rol } from 'gym-library';
+import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
 
 // Importar componentes
@@ -38,7 +38,13 @@ export class App {
   readonly clientes = this.clienteService.obtenerClientes();
   readonly rutinas = this.rutinaService.obtenerRutinas();
   readonly ejercicios = this.ejercicioService.obtenerEjercicios();
-  readonly usuarios = this.userService.users;
+  readonly usuarios = computed(() => {
+    // Agregar un campo displayName para mostrar en el card
+    return this.userService.users().map(user => ({
+      ...user,
+      displayName: user.nombre || user.email || `Usuario ${user.uid}`
+    }));
+  });
 
   // Configuraciones simples para los cards
   readonly usuariosCardConfig: CardConfig = {
@@ -46,7 +52,7 @@ export class App {
     createButtonText: 'Crear Usuario',
     createButtonColor: 'blue',
     emptyStateTitle: 'No hay usuarios creados',
-    displayField: 'nombre',
+    displayField: 'displayName', // Usar el campo display personalizado
     showCounter: true,
     counterColor: 'blue'
   };
@@ -209,7 +215,25 @@ export class App {
    * @returns void
    */
   async addSampleUsuario() {
-    this.openCreateModal('usuario');
+    // Crear un usuario de prueba automáticamente para testing
+    const timestamp = Date.now();
+    const sampleUser = {
+      uid: 'u' + timestamp,
+      nombre: `Usuario Prueba ${timestamp}`,
+      email: `usuario${timestamp}@test.com`,
+      role: Rol.CLIENTE,
+      gimnasioId: 'g-default',
+      emailVerified: true,
+      onboarded: true
+    };
+
+    try {
+      await this.userService.addUser(sampleUser);
+      this.log(`Usuario creado: ${sampleUser.nombre} (${sampleUser.email})`);
+    } catch (error) {
+      console.error('Error creando usuario:', error);
+      this.log(`Error al crear usuario: ${error}`);
+    }
   }
 
 
@@ -528,6 +552,14 @@ export class App {
     return Object.values(Rol);
   }
 
+  // Obtiene los objetivos disponibles
+  getObjetivosDisponibles() {
+    return Object.values(Objetivo).map(objetivo => ({
+      value: objetivo,
+      label: objetivo
+    }));
+  }
+
   // Maneja el toggle de días de la semana en rutinas
   toggleDiaSemana(event: Event, diaValue: number) {
     const checkbox = event.target as HTMLInputElement;
@@ -642,10 +674,10 @@ export class App {
           },
           {
             name: 'objetivo',
-            type: 'textarea',
+            type: 'select',
             label: 'Objetivo',
-            placeholder: 'Objetivo del cliente...',
-            rows: 3,
+            placeholder: 'Seleccionar objetivo',
+            options: this.getObjetivosDisponibles(),
             colSpan: 2
           }
         ];

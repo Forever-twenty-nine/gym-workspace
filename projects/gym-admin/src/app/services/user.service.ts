@@ -1,7 +1,15 @@
 import { Injectable, signal, WritableSignal, Signal, inject, computed } from '@angular/core';
 import { User } from 'gym-library';
-import { Firestore } from '@angular/fire/firestore';
-import { collection, getDocs, addDoc, doc, deleteDoc, DocumentData, onSnapshot } from 'firebase/firestore';
+import { 
+  Firestore,
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  deleteDoc,
+  onSnapshot,
+  DocumentData
+} from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -19,8 +27,7 @@ export class UserService {
   private isListenerInitialized = false;
 
   constructor() {
-    // 🚀 Inicialización no-bloqueante
-    this.initializeListener();
+    // Inicialización lazy - se hará cuando se acceda a users por primera vez
   }
 
   /**
@@ -30,17 +37,31 @@ export class UserService {
     if (this.isListenerInitialized) return;
     
     try {
+      console.log('🔄 UserService: Inicializando listener para colección:', this.COLLECTION_NAME);
+      console.log('🔄 UserService: Firestore instance:', this.firestore);
+      
+      if (!this.firestore) {
+        console.error('🔄 UserService: Firestore instance is null or undefined');
+        return;
+      }
+      
       const usersCol = collection(this.firestore, this.COLLECTION_NAME);
+      console.log('🔄 UserService: Collection reference created:', usersCol);
       
       onSnapshot(usersCol, (snapshot) => {
+        console.log('🔄 UserService: Snapshot recibido, documentos:', snapshot.docs.length);
         const users = snapshot.docs.map(docSnap => {
           const data = docSnap.data() as DocumentData;
-          return this.mapFirestoreToUser(data, docSnap.id);
+          const user = this.mapFirestoreToUser(data, docSnap.id);
+          console.log('🔄 UserService: Usuario mapeado:', user);
+          return user;
         });
         this._users.set(users);
+        console.log('🔄 UserService: Total usuarios actualizados:', users.length);
       });
       
       this.isListenerInitialized = true;
+      console.log('🔄 UserService: Listener inicializado correctamente');
     } catch (error) {
       console.error('🔄 UserService: Error inicializando listener:', error);
     }
@@ -50,6 +71,10 @@ export class UserService {
    * @param {Signal<User[]>}
    */
   get users(): Signal<User[]> {
+    // Inicializar lazy cuando se accede por primera vez
+    if (!this.isListenerInitialized) {
+      this.initializeListener();
+    }
     return this._users.asReadonly();
   }
 
