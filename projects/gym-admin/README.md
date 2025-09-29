@@ -1,59 +1,35 @@
 # GymAdmin
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
+**GymAdmin** es una aplicación web de administración para gimnasios desarrollada con Angular 20.1.4. Esta aplicación permite a los administradores gestionar de manera integral todos los aspectos operativos de un gimnasio.
 
-## Development server
+## 🚀 Funcionalidades Principales
 
-To start a local development server, run:
+### 👥 Gestión de Usuarios
+- Crear, editar y eliminar usuarios del sistema
+- Asignar roles (Cliente, Entrenador, Administrador)
+- Gestionar información de contacto y permisos
 
-```bash
-ng serve
-```
+### 🏃‍♂️ Gestión de Clientes
+- Registro y administración de clientes del gimnasio
+- Definir objetivos específicos para cada cliente
+- Control del estado activo/inactivo de membresías
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 📋 Gestión de Rutinas
+- Crear rutinas personalizadas para clientes
+- Asignar entrenadores responsables
+- Configurar días de la semana para cada rutina
+- Seleccionar ejercicios específicos para cada rutina
+- Marcar rutinas como activas/completadas
 
-## Code scaffolding
+### 🏋️ Gestión de Ejercicios
+- Catálogo completo de ejercicios disponibles
+- Configurar series, repeticiones y pesos
+- Definir tiempos de descanso y duración
+- Descripciones detalladas de cada ejercicio
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 📊 Sistema de Logs
+- Seguimiento en tiempo real de todas las operaciones
+- Historial de cambios y actividades del sistema
+- Monitoreo de acciones administrativas
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+La aplicación cuenta con una interfaz intuitiva organizada en tarjetas (cards) para cada módulo y modales dinámicos para la edición de información.
