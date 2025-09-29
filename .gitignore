@@ -63,8 +63,8 @@ $RECYCLE.BIN/
 /plugins
 
 # Environment files
-/src/environments/
-/projects/*/src/environments/
+#/src/environments/
+#/projects/*/src/environments/
 
 # Nx cache
 /.nx
