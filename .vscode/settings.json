@@ -1,3 +1,4 @@
 {
+  // Configuraciones globales del workspace
   "typescript.preferences.autoImportFileExcludePatterns": ["@ionic/angular/common", "@ionic/angular"]
 }
