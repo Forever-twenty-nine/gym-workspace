@@ -17,7 +17,7 @@ import {
   checkmarkCircleOutline,
   arrowBackOutline
 } from 'ionicons/icons';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from 'gym-library';
 
 @Component({
   selector: 'app-register',

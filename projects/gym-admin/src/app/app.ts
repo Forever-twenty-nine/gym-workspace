@@ -1,8 +1,5 @@
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ClienteService } from './services/cliente.service';
-import { RutinaService } from './services/rutina.service';
-import { EjercicioService } from './services/ejercicio.service';
-import { UserService } from './services/user.service';
+import { ClienteService, RutinaService, EjercicioService, UserService } from 'gym-library';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
@@ -35,9 +32,9 @@ export class App {
   private readonly fb = inject(FormBuilder);
 
   // Signals reactivas para datos
-  readonly clientes = this.clienteService.obtenerClientes();
-  readonly rutinas = this.rutinaService.obtenerRutinas();
-  readonly ejercicios = this.ejercicioService.obtenerEjercicios();
+  readonly clientes = this.clienteService.clientes;
+  readonly rutinas = this.rutinaService.rutinas;
+  readonly ejercicios = this.ejercicioService.ejercicios;
   readonly usuarios = computed(() => {
     // Agregar un campo displayName para mostrar en el card
     return this.userService.users().map(user => ({
@@ -165,7 +162,7 @@ export class App {
    * @return void
    */
   async deleteCliente(id: string) {
-    await this.clienteService.eliminarCliente(id);
+    await this.clienteService.delete(id);
     this.log(`Cliente eliminado: ${id}`);
   }
 
@@ -188,7 +185,7 @@ export class App {
    * @param id El ID de la rutina a eliminar.
    */
   async deleteRutina(id: string) {
-    await this.rutinaService.eliminarRutina(id);
+    await this.rutinaService.delete(id);
     this.log(`Rutina eliminada: ${id}`);
   }
 
@@ -206,7 +203,7 @@ export class App {
    * @return void
    */
   async deleteEjercicio(id: string) {
-    await this.ejercicioService.eliminarEjercicio(id);
+    await this.ejercicioService.delete(id);
     this.log(`Ejercicio eliminado: ${id}`);
   }
 
@@ -227,7 +224,7 @@ export class App {
    * @returns void
    */
   async deleteUsuario(id: string) {
-    await this.userService.removeUser(id);
+    await this.userService.deleteUser(id);
     this.log(`Usuario eliminado: ${id}`);
   }
 
@@ -445,19 +442,19 @@ export class App {
           break;
 
         case 'cliente':
-          await this.clienteService.guardarCliente(updatedData);
+          await this.clienteService.save(updatedData);
           this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.id}`);
           break;
 
         case 'rutina':
-          await this.rutinaService.guardarRutina(updatedData);
+          await this.rutinaService.save(updatedData);
           const clienteNombre = updatedData.clienteId ? this.getClienteName(updatedData.clienteId) : 'Sin cliente';
           const entrenadorNombre = updatedData.entrenadorId ? this.getEntrenadorName(updatedData.entrenadorId) : 'Sin entrenador';
           this.log(`Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
           break;
 
         case 'ejercicio':
-          await this.ejercicioService.guardarEjercicio(updatedData);
+          await this.ejercicioService.save(updatedData);
           this.log(`Ejercicio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
           break;
       }

@@ -21,6 +21,23 @@ export * from './lib/models/environment.model';
  */
 export * from './lib/environments/environment';
 export * from './lib/environments/environment.prod';
-
+/*
+ * servicios centralizados
+ */
+export * from './lib/services/cliente.service';
+export * from './lib/services/user.service';
+export * from './lib/services/rutina.service';
+export * from './lib/services/ejercicio.service';
+export * from './lib/services/auth.service';
+export * from './lib/services/storage.service';
+/*
+ * interfaces para adaptadores
+ */
+export type { IClienteFirestoreAdapter } from './lib/services/cliente.service';
+export type { IUserFirestoreAdapter } from './lib/services/user.service';
+export type { IRutinaFirestoreAdapter } from './lib/services/rutina.service';
+export type { IEjercicioFirestoreAdapter } from './lib/services/ejercicio.service';
+export type { IAuthAdapter } from './lib/services/auth.service';
+export type { IStorageAdapter } from './lib/services/storage.service';
 
 export * from './lib/gym-library';

@@ -12,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, arrowBackOutline } from 'ionicons/icons';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from 'gym-library';
 
 @Component({
   selector: 'app-forgot-password',

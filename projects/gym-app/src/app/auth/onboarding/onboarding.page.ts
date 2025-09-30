@@ -24,7 +24,7 @@ import {
   fitnessOutline,
   rocketOutline
 } from 'ionicons/icons';
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from 'gym-library';
 import { Objetivo } from '../../core/enums/objetivo.enum';
 
 // Configuración del onboarding

@@ -2,10 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 // Service
-import { ClienteService } from '../core/services/cliente.service';
-import { RutinaService } from '../core/services/rutina.service';
-import { EjercicioService } from '../core/services/ejercicio.service';
-import { UserService } from '../core/services/user.service';
+import { ClienteService, RutinaService, EjercicioService, UserService } from 'gym-library';
 // models
 import { Rutina } from '../core/models/rutina.model';
 // enums
@@ -48,9 +45,9 @@ export class TestPage {
   /**
    * Clientes
    */
-  clientes = this.clienteService.obtenerClientes();
-  rutinas = this.rutinaService.obtenerRutinas();
-  ejercicios = this.ejercicioService.obtenerEjercicios();
+  clientes = this.clienteService.clientes;
+  rutinas = this.rutinaService.rutinas;
+  ejercicios = this.ejercicioService.ejercicios;
   usuarios = this.userService.users;
 
   // Logs locales como señal mutable
@@ -132,7 +129,7 @@ export class TestPage {
    * @return void
    */
   async deleteCliente(id: string) {
-    await this.clienteService.eliminarCliente(id);
+    await this.clienteService.delete(id);
     this.log(`Cliente eliminado: ${id}`);
   }
 
@@ -155,7 +152,7 @@ export class TestPage {
    * @param id El ID de la rutina a eliminar.
    */
   async deleteRutina(id: string) {
-    await this.rutinaService.eliminarRutina(id);
+    await this.rutinaService.delete(id);
     this.log(`Rutina eliminada: ${id}`);
   }
 
@@ -173,7 +170,7 @@ export class TestPage {
    * @return void
    */
   async deleteEjercicio(id: string) {
-    await this.ejercicioService.eliminarEjercicio(id);
+    await this.ejercicioService.delete(id);
     this.log(`Ejercicio eliminado: ${id}`);
   }
 
@@ -191,7 +188,7 @@ export class TestPage {
    * @returns void
    */
   async deleteUsuario(id: string) {
-    await this.userService.removeUser(id);
+    await this.userService.deleteUser(id);
     this.log(`Usuario eliminado: ${id}`);
   }
 
@@ -411,19 +408,19 @@ export class TestPage {
           break;
 
         case 'cliente':
-          await this.clienteService.guardarCliente(updatedData);
+          await this.clienteService.save(updatedData);
           this.log(`✅ Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.id}`);
           break;
 
         case 'rutina':
-          await this.rutinaService.guardarRutina(updatedData);
+          await this.rutinaService.save(updatedData);
           const clienteNombre = updatedData.clienteId ? this.getClienteName(updatedData.clienteId) : 'Sin cliente';
           const entrenadorNombre = updatedData.entrenadorId ? this.getEntrenadorName(updatedData.entrenadorId) : 'Sin entrenador';
           this.log(`✅ Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
           break;
 
         case 'ejercicio':
-          await this.ejercicioService.guardarEjercicio(updatedData);
+          await this.ejercicioService.save(updatedData);
           this.log(`✅ Ejercicio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
           break;
       }

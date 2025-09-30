@@ -13,8 +13,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
-import { AuthService } from '../../core/services/auth.service';
-import { UserService } from '../../core/services/user.service';
+import { AuthService, UserService } from 'gym-library';
 
 @Component({
   selector: 'app-login',
@@ -61,12 +60,16 @@ export class LoginPage {
       return;
     }
     try {
-      await this.authService.login(this.email, this.password);
-      const user = this.userService.getCurrentUser();
-      if (!user) {
+      const success = await this.authService.loginWithEmail(this.email, this.password);
+      if (success) {
+        const user = this.authService.currentUser();
+        if (user) {
+          // Login exitoso, la redirección la maneja el AuthService
+          console.log('Login exitoso:', user);
+        }
+      } else {
         this.errorMessage = 'Email o contraseña incorrectos';
       }
-      // La redirección la maneja el AuthService
     } catch (error) {
       this.errorMessage = 'Error al iniciar sesión';
     }

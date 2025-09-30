@@ -24,11 +24,8 @@ import {
   checkmarkCircleOutline,
   timeOutline
 } from 'ionicons/icons';
-import { ClienteService } from '../../core/services/cliente.service';
-import { RutinaService } from '../../core/services/rutina.service';
-import { UserService } from '../../core/services/user.service';
-import { Cliente } from '../../core/models/cliente.model';
-import { Rutina } from '../../core/models/rutina.model';
+import { ClienteService, RutinaService, UserService, AuthService } from 'gym-library';
+import { Cliente, Rutina } from 'gym-library';
 
 @Component({
   selector: 'app-dashboard',
@@ -58,6 +55,7 @@ export class DashboardPage implements OnInit {
   private clienteService = inject(ClienteService);
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
+  private authService = inject(AuthService);
 
   // Signals para datos reactivos
   cliente = signal<Cliente | null>(null);
@@ -75,7 +73,8 @@ export class DashboardPage implements OnInit {
   });
 
   rutinasAsignadas = computed(() => {
-    const userId = this.userService.getUserId();
+    const currentUser = this.authService.currentUser();
+    const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
     
     console.log('🔍 Debug rutinasAsignadas:', {
@@ -109,11 +108,12 @@ export class DashboardPage implements OnInit {
 
     // Efecto para mantener sincronizados los datos del cliente
     effect(() => {
-      const userId = this.userService.getUserId();
+      const currentUser = this.authService.currentUser();
+      const userId = currentUser?.uid;
       console.log('👤 Usuario actual:', userId);
       
       if (userId) {
-        const clienteSignal = this.clienteService.obtenerClientePorId(userId);
+        const clienteSignal = this.clienteService.getCliente(userId);
         const clienteData = clienteSignal();
         console.log('📋 Datos del cliente:', clienteData);
         this.cliente.set(clienteData);
@@ -122,7 +122,7 @@ export class DashboardPage implements OnInit {
 
     // Efecto para mantener sincronizadas todas las rutinas
     effect(() => {
-      const rutinasSignal = this.rutinaService.obtenerRutinas();
+      const rutinasSignal = this.rutinaService.rutinas;
       const rutinas = rutinasSignal();
       console.log('🏃‍♂️ Todas las rutinas:', rutinas);
       this.todasLasRutinas.set(rutinas);

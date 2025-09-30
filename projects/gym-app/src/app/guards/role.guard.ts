@@ -1,12 +1,16 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../core/services/user.service';
+import { AuthService } from 'gym-library';
 
+function getCurrentUserRole(): string | null {
+  const authService = inject(AuthService);
+  const user = authService.currentUser();
+  return user?.role || null;
+}
 
 export const gimnasioGuard = (): boolean => {
-  const userService = inject(UserService);
   const router = inject(Router);
-  const role = userService.getMainRole();
+  const role = getCurrentUserRole();
   if (role === 'gimnasio') {
     return true;
   }
@@ -15,9 +19,8 @@ export const gimnasioGuard = (): boolean => {
 };
 
 export const clienteGuard = (): boolean => {
-  const userService = inject(UserService);
   const router = inject(Router);
-  const role = userService.getMainRole();
+  const role = getCurrentUserRole();
   if (role === 'cliente') {
     return true;
   }
@@ -26,9 +29,8 @@ export const clienteGuard = (): boolean => {
 };
 
 export const entrenadorGuard = (): boolean => {
-  const userService = inject(UserService);
   const router = inject(Router);
-  const role = userService.getMainRole();
+  const role = getCurrentUserRole();
   if (role === 'entrenador') {
     return true;
   }

@@ -14,8 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
-import { UserService } from '../../core/services/user.service';
-import { AuthService } from '../../core/services/auth.service';
+import { UserService, AuthService } from 'gym-library';
 import { User } from '../../core/models/user.model';
 
 @Component({
@@ -48,7 +47,7 @@ export class Tab3Page implements OnInit {
   }
 
   ngOnInit() {
-    this.currentUser = this.userService.getCurrentUser();
+    this.currentUser = this.authService.currentUser();
    
   }
 
