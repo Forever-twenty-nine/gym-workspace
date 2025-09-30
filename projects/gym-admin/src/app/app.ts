@@ -287,7 +287,9 @@ export class App {
           uid: 'u' + timestamp,
           nombre: '',
           email: '',
-          role: ''
+          role: '',
+          emailVerified: false,
+          onboarded: false
         };
       case 'cliente':
         return {
@@ -342,7 +344,9 @@ export class App {
         formConfig = {
           nombre: [item.nombre || ''],
           email: [item.email || ''],
-          role: [item.role || '']
+          role: [item.role || ''],
+          emailVerified: [item.emailVerified || false],
+          onboarded: [item.onboarded || false]
         };
         break;
 
@@ -624,6 +628,20 @@ export class App {
             placeholder: 'Seleccionar rol',
             options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
             colSpan: 2
+          },
+          {
+            name: 'emailVerified',
+            type: 'checkbox',
+            label: 'Estado del Email',
+            checkboxLabel: 'Email Verificado',
+            colSpan: 1
+          },
+          {
+            name: 'onboarded',
+            type: 'checkbox',
+            label: 'Estado de Onboarding',
+            checkboxLabel: 'Usuario Completó Onboarding',
+            colSpan: 1
           }
         ];
 
