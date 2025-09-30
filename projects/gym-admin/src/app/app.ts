@@ -214,26 +214,9 @@ export class App {
    * Crea un usuario de muestra
    * @returns void
    */
-  async addSampleUsuario() {
-    // Crear un usuario de prueba automáticamente para testing
-    const timestamp = Date.now();
-    const sampleUser = {
-      uid: 'u' + timestamp,
-      nombre: `Usuario Prueba ${timestamp}`,
-      email: `usuario${timestamp}@test.com`,
-      role: Rol.CLIENTE,
-      gimnasioId: 'g-default',
-      emailVerified: true,
-      onboarded: true
-    };
-
-    try {
-      await this.userService.addUser(sampleUser);
-      this.log(`Usuario creado: ${sampleUser.nombre} (${sampleUser.email})`);
-    } catch (error) {
-      console.error('Error creando usuario:', error);
-      this.log(`Error al crear usuario: ${error}`);
-    }
+  addSampleUsuario() {
+    // Abrir modal para crear un nuevo usuario
+    this.openCreateModal('usuario');
   }
 
 
@@ -307,8 +290,7 @@ export class App {
           uid: 'u' + timestamp,
           nombre: '',
           email: '',
-          role: '',
-          gimnasioId: 'g-default'
+          role: ''
         };
       case 'cliente':
         return {
@@ -363,8 +345,7 @@ export class App {
         formConfig = {
           nombre: [item.nombre || ''],
           email: [item.email || ''],
-          role: [item.role || ''],
-          gimnasioId: [item.gimnasioId || '']
+          role: [item.role || '']
         };
         break;
 
@@ -645,14 +626,7 @@ export class App {
             label: 'Rol',
             placeholder: 'Seleccionar rol',
             options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
-            colSpan: 1
-          },
-          {
-            name: 'gimnasioId',
-            type: 'text',
-            label: 'Gimnasio ID',
-            placeholder: 'ID del gimnasio',
-            colSpan: 1
+            colSpan: 2
           }
         ];
 
