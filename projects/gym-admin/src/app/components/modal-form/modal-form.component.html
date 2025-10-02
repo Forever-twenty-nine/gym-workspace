@@ -38,9 +38,12 @@
               @case ('text') {
                 <input [type]="field.inputType || 'text'" [formControlName]="field.name"
                   [placeholder]="field.placeholder || ''" [min]="field.min || null" [step]="field.step || null"
+                  [readonly]="field.readonly || false"
                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
                   [class.border-red-300]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
-                  [class.focus:ring-red-500]="form.get(field.name)?.invalid && form.get(field.name)?.touched">
+                  [class.focus:ring-red-500]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+                  [class.bg-gray-100]="field.readonly"
+                  [class.text-gray-600]="field.readonly">
 
                 <!-- Mensaje de error -->
                 @if (form.get(field.name)?.invalid && form.get(field.name)?.touched) {
@@ -176,6 +179,77 @@
                       class="mr-3 h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded-md">
                     <span class="text-sm font-semibold text-gray-700">✓ Completado</span>
                   </label>
+                </div>
+              }
+
+              <!-- Información del usuario asociado -->
+              @case ('user-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner p-4">
+                  @if (field.usuario) {
+                    <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-blue-600 font-semibold text-lg">👤</span>
+                      </div>
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">{{ field.usuario.nombre || 'Sin nombre' }}</h4>
+                        <p class="text-sm text-gray-600">{{ field.usuario.email || 'Sin email' }}</p>
+                        <div class="flex gap-2 mt-2">
+                          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{{ field.usuario.role || 'Sin rol' }}</span>
+                          @if (field.usuario.emailVerified) {
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Verificado</span>
+                          } @else {
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">⚠ No verificado</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="text-center text-gray-500 py-4">
+                      <p class="text-sm">No hay usuario asociado</p>
+                      <p class="text-xs text-gray-400 mt-1">El cliente no tiene un usuario vinculado</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Información de rutinas del cliente -->
+              @case ('rutinas-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
+                  @if (field.rutinas && field.rutinas.length > 0) {
+                    <div class="max-h-60 overflow-y-auto">
+                      @for (rutina of field.rutinas; track rutina.id) {
+                        <div class="p-4 border-b border-gray-200 last:border-b-0 hover:bg-blue-50 transition-colors duration-150">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ rutina.nombre }}</h4>
+                            <div class="flex gap-2">
+                              @if (rutina.activa) {
+                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Activa</span>
+                              } @else {
+                                <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">Inactiva</span>
+                              }
+                              @if (rutina.completado) {
+                                <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Completada</span>
+                              }
+                            </div>
+                          </div>
+                          <div class="text-sm text-gray-600 mt-2">
+                            <p><strong>Fecha asignación:</strong> {{ rutina.fechaAsignacion | date:'short' }}</p>
+                            @if (rutina.ejercicios && rutina.ejercicios.length > 0) {
+                              <p><strong>Ejercicios:</strong> {{ rutina.ejercicios.length }}</p>
+                            }
+                            @if (rutina.DiasSemana && rutina.DiasSemana.length > 0) {
+                              <p><strong>Días:</strong> {{ getDiasSemanaNombres(rutina.DiasSemana) }}</p>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay rutinas asignadas</p>
+                      <p class="text-xs text-gray-400 mt-1">Este cliente no tiene rutinas asociadas</p>
+                    </div>
+                  }
                 </div>
               }
             }

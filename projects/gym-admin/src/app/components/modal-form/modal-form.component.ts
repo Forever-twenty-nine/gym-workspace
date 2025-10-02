@@ -17,6 +17,9 @@ export interface FormFieldConfig {
   step?: number;
   rows?: number;
   checkboxLabel?: string;
+  readonly?: boolean;
+  rutinas?: any[];
+  usuario?: any;
 }
 
 @Component({
@@ -87,5 +90,12 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   getEjercicioById(id: string): Ejercicio | undefined {
     return this.ejercicios.find(e => e.id === id);
+  }
+
+  getDiasSemanaNombres(dias: number[]): string {
+    if (!dias || dias.length === 0) return 'No especificado';
+    
+    const nombresCompletos = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    return dias.map(dia => nombresCompletos[dia] || 'N/A').join(', ');
   }
 }

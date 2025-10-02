@@ -32,7 +32,6 @@ export class App {
   private readonly fb = inject(FormBuilder);
 
   // Signals reactivas para datos
-  readonly clientes = this.clienteService.clientes;
   readonly rutinas = this.rutinaService.rutinas;
   readonly ejercicios = this.ejercicioService.ejercicios;
   readonly usuarios = computed(() => {
@@ -41,6 +40,17 @@ export class App {
       ...user,
       displayName: user.nombre || user.email || `Usuario ${user.uid}`
     }));
+  });
+  
+  readonly clientes = computed(() => {
+    // Agregar displayName a cada cliente basado en el usuario asociado
+    return this.clienteService.clientes().map(cliente => {
+      const usuario = this.usuarios().find(u => u.uid === cliente.id);
+      return {
+        ...cliente,
+        displayName: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`
+      };
+    });
   });
 
   // Configuraciones simples para los cards
@@ -59,7 +69,7 @@ export class App {
     createButtonText: 'Crear Cliente',
     createButtonColor: 'green',
     emptyStateTitle: 'No hay clientes registrados',
-    displayField: 'gimnasioId',
+    displayField: 'displayName', // Mostrar el nombre del cliente
     showCounter: true,
     counterColor: 'green'
   };
@@ -294,7 +304,8 @@ export class App {
       case 'cliente':
         return {
           id: 'c' + timestamp,
-          gimnasioId: 'g-default',
+          gimnasioId: '',
+          entrenadorId: '',
           activo: true,
           fechaRegistro: new Date(),
           objetivo: '',
@@ -352,9 +363,18 @@ export class App {
 
       case 'cliente':
         formConfig = {
-          gimnasioId: [item.gimnasioId || ''],
+          // Campo informativo (no se incluye en el form)
+          usuarioInfo: [{ value: '', disabled: true }],
+          
+          // Campos editables
+          gimnasioId: [item.gimnasioId || '', [Validators.required]],
+          entrenadorId: [item.entrenadorId || '', [Validators.required]],
           activo: [item.activo || false],
-          objetivo: [item.objetivo || '']
+          objetivo: [item.objetivo || ''],
+          fechaRegistro: [item.fechaRegistro ? new Date(item.fechaRegistro).toISOString().slice(0, 16) : ''],
+          
+          // Campo para rutinas (solo informativo)
+          rutinasAsociadas: [{ value: '', disabled: true }]
         };
         break;
 
@@ -446,8 +466,24 @@ export class App {
           break;
 
         case 'cliente':
-          await this.clienteService.save(updatedData);
-          this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.id}`);
+          // Limpiar campos informativos antes de guardar
+          const clienteDataToSave = {
+            ...updatedData,
+            fechaRegistro: updatedData.fechaRegistro ? new Date(updatedData.fechaRegistro) : undefined
+          };
+          
+          // Remover campos informativos
+          delete clienteDataToSave.usuarioInfo;
+          delete clienteDataToSave.rutinasAsociadas;
+          
+          await this.clienteService.save(clienteDataToSave);
+          
+          // Obtener nombres para el log
+          const usuarioNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
+          const gimnasioNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
+          const entrenadorClienteNombre = this.usuarios().find(u => u.uid === updatedData.entrenadorId)?.nombre || 'Entrenador desconocido';
+          
+          this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
           break;
 
         case 'rutina':
@@ -501,6 +537,14 @@ export class App {
    */
   getEntrenadoresDisponibles() {
     return this.usuarios().filter(u => u.role === Rol.ENTRENADOR);
+  }
+
+  /**
+   * Obtiene los gimnasios disponibles para asignar a clientes
+   * @return Usuario[]
+   */
+  getGimnasiosDisponibles() {
+    return this.usuarios().filter(u => u.role === Rol.GIMNASIO);
   }
 
   /**
@@ -646,12 +690,55 @@ export class App {
         ];
 
       case 'cliente':
+        const clienteData = this.modalData();
+        const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
+        const rutinasCliente = this.rutinas().filter(r => r.clienteId === clienteData?.id);
+        
         return [
+          // Información del usuario asociado (solo para mostrar contexto)
+          {
+            name: 'usuarioInfo',
+            type: 'user-info',
+            label: 'Usuario Asociado',
+            colSpan: 2,
+            usuario: usuarioAsociado
+          },
+          
+          // Selección de gimnasio
           {
             name: 'gimnasioId',
-            type: 'text',
-            label: 'Gimnasio ID',
-            placeholder: 'ID del gimnasio',
+            type: 'select',
+            label: 'Gimnasio',
+            placeholder: 'Seleccionar gimnasio',
+            options: this.getGimnasiosDisponibles().map(gimnasio => ({
+              value: gimnasio.uid,
+              label: gimnasio.nombre || gimnasio.email || `Gimnasio ${gimnasio.uid}`
+            })),
+            colSpan: 1,
+            required: true
+          },
+          
+          // Selección de entrenador
+          {
+            name: 'entrenadorId',
+            type: 'select',
+            label: 'Entrenador',
+            placeholder: 'Seleccionar entrenador',
+            options: this.getEntrenadoresDisponibles().map(entrenador => ({
+              value: entrenador.uid,
+              label: entrenador.nombre || entrenador.email || `Entrenador ${entrenador.uid}`
+            })),
+            colSpan: 1,
+            required: true
+          },
+          
+          // Información del cliente
+          {
+            name: 'objetivo',
+            type: 'select',
+            label: 'Objetivo',
+            placeholder: 'Seleccionar objetivo',
+            options: this.getObjetivosDisponibles(),
             colSpan: 1
           },
           {
@@ -661,13 +748,24 @@ export class App {
             checkboxLabel: 'Cliente Activo',
             colSpan: 1
           },
+          
+          // Fecha de registro
           {
-            name: 'objetivo',
-            type: 'select',
-            label: 'Objetivo',
-            placeholder: 'Seleccionar objetivo',
-            options: this.getObjetivosDisponibles(),
+            name: 'fechaRegistro',
+            type: 'text',
+            inputType: 'datetime-local',
+            label: 'Fecha de Registro',
+            placeholder: 'Fecha de registro',
             colSpan: 2
+          },
+          
+          // Lista de rutinas
+          {
+            name: 'rutinasAsociadas',
+            type: 'rutinas-info',
+            label: `Rutinas Asignadas (${rutinasCliente.length})`,
+            colSpan: 2,
+            rutinas: rutinasCliente
           }
         ];
 
