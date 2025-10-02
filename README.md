@@ -1,162 +1,78 @@
-# GymWorkspace
+# Gym App - Descripción y Modelo de Negocio
 
-Este repositorio contiene un monorepo de Angular que incluye múltiples aplicaciones y librerías para la gestión de gimnasios. El proyecto fue generado usando [Angular CLI](https://github.com/angular/angular-cli) versión 20.1.4.
+## 💰 Estrategia de Monetización# 📱 Descripción General
 
-## 📋 Contenido del Repositorio
+Aplicación integral para gimnasios que conecta entrenados, entrenadores y gimnasios en una plataforma unificada. El modelo freemium permite generar ingresos mientras se ofrece valor gratuito básico.
 
-### 🏢 **gym-admin** - Panel de Administración Web
-Aplicación web para administradores de gimnasios construida con Angular 20 y Firebase. Incluye:
-- **Tecnologías**: Angular 20, Firebase/Firestore, TailwindCSS
-- **Características**: Gestión de clientes, rutinas, ejercicios y entrenadores
-- **Servicios**: ClienteService, EjercicioService, RutinaService, UserService
-- **Ubicación**: `projects/gym-admin/`
+## 👥 Tipos de Usuarios y Planes
 
-### 📱 **gym-app** - Aplicación Móvil Híbrida
-Aplicación móvil multiplataforma desarrollada con Ionic y Capacitor para clientes y entrenadores:
-- **Tecnologías**: Ionic 8, Angular 20, Capacitor 7, Firebase
-- **Plataformas**: Android (incluye configuración nativa)
-- **Módulos**: Auth, Cliente, Entrenador, Gimnasio
-- **Características**: Autenticación, gestión de rutinas, seguimiento de progreso
-- **Ubicación**: `projects/gym-app/`
+### 🆓 Entrenados - Versión Free
 
-### 📚 **gym-library** - Librería Compartida
-Librería Angular que contiene modelos, enums y utilidades compartidas entre las aplicaciones:
-- **Modelos**: Cliente, Ejercicio, Entrenador, Gimnasio, Invitación, Rutina, User
-- **Enums**: ClienteTabs, GimnasioTabs, Objetivo, Permiso, Rol
-- **Propósito**: Mantener consistencia de tipos y estructuras de datos
-- **Ubicación**: `projects/gym-library/`
+- **Rutinas básicas**: Acceso a rutinas públicas creadas por entrenadores
+- **Compartir limitado**: Rutinas en redes sociales con marca de agua (marketing orgánico)
+- **Seguimiento básico**: Historial limitado (últimas 2 rutinas)
+- **Publicidad**: Anuncios ligeros y funciones limitadas
 
-## 🚀 Desarrollo
+### 💎 Entrenados - Versión Premium
 
-Este es un **multi-repositorio** que contiene tres proyectos independientes. Cada proyecto tiene sus propias dependencias y configuraciones.
+- **Rutinas personalizadas**: Planes creados específicamente por su entrenador
+- **Estadísticas avanzadas**: Seguimiento de progreso, gráficas y análisis comparativo
+- **Exportación premium**: Descarga en PDF/imagen sin marca de agua
+- **Planes especializados**: Acceso a programas de hipertrofia, running, yoga, etc.
+- **Sin interrupciones**: Experiencia libre de anuncios
 
-### 📦 Instalación de Dependencias
+### 👨‍🏫 Entrenadores
 
-Para instalar todas las dependencias de todos los proyectos:
+#### **Plan Free**
+- Perfil básico en la plataforma
+- Publicación limitada de rutinas públicas
 
-```bash
-npm run install:all
-```
+#### **Plan Pro (Premium)**
+- **Gestión completa**: Herramientas para seguimiento de clientes, métricas y chat ilimitado
+- **Monetización**: Posibilidad de vender rutinas premium dentro de la app
+- **Branding personalizado**: Exportar rutinas con logo propio o del gimnasio
+- **Mayor visibilidad**: Posicionamiento destacado en el buscador de entrenadores
 
-O instalar individualmente:
-```bash
-# Workspace principal (solo para la librería)
-npm install
+### 🏢 Gimnasios (Opcional)
 
-# Proyecto gym-admin
-cd projects/gym-admin && npm install
+#### **Plan Free**
+- Perfil institucional básico
 
-# Proyecto gym-app  
-cd projects/gym-app && npm install
-```
+#### **Plan Business Premium**
+- **Dashboard multi-entrenador**: Gestión centralizada de todo el equipo
+- **Branding institucional**: Logo del gimnasio en todas las rutinas compartidas
+- **Promoción destacada**: Mayor visibilidad en la plataforma
 
-### 🛠️ Desarrollo por Aplicación
+## � Estrategia de Monetización
 
-#### 🏢 Gym Admin (Aplicación Web)
-```bash
-# Opción 1: Usando script del workspace
-npm run gym-admin:serve
+### Modelo de Ingresos por Segmento
 
-# Opción 2: Desde el directorio del proyecto
-cd projects/gym-admin
-npm run start
-```
+| Segmento | Modelo | Precio Estimado |
+|----------|--------|-----------------|
+| **Entrenados** | Freemium + Suscripción mensual/anual | $5-15 USD/mes |
+| **Entrenadores** | Plan Pro + Comisión por ventas | $20-40 USD/mes |
+| **Gimnasios** | Plan Business | $100-300 USD/mes |
 
-#### 📱 Gym App (Aplicación Móvil)
-```bash
-# Opción 1: Usando script del workspace
-npm run gym-app:serve
+### 📈 Palancas de Marketing y Monetización
 
-# Opción 2: Desde el directorio del proyecto
-cd projects/gym-app
-ionic serve
-```
+#### Estrategia de Compartir en Redes Sociales
 
-#### 📚 Gym Library (Librería Compartida)
-```bash
-# Opción 1: Usando script del workspace
-npm run library:build
+- **Versión Free**: Rutinas con marca de agua → **Publicidad viral gratuita**
+- **Versión Premium**: Sin marca de agua o con branding personalizado → **Diferenciación**
 
-# Opción 2: Desde la raíz del workspace
-ng build gym-library
-```
+#### Beneficios del Modelo
 
-### 🔨 Construcción de Proyectos
+✅ **Gratis** = Viralidad orgánica con nuestra marca  
+✅ **Premium** = Profesionalización y personalización  
+✅ **Escalabilidad** = Múltiples fuentes de ingresos  
+✅ **Red de efectos** = Más usuarios atraen más entrenadores y viceversa
 
-```bash
-# Gym Admin
-npm run gym-admin:build
+## 🎯 Propuesta de Valor
 
-# Gym App
-npm run gym-app:build
+- **Para Entrenados**: Acceso fácil a rutinas profesionales y seguimiento de progreso
+- **Para Entrenadores**: Herramientas profesionales y nueva fuente de ingresos
+- **Para Gimnasios**: Digitalización y mejor gestión de servicios
 
-# Gym Library
-npm run library:build
-```
+## 🚀 Ventaja Competitiva
 
-## 🧪 Pruebas
-
-Para ejecutar pruebas unitarias con el test runner [Karma](https://karma-runner.github.io):
-
-```bash
-ng test
-```
-
-Para pruebas end-to-end (e2e):
-
-```bash
-ng e2e
-```
-
-Angular CLI no incluye un framework de testing e2e por defecto. Puedes elegir uno que se adapte a tus necesidades.
-
-## 📱 Desarrollo Móvil (Gym App)
-
-### Prerrequisitos
-- Node.js y npm
-- Ionic CLI: `npm install -g @ionic/cli`
-- Capacitor CLI: `npm install -g @capacitor/cli`
-- Android Studio (para desarrollo Android)
-
-### Comandos Específicos para Móvil
-```bash
-# Servir en modo desarrollo (desde workspace)
-npm run gym-app:serve
-
-# Sincronizar con plataformas nativas
-npm run gym-app:sync
-
-# Ejecutar en Android
-npm run gym-app:android
-
-# O desde el directorio del proyecto:
-cd projects/gym-app
-ionic serve
-ionic cap sync
-ionic cap run android
-```
-
-## 🏗️ Arquitectura del Proyecto
-
-```
-gym-workspace/
-├── projects/
-│   ├── gym-admin/          # 🏢 Aplicación web de administración
-│   ├── gym-app/            # 📱 Aplicación móvil híbrida
-│   └── gym-library/        # 📚 Librería compartida
-├── package.json            # Dependencias del workspace
-└── angular.json           # Configuración de Angular CLI
-```
-
-## 🔧 Tecnologías Utilizadas
-
-- **Frontend**: Angular 20, Ionic 8
-- **Backend**: Firebase/Firestore
-- **Móvil**: Capacitor 7
-- **Estilos**: TailwindCSS, Ionic Components
-- **Lenguaje**: TypeScript
-- **Herramientas**: Angular CLI, Ionic CLI
-
-## 📚 Recursos Adicionales
-
-Para más información sobre el uso de Angular CLI, incluyendo referencias detalladas de comandos, visita la página [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli).
+La función de compartir rutinas se convierte en una **herramienta de marketing viral**, donde cada compartición gratuita promociona la aplicación, mientras que las versiones premium ofrecen profesionalización sin perder la capacidad de generar leads orgánicos.
