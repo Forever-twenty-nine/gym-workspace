@@ -21,7 +21,7 @@ export interface CardItem {
   selector: 'app-generic-card',
   imports: [CommonModule],
   template: `
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm h-[500px] flex flex-col">
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm h-[350px] flex flex-col">
       <!-- Header -->
       <div class="p-4 border-b border-gray-100 flex-shrink-0">
         <div class="flex items-center justify-between">
@@ -31,17 +31,19 @@ export interface CardItem {
           }
         </div>
         
-        <button 
-          [class]="getButtonClasses()"
-          [disabled]="!canCreate()"
-          (click)="create.emit()">
-          {{ config().createButtonText }}
-        </button>
-        
-        @if (!canCreate() && validationMessage()) {
-          <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
-            <p class="text-xs text-amber-800">{{ validationMessage() }}</p>
-          </div>
+        @if (canCreate()) {
+          <button 
+            [class]="getButtonClasses()"
+            [disabled]="!canCreate()"
+            (click)="create.emit()">
+            {{ config().createButtonText }}
+          </button>
+          
+          @if (!canCreate() && validationMessage()) {
+            <div class="mt-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+              <p class="text-xs text-amber-800">{{ validationMessage() }}</p>
+            </div>
+          }
         }
       </div>
 

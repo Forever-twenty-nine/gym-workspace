@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ClienteService, RutinaService, EjercicioService, UserService } from 'gym-library';
+import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService } from 'gym-library';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
@@ -29,6 +29,8 @@ export class App {
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
   private readonly userService = inject(UserService);
+  private readonly entrenadorService = inject(EntrenadorService);
+  private readonly gimnasioService = inject(GimnasioService);
   private readonly fb = inject(FormBuilder);
 
   // Signals reactivas para datos
@@ -53,6 +55,25 @@ export class App {
     });
   });
 
+  readonly entrenadores = computed(() => {
+    // Agregar displayName a cada entrenador basado en el usuario asociado
+    return this.entrenadorService.entrenadores().map(entrenador => {
+      const usuario = this.usuarios().find(u => u.uid === entrenador.id);
+      return {
+        ...entrenador,
+        displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
+      };
+    });
+  });
+
+  readonly gimnasios = computed(() => {
+    // Agregar displayName a cada gimnasio usando el nombre
+    return this.gimnasioService.gimnasios().map(gimnasio => ({
+      ...gimnasio,
+      displayName: gimnasio.nombre || `Gimnasio ${gimnasio.id}`
+    }));
+  });
+
   // Configuraciones simples para los cards
   readonly usuariosCardConfig: CardConfig = {
     title: 'Usuarios',
@@ -66,12 +87,32 @@ export class App {
 
   readonly clientesCardConfig: CardConfig = {
     title: 'Clientes',
-    createButtonText: 'Crear Cliente',
+    createButtonText: 'N/A', // No se usa porque canCreate será false
     createButtonColor: 'green',
     emptyStateTitle: 'No hay clientes registrados',
     displayField: 'displayName', // Mostrar el nombre del cliente
     showCounter: true,
     counterColor: 'green'
+  };
+
+  readonly entrenadoresCardConfig: CardConfig = {
+    title: 'Entrenadores',
+    createButtonText: 'N/A', // No se usa porque canCreate será false
+    createButtonColor: 'orange',
+    emptyStateTitle: 'No hay entrenadores registrados',
+    displayField: 'displayName', // Mostrar el nombre del entrenador
+    showCounter: true,
+    counterColor: 'orange'
+  };
+
+  readonly gimnasiosCardConfig: CardConfig = {
+    title: 'Gimnasios',
+    createButtonText: 'N/A', // No se usa porque canCreate será false
+    createButtonColor: 'purple',
+    emptyStateTitle: 'No hay gimnasios registrados',
+    displayField: 'displayName', // Mostrar el nombre del gimnasio
+    showCounter: true,
+    counterColor: 'purple'
   };
 
   readonly rutinasCardConfig: CardConfig = {
@@ -174,6 +215,35 @@ export class App {
   async deleteCliente(id: string) {
     await this.clienteService.delete(id);
     this.log(`Cliente eliminado: ${id}`);
+  }
+
+  /**
+   * Elimina un entrenador por su ID.
+   * @param id El ID del entrenador a eliminar.
+   * @return void
+   */
+  async deleteEntrenador(id: string) {
+    await this.entrenadorService.delete(id);
+    this.log(`Entrenador eliminado: ${id}`);
+  }
+
+  /**
+   * Crea un gimnasio de muestra
+   * @returns void
+   */
+  addSampleGimnasio() {
+    // Abrir modal para crear un nuevo gimnasio
+    this.openCreateModal('gimnasio');
+  }
+
+  /**
+   * Elimina un gimnasio por su ID.
+   * @param id El ID del gimnasio a eliminar.
+   * @return void
+   */
+  async deleteGimnasio(id: string) {
+    await this.gimnasioService.delete(id);
+    this.log(`Gimnasio eliminado: ${id}`);
   }
 
   /**
@@ -322,6 +392,13 @@ export class App {
           descansoSegundos: 0,
           descripcion: ''
         };
+      case 'gimnasio':
+        return {
+          id: 'g' + timestamp,
+          nombre: '',
+          direccion: '',
+          activo: true
+        };
       default:
         return {};
     }
@@ -402,6 +479,14 @@ export class App {
           serieSegundos: [item.serieSegundos || 0],
           descansoSegundos: [item.descansoSegundos || 0],
           descripcion: [item.descripcion || '']
+        };
+        break;
+
+      case 'gimnasio':
+        formConfig = {
+          nombre: [item.nombre || '', [Validators.required]],
+          direccion: [item.direccion || '', [Validators.required]],
+          activo: [item.activo || true]
         };
         break;
 
@@ -496,6 +581,11 @@ export class App {
         case 'ejercicio':
           await this.ejercicioService.save(updatedData);
           this.log(`Ejercicio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
+          break;
+
+        case 'gimnasio':
+          await this.gimnasioService.save(updatedData);
+          this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
           break;
       }
 
@@ -881,6 +971,31 @@ export class App {
             label: 'Descanso (seg)',
             placeholder: 'Tiempo de descanso entre series',
             min: 0,
+            colSpan: 2
+          }
+        ];
+
+      case 'gimnasio':
+        return [
+          {
+            name: 'nombre',
+            type: 'text',
+            label: 'Nombre',
+            placeholder: 'Nombre del gimnasio',
+            colSpan: 2
+          },
+          {
+            name: 'direccion',
+            type: 'text',
+            label: 'Dirección',
+            placeholder: 'Dirección del gimnasio',
+            colSpan: 2
+          },
+          {
+            name: 'activo',
+            type: 'checkbox',
+            label: 'Estado',
+            checkboxLabel: 'Gimnasio Activo',
             colSpan: 2
           }
         ];

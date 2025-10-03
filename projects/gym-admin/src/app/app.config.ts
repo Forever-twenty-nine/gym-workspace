@@ -5,11 +5,13 @@ import { environment } from '../environments/environment';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { ClienteService, UserService, RutinaService, EjercicioService } from 'gym-library';
+import { ClienteService, UserService, RutinaService, EjercicioService, EntrenadorService, GimnasioService, ENTRENADOR_FIRESTORE_ADAPTER, GIMNASIO_FIRESTORE_ADAPTER } from 'gym-library';
 import { ClienteFirestoreAdapter } from './adapters/cliente-firestore.adapter';
 import { UserFirestoreAdapter } from './adapters/user-firestore.adapter';
 import { RutinaFirestoreAdapter } from './adapters/rutina-firestore.adapter';
 import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapter';
+import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adapter';
+import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
 
 import { routes } from './app.routes';
 
@@ -19,10 +21,12 @@ function initializeServiceAdapters(
   userService: UserService,
   rutinaService: RutinaService,
   ejercicioService: EjercicioService,
+  gimnasioService: GimnasioService,
   clienteAdapter: ClienteFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
-  ejercicioAdapter: EjercicioFirestoreAdapter
+  ejercicioAdapter: EjercicioFirestoreAdapter,
+  gimnasioAdapter: GimnasioFirestoreAdapter
 ) {
   return () => {
     console.log('🔧 Inicializando adaptadores de servicios para gym-admin...');
@@ -32,6 +36,7 @@ function initializeServiceAdapters(
     userService.setFirestoreAdapter(userAdapter);
     rutinaService.setFirestoreAdapter(rutinaAdapter);
     ejercicioService.setFirestoreAdapter(ejercicioAdapter);
+    gimnasioService.setFirestoreAdapter(gimnasioAdapter);
     
     console.log('✅ Adaptadores configurados correctamente');
     return Promise.resolve();
@@ -50,6 +55,16 @@ export const appConfig: ApplicationConfig = {
       auth.useDeviceLanguage();
       return auth;
     }),
+    // Proveer el adaptador de entrenadores
+    {
+      provide: ENTRENADOR_FIRESTORE_ADAPTER,
+      useClass: EntrenadorFirestoreAdapter
+    },
+    // Proveer el adaptador de gimnasios
+    {
+      provide: GIMNASIO_FIRESTORE_ADAPTER,
+      useClass: GimnasioFirestoreAdapter
+    },
     // Inicializar los adaptadores de servicios al arranque
     {
       provide: APP_INITIALIZER,
@@ -59,10 +74,12 @@ export const appConfig: ApplicationConfig = {
         UserService, 
         RutinaService, 
         EjercicioService,
+        GimnasioService,
         ClienteFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
-        EjercicioFirestoreAdapter
+        EjercicioFirestoreAdapter,
+        GimnasioFirestoreAdapter
       ],
       multi: true
     }

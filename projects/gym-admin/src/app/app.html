@@ -20,9 +20,29 @@
       [config]="clientesCardConfig"
       [items]="clientes()"
       [idField]="'id'"
-      (create)="addSampleCliente()"
+      [canCreate]="false"
       (edit)="openDetailsModal($event, 'cliente')"
       (delete)="deleteCliente($event)">
+    </app-generic-card>
+
+    <!-- Entrenadores -->
+    <app-generic-card
+      [config]="entrenadoresCardConfig"
+      [items]="entrenadores()"
+      [idField]="'id'"
+      [canCreate]="false"
+      (edit)="openDetailsModal($event, 'entrenador')"
+      (delete)="deleteEntrenador($event)">
+    </app-generic-card>
+
+    <!-- Gimnasios -->
+    <app-generic-card
+      [config]="gimnasiosCardConfig"
+      [items]="gimnasios()"
+      [idField]="'id'"
+      [canCreate]="false"
+      (edit)="openDetailsModal($event, 'gimnasio')"
+      (delete)="deleteGimnasio($event)">
     </app-generic-card>
 
     <!-- Rutinas -->

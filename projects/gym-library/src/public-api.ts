@@ -12,6 +12,7 @@ export * from './lib/enums/cliente-tabs.enum';
 export * from './lib/models/user.model';
 export * from './lib/models/cliente.model';
 export * from './lib/models/entrenador.model';
+export * from './lib/models/gimnasio.model';
 export * from './lib/models/ejercicio.model';
 export * from './lib/models/rutina.model';
 export * from './lib/models/invitacion.model';
@@ -28,6 +29,8 @@ export * from './lib/services/cliente.service';
 export * from './lib/services/user.service';
 export * from './lib/services/rutina.service';
 export * from './lib/services/ejercicio.service';
+export * from './lib/services/entrenador.service';
+export * from './lib/services/gimnasio.service';
 export * from './lib/services/auth.service';
 export * from './lib/services/storage.service';
 /*
@@ -37,6 +40,10 @@ export type { IClienteFirestoreAdapter } from './lib/services/cliente.service';
 export type { IUserFirestoreAdapter } from './lib/services/user.service';
 export type { IRutinaFirestoreAdapter } from './lib/services/rutina.service';
 export type { IEjercicioFirestoreAdapter } from './lib/services/ejercicio.service';
+export type { IEntrenadorFirestoreAdapter } from './lib/services/entrenador.service';
+export { ENTRENADOR_FIRESTORE_ADAPTER } from './lib/services/entrenador.service';
+export type { IGimnasioFirestoreAdapter } from './lib/services/gimnasio.service';
+export { GIMNASIO_FIRESTORE_ADAPTER } from './lib/services/gimnasio.service';
 export type { IAuthAdapter } from './lib/services/auth.service';
 export type { IStorageAdapter } from './lib/services/storage.service';
 
