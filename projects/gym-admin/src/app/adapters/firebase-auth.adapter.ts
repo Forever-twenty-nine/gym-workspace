@@ -9,7 +9,7 @@ import {
   UserCredential
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { User, Rol } from 'gym-library';
+import { User, Rol, Cliente, Objetivo } from 'gym-library';
 
 interface IAuthAdapter {
   createUserWithEmailAndPassword(email: string, password: string, userData: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }>;
@@ -51,18 +51,38 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
           });
         }
 
-        // Crear objeto User completo
+        // Crear objeto User mínimo - solo datos básicos sin inferencias
         const newUser: User = {
           uid: firebaseUser.uid,
           email: firebaseUser.email || email,
-          emailVerified: firebaseUser.emailVerified,
-          nombre: userData.nombre || firebaseUser.displayName || this.inferNameFromEmail(email),
-          role: userData.role || this.inferRoleFromEmail(email),
-          entrenadorId: userData.entrenadorId,
-          gimnasioId: userData.gimnasioId,
-          onboarded: userData.onboarded || false,
-          plan: userData.plan
+          emailVerified: firebaseUser.emailVerified
         };
+
+        // Solo agregar campos que estén explícitamente definidos en userData
+        if (userData.nombre !== undefined) {
+          newUser.nombre = userData.nombre;
+        }
+        if (userData.role !== undefined) {
+          newUser.role = userData.role;
+        }
+        if (userData.entrenadorId !== undefined) {
+          newUser.entrenadorId = userData.entrenadorId;
+        }
+        if (userData.gimnasioId !== undefined) {
+          newUser.gimnasioId = userData.gimnasioId;
+        }
+        if (userData.plan !== undefined) {
+          newUser.plan = userData.plan;
+        }
+        if ((userData as any).clienteId !== undefined) {
+          (newUser as any).clienteId = (userData as any).clienteId;
+        }
+        if (userData.onboarded !== undefined) {
+          newUser.onboarded = userData.onboarded;
+        }
+
+        // No crear documentos automáticamente al registrar usuario
+        // Los documentos específicos (cliente, gimnasio, entrenador) se crearán al editar el rol
 
         // Guardar datos adicionales en Firestore
         const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
@@ -91,13 +111,11 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
         if (userSnap.exists()) {
           user = userSnap.data() as User;
         } else {
+          // Si no existe documento en Firestore, crear usuario mínimo
           user = {
             uid: firebaseUser.uid,
-            nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
             email: firebaseUser.email || '',
-            role: this.inferRoleFromEmail(firebaseUser.email || ''),
-            emailVerified: firebaseUser.emailVerified,
-            onboarded: false
+            emailVerified: firebaseUser.emailVerified
           };
         }
         
@@ -127,13 +145,11 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
             if (userSnap.exists()) {
               resolve(userSnap.data() as User);
             } else {
+              // Si no existe documento en Firestore, devolver usuario mínimo
               resolve({
                 uid: firebaseUser.uid,
-                nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
                 email: firebaseUser.email || '',
-                role: this.inferRoleFromEmail(firebaseUser.email || ''),
-                emailVerified: firebaseUser.emailVerified,
-                onboarded: false
+                emailVerified: firebaseUser.emailVerified
               });
             }
           } catch (error) {

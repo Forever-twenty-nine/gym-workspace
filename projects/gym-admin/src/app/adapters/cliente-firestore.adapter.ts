@@ -70,9 +70,10 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
     return {
       id: data.id,
       gimnasioId: data.gimnasioId || '',
+      entrenadorId: data.entrenadorId || '',
       activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-      objetivo: data.objetivo || null,
+      objetivo: data.objetivo || undefined, // Usar undefined en lugar de null para consistencia
       rutinas: data.rutinas || []
     };
   }
@@ -82,11 +83,23 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
    */
   private mapToFirestore(cliente: Cliente): any {
     const data: any = {
-      gimnasioId: cliente.gimnasioId,
       activo: cliente.activo,
-      objetivo: cliente.objetivo,
       rutinas: cliente.rutinas || []
     };
+
+    // Solo incluir campos si no son undefined
+    if (cliente.gimnasioId !== undefined && cliente.gimnasioId !== null) {
+      data.gimnasioId = cliente.gimnasioId;
+    }
+    
+    if (cliente.entrenadorId !== undefined && cliente.entrenadorId !== null) {
+      data.entrenadorId = cliente.entrenadorId;
+    }
+
+    // Solo incluir objetivo si no es undefined o null
+    if (cliente.objetivo !== undefined && cliente.objetivo !== null) {
+      data.objetivo = cliente.objetivo;
+    }
 
     if (cliente.fechaRegistro) {
       data.fechaRegistro = cliente.fechaRegistro instanceof Date 

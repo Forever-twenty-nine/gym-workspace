@@ -20,6 +20,13 @@ export interface IEntrenadorFirestoreAdapter {
   create(entrenador: Omit<Entrenador, 'id'>): Promise<string>;
   
   /**
+   * 📄 Crea un nuevo entrenador con ID específico
+   * @param id - ID específico del entrenador
+   * @param entrenador - Datos del entrenador a crear
+   */
+  createWithId?(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void>;
+  
+  /**
    * ✏️ Actualiza un entrenador existente
    * @param id - ID del entrenador
    * @param entrenador - Datos actualizados del entrenador
@@ -108,6 +115,31 @@ export class EntrenadorService {
       return id;
     } catch (error) {
       console.error('❌ Error al crear entrenador:', error);
+      this._error.set('Error al crear entrenador');
+      throw error;
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  /**
+   * 📄 Crea un nuevo entrenador con ID específico
+   * @param id - ID específico del entrenador (igual al uid del usuario)
+   * @param entrenadorData - Datos del entrenador a crear
+   */
+  async createWithId(id: string, entrenadorData: Omit<Entrenador, 'id'>): Promise<void> {
+    this._loading.set(true);
+    this._error.set(null);
+    
+    try {
+      if (this.adapter.createWithId) {
+        await this.adapter.createWithId(id, entrenadorData);
+        console.log('✅ Entrenador creado con ID específico:', id);
+      } else {
+        throw new Error('El adaptador no soporta createWithId');
+      }
+    } catch (error) {
+      console.error('❌ Error al crear entrenador con ID:', error);
       this._error.set('Error al crear entrenador');
       throw error;
     } finally {

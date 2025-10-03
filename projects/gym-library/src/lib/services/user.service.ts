@@ -155,7 +155,7 @@ export class UserService {
     
     try {
       await this.firestoreAdapter.updateUser(uid, userData);
-      console.log('🔄 UserService: Usuario actualizado:', uid);
+     
     } catch (error: any) {
       console.error('🔄 UserService: Error al actualizar usuario:', error);
       this._error.set(error.message);

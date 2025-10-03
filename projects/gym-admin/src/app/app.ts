@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService, User } from 'gym-library';
+import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService, User, Cliente, Entrenador, Gimnasio } from 'gym-library';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
@@ -41,11 +41,17 @@ export class App {
   readonly rutinas = this.rutinaService.rutinas;
   readonly ejercicios = this.ejercicioService.ejercicios;
   readonly usuarios = computed(() => {
-    // Agregar un campo displayName para mostrar en el card
-    return this.userService.users().map(user => ({
-      ...user,
-      displayName: user.nombre || user.email || `Usuario ${user.uid}`
-    }));
+    // Agregar un campo displayName para mostrar en el card y detectar usuarios incompletos
+    return this.userService.users().map(user => {
+      // Un usuario necesita revisión si le falta nombre o rol
+      const needsReview = !user.nombre || !user.role;
+      
+      return {
+        ...user,
+        displayName: user.nombre || user.email || `Usuario ${user.uid}`,
+        needsReview
+      };
+    });
   });
   
   readonly clientes = computed(() => {
@@ -579,6 +585,14 @@ export class App {
             // Remover campos que no se pueden actualizar
             delete updatedData.password;
             
+            // Detectar si cambió el rol para crear documentos específicos
+            const originalRole = originalData.role;
+            const newRole = updatedData.role;
+            
+            if (originalRole !== newRole && newRole) {
+              await this.handleRoleChange(updatedData.uid, newRole, updatedData);
+            }
+            
             await this.userService.updateUser(updatedData.uid, updatedData);
             this.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
           }
@@ -1082,5 +1096,103 @@ export class App {
       }
     }
     return cleaned;
+  }
+
+  /**
+   * Maneja el cambio de rol creando el documento específico correspondiente
+   */
+  private async handleRoleChange(uid: string, newRole: Rol, userData: any): Promise<void> {
+    try {
+      switch (newRole) {
+        case Rol.CLIENTE:
+          // Crear documento cliente - solo campos requeridos y con valor
+          const clienteData: any = {
+            id: uid,
+            activo: true,
+            fechaRegistro: new Date(),
+            objetivo: Objetivo.MANTENER_PESO
+          };
+          
+          // Solo agregar gimnasioId si tiene un valor válido
+          if (userData.gimnasioId && userData.gimnasioId !== '') {
+            clienteData.gimnasioId = userData.gimnasioId;
+          } else {
+            // Si no hay gimnasioId, usar string vacío pero no undefined
+            clienteData.gimnasioId = '';
+          }
+          
+          await this.clienteService.save(clienteData);
+          
+          // Actualizar usuario con clienteId
+          userData.clienteId = uid;
+          
+          this.log(`✅ Documento Cliente creado para usuario: ${userData.nombre || userData.email}`);
+          break;
+
+        case Rol.GIMNASIO:
+          // Crear documento gimnasio
+          const gimnasioData: Gimnasio = {
+            id: uid,
+            nombre: userData.nombre || userData.email || 'Gimnasio',
+            direccion: '',
+            activo: true
+          };
+          
+          // Limpiar campos undefined antes de guardar
+          const cleanGimnasioData = this.cleanUndefinedFields(gimnasioData);
+          await this.gimnasioService.save(cleanGimnasioData);
+          
+          // Actualizar usuario con gimnasioId
+          userData.gimnasioId = uid;
+          
+          this.log(`✅ Documento Gimnasio creado para usuario: ${userData.nombre || userData.email}`);
+          break;
+
+        case Rol.ENTRENADOR:
+        case Rol.PERSONAL_TRAINER:
+          // Crear documento entrenador usando el adaptador directamente a través del servicio
+          const entrenadorData: any = {
+            gimnasioId: '', // Se puede establecer después
+            activo: true,
+            clientes: [],
+            rutinas: []
+          };
+          
+          // Acceder al adaptador a través del servicio de forma correcta
+          const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;
+          if (entrenadorServiceAdapter && entrenadorServiceAdapter.createWithId) {
+            await entrenadorServiceAdapter.createWithId(uid, entrenadorData);
+          } else {
+            // Si no tiene createWithId, usar create normal y luego eliminar/recrear
+            this.log(`⚠️ Usando método create normal para entrenador (se generará ID automático)`);
+            const tempId = await this.entrenadorService.create(entrenadorData);
+            
+            // Eliminar el documento con ID temporal
+            await this.entrenadorService.delete(tempId);
+            
+            // Crear nuevo documento con el ID correcto usando el adaptador
+            if (entrenadorServiceAdapter) {
+              // Usar setDoc a través del adaptador si es posible
+              await entrenadorServiceAdapter.update(uid, entrenadorData);
+            } else {
+              throw new Error('No se puede acceder al adaptador de entrenador');
+            }
+          }
+          
+          // Actualizar usuario con entrenadorId
+          userData.entrenadorId = uid;
+          
+          this.log(`✅ Documento Entrenador creado para usuario: ${userData.nombre || userData.email}`);
+          break;
+
+        default:
+          this.log(`⚠️ Rol ${newRole} no requiere documento específico`);
+          break;
+      }
+    } catch (error) {
+      console.error('Error creando documento específico:', error);
+      this.log(`❌ Error creando documento para rol ${newRole}: ${error}`);
+      throw error;
+    }
   }
 }

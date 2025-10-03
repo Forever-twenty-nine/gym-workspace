@@ -5,6 +5,7 @@ import {
     addDoc, 
     updateDoc, 
     deleteDoc, 
+    setDoc,
     onSnapshot, 
     query, 
     orderBy,
@@ -72,18 +73,25 @@ export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
      */
     async save(gimnasio: Gimnasio): Promise<void> {
         try {
-            const gimnasioData = {
-                nombre: gimnasio.nombre,
-                direccion: gimnasio.direccion,
+            const gimnasioData: any = {
                 activo: gimnasio.activo
             };
+            
+            // Solo agregar campos si no son undefined
+            if (gimnasio.nombre !== undefined && gimnasio.nombre !== null) {
+                gimnasioData.nombre = gimnasio.nombre;
+            }
+            
+            if (gimnasio.direccion !== undefined && gimnasio.direccion !== null) {
+                gimnasioData.direccion = gimnasio.direccion;
+            }
 
             if (gimnasio.id) {
-                // Actualizar gimnasio existente
+                // Crear o actualizar gimnasio con ID específico usando setDoc
                 const gimnasioRef = doc(this.firestore, this.collectionName, gimnasio.id);
-                await updateDoc(gimnasioRef, gimnasioData);
+                await setDoc(gimnasioRef, gimnasioData);
             } else {
-                // Crear nuevo gimnasio
+                // Crear nuevo gimnasio con ID automático
                 const gimnasiosCollection = collection(this.firestore, this.collectionName);
                 await addDoc(gimnasiosCollection, gimnasioData);
             }

@@ -12,6 +12,7 @@ export interface User {
   role?: Rol;
   entrenadorId?: string;
   gimnasioId?: string;
+  clienteId?: string;
   onboarded?: boolean;
   plan?: Plan;
 }

@@ -80,6 +80,25 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
   }
 
   /**
+   * 📄 Crea un nuevo entrenador con ID específico (para vinculación con usuario)
+   * @param id - ID específico del entrenador (igual al uid del usuario)
+   * @param entrenador - Datos del entrenador a crear
+   */
+  async createWithId(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void> {
+    try {
+      const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+      await setDoc(entrenadorDoc, {
+        ...entrenador,
+        clientes: entrenador.clientes || [],
+        rutinas: entrenador.rutinas || []
+      });
+    } catch (error) {
+      console.error('❌ EntrenadorFirestoreAdapter: Error al crear entrenador con ID:', error);
+      throw error;
+    }
+  }
+
+  /**
    * ✏️ Actualiza un entrenador existente
    * @param id - ID del entrenador
    * @param entrenador - Datos actualizados del entrenador
