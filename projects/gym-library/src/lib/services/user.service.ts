@@ -4,7 +4,7 @@ import { User } from '../models/user.model';
 export interface IUserFirestoreAdapter {
   initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void;
   getUsers(): Promise<User[]>;
-  addUser(user: Omit<User, 'uid'>): Promise<string>;
+  addUser(user: Omit<User, 'uid'>, password?: string): Promise<string>;
   updateUser(uid: string, userData: Partial<User>): Promise<void>;
   deleteUser(uid: string): Promise<void>;
 }
@@ -39,7 +39,7 @@ export class UserService {
     if (this.isListenerInitialized || !this.firestoreAdapter) return;
     
     try {
-      console.log('🔄 UserService: Inicializando listener para usuarios');
+      
       
       this.firestoreAdapter.initializeListener(
         (users: User[]) => {
@@ -118,8 +118,10 @@ export class UserService {
 
   /**
    * Agrega un nuevo usuario
+   * @param user - Datos del usuario
+   * @param password - Contraseña opcional para crear cuenta de Firebase Auth
    */
-  async addUser(user: Omit<User, 'uid'>): Promise<string> {
+  async addUser(user: Omit<User, 'uid'>, password?: string): Promise<string> {
     if (!this.firestoreAdapter) {
       throw new Error('Firestore adapter no configurado');
     }
@@ -128,7 +130,7 @@ export class UserService {
     this._error.set(null);
     
     try {
-      const docId = await this.firestoreAdapter.addUser(user);
+      const docId = await this.firestoreAdapter.addUser(user, password);
       console.log('🔄 UserService: Usuario agregado con ID:', docId);
       return docId;
     } catch (error: any) {

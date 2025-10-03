@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService } from 'gym-library';
+import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService, User } from 'gym-library';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
@@ -8,6 +8,9 @@ import { CommonModule } from '@angular/common';
 import { GenericCardComponent, CardConfig } from './components/shared/generic-card/generic-card.component';
 import { LogsSectionComponent } from './components/logs-section/logs-section.component';
 import { ModalFormComponent, FormFieldConfig } from './components/modal-form/modal-form.component';
+
+// Importar adaptador de autenticación
+import { FirebaseAuthAdapter } from './adapters/firebase-auth.adapter';
 
 
 
@@ -32,6 +35,7 @@ export class App {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
   private readonly fb = inject(FormBuilder);
+  private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
 
   // Signals reactivas para datos
   readonly rutinas = this.rutinaService.rutinas;
@@ -365,11 +369,8 @@ export class App {
       case 'usuario':
         return {
           uid: 'u' + timestamp,
-          nombre: '',
           email: '',
-          role: '',
-          emailVerified: false,
-          onboarded: false
+          password: ''
         };
       case 'cliente':
         return {
@@ -429,13 +430,22 @@ export class App {
 
     switch (type) {
       case 'usuario':
-        formConfig = {
-          nombre: [item.nombre || ''],
-          email: [item.email || ''],
-          role: [item.role || ''],
-          emailVerified: [item.emailVerified || false],
-          onboarded: [item.onboarded || false]
-        };
+        if (this.isCreating()) {
+          // Formulario simplificado para creación
+          formConfig = {
+            email: [item.email || '', [Validators.required, Validators.email]],
+            password: [item.password || '', [Validators.required, Validators.minLength(6)]]
+          };
+        } else {
+          // Formulario completo para edición
+          formConfig = {
+            nombre: [item.nombre || ''],
+            email: [{ value: item.email || '', disabled: true }], // Email no editable
+            role: [item.role || ''],
+            emailVerified: [item.emailVerified || false],
+            onboarded: [item.onboarded || false]
+          };
+        }
         break;
 
       case 'cliente':
@@ -546,8 +556,32 @@ export class App {
 
       switch (type) {
         case 'usuario':
-          await this.userService.addUser(updatedData);
-          this.log(`Usuario ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
+          if (this.isCreating()) {
+            // Extraer contraseña y preparar datos para creación
+            const password = updatedData.password;
+            delete updatedData.password;
+            
+            // Para creación, solo tenemos email y password
+            // Firebase Auth creará el usuario y inferirá el nombre del email
+            const userDataForCreation = {
+              email: updatedData.email,
+              // Se inferirá automáticamente en el adaptador:
+              // - nombre desde email
+              // - role desde email 
+              // - emailVerified: false
+              // - onboarded: false
+            };
+            
+            await (this.userService as any).addUser(userDataForCreation, password);
+            this.log(`✅ Usuario creado con Firebase Auth: ${updatedData.email}`);
+          } else {
+            // Para edición, actualizar usuario existente
+            // Remover campos que no se pueden actualizar
+            delete updatedData.password;
+            
+            await this.userService.updateUser(updatedData.uid, updatedData);
+            this.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
+          }
           break;
 
         case 'cliente':
@@ -739,45 +773,71 @@ export class App {
 
     switch (type) {
       case 'usuario':
-        return [
-          {
-            name: 'nombre',
-            type: 'text',
-            label: 'Nombre',
-            placeholder: 'Nombre del usuario',
-            colSpan: 2
-          },
-          {
-            name: 'email',
-            type: 'text',
-            inputType: 'email',
-            label: 'Email',
-            placeholder: 'email@ejemplo.com',
-            colSpan: 2
-          },
-          {
-            name: 'role',
-            type: 'select',
-            label: 'Rol',
-            placeholder: 'Seleccionar rol',
-            options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
-            colSpan: 2
-          },
-          {
-            name: 'emailVerified',
-            type: 'checkbox',
-            label: 'Estado del Email',
-            checkboxLabel: 'Email Verificado',
-            colSpan: 1
-          },
-          {
-            name: 'onboarded',
-            type: 'checkbox',
-            label: 'Estado de Onboarding',
-            checkboxLabel: 'Usuario Completó Onboarding',
-            colSpan: 1
-          }
-        ];
+        // Formulario simplificado para creación: solo email y contraseña
+        if (this.isCreating()) {
+          return [
+            {
+              name: 'email',
+              type: 'text',
+              inputType: 'email',
+              label: 'Email',
+              placeholder: 'email@ejemplo.com',
+              colSpan: 2,
+              required: true
+            },
+            {
+              name: 'password',
+              type: 'text',
+              inputType: 'password',
+              label: 'Contraseña',
+              placeholder: 'Mínimo 6 caracteres',
+              colSpan: 2,
+              required: true
+            }
+          ];
+        } else {
+          // Formulario completo para edición
+          return [
+            {
+              name: 'nombre',
+              type: 'text',
+              label: 'Nombre',
+              placeholder: 'Nombre del usuario',
+              colSpan: 2
+            },
+            {
+              name: 'email',
+              type: 'text',
+              inputType: 'email',
+              label: 'Email',
+              placeholder: 'email@ejemplo.com',
+              colSpan: 2,
+              readonly: true // El email no se puede cambiar una vez creado
+            },
+            {
+              name: 'role',
+              type: 'select',
+              label: 'Rol',
+              placeholder: 'Seleccionar rol',
+              options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
+              colSpan: 2
+            },
+            {
+              name: 'emailVerified',
+              type: 'checkbox',
+              label: 'Estado del Email',
+              checkboxLabel: 'Email Verificado',
+              colSpan: 1
+            },
+            {
+              name: 'onboarded',
+              type: 'checkbox',
+              label: 'Estado de Onboarding',
+              checkboxLabel: 'Usuario Completó Onboarding',
+              colSpan: 1
+            }
+          ];
+        }
 
       case 'cliente':
         const clienteData = this.modalData();

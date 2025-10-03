@@ -21,24 +21,24 @@ function initializeServiceAdapters(
   userService: UserService,
   rutinaService: RutinaService,
   ejercicioService: EjercicioService,
+  entrenadorService: EntrenadorService,
   gimnasioService: GimnasioService,
   clienteAdapter: ClienteFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
   ejercicioAdapter: EjercicioFirestoreAdapter,
+  entrenadorAdapter: EntrenadorFirestoreAdapter,
   gimnasioAdapter: GimnasioFirestoreAdapter
 ) {
   return () => {
-    console.log('🔧 Inicializando adaptadores de servicios para gym-admin...');
-    
     // Configurar adaptadores
     clienteService.setFirestoreAdapter(clienteAdapter);
     userService.setFirestoreAdapter(userAdapter);
     rutinaService.setFirestoreAdapter(rutinaAdapter);
     ejercicioService.setFirestoreAdapter(ejercicioAdapter);
+    // NOTA: entrenadorService usa injection token, no necesita setFirestoreAdapter
     gimnasioService.setFirestoreAdapter(gimnasioAdapter);
     
-    console.log('✅ Adaptadores configurados correctamente');
     return Promise.resolve();
   };
 }
@@ -74,11 +74,13 @@ export const appConfig: ApplicationConfig = {
         UserService, 
         RutinaService, 
         EjercicioService,
+        EntrenadorService,
         GimnasioService,
         ClienteFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
         EjercicioFirestoreAdapter,
+        EntrenadorFirestoreAdapter,
         GimnasioFirestoreAdapter
       ],
       multi: true
