@@ -10,7 +10,7 @@ export interface FormFieldConfig {
   icon?: string;
   placeholder?: string;
   required?: boolean;
-  options?: { value: any; label: string }[];
+  options?: { value: any; label: string; extra?: string }[];
   colSpan?: number;
   inputType?: string;
   min?: number;
@@ -20,6 +20,9 @@ export interface FormFieldConfig {
   readonly?: boolean;
   rutinas?: any[];
   usuario?: any;
+  gimnasio?: any;
+  clientes?: any[];
+  ejercicios?: any[];
 }
 
 @Component({
@@ -97,5 +100,38 @@ export class ModalFormComponent implements OnInit, OnDestroy {
     
     const nombresCompletos = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     return dias.map(dia => nombresCompletos[dia] || 'N/A').join(', ');
+  }
+
+  // Métodos para manejar multiselects
+  isOptionSelected(fieldName: string, optionValue: any): boolean {
+    if (!this.form) return false;
+    const fieldValue = this.form.get(fieldName)?.value;
+    return Array.isArray(fieldValue) ? fieldValue.includes(optionValue) : false;
+  }
+
+  onToggleMultiselect(fieldName: string, optionValue: any, event: Event) {
+    if (!this.form) return;
+    
+    const checkbox = event.target as HTMLInputElement;
+    const currentValues = this.form.get(fieldName)?.value || [];
+    
+    let newValues: any[];
+    if (checkbox.checked) {
+      // Agregar valor si no está presente
+      newValues = currentValues.includes(optionValue) 
+        ? currentValues 
+        : [...currentValues, optionValue];
+    } else {
+      // Remover valor si está presente
+      newValues = currentValues.filter((value: any) => value !== optionValue);
+    }
+    
+    this.form.patchValue({ [fieldName]: newValues });
+  }
+
+  getSelectedCount(fieldName: string): number {
+    if (!this.form) return 0;
+    const fieldValue = this.form.get(fieldName)?.value;
+    return Array.isArray(fieldValue) ? fieldValue.length : 0;
   }
 }

@@ -210,6 +210,73 @@ export class App {
   }
 
   /**
+   * Obtiene los clientes asignados a un entrenador específico
+   * @param entrenadorId ID del entrenador
+   * @returns Lista de clientes asociados al entrenador
+   */
+  getClientesByEntrenador(entrenadorId: string) {
+    return this.clientes().filter(cliente => cliente.entrenadorId === entrenadorId);
+  }
+
+  /**
+   * Obtiene las rutinas creadas por un entrenador específico
+   * @param entrenadorId ID del entrenador
+   * @returns Lista de rutinas creadas por el entrenador
+   */
+  getRutinasByEntrenador(entrenadorId: string) {
+    return this.rutinas().filter(rutina => rutina.entrenadorId === entrenadorId);
+  }
+
+  /**
+   * Obtiene los ejercicios creados por un entrenador específico
+   * @param entrenadorId ID del entrenador
+   * @returns Lista de ejercicios creados por el entrenador
+   */
+  getEjerciciosByEntrenador(entrenadorId: string) {
+    // Por ahora asumimos que todos los ejercicios están disponibles para todos los entrenadores
+    // En el futuro se podría agregar un campo 'creadoPor' al modelo de ejercicio
+    return this.ejercicios();
+  }
+
+  /**
+   * Obtiene la información del gimnasio asociado a un entrenador
+   * @param gimnasioId ID del gimnasio
+   * @returns Datos del gimnasio o null si no existe
+   */
+  getGimnasioInfo(gimnasioId: string) {
+    const gimnasioUsuario = this.usuarios().find(u => u.uid === gimnasioId && u.role === Rol.GIMNASIO);
+    const gimnasioData = this.gimnasios().find(g => g.id === gimnasioId);
+    
+    if (gimnasioUsuario && gimnasioData) {
+      return {
+        ...gimnasioData,
+        email: gimnasioUsuario.email,
+        emailVerified: gimnasioUsuario.emailVerified,
+        onboarded: gimnasioUsuario.onboarded
+      };
+    }
+    
+    return null;
+  }
+
+  /**
+   * Obtiene los entrenadores asociados a un gimnasio específico
+   * @param gimnasioId ID del gimnasio
+   * @returns Lista de entrenadores del gimnasio
+   */
+  getEntrenadoresByGimnasio(gimnasioId: string) {
+    return this.entrenadores().filter(entrenador => entrenador.gimnasioId === gimnasioId);
+  }
+
+  /**
+   * Obtiene todos los entrenadores disponibles (usuarios con rol ENTRENADOR)
+   * @returns Lista de usuarios entrenadores
+   */
+  getEntrenadoresDisponiblesParaGimnasio() {
+    return this.usuarios().filter(u => u.role === Rol.ENTRENADOR);
+  }
+
+  /**
    * Crea un cliente de muestra
    * @return void
    */
@@ -404,7 +471,17 @@ export class App {
           id: 'g' + timestamp,
           nombre: '',
           direccion: '',
-          activo: true
+          activo: true,
+          entrenadores: []
+        };
+      case 'entrenador':
+        return {
+          id: 'e' + timestamp,
+          gimnasioId: '',
+          activo: true,
+          clientes: [],
+          rutinas: [],
+          ejercicios: []
         };
       default:
         return {};
@@ -471,6 +548,24 @@ export class App {
         };
         break;
 
+      case 'entrenador':
+        formConfig = {
+          // Campo informativo del usuario asociado
+          usuarioInfo: [{ value: '', disabled: true }],
+          
+          // Campos editables
+          activo: [item.activo || false],
+          
+          // Campos para selección múltiple
+          rutinasAsociadas: [item.rutinas || []],
+          ejerciciosAsociados: [item.ejercicios || []],
+          
+          // Campos informativos (solo lectura)
+          clientesAsociados: [{ value: '', disabled: true }],
+          gimnasioInfo: [{ value: '', disabled: true }]
+        };
+        break;
+
       case 'rutina':
         formConfig = {
           nombre: [item.nombre || '', [Validators.required]],
@@ -480,6 +575,12 @@ export class App {
           completado: [item.completado || false],
           DiasSemana: [item.DiasSemana || []]
         };
+        
+        // Agregar gimnasioId solo si existe y no está vacío
+        if (item.gimnasioId && item.gimnasioId.trim() !== '') {
+          formConfig.gimnasioId = [item.gimnasioId];
+        }
+        
         // Cargar ejercicios seleccionados si existen
         if (item.ejercicios) {
           this.selectedEjercicios.set(Array.isArray(item.ejercicios) ? item.ejercicios : []);
@@ -499,10 +600,20 @@ export class App {
         break;
 
       case 'gimnasio':
+        // Obtener entrenadores ya asociados a este gimnasio
+        const entrenadoresAsociados = this.getEntrenadoresByGimnasio(item.id || '').map(e => e.id);
+        
         formConfig = {
+          // Campo informativo del usuario asociado
+          usuarioInfo: [{ value: '', disabled: true }],
+          
+          // Campos editables
           nombre: [item.nombre || '', [Validators.required]],
           direccion: [item.direccion || '', [Validators.required]],
-          activo: [item.activo || true]
+          activo: [item.activo || true],
+          
+          // Campo para selección múltiple de entrenadores (pre-cargado con los ya asociados)
+          entrenadoresAsociados: [entrenadoresAsociados]
         };
         break;
 
@@ -619,8 +730,64 @@ export class App {
           this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
           break;
 
+        case 'entrenador':
+          // Limpiar campos informativos antes de guardar
+          const entrenadorDataToSave = {
+            ...updatedData
+          };
+          
+          // Remover campos informativos
+          delete entrenadorDataToSave.usuarioInfo;
+          delete entrenadorDataToSave.clientesAsociados;
+          delete entrenadorDataToSave.gimnasioInfo;
+          
+          // Los campos rutinasAsociadas y ejerciciosAsociados se mantienen como arrays
+          // que se guardarán en el documento del entrenador
+          
+          if (this.isCreating()) {
+            // Usar la misma lógica que en handleRoleChange para crear entrenadores
+            const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;
+            if (entrenadorServiceAdapter && entrenadorServiceAdapter.createWithId) {
+              await entrenadorServiceAdapter.createWithId(entrenadorDataToSave.id, entrenadorDataToSave);
+            } else {
+              // Fallback: crear con ID temporal y luego actualizar
+              const tempId = await this.entrenadorService.create(entrenadorDataToSave);
+              // Eliminar el documento temporal
+              await this.entrenadorService.delete(tempId);
+              // Crear el documento con el ID correcto usando el adaptador
+              if (entrenadorServiceAdapter) {
+                await entrenadorServiceAdapter.update(entrenadorDataToSave.id, entrenadorDataToSave);
+              }
+            }
+          } else {
+            await this.entrenadorService.update(entrenadorDataToSave.id, entrenadorDataToSave);
+          }
+          
+          // Obtener nombres para el log
+          const usuarioEntrenadorNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
+          const gimnasioEntrenadorNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
+          const clientesCount = this.getClientesByEntrenador(updatedData.id).length;
+          const rutinasCount = this.getRutinasByEntrenador(updatedData.id).length;
+          
+          this.log(`Entrenador ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioEntrenadorNombre} - Gimnasio: ${gimnasioEntrenadorNombre} - Clientes: ${clientesCount} - Rutinas: ${rutinasCount}`);
+          break;
+
         case 'rutina':
-          await this.rutinaService.save(updatedData);
+          // Limpieza específica para rutina: remover campos undefined o vacíos
+          const rutinaDataToSave = { ...updatedData };
+          
+          // Remover campos opcionales si están undefined o vacíos
+          if (!rutinaDataToSave.gimnasioId || rutinaDataToSave.gimnasioId.trim() === '') {
+            delete rutinaDataToSave.gimnasioId;
+          }
+          if (!rutinaDataToSave.notas || rutinaDataToSave.notas.trim() === '') {
+            delete rutinaDataToSave.notas;
+          }
+          if (!rutinaDataToSave.duracion || rutinaDataToSave.duracion === 0) {
+            delete rutinaDataToSave.duracion;
+          }
+          
+          await this.rutinaService.save(rutinaDataToSave);
           const clienteNombre = updatedData.clienteId ? this.getClienteName(updatedData.clienteId) : 'Sin cliente';
           const entrenadorNombre = updatedData.entrenadorId ? this.getEntrenadorName(updatedData.entrenadorId) : 'Sin entrenador';
           this.log(`Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
@@ -632,8 +799,65 @@ export class App {
           break;
 
         case 'gimnasio':
-          await this.gimnasioService.save(updatedData);
-          this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre}`);
+          // Limpiar campos informativos antes de guardar
+          const gimnasioDataToSave = {
+            ...updatedData
+          };
+          
+          // Remover campos informativos y el array de entrenadores (no se guarda en el modelo de gimnasio)
+          delete gimnasioDataToSave.usuarioInfo;
+          const entrenadoresSeleccionados = updatedData.entrenadoresAsociados || [];
+          delete gimnasioDataToSave.entrenadoresAsociados;
+          
+          // Guardar datos del gimnasio
+          await this.gimnasioService.save(gimnasioDataToSave);
+          
+          // Actualizar la relación de entrenadores
+          if (!this.isCreating()) {
+            // Para edición, primero desasociar todos los entrenadores actuales
+            const entrenadoresActuales = this.getEntrenadoresByGimnasio(updatedData.id);
+            for (const entrenador of entrenadoresActuales) {
+              if (!entrenadoresSeleccionados.includes(entrenador.id)) {
+                // Desasociar entrenador (quitar gimnasioId)
+                await this.entrenadorService.update(entrenador.id, { 
+                  ...entrenador, 
+                  gimnasioId: '' 
+                });
+              }
+            }
+          }
+          
+          // Asociar los entrenadores seleccionados
+          for (const entrenadorId of entrenadoresSeleccionados) {
+            try {
+              const entrenadorActual = this.entrenadores().find(e => e.id === entrenadorId);
+              if (entrenadorActual) {
+                // Actualizar entrenador existente
+                await this.entrenadorService.update(entrenadorId, {
+                  ...entrenadorActual,
+                  gimnasioId: updatedData.id
+                });
+              } else {
+                // Crear nuevo documento de entrenador si no existe
+                const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;
+                if (entrenadorServiceAdapter && entrenadorServiceAdapter.createWithId) {
+                  await entrenadorServiceAdapter.createWithId(entrenadorId, {
+                    id: entrenadorId,
+                    gimnasioId: updatedData.id,
+                    activo: true,
+                    clientes: [],
+                    rutinas: [],
+                    ejercicios: []
+                  });
+                }
+              }
+            } catch (error) {
+              console.error(`Error al asociar entrenador ${entrenadorId}:`, error);
+              this.log(`⚠️ Error al asociar entrenador ${entrenadorId}: ${error}`);
+            }
+          }
+          
+          this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre} - Entrenadores: ${entrenadoresSeleccionados.length}`);
           break;
       }
 
@@ -933,6 +1157,84 @@ export class App {
           }
         ];
 
+      case 'entrenador':
+        const entrenadorData = this.modalData();
+        const usuarioEntrenador = this.usuarios().find(u => u.uid === entrenadorData?.id);
+        const clientesEntrenador = this.getClientesByEntrenador(entrenadorData?.id || '');
+        const rutinasEntrenador = this.getRutinasByEntrenador(entrenadorData?.id || '');
+        const ejerciciosEntrenador = this.getEjerciciosByEntrenador(entrenadorData?.id || '');
+        const gimnasioInfo = entrenadorData?.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
+        
+        return [
+          // Información del usuario asociado
+          {
+            name: 'usuarioInfo',
+            type: 'user-info',
+            label: 'Usuario Asociado',
+            colSpan: 2,
+            usuario: usuarioEntrenador
+          },
+          
+          // Información del gimnasio asociado (solo lectura)
+          {
+            name: 'gimnasioInfo',
+            type: 'gimnasio-info',
+            label: 'Gimnasio Asociado',
+            colSpan: 2,
+            gimnasio: gimnasioInfo
+          },
+          
+          // Estado del entrenador
+          {
+            name: 'activo',
+            type: 'checkbox',
+            label: 'Estado',
+            checkboxLabel: 'Entrenador Activo',
+            colSpan: 2
+          },
+          
+          // Lista de clientes asociados
+          {
+            name: 'clientesAsociados',
+            type: 'clientes-info',
+            label: `Clientes Asignados (${clientesEntrenador.length})`,
+            colSpan: 2,
+            clientes: clientesEntrenador.map(cliente => {
+              const usuario = this.usuarios().find(u => u.uid === cliente.id);
+              return {
+                ...cliente,
+                usuario: usuario
+              };
+            })
+          },
+          
+          // Selección múltiple de rutinas
+          {
+            name: 'rutinasAsociadas',
+            type: 'rutinas-multiselect',
+            label: `Rutinas del Entrenador (${rutinasEntrenador.length} disponibles)`,
+            colSpan: 2,
+            options: rutinasEntrenador.map(rutina => ({
+              value: rutina.id,
+              label: rutina.nombre,
+              extra: this.usuarios().find(u => u.uid === rutina.clienteId)?.nombre || 'Sin cliente'
+            }))
+          },
+          
+          // Selección múltiple de ejercicios
+          {
+            name: 'ejerciciosAsociados',
+            type: 'ejercicios-multiselect',
+            label: `Ejercicios Favoritos (${ejerciciosEntrenador.length} disponibles)`,
+            colSpan: 2,
+            options: ejerciciosEntrenador.map(ejercicio => ({
+              value: ejercicio.id,
+              label: ejercicio.nombre,
+              extra: `${ejercicio.series}x${ejercicio.repeticiones}`
+            }))
+          }
+        ];
+
       case 'rutina':
         return [
           {
@@ -1050,7 +1352,22 @@ export class App {
         ];
 
       case 'gimnasio':
+        const gimnasioData = this.modalData();
+        const usuarioGimnasio = this.usuarios().find(u => u.uid === gimnasioData?.id);
+        const entrenadoresGimnasio = this.getEntrenadoresByGimnasio(gimnasioData?.id || '');
+        const entrenadoresDisponibles = this.getEntrenadoresDisponiblesParaGimnasio();
+        
         return [
+          // Información del usuario asociado
+          {
+            name: 'usuarioInfo',
+            type: 'user-info',
+            label: 'Usuario Asociado',
+            colSpan: 2,
+            usuario: usuarioGimnasio
+          },
+          
+          // Información básica del gimnasio
           {
             name: 'nombre',
             type: 'text',
@@ -1071,6 +1388,19 @@ export class App {
             label: 'Estado',
             checkboxLabel: 'Gimnasio Activo',
             colSpan: 2
+          },
+          
+          // Selección múltiple de entrenadores
+          {
+            name: 'entrenadoresAsociados',
+            type: 'entrenadores-multiselect',
+            label: `Entrenadores del Gimnasio (${entrenadoresDisponibles.length} disponibles)`,
+            colSpan: 2,
+            options: entrenadoresDisponibles.map(entrenador => ({
+              value: entrenador.uid,
+              label: entrenador.nombre || entrenador.email || `Entrenador ${entrenador.uid}`,
+              extra: entrenador.emailVerified ? 'Verificado' : 'Sin verificar'
+            }))
           }
         ];
 
@@ -1084,16 +1414,18 @@ export class App {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(obj)) {
       if (value !== undefined && value !== null) {
-        // Para strings vacíos, solo incluir si es un campo requerido
-        if (typeof value === 'string' && value === '') {
-          const requiredFields = ['id', 'nombre', 'fechaAsignacion', 'activa', 'completado'];
+        // Para strings vacíos, solo incluir si es un campo requerido o si no está vacío
+        if (typeof value === 'string' && value.trim() === '') {
+          const requiredFields = ['id', 'nombre'];
           if (requiredFields.includes(key)) {
             cleaned[key] = value;
           }
+          // Si es un string vacío y no es requerido, no lo incluimos
         } else {
           cleaned[key] = value;
         }
       }
+      // Para campos undefined o null, los omitimos completamente
     }
     return cleaned;
   }

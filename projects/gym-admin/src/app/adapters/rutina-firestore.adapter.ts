@@ -84,12 +84,22 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       ejercicios: rutina.ejercicios || [],
       activa: rutina.activa,
       entrenadorId: rutina.entrenadorId,
-      gimnasioId: rutina.gimnasioId,
-      duracion: rutina.duracion,
       DiasSemana: rutina.DiasSemana || [],
-      completado: rutina.completado,
-      notas: rutina.notas
+      completado: rutina.completado
     };
+
+    // Solo incluir campos opcionales si tienen valor válido
+    if (rutina.gimnasioId && rutina.gimnasioId !== null && rutina.gimnasioId.trim() !== '') {
+      data.gimnasioId = rutina.gimnasioId;
+    }
+    
+    if (rutina.duracion && rutina.duracion > 0) {
+      data.duracion = rutina.duracion;
+    }
+    
+    if (rutina.notas && rutina.notas.trim() !== '') {
+      data.notas = rutina.notas;
+    }
 
     if (rutina.fechaAsignacion) {
       data.fechaAsignacion = rutina.fechaAsignacion instanceof Date 

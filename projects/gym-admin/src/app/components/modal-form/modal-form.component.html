@@ -252,6 +252,289 @@
                   }
                 </div>
               }
+
+              <!-- Información del gimnasio asociado al entrenador -->
+              @case ('gimnasio-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner p-4">
+                  @if (field.gimnasio) {
+                    <div class="flex items-center space-x-4">
+                      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <span class="text-purple-600 font-semibold text-lg">🏢</span>
+                      </div>
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">{{ field.gimnasio.nombre || 'Sin nombre' }}</h4>
+                        <p class="text-sm text-gray-600">{{ field.gimnasio.email || 'Sin email' }}</p>
+                        @if (field.gimnasio.direccion) {
+                          <p class="text-sm text-gray-600">📍 {{ field.gimnasio.direccion }}</p>
+                        }
+                        <div class="flex gap-2 mt-2">
+                          @if (field.gimnasio.activo) {
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Activo</span>
+                          } @else {
+                            <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">✗ Inactivo</span>
+                          }
+                          @if (field.gimnasio.emailVerified) {
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">✓ Verificado</span>
+                          } @else {
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">⚠ No verificado</span>
+                          }
+                        </div>
+                        <p class="text-xs text-purple-600 mt-2 bg-purple-50 p-2 rounded">
+                          ℹ️ Para cambiar la asociación, gestionarlo desde el panel del gimnasio
+                        </p>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="text-center text-gray-500 py-4">
+                      <p class="text-sm">🏢 Sin gimnasio asociado</p>
+                      <p class="text-xs text-gray-400 mt-1">La asociación con un gimnasio se realiza desde el panel del gimnasio</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Información de clientes del entrenador -->
+              @case ('clientes-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
+                  @if (field.clientes && field.clientes.length > 0) {
+                    <div class="max-h-60 overflow-y-auto">
+                      @for (cliente of field.clientes; track cliente.id) {
+                        <div class="p-4 border-b border-gray-200 last:border-b-0 hover:bg-green-50 transition-colors duration-150">
+                          <div class="flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <span class="text-green-600 text-sm">👤</span>
+                              </div>
+                              <div>
+                                <h4 class="font-medium text-gray-800">{{ cliente.usuario?.nombre || cliente.usuario?.email || 'Cliente ' + cliente.id }}</h4>
+                                @if (cliente.usuario?.email && cliente.usuario?.nombre) {
+                                  <p class="text-sm text-gray-600">{{ cliente.usuario.email }}</p>
+                                }
+                              </div>
+                            </div>
+                            <div class="flex gap-2">
+                              @if (cliente.activo) {
+                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Activo</span>
+                              } @else {
+                                <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">Inactivo</span>
+                              }
+                              @if (cliente.objetivo) {
+                                <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{{ cliente.objetivo }}</span>
+                              }
+                            </div>
+                          </div>
+                          @if (cliente.fechaRegistro) {
+                            <p class="text-xs text-gray-500 mt-2">Registrado: {{ cliente.fechaRegistro | date:'short' }}</p>
+                          }
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay clientes asignados</p>
+                      <p class="text-xs text-gray-400 mt-1">Este entrenador no tiene clientes asociados</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Información de rutinas creadas por el entrenador -->
+              @case ('rutinas-entrenador-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
+                  @if (field.rutinas && field.rutinas.length > 0) {
+                    <div class="max-h-60 overflow-y-auto">
+                      @for (rutina of field.rutinas; track rutina.id) {
+                        <div class="p-4 border-b border-gray-200 last:border-b-0 hover:bg-purple-50 transition-colors duration-150">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ rutina.nombre }}</h4>
+                            <div class="flex gap-2">
+                              @if (rutina.activa) {
+                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Activa</span>
+                              } @else {
+                                <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">Inactiva</span>
+                              }
+                              @if (rutina.completado) {
+                                <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Completada</span>
+                              }
+                            </div>
+                          </div>
+                          <div class="text-sm text-gray-600 mt-2">
+                            <p><strong>Cliente:</strong> {{ rutina.clienteNombre }}</p>
+                            <p><strong>Fecha asignación:</strong> {{ rutina.fechaAsignacion | date:'short' }}</p>
+                            @if (rutina.ejercicios && rutina.ejercicios.length > 0) {
+                              <p><strong>Ejercicios:</strong> {{ rutina.ejercicios.length }}</p>
+                            }
+                            @if (rutina.DiasSemana && rutina.DiasSemana.length > 0) {
+                              <p><strong>Días:</strong> {{ getDiasSemanaNombres(rutina.DiasSemana) }}</p>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay rutinas creadas</p>
+                      <p class="text-xs text-gray-400 mt-1">Este entrenador no ha creado rutinas aún</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Información de ejercicios disponibles para el entrenador -->
+              @case ('ejercicios-entrenador-info') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
+                  @if (field.ejercicios && field.ejercicios.length > 0) {
+                    <div class="max-h-60 overflow-y-auto">
+                      @for (ejercicio of field.ejercicios; track ejercicio.id) {
+                        <div class="p-4 border-b border-gray-200 last:border-b-0 hover:bg-orange-50 transition-colors duration-150">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ ejercicio.nombre }}</h4>
+                            <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                              {{ ejercicio.series }}x{{ ejercicio.repeticiones }}
+                            </span>
+                          </div>
+                          @if (ejercicio.descripcion) {
+                            <p class="text-sm text-gray-600 mt-1">{{ ejercicio.descripcion }}</p>
+                          }
+                          <div class="text-xs text-gray-500 mt-2 flex gap-3">
+                            @if (ejercicio.peso && ejercicio.peso > 0) {
+                              <span>💪 {{ ejercicio.peso }}kg</span>
+                            }
+                            @if (ejercicio.serieSegundos && ejercicio.serieSegundos > 0) {
+                              <span>⏱️ {{ ejercicio.serieSegundos }}s</span>
+                            }
+                            @if (ejercicio.descansoSegundos) {
+                              <span>⏸️ {{ ejercicio.descansoSegundos }}s descanso</span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay ejercicios disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">No hay ejercicios en el sistema</p>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Multiselect de rutinas para entrenador -->
+              @case ('rutinas-multiselect') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner max-h-60 overflow-y-auto">
+                  @if (field.options && field.options.length > 0) {
+                    @for (option of field.options; track option.value) {
+                      <label
+                        class="flex items-center p-3 hover:bg-purple-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
+                        <input type="checkbox" 
+                               [checked]="isOptionSelected(field.name, option.value)"
+                               (change)="onToggleMultiselect(field.name, option.value, $event)"
+                               class="mr-3 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
+                        <div class="flex-1">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ option.label }}</h4>
+                            @if (option.extra) {
+                              <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                                👤 {{ option.extra }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </label>
+                    }
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay rutinas disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">Este entrenador no ha creado rutinas aún</p>
+                    </div>
+                  }
+                </div>
+                
+                <!-- Contador de seleccionados -->
+                @if (getSelectedCount(field.name) > 0) {
+                  <div class="mt-2 text-sm text-purple-600 bg-purple-50 p-2 rounded-lg">
+                    ✅ {{ getSelectedCount(field.name) }} rutina(s) seleccionada(s)
+                  </div>
+                }
+              }
+
+              <!-- Multiselect de ejercicios para entrenador -->
+              @case ('ejercicios-multiselect') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner max-h-60 overflow-y-auto">
+                  @if (field.options && field.options.length > 0) {
+                    @for (option of field.options; track option.value) {
+                      <label
+                        class="flex items-center p-3 hover:bg-orange-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
+                        <input type="checkbox" 
+                               [checked]="isOptionSelected(field.name, option.value)"
+                               (change)="onToggleMultiselect(field.name, option.value, $event)"
+                               class="mr-3 h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded">
+                        <div class="flex-1">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ option.label }}</h4>
+                            @if (option.extra) {
+                              <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                                💪 {{ option.extra }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </label>
+                    }
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay ejercicios disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">No hay ejercicios en el sistema</p>
+                    </div>
+                  }
+                </div>
+                
+                <!-- Contador de seleccionados -->
+                @if (getSelectedCount(field.name) > 0) {
+                  <div class="mt-2 text-sm text-orange-600 bg-orange-50 p-2 rounded-lg">
+                    ✅ {{ getSelectedCount(field.name) }} ejercicio(s) favorito(s)
+                  </div>
+                }
+              }
+
+              <!-- Multiselect de entrenadores para gimnasio -->
+              @case ('entrenadores-multiselect') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner max-h-60 overflow-y-auto">
+                  @if (field.options && field.options.length > 0) {
+                    @for (option of field.options; track option.value) {
+                      <label
+                        class="flex items-center p-3 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
+                        <input type="checkbox" 
+                               [checked]="isOptionSelected(field.name, option.value)"
+                               (change)="onToggleMultiselect(field.name, option.value, $event)"
+                               class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <div class="flex-1">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ option.label }}</h4>
+                            @if (option.extra) {
+                              <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                                🔐 {{ option.extra }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </label>
+                    }
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay entrenadores disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">No hay entrenadores registrados en el sistema</p>
+                    </div>
+                  }
+                </div>
+                
+                <!-- Contador de seleccionados -->
+                @if (getSelectedCount(field.name) > 0) {
+                  <div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded-lg">
+                    ✅ {{ getSelectedCount(field.name) }} entrenador(es) asignado(s)
+                  </div>
+                }
+              }
             }
           </div>
           }
