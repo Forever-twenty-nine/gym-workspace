@@ -73,8 +73,7 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
       entrenadorId: data.entrenadorId || '',
       activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-      objetivo: data.objetivo || undefined, // Usar undefined en lugar de null para consistencia
-      rutinas: data.rutinas || []
+      objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
     };
   }
 
@@ -83,8 +82,7 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
    */
   private mapToFirestore(cliente: Cliente): any {
     const data: any = {
-      activo: cliente.activo,
-      rutinas: cliente.rutinas || []
+      activo: cliente.activo
     };
 
     // Solo incluir campos si no son undefined

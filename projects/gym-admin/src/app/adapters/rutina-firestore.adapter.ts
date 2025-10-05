@@ -68,12 +68,17 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       fechaAsignacion: data.fechaAsignacion?.toDate?.() || data.fechaAsignacion || new Date(),
       ejercicios: data.ejercicios || [],
       activa: data.activa ?? true,
-      entrenadorId: data.entrenadorId,
-      gimnasioId: data.gimnasioId,
       duracion: data.duracion,
       DiasSemana: data.DiasSemana || [],
       completado: data.completado ?? false,
-      notas: data.notas || ''
+      notas: data.notas || '',
+      // Nuevos campos
+      creadorId: data.creadorId,
+      creadorTipo: data.creadorTipo,
+      asignadoId: data.asignadoId,
+      asignadoTipo: data.asignadoTipo,
+      fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
+      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
     };
   }
 
@@ -83,16 +88,11 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       nombre: rutina.nombre,
       ejercicios: rutina.ejercicios || [],
       activa: rutina.activa,
-      entrenadorId: rutina.entrenadorId,
       DiasSemana: rutina.DiasSemana || [],
       completado: rutina.completado
     };
 
     // Solo incluir campos opcionales si tienen valor válido
-    if (rutina.gimnasioId && rutina.gimnasioId !== null && rutina.gimnasioId.trim() !== '') {
-      data.gimnasioId = rutina.gimnasioId;
-    }
-    
     if (rutina.duracion && rutina.duracion > 0) {
       data.duracion = rutina.duracion;
     }
@@ -105,6 +105,35 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       data.fechaAsignacion = rutina.fechaAsignacion instanceof Date 
         ? Timestamp.fromDate(rutina.fechaAsignacion)
         : rutina.fechaAsignacion;
+    }
+
+    // Nuevos campos opcionales
+    if (rutina.creadorId) {
+      data.creadorId = rutina.creadorId;
+    }
+    
+    if (rutina.creadorTipo) {
+      data.creadorTipo = rutina.creadorTipo;
+    }
+    
+    if (rutina.asignadoId) {
+      data.asignadoId = rutina.asignadoId;
+    }
+    
+    if (rutina.asignadoTipo) {
+      data.asignadoTipo = rutina.asignadoTipo;
+    }
+    
+    if (rutina.fechaCreacion) {
+      data.fechaCreacion = rutina.fechaCreacion instanceof Date 
+        ? Timestamp.fromDate(rutina.fechaCreacion)
+        : rutina.fechaCreacion;
+    }
+    
+    if (rutina.fechaModificacion) {
+      data.fechaModificacion = rutina.fechaModificacion instanceof Date 
+        ? Timestamp.fromDate(rutina.fechaModificacion)
+        : rutina.fechaModificacion;
     }
 
     return data;

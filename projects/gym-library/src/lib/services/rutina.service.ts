@@ -160,12 +160,77 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por entrenador
+     * 🔍 Busca rutinas por entrenador (usando creadorId)
+     * @deprecated Use getRutinasByCreador instead
      */
     getRutinasByEntrenador(entrenadorId: string): Signal<Rutina[]> {
         return computed(() => 
             this._rutinas().filter(rutina => 
-                rutina.entrenadorId === entrenadorId
+                rutina.creadorId === entrenadorId
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas por creador
+     */
+    getRutinasByCreador(creadorId: string): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => 
+                rutina.creadorId === creadorId
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas por tipo de creador (Rol)
+     */
+    getRutinasByCreadorTipo(tipo: string): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => 
+                rutina.creadorTipo === tipo
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas por asignado
+     */
+    getRutinasByAsignado(asignadoId: string): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => 
+                rutina.asignadoId === asignadoId
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas por tipo de asignado (Rol)
+     */
+    getRutinasByAsignadoTipo(tipo: string): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => 
+                rutina.asignadoTipo === tipo
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas completadas
+     */
+    getRutinasCompletadas(): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => rutina.completado === true)
+        );
+    }
+
+    /**
+     * 🔍 Busca rutinas por día de la semana
+     */
+    getRutinasByDiaSemana(dia: number): Signal<Rutina[]> {
+        return computed(() => 
+            this._rutinas().filter(rutina => 
+                rutina.DiasSemana?.includes(dia) || false
             )
         );
     }

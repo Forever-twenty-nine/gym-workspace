@@ -535,6 +535,45 @@
                   </div>
                 }
               }
+
+              <!-- Multiselect de clientes para gimnasio -->
+              @case ('clientes-multiselect') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner max-h-60 overflow-y-auto">
+                  @if (field.options && field.options.length > 0) {
+                    @for (option of field.options; track option.value) {
+                      <label
+                        class="flex items-center p-3 hover:bg-green-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
+                        <input type="checkbox" 
+                               [checked]="isOptionSelected(field.name, option.value)"
+                               (change)="onToggleMultiselect(field.name, option.value, $event)"
+                               class="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <div class="flex-1">
+                          <div class="flex justify-between items-center">
+                            <h4 class="font-medium text-gray-800">{{ option.label }}</h4>
+                            @if (option.extra) {
+                              <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                                🔐 {{ option.extra }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </label>
+                    }
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-sm">No hay clientes disponibles</p>
+                      <p class="text-xs text-gray-400 mt-1">No hay clientes registrados en el sistema</p>
+                    </div>
+                  }
+                </div>
+                
+                <!-- Contador de seleccionados -->
+                @if (getSelectedCount(field.name) > 0) {
+                  <div class="mt-2 text-sm text-green-600 bg-green-50 p-2 rounded-lg">
+                    ✅ {{ getSelectedCount(field.name) }} cliente(s) asignado(s)
+                  </div>
+                }
+              }
             }
           </div>
           }

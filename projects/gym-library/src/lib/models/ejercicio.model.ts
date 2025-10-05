@@ -1,6 +1,4 @@
-/**
- * Ejercicio dentro de una rutina de entrenamiento.
- */
+import { Rol } from '../enums/rol.enum';
 
 export interface Ejercicio {
     id: string;
@@ -11,4 +9,13 @@ export interface Ejercicio {
     peso?: number;
     descansoSegundos?: number;
     serieSegundos?: number;
+    // Información del creador (opcional)
+    creadorId?: string; 
+    creadorTipo?: Rol; 
+    // informacion del asignado (opcional)
+    asignadoAId?: string;
+    asignadoATipo?: Rol;
+    // Metadatos
+    fechaCreacion?: Date;
+    fechaModificacion?: Date;
 }

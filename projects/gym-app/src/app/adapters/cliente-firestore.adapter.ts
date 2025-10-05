@@ -69,8 +69,7 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
       gimnasioId: data.gimnasioId || '',
       activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-      objetivo: data.objetivo || null,
-      rutinas: data.rutinas || []
+      objetivo: data.objetivo || null
     };
   }
 
@@ -78,8 +77,7 @@ export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
     const data: any = {
       gimnasioId: cliente.gimnasioId,
       activo: cliente.activo,
-      objetivo: cliente.objetivo,
-      rutinas: cliente.rutinas || []
+      objetivo: cliente.objetivo
     };
 
     if (cliente.fechaRegistro) {

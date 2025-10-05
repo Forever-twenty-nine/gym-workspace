@@ -68,12 +68,17 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
       repeticiones: data.repeticiones || 0,
       peso: data.peso,
       descansoSegundos: data.descansoSegundos,
-      serieSegundos: data.serieSegundos
+      serieSegundos: data.serieSegundos,
+      // Nuevos campos
+      creadorId: data.creadorId,
+      creadorTipo: data.creadorTipo,
+      fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
+      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
     };
   }
 
   private mapToFirestore(ejercicio: Ejercicio): any {
-    return {
+    const data: any = {
       nombre: ejercicio.nombre,
       descripcion: ejercicio.descripcion,
       series: ejercicio.series,
@@ -82,5 +87,28 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
       descansoSegundos: ejercicio.descansoSegundos,
       serieSegundos: ejercicio.serieSegundos
     };
+
+    // Incluir campos opcionales solo si tienen valor
+    if (ejercicio.creadorId) {
+      data.creadorId = ejercicio.creadorId;
+    }
+    
+    if (ejercicio.creadorTipo) {
+      data.creadorTipo = ejercicio.creadorTipo;
+    }
+    
+    if (ejercicio.fechaCreacion) {
+      data.fechaCreacion = ejercicio.fechaCreacion instanceof Date 
+        ? ejercicio.fechaCreacion
+        : ejercicio.fechaCreacion;
+    }
+    
+    if (ejercicio.fechaModificacion) {
+      data.fechaModificacion = ejercicio.fechaModificacion instanceof Date 
+        ? ejercicio.fechaModificacion
+        : ejercicio.fechaModificacion;
+    }
+
+    return data;
   }
 }
