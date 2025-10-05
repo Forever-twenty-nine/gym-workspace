@@ -64,8 +64,8 @@ export class LoginPage {
       if (success) {
         const user = this.authService.currentUser();
         if (user) {
-          // Login exitoso, la redirección la maneja el AuthService
           console.log('Login exitoso:', user);
+          this.redirectToRolePage(user.role);
         }
       } else {
         this.errorMessage = 'Email o contraseña incorrectos';
@@ -78,13 +78,39 @@ export class LoginPage {
   async loginWithGoogle(): Promise<void> {
     try {
       const success = await this.authService.loginWithGoogle();
-      if (!success) {
+      if (success) {
+        const user = this.authService.currentUser();
+        if (user) {
+          console.log('Login con Google exitoso:', user);
+          this.redirectToRolePage(user.role);
+        }
+      } else {
         this.errorMessage = 'Error al autenticar con Google';
       }
-      // La redirección la maneja el AuthService
     } catch (error: any) {
       this.errorMessage = error?.message || 'Ocurrió un error inesperado';
       console.error('Google login error:', error);
+    }
+  }
+
+  /**
+   * Redirige al usuario según su rol
+   */
+  private redirectToRolePage(role?: string): void {
+    switch (role) {
+      case Rol.CLIENTE:
+        this.router.navigate(['/cliente-tabs']);
+        break;
+      case Rol.ENTRENADOR:
+      case Rol.PERSONAL_TRAINER:
+        this.router.navigate(['/entrenador-tabs']);
+        break;
+      case Rol.GIMNASIO:
+        this.router.navigate(['/gimnasio-tabs']);
+        break;
+      default:
+        // Si no tiene rol definido, enviar a onboarding
+        this.router.navigate(['/onboarding']);
     }
   }
 }

@@ -39,15 +39,11 @@ export const routes: Routes = [
   {
     path: 'cliente-tabs',
     loadChildren: () => import('./cliente/cliente-tabs/cliente-tabs.routes').then((m) => m.routes),
-    //canActivate: [clienteGuard]
+    canActivate: [clienteGuard]
   },
   {
     path: 'entrenador-tabs',
     loadChildren: () => import('./entrenador/entrenador-tabs/entrenador-tabs.routes').then((m) => m.routes),
     canActivate: [entrenadorGuard]
-  },
-  {
-    path: 'test',
-    loadComponent: () => import('./test/test.page').then(m => m.TestPage)
   }
 ];

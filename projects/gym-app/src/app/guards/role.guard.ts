@@ -1,19 +1,22 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'gym-library';
+import { Rol } from 'gym-library';
 
-function getCurrentUserRole(): string | null {
+function getCurrentUserRole(): string | undefined {
   const authService = inject(AuthService);
   const user = authService.currentUser();
-  return user?.role || null;
+  return user?.role;
 }
 
 export const gimnasioGuard = (): boolean => {
   const router = inject(Router);
   const role = getCurrentUserRole();
-  if (role === 'gimnasio') {
+  
+  if (role === Rol.GIMNASIO) {
     return true;
   }
+  
   router.navigate(['/login']);
   return false;
 };
@@ -21,9 +24,11 @@ export const gimnasioGuard = (): boolean => {
 export const clienteGuard = (): boolean => {
   const router = inject(Router);
   const role = getCurrentUserRole();
-  if (role === 'cliente') {
+  
+  if (role === Rol.CLIENTE) {
     return true;
   }
+  
   router.navigate(['/login']);
   return false;
 };
@@ -31,9 +36,11 @@ export const clienteGuard = (): boolean => {
 export const entrenadorGuard = (): boolean => {
   const router = inject(Router);
   const role = getCurrentUserRole();
-  if (role === 'entrenador') {
+  
+  if (role === Rol.ENTRENADOR || role === Rol.PERSONAL_TRAINER) {
     return true;
   }
+  
   router.navigate(['/login']);
   return false;
 };

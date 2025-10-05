@@ -133,13 +133,16 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
   }
 
   private inferRoleFromEmail(email: string): Rol {
-    if (email.includes('trainer') || email.includes('entrenador')) {
+    const emailLower = email.toLowerCase();
+    
+    if (emailLower.includes('trainer') || emailLower.includes('entrenador')) {
       return Rol.ENTRENADOR;
-    } else if (email.includes('gimnasio') || email.includes('gym')) {
+    } else if (emailLower.includes('gimnasio') || emailLower.includes('gym')) {
       return Rol.GIMNASIO;
-    } else if (email.includes('personal')) {
+    } else if (emailLower.includes('personal')) {
       return Rol.PERSONAL_TRAINER;
     }
+    
     return Rol.CLIENTE;
   }
 }
