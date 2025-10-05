@@ -15,7 +15,11 @@
     "gym-app:android": "cd projects/gym-app && ionic cap run android",
     "gym-app:sync": "cd projects/gym-app && ionic cap sync",
     "library:build": "ng build gym-library",
+    "library:watch": "ng build gym-library --watch",
     "library:test": "ng test gym-library",
+    "dev": "npm run library:build && npm run dev:parallel",
+    "dev:parallel": "concurrently \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
+    "dev:all": "concurrently \"npm run library:watch\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"lib,admin,app\" --prefix-colors \"yellow,cyan,magenta\"",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {
@@ -45,6 +49,7 @@
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.0",
     "@types/jasmine": "~5.1.0",
+    "concurrently": "^9.2.1",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

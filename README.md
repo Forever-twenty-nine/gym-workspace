@@ -1,6 +1,23 @@
 # Gym App - Descripción y Modelo de Negocio
 
-## 💰 Estrategia de Monetización# 📱 Descripción General
+## � Inicio Rápido
+
+### Instalación
+```bash
+npm run install:all
+```
+
+### Desarrollo
+```bash
+# Compilar librería + iniciar ambas apps
+npm run dev
+```
+
+Ver [DEV_COMMANDS.md](./DEV_COMMANDS.md) para más comandos de desarrollo.
+
+---
+
+## �💰 Estrategia de Monetización# 📱 Descripción General
 
 Aplicación integral para gimnasios que conecta entrenados, entrenadores y gimnasios en una plataforma unificada. El modelo freemium permite generar ingresos mientras se ofrece valor gratuito básico.
 
