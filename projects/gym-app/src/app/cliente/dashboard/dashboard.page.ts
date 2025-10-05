@@ -24,7 +24,7 @@ import {
   checkmarkCircleOutline,
   timeOutline
 } from 'ionicons/icons';
-import { ClienteService, RutinaService, UserService, AuthService } from 'gym-library';
+import { ClienteService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
 import { Cliente, Rutina } from 'gym-library';
 
 @Component({
@@ -77,20 +77,13 @@ export class DashboardPage implements OnInit {
     const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
     
-    console.log('🔍 Debug rutinasAsignadas:', {
-      userId,
-      totalRutinas: rutinas.length,
-      rutinas: rutinas
-    });
-    
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas que pertenecen al cliente actual (usando clienteId para compatibilidad y asignadoId como principal)
+    // Filtrar rutinas que están EXPLÍCITAMENTE asignadas a este cliente
+    // Solo usar la lógica nueva (asignadoId + asignadoTipo) para evitar datos corruptos
     const rutinasDelCliente = rutinas.filter(rutina => 
-      rutina.clienteId === userId || (rutina.asignadoId === userId && (rutina.asignadoTipo === 'cliente' || !rutina.asignadoTipo))
+      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.CLIENTE
     );
-    
-    console.log('🎯 Rutinas del cliente:', rutinasDelCliente);
     
     return rutinasDelCliente.map(rutina => ({
       nombre: rutina.nombre,

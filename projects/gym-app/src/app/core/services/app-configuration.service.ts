@@ -8,6 +8,7 @@ import {
   StorageService 
 } from 'gym-library';
 import { ClienteFirestoreAdapter } from '../../adapters/cliente-firestore.adapter';
+import { RutinaFirestoreAdapter } from '../../adapters/rutina-firestore.adapter';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
 import { IonicStorageAdapter } from '../../adapters/ionic-storage.adapter';
 
@@ -17,10 +18,12 @@ import { IonicStorageAdapter } from '../../adapters/ionic-storage.adapter';
 export class AppConfigurationService {
   private clienteService = inject(ClienteService);
   private userService = inject(UserService);
+  private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private storageService = inject(StorageService);
 
   private clienteAdapter = inject(ClienteFirestoreAdapter);
+  private rutinaAdapter = inject(RutinaFirestoreAdapter);
   private authAdapter = inject(FirebaseAuthAdapter);
   private storageAdapter = inject(IonicStorageAdapter);
 
@@ -30,6 +33,7 @@ export class AppConfigurationService {
     try {
       // Configurar adaptadores
       this.clienteService.setFirestoreAdapter(this.clienteAdapter);
+      this.rutinaService.setFirestoreAdapter(this.rutinaAdapter);
       this.authService.setAuthAdapter(this.authAdapter);
       this.storageService.setStorageAdapter(this.storageAdapter);
 

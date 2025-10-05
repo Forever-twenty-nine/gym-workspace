@@ -53,23 +53,37 @@
       <ion-card-title>Rutinas Asignadas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let rutina of rutinasAsignadas()" button (click)="verRutina(rutina)">
-          <ion-icon
-            [name]="rutina.completada ? 'checkmark-circle-outline' : 'time-outline'"
-            [color]="rutina.completada ? 'success' : 'warning'"
-            slot="start">
-          </ion-icon>
-          <ion-label>
-            <h3>{{ rutina.nombre }}</h3>
+      @if (rutinasAsignadas().length > 0) {
+        <ion-list>
+          @for (rutina of rutinasAsignadas(); track rutina.nombre) {
+            <ion-item button (click)="verRutina(rutina)">
+              <ion-icon
+                [name]="rutina.completada ? 'checkmark-circle-outline' : 'time-outline'"
+                [color]="rutina.completada ? 'success' : 'warning'"
+                slot="start">
+              </ion-icon>
+              <ion-label>
+                <h3>{{ rutina.nombre }}</h3>
+                @if (rutina.fechaAsignada) {
+                  <p>Asignada: {{ rutina.fechaAsignada }}</p>
+                }
+              </ion-label>
+              <ion-chip
+                slot="end"
+                [color]="rutina.completada ? 'success' : 'warning'">
+                {{ rutina.completada ? 'Completada' : 'Pendiente' }}
+              </ion-chip>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <ion-item lines="none">
+          <ion-icon name="fitness-outline" slot="start" color="medium"></ion-icon>
+          <ion-label color="medium">
+            <p>No tienes rutinas asignadas</p>
           </ion-label>
-          <ion-chip
-            slot="end"
-            [color]="rutina.completada ? 'success' : 'warning'">
-            {{ rutina.completada ? 'Completada' : 'Pendiente' }}
-          </ion-chip>
         </ion-item>
-      </ion-list>
+      }
     </ion-card-content>
   </ion-card>
 

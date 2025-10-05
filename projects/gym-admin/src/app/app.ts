@@ -386,6 +386,36 @@ export class App {
   }
 
   /**
+   * Obtiene las rutinas asignadas a un cliente específico
+   * 
+   * ℹ️ LÓGICA DE ASIGNACIÓN (ESTRICTA):
+   * - Las rutinas se crean individualmente y se asignan a clientes específicos
+   * - La asignación DEBE tener: rutina.asignadoId = clienteId Y rutina.asignadoTipo = 'cliente'
+   * - NO se usa el campo legacy 'clienteId' para evitar datos corruptos
+   * - Solo se incluyen rutinas con asignación EXPLÍCITA y válida
+   * 
+   * @param clienteId ID del cliente
+   * @returns Lista de rutinas explícitamente asignadas al cliente
+   */
+  getRutinasAsignadasAlCliente(clienteId: string) {
+    if (!clienteId) return [];
+    
+    const todasLasRutinas = this.rutinas();
+    
+    // Buscar rutinas que fueron asignadas a este cliente específico
+    // SOLO usar la lógica nueva (asignadoId + asignadoTipo) - más confiable y precisa
+    return todasLasRutinas.filter(rutina => {
+      const tieneAsignadoIdValido = rutina.asignadoId && rutina.asignadoId.trim() !== '';
+      const tieneAsignadoTipoValido = rutina.asignadoTipo === Rol.CLIENTE;
+      
+      // Solo incluir rutinas que están EXPLÍCITAMENTE asignadas a este cliente
+      return tieneAsignadoIdValido && 
+             tieneAsignadoTipoValido && 
+             rutina.asignadoId === clienteId;
+    });
+  }
+
+  /**
    * Obtiene la información del gimnasio asociado a un entrenador
    * @param gimnasioId ID del gimnasio
    * @returns Datos del gimnasio o null si no existe
@@ -1371,7 +1401,9 @@ export class App {
       case 'cliente':
         const clienteData = this.modalData();
         const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
-        const rutinasCliente = this.rutinas().filter(r => r.clienteId === clienteData?.id);
+        
+        // Obtener rutinas asignadas a este cliente usando el método específico
+        const rutinasAsignadasAlCliente = this.getRutinasAsignadasAlCliente(clienteData?.id || '');
         
         // Obtener información del gimnasio y entrenador para mostrar
         const gimnasioAsociado = clienteData?.gimnasioId ? this.gimnasios().find(g => g.id === clienteData.gimnasioId) : null;
@@ -1453,13 +1485,13 @@ export class App {
             colSpan: 2
           },
           
-          // Lista de rutinas
+          // Lista de rutinas simplificada
           {
             name: 'rutinasAsociadas',
-            type: 'rutinas-info',
-            label: `Rutinas Asignadas (${rutinasCliente.length})`,
+            type: 'rutinas-simple',
+            label: `Rutinas Asignadas (${rutinasAsignadasAlCliente.length})`,
             colSpan: 2,
-            rutinas: rutinasCliente
+            rutinas: rutinasAsignadasAlCliente
           }
         ];
 
