@@ -6,8 +6,8 @@ import { CommonModule } from '@angular/common';
 
 // Importar componentes
 import { GenericCardComponent, CardConfig } from './components/shared/generic-card/generic-card.component';
-import { LogsSectionComponent } from './components/logs-section/logs-section.component';
 import { ModalFormComponent, FormFieldConfig } from './components/modal-form/modal-form.component';
+import { ToastComponent, Toast } from './components/shared/toast/toast.component';
 
 // Importar adaptador de autenticación
 import { FirebaseAuthAdapter } from './adapters/firebase-auth.adapter';
@@ -18,8 +18,8 @@ import { FirebaseAuthAdapter } from './adapters/firebase-auth.adapter';
     CommonModule, 
     ReactiveFormsModule,
     GenericCardComponent,
-    LogsSectionComponent,
-    ModalFormComponent
+    ModalFormComponent,
+    ToastComponent
   ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -36,8 +36,47 @@ export class App {
   private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
 
   // Signals reactivas para datos
-  readonly rutinas = this.rutinaService.rutinas;
-  readonly ejercicios = this.ejercicioService.ejercicios;
+  readonly rutinas = computed(() => {
+    // Agregar información del creador a cada rutina
+    return this.rutinaService.rutinas().map(rutina => {
+      let creadorName = null;
+      let asignadoName = null;
+      
+      // Información del creador
+      if (rutina.creadorId) {
+        const usuario = this.usuarios().find(u => u.uid === rutina.creadorId);
+        creadorName = usuario?.nombre || usuario?.email || `Usuario ${rutina.creadorId}`;
+      }
+      
+      // Información del asignado
+      if (rutina.asignadoId) {
+        const usuario = this.usuarios().find(u => u.uid === rutina.asignadoId);
+        asignadoName = usuario?.nombre || usuario?.email || `Usuario ${rutina.asignadoId}`;
+      }
+      
+      return {
+        ...rutina,
+        creadorName,
+        asignadoName
+      };
+    });
+  });
+  readonly ejercicios = computed(() => {
+    // Agregar información del creador a cada ejercicio
+    return this.ejercicioService.ejercicios().map(ejercicio => {
+      let creadorName = null;
+      
+      if (ejercicio.creadorId) {
+        const usuario = this.usuarios().find(u => u.uid === ejercicio.creadorId);
+        creadorName = usuario?.nombre || usuario?.email || `Usuario ${ejercicio.creadorId}`;
+      }
+      
+      return {
+        ...ejercicio,
+        creadorName
+      };
+    });
+  });
   readonly usuarios = computed(() => {
     // Agregar un campo displayName para mostrar en el card y detectar usuarios incompletos
     return this.userService.users().map(user => {
@@ -56,20 +95,56 @@ export class App {
     // Agregar displayName a cada cliente basado en el usuario asociado
     return this.clienteService.clientes().map(cliente => {
       const usuario = this.usuarios().find(u => u.uid === cliente.id);
+      
+      // Obtener información del entrenador asociado
+      const entrenador = this.entrenadoresBase().find(e => e.id === cliente.entrenadorId);
+      const entrenadorName = entrenador?.displayName || (cliente.entrenadorId ? `Entrenador ${cliente.entrenadorId}` : null);
+      
+      // Obtener información del gimnasio asociado
+      const gimnasio = this.gimnasios().find(g => g.id === cliente.gimnasioId);
+      const gimnasioName = gimnasio?.displayName || (cliente.gimnasioId ? `Gimnasio ${cliente.gimnasioId}` : null);
+      
       return {
         ...cliente,
-        displayName: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`
+        displayName: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`,
+        entrenadorName,
+        gimnasioName
       };
     });
   });
 
-  readonly entrenadores = computed(() => {
-    // Agregar displayName a cada entrenador basado en el usuario asociado
+  readonly entrenadoresBase = computed(() => {
+    // Signal base para entrenadores sin métricas
     return this.entrenadorService.entrenadores().map(entrenador => {
       const usuario = this.usuarios().find(u => u.uid === entrenador.id);
       return {
         ...entrenador,
         displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
+      };
+    });
+  });
+
+  readonly entrenadores = computed(() => {
+    // Agregar métricas a cada entrenador
+    return this.entrenadoresBase().map(entrenador => {
+      // Calcular métricas del entrenador usando los datos base
+      const ejerciciosCreados = this.ejercicios().filter(e => 
+        e.creadorId === entrenador.id && e.creadorTipo === 'entrenador'
+      ).length;
+      
+      const clientesAsignados = this.clienteService.clientes().filter(c => 
+        c.entrenadorId === entrenador.id
+      ).length;
+      
+      const rutinasCreadas = this.rutinas().filter(r => 
+        r.creadorId === entrenador.id
+      ).length;
+      
+      return {
+        ...entrenador,
+        ejerciciosCount: ejerciciosCreados,
+        clientesCount: clientesAsignados,
+        rutinasCount: rutinasCreadas
       };
     });
   });
@@ -100,7 +175,8 @@ export class App {
     emptyStateTitle: 'No hay clientes registrados',
     displayField: 'displayName', // Mostrar el nombre del cliente
     showCounter: true,
-    counterColor: 'green'
+    counterColor: 'green',
+    showChips: ['gimnasioName', 'entrenadorName'] // Primero gimnasio, después entrenador
   };
 
   readonly entrenadoresCardConfig: CardConfig = {
@@ -110,7 +186,8 @@ export class App {
     emptyStateTitle: 'No hay entrenadores registrados',
     displayField: 'displayName', // Mostrar el nombre del entrenador
     showCounter: true,
-    counterColor: 'orange'
+    counterColor: 'orange',
+    showChips: ['ejerciciosCount', 'clientesCount', 'rutinasCount']
   };
 
   readonly gimnasiosCardConfig: CardConfig = {
@@ -130,7 +207,8 @@ export class App {
     emptyStateTitle: 'No hay rutinas creadas',
     displayField: 'nombre',
     showCounter: true,
-    counterColor: 'purple'
+    counterColor: 'purple',
+    showChips: ['creadorName', 'asignadoName']
   };
 
   readonly ejerciciosCardConfig: CardConfig = {
@@ -140,7 +218,8 @@ export class App {
     emptyStateTitle: 'No hay ejercicios creados',
     displayField: 'nombre',
     showCounter: true,
-    counterColor: 'orange'
+    counterColor: 'orange',
+    showChips: ['creadorName']
   };
 
 
@@ -148,7 +227,7 @@ export class App {
 
 
   // Signals para el estado del componente
-  readonly logs = signal<string[]>([]);
+  readonly toasts = signal<Toast[]>([]);
   readonly isModalOpen = signal(false);
   readonly modalData = signal<any>(null);
   readonly modalType = signal<string>('');
@@ -166,8 +245,75 @@ export class App {
     return m;
   });
 
+  private showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 4000) {
+    const id = Date.now().toString();
+    const toast: Toast = {
+      id,
+      message,
+      type,
+      duration,
+      isVisible: false
+    };
+
+    // Agregar el toast
+    this.toasts.update(toasts => [...toasts, toast]);
+
+    // Hacer visible el toast después de un frame para la animación
+    setTimeout(() => {
+      this.toasts.update(toasts => 
+        toasts.map(t => t.id === id ? { ...t, isVisible: true } : t)
+      );
+    }, 10);
+
+    // Auto-remover después de la duración
+    setTimeout(() => {
+      this.removeToast(id);
+    }, duration);
+  }
+
+  private showSuccess(message: string, duration?: number) {
+    this.showToast(message, 'success', duration);
+  }
+
+  private showError(message: string, duration?: number) {
+    this.showToast(message, 'error', duration);
+  }
+
+  private showWarning(message: string, duration?: number) {
+    this.showToast(message, 'warning', duration);
+  }
+
+  private showInfo(message: string, duration?: number) {
+    this.showToast(message, 'info', duration);
+  }
+
+  removeToast(id: string) {
+    // Primero ocultar con animación
+    this.toasts.update(toasts => 
+      toasts.map(t => t.id === id ? { ...t, isVisible: false } : t)
+    );
+
+    // Luego remover después de la animación
+    setTimeout(() => {
+      this.toasts.update(toasts => toasts.filter(t => t.id !== id));
+    }, 300);
+  }
+
+  // Método de compatibilidad para reemplazar log()
   private log(msg: string) {
-    this.logs.update(l => [msg, ...l].slice(0, 100));
+    // Limpiar emojis para toasts más limpios
+    const cleanMsg = msg.replace(/✅|❌|⚠️/g, '').trim();
+    
+    // Determinar el tipo de mensaje basado en el contenido
+    if (msg.includes('Error') || msg.includes('ERROR') || msg.includes('❌')) {
+      this.showError(cleanMsg);
+    } else if (msg.includes('⚠️') || msg.includes('Warning')) {
+      this.showWarning(cleanMsg);
+    } else if (msg.includes('✅') || msg.includes('creado') || msg.includes('actualizado') || msg.includes('eliminado')) {
+      this.showSuccess(cleanMsg);
+    } else {
+      this.showInfo(cleanMsg);
+    }
   }
 
   /**
@@ -231,9 +377,12 @@ export class App {
    * @returns Lista de ejercicios creados por el entrenador
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
-    // Por ahora asumimos que todos los ejercicios están disponibles para todos los entrenadores
-    // En el futuro se podría agregar un campo 'creadoPor' al modelo de ejercicio
-    return this.ejercicios();
+    if (!entrenadorId) return [];
+    
+    // Filtrar ejercicios que tienen como creador a este entrenador
+    return this.ejercicios().filter(ejercicio => 
+      ejercicio.creadorId === entrenadorId && ejercicio.creadorTipo === 'entrenador'
+    );
   }
 
   /**
@@ -446,13 +595,18 @@ export class App {
         return {
           id: 'r' + timestamp,
           nombre: '',
-          clienteId: '',
-          entrenadorId: '',
           fechaAsignacion: new Date(),
           ejercicios: [],
           activa: true,
           DiasSemana: [],
-          completado: false
+          completado: false,
+          // Campos principales (nuevos)
+          creadorId: '',
+          creadorTipo: '',
+          asignadoId: '',
+          asignadoTipo: '',
+          // Campo de compatibilidad (derivado de asignadoId si asignadoTipo es CLIENTE)
+          clienteId: ''
         };
       case 'usuario':
         return {
@@ -541,19 +695,24 @@ export class App {
             email: [{ value: item.email || '', disabled: true }], // Email no editable
             role: [item.role || ''],
             emailVerified: [item.emailVerified || false],
-            onboarded: [item.onboarded || false]
+            onboarded: [item.onboarded || false],
+            plan: [item.plan || '']
           };
         }
         break;
 
       case 'cliente':
         formConfig = {
-          // Campo informativo (no se incluye en el form)
-          usuarioInfo: [{ value: '', disabled: true }],
+          // Campos informativos del usuario (solo lectura)
+          nombre: [{ value: '', disabled: true }],
+          email: [{ value: '', disabled: true }],
+          planInfo: [{ value: '', disabled: true }],
           
-          // Campos editables
-          gimnasioId: [item.gimnasioId || '', [Validators.required]],
-          entrenadorId: [item.entrenadorId || '', [Validators.required]],
+          // Campos informativos de asociaciones (solo lectura)
+          gimnasioInfo: [{ value: '', disabled: true }],
+          entrenadorInfo: [{ value: '', disabled: true }],
+          
+          // Campos editables del cliente
           activo: [item.activo || false],
           objetivo: [item.objetivo || ''],
           fechaRegistro: [item.fechaRegistro ? new Date(item.fechaRegistro).toISOString().slice(0, 16) : ''],
@@ -565,30 +724,37 @@ export class App {
 
       case 'entrenador':
         formConfig = {
-          // Campo informativo del usuario asociado
-          usuarioInfo: [{ value: '', disabled: true }],
+          // Campos informativos del usuario (solo lectura)
+          nombre: [{ value: '', disabled: true }],
+          email: [{ value: '', disabled: true }],
+          planInfo: [{ value: '', disabled: true }],
+          
+          // Campo informativo del gimnasio (solo lectura)
+          gimnasioInfo: [{ value: '', disabled: true }],
           
           // Campos editables
           activo: [item.activo || false],
           
           // Campos para selección múltiple
           rutinasAsociadas: [item.rutinas || []],
-          ejerciciosAsociados: [item.ejercicios || []],
           
           // Campos informativos (solo lectura)
-          clientesAsociados: [{ value: '', disabled: true }],
-          gimnasioInfo: [{ value: '', disabled: true }]
+          clientesAsignados: [{ value: '', disabled: true }],
+          ejerciciosCreados: [{ value: '', disabled: true }]
         };
         break;
 
       case 'rutina':
         formConfig = {
           nombre: [item.nombre || '', [Validators.required]],
-          clienteId: [item.clienteId || '', [Validators.required]],
-          entrenadorId: [item.entrenadorId || '', [Validators.required]],
           activa: [item.activa || false],
           completado: [item.completado || false],
-          DiasSemana: [item.DiasSemana || []]
+          DiasSemana: [item.DiasSemana || []],
+          // Campos principales
+          creadorId: [item.creadorId || ''],
+          creadorTipo: [item.creadorTipo || ''],
+          asignadoId: [item.asignadoId || item.clienteId || '', [Validators.required]], // Usar asignadoId como principal, clienteId como fallback
+          asignadoTipo: [item.asignadoTipo || (item.clienteId ? 'CLIENTE' : ''), [Validators.required]]
         };
         
         // Agregar gimnasioId solo si existe y no está vacío
@@ -665,16 +831,16 @@ export class App {
     form.markAllAsTouched();
 
     if (type === 'rutina' && this.isCreating()) {
-      const clienteId = form.get('clienteId')?.value;
-      const entrenadorId = form.get('entrenadorId')?.value;
+      const asignadoId = form.get('asignadoId')?.value;
+      const asignadoTipo = form.get('asignadoTipo')?.value;
 
-      if (!clienteId) {
-        this.log('Error: Debes seleccionar un cliente para la rutina');
+      if (!asignadoId) {
+        this.log('Error: Debes seleccionar a quién se asigna la rutina');
         return;
       }
 
-      if (!entrenadorId) {
-        this.log('Error: Debes seleccionar un entrenador para la rutina');
+      if (!asignadoTipo) {
+        this.log('Error: Debes especificar el tipo de asignado');
         return;
       }
     }
@@ -800,6 +966,16 @@ export class App {
           // Limpieza específica para rutina: remover campos undefined o vacíos
           const rutinaDataToSave = { ...updatedData };
           
+          // Sincronizar clienteId con asignadoId para compatibilidad hacia atrás
+          if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === 'CLIENTE') {
+            rutinaDataToSave.clienteId = rutinaDataToSave.asignadoId;
+          } else if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === Rol.CLIENTE) {
+            rutinaDataToSave.clienteId = rutinaDataToSave.asignadoId;
+          } else {
+            // Si no hay asignado cliente, limpiar clienteId
+            rutinaDataToSave.clienteId = '';
+          }
+          
           // Remover campos opcionales si están undefined o vacíos
           if (!rutinaDataToSave.gimnasioId || rutinaDataToSave.gimnasioId.trim() === '') {
             delete rutinaDataToSave.gimnasioId;
@@ -812,9 +988,23 @@ export class App {
           }
           
           await this.rutinaService.save(rutinaDataToSave);
-          const clienteNombre = updatedData.clienteId ? this.getClienteName(updatedData.clienteId) : 'Sin cliente';
-          const entrenadorNombre = updatedData.entrenadorId ? this.getEntrenadorName(updatedData.entrenadorId) : 'Sin entrenador';
-          this.log(`Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Cliente: ${clienteNombre} - Entrenador: ${entrenadorNombre} - Ejercicios: ${updatedData.ejercicios.length}`);
+          
+          // Log con información usando los nuevos campos
+          let logMessage = `Rutina ${this.isCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre} - Ejercicios: ${updatedData.ejercicios.length}`;
+          
+          // Información del asignado (principal)
+          if (updatedData.asignadoId) {
+            const asignado = this.usuarios().find(u => u.uid === updatedData.asignadoId);
+            logMessage += ` - Asignado a: ${asignado?.nombre || asignado?.email || updatedData.asignadoId} (${updatedData.asignadoTipo || 'N/A'})`;
+          }
+          
+          // Información del creador si existe
+          if (updatedData.creadorId) {
+            const creador = this.usuarios().find(u => u.uid === updatedData.creadorId);
+            logMessage += ` - Creador: ${creador?.nombre || creador?.email || updatedData.creadorId} (${updatedData.creadorTipo || 'N/A'})`;
+          }
+          
+          this.log(logMessage);
           break;
 
         case 'ejercicio':
@@ -1008,7 +1198,8 @@ export class App {
    * @return boolean
    */
   canCreateRutina(): boolean {
-    return this.getClientesDisponibles().length > 0 && this.getEntrenadoresDisponibles().length > 0;
+    // Solo necesitamos clientes para asignar rutinas (los entrenadores son opcionales como creadores)
+    return this.getClientesDisponibles().length > 0;
   }
 
   /**
@@ -1017,14 +1208,9 @@ export class App {
    */
   getRutinaValidationMessage(): string {
     const clientes = this.getClientesDisponibles().length;
-    const entrenadores = this.getEntrenadoresDisponibles().length;
 
-    if (clientes === 0 && entrenadores === 0) {
-      return 'Necesitas crear al menos un cliente y un entrenador para poder crear rutinas';
-    } else if (clientes === 0) {
-      return 'Necesitas crear al menos un cliente para poder crear rutinas';
-    } else if (entrenadores === 0) {
-      return 'Necesitas crear al menos un entrenador para poder crear rutinas';
+    if (clientes === 0) {
+      return 'Necesitas crear al menos un cliente para poder asignar rutinas';
     }
     return '';
   }
@@ -1167,6 +1353,17 @@ export class App {
               label: 'Estado de Onboarding',
               checkboxLabel: 'Usuario Completó Onboarding',
               colSpan: 1
+            },
+            {
+              name: 'plan',
+              type: 'select',
+              label: 'Plan de Suscripción',
+              placeholder: 'Seleccionar plan',
+              options: [
+                { value: 'free', label: 'Gratuito' },
+                { value: 'premium', label: 'Premium' }
+              ],
+              colSpan: 2
             }
           ];
         }
@@ -1176,45 +1373,60 @@ export class App {
         const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
         const rutinasCliente = this.rutinas().filter(r => r.clienteId === clienteData?.id);
         
+        // Obtener información del gimnasio y entrenador para mostrar
+        const gimnasioAsociado = clienteData?.gimnasioId ? this.gimnasios().find(g => g.id === clienteData.gimnasioId) : null;
+        const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
+        
         return [
-          // Información del usuario asociado (solo para mostrar contexto)
+          // Información básica del cliente (integrada con usuario)
           {
-            name: 'usuarioInfo',
-            type: 'user-info',
-            label: 'Usuario Asociado',
-            colSpan: 2,
-            usuario: usuarioAsociado
+            name: 'nombre',
+            type: 'text',
+            label: 'Nombre del Cliente',
+            placeholder: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Nombre del cliente',
+            readonly: true,
+            colSpan: 1
+          },
+          {
+            name: 'email',
+            type: 'text',
+            label: 'Email',
+            placeholder: usuarioAsociado?.email || 'Email del cliente',
+            readonly: true,
+            colSpan: 1
           },
           
-          // Selección de gimnasio
+          // Plan del usuario (solo informativo)
           {
-            name: 'gimnasioId',
-            type: 'select',
-            label: 'Gimnasio',
-            placeholder: 'Seleccionar gimnasio',
-            options: this.getGimnasiosDisponibles().map(gimnasio => ({
-              value: gimnasio.uid,
-              label: gimnasio.nombre || gimnasio.email || `Gimnasio ${gimnasio.uid}`
-            })),
-            colSpan: 1,
-            required: true
+            name: 'planInfo',
+            type: 'text',
+            label: 'Plan de Suscripción',
+            placeholder: usuarioAsociado?.plan ? (usuarioAsociado.plan === 'premium' ? 'Premium' : 'Gratuito') : 'Sin plan',
+            readonly: true,
+            colSpan: 2
           },
           
-          // Selección de entrenador
+          // Información del gimnasio (solo lectura)
           {
-            name: 'entrenadorId',
-            type: 'select',
-            label: 'Entrenador',
-            placeholder: 'Seleccionar entrenador',
-            options: this.getEntrenadoresDisponibles().map(entrenador => ({
-              value: entrenador.uid,
-              label: entrenador.nombre || entrenador.email || `Entrenador ${entrenador.uid}`
-            })),
-            colSpan: 1,
-            required: true
+            name: 'gimnasioInfo',
+            type: 'text',
+            label: 'Gimnasio Asociado',
+            placeholder: gimnasioAsociado?.displayName || 'Sin gimnasio asignado',
+            readonly: true,
+            colSpan: 1
           },
           
-          // Información del cliente
+          // Información del entrenador (solo lectura)
+          {
+            name: 'entrenadorInfo',
+            type: 'text',
+            label: 'Entrenador Asociado',
+            placeholder: entrenadorAsociado?.displayName || 'Sin entrenador asignado',
+            readonly: true,
+            colSpan: 1
+          },
+          
+          // Información del cliente (campos editables)
           {
             name: 'objetivo',
             type: 'select',
@@ -1260,22 +1472,42 @@ export class App {
         const gimnasioInfo = entrenadorData?.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
         
         return [
-          // Información del usuario asociado
+          // Información básica del entrenador (integrada con usuario)
           {
-            name: 'usuarioInfo',
-            type: 'user-info',
-            label: 'Usuario Asociado',
-            colSpan: 2,
-            usuario: usuarioEntrenador
+            name: 'nombre',
+            type: 'text',
+            label: 'Nombre del Entrenador',
+            placeholder: usuarioEntrenador?.nombre || usuarioEntrenador?.email || 'Nombre del entrenador',
+            readonly: true,
+            colSpan: 1
+          },
+          {
+            name: 'email',
+            type: 'text',
+            label: 'Email',
+            placeholder: usuarioEntrenador?.email || 'Email del entrenador',
+            readonly: true,
+            colSpan: 1
           },
           
-          // Información del gimnasio asociado (solo lectura)
+          // Plan del usuario (solo informativo)
+          {
+            name: 'planInfo',
+            type: 'text',
+            label: 'Plan de Suscripción',
+            placeholder: usuarioEntrenador?.plan ? (usuarioEntrenador.plan === 'premium' ? 'Premium' : 'Gratuito') : 'Sin plan',
+            readonly: true,
+            colSpan: 1
+          },
+          
+          // Información del gimnasio (solo lectura)
           {
             name: 'gimnasioInfo',
-            type: 'gimnasio-info',
+            type: 'text',
             label: 'Gimnasio Asociado',
-            colSpan: 2,
-            gimnasio: gimnasioInfo
+            placeholder: gimnasioInfo?.nombre || 'Sin gimnasio asignado',
+            readonly: true,
+            colSpan: 1
           },
           
           // Estado del entrenador
@@ -1287,17 +1519,17 @@ export class App {
             colSpan: 2
           },
           
-          // Lista de clientes asociados
+          // Lista de clientes asignados (solo nombres)
           {
-            name: 'clientesAsociados',
-            type: 'clientes-info',
+            name: 'clientesAsignados',
+            type: 'clientes-simple',
             label: `Clientes Asignados (${clientesEntrenador.length})`,
             colSpan: 2,
             clientes: clientesEntrenador.map(cliente => {
               const usuario = this.usuarios().find(u => u.uid === cliente.id);
               return {
-                ...cliente,
-                usuario: usuario
+                id: cliente.id,
+                nombre: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`
               };
             })
           },
@@ -1315,17 +1547,13 @@ export class App {
             }))
           },
           
-          // Selección múltiple de ejercicios
+          // Lista de ejercicios creados (solo lectura)
           {
-            name: 'ejerciciosAsociados',
-            type: 'ejercicios-multiselect',
-            label: `Ejercicios Favoritos (${ejerciciosEntrenador.length} disponibles)`,
+            name: 'ejerciciosCreados',
+            type: 'ejercicios-info',
+            label: `Ejercicios Creados (${ejerciciosEntrenador.length})`,
             colSpan: 2,
-            options: ejerciciosEntrenador.map(ejercicio => ({
-              value: ejercicio.id,
-              label: ejercicio.nombre,
-              extra: `${ejercicio.series}x${ejercicio.repeticiones}`
-            }))
+            ejercicios: ejerciciosEntrenador
           }
         ];
 
@@ -1339,28 +1567,6 @@ export class App {
             colSpan: 2
           },
           {
-            name: 'clienteId',
-            type: 'select',
-            label: 'Cliente',
-            placeholder: 'Seleccionar cliente',
-            options: this.getClientesDisponibles().map(cliente => ({
-              value: cliente.uid,
-              label: cliente.nombre || cliente.email || `Usuario ${cliente.uid}`
-            })),
-            colSpan: 1
-          },
-          {
-            name: 'entrenadorId',
-            type: 'select',
-            label: 'Entrenador',
-            placeholder: 'Seleccionar entrenador',
-            options: this.getEntrenadoresDisponibles().map(entrenador => ({
-              value: entrenador.uid,
-              label: entrenador.nombre || entrenador.email || `Entrenador ${entrenador.uid}`
-            })),
-            colSpan: 1
-          },
-          {
             name: 'estados',
             type: 'rutina-estados',
             label: 'Estados',
@@ -1371,6 +1577,65 @@ export class App {
             type: 'dias-semana',
             label: 'Días de la Semana',
             colSpan: 2
+          },
+          // Información del creador
+          {
+            name: 'creadorId',
+            type: 'select',
+            label: 'Creador de la Rutina',
+            placeholder: 'Seleccionar creador (opcional)',
+            options: [
+              { value: '', label: '-- Sin creador --' },
+              // Filtrar usuarios que pueden crear rutinas (CLIENTE y ENTRENADOR)
+              ...this.usuarios()
+                .filter(user => user.role === Rol.CLIENTE || user.role === Rol.ENTRENADOR)
+                .map(user => ({
+                  value: user.uid,
+                  label: `${user.nombre || user.email || user.uid} (${user.role})`
+                }))
+            ],
+            colSpan: 1
+          },
+          {
+            name: 'creadorTipo',
+            type: 'select',
+            label: 'Tipo de Creador',
+            placeholder: 'Seleccionar tipo (opcional)',
+            options: [
+              { value: '', label: '-- Sin tipo --' },
+              { value: Rol.CLIENTE, label: 'CLIENTE' },
+              { value: Rol.ENTRENADOR, label: 'ENTRENADOR' }
+            ],
+            colSpan: 1
+          },
+          // Información del asignado (principal - reemplaza clienteId)
+          {
+            name: 'asignadoId',
+            type: 'select',
+            label: 'Asignado A (Cliente) *',
+            placeholder: 'Seleccionar cliente',
+            options: [
+              // Solo clientes pueden ser asignados a rutinas
+              ...this.usuarios()
+                .filter(user => user.role === Rol.CLIENTE)
+                .map(user => ({
+                  value: user.uid,
+                  label: `${user.nombre || user.email || user.uid}`
+                }))
+            ],
+            colSpan: 1,
+            required: true
+          },
+          {
+            name: 'asignadoTipo',
+            type: 'select',
+            label: 'Tipo de Asignado',
+            placeholder: 'Automático: Cliente',
+            options: [
+              { value: Rol.CLIENTE, label: 'CLIENTE' }
+            ],
+            colSpan: 1,
+            required: true
           },
           {
             name: 'ejercicios',

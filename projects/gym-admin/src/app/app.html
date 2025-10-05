@@ -1,10 +1,10 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6 space-y-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6 flex flex-col">
 
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between mb-6 flex-shrink-0">
     <h1 class="text-3xl font-bold text-white drop-shadow-lg">Admin Gym - Test de Servicios</h1>
   </div>
 
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1 overflow-y-auto pb-6">
     <!-- Usuarios -->
     <app-generic-card
       [config]="usuariosCardConfig"
@@ -68,8 +68,11 @@
     </app-generic-card>
   </section>
 
-  <!-- Logs -->
-  <app-logs-section [logs]="logs()"></app-logs-section>
+  <!-- Toasts -->
+  <app-toast 
+    [toasts]="toasts()" 
+    (closeToast)="removeToast($event)">
+  </app-toast>
 
   <!-- Modal de edición -->
   <app-modal-form

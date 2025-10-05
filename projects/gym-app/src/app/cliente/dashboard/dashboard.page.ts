@@ -85,8 +85,10 @@ export class DashboardPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas que pertenecen al cliente actual
-    const rutinasDelCliente = rutinas.filter(rutina => rutina.clienteId === userId);
+    // Filtrar rutinas que pertenecen al cliente actual (usando clienteId para compatibilidad y asignadoId como principal)
+    const rutinasDelCliente = rutinas.filter(rutina => 
+      rutina.clienteId === userId || (rutina.asignadoId === userId && (rutina.asignadoTipo === 'cliente' || !rutina.asignadoTipo))
+    );
     
     console.log('🎯 Rutinas del cliente:', rutinasDelCliente);
     
