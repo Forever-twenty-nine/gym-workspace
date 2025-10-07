@@ -11,9 +11,11 @@ import {
   NotificacionService,
   MensajeService,
   InvitacionService,
+  ConversacionService,
   Notificacion,
   Mensaje,
   Invitacion,
+  Conversacion,
   Entrenador, 
   Rol 
 } from 'gym-library';
@@ -46,6 +48,7 @@ export class EntrenadoresPage {
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
   private readonly invitacionService = inject(InvitacionService);
+  private readonly conversacionService = inject(ConversacionService);
   private readonly fb = inject(FormBuilder);
   private readonly displayHelper = inject(DisplayHelperService);
 
@@ -225,6 +228,17 @@ export class EntrenadoresPage {
     showChips: ['remitenteChip', 'destinatarioChip']
   };
 
+  readonly conversacionesCardConfig: CardConfig = {
+    title: 'Conversaciones',
+    createButtonText: 'N/A',
+    createButtonColor: 'blue',
+    emptyStateTitle: 'No hay conversaciones activas',
+    displayField: 'titulo',
+    showCounter: true,
+    counterColor: 'blue',
+    showChips: ['entrenadorChip', 'entrenadoChip', 'mensajesChip']
+  };
+
   readonly invitacionesCardConfig: CardConfig = {
     title: 'Invitaciones',
     createButtonText: 'Nueva Invitación',
@@ -298,6 +312,25 @@ export class EntrenadoresPage {
     return this.mensajes().filter(mensaje => {
       const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
       return remitente?.role === Rol.ENTRENADOR;
+    });
+  });
+
+  // Signals para conversaciones (desde el servicio)
+  readonly conversaciones = computed(() => {
+    return this.conversacionService.conversaciones().map(conv => {
+      const entrenador = this.usuarios().find(u => u.uid === conv.entrenadorId);
+      const entrenado = this.usuarios().find(u => u.uid === conv.entrenadoId);
+      
+      const entrenadorNombre = entrenador?.nombre || entrenador?.email || `Entrenador ${conv.entrenadorId}`;
+      const entrenadoNombre = entrenado?.nombre || entrenado?.email || `Cliente ${conv.entrenadoId}`;
+      
+      return {
+        ...conv,
+        titulo: `${entrenadorNombre} ↔ ${entrenadoNombre}`,
+        entrenadorChip: `👨‍🏫 ${entrenadorNombre}`,
+        entrenadoChip: `👤 ${entrenadoNombre}`,
+        mensajesChip: `💬 Mensajes sin leer: ${conv.noLeidosEntrenador + conv.noLeidosEntrenado}`
+      };
     });
   });
 
@@ -1325,6 +1358,26 @@ export class EntrenadoresPage {
       this.log('Invitación rechazada');
     } catch (error) {
       this.log('ERROR al rechazar invitación');
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA CONVERSACIONES
+  // ========================================
+  
+  openConversacionModal(item: any) {
+    // Mostrar detalles de la conversación
+    this.log(`Ver conversación: ${item.titulo || 'Conversación'}`);
+    // Aquí podrías abrir un modal con el historial de mensajes
+  }
+
+  async deleteConversacion(id: string) {
+    try {
+      await this.conversacionService.delete(id);
+      this.log('Conversación eliminada correctamente');
+    } catch (error) {
+      this.log('ERROR al eliminar conversación');
+      console.error('Error al eliminar conversación:', error);
     }
   }
 }

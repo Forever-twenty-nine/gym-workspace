@@ -52,6 +52,16 @@
       (delete)="deleteMensaje($event)">
     </app-generic-card>
 
+    <!-- Card de Conversaciones -->
+    <app-generic-card
+      [config]="conversacionesCardConfig"
+      [items]="conversaciones()"
+      [idField]="'id'"
+      [canCreate]="false"
+      (edit)="openConversacionModal($event)"
+      (delete)="deleteConversacion($event)">
+    </app-generic-card>
+
     <!-- Card de Invitaciones -->
     <app-generic-card
       [config]="invitacionesCardConfig"
