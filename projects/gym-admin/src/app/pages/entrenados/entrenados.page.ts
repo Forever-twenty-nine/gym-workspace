@@ -1,7 +1,20 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EntrenadoService, UserService, GimnasioService, EntrenadorService, RutinaService, EjercicioService, Entrenado, Rol, Objetivo } from 'gym-library';
+import { 
+  EntrenadoService, 
+  UserService, 
+  GimnasioService, 
+  EntrenadorService, 
+  RutinaService, 
+  EjercicioService, 
+  NotificacionService,
+  MensajeService,
+  InvitacionService,
+  Entrenado, 
+  Rol, 
+  Objetivo 
+} from 'gym-library';
 import { GenericCardComponent, CardConfig } from '../../components/shared/generic-card/generic-card.component';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
@@ -48,6 +61,36 @@ import { ToastComponent, Toast } from '../../components/shared/toast/toast.compo
           (create)="addSampleRutina()"
           (edit)="openRutinaModal($event)"
           (delete)="deleteRutina($event)">
+        </app-generic-card>
+
+        <!-- Card de Notificaciones -->
+        <app-generic-card
+          [config]="notificacionesCardConfig"
+          [items]="notificaciones()"
+          [idField]="'id'"
+          (create)="addNotificacion()"
+          (edit)="openNotificacionModal($event)"
+          (delete)="deleteNotificacion($event)">
+        </app-generic-card>
+
+        <!-- Card de Mensajes -->
+        <app-generic-card
+          [config]="mensajesCardConfig"
+          [items]="mensajes()"
+          [idField]="'id'"
+          (create)="addMensaje()"
+          (edit)="openMensajeModal($event)"
+          (delete)="deleteMensaje($event)">
+        </app-generic-card>
+
+        <!-- Card de Invitaciones -->
+        <app-generic-card
+          [config]="invitacionesCardConfig"
+          [items]="invitaciones()"
+          [idField]="'id'"
+          (create)="addInvitacion()"
+          (edit)="openInvitacionModal($event)"
+          (delete)="deleteInvitacion($event)">
         </app-generic-card>
       </section>
 
@@ -104,6 +147,54 @@ import { ToastComponent, Toast } from '../../components/shared/toast/toast.compo
         (toggleDiaSemana)="onToggleDiaSemana($event)"
         (toggleEjercicio)="toggleEjercicio($event)">
       </app-modal-form>
+
+      <!-- Modal de notificaciones -->
+      <app-modal-form
+        [isOpen]="isNotificacionModalOpen()"
+        [modalType]="'notificacion'"
+        [isCreating]="isNotificacionCreating()"
+        [form]="notificacionEditForm()"
+        [formFields]="getNotificacionFormFields()"
+        [ejercicios]="[]"
+        [selectedEjercicios]="[]"
+        [isLoading]="isLoading()"
+        (close)="closeNotificacionModal()"
+        (save)="saveNotificacionChanges()"
+        (toggleDiaSemana)="onToggleDiaSemana($event)"
+        (toggleEjercicio)="toggleEjercicio($event)">
+      </app-modal-form>
+
+      <!-- Modal de mensajes -->
+      <app-modal-form
+        [isOpen]="isMensajeModalOpen()"
+        [modalType]="'mensaje'"
+        [isCreating]="isMensajeCreating()"
+        [form]="mensajeEditForm()"
+        [formFields]="getMensajeFormFields()"
+        [ejercicios]="[]"
+        [selectedEjercicios]="[]"
+        [isLoading]="isLoading()"
+        (close)="closeMensajeModal()"
+        (save)="saveMensajeChanges()"
+        (toggleDiaSemana)="onToggleDiaSemana($event)"
+        (toggleEjercicio)="toggleEjercicio($event)">
+      </app-modal-form>
+
+      <!-- Modal de invitaciones -->
+      <app-modal-form
+        [isOpen]="isInvitacionModalOpen()"
+        [modalType]="'invitacion'"
+        [isCreating]="isInvitacionCreating()"
+        [form]="invitacionEditForm()"
+        [formFields]="getInvitacionFormFields()"
+        [ejercicios]="[]"
+        [selectedEjercicios]="[]"
+        [isLoading]="isLoading()"
+        (close)="closeInvitacionModal()"
+        (save)="saveInvitacionChanges()"
+        (toggleDiaSemana)="onToggleDiaSemana($event)"
+        (toggleEjercicio)="toggleEjercicio($event)">
+      </app-modal-form>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -116,6 +207,9 @@ export class EntrenadosPage {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
+  private readonly notificacionService = inject(NotificacionService);
+  private readonly mensajeService = inject(MensajeService);
+  private readonly invitacionService = inject(InvitacionService);
   private readonly fb = inject(FormBuilder);
 
   // Signals reactivas para datos
@@ -237,6 +331,39 @@ export class EntrenadosPage {
     showChips: ['creadorName', 'asignadoName']
   };
 
+  readonly notificacionesCardConfig: CardConfig = {
+    title: 'Notificaciones',
+    createButtonText: 'Nueva Notificación',
+    createButtonColor: 'blue',
+    emptyStateTitle: 'No hay notificaciones',
+    displayField: 'titulo',
+    showCounter: true,
+    counterColor: 'blue',
+    showChips: ['tipo', 'leida']
+  };
+
+  readonly mensajesCardConfig: CardConfig = {
+    title: 'Mensajes',
+    createButtonText: 'Nuevo Mensaje',
+    createButtonColor: 'purple',
+    emptyStateTitle: 'No hay mensajes',
+    displayField: 'titulo',
+    showCounter: true,
+    counterColor: 'purple',
+    showChips: ['remitenteChip', 'destinatarioChip']
+  };
+
+  readonly invitacionesCardConfig: CardConfig = {
+    title: 'Invitaciones',
+    createButtonText: 'Nueva Invitación',
+    createButtonColor: 'orange',
+    emptyStateTitle: 'No hay invitaciones',
+    displayField: 'mensaje',
+    showCounter: true,
+    counterColor: 'orange',
+    showChips: ['estado', 'tipo']
+  };
+
   // Signals para el estado del componente
   readonly toasts = signal<Toast[]>([]);
   readonly isModalOpen = signal(false);
@@ -256,6 +383,91 @@ export class EntrenadosPage {
   readonly rutinaModalData = signal<any>(null);
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
+
+  // Signals para notificaciones
+  readonly isNotificacionModalOpen = signal(false);
+  readonly notificacionModalData = signal<any>(null);
+  readonly notificacionEditForm = signal<FormGroup | null>(null);
+  readonly isNotificacionCreating = signal(false);
+
+  // Signals para mensajes
+  readonly isMensajeModalOpen = signal(false);
+  readonly mensajeModalData = signal<any>(null);
+  readonly mensajeEditForm = signal<FormGroup | null>(null);
+  readonly isMensajeCreating = signal(false);
+
+  // Signals para invitaciones
+  readonly isInvitacionModalOpen = signal(false);
+  readonly invitacionModalData = signal<any>(null);
+  readonly invitacionEditForm = signal<FormGroup | null>(null);
+  readonly isInvitacionCreating = signal(false);
+
+  // Signals para notificaciones (desde el servicio)
+  readonly notificaciones = computed(() => {
+    return this.notificacionService.notificaciones().map(notif => {
+      const tipoDisplay = this.getTipoNotificacionDisplay(notif.tipo);
+      const leidaDisplay = notif.leida ? '✓ Leída' : '❌ No leída';
+      
+      return {
+        ...notif,
+        titulo: notif.titulo,
+        tipo: tipoDisplay,
+        leida: leidaDisplay
+      };
+    });
+  });
+
+  // Signals para mensajes (desde el servicio)
+  readonly mensajes = computed(() => {
+    return this.mensajeService.mensajes().map(mensaje => {
+      const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
+      const destinatario = this.usuarios().find(u => u.uid === mensaje.destinatarioId);
+      
+      const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
+      const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
+      
+      // Generar título descriptivo según el tipo de mensaje
+      let titulo = 'Mensaje';
+      switch (mensaje.tipo) {
+        case 'texto':
+          titulo = 'Mensaje de texto';
+          break;
+        case 'imagen':
+          titulo = 'Imagen compartida';
+          break;
+        case 'video':
+          titulo = 'Video compartido';
+          break;
+        case 'audio':
+          titulo = 'Audio compartido';
+          break;
+        default:
+          titulo = 'Mensaje';
+      }
+      
+      return {
+        ...mensaje,
+        titulo,
+        remitenteChip: `De: ${remitenteNombre}`,
+        destinatarioChip: `Para: ${destinatarioNombre}`
+      };
+    });
+  });
+
+  // Signals para invitaciones (desde el servicio)
+  readonly invitaciones = computed(() => {
+    return this.invitacionService.invitaciones().map((inv: any) => {
+      const estadoDisplay = this.getEstadoInvitacionDisplay(inv.estado);
+      const tipoDisplay = this.getTipoInvitacionDisplay(inv.franjaHoraria);
+      
+      return {
+        ...inv,
+        mensaje: inv.mensaje || `Invitación para ${inv.email}`,
+        tipo: tipoDisplay,
+        estado: estadoDisplay
+      };
+    });
+  });
 
   private showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 4000) {
     const id = Date.now().toString();
@@ -310,6 +522,38 @@ export class EntrenadosPage {
     setTimeout(() => {
       this.toasts.update(toasts => toasts.filter(t => t.id !== id));
     }, 300);
+  }
+
+  // Funciones helper para display
+  private getTipoNotificacionDisplay(tipo: any): string {
+    const tipoMap: Record<string, string> = {
+      'rutina_asignada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg> Rutina',
+      'mensaje_nuevo': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/><path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/></svg> Mensaje',
+      'invitacion': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg> Invitación',
+      'ejercicio_completado': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Ejercicio',
+      'sesion_programada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg> Sesión',
+      'info': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg> Info'
+    };
+    return tipoMap[tipo] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg> Info';
+  }
+
+  private getEstadoInvitacionDisplay(estado: string): string {
+    const estadoMap: Record<string, string> = {
+      'pendiente': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg> Pendiente',
+      'aceptada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Aceptada',
+      'rechazada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg> Rechazada'
+    };
+    return estadoMap[estado] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg> Pendiente';
+  }
+
+  private getTipoInvitacionDisplay(franja?: string): string {
+    if (!franja) return '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg> General';
+    const tipoMap: Record<string, string> = {
+      'mañana': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg> Mañana',
+      'tarde': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg> Tarde',
+      'noche': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg> Noche'
+    };
+    return tipoMap[franja] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg> General';
   }
 
   async deleteEntrenado(id: string) {
@@ -853,5 +1097,453 @@ export class EntrenadosPage {
         colSpan: 1
       }
     ];
+  }
+
+  // ========================================
+  // MÉTODOS PARA NOTIFICACIONES
+  // ========================================
+
+  addNotificacion() {
+    this.openCreateNotificacionModal();
+  }
+
+  openCreateNotificacionModal() {
+    const newNotificacion = {
+      id: 'n' + Date.now(),
+      usuarioId: '',
+      tipo: 'info',
+      titulo: '',
+      mensaje: '',
+      leida: false,
+      fechaCreacion: new Date()
+    };
+    this.notificacionModalData.set(newNotificacion);
+    this.isNotificacionModalOpen.set(true);
+    this.isNotificacionCreating.set(true);
+    this.createNotificacionEditForm(newNotificacion);
+  }
+
+  openNotificacionModal(item: any) {
+    this.notificacionModalData.set(item);
+    this.isNotificacionModalOpen.set(true);
+    this.isNotificacionCreating.set(false);
+    this.createNotificacionEditForm(item);
+  }
+
+  closeNotificacionModal() {
+    this.isNotificacionModalOpen.set(false);
+    this.notificacionModalData.set(null);
+    this.notificacionEditForm.set(null);
+    this.isNotificacionCreating.set(false);
+  }
+
+  private createNotificacionEditForm(item: any) {
+    const formConfig: any = {
+      usuarioId: [item.usuarioId || '', Validators.required],
+      tipo: [item.tipo || 'info', Validators.required],
+      titulo: [item.titulo || '', Validators.required],
+      mensaje: [item.mensaje || '', Validators.required]
+    };
+    this.notificacionEditForm.set(this.fb.group(formConfig));
+  }
+
+  async saveNotificacionChanges() {
+    const form = this.notificacionEditForm();
+    const originalData = this.notificacionModalData();
+
+    if (!form || !originalData) {
+      this.log('Error: Formulario inválido o datos faltantes');
+      return;
+    }
+
+    form.markAllAsTouched();
+
+    if (!form.valid) {
+      this.log('Error: Por favor, completa todos los campos obligatorios');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    try {
+      const updatedData = { 
+        ...originalData, 
+        ...form.value,
+        leida: false,
+        fechaCreacion: new Date()
+      };
+      
+      await this.notificacionService.save(updatedData);
+      this.log(`Notificación ${this.isNotificacionCreating() ? 'creada' : 'actualizada'}: ${updatedData.titulo}`);
+      this.closeNotificacionModal();
+    } catch (error: any) {
+      console.error('Error al guardar:', error);
+      this.log(`ERROR al guardar notificación: ${error.message}`);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  getNotificacionFormFields(): FormFieldConfig[] {
+    return [
+      {
+        name: 'usuarioId',
+        type: 'select',
+        label: 'Usuario Destinatario',
+        placeholder: 'Seleccionar usuario',
+        options: this.usuarios().map(user => ({
+          value: user.uid,
+          label: `${user.nombre || user.email || user.uid} (${user.role})`
+        })),
+        colSpan: 2
+      },
+      {
+        name: 'tipo',
+        type: 'select',
+        label: 'Tipo de Notificación',
+        placeholder: 'Seleccionar tipo',
+        options: [
+          { value: 'info', label: 'Información' },
+          { value: 'exito', label: 'Éxito' },
+          { value: 'advertencia', label: 'Advertencia' },
+          { value: 'error', label: 'Error' },
+          { value: 'mensaje', label: 'Mensaje' },
+          { value: 'recordatorio', label: 'Recordatorio' },
+          { value: 'sistema', label: 'Sistema' }
+        ],
+        colSpan: 2
+      },
+      {
+        name: 'titulo',
+        type: 'text',
+        label: 'Título',
+        placeholder: 'Título de la notificación',
+        colSpan: 2
+      },
+      {
+        name: 'mensaje',
+        type: 'textarea',
+        label: 'Mensaje',
+        placeholder: 'Escribe el mensaje de la notificación...',
+        rows: 4,
+        colSpan: 2
+      }
+    ];
+  }
+
+  async deleteNotificacion(id: string) {
+    try {
+      await this.notificacionService.delete(id);
+      this.log('Notificación eliminada: ' + id);
+    } catch (error) {
+      this.log('Error al eliminar notificación');
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA MENSAJES
+  // ========================================
+
+  addMensaje() {
+    this.openCreateMensajeModal();
+  }
+
+  openCreateMensajeModal() {
+    const newMensaje = {
+      id: 'm' + Date.now(),
+      conversacionId: 'conv-' + Date.now(),
+      remitenteId: '',
+      remitenteTipo: 'entrenador',
+      destinatarioId: '',
+      destinatarioTipo: 'entrenado',
+      contenido: '',
+      tipo: 'texto',
+      leido: false,
+      entregado: false,
+      fechaEnvio: new Date()
+    };
+    this.mensajeModalData.set(newMensaje);
+    this.isMensajeModalOpen.set(true);
+    this.isMensajeCreating.set(true);
+    this.createMensajeEditForm(newMensaje);
+  }
+
+  openMensajeModal(item: any) {
+    this.mensajeModalData.set(item);
+    this.isMensajeModalOpen.set(true);
+    this.isMensajeCreating.set(false);
+    this.createMensajeEditForm(item);
+  }
+
+  closeMensajeModal() {
+    this.isMensajeModalOpen.set(false);
+    this.mensajeModalData.set(null);
+    this.mensajeEditForm.set(null);
+    this.isMensajeCreating.set(false);
+  }
+
+  private createMensajeEditForm(item: any) {
+    const formConfig: any = {
+      remitenteId: [item.remitenteId || '', Validators.required],
+      destinatarioId: [item.destinatarioId || '', Validators.required],
+      contenido: [item.contenido || '', Validators.required],
+      tipo: [item.tipo || 'texto', Validators.required]
+    };
+    this.mensajeEditForm.set(this.fb.group(formConfig));
+  }
+
+  async saveMensajeChanges() {
+    const form = this.mensajeEditForm();
+    const originalData = this.mensajeModalData();
+
+    if (!form || !originalData) {
+      this.log('Error: Formulario inválido o datos faltantes');
+      return;
+    }
+
+    form.markAllAsTouched();
+
+    if (!form.valid) {
+      this.log('Error: Por favor, completa todos los campos obligatorios');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    try {
+      const remitenteUser = this.usuarios().find(u => u.uid === form.value.remitenteId);
+      const destinatarioUser = this.usuarios().find(u => u.uid === form.value.destinatarioId);
+
+      const updatedData = { 
+        ...originalData, 
+        ...form.value,
+        remitenteTipo: remitenteUser?.role || 'entrenador',
+        destinatarioTipo: destinatarioUser?.role || 'entrenado',
+        leido: false,
+        entregado: true,
+        fechaEnvio: new Date()
+      };
+      
+      await this.mensajeService.save(updatedData);
+      this.log(`Mensaje ${this.isMensajeCreating() ? 'creado' : 'actualizado'}`);
+      this.closeMensajeModal();
+    } catch (error: any) {
+      console.error('Error al guardar:', error);
+      this.log(`ERROR al guardar mensaje: ${error.message}`);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  getMensajeFormFields(): FormFieldConfig[] {
+    return [
+      {
+        name: 'remitenteId',
+        type: 'select',
+        label: 'Remitente',
+        placeholder: 'Seleccionar remitente',
+        options: this.usuarios().map(user => ({
+          value: user.uid,
+          label: `${user.nombre || user.email || user.uid} (${user.role})`
+        })),
+        colSpan: 1
+      },
+      {
+        name: 'destinatarioId',
+        type: 'select',
+        label: 'Destinatario',
+        placeholder: 'Seleccionar destinatario',
+        options: this.usuarios().map(user => ({
+          value: user.uid,
+          label: `${user.nombre || user.email || user.uid} (${user.role})`
+        })),
+        colSpan: 1
+      },
+      {
+        name: 'tipo',
+        type: 'select',
+        label: 'Tipo de Mensaje',
+        placeholder: 'Seleccionar tipo',
+        options: [
+          { value: 'texto', label: 'Texto' },
+          { value: 'imagen', label: 'Imagen' },
+          { value: 'video', label: 'Video' },
+          { value: 'audio', label: 'Audio' }
+        ],
+        colSpan: 2
+      },
+      {
+        name: 'contenido',
+        type: 'textarea',
+        label: 'Contenido',
+        placeholder: 'Escribe el mensaje aquí...',
+        rows: 4,
+        colSpan: 2
+      }
+    ];
+  }
+
+  async deleteMensaje(id: string) {
+    try {
+      await this.mensajeService.delete(id);
+      this.log('Mensaje eliminado: ' + id);
+    } catch (error) {
+      this.log('Error al eliminar mensaje');
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA INVITACIONES
+  // ========================================
+
+  addInvitacion() {
+    this.openCreateInvitacionModal();
+  }
+
+  openCreateInvitacionModal() {
+    const newInvitacion = {
+      id: 'inv-' + Date.now(),
+      invitadorId: '',
+      email: '',
+      estado: 'pendiente',
+      mensaje: '',
+      franjaHoraria: 'tarde',
+      fechaInvitacion: new Date()
+    };
+    this.invitacionModalData.set(newInvitacion);
+    this.isInvitacionModalOpen.set(true);
+    this.isInvitacionCreating.set(true);
+    this.createInvitacionEditForm(newInvitacion);
+  }
+
+  openInvitacionModal(item: any) {
+    this.invitacionModalData.set(item);
+    this.isInvitacionModalOpen.set(true);
+    this.isInvitacionCreating.set(false);
+    this.createInvitacionEditForm(item);
+  }
+
+  closeInvitacionModal() {
+    this.isInvitacionModalOpen.set(false);
+    this.invitacionModalData.set(null);
+    this.invitacionEditForm.set(null);
+    this.isInvitacionCreating.set(false);
+  }
+
+  private createInvitacionEditForm(item: any) {
+    const formConfig: any = {
+      invitadorId: [item.invitadorId || '', Validators.required],
+      email: [item.email || '', [Validators.required, Validators.email]],
+      mensaje: [item.mensaje || ''],
+      franjaHoraria: [item.franjaHoraria || 'tarde', Validators.required]
+    };
+    this.invitacionEditForm.set(this.fb.group(formConfig));
+  }
+
+  async saveInvitacionChanges() {
+    const form = this.invitacionEditForm();
+    const originalData = this.invitacionModalData();
+
+    if (!form || !originalData) {
+      this.log('Error: Formulario inválido o datos faltantes');
+      return;
+    }
+
+    form.markAllAsTouched();
+
+    if (!form.valid) {
+      this.log('Error: Por favor, completa todos los campos obligatorios');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    try {
+      const updatedData = { 
+        ...originalData, 
+        ...form.value,
+        estado: 'pendiente',
+        fechaInvitacion: new Date()
+      };
+      
+      await this.invitacionService.save(updatedData);
+      this.log(`Invitación ${this.isInvitacionCreating() ? 'creada' : 'actualizada'}`);
+      this.closeInvitacionModal();
+    } catch (error: any) {
+      console.error('Error al guardar:', error);
+      this.log(`ERROR al guardar invitación: ${error.message}`);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  getInvitacionFormFields(): FormFieldConfig[] {
+    return [
+      {
+        name: 'invitadorId',
+        type: 'select',
+        label: 'Invitador',
+        placeholder: 'Seleccionar invitador',
+        options: this.usuarios().map(user => ({
+          value: user.uid,
+          label: `${user.nombre || user.email || user.uid} (${user.role})`
+        })),
+        colSpan: 1
+      },
+      {
+        name: 'email',
+        type: 'text',
+        label: 'Email del Invitado',
+        placeholder: 'ejemplo@email.com',
+        colSpan: 1
+      },
+      {
+        name: 'franjaHoraria',
+        type: 'select',
+        label: 'Franja Horaria',
+        placeholder: 'Seleccionar franja horaria',
+        options: [
+          { value: 'mañana', label: 'Mañana (6:00 - 12:00)' },
+          { value: 'tarde', label: 'Tarde (12:00 - 18:00)' },
+          { value: 'noche', label: 'Noche (18:00 - 23:00)' }
+        ],
+        colSpan: 2
+      },
+      {
+        name: 'mensaje',
+        type: 'textarea',
+        label: 'Mensaje Personalizado',
+        placeholder: 'Agrega un mensaje personal a la invitación (opcional)...',
+        rows: 4,
+        colSpan: 2
+      }
+    ];
+  }
+
+  async deleteInvitacion(id: string) {
+    try {
+      await this.invitacionService.delete(id);
+      this.log('Invitación eliminada: ' + id);
+    } catch (error) {
+      this.log('Error al eliminar invitación');
+    }
+  }
+
+  async aceptarInvitacion(id: string) {
+    try {
+      await this.invitacionService.aceptar(id);
+      this.log('Invitación aceptada: ' + id);
+    } catch (error) {
+      this.log('Error al aceptar invitación');
+    }
+  }
+
+  async rechazarInvitacion(id: string) {
+    try {
+      await this.invitacionService.rechazar(id);
+      this.log('Invitación rechazada: ' + id);
+    } catch (error) {
+      this.log('Error al rechazar invitación');
+    }
   }
 }

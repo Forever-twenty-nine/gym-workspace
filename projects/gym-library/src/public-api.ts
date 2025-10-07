@@ -41,6 +41,7 @@ export * from './lib/services/storage.service';
 export * from './lib/services/notificacion.service';
 export * from './lib/services/mensaje.service';
 export * from './lib/services/conversacion.service';
+export * from './lib/services/invitacion.service';
 /*
  * interfaces para adaptadores
  */
@@ -57,5 +58,6 @@ export type { IStorageAdapter } from './lib/services/storage.service';
 export type { INotificacionFirestoreAdapter } from './lib/services/notificacion.service';
 export type { IMensajeFirestoreAdapter } from './lib/services/mensaje.service';
 export type { IConversacionFirestoreAdapter } from './lib/services/conversacion.service';
+export type { IInvitacionFirestoreAdapter } from './lib/services/invitacion.service';
 
 export * from './lib/gym-library';

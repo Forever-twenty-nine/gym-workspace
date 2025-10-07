@@ -5,13 +5,28 @@ import { environment } from '../environments/environment';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { EntrenadoService, UserService, RutinaService, EjercicioService, EntrenadorService, GimnasioService, ENTRENADOR_FIRESTORE_ADAPTER, GIMNASIO_FIRESTORE_ADAPTER } from 'gym-library';
+import { 
+  EntrenadoService, 
+  UserService, 
+  RutinaService, 
+  EjercicioService, 
+  EntrenadorService, 
+  GimnasioService,
+  NotificacionService,
+  MensajeService,
+  InvitacionService,
+  ENTRENADOR_FIRESTORE_ADAPTER, 
+  GIMNASIO_FIRESTORE_ADAPTER 
+} from 'gym-library';
 import { EntrenadoFirestoreAdapter } from './adapters/entrenado-firestore.adapter';
 import { UserFirestoreAdapter } from './adapters/user-firestore.adapter';
 import { RutinaFirestoreAdapter } from './adapters/rutina-firestore.adapter';
 import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapter';
 import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adapter';
 import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
+import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.adapter';
+import { MensajeFirestoreAdapter } from './adapters/mensaje-firestore.adapter';
+import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
 
 import { routes } from './app.routes';
 
@@ -23,12 +38,18 @@ function initializeServiceAdapters(
   ejercicioService: EjercicioService,
   entrenadorService: EntrenadorService,
   gimnasioService: GimnasioService,
+  notificacionService: NotificacionService,
+  mensajeService: MensajeService,
+  invitacionService: InvitacionService,
   entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
   ejercicioAdapter: EjercicioFirestoreAdapter,
   entrenadorAdapter: EntrenadorFirestoreAdapter,
-  gimnasioAdapter: GimnasioFirestoreAdapter
+  gimnasioAdapter: GimnasioFirestoreAdapter,
+  notificacionAdapter: NotificacionFirestoreAdapter,
+  mensajeAdapter: MensajeFirestoreAdapter,
+  invitacionAdapter: InvitacionFirestoreAdapter
 ) {
   return () => {
     // Configurar adaptadores
@@ -38,6 +59,9 @@ function initializeServiceAdapters(
     ejercicioService.setFirestoreAdapter(ejercicioAdapter);
     // NOTA: entrenadorService usa injection token, no necesita setFirestoreAdapter
     gimnasioService.setFirestoreAdapter(gimnasioAdapter);
+    notificacionService.setFirestoreAdapter(notificacionAdapter);
+    mensajeService.setFirestoreAdapter(mensajeAdapter);
+    invitacionService.setFirestoreAdapter(invitacionAdapter);
     
     return Promise.resolve();
   };
@@ -76,12 +100,18 @@ export const appConfig: ApplicationConfig = {
         EjercicioService,
         EntrenadorService,
         GimnasioService,
+        NotificacionService,
+        MensajeService,
+        InvitacionService,
         EntrenadoFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
         EjercicioFirestoreAdapter,
         EntrenadorFirestoreAdapter,
-        GimnasioFirestoreAdapter
+        GimnasioFirestoreAdapter,
+        NotificacionFirestoreAdapter,
+        MensajeFirestoreAdapter,
+        InvitacionFirestoreAdapter
       ],
       multi: true
     }
