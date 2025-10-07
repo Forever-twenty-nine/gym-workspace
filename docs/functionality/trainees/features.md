@@ -1,102 +1,73 @@
 # 💪 Entrenados - Features
 
-> Listado de funcionalidades por plan
+> Funcionalidades por plan para usuarios finales
 
-## 🔗 Modelo de Conexión
+## 🆓 Plan Free
 
-**Sistema de gestión por gimnasio:**
+### ✅ Funcionalidades Incluidas
 
-Los entrenados son gestionados a través del gimnasio al que pertenecen:
+**Rutinas:**
+- Ver rutinas asignadas por entrenador
+- Iniciar y registrar ejercicios completados
+- Ver detalles de cada ejercicio (series, reps, peso, notas)
+- Historial limitado: últimas 2 rutinas
 
-1. **Registro:** El gimnasio crea la cuenta del entrenado
-2. **Asignación:** Se asigna opcionalmente a un entrenador específico
-3. **Multi-tenancy:** Cada entrenado pertenece a un gimnasio (`gimnasioId`)
-4. **Estado:** Se puede activar/desactivar (`activo: boolean`)
-
-> **Importante:** El sistema usa multi-tenancy basado en `gimnasioId`.
-
-## � Funcionalidades Actuales
-
-### ✅ MVP Implementado
-
-**Gestión de Entrenados:**
-- CRUD completo de entrenados
-- Filtrado por gimnasio
-- Filtrado por objetivo (bajar peso, aumentar músculo, mantener peso)
-- Filtrado por estado (activo/inactivo)
-- Búsqueda por ID
-- Contadores de total y activos
-
-**Datos básicos:**
-- ID único
-- Gimnasio asociado
-- Entrenador asignado (opcional)
-- Estado activo/inactivo
-- Fecha de registro
-- Objetivo de entrenamiento
-
-### 📋 Funcionalidades Planificadas
-
-> Las siguientes funcionalidades están en el roadmap pero aún no implementadas:
-
-**Rutinas y Entrenamientos:**
-- Ver rutinas asignadas
-- Registrar entrenamientos
-- Historial de ejercicios
-- Progreso por rutina
-
-**Estadísticas:**
+**Progreso:**
 - Contador de rutinas completadas
-- Racha de entrenamiento
-- Records personales (PRs)
+- Racha de entrenamiento (días consecutivos)
+- Progreso básico por rutina (% completado)
 
-**Planes Free vs Premium:**
-- Límites según plan
-- Exportación PDF/Excel
-- Estadísticas avanzadas
+**Social:**
+- Compartir progreso en RRSS (Instagram, Facebook, Twitter)
+- Incluye watermark "Powered by [App]"
 
 **Notificaciones:**
-- Push notifications
-- Recordatorios
-- Alertas de progreso
+- Push: Nueva rutina asignada
+- Push: Recordatorio de entrenamiento (configurable)
+- Email: Resumen semanal
 
-## 🎯 Roadmap de Funcionalidades
+### ❌ Restricciones
 
-> **Estado actual:** MVP básico de gestión de entrenados
+- Solo 2 rutinas en historial (las más recientes)
+- Sin estadísticas avanzadas
+- Sin exportación PDF/Excel
+- Watermark obligatorio al compartir
+- Anuncios intersticiales cada X acciones
 
-### Fase 1: MVP ✅ (Implementado)
-- [x] Modelo básico de Entrenado
-- [x] Servicio con signals reactivas
-- [x] CRUD completo
-- [x] Filtros por gimnasio, objetivo, estado
-- [x] Contadores y estadísticas básicas
+## 💎 Plan Premium
 
-### Fase 2: Rutinas y Entrenamientos 📋 (Planificado)
-- [ ] Modelo RutinaAsignada
-- [ ] Modelo RegistroEntrenamiento
-- [ ] Vista de rutinas asignadas
-- [ ] Iniciar y completar entrenamientos
-- [ ] Registrar series, reps y peso
-- [ ] Progreso por rutina (%)
+### ✅ Todo lo de Free +
 
-### Fase 3: Estadísticas 📋 (Planificado)
-- [ ] Racha de entrenamientos
-- [ ] Records personales (PRs)
-- [ ] Historial de entrenamientos
-- [ ] Gráficas de progreso
-- [ ] Volumen total levantado
+**Rutinas:**
+- Historial completo e ilimitado de rutinas
+- Búsqueda y filtros en historial
+- Rutinas personalizadas avanzadas
 
-### Fase 4: Planes y Premium 📋 (Planificado)
-- [ ] Diferenciación Free vs Premium
-- [ ] Límites por plan (historial, etc.)
-- [ ] Exportación PDF/Excel
-- [ ] Sin watermark para Premium
+**Estadísticas Avanzadas:**
+- Gráficas de progreso temporal (líneas, barras)
+- Volumen total levantado (acumulado)
+- Tiempo total de entrenamiento
+- Calorías estimadas quemadas
+- Distribución por grupo muscular
+- Comparativas mes vs mes
+- Personal Records (PRs) destacados
 
-### Fase 5: Notificaciones 📋 (Planificado)
-- [ ] Push notifications (FCM)
-- [ ] Recordatorios de entrenamiento
-- [ ] Alertas de logros
-- [ ] Resumen semanal
+**Exportación:**
+- Descargar rutinas en PDF (sin watermark)
+- Exportar historial a Excel/CSV
+- Generar imágenes optimizadas para RRSS (sin marca)
+
+**Experiencia:**
+- Sin anuncios
+- Soporte prioritario
+
+**Comunicación:**
+- Chat directo con entrenador (si entrenador tiene Plan Pro)
+- Notificaciones prioritarias
+
+**Múltiples Entrenadores:**
+- Conexión ilimitada con varios entrenadores
+- Panel para gestionar múltiples programas simultáneamente
 
 ---
 
