@@ -70,12 +70,14 @@ export class EntrenamientosPage {
   }
 
   iniciarEntrenamiento(entrenamiento: any) {
-    console.log('Iniciando entrenamiento:', entrenamiento);
-    // Aquí iría la lógica para iniciar el entrenamiento
+    // Lógica para iniciar el entrenamiento
+  }
+
+  completarEntrenamiento(entrenamiento: any) {
+    // Marcar entrenamiento como completado
   }
 
   marcarCompletado(entrenamiento: any) {
-    entrenamiento.completado = !entrenamiento.completado;
-    console.log('Entrenamiento marcado como completado:', entrenamiento);
+    // Marcar entrenamiento como completado
   }
 }

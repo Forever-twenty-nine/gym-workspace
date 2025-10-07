@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Rol } from '../../core/enums/rol.enum';
 import {
   IonContent,
   IonItem,
@@ -13,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
-import { AuthService, UserService } from 'gym-library';
+import { AuthService, UserService, Rol } from 'gym-library';
 
 @Component({
   selector: 'app-login',
@@ -64,7 +63,6 @@ export class LoginPage {
       if (success) {
         const user = this.authService.currentUser();
         if (user) {
-          console.log('Login exitoso:', user);
           this.redirectToRolePage(user.role);
         }
       } else {
@@ -81,7 +79,6 @@ export class LoginPage {
       if (success) {
         const user = this.authService.currentUser();
         if (user) {
-          console.log('Login con Google exitoso:', user);
           this.redirectToRolePage(user.role);
         }
       } else {

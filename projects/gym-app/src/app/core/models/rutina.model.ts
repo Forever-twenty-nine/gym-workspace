@@ -1,5 +1,5 @@
 import { Ejercicio } from "./ejercicio.model";
-import { Rol } from "../enums/rol.enum";
+import { Rol } from "gym-library";
 
 export interface Rutina {
     id: string;

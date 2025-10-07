@@ -1,4 +1,5 @@
-import { Rol} from '../enums/rol.enum';
+import { Rol } from 'gym-library';
+
 /**
  * Usuario de firebase 
  */

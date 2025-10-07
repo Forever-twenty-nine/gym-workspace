@@ -64,10 +64,15 @@ export class DashboardPage {
   }
 
   verCliente(cliente: any) {
-    console.log('Ver cliente:', cliente);
+    // Navegar al detalle del cliente
+  }
+
+  crearNuevoEntrenamiento() {
+    // Crear nuevo entrenamiento
   }
 
   crearEntrenamiento() {
-    console.log('Crear nuevo entrenamiento');
+    // Alias para crearNuevoEntrenamiento
+    this.crearNuevoEntrenamiento();
   }
 }

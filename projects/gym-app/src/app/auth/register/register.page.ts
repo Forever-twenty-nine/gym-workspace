@@ -179,7 +179,6 @@ export class RegisterPage {
    */
   async register() {
     // solo mock
-    console.log('Registrando usuario...');
     this.router.navigate(['/onboarding']);
   }
 

@@ -24,8 +24,7 @@ import {
   fitnessOutline,
   rocketOutline
 } from 'ionicons/icons';
-import { AuthService } from 'gym-library';
-import { Objetivo } from '../../core/enums/objetivo.enum';
+import { AuthService, Objetivo } from 'gym-library';
 
 // Configuración del onboarding
 const ONBOARDING_CONFIG = {
@@ -108,7 +107,6 @@ export class OnboardingPage {
    */
   async initializeForTesting() {
     // solo mock
-    console.log('Inicializando Onboarding para testing');
   }
 
   /**

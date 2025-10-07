@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, effect, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
   collection, 
@@ -6,11 +6,11 @@ import {
   doc, 
   deleteDoc, 
   setDoc,
-  onSnapshot,
   Timestamp,
-  QuerySnapshot,
-  DocumentSnapshot
+  collectionData,
+  docData
 } from '@angular/fire/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Cliente } from 'gym-library';
 
 interface IClienteFirestoreAdapter {
@@ -24,24 +24,43 @@ interface IClienteFirestoreAdapter {
 export class ClienteFirestoreAdapter implements IClienteFirestoreAdapter {
   private readonly COLLECTION = 'clientes';
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
 
   initializeListener(onUpdate: (clientes: Cliente[]) => void): void {
-    const clientesCol = collection(this.firestore, this.COLLECTION);
-    
-    onSnapshot(clientesCol, (snapshot: QuerySnapshot) => {
-      const list = snapshot.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-      onUpdate(list);
+    // Ejecutar dentro del contexto de inyección
+    runInInjectionContext(this.injector, () => {
+      const clientesSignal = toSignal(
+        collectionData(collection(this.firestore, this.COLLECTION), { idField: 'id' })
+      );
+      
+      effect(() => {
+        const data = clientesSignal();
+        if (data) {
+          const list = data.map((d: any) => this.mapFromFirestore(d));
+          onUpdate(list);
+        }
+      });
     });
   }
 
   subscribeToCliente(id: string, onUpdate: (cliente: Cliente | null) => void): void {
-    const clienteRef = doc(this.firestore, this.COLLECTION, id);
-    onSnapshot(clienteRef, (doc: DocumentSnapshot) => {
-      if (doc.exists()) {
-        onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-      } else {
-        onUpdate(null);
-      }
+    // Ejecutar la suscripción dentro del contexto de inyección
+    runInInjectionContext(this.injector, () => {
+      const clienteRef = doc(this.firestore, this.COLLECTION, id);
+      
+      docData(clienteRef, { idField: 'id' }).subscribe({
+        next: (data) => {
+          if (data) {
+            onUpdate(this.mapFromFirestore(data));
+          } else {
+            onUpdate(null);
+          }
+        },
+        error: (error) => {
+          console.error('Error subscribing to cliente:', error);
+          onUpdate(null);
+        }
+      });
     });
   }
 

@@ -1,4 +1,4 @@
-import { Objetivo } from '../enums/objetivo.enum';
+import { Objetivo } from 'gym-library';
 import { Rutina } from './rutina.model';
 
 /**

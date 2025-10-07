@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonHeader, 
@@ -56,6 +56,7 @@ export class DashboardPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private injector = inject(Injector);
 
   // Signals para datos reactivos
   cliente = signal<Cliente | null>(null);
@@ -100,32 +101,29 @@ export class DashboardPage implements OnInit {
       checkmarkCircleOutline,
       timeOutline
     });
-
-    // Efecto para mantener sincronizados los datos del cliente
-    effect(() => {
-      const currentUser = this.authService.currentUser();
-      const userId = currentUser?.uid;
-      console.log('👤 Usuario actual:', userId);
-      
-      if (userId) {
-        const clienteSignal = this.clienteService.getCliente(userId);
-        const clienteData = clienteSignal();
-        console.log('📋 Datos del cliente:', clienteData);
-        this.cliente.set(clienteData);
-      }
-    });
-
-    // Efecto para mantener sincronizadas todas las rutinas
-    effect(() => {
-      const rutinasSignal = this.rutinaService.rutinas;
-      const rutinas = rutinasSignal();
-      console.log('🏃‍♂️ Todas las rutinas:', rutinas);
-      this.todasLasRutinas.set(rutinas);
-    });
   }
 
   ngOnInit() {
-    // La carga de datos se maneja reactivamente en el constructor con effect()
+    // Obtener el usuario actual y suscribirse a sus datos
+    const currentUser = this.authService.currentUser();
+    const userId = currentUser?.uid;
+    
+    if (userId) {
+      // Obtener el signal del cliente (esto llama a subscribeToCliente una sola vez)
+      const clienteSignal = this.clienteService.getCliente(userId);
+      
+      // Sincronizar el signal local con el del servicio usando el injector
+      effect(() => {
+        const clienteData = clienteSignal();
+        this.cliente.set(clienteData);
+      }, { injector: this.injector });
+    }
+
+    // Sincronizar rutinas
+    effect(() => {
+      const rutinas = this.rutinaService.rutinas();
+      this.todasLasRutinas.set(rutinas);
+    }, { injector: this.injector });
   }
 
   private formatearFecha(fecha: Date): string {
@@ -140,12 +138,10 @@ export class DashboardPage implements OnInit {
 
   verRutina(rutina: any) {
     // Navegar al detalle de la rutina
-    console.log('Ver rutina:', rutina);
   }
 
   contactarEntrenador() {
     // Contactar con el entrenador
-    console.log('Contactar entrenador');
   }
 
 }

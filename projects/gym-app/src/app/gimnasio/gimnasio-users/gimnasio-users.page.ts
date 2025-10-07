@@ -87,11 +87,21 @@ export class GimnasioUsersPage {
     }
   }
 
+  editarUsuario(user: any) {
+    // Editar usuario
+  }
+
+  eliminarUsuario(user: any) {
+    // Eliminar usuario
+  }
+
   editUser(user: any) {
-    console.log('Editar usuario:', user);
+    // Alias para editarUsuario
+    this.editarUsuario(user);
   }
 
   deleteUser(user: any) {
-    console.log('Eliminar usuario:', user);
+    // Alias para eliminarUsuario
+    this.eliminarUsuario(user);
   }
 }

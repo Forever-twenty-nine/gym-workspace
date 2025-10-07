@@ -15,7 +15,6 @@ export class AppComponent implements OnInit {
   async ngOnInit() {
     try {
       await this.appConfig.initialize();
-      console.log('✅ App inicializada correctamente');
     } catch (error) {
       console.error('❌ Error inicializando app:', error);
     }

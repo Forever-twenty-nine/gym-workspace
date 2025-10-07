@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, effect, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
   collection, 
@@ -6,34 +6,54 @@ import {
   doc, 
   deleteDoc, 
   setDoc,
-  onSnapshot,
   Timestamp,
-  QuerySnapshot,
-  DocumentSnapshot
+  collectionData,
+  docData
 } from '@angular/fire/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Rutina, IRutinaFirestoreAdapter } from 'gym-library';
 
 @Injectable({ providedIn: 'root' })
 export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   private readonly COLLECTION = 'rutinas';
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
 
   initializeListener(onUpdate: (rutinas: Rutina[]) => void): void {
-    const col = collection(this.firestore, this.COLLECTION);
-    onSnapshot(col, (snap: QuerySnapshot) => {
-      const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-      onUpdate(list);
+    // Ejecutar dentro del contexto de inyección
+    runInInjectionContext(this.injector, () => {
+      const rutinasSignal = toSignal(
+        collectionData(collection(this.firestore, this.COLLECTION), { idField: 'id' })
+      );
+      
+      effect(() => {
+        const data = rutinasSignal();
+        if (data) {
+          const list = data.map((d: any) => this.mapFromFirestore(d));
+          onUpdate(list);
+        }
+      });
     });
   }
 
   subscribeToRutina(id: string, onUpdate: (rutina: Rutina | null) => void): void {
-    const rutinaRef = doc(this.firestore, this.COLLECTION, id);
-    onSnapshot(rutinaRef, (doc: DocumentSnapshot) => {
-      if (doc.exists()) {
-        onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-      } else {
-        onUpdate(null);
-      }
+    // Ejecutar la suscripción dentro del contexto de inyección
+    runInInjectionContext(this.injector, () => {
+      const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+      
+      docData(rutinaRef, { idField: 'id' }).subscribe({
+        next: (data) => {
+          if (data) {
+            onUpdate(this.mapFromFirestore(data));
+          } else {
+            onUpdate(null);
+          }
+        },
+        error: (error) => {
+          console.error('Error subscribing to rutina:', error);
+          onUpdate(null);
+        }
+      });
     });
   }
 
