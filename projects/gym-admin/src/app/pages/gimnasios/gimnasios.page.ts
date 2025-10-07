@@ -15,45 +15,7 @@ import { ToastComponent, Toast } from '../../components/shared/toast/toast.compo
     ModalFormComponent,
     ToastComponent
   ],
-  template: `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-white mb-6">Gimnasios</h1>
-      
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Card de Gimnasios -->
-        <app-generic-card
-          [config]="gimnasiosCardConfig"
-          [items]="gimnasios()"
-          [idField]="'id'"
-          [canCreate]="false"
-          (edit)="openDetailsModal($event)"
-          (delete)="deleteGimnasio($event)">
-        </app-generic-card>
-      </section>
-
-      <!-- Toasts -->
-      <app-toast 
-        [toasts]="toasts()" 
-        (closeToast)="removeToast($event)">
-      </app-toast>
-
-      <!-- Modal de edición -->
-      <app-modal-form
-        [isOpen]="isModalOpen()"
-        [modalType]="'gimnasio'"
-        [isCreating]="isCreating()"
-        [form]="editForm()"
-        [formFields]="getFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeModal()"
-        (save)="saveChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-    </div>
-  `,
+  templateUrl: './gimnasios.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GimnasiosPage {

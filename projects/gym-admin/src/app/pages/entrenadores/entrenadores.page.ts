@@ -11,12 +11,17 @@ import {
   NotificacionService,
   MensajeService,
   InvitacionService,
+  Notificacion,
+  Mensaje,
+  Invitacion,
   Entrenador, 
   Rol 
 } from 'gym-library';
 import { GenericCardComponent, CardConfig } from '../../components/shared/generic-card/generic-card.component';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
+import { GenericModalManager } from '../../helpers/modal-manager.helper';
+import { DisplayHelperService } from '../../services/display-helper.service';
 
 @Component({
   selector: 'app-entrenadores-page',
@@ -27,175 +32,7 @@ import { ToastComponent, Toast } from '../../components/shared/toast/toast.compo
     ModalFormComponent,
     ToastComponent
   ],
-  template: `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-white mb-6">Entrenadores</h1>
-      
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Card de Entrenadores -->
-        <app-generic-card
-          [config]="entrenadoresCardConfig"
-          [items]="entrenadores()"
-          [idField]="'id'"
-          [canCreate]="false"
-          (edit)="openDetailsModal($event)"
-          (delete)="deleteEntrenador($event)">
-        </app-generic-card>
-
-        <!-- Card de Ejercicios -->
-        <app-generic-card
-          [config]="ejerciciosCardConfig"
-          [items]="ejercicios()"
-          [idField]="'id'"
-          (create)="addSampleEjercicio()"
-          (edit)="openEjercicioModal($event)"
-          (delete)="deleteEjercicio($event)">
-        </app-generic-card>
-
-        <!-- Card de Rutinas -->
-        <app-generic-card
-          [config]="rutinasCardConfig"
-          [items]="rutinas()"
-          [idField]="'id'"
-          (create)="addSampleRutina()"
-          (edit)="openRutinaModal($event)"
-          (delete)="deleteRutina($event)">
-        </app-generic-card>
-
-        <!-- Card de Notificaciones -->
-        <app-generic-card
-          [config]="notificacionesCardConfig"
-          [items]="notificaciones()"
-          [idField]="'id'"
-          (create)="addNotificacion()"
-          (edit)="openNotificacionModal($event)"
-          (delete)="deleteNotificacion($event)">
-        </app-generic-card>
-
-        <!-- Card de Mensajes -->
-        <app-generic-card
-          [config]="mensajesCardConfig"
-          [items]="mensajes()"
-          [idField]="'id'"
-          (create)="addMensaje()"
-          (edit)="openMensajeModal($event)"
-          (delete)="deleteMensaje($event)">
-        </app-generic-card>
-
-        <!-- Card de Invitaciones -->
-        <app-generic-card
-          [config]="invitacionesCardConfig"
-          [items]="invitaciones()"
-          [idField]="'id'"
-          (create)="addInvitacion()"
-          (edit)="openInvitacionModal($event)"
-          (delete)="deleteInvitacion($event)">
-        </app-generic-card>
-      </section>
-
-      <!-- Toasts -->
-      <app-toast 
-        [toasts]="toasts()" 
-        (closeToast)="removeToast($event)">
-      </app-toast>
-
-      <!-- Modal de edición de entrenador -->
-      <app-modal-form
-        [isOpen]="isModalOpen()"
-        [modalType]="'entrenador'"
-        [isCreating]="isCreating()"
-        [form]="editForm()"
-        [formFields]="getFormFields()"
-        [ejercicios]="ejercicios()"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeModal()"
-        (save)="saveChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-
-      <!-- Modal de ejercicios -->
-      <app-modal-form
-        [isOpen]="isEjercicioModalOpen()"
-        [modalType]="'ejercicio'"
-        [isCreating]="isEjercicioCreating()"
-        [form]="ejercicioEditForm()"
-        [formFields]="getEjercicioFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeEjercicioModal()"
-        (save)="saveEjercicioChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-
-      <!-- Modal de rutinas -->
-      <app-modal-form
-        [isOpen]="isRutinaModalOpen()"
-        [modalType]="'rutina'"
-        [isCreating]="isRutinaCreating()"
-        [form]="rutinaEditForm()"
-        [formFields]="getRutinaFormFields()"
-        [ejercicios]="ejercicios()"
-        [selectedEjercicios]="rutinaModalData()?.ejercicios || []"
-        [isLoading]="isLoading()"
-        (close)="closeRutinaModal()"
-        (save)="saveRutinaChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-
-      <!-- Modal de notificaciones -->
-      <app-modal-form
-        [isOpen]="isNotificacionModalOpen()"
-        [modalType]="'notificacion'"
-        [isCreating]="isNotificacionCreating()"
-        [form]="notificacionEditForm()"
-        [formFields]="getNotificacionFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeNotificacionModal()"
-        (save)="saveNotificacionChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-
-      <!-- Modal de mensajes -->
-      <app-modal-form
-        [isOpen]="isMensajeModalOpen()"
-        [modalType]="'mensaje'"
-        [isCreating]="isMensajeCreating()"
-        [form]="mensajeEditForm()"
-        [formFields]="getMensajeFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeMensajeModal()"
-        (save)="saveMensajeChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-
-      <!-- Modal de invitaciones -->
-      <app-modal-form
-        [isOpen]="isInvitacionModalOpen()"
-        [modalType]="'invitacion'"
-        [isCreating]="isInvitacionCreating()"
-        [form]="invitacionEditForm()"
-        [formFields]="getInvitacionFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeInvitacionModal()"
-        (save)="saveInvitacionChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-    </div>
-  `,
+  templateUrl: './entrenadores.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntrenadoresPage {
@@ -210,6 +47,36 @@ export class EntrenadoresPage {
   private readonly mensajeService = inject(MensajeService);
   private readonly invitacionService = inject(InvitacionService);
   private readonly fb = inject(FormBuilder);
+  private readonly displayHelper = inject(DisplayHelperService);
+
+  // Modal managers para notificaciones, mensajes e invitaciones
+  readonly notificacionManager: GenericModalManager<Notificacion>;
+  readonly mensajeManager: GenericModalManager<Mensaje>;
+  readonly invitacionManager: GenericModalManager<Invitacion>;
+
+  constructor() {
+    // Inicializar modal managers
+    this.notificacionManager = new GenericModalManager<Notificacion>(
+      this.fb,
+      (item) => this.createNotificacionEditForm(item),
+      (data) => this.notificacionService.save(data),
+      (id) => this.notificacionService.delete(id)
+    );
+
+    this.mensajeManager = new GenericModalManager<Mensaje>(
+      this.fb,
+      (item) => this.createMensajeEditForm(item),
+      (data) => this.mensajeService.save(data),
+      (id) => this.mensajeService.delete(id)
+    );
+
+    this.invitacionManager = new GenericModalManager<Invitacion>(
+      this.fb,
+      (item) => this.createInvitacionEditForm(item),
+      (data) => this.invitacionService.save(data),
+      (id) => this.invitacionService.delete(id)
+    );
+  }
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -389,29 +256,13 @@ export class EntrenadoresPage {
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
 
-  // Signals para notificaciones modal
-  readonly isNotificacionModalOpen = signal(false);
-  readonly notificacionModalData = signal<any>(null);
-  readonly notificacionEditForm = signal<FormGroup | null>(null);
-  readonly isNotificacionCreating = signal(false);
-
-  // Signals para mensajes modal
-  readonly isMensajeModalOpen = signal(false);
-  readonly mensajeModalData = signal<any>(null);
-  readonly mensajeEditForm = signal<FormGroup | null>(null);
-  readonly isMensajeCreating = signal(false);
-
-  // Signals para invitaciones modal
-  readonly isInvitacionModalOpen = signal(false);
-  readonly invitacionModalData = signal<any>(null);
-  readonly invitacionEditForm = signal<FormGroup | null>(null);
-  readonly isInvitacionCreating = signal(false);
-
   // Signals para notificaciones (desde el servicio)
   readonly notificaciones = computed(() => {
     return this.notificacionService.notificaciones().map(notif => {
-      const tipoDisplay = this.getTipoNotificacionDisplay(notif.tipo);
-      const leidaDisplay = notif.leida ? '✓ Leída' : '❌ No leída';
+      const tipoDisplay = this.displayHelper.getTipoNotificacionDisplay(notif.tipo);
+      const leidaDisplay = notif.leida 
+        ? '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Leída' 
+        : '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg> No leída';
       
       return {
         ...notif,
@@ -431,24 +282,7 @@ export class EntrenadoresPage {
       const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
       const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
       
-      // Generar título descriptivo según el tipo de mensaje
-      let titulo = 'Mensaje';
-      switch (mensaje.tipo) {
-        case 'texto':
-          titulo = 'Mensaje de texto';
-          break;
-        case 'imagen':
-          titulo = 'Imagen compartida';
-          break;
-        case 'video':
-          titulo = 'Video compartido';
-          break;
-        case 'audio':
-          titulo = 'Audio compartido';
-          break;
-        default:
-          titulo = 'Mensaje';
-      }
+      const titulo = this.displayHelper.getTituloMensaje(mensaje.tipo);
       
       return {
         ...mensaje,
@@ -462,8 +296,8 @@ export class EntrenadoresPage {
   // Signals para invitaciones (desde el servicio)
   readonly invitaciones = computed(() => {
     return this.invitacionService.invitaciones().map(inv => {
-      const estadoDisplay = this.getEstadoInvitacionDisplay(inv.estado);
-      const tipoDisplay = this.getTipoInvitacionDisplay(inv.franjaHoraria);
+      const estadoDisplay = this.displayHelper.getEstadoInvitacionDisplay(inv.estado);
+      const tipoDisplay = this.displayHelper.getFranjaHorariaDisplay(inv.franjaHoraria);
       
       return {
         ...inv,
@@ -1141,84 +975,48 @@ export class EntrenadoresPage {
   // MÉTODOS PARA NOTIFICACIONES
   // ========================================
 
-  addNotificacion() {
-    this.openCreateNotificacionModal();
-  }
+  // ========================================
+  // MÉTODOS PARA NOTIFICACIONES
+  // ========================================
 
-  openCreateNotificacionModal() {
+  addNotificacion() {
     const newNotificacion = {
       id: 'n' + Date.now(),
       usuarioId: '',
-      tipo: 'rutina_asignada',
+      tipo: 'rutina_asignada' as const,
       titulo: '',
       mensaje: '',
       leida: false,
       fechaCreacion: new Date()
-    };
-    this.notificacionModalData.set(newNotificacion);
-    this.isNotificacionModalOpen.set(true);
-    this.isNotificacionCreating.set(true);
-    this.createNotificacionEditForm(newNotificacion);
+    } as Notificacion;
+    this.notificacionManager.openCreateModal(newNotificacion);
   }
 
   openNotificacionModal(item: any) {
-    this.notificacionModalData.set(item);
-    this.isNotificacionModalOpen.set(true);
-    this.isNotificacionCreating.set(false);
-    this.createNotificacionEditForm(item);
+    this.notificacionManager.openEditModal(item as Notificacion);
   }
 
-  closeNotificacionModal() {
-    this.isNotificacionModalOpen.set(false);
-    this.notificacionModalData.set(null);
-    this.notificacionEditForm.set(null);
-    this.isNotificacionCreating.set(false);
-  }
-
-  private createNotificacionEditForm(item: any) {
-    const formConfig: any = {
+  private createNotificacionEditForm(item: Notificacion): FormGroup {
+    return this.fb.group({
       usuarioId: [item.usuarioId || '', Validators.required],
       tipo: [item.tipo || 'rutina_asignada', Validators.required],
       titulo: [item.titulo || '', Validators.required],
       mensaje: [item.mensaje || '', Validators.required]
-    };
-    this.notificacionEditForm.set(this.fb.group(formConfig));
+    });
   }
 
-  async saveNotificacionChanges() {
-    const form = this.notificacionEditForm();
-    const originalData = this.notificacionModalData();
-
-    if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
+  async saveNotificacion() {
     this.isLoading.set(true);
-
-    try {
-      const updatedData = { 
-        ...originalData, 
-        ...form.value,
-        leida: false,
-        fechaCreacion: new Date()
-      };
-      
-      await this.notificacionService.save(updatedData);
-      this.log(`Notificación ${this.isNotificacionCreating() ? 'creada' : 'actualizada'}: ${updatedData.titulo}`);
-      this.closeNotificacionModal();
-    } catch (error: any) {
-      console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar notificación: ${error.message}`);
-    } finally {
-      this.isLoading.set(false);
+    const result = await this.notificacionManager.save({
+      leida: false,
+      fechaCreacion: new Date()
+    });
+    this.isLoading.set(false);
+    
+    if (result.success) {
+      this.log(`Notificación ${this.notificacionManager.isCreating() ? 'creada' : 'actualizada'}`);
+    } else {
+      this.log(`ERROR: ${result.error}`);
     }
   }
 
@@ -1270,11 +1068,11 @@ export class EntrenadoresPage {
   }
 
   async deleteNotificacion(id: string) {
-    try {
-      await this.notificacionService.delete(id);
-      this.log('Notificación eliminada: ' + id);
-    } catch (error) {
-      this.log('Error al eliminar notificación');
+    const result = await this.notificacionManager.delete(id);
+    if (result.success) {
+      this.log('Notificación eliminada');
+    } else {
+      this.log(`ERROR: ${result.error}`);
     }
   }
 
@@ -1283,93 +1081,61 @@ export class EntrenadoresPage {
   // ========================================
 
   addMensaje() {
-    this.openCreateMensajeModal();
-  }
-
-  openCreateMensajeModal() {
     const newMensaje = {
       id: 'm' + Date.now(),
       conversacionId: 'conv-' + Date.now(),
       remitenteId: '',
-      remitenteTipo: 'entrenador',
+      remitenteTipo: Rol.ENTRENADOR,
       destinatarioId: '',
-      destinatarioTipo: 'entrenado',
+      destinatarioTipo: Rol.ENTRENADO,
       contenido: '',
-      tipo: 'texto',
+      tipo: 'texto' as const,
       leido: false,
       entregado: false,
       fechaEnvio: new Date()
-    };
-    this.mensajeModalData.set(newMensaje);
-    this.isMensajeModalOpen.set(true);
-    this.isMensajeCreating.set(true);
-    this.createMensajeEditForm(newMensaje);
+    } as Mensaje;
+    this.mensajeManager.openCreateModal(newMensaje);
   }
 
   openMensajeModal(item: any) {
-    this.mensajeModalData.set(item);
-    this.isMensajeModalOpen.set(true);
-    this.isMensajeCreating.set(false);
-    this.createMensajeEditForm(item);
+    this.mensajeManager.openEditModal(item as Mensaje);
   }
 
-  closeMensajeModal() {
-    this.isMensajeModalOpen.set(false);
-    this.mensajeModalData.set(null);
-    this.mensajeEditForm.set(null);
-    this.isMensajeCreating.set(false);
-  }
-
-  private createMensajeEditForm(item: any) {
-    const formConfig: any = {
+  private createMensajeEditForm(item: Mensaje): FormGroup {
+    return this.fb.group({
       remitenteId: [item.remitenteId || '', Validators.required],
       destinatarioId: [item.destinatarioId || '', Validators.required],
       contenido: [item.contenido || '', Validators.required],
       tipo: [item.tipo || 'texto', Validators.required]
-    };
-    this.mensajeEditForm.set(this.fb.group(formConfig));
+    });
   }
 
-  async saveMensajeChanges() {
-    const form = this.mensajeEditForm();
-    const originalData = this.mensajeModalData();
-
-    if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
+  async saveMensaje() {
     this.isLoading.set(true);
-
-    try {
+    
+    const form = this.mensajeManager.editForm();
+    if (form) {
       const remitenteUser = this.usuarios().find(u => u.uid === form.value.remitenteId);
       const destinatarioUser = this.usuarios().find(u => u.uid === form.value.destinatarioId);
-
-      const updatedData = { 
-        ...originalData, 
-        ...form.value,
-        remitenteTipo: remitenteUser?.role || 'entrenador',
-        destinatarioTipo: destinatarioUser?.role || 'entrenado',
+      
+      const result = await this.mensajeManager.save({
+        remitenteTipo: remitenteUser?.role || Rol.ENTRENADOR,
+        destinatarioTipo: destinatarioUser?.role || Rol.ENTRENADO,
         leido: false,
         entregado: true,
         fechaEnvio: new Date()
-      };
+      });
       
-      await this.mensajeService.save(updatedData);
-      this.log(`Mensaje ${this.isMensajeCreating() ? 'creado' : 'actualizado'}`);
-      this.closeMensajeModal();
-    } catch (error: any) {
-      console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar mensaje: ${error.message}`);
-    } finally {
       this.isLoading.set(false);
+      
+      if (result.success) {
+        this.log(`Mensaje ${this.mensajeManager.isCreating() ? 'creado' : 'actualizado'}`);
+      } else {
+        this.log(`ERROR: ${result.error}`);
+      }
+    } else {
+      this.isLoading.set(false);
+      this.log('ERROR: Formulario inválido');
     }
   }
 
@@ -1422,11 +1188,11 @@ export class EntrenadoresPage {
   }
 
   async deleteMensaje(id: string) {
-    try {
-      await this.mensajeService.delete(id);
-      this.log('Mensaje eliminado: ' + id);
-    } catch (error) {
-      this.log('Error al eliminar mensaje');
+    const result = await this.mensajeManager.delete(id);
+    if (result.success) {
+      this.log('Mensaje eliminado');
+    } else {
+      this.log(`ERROR: ${result.error}`);
     }
   }
 
@@ -1435,83 +1201,43 @@ export class EntrenadoresPage {
   // ========================================
 
   addInvitacion() {
-    this.openCreateInvitacionModal();
-  }
-
-  openCreateInvitacionModal() {
     const newInvitacion = {
       id: 'inv-' + Date.now(),
       invitadorId: '',
       email: '',
-      estado: 'pendiente',
+      estado: 'pendiente' as const,
       mensaje: '',
-      franjaHoraria: 'mañana',
-      fechaInvitacion: new Date()
-    };
-    this.invitacionModalData.set(newInvitacion);
-    this.isInvitacionModalOpen.set(true);
-    this.isInvitacionCreating.set(true);
-    this.createInvitacionEditForm(newInvitacion);
+      franjaHoraria: 'mañana' as 'mañana' | 'tarde' | 'noche',
+      fechaEnvio: new Date()
+    } as Invitacion;
+    this.invitacionManager.openCreateModal(newInvitacion);
   }
 
   openInvitacionModal(item: any) {
-    this.invitacionModalData.set(item);
-    this.isInvitacionModalOpen.set(true);
-    this.isInvitacionCreating.set(false);
-    this.createInvitacionEditForm(item);
+    this.invitacionManager.openEditModal(item as Invitacion);
   }
 
-  closeInvitacionModal() {
-    this.isInvitacionModalOpen.set(false);
-    this.invitacionModalData.set(null);
-    this.invitacionEditForm.set(null);
-    this.isInvitacionCreating.set(false);
-  }
-
-  private createInvitacionEditForm(item: any) {
-    const formConfig: any = {
+  private createInvitacionEditForm(item: Invitacion): FormGroup {
+    return this.fb.group({
       invitadorId: [item.invitadorId || '', Validators.required],
       email: [item.email || '', [Validators.required, Validators.email]],
       mensaje: [item.mensaje || ''],
       franjaHoraria: [item.franjaHoraria || 'mañana', Validators.required]
-    };
-    this.invitacionEditForm.set(this.fb.group(formConfig));
+    });
   }
 
-  async saveInvitacionChanges() {
-    const form = this.invitacionEditForm();
-    const originalData = this.invitacionModalData();
-
-    if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
+  async saveInvitacion() {
     this.isLoading.set(true);
-
-    try {
-      const updatedData = { 
-        ...originalData, 
-        ...form.value,
-        estado: 'pendiente',
-        fechaInvitacion: new Date()
-      };
-      
-      await this.invitacionService.save(updatedData);
-      this.log(`Invitación ${this.isInvitacionCreating() ? 'creada' : 'actualizada'}`);
-      this.closeInvitacionModal();
-    } catch (error: any) {
-      console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar invitación: ${error.message}`);
-    } finally {
-      this.isLoading.set(false);
+    const result = await this.invitacionManager.save({
+      estado: 'pendiente' as const,
+      fechaEnvio: new Date()
+    });
+    this.isLoading.set(false);
+    
+    if (result.success) {
+      this.log(`Invitación ${this.invitacionManager.isCreating() ? 'creada' : 'actualizada'}`);
+    } else {
+      this.log(`ERROR: ${result.error}`);
     }
   }
 
@@ -1559,29 +1285,29 @@ export class EntrenadoresPage {
   }
 
   async deleteInvitacion(id: string) {
-    try {
-      await this.invitacionService.delete(id);
-      this.log('Invitación eliminada: ' + id);
-    } catch (error) {
-      this.log('Error al eliminar invitación');
+    const result = await this.invitacionManager.delete(id);
+    if (result.success) {
+      this.log('Invitación eliminada');
+    } else {
+      this.log(`ERROR: ${result.error}`);
     }
   }
 
   async aceptarInvitacion(id: string) {
     try {
       await this.invitacionService.aceptar(id);
-      this.log('Invitación aceptada: ' + id);
+      this.log('Invitación aceptada');
     } catch (error) {
-      this.log('Error al aceptar invitación');
+      this.log('ERROR al aceptar invitación');
     }
   }
 
   async rechazarInvitacion(id: string) {
     try {
       await this.invitacionService.rechazar(id);
-      this.log('Invitación rechazada: ' + id);
+      this.log('Invitación rechazada');
     } catch (error) {
-      this.log('Error al rechazar invitación');
+      this.log('ERROR al rechazar invitación');
     }
   }
 }

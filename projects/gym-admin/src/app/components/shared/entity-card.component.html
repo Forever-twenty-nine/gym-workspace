@@ -1,0 +1,66 @@
+<div class="p-6 border border-gray-200 rounded-xl bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+  <!-- Header -->
+  <h2 class="font-bold text-gray-800 mb-4 text-lg flex items-center gap-2">
+    {{ config.icon }} {{ config.title }}
+    <span [class]="getCountBadgeClass()">{{ config.count }}</span>
+  </h2>
+
+  <div class="space-y-3">
+    <!-- Create Button -->
+    <button 
+      class="w-full px-4 py-3 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+      [class]="getCreateButtonClass()"
+      [disabled]="!canCreate()"
+      (click)="onCreateClick()"
+      [title]="getCreateButtonTitle()">
+      @if (canCreate()) {
+        ➕ {{ config.createButtonText }}
+      } @else {
+        ⚠️ {{ config.validationMessage || 'No se puede crear' }}
+      }
+    </button>
+
+    <!-- Validation Message -->
+    @if (!canCreate() && config.validationMessage) {
+      <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-500">⚠️</span>
+          <p class="text-xs text-amber-700 font-medium">{{ config.validationMessage }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Entity List -->
+    <div class="border border-gray-200 rounded-xl bg-gray-50 max-h-80 overflow-y-auto">
+      @for(item of items; track trackByFn(item)) {
+        <div class="px-4 py-3 border-b border-gray-200 last:border-b-0 hover:bg-white transition-colors duration-150">
+          <div class="flex justify-between items-center">
+            <!-- Content Projection -->
+            <div class="flex-1">
+              <ng-content select="[slot=item-content]"></ng-content>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex gap-2">
+              @for(action of actions; track action.type) {
+                <button 
+                  class="p-2 rounded-lg transition-all duration-150 hover:scale-110"
+                  [class]="getActionButtonClass(action)"
+                  (click)="onActionClick(action.type, item)"
+                  [title]="action.tooltip">
+                  {{ action.icon }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="px-4 py-8 text-center text-gray-500">
+          <div class="text-4xl mb-2">{{ config.emptyStateIcon }}</div>
+          <p class="text-sm font-medium">{{ config.emptyStateTitle }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ config.emptyStateSubtitle }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

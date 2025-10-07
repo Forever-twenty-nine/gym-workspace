@@ -1,0 +1,167 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-white mb-6">Entrenadores</h1>
+  
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Card de Entrenadores -->
+    <app-generic-card
+      [config]="entrenadoresCardConfig"
+      [items]="entrenadores()"
+      [idField]="'id'"
+      [canCreate]="false"
+      (edit)="openDetailsModal($event)"
+      (delete)="deleteEntrenador($event)">
+    </app-generic-card>
+
+    <!-- Card de Ejercicios -->
+    <app-generic-card
+      [config]="ejerciciosCardConfig"
+      [items]="ejercicios()"
+      [idField]="'id'"
+      (create)="addSampleEjercicio()"
+      (edit)="openEjercicioModal($event)"
+      (delete)="deleteEjercicio($event)">
+    </app-generic-card>
+
+    <!-- Card de Rutinas -->
+    <app-generic-card
+      [config]="rutinasCardConfig"
+      [items]="rutinas()"
+      [idField]="'id'"
+      (create)="addSampleRutina()"
+      (edit)="openRutinaModal($event)"
+      (delete)="deleteRutina($event)">
+    </app-generic-card>
+
+    <!-- Card de Notificaciones -->
+    <app-generic-card
+      [config]="notificacionesCardConfig"
+      [items]="notificaciones()"
+      [idField]="'id'"
+      (create)="addNotificacion()"
+      (edit)="openNotificacionModal($event)"
+      (delete)="deleteNotificacion($event)">
+    </app-generic-card>
+
+    <!-- Card de Mensajes -->
+    <app-generic-card
+      [config]="mensajesCardConfig"
+      [items]="mensajes()"
+      [idField]="'id'"
+      (create)="addMensaje()"
+      (edit)="openMensajeModal($event)"
+      (delete)="deleteMensaje($event)">
+    </app-generic-card>
+
+    <!-- Card de Invitaciones -->
+    <app-generic-card
+      [config]="invitacionesCardConfig"
+      [items]="invitaciones()"
+      [idField]="'id'"
+      (create)="addInvitacion()"
+      (edit)="openInvitacionModal($event)"
+      (delete)="deleteInvitacion($event)">
+    </app-generic-card>
+  </section>
+
+  <!-- Toasts -->
+  <app-toast 
+    [toasts]="toasts()" 
+    (closeToast)="removeToast($event)">
+  </app-toast>
+
+  <!-- Modal de edición de entrenador -->
+  <app-modal-form
+    [isOpen]="isModalOpen()"
+    [modalType]="'entrenador'"
+    [isCreating]="isCreating()"
+    [form]="editForm()"
+    [formFields]="getFormFields()"
+    [ejercicios]="ejercicios()"
+    [selectedEjercicios]="[]"
+    [isLoading]="isLoading()"
+    (close)="closeModal()"
+    (save)="saveChanges()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+
+  <!-- Modal de ejercicios -->
+  <app-modal-form
+    [isOpen]="isEjercicioModalOpen()"
+    [modalType]="'ejercicio'"
+    [isCreating]="isEjercicioCreating()"
+    [form]="ejercicioEditForm()"
+    [formFields]="getEjercicioFormFields()"
+    [ejercicios]="[]"
+    [selectedEjercicios]="[]"
+    [isLoading]="isLoading()"
+    (close)="closeEjercicioModal()"
+    (save)="saveEjercicioChanges()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+
+  <!-- Modal de rutinas -->
+  <app-modal-form
+    [isOpen]="isRutinaModalOpen()"
+    [modalType]="'rutina'"
+    [isCreating]="isRutinaCreating()"
+    [form]="rutinaEditForm()"
+    [formFields]="getRutinaFormFields()"
+    [ejercicios]="ejercicios()"
+    [selectedEjercicios]="rutinaModalData()?.ejercicios || []"
+    [isLoading]="isLoading()"
+    (close)="closeRutinaModal()"
+    (save)="saveRutinaChanges()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+
+  <!-- Modal de notificaciones -->
+  <app-modal-form
+    [isOpen]="notificacionManager.isModalOpen()"
+    [modalType]="'notificacion'"
+    [isCreating]="notificacionManager.isCreating()"
+    [form]="notificacionManager.editForm()"
+    [formFields]="getNotificacionFormFields()"
+    [ejercicios]="[]"
+    [selectedEjercicios]="[]"
+    [isLoading]="isLoading()"
+    (close)="notificacionManager.closeModal()"
+    (save)="saveNotificacion()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+
+  <!-- Modal de mensajes -->
+  <app-modal-form
+    [isOpen]="mensajeManager.isModalOpen()"
+    [modalType]="'mensaje'"
+    [isCreating]="mensajeManager.isCreating()"
+    [form]="mensajeManager.editForm()"
+    [formFields]="getMensajeFormFields()"
+    [ejercicios]="[]"
+    [selectedEjercicios]="[]"
+    [isLoading]="isLoading()"
+    (close)="mensajeManager.closeModal()"
+    (save)="saveMensaje()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+
+  <!-- Modal de invitaciones -->
+  <app-modal-form
+    [isOpen]="invitacionManager.isModalOpen()"
+    [modalType]="'invitacion'"
+    [isCreating]="invitacionManager.isCreating()"
+    [form]="invitacionManager.editForm()"
+    [formFields]="getInvitacionFormFields()"
+    [ejercicios]="[]"
+    [selectedEjercicios]="[]"
+    [isLoading]="isLoading()"
+    (close)="invitacionManager.closeModal()"
+    (save)="saveInvitacion()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)"
+    (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
+</div>

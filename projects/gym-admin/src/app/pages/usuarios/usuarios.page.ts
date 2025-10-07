@@ -16,45 +16,7 @@ import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
     ModalFormComponent,
     ToastComponent
   ],
-  template: `
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-white mb-6">Usuarios</h1>
-      
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Card de Usuarios -->
-        <app-generic-card
-          [config]="usuariosCardConfig"
-          [items]="usuarios()"
-          [idField]="'uid'"
-          (create)="addSampleUsuario()"
-          (edit)="openDetailsModal($event)"
-          (delete)="deleteUsuario($event)">
-        </app-generic-card>
-      </section>
-
-      <!-- Toasts -->
-      <app-toast 
-        [toasts]="toasts()" 
-        (closeToast)="removeToast($event)">
-      </app-toast>
-
-      <!-- Modal de edición -->
-      <app-modal-form
-        [isOpen]="isModalOpen()"
-        [modalType]="'usuario'"
-        [isCreating]="isCreating()"
-        [form]="editForm()"
-        [formFields]="getFormFields()"
-        [ejercicios]="[]"
-        [selectedEjercicios]="[]"
-        [isLoading]="isLoading()"
-        (close)="closeModal()"
-        (save)="saveChanges()"
-        (toggleDiaSemana)="onToggleDiaSemana($event)"
-        (toggleEjercicio)="toggleEjercicio($event)">
-      </app-modal-form>
-    </div>
-  `,
+  templateUrl: './usuarios.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsuariosPage {
