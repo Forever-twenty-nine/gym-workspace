@@ -4,6 +4,8 @@
 
 ## 📋 Prerrequisitos
 
+> 💡 **Ver guía completa:** [Prerrequisitos detallados](./prerequisites.md)
+
 Antes de comenzar, asegúrate de tener instalado:
 
 ### Requerimientos Obligatorios
@@ -458,9 +460,10 @@ git show
 
 ### Documentación del Proyecto
 
-- [README.md](./README.md) - Descripción general y modelo de negocio
-- [SECURITY-RECOMMENDATIONS.md](./SECURITY-RECOMMENDATIONS.md) - Recomendaciones de seguridad
-- [DEV_COMMANDS.md](./DEV_COMMANDS.md) - Comandos de desarrollo (si existe)
+- [Documentación Principal](../README.md) - Índice completo de documentación
+- [Modelo de Negocio](../business/model.md) - Estrategia y monetización
+- [Recomendaciones de Seguridad](../security/recommendations.md) - Mejores prácticas
+- [Guía de Desarrollo](../guides/development.md) - Comandos y workflow
 
 ### Documentación Oficial
 

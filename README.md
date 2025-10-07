@@ -1,95 +1,105 @@
-# Gym App - Descripción y Modelo de Negocio
+# 🏋️ Gym Workspace
 
-## � Inicio Rápido
+> Plataforma integral para gimnasios: conectando entrenados, entrenadores y gimnasios
 
-### Instalación
+[![Angular](https://img.shields.io/badge/Angular-20.1.4-red)](https://angular.dev/)
+[![Ionic](https://img.shields.io/badge/Ionic-8.x-blue)](https://ionicframework.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-10.x-orange)](https://firebase.google.com/)
+
+## 📱 ¿Qué es Gym Workspace?
+
+Aplicación freemium que revoluciona la gestión de gimnasios mediante:
+
+- 🏃‍♂️ **Para Clientes**: Rutinas personalizadas, seguimiento de progreso, planes especializados
+- 👨‍🏫 **Para Entrenadores**: Herramientas pro, gestión de clientes, monetización de rutinas
+- 🏢 **Para Gimnasios**: Dashboard centralizado, branding institucional, promoción destacada
+
+## 🚀 Inicio Rápido
+
 ```bash
+# Clonar repositorio
+git clone https://github.com/sebasechazu/gym-workspace.git
+cd gym-workspace
+
+# Instalar dependencias
 npm run install:all
-```
 
-### Desarrollo
-```bash
-# Compilar librería + iniciar ambas apps
+# Iniciar desarrollo
 npm run dev
 ```
 
-Ver [DEV_COMMANDS.md](./DEV_COMMANDS.md) para más comandos de desarrollo.
+**✨ Listo!** Abre:
+- 🖥️ **gym-admin**: http://localhost:4200
+- 📱 **gym-app**: http://localhost:8100
+
+## 📚 Documentación Completa
+
+> Toda la documentación está organizada en `/docs`
+
+### 🎯 Para Empezar
+- **[📖 Guía de Setup](./docs/getting-started/setup.md)** - Instalación paso a paso
+- **[📋 Prerrequisitos](./docs/getting-started/prerequisites.md)** - Herramientas necesarias
+
+### 🏗️ Arquitectura
+- **[🔍 Visión General](./docs/architecture/overview.md)** - Estructura del monorepo
+- **[🖥️ Gym Admin](./docs/architecture/gym-admin.md)** - Panel administrativo
+- **[📱 Gym App](./docs/architecture/gym-app.md)** - Aplicación móvil (próximamente)
+
+### 💼 Business
+- **[💰 Modelo de Negocio](./docs/business/model.md)** - Estrategia freemium y monetización
+
+### �� Guías
+- **[🚀 Desarrollo](./docs/guides/development.md)** - Comandos y workflow
+- **[🎨 Estilos](./docs/guides/styles-guide.md)** - Convenciones CSS
+
+### 🔒 Seguridad
+- **[🛡️ Recomendaciones](./docs/security/recommendations.md)** - Mejores prácticas
+
+📖 **[Ver índice completo de documentación →](./docs/README.md)**
+
+## 🛠️ Comandos Principales
+
+```bash
+# Desarrollo
+npm run dev              # Iniciar todo (admin + app)
+npm run gym-admin:serve  # Solo panel admin
+npm run gym-app:serve    # Solo app móvil
+
+# Build
+npm run library:build    # Compilar librería
+npm run gym-admin:build  # Build admin
+npm run gym-app:build    # Build app
+
+# Testing
+npm test                 # Todos los tests
+npm run gym-admin:test   # Tests admin
+```
+
+## 📦 Estructura del Proyecto
+
+```
+gym-workspace/
+├── projects/
+│   ├── gym-library/   → Código compartido
+│   ├── gym-admin/     → Panel web (Angular)
+│   └── gym-app/       → App móvil (Ionic)
+├── docs/              → 📚 Documentación centralizada
+└── .github/           → CI/CD y configuraciones
+```
+
+## 🤝 Contribuir
+
+1. Lee la [Guía de Setup](./docs/getting-started/setup.md)
+2. Crea una rama: `git checkout -b feature/nombre`
+3. Haz commits con [Conventional Commits](https://www.conventionalcommits.org/)
+4. Push: `git push origin feature/nombre`
+5. Crea un Pull Request
+
+## 📄 Licencia
+
+Este proyecto es privado y confidencial.
 
 ---
 
-## �💰 Estrategia de Monetización# 📱 Descripción General
-
-Aplicación integral para gimnasios que conecta entrenados, entrenadores y gimnasios en una plataforma unificada. El modelo freemium permite generar ingresos mientras se ofrece valor gratuito básico.
-
-## 👥 Tipos de Usuarios y Planes
-
-### 🆓 Entrenados - Versión Free
-
-- **Rutinas básicas**: Acceso a rutinas públicas creadas por entrenadores
-- **Compartir limitado**: Rutinas en redes sociales con marca de agua (marketing orgánico)
-- **Seguimiento básico**: Historial limitado (últimas 2 rutinas)
-- **Publicidad**: Anuncios ligeros y funciones limitadas
-
-### 💎 Entrenados - Versión Premium
-
-- **Rutinas personalizadas**: Planes creados específicamente por su entrenador
-- **Estadísticas avanzadas**: Seguimiento de progreso, gráficas y análisis comparativo
-- **Exportación premium**: Descarga en PDF/imagen sin marca de agua
-- **Planes especializados**: Acceso a programas de hipertrofia, running, yoga, etc.
-- **Sin interrupciones**: Experiencia libre de anuncios
-
-### 👨‍🏫 Entrenadores
-
-#### **Plan Free**
-- Perfil básico en la plataforma
-- Publicación limitada de rutinas públicas
-
-#### **Plan Pro (Premium)**
-- **Gestión completa**: Herramientas para seguimiento de clientes, métricas y chat ilimitado
-- **Monetización**: Posibilidad de vender rutinas premium dentro de la app
-- **Branding personalizado**: Exportar rutinas con logo propio o del gimnasio
-- **Mayor visibilidad**: Posicionamiento destacado en el buscador de entrenadores
-
-### 🏢 Gimnasios (Opcional)
-
-#### **Plan Free**
-- Perfil institucional básico
-
-#### **Plan Business Premium**
-- **Dashboard multi-entrenador**: Gestión centralizada de todo el equipo
-- **Branding institucional**: Logo del gimnasio en todas las rutinas compartidas
-- **Promoción destacada**: Mayor visibilidad en la plataforma
-
-## � Estrategia de Monetización
-
-### Modelo de Ingresos por Segmento
-
-| Segmento | Modelo | Precio Estimado |
-|----------|--------|-----------------|
-| **Entrenados** | Freemium + Suscripción mensual/anual | $5-15 USD/mes |
-| **Entrenadores** | Plan Pro + Comisión por ventas | $20-40 USD/mes |
-| **Gimnasios** | Plan Business | $100-300 USD/mes |
-
-### 📈 Palancas de Marketing y Monetización
-
-#### Estrategia de Compartir en Redes Sociales
-
-- **Versión Free**: Rutinas con marca de agua → **Publicidad viral gratuita**
-- **Versión Premium**: Sin marca de agua o con branding personalizado → **Diferenciación**
-
-#### Beneficios del Modelo
-
-✅ **Gratis** = Viralidad orgánica con nuestra marca  
-✅ **Premium** = Profesionalización y personalización  
-✅ **Escalabilidad** = Múltiples fuentes de ingresos  
-✅ **Red de efectos** = Más usuarios atraen más entrenadores y viceversa
-
-## 🎯 Propuesta de Valor
-
-- **Para Entrenados**: Acceso fácil a rutinas profesionales y seguimiento de progreso
-- **Para Entrenadores**: Herramientas profesionales y nueva fuente de ingresos
-- **Para Gimnasios**: Digitalización y mejor gestión de servicios
-
-## 🚀 Ventaja Competitiva
-
-La función de compartir rutinas se convierte en una **herramienta de marketing viral**, donde cada compartición gratuita promociona la aplicación, mientras que las versiones premium ofrecen profesionalización sin perder la capacidad de generar leads orgánicos.
+**Mantenido con ❤️ por [@sebasechazu](https://github.com/sebasechazu)**

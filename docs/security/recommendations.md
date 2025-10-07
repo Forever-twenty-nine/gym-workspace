@@ -206,7 +206,7 @@ export const environment: Environment = {
 
 **Instrucciones para otros desarrolladores:**
 
-Crear un `SETUP.md`:
+Crear documentación en [Setup](../getting-started/setup.md):
 
 ```markdown
 ## Setup para Desarrolladores
@@ -426,6 +426,10 @@ npx license-checker --summary
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Git Secrets Prevention](https://git-secret.io/)
 - [GitHub Secret Scanning](https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning)
+
+**Ver también:**
+- [Guía de Setup](../getting-started/setup.md)
+- [Arquitectura General](../architecture/overview.md)
 
 ---
 
