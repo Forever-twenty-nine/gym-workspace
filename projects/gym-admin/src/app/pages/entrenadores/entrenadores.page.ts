@@ -801,10 +801,6 @@ export class EntrenadoresPage {
       }
     ];
   }
-
-  // ========================================
-  // MÉTODOS PARA RUTINAS
-  // ========================================
   
   addSampleRutina() {
     this.openCreateRutinaModal();
@@ -971,13 +967,6 @@ export class EntrenadoresPage {
     ];
   }
 
-  // ========================================
-  // MÉTODOS PARA NOTIFICACIONES
-  // ========================================
-
-  // ========================================
-  // MÉTODOS PARA NOTIFICACIONES
-  // ========================================
 
   addNotificacion() {
     const newNotificacion = {
@@ -996,13 +985,13 @@ export class EntrenadoresPage {
     this.notificacionManager.openEditModal(item as Notificacion);
   }
 
-  private createNotificacionEditForm(item: Notificacion): FormGroup {
-    return this.fb.group({
+  private createNotificacionEditForm(item: Notificacion): any {
+    return {
       usuarioId: [item.usuarioId || '', Validators.required],
       tipo: [item.tipo || 'rutina_asignada', Validators.required],
       titulo: [item.titulo || '', Validators.required],
       mensaje: [item.mensaje || '', Validators.required]
-    });
+    };
   }
 
   async saveNotificacion() {
@@ -1076,15 +1065,23 @@ export class EntrenadoresPage {
     }
   }
 
-  // ========================================
-  // MÉTODOS PARA MENSAJES
-  // ========================================
 
-  addMensaje() {
+  addMensaje(remitenteId?: string) {
+    // Si estamos editando un entrenador, usar su ID como remitente
+    const entrenadorActual = this.modalData();
+    const remitenteIdFinal = remitenteId || entrenadorActual?.id || '';
+    
+    console.log('🔍 Debug addMensaje:', {
+      remitenteIdParam: remitenteId,
+      entrenadorActual: entrenadorActual,
+      entrenadorId: entrenadorActual?.id,
+      remitenteIdFinal: remitenteIdFinal
+    });
+    
     const newMensaje = {
       id: 'm' + Date.now(),
       conversacionId: 'conv-' + Date.now(),
-      remitenteId: '',
+      remitenteId: remitenteIdFinal,
       remitenteTipo: Rol.ENTRENADOR,
       destinatarioId: '',
       destinatarioTipo: Rol.ENTRENADO,
@@ -1094,6 +1091,8 @@ export class EntrenadoresPage {
       entregado: false,
       fechaEnvio: new Date()
     } as Mensaje;
+    
+    console.log('📧 Nuevo mensaje creado:', newMensaje);
     this.mensajeManager.openCreateModal(newMensaje);
   }
 
@@ -1101,13 +1100,25 @@ export class EntrenadoresPage {
     this.mensajeManager.openEditModal(item as Mensaje);
   }
 
-  private createMensajeEditForm(item: Mensaje): FormGroup {
-    return this.fb.group({
-      remitenteId: [item.remitenteId || '', Validators.required],
+  private createMensajeEditForm(item: Mensaje): any {
+    console.log('📝 Creando configuración de formulario de mensaje con item:', item);
+    
+    // Si el remitenteId ya está pre-rellenado (viene del botón del modal), deshabilitar el campo
+    const remitenteDisabled = !!item.remitenteId;
+    
+    const formConfig = {
+      remitenteId: [
+        { value: item.remitenteId || '', disabled: remitenteDisabled },
+        Validators.required
+      ],
       destinatarioId: [item.destinatarioId || '', Validators.required],
       contenido: [item.contenido || '', Validators.required],
       tipo: [item.tipo || 'texto', Validators.required]
-    });
+    };
+    
+    console.log('📝 Configuración de formulario:', formConfig);
+    console.log('🔒 Campo remitente deshabilitado:', remitenteDisabled);
+    return formConfig;
   }
 
   async saveMensaje() {
@@ -1115,8 +1126,10 @@ export class EntrenadoresPage {
     
     const form = this.mensajeManager.editForm();
     if (form) {
-      const remitenteUser = this.usuarios().find(u => u.uid === form.value.remitenteId);
-      const destinatarioUser = this.usuarios().find(u => u.uid === form.value.destinatarioId);
+      // Usar getRawValue() para obtener también los campos deshabilitados
+      const formValues = form.getRawValue();
+      const remitenteUser = this.usuarios().find(u => u.uid === formValues.remitenteId);
+      const destinatarioUser = this.usuarios().find(u => u.uid === formValues.destinatarioId);
       
       const result = await this.mensajeManager.save({
         remitenteTipo: remitenteUser?.role || Rol.ENTRENADOR,
@@ -1196,10 +1209,6 @@ export class EntrenadoresPage {
     }
   }
 
-  // ========================================
-  // MÉTODOS PARA INVITACIONES
-  // ========================================
-
   addInvitacion() {
     const newInvitacion = {
       id: 'inv-' + Date.now(),
@@ -1217,13 +1226,13 @@ export class EntrenadoresPage {
     this.invitacionManager.openEditModal(item as Invitacion);
   }
 
-  private createInvitacionEditForm(item: Invitacion): FormGroup {
-    return this.fb.group({
+  private createInvitacionEditForm(item: Invitacion): any {
+    return {
       invitadorId: [item.invitadorId || '', Validators.required],
       email: [item.email || '', [Validators.required, Validators.email]],
       mensaje: [item.mensaje || ''],
       franjaHoraria: [item.franjaHoraria || 'mañana', Validators.required]
-    });
+    };
   }
 
   async saveInvitacion() {

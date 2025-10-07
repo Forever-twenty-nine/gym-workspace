@@ -1081,24 +1081,37 @@ export class EntrenadosPage {
   // MÉTODOS PARA MENSAJES
   // ========================================
 
-  addMensaje() {
-    this.openCreateMensajeModal();
+  addMensaje(remitenteId?: string) {
+    // Si estamos editando un entrenado, usar su ID como remitente
+    const entrenadoActual = this.modalData();
+    const remitenteIdFinal = remitenteId || entrenadoActual?.id || '';
+    
+    console.log('🔍 Debug addMensaje (Entrenados):', {
+      remitenteIdParam: remitenteId,
+      entrenadoActual: entrenadoActual,
+      entrenadoId: entrenadoActual?.id,
+      remitenteIdFinal: remitenteIdFinal
+    });
+    
+    this.openCreateMensajeModal(remitenteIdFinal);
   }
 
-  openCreateMensajeModal() {
+  openCreateMensajeModal(remitenteId: string = '') {
     const newMensaje = {
       id: 'm' + Date.now(),
       conversacionId: 'conv-' + Date.now(),
-      remitenteId: '',
-      remitenteTipo: 'entrenador',
+      remitenteId: remitenteId,
+      remitenteTipo: 'entrenado',
       destinatarioId: '',
-      destinatarioTipo: 'entrenado',
+      destinatarioTipo: 'entrenador',
       contenido: '',
       tipo: 'texto',
       leido: false,
       entregado: false,
       fechaEnvio: new Date()
     };
+    
+    console.log('📧 Nuevo mensaje creado (Entrenados):', newMensaje);
     this.mensajeModalData.set(newMensaje);
     this.isMensajeModalOpen.set(true);
     this.isMensajeCreating.set(true);
@@ -1120,12 +1133,22 @@ export class EntrenadosPage {
   }
 
   private createMensajeEditForm(item: any) {
+    // Si el remitenteId ya está pre-rellenado (viene del botón del modal), deshabilitar el campo
+    const remitenteDisabled = !!item.remitenteId;
+    
     const formConfig: any = {
-      remitenteId: [item.remitenteId || '', Validators.required],
+      remitenteId: [
+        { value: item.remitenteId || '', disabled: remitenteDisabled },
+        Validators.required
+      ],
       destinatarioId: [item.destinatarioId || '', Validators.required],
       contenido: [item.contenido || '', Validators.required],
       tipo: [item.tipo || 'texto', Validators.required]
     };
+    
+    console.log('📝 Configuración de formulario de mensaje:', formConfig);
+    console.log('🔒 Campo remitente deshabilitado:', remitenteDisabled);
+    
     this.mensajeEditForm.set(this.fb.group(formConfig));
   }
 
@@ -1148,12 +1171,14 @@ export class EntrenadosPage {
     this.isLoading.set(true);
 
     try {
-      const remitenteUser = this.usuarios().find(u => u.uid === form.value.remitenteId);
-      const destinatarioUser = this.usuarios().find(u => u.uid === form.value.destinatarioId);
+      // Usar getRawValue() para obtener también los campos deshabilitados
+      const formValues = form.getRawValue();
+      const remitenteUser = this.usuarios().find(u => u.uid === formValues.remitenteId);
+      const destinatarioUser = this.usuarios().find(u => u.uid === formValues.destinatarioId);
 
       const updatedData = { 
         ...originalData, 
-        ...form.value,
+        ...formValues,
         remitenteTipo: remitenteUser?.role || 'entrenador',
         destinatarioTipo: destinatarioUser?.role || 'entrenado',
         leido: false,

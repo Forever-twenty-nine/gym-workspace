@@ -79,8 +79,12 @@
     [ejercicios]="[]"
     [selectedEjercicios]="[]"
     [isLoading]="isLoading()"
+    [showCustomAction]="!isCreating() && modalData() !== null"
+    [customActionLabel]="'Enviar Mensaje'"
+    [customActionIcon]="'💬'"
     (close)="closeModal()"
     (save)="saveChanges()"
+    (customAction)="addMensaje()"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>

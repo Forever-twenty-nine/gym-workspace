@@ -40,11 +40,15 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Input() ejercicios: Ejercicio[] = [];
   @Input() selectedEjercicios: string[] = [];
   @Input() isLoading: boolean = false;
+  @Input() showCustomAction: boolean = false;
+  @Input() customActionLabel: string = 'Acción';
+  @Input() customActionIcon: string = '⚡';
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
   @Output() toggleDiaSemana = new EventEmitter<{ event: Event; value: string }>();
   @Output() toggleEjercicio = new EventEmitter<string>();
+  @Output() customAction = new EventEmitter<void>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -85,6 +89,10 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onToggleEjercicio(ejercicioId: string) {
     this.toggleEjercicio.emit(ejercicioId);
+  }
+
+  onCustomAction() {
+    this.customAction.emit();
   }
 
   isEjercicioSelected(ejercicioId: string): boolean {
