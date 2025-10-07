@@ -47,13 +47,13 @@ import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } fro
 })
 export class DashboardPage {
   stats = {
-    clientesActivos: 15,
+    entrenadosActivos: 15,
     entrenamientosHoy: 8,
     nuevosClientes: 3,
     horasEntrenamiento: 32
   };
 
-  clientesRecientes = [
+  entrenadosRecientes = [
     { nombre: 'Ana García', ultimoEntrenamiento: '2025-01-28', estado: 'activo' },
     { nombre: 'Carlos López', ultimoEntrenamiento: '2025-01-27', estado: 'activo' },
     { nombre: 'María Rodríguez', ultimoEntrenamiento: '2025-01-26', estado: 'pendiente' }
@@ -63,8 +63,8 @@ export class DashboardPage {
     addIcons({ peopleOutline, fitnessOutline, statsChartOutline, calendarOutline });
   }
 
-  verCliente(cliente: any) {
-    // Navegar al detalle del cliente
+  verCliente(entrenado: any) {
+    // Navegar al detalle del entrenado
   }
 
   crearNuevoEntrenamiento() {

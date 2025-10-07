@@ -5,8 +5,8 @@ import { environment } from '../environments/environment';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { ClienteService, UserService, RutinaService, EjercicioService, EntrenadorService, GimnasioService, ENTRENADOR_FIRESTORE_ADAPTER, GIMNASIO_FIRESTORE_ADAPTER } from 'gym-library';
-import { ClienteFirestoreAdapter } from './adapters/cliente-firestore.adapter';
+import { EntrenadoService, UserService, RutinaService, EjercicioService, EntrenadorService, GimnasioService, ENTRENADOR_FIRESTORE_ADAPTER, GIMNASIO_FIRESTORE_ADAPTER } from 'gym-library';
+import { EntrenadoFirestoreAdapter } from './adapters/entrenado-firestore.adapter';
 import { UserFirestoreAdapter } from './adapters/user-firestore.adapter';
 import { RutinaFirestoreAdapter } from './adapters/rutina-firestore.adapter';
 import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapter';
@@ -17,13 +17,13 @@ import { routes } from './app.routes';
 
 // Función para inicializar los adaptadores de servicios
 function initializeServiceAdapters(
-  clienteService: ClienteService,
+  entrenadoService: EntrenadoService,
   userService: UserService,
   rutinaService: RutinaService,
   ejercicioService: EjercicioService,
   entrenadorService: EntrenadorService,
   gimnasioService: GimnasioService,
-  clienteAdapter: ClienteFirestoreAdapter,
+  entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
   ejercicioAdapter: EjercicioFirestoreAdapter,
@@ -32,7 +32,7 @@ function initializeServiceAdapters(
 ) {
   return () => {
     // Configurar adaptadores
-    clienteService.setFirestoreAdapter(clienteAdapter);
+    entrenadoService.setFirestoreAdapter(entrenadoAdapter);
     userService.setFirestoreAdapter(userAdapter);
     rutinaService.setFirestoreAdapter(rutinaAdapter);
     ejercicioService.setFirestoreAdapter(ejercicioAdapter);
@@ -70,13 +70,13 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeServiceAdapters,
       deps: [
-        ClienteService, 
+        EntrenadoService, 
         UserService, 
         RutinaService, 
         EjercicioService,
         EntrenadorService,
         GimnasioService,
-        ClienteFirestoreAdapter, 
+        EntrenadoFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
         EjercicioFirestoreAdapter,

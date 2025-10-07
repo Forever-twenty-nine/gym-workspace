@@ -15,14 +15,14 @@
       (delete)="deleteUsuario($event)">
     </app-generic-card>
 
-    <!-- Clientes -->
+    <!-- Entrenados -->
     <app-generic-card
-      [config]="clientesCardConfig"
-      [items]="clientes()"
+      [config]="entrenadosCardConfig"
+      [items]="entrenados()"
       [idField]="'id'"
       [canCreate]="false"
-      (edit)="openDetailsModal($event, 'cliente')"
-      (delete)="deleteCliente($event)">
+      (edit)="openDetailsModal($event, 'entrenado')"
+      (delete)="deleteEntrenado($event)">
     </app-generic-card>
 
     <!-- Entrenadores -->

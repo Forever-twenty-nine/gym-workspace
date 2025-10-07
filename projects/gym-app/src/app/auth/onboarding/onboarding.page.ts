@@ -33,7 +33,7 @@ const ONBOARDING_CONFIG = {
     OBJETIVO: 2
   },
   MAX_STEPS: {
-    CLIENTE: 2,
+    ENTRENADO: 2,
     OTROS: 1
   }
 } as const;
@@ -60,11 +60,11 @@ const ONBOARDING_CONFIG = {
 export class OnboardingPage {
   // Signals para mejor reactividad
   currentStep = signal<number>(ONBOARDING_CONFIG.STEPS.DATOS_PERSONALES);
-  totalSteps = signal<number>(ONBOARDING_CONFIG.MAX_STEPS.CLIENTE);
+  totalSteps = signal<number>(ONBOARDING_CONFIG.MAX_STEPS.ENTRENADO);
   
   formData = signal({
     nombre: '',
-    role: 'cliente' as 'cliente' | 'entrenador' | 'gimnasio',
+    role: 'entrenado' as 'entrenado' | 'entrenador' | 'gimnasio',
     objetivo: '' as keyof typeof Objetivo | ''
   });
 
@@ -73,7 +73,7 @@ export class OnboardingPage {
 
   // Computed properties
   progress = computed(() => (this.currentStep() / this.totalSteps()) * 100);
-  isClient = computed(() => this.formData().role === 'cliente');
+  isClient = computed(() => this.formData().role === 'entrenado');
   showStep2 = computed(() => this.currentStep() === ONBOARDING_CONFIG.STEPS.OBJETIVO && this.isClient());
 
   // Enum para el template
@@ -118,14 +118,14 @@ export class OnboardingPage {
         return;
       }
 
-      // Si no es cliente, completar onboarding directamente
-      if (this.formData().role !== 'cliente') {
+      // Si no es entrenado, completar onboarding directamente
+      if (this.formData().role !== 'entrenado') {
         this.totalSteps.set(ONBOARDING_CONFIG.MAX_STEPS.OTROS);
         this.completeOnboarding();
         return;
       }
 
-      this.totalSteps.set(ONBOARDING_CONFIG.MAX_STEPS.CLIENTE);
+      this.totalSteps.set(ONBOARDING_CONFIG.MAX_STEPS.ENTRENADO);
       this.currentStep.set(ONBOARDING_CONFIG.STEPS.OBJETIVO);
     } else if (this.currentStep() === ONBOARDING_CONFIG.STEPS.OBJETIVO) {
       if (!this.validateStep2()) {
@@ -147,7 +147,7 @@ export class OnboardingPage {
       return null;
     },
     objetivo: (value: string, role: string) => {
-      if (role === 'cliente' && !value) return 'Por favor, selecciona tu objetivo principal';
+      if (role === 'entrenado' && !value) return 'Por favor, selecciona tu objetivo principal';
       return null;
     }
   };
@@ -190,7 +190,7 @@ export class OnboardingPage {
   }
 
   /**
-   * Valida el segundo paso (objetivo para clientes)
+   * Valida el segundo paso (objetivo para entrenados)
    */
   validateStep2(): boolean {
     const data = this.formData();
@@ -219,8 +219,8 @@ export class OnboardingPage {
   redirectToRolePage() {
     const role = this.formData().role;
     switch (role) {
-      case 'cliente':
-        this.router.navigate(['/cliente-tabs']);
+      case 'entrenado':
+        this.router.navigate(['/entrenado-tabs']);
         break;
       case 'entrenador':
         this.router.navigate(['/entrenador-tabs']);
@@ -238,10 +238,10 @@ export class OnboardingPage {
    */
   getRoleDescription(role: string): string {
     switch (role) {
-      case 'cliente':
+      case 'entrenado':
         return 'Acceso a entrenamientos y seguimiento de progreso';
       case 'entrenador':
-        return 'Gestión de clientes y creación de rutinas';
+        return 'Gestión de entrenados y creación de rutinas';
       case 'gimnasio':
         return 'Administración completa del gimnasio';
       default:

@@ -67,7 +67,7 @@ export class Tab3Page implements OnInit {
     switch (role) {
       case 'gimnasio':
         return 'danger';
-      case 'cliente':
+      case 'entrenado':
         return 'success';
       case 'entrenador':
         return 'warning';
@@ -85,8 +85,8 @@ export class Tab3Page implements OnInit {
     switch (role) {
       case 'gimnasio':
         return 'Gimnasio';
-      case 'cliente':
-        return 'Cliente';
+      case 'entrenado':
+        return 'Entrenado';
       case 'entrenador':
         return 'Entrenador';
       case 'user':

@@ -1,7 +1,7 @@
 import { Objetivo } from '../enums/objetivo.enum';
 import { Rutina } from './rutina.model';
 
-export interface Cliente {
+export interface Entrenado {
     id: string;
     gimnasioId: string;
     entrenadorId?: string;
@@ -10,4 +10,3 @@ export interface Cliente {
     objetivo?: Objetivo;
    
 }
-  

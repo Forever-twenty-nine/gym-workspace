@@ -63,7 +63,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   private mapFromFirestore(data: any): Rutina {
     return {
       id: data.id,
-      clienteId: data.clienteId,
+      entrenadoId: data.entrenadoId,
       nombre: data.nombre || '',
       fechaAsignacion: data.fechaAsignacion?.toDate?.() || data.fechaAsignacion || new Date(),
       ejercicios: data.ejercicios || [],
@@ -84,7 +84,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
 
   private mapToFirestore(rutina: Rutina): any {
     const data: any = {
-      clienteId: rutina.clienteId,
+      entrenadoId: rutina.entrenadoId,
       nombre: rutina.nombre,
       ejercicios: rutina.ejercicios || [],
       activa: rutina.activa,

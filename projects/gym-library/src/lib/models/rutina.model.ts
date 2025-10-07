@@ -3,7 +3,7 @@ import { Ejercicio } from "./ejercicio.model";
 
 export interface Rutina {
     id: string;
-    clienteId?: string;
+    entrenadoId?: string;
     nombre: string;
     fechaAsignacion: Date;
     ejercicios?: Ejercicio[];

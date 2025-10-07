@@ -87,7 +87,7 @@
               (ngModelChange)="updateFormField('role', $event)"
               placeholder="Selecciona tu rol"
               style="--placeholder-color: var(--ion-color-medium);">
-            <ion-select-option value="cliente">Cliente</ion-select-option>
+            <ion-select-option value="entrenado">Entrenado</ion-select-option>
             <ion-select-option value="entrenador">Entrenador</ion-select-option>
             <ion-select-option value="gimnasio">Gimnasio</ion-select-option>
           </ion-select>
@@ -107,7 +107,7 @@
       </div>
     }
 
-    <!-- Paso 2: Objetivo (solo para clientes) -->
+    <!-- Paso 2: Objetivo (solo para entrenados) -->
     @if (showStep2()) {
       <div>
         <!-- Campo Objetivo -->
@@ -170,12 +170,12 @@
           @if (isLoading()) {
             <span>Configurando...</span>
           } @else {
-            @if (!isLoading() && (currentStep() < totalSteps() || formData().role !== 'cliente')) {
+            @if (!isLoading() && (currentStep() < totalSteps() || formData().role !== 'entrenado')) {
               <ion-icon name="arrow-forward-outline" slot="end" size="small" class="ml-1"></ion-icon>
-            } @if (!isLoading() && currentStep() === totalSteps() && formData().role === 'cliente') {
+            } @if (!isLoading() && currentStep() === totalSteps() && formData().role === 'entrenado') {
               <ion-icon name="checkmark-circle-outline" slot="end" size="small" class="ml-1"></ion-icon>
             }
-            @if (currentStep() < totalSteps() && formData().role === 'cliente') {
+            @if (currentStep() < totalSteps() && formData().role === 'entrenado') {
               <span>Continuar</span>
             } @else {
               <span>Finalizar</span>

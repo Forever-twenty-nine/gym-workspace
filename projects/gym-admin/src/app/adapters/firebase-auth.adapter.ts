@@ -9,7 +9,7 @@ import {
   UserCredential
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { User, Rol, Cliente, Objetivo } from 'gym-library';
+import { User, Rol, Entrenado, Objetivo } from 'gym-library';
 
 interface IAuthAdapter {
   createUserWithEmailAndPassword(email: string, password: string, userData: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }>;
@@ -74,8 +74,8 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
         if (userData.plan !== undefined) {
           newUser.plan = userData.plan;
         }
-        if ((userData as any).clienteId !== undefined) {
-          (newUser as any).clienteId = (userData as any).clienteId;
+        if ((userData as any).entrenadoId !== undefined) {
+          (newUser as any).entrenadoId = (userData as any).entrenadoId;
         }
         if (userData.onboarded !== undefined) {
           newUser.onboarded = userData.onboarded;
@@ -186,7 +186,7 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
     if (email.includes('entrenador') || email.includes('trainer')) return Rol.ENTRENADOR;
     if (email.includes('gimnasio') || email.includes('gym')) return Rol.GIMNASIO;
     if (email.includes('personal')) return Rol.PERSONAL_TRAINER;
-    return Rol.CLIENTE;
+    return Rol.ENTRENADO;
   }
 
   /**

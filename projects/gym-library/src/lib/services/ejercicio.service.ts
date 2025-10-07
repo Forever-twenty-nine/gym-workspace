@@ -86,20 +86,20 @@ export class EjercicioService {
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	validateEjercicio(ejercicio: Ejercicio): void {
-		// Validación 1: Solo CLIENTE o ENTRENADOR pueden ser creadores
+		// Validación 1: Solo ENTRENADO o ENTRENADOR pueden ser creadores
 		if (ejercicio.creadorTipo) {
-			if (ejercicio.creadorTipo !== Rol.CLIENTE && ejercicio.creadorTipo !== Rol.ENTRENADOR) {
+			if (ejercicio.creadorTipo !== Rol.ENTRENADO && ejercicio.creadorTipo !== Rol.ENTRENADOR) {
 				throw new EjercicioValidationError(
-					`Solo clientes y entrenadores pueden crear ejercicios. Tipo recibido: ${ejercicio.creadorTipo}`
+					`Solo entrenados y entrenadores pueden crear ejercicios. Tipo recibido: ${ejercicio.creadorTipo}`
 				);
 			}
 		}
 
-		// Validación 2: Solo CLIENTE puede ser asignado
+		// Validación 2: Solo ENTRENADO puede ser asignado
 		if (ejercicio.asignadoATipo) {
-			if (ejercicio.asignadoATipo !== Rol.CLIENTE) {
+			if (ejercicio.asignadoATipo !== Rol.ENTRENADO) {
 				throw new EjercicioValidationError(
-					`Los ejercicios solo pueden ser asignados a clientes. Tipo recibido: ${ejercicio.asignadoATipo}`
+					`Los ejercicios solo pueden ser asignados a entrenados. Tipo recibido: ${ejercicio.asignadoATipo}`
 				);
 			}
 		}
@@ -150,9 +150,9 @@ export class EjercicioService {
 			delete normalized.asignadoATipo;
 		}
 
-		// Si hay asignadoAId, asegurarse que asignadoATipo sea CLIENTE
+		// Si hay asignadoAId, asegurarse que asignadoATipo sea ENTRENADO
 		if (normalized.asignadoAId) {
-			normalized.asignadoATipo = Rol.CLIENTE;
+			normalized.asignadoATipo = Rol.ENTRENADO;
 		}
 
 		// Agregar o actualizar metadatos de fecha
@@ -309,12 +309,12 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios asignados a clientes (todos)
+	 * 🔍 Obtiene ejercicios asignados a entrenados (todos)
 	 */
 	getEjerciciosAsignados(): Signal<Ejercicio[]> {
 		return computed(() => 
 			this._ejercicios().filter(ejercicio => 
-				ejercicio.asignadoAId && ejercicio.asignadoATipo === Rol.CLIENTE
+				ejercicio.asignadoAId && ejercicio.asignadoATipo === Rol.ENTRENADO
 			)
 		);
 	}
@@ -329,11 +329,11 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios creados por clientes
+	 * 🔍 Obtiene ejercicios creados por entrenados
 	 */
-	getEjerciciosCreadosPorClientes(): Signal<Ejercicio[]> {
+	getEjerciciosCreadosPorEntrenados(): Signal<Ejercicio[]> {
 		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.CLIENTE)
+			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADO)
 		);
 	}
 
@@ -350,27 +350,27 @@ export class EjercicioService {
 	 * ✅ Verifica si un rol puede crear ejercicios
 	 */
 	static canCreateEjercicio(rol: Rol): boolean {
-		return rol === Rol.CLIENTE || rol === Rol.ENTRENADOR;
+		return rol === Rol.ENTRENADO || rol === Rol.ENTRENADOR;
 	}
 
 	/**
 	 * ✅ Verifica si un rol puede ser asignado a un ejercicio
 	 */
 	static canBeAssignedToEjercicio(rol: Rol): boolean {
-		return rol === Rol.CLIENTE;
+		return rol === Rol.ENTRENADO;
 	}
 
 	/**
 	 * 📋 Obtiene los roles que pueden crear ejercicios
 	 */
 	static getRolesCreadores(): Rol[] {
-		return [Rol.CLIENTE, Rol.ENTRENADOR];
+		return [Rol.ENTRENADO, Rol.ENTRENADOR];
 	}
 
 	/**
 	 * 📋 Obtiene los roles que pueden ser asignados a ejercicios
 	 */
 	static getRolesAsignables(): Rol[] {
-		return [Rol.CLIENTE];
+		return [Rol.ENTRENADO];
 	}
 }

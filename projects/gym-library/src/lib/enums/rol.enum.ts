@@ -1,5 +1,5 @@
 export enum Rol {
-  CLIENTE = 'cliente',
+  ENTRENADO = 'entrenado',
   ENTRENADOR = 'entrenador',
   GIMNASIO = 'gimnasio',
   PERSONAL_TRAINER = 'personal_trainer',

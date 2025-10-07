@@ -13,8 +13,8 @@ import {
   personOutline, statsChartOutline } from 'ionicons/icons';
 
 @Component({
-  selector: 'app-cliente-tabs',
-  templateUrl: './cliente-tabs.page.html',
+  selector: 'app-entrenado-tabs',
+  templateUrl: './entrenado-tabs.page.html',
   standalone: true,
   imports: [
     CommonModule,
@@ -25,7 +25,7 @@ import {
     IonLabel
   ]
 })
-export class ClienteTabsPage {
+export class EntrenadoTabsPage {
 
   constructor() { 
     addIcons({statsChartOutline,fitnessOutline,personOutline});

@@ -21,7 +21,7 @@
               <div class="stat-content">
                 <ion-icon name="people-outline" color="primary"></ion-icon>
                 <div class="stat-info">
-                  <h2>{{ stats.clientesActivos }}</h2>
+                  <h2>{{ stats.entrenadosActivos }}</h2>
                   <p>Clientes Activos</p>
                 </div>
               </div>
@@ -82,10 +82,10 @@
       </ion-card-header>
       <ion-card-content>
         <ion-list>
-          <ion-item *ngFor="let cliente of clientesRecientes" button (click)="verCliente(cliente)">
+          <ion-item *ngFor="let entrenado of entrenadosRecientes" button (click)="verCliente(entrenado)">
             <ion-label>
-              <h3>{{ cliente.nombre }}</h3>
-              <p>Último entrenamiento: {{ cliente.ultimoEntrenamiento }}</p>
+              <h3>{{ entrenado.nombre }}</h3>
+              <p>Último entrenamiento: {{ entrenado.ultimoEntrenamiento }}</p>
             </ion-label>
             <ion-button fill="clear" slot="end" color="primary">
               Ver

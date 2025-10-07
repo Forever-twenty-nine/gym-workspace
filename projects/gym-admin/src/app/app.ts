@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
-import { ClienteService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService, User, Cliente, Entrenador, Gimnasio } from 'gym-library';
+import { EntrenadoService, RutinaService, EjercicioService, UserService, EntrenadorService, GimnasioService, User, Entrenado, Entrenador, Gimnasio } from 'gym-library';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, Rol, Objetivo } from 'gym-library';
 import { CommonModule } from '@angular/common';
@@ -26,7 +26,7 @@ import { FirebaseAuthAdapter } from './adapters/firebase-auth.adapter';
 })
 export class App {
   // Servicios inyectados
-  private readonly clienteService = inject(ClienteService);
+  private readonly entrenadoService = inject(EntrenadoService);
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
   private readonly userService = inject(UserService);
@@ -91,22 +91,22 @@ export class App {
     });
   });
   
-  readonly clientes = computed(() => {
-    // Agregar displayName a cada cliente basado en el usuario asociado
-    return this.clienteService.clientes().map(cliente => {
-      const usuario = this.usuarios().find(u => u.uid === cliente.id);
+  readonly entrenados = computed(() => {
+    // Agregar displayName a cada entrenado basado en el usuario asociado
+    return this.entrenadoService.entrenados().map(entrenado => {
+      const usuario = this.usuarios().find(u => u.uid === entrenado.id);
       
       // Obtener información del entrenador asociado
-      const entrenador = this.entrenadoresBase().find(e => e.id === cliente.entrenadorId);
-      const entrenadorName = entrenador?.displayName || (cliente.entrenadorId ? `Entrenador ${cliente.entrenadorId}` : null);
+      const entrenador = this.entrenadoresBase().find(e => e.id === entrenado.entrenadorId);
+      const entrenadorName = entrenador?.displayName || (entrenado.entrenadorId ? `Entrenador ${entrenado.entrenadorId}` : null);
       
       // Obtener información del gimnasio asociado
-      const gimnasio = this.gimnasios().find(g => g.id === cliente.gimnasioId);
-      const gimnasioName = gimnasio?.displayName || (cliente.gimnasioId ? `Gimnasio ${cliente.gimnasioId}` : null);
+      const gimnasio = this.gimnasios().find(g => g.id === entrenado.gimnasioId);
+      const gimnasioName = gimnasio?.displayName || (entrenado.gimnasioId ? `Gimnasio ${entrenado.gimnasioId}` : null);
       
       return {
-        ...cliente,
-        displayName: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`,
+        ...entrenado,
+        displayName: usuario?.nombre || usuario?.email || `Entrenado ${entrenado.id}`,
         entrenadorName,
         gimnasioName
       };
@@ -132,7 +132,7 @@ export class App {
         e.creadorId === entrenador.id && e.creadorTipo === 'entrenador'
       ).length;
       
-      const clientesAsignados = this.clienteService.clientes().filter(c => 
+      const clientesAsignados = this.entrenadoService.entrenados().filter(c => 
         c.entrenadorId === entrenador.id
       ).length;
       
@@ -168,12 +168,12 @@ export class App {
     counterColor: 'blue'
   };
 
-  readonly clientesCardConfig: CardConfig = {
-    title: 'Clientes',
+  readonly entrenadosCardConfig: CardConfig = {
+    title: 'Entrenados',
     createButtonText: 'N/A', // No se usa porque canCreate será false
     createButtonColor: 'green',
-    emptyStateTitle: 'No hay clientes registrados',
-    displayField: 'displayName', // Mostrar el nombre del cliente
+    emptyStateTitle: 'No hay entrenados registrados',
+    displayField: 'displayName', // Mostrar el nombre del entrenado
     showCounter: true,
     counterColor: 'green',
     showChips: ['gimnasioName', 'entrenadorName'] // Primero gimnasio, después entrenador
@@ -317,21 +317,21 @@ export class App {
   }
 
   /**
-   * Obtiene el nombre del cliente a partir de su ID
-   * @param clienteId ID del cliente
-   * @returns Nombre del cliente o 'Cliente no encontrado' si no existe
+   * Obtiene el nombre del entrenado a partir de su ID
+   * @param clienteId ID del entrenado
+   * @returns Nombre del entrenado o 'Cliente no encontrado' si no existe
    */
   getClienteName(clienteId: string): string {
-    if (!clienteId) return 'Sin cliente asignado';
+    if (!clienteId) return 'Sin entrenado asignado';
 
     const usuario = this.usuarios().find(u => u.uid === clienteId);
     if (usuario) {
       return usuario.nombre || usuario.email || `Usuario ${usuario.uid}`;
     }
 
-    const cliente = this.clientes().find(c => c.id === clienteId);
-    if (cliente) {
-      return `Cliente ${cliente.id}`;
+    const entrenado = this.entrenados().find(c => c.id === clienteId);
+    if (entrenado) {
+      return `Cliente ${entrenado.id}`;
     }
 
     return `Cliente ${clienteId}`;
@@ -358,8 +358,8 @@ export class App {
    * @param entrenadorId ID del entrenador
    * @returns Lista de clientes asociados al entrenador
    */
-  getClientesByEntrenador(entrenadorId: string) {
-    return this.clientes().filter(cliente => cliente.entrenadorId === entrenadorId);
+  getEntrenadosByEntrenador(entrenadorId: string) {
+    return this.entrenados().filter(entrenado => entrenado.entrenadorId === entrenadorId);
   }
 
   /**
@@ -386,29 +386,29 @@ export class App {
   }
 
   /**
-   * Obtiene las rutinas asignadas a un cliente específico
+   * Obtiene las rutinas asignadas a un entrenado específico
    * 
    * ℹ️ LÓGICA DE ASIGNACIÓN (ESTRICTA):
    * - Las rutinas se crean individualmente y se asignan a clientes específicos
-   * - La asignación DEBE tener: rutina.asignadoId = clienteId Y rutina.asignadoTipo = 'cliente'
+   * - La asignación DEBE tener: rutina.asignadoId = clienteId Y rutina.asignadoTipo = 'entrenado'
    * - NO se usa el campo legacy 'clienteId' para evitar datos corruptos
    * - Solo se incluyen rutinas con asignación EXPLÍCITA y válida
    * 
-   * @param clienteId ID del cliente
-   * @returns Lista de rutinas explícitamente asignadas al cliente
+   * @param clienteId ID del entrenado
+   * @returns Lista de rutinas explícitamente asignadas al entrenado
    */
   getRutinasAsignadasAlCliente(clienteId: string) {
     if (!clienteId) return [];
     
     const todasLasRutinas = this.rutinas();
     
-    // Buscar rutinas que fueron asignadas a este cliente específico
+    // Buscar rutinas que fueron asignadas a este entrenado específico
     // SOLO usar la lógica nueva (asignadoId + asignadoTipo) - más confiable y precisa
     return todasLasRutinas.filter(rutina => {
       const tieneAsignadoIdValido = rutina.asignadoId && rutina.asignadoId.trim() !== '';
-      const tieneAsignadoTipoValido = rutina.asignadoTipo === Rol.CLIENTE;
+      const tieneAsignadoTipoValido = rutina.asignadoTipo === Rol.ENTRENADO;
       
-      // Solo incluir rutinas que están EXPLÍCITAMENTE asignadas a este cliente
+      // Solo incluir rutinas que están EXPLÍCITAMENTE asignadas a este entrenado
       return tieneAsignadoIdValido && 
              tieneAsignadoTipoValido && 
              rutina.asignadoId === clienteId;
@@ -458,34 +458,34 @@ export class App {
    * @param gimnasioId ID del gimnasio
    * @returns Lista de clientes del gimnasio
    */
-  getClientesByGimnasio(gimnasioId: string) {
-    return this.clientes().filter(cliente => cliente.gimnasioId === gimnasioId);
+  getEntrenadosByGimnasio(gimnasioId: string) {
+    return this.entrenados().filter(entrenado => entrenado.gimnasioId === gimnasioId);
   }
 
   /**
    * Obtiene todos los clientes disponibles (usuarios con rol CLIENTE)
    * @returns Lista de usuarios clientes
    */
-  getClientesDisponiblesParaGimnasio() {
-    return this.usuarios().filter(u => u.role === Rol.CLIENTE);
+  getEntrenadosDisponiblesParaGimnasio() {
+    return this.usuarios().filter(u => u.role === Rol.ENTRENADO);
   }
 
   /**
-   * Crea un cliente de muestra
+   * Crea un entrenado de muestra
    * @return void
    */
   async addSampleCliente() {
-    this.openCreateModal('cliente');
+    this.openCreateModal('entrenado');
   }
 
   /**
-   * Elimina un cliente por su ID.
-   * @param id El ID del cliente a eliminar.
+   * Elimina un entrenado por su ID.
+   * @param id El ID del entrenado a eliminar.
    * @return void
    */
-  async deleteCliente(id: string) {
-    await this.clienteService.delete(id);
-    this.log(`Cliente eliminado: ${id}`);
+  async deleteEntrenado(id: string) {
+    await this.entrenadoService.delete(id);
+    this.log(`Entrenado eliminado: ${id}`);
   }
 
   /**
@@ -582,7 +582,7 @@ export class App {
   /** 
    * Abre el modal de edición con el elemento seleccionado
    * @param item El elemento a editar
-   * @param type El tipo de elemento ('usuario', 'cliente', 'rutina', 'ejercicio')
+   * @param type El tipo de elemento ('usuario', 'entrenado', 'rutina', 'ejercicio')
    * @returns void
    */
   openDetailsModal(item: any, type: string) {
@@ -599,7 +599,7 @@ export class App {
 
   /** 
    * Abre el modal para crear un nuevo elemento
-   * @param type El tipo de elemento a crear ('usuario', 'cliente', 'rutina', 'ejercicio')
+   * @param type El tipo de elemento a crear ('usuario', 'entrenado', 'rutina', 'ejercicio')
    * @returns void
    */
   openCreateModal(type: string) {
@@ -614,7 +614,7 @@ export class App {
 
   /**
    * Crea un elemento vacío según el tipo
-   * @param type El tipo de elemento ('usuario', 'cliente', 'rutina', 'ejercicio')
+   * @param type El tipo de elemento ('usuario', 'entrenado', 'rutina', 'ejercicio')
    * @returns Un objeto vacío con la estructura adecuada
    */
   private createEmptyItem(type: string): any {
@@ -644,7 +644,7 @@ export class App {
           email: '',
           password: ''
         };
-      case 'cliente':
+      case 'entrenado':
         return {
           id: 'c' + timestamp,
           gimnasioId: '',
@@ -704,7 +704,7 @@ export class App {
   /**
    * Crea el formulario de edición según el tipo de elemento
    * @param item El elemento a editar
-   * @param type El tipo de elemento ('usuario', 'cliente', 'rutina', 'ejercicio')
+   * @param type El tipo de elemento ('usuario', 'entrenado', 'rutina', 'ejercicio')
    * @return FormGroup configurado
    */
   private createEditForm(item: any, type: string) {
@@ -731,7 +731,7 @@ export class App {
         }
         break;
 
-      case 'cliente':
+      case 'entrenado':
         formConfig = {
           // Campos informativos del usuario (solo lectura)
           nombre: [{ value: '', disabled: true }],
@@ -742,7 +742,7 @@ export class App {
           gimnasioInfo: [{ value: '', disabled: true }],
           entrenadorInfo: [{ value: '', disabled: true }],
           
-          // Campos editables del cliente
+          // Campos editables del entrenado
           activo: [item.activo || false],
           objetivo: [item.objetivo || ''],
           fechaRegistro: [item.fechaRegistro ? new Date(item.fechaRegistro).toISOString().slice(0, 16) : ''],
@@ -784,7 +784,7 @@ export class App {
           creadorId: [item.creadorId || ''],
           creadorTipo: [item.creadorTipo || ''],
           asignadoId: [item.asignadoId || item.clienteId || '', [Validators.required]], // Usar asignadoId como principal, clienteId como fallback
-          asignadoTipo: [item.asignadoTipo || (item.clienteId ? 'CLIENTE' : ''), [Validators.required]]
+          asignadoTipo: [item.asignadoTipo || (item.clienteId ? 'ENTRENADO' : ''), [Validators.required]]
         };
         
         // Agregar gimnasioId solo si existe y no está vacío
@@ -819,7 +819,7 @@ export class App {
         // Obtener entrenadores ya asociados a este gimnasio
         const entrenadoresAsociados = this.getEntrenadoresByGimnasio(item.id || '').map(e => e.id);
         // Obtener clientes ya asociados a este gimnasio
-        const clientesAsociados = this.getClientesByGimnasio(item.id || '').map(c => c.id);
+        const clientesAsociados = this.getEntrenadosByGimnasio(item.id || '').map(c => c.id);
         
         formConfig = {
           // Campo informativo del usuario asociado
@@ -929,7 +929,7 @@ export class App {
           }
           break;
 
-        case 'cliente':
+        case 'entrenado':
           // Limpiar campos informativos antes de guardar
           const clienteDataToSave = {
             ...updatedData,
@@ -940,7 +940,7 @@ export class App {
           delete clienteDataToSave.usuarioInfo;
           delete clienteDataToSave.rutinasAsociadas;
           
-          await this.clienteService.save(clienteDataToSave);
+          await this.entrenadoService.save(clienteDataToSave);
           
           // Obtener nombres para el log
           const usuarioNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
@@ -986,10 +986,10 @@ export class App {
           // Obtener nombres para el log
           const usuarioEntrenadorNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
           const gimnasioEntrenadorNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
-          const clientesCount = this.getClientesByEntrenador(updatedData.id).length;
+          const clientesCount = this.getEntrenadosByEntrenador(updatedData.id).length;
           const rutinasCount = this.getRutinasByEntrenador(updatedData.id).length;
           
-          this.log(`Entrenador ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioEntrenadorNombre} - Gimnasio: ${gimnasioEntrenadorNombre} - Clientes: ${clientesCount} - Rutinas: ${rutinasCount}`);
+          this.log(`Entrenador ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioEntrenadorNombre} - Gimnasio: ${gimnasioEntrenadorNombre} - Entrenados: ${clientesCount} - Rutinas: ${rutinasCount}`);
           break;
 
         case 'rutina':
@@ -997,12 +997,12 @@ export class App {
           const rutinaDataToSave = { ...updatedData };
           
           // Sincronizar clienteId con asignadoId para compatibilidad hacia atrás
-          if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === 'CLIENTE') {
+          if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === 'ENTRENADO') {
             rutinaDataToSave.clienteId = rutinaDataToSave.asignadoId;
-          } else if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === Rol.CLIENTE) {
+          } else if (rutinaDataToSave.asignadoId && rutinaDataToSave.asignadoTipo === Rol.ENTRENADO) {
             rutinaDataToSave.clienteId = rutinaDataToSave.asignadoId;
           } else {
-            // Si no hay asignado cliente, limpiar clienteId
+            // Si no hay asignado entrenado, limpiar clienteId
             rutinaDataToSave.clienteId = '';
           }
           
@@ -1098,12 +1098,12 @@ export class App {
             }
             
             // Desasociar todos los clientes actuales que no estén en la selección
-            const clientesActuales = this.getClientesByGimnasio(updatedData.id);
-            for (const cliente of clientesActuales) {
-              if (!clientesSeleccionados.includes(cliente.id)) {
-                // Desasociar cliente (quitar gimnasioId)
-                await this.clienteService.save({ 
-                  ...cliente, 
+            const clientesActuales = this.getEntrenadosByGimnasio(updatedData.id);
+            for (const entrenado of clientesActuales) {
+              if (!clientesSeleccionados.includes(entrenado.id)) {
+                // Desasociar entrenado (quitar gimnasioId)
+                await this.entrenadoService.save({ 
+                  ...entrenado, 
                   gimnasioId: '' 
                 });
               }
@@ -1143,18 +1143,18 @@ export class App {
           // Asociar los clientes seleccionados
           for (const clienteId of clientesSeleccionados) {
             try {
-              const clienteActual = this.clientes().find(c => c.id === clienteId);
+              const clienteActual = this.entrenados().find(c => c.id === clienteId);
               if (clienteActual) {
-                // Actualizar cliente existente
-                await this.clienteService.save({
+                // Actualizar entrenado existente
+                await this.entrenadoService.save({
                   ...clienteActual,
                   gimnasioId: updatedData.id
                 });
               } else {
-                // Crear nuevo documento de cliente si no existe
-                const clienteServiceAdapter = (this.clienteService as any).adapter;
-                if (clienteServiceAdapter && clienteServiceAdapter.createWithId) {
-                  await clienteServiceAdapter.createWithId(clienteId, {
+                // Crear nuevo documento de entrenado si no existe
+                const entrenadoServiceAdapter = (this.entrenadoService as any).adapter;
+                if (entrenadoServiceAdapter && entrenadoServiceAdapter.createWithId) {
+                  await entrenadoServiceAdapter.createWithId(clienteId, {
                     id: clienteId,
                     gimnasioId: updatedData.id,
                     activo: true,
@@ -1166,12 +1166,12 @@ export class App {
                 }
               }
             } catch (error) {
-              console.error(`Error al asociar cliente ${clienteId}:`, error);
-              this.log(`⚠️ Error al asociar cliente ${clienteId}: ${error}`);
+              console.error(`Error al asociar entrenado ${clienteId}:`, error);
+              this.log(`⚠️ Error al asociar entrenado ${clienteId}: ${error}`);
             }
           }
           
-          this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre} - Entrenadores: ${entrenadoresSeleccionados.length}, Clientes: ${clientesSeleccionados.length}`);
+          this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre} - Entrenadores: ${entrenadoresSeleccionados.length}, Entrenados: ${clientesSeleccionados.length}`);
           break;
       }
 
@@ -1203,8 +1203,8 @@ export class App {
    * Obtiene los clientes disponibles para asignar a rutinas
    * @return Usuario[]
    */
-  getClientesDisponibles() {
-    return this.usuarios().filter(u => u.role === Rol.CLIENTE);
+  getEntrenadosDisponibles() {
+    return this.usuarios().filter(u => u.role === Rol.ENTRENADO);
   }
 
   /**
@@ -1229,7 +1229,7 @@ export class App {
    */
   canCreateRutina(): boolean {
     // Solo necesitamos clientes para asignar rutinas (los entrenadores son opcionales como creadores)
-    return this.getClientesDisponibles().length > 0;
+    return this.getEntrenadosDisponibles().length > 0;
   }
 
   /**
@@ -1237,10 +1237,10 @@ export class App {
    * @return string
    */
   getRutinaValidationMessage(): string {
-    const clientes = this.getClientesDisponibles().length;
+    const clientes = this.getEntrenadosDisponibles().length;
 
     if (clientes === 0) {
-      return 'Necesitas crear al menos un cliente para poder asignar rutinas';
+      return 'Necesitas crear al menos un entrenado para poder asignar rutinas';
     }
     return '';
   }
@@ -1398,11 +1398,11 @@ export class App {
           ];
         }
 
-      case 'cliente':
+      case 'entrenado':
         const clienteData = this.modalData();
         const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
         
-        // Obtener rutinas asignadas a este cliente usando el método específico
+        // Obtener rutinas asignadas a este entrenado usando el método específico
         const rutinasAsignadasAlCliente = this.getRutinasAsignadasAlCliente(clienteData?.id || '');
         
         // Obtener información del gimnasio y entrenador para mostrar
@@ -1410,12 +1410,12 @@ export class App {
         const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
         
         return [
-          // Información básica del cliente (integrada con usuario)
+          // Información básica del entrenado (integrada con usuario)
           {
             name: 'nombre',
             type: 'text',
             label: 'Nombre del Cliente',
-            placeholder: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Nombre del cliente',
+            placeholder: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Nombre del entrenado',
             readonly: true,
             colSpan: 1
           },
@@ -1423,7 +1423,7 @@ export class App {
             name: 'email',
             type: 'text',
             label: 'Email',
-            placeholder: usuarioAsociado?.email || 'Email del cliente',
+            placeholder: usuarioAsociado?.email || 'Email del entrenado',
             readonly: true,
             colSpan: 1
           },
@@ -1458,7 +1458,7 @@ export class App {
             colSpan: 1
           },
           
-          // Información del cliente (campos editables)
+          // Información del entrenado (campos editables)
           {
             name: 'objetivo',
             type: 'select',
@@ -1498,7 +1498,7 @@ export class App {
       case 'entrenador':
         const entrenadorData = this.modalData();
         const usuarioEntrenador = this.usuarios().find(u => u.uid === entrenadorData?.id);
-        const clientesEntrenador = this.getClientesByEntrenador(entrenadorData?.id || '');
+        const clientesEntrenador = this.getEntrenadosByEntrenador(entrenadorData?.id || '');
         const rutinasEntrenador = this.getRutinasByEntrenador(entrenadorData?.id || '');
         const ejerciciosEntrenador = this.getEjerciciosByEntrenador(entrenadorData?.id || '');
         const gimnasioInfo = entrenadorData?.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
@@ -1555,13 +1555,13 @@ export class App {
           {
             name: 'clientesAsignados',
             type: 'clientes-simple',
-            label: `Clientes Asignados (${clientesEntrenador.length})`,
+            label: `Entrenados Asignados (${clientesEntrenador.length})`,
             colSpan: 2,
-            clientes: clientesEntrenador.map(cliente => {
-              const usuario = this.usuarios().find(u => u.uid === cliente.id);
+            clientes: clientesEntrenador.map(entrenado => {
+              const usuario = this.usuarios().find(u => u.uid === entrenado.id);
               return {
-                id: cliente.id,
-                nombre: usuario?.nombre || usuario?.email || `Cliente ${cliente.id}`
+                id: entrenado.id,
+                nombre: usuario?.nombre || usuario?.email || `Cliente ${entrenado.id}`
               };
             })
           },
@@ -1575,7 +1575,7 @@ export class App {
             options: rutinasEntrenador.map(rutina => ({
               value: rutina.id,
               label: rutina.nombre,
-              extra: this.usuarios().find(u => u.uid === rutina.clienteId)?.nombre || 'Sin cliente'
+              extra: this.usuarios().find(u => u.uid === rutina.entrenadoId)?.nombre || 'Sin entrenado'
             }))
           },
           
@@ -1620,7 +1620,7 @@ export class App {
               { value: '', label: '-- Sin creador --' },
               // Filtrar usuarios que pueden crear rutinas (CLIENTE y ENTRENADOR)
               ...this.usuarios()
-                .filter(user => user.role === Rol.CLIENTE || user.role === Rol.ENTRENADOR)
+                .filter(user => user.role === Rol.ENTRENADO || user.role === Rol.ENTRENADOR)
                 .map(user => ({
                   value: user.uid,
                   label: `${user.nombre || user.email || user.uid} (${user.role})`
@@ -1635,7 +1635,7 @@ export class App {
             placeholder: 'Seleccionar tipo (opcional)',
             options: [
               { value: '', label: '-- Sin tipo --' },
-              { value: Rol.CLIENTE, label: 'CLIENTE' },
+              { value: Rol.ENTRENADO, label: 'ENTRENADO' },
               { value: Rol.ENTRENADOR, label: 'ENTRENADOR' }
             ],
             colSpan: 1
@@ -1645,11 +1645,11 @@ export class App {
             name: 'asignadoId',
             type: 'select',
             label: 'Asignado A (Cliente) *',
-            placeholder: 'Seleccionar cliente',
+            placeholder: 'Seleccionar entrenado',
             options: [
               // Solo clientes pueden ser asignados a rutinas
               ...this.usuarios()
-                .filter(user => user.role === Rol.CLIENTE)
+                .filter(user => user.role === Rol.ENTRENADO)
                 .map(user => ({
                   value: user.uid,
                   label: `${user.nombre || user.email || user.uid}`
@@ -1664,7 +1664,7 @@ export class App {
             label: 'Tipo de Asignado',
             placeholder: 'Automático: Cliente',
             options: [
-              { value: Rol.CLIENTE, label: 'CLIENTE' }
+              { value: Rol.ENTRENADO, label: 'ENTRENADO' }
             ],
             colSpan: 1,
             required: true
@@ -1780,7 +1780,7 @@ export class App {
             name: 'asignadoAId',
             type: 'select',
             label: 'Asignado A (Cliente)',
-            placeholder: 'Seleccionar cliente (opcional)',
+            placeholder: 'Seleccionar entrenado (opcional)',
             options: [
               { value: '', label: '-- No asignado --' },
               // Filtrar usuarios usando el método estático del servicio
@@ -1815,8 +1815,8 @@ export class App {
         const usuarioGimnasio = this.usuarios().find(u => u.uid === gimnasioData?.id);
         const entrenadoresGimnasio = this.getEntrenadoresByGimnasio(gimnasioData?.id || '');
         const entrenadoresDisponibles = this.getEntrenadoresDisponiblesParaGimnasio();
-        const clientesGimnasio = this.getClientesByGimnasio(gimnasioData?.id || '');
-        const clientesDisponibles = this.getClientesDisponiblesParaGimnasio();
+        const clientesGimnasio = this.getEntrenadosByGimnasio(gimnasioData?.id || '');
+        const clientesDisponibles = this.getEntrenadosDisponiblesParaGimnasio();
         
         return [
           // Información del usuario asociado
@@ -1868,12 +1868,12 @@ export class App {
           {
             name: 'clientesAsociados',
             type: 'clientes-multiselect',
-            label: `Clientes del Gimnasio (${clientesDisponibles.length} disponibles)`,
+            label: `Entrenados del Gimnasio (${clientesDisponibles.length} disponibles)`,
             colSpan: 2,
-            options: clientesDisponibles.map(cliente => ({
-              value: cliente.uid,
-              label: cliente.nombre || cliente.email || `Cliente ${cliente.uid}`,
-              extra: cliente.emailVerified ? 'Verificado' : 'Sin verificar'
+            options: clientesDisponibles.map(entrenado => ({
+              value: entrenado.uid,
+              label: entrenado.nombre || entrenado.email || `Cliente ${entrenado.uid}`,
+              extra: entrenado.emailVerified ? 'Verificado' : 'Sin verificar'
             }))
           }
         ];
@@ -1910,8 +1910,8 @@ export class App {
   private async handleRoleChange(uid: string, newRole: Rol, userData: any): Promise<void> {
     try {
       switch (newRole) {
-        case Rol.CLIENTE:
-          // Crear documento cliente - solo campos requeridos y con valor
+        case Rol.ENTRENADO:
+          // Crear documento entrenado - solo campos requeridos y con valor
           const clienteData: any = {
             id: uid,
             activo: true,
@@ -1927,7 +1927,7 @@ export class App {
             clienteData.gimnasioId = '';
           }
           
-          await this.clienteService.save(clienteData);
+          await this.entrenadoService.save(clienteData);
           
           // Actualizar usuario con clienteId
           userData.clienteId = uid;

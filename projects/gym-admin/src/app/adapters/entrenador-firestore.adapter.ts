@@ -68,7 +68,7 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
       const entrenadoresCollection = collection(this.firestore, this.collectionName);
       const docRef = await addDoc(entrenadoresCollection, {
         ...entrenador,
-        clientes: entrenador.clientes || [],
+        entrenados: entrenador.entrenados || [],
         rutinas: entrenador.rutinas || []
       });
       
@@ -89,7 +89,7 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
       const entrenadorDoc = doc(this.firestore, this.collectionName, id);
       await setDoc(entrenadorDoc, {
         ...entrenador,
-        clientes: entrenador.clientes || [],
+        entrenados: entrenador.entrenados || [],
         rutinas: entrenador.rutinas || []
       });
     } catch (error) {

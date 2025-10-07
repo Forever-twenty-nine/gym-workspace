@@ -21,11 +21,11 @@ export const gimnasioGuard = (): boolean => {
   return false;
 };
 
-export const clienteGuard = (): boolean => {
+export const entrenadoGuard = (): boolean => {
   const router = inject(Router);
   const role = getCurrentUserRole();
   
-  if (role === Rol.CLIENTE) {
+  if (role === Rol.ENTRENADO) {
     return true;
   }
   

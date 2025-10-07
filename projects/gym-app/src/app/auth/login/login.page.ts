@@ -95,8 +95,8 @@ export class LoginPage {
    */
   private redirectToRolePage(role?: string): void {
     switch (role) {
-      case Rol.CLIENTE:
-        this.router.navigate(['/cliente-tabs']);
+      case Rol.ENTRENADO:
+        this.router.navigate(['/entrenado-tabs']);
         break;
       case Rol.ENTRENADOR:
       case Rol.PERSONAL_TRAINER:

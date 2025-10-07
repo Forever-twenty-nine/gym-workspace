@@ -73,7 +73,7 @@ export class EntrenamientosPage implements OnInit {
   rutinaSeleccionada = signal<any>(null);
   modalAbierto = signal<boolean>(false);
 
-  // Computed para rutinas del cliente actual
+  // Computed para rutinas del entrenado actual
   rutinas = computed(() => {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
@@ -81,9 +81,9 @@ export class EntrenamientosPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar solo las rutinas asignadas a este cliente
+    // Filtrar solo las rutinas asignadas a este entrenado
     return rutinas.filter(rutina => 
-      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.CLIENTE
+      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.ENTRENADO
     );
   });
 

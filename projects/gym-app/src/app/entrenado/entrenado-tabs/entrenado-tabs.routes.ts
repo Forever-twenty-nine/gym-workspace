@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { ClienteTabsPage } from './cliente-tabs.page';
+import { EntrenadoTabsPage } from './entrenado-tabs.page';
 
 export const routes: Routes = [
   {
     path: '',
-    component: ClienteTabsPage,
+    component: EntrenadoTabsPage,
     children: [
       {
         path: 'dashboard',

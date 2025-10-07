@@ -115,12 +115,12 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por cliente
+     * 🔍 Busca rutinas por entrenado
      */
-    getRutinasByCliente(clienteId: string): Signal<Rutina[]> {
+    getRutinasByEntrenado(entrenadoId: string): Signal<Rutina[]> {
         return computed(() => 
             this._rutinas().filter(rutina => 
-                rutina.clienteId === clienteId
+                rutina.entrenadoId === entrenadoId
             )
         );
     }

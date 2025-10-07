@@ -40,10 +40,10 @@ import { personOutline, createOutline, trashOutline } from 'ionicons/icons';
 })
 export class GimnasioUsersPage {
   users = [
-    { id: 1, name: 'Juan Pérez', email: 'juan@email.com', role: 'cliente', status: 'active' },
-    { id: 2, name: 'María García', email: 'maria@email.com', role: 'cliente', status: 'active' },
+    { id: 1, name: 'Juan Pérez', email: 'juan@email.com', role: 'entrenado', status: 'active' },
+    { id: 2, name: 'María García', email: 'maria@email.com', role: 'entrenado', status: 'active' },
     { id: 3, name: 'Carlos López', email: 'carlos@email.com', role: 'entrenador', status: 'active' },
-    { id: 4, name: 'Ana Martínez', email: 'ana@email.com', role: 'cliente', status: 'inactive' },
+    { id: 4, name: 'Ana Martínez', email: 'ana@email.com', role: 'entrenado', status: 'inactive' },
     { id: 5, name: 'Luis Rodríguez', email: 'luis@email.com', role: 'entrenador', status: 'active' },
   ];
 
@@ -58,7 +58,7 @@ export class GimnasioUsersPage {
     switch (role) {
       case 'gimnasio':
         return 'danger';
-      case 'cliente':
+      case 'entrenado':
         return 'success';
       case 'entrenador':
         return 'warning';
@@ -76,8 +76,8 @@ export class GimnasioUsersPage {
     switch (role) {
       case 'gimnasio':
         return 'Gimnasio';
-      case 'cliente':
-        return 'Cliente';
+      case 'entrenado':
+        return 'Entrenado';
       case 'entrenador':
         return 'Entrenador';
       case 'user':

@@ -138,6 +138,6 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
       return Rol.PERSONAL_TRAINER;
     }
     
-    return Rol.CLIENTE;
+    return Rol.ENTRENADO;
   }
 }

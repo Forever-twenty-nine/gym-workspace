@@ -24,8 +24,8 @@ import {
   checkmarkCircleOutline,
   timeOutline
 } from 'ionicons/icons';
-import { ClienteService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
-import { Cliente, Rutina } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
+import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
   selector: 'app-dashboard',
@@ -52,25 +52,25 @@ import { Cliente, Rutina } from 'gym-library';
 })
 export class DashboardPage implements OnInit {
   
-  private clienteService = inject(ClienteService);
+  private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
   private injector = inject(Injector);
 
   // Signals para datos reactivos
-  cliente = signal<Cliente | null>(null);
+  entrenado = signal<Entrenado | null>(null);
   todasLasRutinas = signal<Rutina[]>([]);
   
   // Computed signals para UI
-  nombreCliente = computed(() => {
+  nombreEntrenado = computed(() => {
     const user = this.userService.user();
-    return user?.nombre || 'Cliente';
+    return user?.nombre || 'Entrenado';
   });
 
   objetivoActual = computed(() => {
-    const clienteData = this.cliente();
-    return clienteData?.objetivo || 'Sin objetivo definido';
+    const entrenadoData = this.entrenado();
+    return entrenadoData?.objetivo || 'Sin objetivo definido';
   });
 
   rutinasAsignadas = computed(() => {
@@ -80,13 +80,13 @@ export class DashboardPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas que están EXPLÍCITAMENTE asignadas a este cliente
+    // Filtrar rutinas que están EXPLÍCITAMENTE asignadas a este entrenado
     // Solo usar la lógica nueva (asignadoId + asignadoTipo) para evitar datos corruptos
-    const rutinasDelCliente = rutinas.filter(rutina => 
-      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.CLIENTE
+    const rutinasDelEntrenado = rutinas.filter(rutina => 
+      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.ENTRENADO
     );
     
-    return rutinasDelCliente.map(rutina => ({
+    return rutinasDelEntrenado.map(rutina => ({
       nombre: rutina.nombre,
       fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
       completada: rutina.completado || false
@@ -109,13 +109,13 @@ export class DashboardPage implements OnInit {
     const userId = currentUser?.uid;
     
     if (userId) {
-      // Obtener el signal del cliente (esto llama a subscribeToCliente una sola vez)
-      const clienteSignal = this.clienteService.getCliente(userId);
+      // Obtener el signal del entrenado (esto llama a subscribeToEntrenado una sola vez)
+      const entrenadoSignal = this.entrenadoService.getEntrenado(userId);
       
       // Sincronizar el signal local con el del servicio usando el injector
       effect(() => {
-        const clienteData = clienteSignal();
-        this.cliente.set(clienteData);
+        const entrenadoData = entrenadoSignal();
+        this.entrenado.set(entrenadoData);
       }, { injector: this.injector });
     }
 
