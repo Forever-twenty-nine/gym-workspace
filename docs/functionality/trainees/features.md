@@ -42,6 +42,10 @@
 - Historial completo e ilimitado de rutinas
 - Búsqueda y filtros en historial
 - Rutinas personalizadas avanzadas
+- **Crear sus propias rutinas personalizadas**
+- **Crear biblioteca de ejercicios personalizados**
+- Duplicar y editar rutinas existentes
+- Organizar rutinas por categorías
 
 **Estadísticas Avanzadas:**
 - Gráficas de progreso temporal (líneas, barras)

@@ -16,10 +16,6 @@ export class EntrenadoService {
     private isListenerInitialized = false;
     private firestoreAdapter?: IEntrenadoFirestoreAdapter;
 
-    constructor() {
-        // La inicialización se hará cuando se configure el adaptador
-    }
-
     /**
      * Configura el adaptador de Firestore
      */
