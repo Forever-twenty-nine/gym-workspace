@@ -1,11 +1,12 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol } from 'gym-library';
+import { UserService, EntrenadoService, EntrenadorService, GimnasioService, MensajeService, Rol } from 'gym-library';
 import { GenericCardComponent, CardConfig } from '../../components/shared/generic-card/generic-card.component';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
+import { DisplayHelperService } from '../../services/display-helper.service';
 
 @Component({
   selector: 'app-usuarios-page',
@@ -25,8 +26,10 @@ export class UsuariosPage {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
+  private readonly mensajeService = inject(MensajeService);
   private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
   private readonly fb = inject(FormBuilder);
+  private readonly displayHelper = inject(DisplayHelperService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -40,6 +43,26 @@ export class UsuariosPage {
     });
   });
 
+  // Signals para mensajes (todos los mensajes sin filtro)
+  readonly mensajes = computed(() => {
+    return this.mensajeService.mensajes().map(mensaje => {
+      const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
+      const destinatario = this.usuarios().find(u => u.uid === mensaje.destinatarioId);
+      
+      const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
+      const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
+      
+      const titulo = this.displayHelper.getTituloMensaje(mensaje.tipo);
+      
+      return {
+        ...mensaje,
+        titulo,
+        remitenteChip: `De: ${remitenteNombre}`,
+        destinatarioChip: `Para: ${destinatarioNombre}`
+      };
+    });
+  });
+
   // Configuración del card
   readonly usuariosCardConfig: CardConfig = {
     title: 'Usuarios',
@@ -49,6 +72,17 @@ export class UsuariosPage {
     displayField: 'displayName',
     showCounter: true,
     counterColor: 'blue'
+  };
+
+  readonly mensajesCardConfig: CardConfig = {
+    title: 'Todos los Mensajes',
+    createButtonText: 'N/A',
+    createButtonColor: 'purple',
+    emptyStateTitle: 'No hay mensajes en el sistema',
+    displayField: 'titulo',
+    showCounter: true,
+    counterColor: 'purple',
+    showChips: ['remitenteChip', 'destinatarioChip']
   };
 
   // Signals para el estado del componente
@@ -386,6 +420,26 @@ export class UsuariosPage {
           colSpan: 2
         }
       ];
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA MENSAJES
+  // ========================================
+  
+  openMensajeModal(item: any) {
+    // Abrir modal en modo solo lectura
+    this.log(`Ver mensaje: ${item.titulo || 'Mensaje'}`);
+    // Aquí podrías implementar un modal de visualización si lo necesitas
+  }
+
+  async deleteMensaje(id: string) {
+    try {
+      await this.mensajeService.delete(id);
+      this.log('Mensaje eliminado correctamente');
+    } catch (error) {
+      this.log('ERROR al eliminar mensaje');
+      console.error('Error al eliminar mensaje:', error);
     }
   }
 

@@ -180,10 +180,10 @@ export class EntrenadosPage {
   };
 
   readonly mensajesCardConfig: CardConfig = {
-    title: 'Mensajes',
-    createButtonText: 'Nuevo Mensaje',
+    title: 'Mensajes de Entrenados',
+    createButtonText: 'N/A',
     createButtonColor: 'purple',
-    emptyStateTitle: 'No hay mensajes',
+    emptyStateTitle: 'No hay mensajes de entrenados',
     displayField: 'titulo',
     showCounter: true,
     counterColor: 'purple',
@@ -288,6 +288,14 @@ export class EntrenadosPage {
         remitenteChip: `De: ${remitenteNombre}`,
         destinatarioChip: `Para: ${destinatarioNombre}`
       };
+    });
+  });
+
+  // Mensajes filtrados: solo mostrar mensajes donde el remitente es ENTRENADO
+  readonly mensajesFiltrados = computed(() => {
+    return this.mensajes().filter(mensaje => {
+      const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
+      return remitente?.role === Rol.ENTRENADO;
     });
   });
 

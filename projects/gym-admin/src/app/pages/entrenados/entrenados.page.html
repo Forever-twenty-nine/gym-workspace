@@ -45,9 +45,9 @@
     <!-- Card de Mensajes -->
     <app-generic-card
       [config]="mensajesCardConfig"
-      [items]="mensajes()"
+      [items]="mensajesFiltrados()"
       [idField]="'id'"
-      (create)="addMensaje()"
+      [canCreate]="false"
       (edit)="openMensajeModal($event)"
       (delete)="deleteMensaje($event)">
     </app-generic-card>

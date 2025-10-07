@@ -11,6 +11,16 @@
       (edit)="openDetailsModal($event)"
       (delete)="deleteUsuario($event)">
     </app-generic-card>
+
+    <!-- Card de Mensajes (Todos) -->
+    <app-generic-card
+      [config]="mensajesCardConfig"
+      [items]="mensajes()"
+      [idField]="'id'"
+      [canCreate]="false"
+      (edit)="openMensajeModal($event)"
+      (delete)="deleteMensaje($event)">
+    </app-generic-card>
   </section>
 
   <!-- Toasts -->
