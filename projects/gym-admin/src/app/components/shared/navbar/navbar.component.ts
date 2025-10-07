@@ -1,0 +1,53 @@
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
+@Component({
+  selector: 'app-navbar',
+  imports: [RouterLink, RouterLinkActive],
+  template: `
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo/Título -->
+          <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-white">Admin Gym</h1>
+          </div>
+
+          <!-- Enlaces de navegación -->
+          <div class="flex space-x-4">
+            <a
+              routerLink="/usuarios"
+              routerLinkActive="bg-blue-900 text-white"
+              class="px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200"
+            >
+              Usuarios
+            </a>
+            <a
+              routerLink="/entrenadores"
+              routerLinkActive="bg-blue-900 text-white"
+              class="px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200"
+            >
+              Entrenadores
+            </a>
+            <a
+              routerLink="/entrenados"
+              routerLinkActive="bg-blue-900 text-white"
+              class="px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200"
+            >
+              Entrenados
+            </a>
+            <a
+              routerLink="/gimnasios"
+              routerLinkActive="bg-blue-900 text-white"
+              class="px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200"
+            >
+              Gimnasios
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class NavbarComponent {}
