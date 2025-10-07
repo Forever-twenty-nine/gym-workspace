@@ -1,5 +1,5 @@
 /* 
- * Entrenamientos Page Styles
+ * Rutinas Page Styles
  * Los estilos comunes ahora están centralizados en global.css
  * Aquí solo van estilos específicos de esta página
  */
@@ -8,18 +8,210 @@
   padding: 16px;
 }
 
-.entrenamiento-card {
+/* Estilos para cards simplificadas */
+.rutina-card {
   margin-bottom: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.button-container {
+.rutina-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rutina-card ion-card-header {
+  padding-bottom: 8px;
+}
+
+.card-header-content {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
-.button-container ion-button {
+.rutina-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Removido font-size y font-weight para usar los valores por defecto de Ionic */
   flex: 1;
+}
+
+.completado-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Grid de información resumida */
+.info-resumida {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Removido font-size para usar el valor por defecto */
+}
+
+.info-item ion-icon {
+  color: var(--ion-color-primary);
+}
+
+/* Acción rápida */
+.accion-rapida {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.accion-rapida ion-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  /* Removido font-size para usar el valor por defecto */
+}
+
+/* Estilos del modal */
+.modal-content {
+  padding-bottom: 20px;
+}
+
+.modal-section {
+  margin-bottom: 24px;
+}
+
+.modal-section h3 {
+  margin-bottom: 12px;
+  /* Removido font-size, font-weight y color para usar valores por defecto */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-section h3 ion-icon {
+  color: var(--ion-color-primary);
+}
+
+.modal-section p {
+  line-height: 1.6;
+  margin: 0;
+  /* Removido color para usar valor por defecto */
+}
+
+.modal-section ion-list {
+  background: transparent;
+}
+
+.modal-section ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+}
+
+.modal-section ion-item ion-icon {
+  margin-right: 12px;
+  color: var(--ion-color-primary);
+}
+
+.modal-section ion-item h4 {
+  margin: 0 0 4px 0;
+  /* Removido font-size, font-weight y color para usar valores por defecto */
+}
+
+/* Chips containers */
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chips-container ion-chip {
+  margin: 0;
+}
+
+/* Notas */
+.notas-text {
+  background: var(--ion-color-light);
+  padding: 12px;
+  border-radius: 8px;
+  font-style: italic;
+  /* Removido color para usar valor por defecto */
+}
+
+/* Lista de ejercicios */
+.ejercicio-item {
+  margin-bottom: 8px;
+}
+
+.ejercicio-numero {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ejercicio-item ion-label h4 {
+  margin: 0 0 4px 0;
+  /* Removido font-size, font-weight y color para usar valores por defecto */
+}
+
+.ejercicio-descripcion {
+  margin: 4px 0 8px 0;
+  line-height: 1.4;
+  /* Removido font-size y color para usar valores por defecto */
+}
+
+.ejercicio-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+  /* Removido font-size y color para usar valores por defecto */
+}
+
+.ejercicio-detalles span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.ejercicio-detalles .separador {
+  opacity: 0.5;
+}
+
+/* Botones de acción del modal */
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-actions ion-button {
+  margin: 0;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 576px) {
+  .info-resumida {
+    justify-content: space-between;
+  }
+  
+  .info-item {
+    flex: 1 1 45%;
+  }
 }

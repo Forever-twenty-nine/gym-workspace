@@ -14,8 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
-import { UserService, AuthService } from 'gym-library';
-import { User } from '../../core/models/user.model';
+import { UserService, AuthService, User } from 'gym-library';
 
 @Component({
   selector: 'app-tab3',

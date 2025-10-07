@@ -12,7 +12,7 @@ export const routes: Routes = [
           import('../dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
-        path: 'entrenamientos',
+        path: 'rutinas',
         loadComponent: () =>
           import('../entrenamientos/entrenamientos.page').then((m) => m.EntrenamientosPage),
       },

@@ -27,7 +27,8 @@ export class AuthService {
    */
   setAuthAdapter(adapter: IAuthAdapter): void {
     this.authAdapter = adapter;
-    this.checkCurrentUser();
+    // No llamar checkCurrentUser automáticamente para evitar problemas con contextos de inyección
+    // Debe ser llamado explícitamente con refreshAuth() cuando sea necesario
   }
 
   /**
