@@ -23,7 +23,8 @@ import {
 import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
-import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
+import { ToastComponent } from '../../components/shared/toast/toast.component';
+import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
 
@@ -52,6 +53,8 @@ export class EntrenadosPage {
   private readonly invitacionService = inject(InvitacionService);
   private readonly conversacionService = inject(ConversacionService);
   private readonly fb = inject(FormBuilder);
+  readonly toastService = inject(ToastService);
+  private readonly displayHelper = inject(DisplayHelperService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -217,7 +220,6 @@ export class EntrenadosPage {
   };
 
   // Signals para el estado del componente
-  readonly toasts = signal<Toast[]>([]);
   readonly isModalOpen = signal(false);
   readonly modalData = signal<any>(null);
   readonly editForm = signal<FormGroup | null>(null);
@@ -348,61 +350,6 @@ export class EntrenadosPage {
     });
   });
 
-  private showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 4000) {
-    const id = Date.now().toString();
-    const toast: Toast = {
-      id,
-      message,
-      type,
-      duration,
-      isVisible: false
-    };
-
-    this.toasts.update(toasts => [...toasts, toast]);
-
-    setTimeout(() => {
-      this.toasts.update(toasts => 
-        toasts.map(t => t.id === id ? { ...t, isVisible: true } : t)
-      );
-    }, 10);
-
-    setTimeout(() => {
-      this.removeToast(id);
-    }, duration);
-  }
-
-  private showSuccess(message: string, duration?: number) {
-    this.showToast(message, 'success', duration);
-  }
-
-  private showError(message: string, duration?: number) {
-    this.showToast(message, 'error', duration);
-  }
-
-  private log(msg: string) {
-    const cleanMsg = msg.replace(/✅|❌|⚠️/g, '').trim();
-    
-    if (msg.includes('Error') || msg.includes('ERROR') || msg.includes('❌')) {
-      this.showError(cleanMsg);
-    } else if (msg.includes('⚠️') || msg.includes('Warning')) {
-      this.showToast(cleanMsg, 'warning');
-    } else if (msg.includes('✅') || msg.includes('creado') || msg.includes('actualizado') || msg.includes('eliminado')) {
-      this.showSuccess(cleanMsg);
-    } else {
-      this.showToast(cleanMsg, 'info');
-    }
-  }
-
-  removeToast(id: string) {
-    this.toasts.update(toasts => 
-      toasts.map(t => t.id === id ? { ...t, isVisible: false } : t)
-    );
-
-    setTimeout(() => {
-      this.toasts.update(toasts => toasts.filter(t => t.id !== id));
-    }, 300);
-  }
-
   // Funciones helper para display
   private getTipoNotificacionDisplay(tipo: any): string {
     const tipoMap: Record<string, string> = {
@@ -437,7 +384,7 @@ export class EntrenadosPage {
 
   async deleteEntrenado(id: string) {
     await this.entrenadoService.delete(id);
-    this.log(`Entrenado eliminado: ${id}`);
+    this.toastService.log(`Entrenado eliminado: ${id}`);
   }
 
   openDetailsModal(item: any) {
@@ -476,14 +423,14 @@ export class EntrenadosPage {
     const originalData = this.modalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -506,12 +453,12 @@ export class EntrenadosPage {
       const gimnasioNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
       const entrenadorClienteNombre = this.usuarios().find(u => u.uid === updatedData.entrenadorId)?.nombre || 'Entrenador desconocido';
       
-      this.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
+      this.toastService.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
       
       this.closeModal();
     } catch (error) {
       console.error('Error al guardar:', error);
-      this.log(`Error al guardar los cambios: ${error}`);
+      this.toastService.log(`Error al guardar los cambios: ${error}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -629,7 +576,7 @@ export class EntrenadosPage {
 
   async deleteEjercicio(id: string) {
     await this.ejercicioService.delete(id);
-    this.log(`Ejercicio eliminado: ${id}`);
+    this.toastService.log(`Ejercicio eliminado: ${id}`);
   }
 
   openEjercicioModal(item: any) {
@@ -691,14 +638,14 @@ export class EntrenadosPage {
     const originalData = this.ejercicioModalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -716,12 +663,12 @@ export class EntrenadosPage {
         logMessage += ` - Creador: ${creador?.nombre || creador?.email || updatedData.creadorId}`;
       }
       
-      this.log(logMessage);
+      this.toastService.log(logMessage);
       
       this.closeEjercicioModal();
     } catch (error: any) {
       console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar ejercicio: ${error.message}`);
+      this.toastService.log(`ERROR al guardar ejercicio: ${error.message}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -819,7 +766,7 @@ export class EntrenadosPage {
 
   async deleteRutina(id: string) {
     await this.rutinaService.delete(id);
-    this.log(`Rutina eliminada: ${id}`);
+    this.toastService.log(`Rutina eliminada: ${id}`);
   }
 
   openRutinaModal(item: any) {
@@ -873,14 +820,14 @@ export class EntrenadosPage {
     const originalData = this.rutinaModalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -903,12 +850,12 @@ export class EntrenadosPage {
         logMessage += ` - Asignado a: ${asignado?.nombre || asignado?.email || updatedData.asignadoId}`;
       }
       
-      this.log(logMessage);
+      this.toastService.log(logMessage);
       
       this.closeRutinaModal();
     } catch (error: any) {
       console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar rutina: ${error.message}`);
+      this.toastService.log(`ERROR al guardar rutina: ${error.message}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -1031,14 +978,14 @@ export class EntrenadosPage {
     const originalData = this.notificacionModalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -1053,11 +1000,11 @@ export class EntrenadosPage {
       };
       
       await this.notificacionService.save(updatedData);
-      this.log(`Notificación ${this.isNotificacionCreating() ? 'creada' : 'actualizada'}: ${updatedData.titulo}`);
+      this.toastService.log(`Notificación ${this.isNotificacionCreating() ? 'creada' : 'actualizada'}: ${updatedData.titulo}`);
       this.closeNotificacionModal();
     } catch (error: any) {
       console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar notificación: ${error.message}`);
+      this.toastService.log(`ERROR al guardar notificación: ${error.message}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -1113,9 +1060,9 @@ export class EntrenadosPage {
   async deleteNotificacion(id: string) {
     try {
       await this.notificacionService.delete(id);
-      this.log('Notificación eliminada: ' + id);
+      this.toastService.log('Notificación eliminada: ' + id);
     } catch (error) {
-      this.log('Error al eliminar notificación');
+      this.toastService.log('Error al eliminar notificación');
     }
   }
 
@@ -1199,14 +1146,14 @@ export class EntrenadosPage {
     const originalData = this.mensajeModalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -1229,11 +1176,11 @@ export class EntrenadosPage {
       };
       
       await this.mensajeService.save(updatedData);
-      this.log(`Mensaje ${this.isMensajeCreating() ? 'creado' : 'actualizado'}`);
+      this.toastService.log(`Mensaje ${this.isMensajeCreating() ? 'creado' : 'actualizado'}`);
       this.closeMensajeModal();
     } catch (error: any) {
       console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar mensaje: ${error.message}`);
+      this.toastService.log(`ERROR al guardar mensaje: ${error.message}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -1290,9 +1237,9 @@ export class EntrenadosPage {
   async deleteMensaje(id: string) {
     try {
       await this.mensajeService.delete(id);
-      this.log('Mensaje eliminado: ' + id);
+      this.toastService.log('Mensaje eliminado: ' + id);
     } catch (error) {
-      this.log('Error al eliminar mensaje');
+      this.toastService.log('Error al eliminar mensaje');
     }
   }
 
@@ -1349,14 +1296,14 @@ export class EntrenadosPage {
     const originalData = this.invitacionModalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -1371,11 +1318,11 @@ export class EntrenadosPage {
       };
       
       await this.invitacionService.save(updatedData);
-      this.log(`Invitación ${this.isInvitacionCreating() ? 'creada' : 'actualizada'}`);
+      this.toastService.log(`Invitación ${this.isInvitacionCreating() ? 'creada' : 'actualizada'}`);
       this.closeInvitacionModal();
     } catch (error: any) {
       console.error('Error al guardar:', error);
-      this.log(`ERROR al guardar invitación: ${error.message}`);
+      this.toastService.log(`ERROR al guardar invitación: ${error.message}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -1427,27 +1374,27 @@ export class EntrenadosPage {
   async deleteInvitacion(id: string) {
     try {
       await this.invitacionService.delete(id);
-      this.log('Invitación eliminada: ' + id);
+      this.toastService.log('Invitación eliminada: ' + id);
     } catch (error) {
-      this.log('Error al eliminar invitación');
+      this.toastService.log('Error al eliminar invitación');
     }
   }
 
   async aceptarInvitacion(id: string) {
     try {
       await this.invitacionService.aceptar(id);
-      this.log('Invitación aceptada: ' + id);
+      this.toastService.log('Invitación aceptada: ' + id);
     } catch (error) {
-      this.log('Error al aceptar invitación');
+      this.toastService.log('Error al aceptar invitación');
     }
   }
 
   async rechazarInvitacion(id: string) {
     try {
       await this.invitacionService.rechazar(id);
-      this.log('Invitación rechazada: ' + id);
+      this.toastService.log('Invitación rechazada: ' + id);
     } catch (error) {
-      this.log('Error al rechazar invitación');
+      this.toastService.log('Error al rechazar invitación');
     }
   }
 
@@ -1457,16 +1404,16 @@ export class EntrenadosPage {
   
   openConversacionModal(item: any) {
     // Mostrar detalles de la conversación
-    this.log(`Ver conversación: ${item.titulo || 'Conversación'}`);
+    this.toastService.log(`Ver conversación: ${item.titulo || 'Conversación'}`);
     // Aquí podrías abrir un modal con el historial de mensajes
   }
 
   async deleteConversacion(id: string) {
     try {
       await this.conversacionService.delete(id);
-      this.log('Conversación eliminada correctamente');
+      this.toastService.log('Conversación eliminada correctamente');
     } catch (error) {
-      this.log('ERROR al eliminar conversación');
+      this.toastService.log('ERROR al eliminar conversación');
       console.error('Error al eliminar conversación:', error);
     }
   }

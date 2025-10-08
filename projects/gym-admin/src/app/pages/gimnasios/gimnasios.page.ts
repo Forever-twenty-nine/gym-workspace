@@ -5,7 +5,8 @@ import { GimnasioService, UserService, EntrenadorService, EntrenadoService, Gimn
 import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
-import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
+import { ToastComponent } from '../../components/shared/toast/toast.component';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-gimnasios-page',
@@ -26,6 +27,7 @@ export class GimnasiosPage {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly fb = inject(FormBuilder);
+  readonly toastService = inject(ToastService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -58,71 +60,15 @@ export class GimnasiosPage {
   };
 
   // Signals para el estado del componente
-  readonly toasts = signal<Toast[]>([]);
   readonly isModalOpen = signal(false);
   readonly modalData = signal<any>(null);
   readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
 
-  private showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 4000) {
-    const id = Date.now().toString();
-    const toast: Toast = {
-      id,
-      message,
-      type,
-      duration,
-      isVisible: false
-    };
-
-    this.toasts.update(toasts => [...toasts, toast]);
-
-    setTimeout(() => {
-      this.toasts.update(toasts => 
-        toasts.map(t => t.id === id ? { ...t, isVisible: true } : t)
-      );
-    }, 10);
-
-    setTimeout(() => {
-      this.removeToast(id);
-    }, duration);
-  }
-
-  private showSuccess(message: string, duration?: number) {
-    this.showToast(message, 'success', duration);
-  }
-
-  private showError(message: string, duration?: number) {
-    this.showToast(message, 'error', duration);
-  }
-
-  private log(msg: string) {
-    const cleanMsg = msg.replace(/✅|❌|⚠️/g, '').trim();
-    
-    if (msg.includes('Error') || msg.includes('ERROR') || msg.includes('❌')) {
-      this.showError(cleanMsg);
-    } else if (msg.includes('⚠️') || msg.includes('Warning')) {
-      this.showToast(cleanMsg, 'warning');
-    } else if (msg.includes('✅') || msg.includes('creado') || msg.includes('actualizado') || msg.includes('eliminado')) {
-      this.showSuccess(cleanMsg);
-    } else {
-      this.showToast(cleanMsg, 'info');
-    }
-  }
-
-  removeToast(id: string) {
-    this.toasts.update(toasts => 
-      toasts.map(t => t.id === id ? { ...t, isVisible: false } : t)
-    );
-
-    setTimeout(() => {
-      this.toasts.update(toasts => toasts.filter(t => t.id !== id));
-    }, 300);
-  }
-
   async deleteGimnasio(id: string) {
     await this.gimnasioService.delete(id);
-    this.log(`Gimnasio eliminado: ${id}`);
+    this.toastService.log(`Gimnasio eliminado: ${id}`);
   }
 
   openDetailsModal(item: any) {
@@ -161,14 +107,14 @@ export class GimnasiosPage {
     const originalData = this.modalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -234,7 +180,7 @@ export class GimnasiosPage {
           }
         } catch (error) {
           console.error(`Error al asociar entrenador ${entrenadorId}:`, error);
-          this.log(`⚠️ Error al asociar entrenador ${entrenadorId}: ${error}`);
+          this.toastService.log(`⚠️ Error al asociar entrenador ${entrenadorId}: ${error}`);
         }
       }
       
@@ -262,16 +208,16 @@ export class GimnasiosPage {
           }
         } catch (error) {
           console.error(`Error al asociar entrenado ${clienteId}:`, error);
-          this.log(`⚠️ Error al asociar entrenado ${clienteId}: ${error}`);
+          this.toastService.log(`⚠️ Error al asociar entrenado ${clienteId}: ${error}`);
         }
       }
       
-      this.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre} - Entrenadores: ${entrenadoresSeleccionados.length}, Entrenados: ${clientesSeleccionados.length}`);
+      this.toastService.log(`Gimnasio ${this.isCreating() ? 'creado' : 'actualizado'}: ${updatedData.nombre} - Entrenadores: ${entrenadoresSeleccionados.length}, Entrenados: ${clientesSeleccionados.length}`);
       
       this.closeModal();
     } catch (error) {
       console.error('Error al guardar:', error);
-      this.log(`Error al guardar los cambios: ${error}`);
+      this.toastService.log(`Error al guardar los cambios: ${error}`);
     } finally {
       this.isLoading.set(false);
     }

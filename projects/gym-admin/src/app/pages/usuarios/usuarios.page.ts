@@ -5,9 +5,10 @@ import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Mens
 import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
-import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
+import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
 import { DisplayHelperService } from '../../services/display-helper.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-usuarios-page',
@@ -31,6 +32,7 @@ export class UsuariosPage {
   private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
   private readonly fb = inject(FormBuilder);
   private readonly displayHelper = inject(DisplayHelperService);
+  readonly toastService = inject(ToastService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -87,67 +89,11 @@ export class UsuariosPage {
   };
 
   // Signals para el estado del componente
-  readonly toasts = signal<Toast[]>([]);
   readonly isModalOpen = signal(false);
   readonly modalData = signal<any>(null);
   readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
-
-  private showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration: number = 4000) {
-    const id = Date.now().toString();
-    const toast: Toast = {
-      id,
-      message,
-      type,
-      duration,
-      isVisible: false
-    };
-
-    this.toasts.update(toasts => [...toasts, toast]);
-
-    setTimeout(() => {
-      this.toasts.update(toasts => 
-        toasts.map(t => t.id === id ? { ...t, isVisible: true } : t)
-      );
-    }, 10);
-
-    setTimeout(() => {
-      this.removeToast(id);
-    }, duration);
-  }
-
-  private showSuccess(message: string, duration?: number) {
-    this.showToast(message, 'success', duration);
-  }
-
-  private showError(message: string, duration?: number) {
-    this.showToast(message, 'error', duration);
-  }
-
-  private log(msg: string) {
-    const cleanMsg = msg.replace(/✅|❌|⚠️/g, '').trim();
-    
-    if (msg.includes('Error') || msg.includes('ERROR') || msg.includes('❌')) {
-      this.showError(cleanMsg);
-    } else if (msg.includes('⚠️') || msg.includes('Warning')) {
-      this.showToast(cleanMsg, 'warning');
-    } else if (msg.includes('✅') || msg.includes('creado') || msg.includes('actualizado') || msg.includes('eliminado')) {
-      this.showSuccess(cleanMsg);
-    } else {
-      this.showToast(cleanMsg, 'info');
-    }
-  }
-
-  removeToast(id: string) {
-    this.toasts.update(toasts => 
-      toasts.map(t => t.id === id ? { ...t, isVisible: false } : t)
-    );
-
-    setTimeout(() => {
-      this.toasts.update(toasts => toasts.filter(t => t.id !== id));
-    }, 300);
-  }
 
   addSampleUsuario() {
     this.openCreateModal();
@@ -155,7 +101,7 @@ export class UsuariosPage {
 
   async deleteUsuario(id: string) {
     await this.userService.deleteUser(id);
-    this.log(`Usuario eliminado: ${id}`);
+    this.toastService.log(`Usuario eliminado: ${id}`);
   }
 
   openDetailsModal(item: any) {
@@ -217,14 +163,14 @@ export class UsuariosPage {
     const originalData = this.modalData();
 
     if (!form || !originalData) {
-      this.log('Error: Formulario inválido o datos faltantes');
+      this.toastService.log('Error: Formulario inválido o datos faltantes');
       return;
     }
 
     form.markAllAsTouched();
 
     if (!form.valid) {
-      this.log('Error: Por favor, completa todos los campos obligatorios');
+      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
       return;
     }
 
@@ -242,7 +188,7 @@ export class UsuariosPage {
         };
         
         await (this.userService as any).addUser(userDataForCreation, password);
-        this.log(`✅ Usuario creado con Firebase Auth: ${updatedData.email}`);
+        this.toastService.log(`✅ Usuario creado con Firebase Auth: ${updatedData.email}`);
       } else {
         delete updatedData.password;
         
@@ -254,13 +200,13 @@ export class UsuariosPage {
         }
         
         await this.userService.updateUser(updatedData.uid, updatedData);
-        this.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
+        this.toastService.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
       }
 
       this.closeModal();
     } catch (error) {
       console.error('Error al guardar:', error);
-      this.log(`Error al guardar los cambios: ${error}`);
+      this.toastService.log(`Error al guardar los cambios: ${error}`);
     } finally {
       this.isLoading.set(false);
     }
@@ -286,7 +232,7 @@ export class UsuariosPage {
           await this.entrenadoService.save(clienteData);
           userData.clienteId = uid;
           
-          this.log(`✅ Documento Cliente creado para usuario: ${userData.nombre || userData.email}`);
+          this.toastService.log(`✅ Documento Cliente creado para usuario: ${userData.nombre || userData.email}`);
           break;
 
         case Rol.GIMNASIO:
@@ -300,7 +246,7 @@ export class UsuariosPage {
           await this.gimnasioService.save(gimnasioData);
           userData.gimnasioId = uid;
           
-          this.log(`✅ Documento Gimnasio creado para usuario: ${userData.nombre || userData.email}`);
+          this.toastService.log(`✅ Documento Gimnasio creado para usuario: ${userData.nombre || userData.email}`);
           break;
 
         case Rol.ENTRENADOR:
@@ -316,7 +262,7 @@ export class UsuariosPage {
           if (entrenadorServiceAdapter && entrenadorServiceAdapter.createWithId) {
             await entrenadorServiceAdapter.createWithId(uid, entrenadorData);
           } else {
-            this.log(`⚠️ Usando método create normal para entrenador`);
+            this.toastService.log(`⚠️ Usando método create normal para entrenador`);
             const tempId = await this.entrenadorService.create(entrenadorData);
             await this.entrenadorService.delete(tempId);
             
@@ -329,16 +275,16 @@ export class UsuariosPage {
           
           userData.entrenadorId = uid;
           
-          this.log(`✅ Documento Entrenador creado para usuario: ${userData.nombre || userData.email}`);
+          this.toastService.log(`✅ Documento Entrenador creado para usuario: ${userData.nombre || userData.email}`);
           break;
 
         default:
-          this.log(`⚠️ Rol ${newRole} no requiere documento específico`);
+          this.toastService.log(`⚠️ Rol ${newRole} no requiere documento específico`);
           break;
       }
     } catch (error) {
       console.error('Error creando documento específico:', error);
-      this.log(`❌ Error creando documento para rol ${newRole}: ${error}`);
+      this.toastService.log(`❌ Error creando documento para rol ${newRole}: ${error}`);
       throw error;
     }
   }
@@ -430,16 +376,16 @@ export class UsuariosPage {
   
   openMensajeModal(item: any) {
     // Abrir modal en modo solo lectura
-    this.log(`Ver mensaje: ${item.titulo || 'Mensaje'}`);
+    this.toastService.log(`Ver mensaje: ${item.titulo || 'Mensaje'}`);
     // Aquí podrías implementar un modal de visualización si lo necesitas
   }
 
   async deleteMensaje(id: string) {
     try {
       await this.mensajeService.delete(id);
-      this.log('Mensaje eliminado correctamente');
+      this.toastService.log('Mensaje eliminado correctamente');
     } catch (error) {
-      this.log('ERROR al eliminar mensaje');
+      this.toastService.log('ERROR al eliminar mensaje');
       console.error('Error al eliminar mensaje:', error);
     }
   }

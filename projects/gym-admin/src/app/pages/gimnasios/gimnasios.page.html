@@ -15,8 +15,8 @@
 
   <!-- Toasts -->
   <app-toast 
-    [toasts]="toasts()" 
-    (closeToast)="removeToast($event)">
+    [toasts]="toastService.toasts()" 
+    (closeToast)="toastService.remove($event)">
   </app-toast>
 
   <!-- Modal de edición -->
