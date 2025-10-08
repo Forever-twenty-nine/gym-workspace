@@ -20,7 +20,8 @@ import {
   Rol, 
   Objetivo 
 } from 'gym-library';
-import { GenericCardComponent, CardConfig } from '../../components/shared/generic-card/generic-card.component';
+import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
+import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';

@@ -2,7 +2,8 @@ import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@a
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, EntrenadoService, EntrenadorService, GimnasioService, MensajeService, Rol } from 'gym-library';
-import { GenericCardComponent, CardConfig } from '../../components/shared/generic-card/generic-card.component';
+import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
+import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent, Toast } from '../../components/shared/toast/toast.component';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
