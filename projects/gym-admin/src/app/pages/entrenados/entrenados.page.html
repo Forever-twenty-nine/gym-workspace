@@ -32,16 +32,6 @@
       (delete)="deleteRutina($event)">
     </app-generic-card>
 
-    <!-- Card de Notificaciones -->
-    <app-generic-card
-      [config]="notificacionesCardConfig"
-      [items]="notificaciones()"
-      [idField]="'id'"
-      (create)="addNotificacion()"
-      (edit)="openNotificacionModal($event)"
-      (delete)="deleteNotificacion($event)">
-    </app-generic-card>
-
     <!-- Card de Mensajes -->
     <app-generic-card
       [config]="mensajesCardConfig"
@@ -60,16 +50,6 @@
       [canCreate]="false"
       (edit)="openConversacionModal($event)"
       (delete)="deleteConversacion($event)">
-    </app-generic-card>
-
-    <!-- Card de Invitaciones -->
-    <app-generic-card
-      [config]="invitacionesCardConfig"
-      [items]="invitaciones()"
-      [idField]="'id'"
-      (create)="addInvitacion()"
-      (edit)="openInvitacionModal($event)"
-      (delete)="deleteInvitacion($event)">
     </app-generic-card>
   </section>
 
@@ -95,6 +75,8 @@
     (close)="closeModal()"
     (save)="saveChanges()"
     (customAction)="addMensaje()"
+    (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
+    (verMensaje)="abrirMensaje($event)"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
@@ -131,22 +113,6 @@
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
 
-  <!-- Modal de notificaciones -->
-  <app-modal-form
-    [isOpen]="isNotificacionModalOpen()"
-    [modalType]="'notificacion'"
-    [isCreating]="isNotificacionCreating()"
-    [form]="notificacionEditForm()"
-    [formFields]="getNotificacionFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeNotificacionModal()"
-    (save)="saveNotificacionChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
-  </app-modal-form>
-
   <!-- Modal de mensajes -->
   <app-modal-form
     [isOpen]="isMensajeModalOpen()"
@@ -159,22 +125,6 @@
     [isLoading]="isLoading()"
     (close)="closeMensajeModal()"
     (save)="saveMensajeChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
-  </app-modal-form>
-
-  <!-- Modal de invitaciones -->
-  <app-modal-form
-    [isOpen]="isInvitacionModalOpen()"
-    [modalType]="'invitacion'"
-    [isCreating]="isInvitacionCreating()"
-    [form]="invitacionEditForm()"
-    [formFields]="getInvitacionFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeInvitacionModal()"
-    (save)="saveInvitacionChanges()"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>

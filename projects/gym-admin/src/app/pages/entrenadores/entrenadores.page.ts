@@ -13,6 +13,7 @@ import {
   InvitacionService,
   ConversacionService,
   Notificacion,
+  TipoNotificacion,
   Mensaje,
   Invitacion,
   Conversacion,
@@ -55,20 +56,12 @@ export class EntrenadoresPage {
   private readonly displayHelper = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
 
-  // Modal managers para notificaciones, mensajes e invitaciones
-  readonly notificacionManager: GenericModalManager<Notificacion>;
+  // Modal managers para mensajes e invitaciones
   readonly mensajeManager: GenericModalManager<Mensaje>;
   readonly invitacionManager: GenericModalManager<Invitacion>;
 
   constructor() {
     // Inicializar modal managers
-    this.notificacionManager = new GenericModalManager<Notificacion>(
-      this.fb,
-      (item) => this.createNotificacionEditForm(item),
-      (data) => this.notificacionService.save(data),
-      (id) => this.notificacionService.delete(id)
-    );
-
     this.mensajeManager = new GenericModalManager<Mensaje>(
       this.fb,
       (item) => this.createMensajeEditForm(item),
@@ -209,17 +202,6 @@ export class EntrenadoresPage {
     showChips: ['creadorName', 'asignadoName']
   };
 
-  readonly notificacionesCardConfig: CardConfig = {
-    title: 'Notificaciones',
-    createButtonText: 'Nueva Notificación',
-    createButtonColor: 'blue',
-    emptyStateTitle: 'No hay notificaciones',
-    displayField: 'titulo',
-    showCounter: true,
-    counterColor: 'blue',
-    showChips: ['tipo', 'leida']
-  };
-
   readonly mensajesCardConfig: CardConfig = {
     title: 'Mensajes de Entrenadores',
     createButtonText: 'N/A',
@@ -228,7 +210,8 @@ export class EntrenadoresPage {
     displayField: 'titulo',
     showCounter: true,
     counterColor: 'purple',
-    showChips: ['remitenteChip', 'destinatarioChip']
+    showChips: ['remitenteChip', 'destinatarioChip'],
+    showArrowBetweenChips: true
   };
 
   readonly conversacionesCardConfig: CardConfig = {
@@ -272,23 +255,6 @@ export class EntrenadoresPage {
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
 
-  // Signals para notificaciones (desde el servicio)
-  readonly notificaciones = computed(() => {
-    return this.notificacionService.notificaciones().map(notif => {
-      const tipoDisplay = this.displayHelper.getTipoNotificacionDisplay(notif.tipo);
-      const leidaDisplay = notif.leida 
-        ? '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Leída' 
-        : '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg> No leída';
-      
-      return {
-        ...notif,
-        titulo: notif.titulo,
-        tipo: tipoDisplay,
-        leida: leidaDisplay
-      };
-    });
-  });
-
   // Signals para mensajes (desde el servicio)
   readonly mensajes = computed(() => {
     return this.mensajeService.mensajes().map(mensaje => {
@@ -298,13 +264,14 @@ export class EntrenadoresPage {
       const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
       const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
       
-      const titulo = this.displayHelper.getTituloMensaje(mensaje.tipo);
+      // Mostrar solo el tipo de mensaje
+      const titulo = mensaje.tipo || 'texto';
       
       return {
         ...mensaje,
         titulo,
-        remitenteChip: `De: ${remitenteNombre}`,
-        destinatarioChip: `Para: ${destinatarioNombre}`
+        remitenteChip: remitenteNombre,
+        destinatarioChip: destinatarioNombre
       };
     });
   });
@@ -350,19 +317,6 @@ export class EntrenadoresPage {
       };
     });
   });
-
-  // Funciones helper para display
-  private getTipoNotificacionDisplay(tipo: any): string {
-    const tipoMap: Record<string, string> = {
-      'rutina_asignada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg> Rutina',
-      'mensaje_nuevo': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/><path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/></svg> Mensaje',
-      'invitacion': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg> Invitación',
-      'ejercicio_completado': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Ejercicio',
-      'sesion_programada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg> Sesión',
-      'info': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg> Info'
-    };
-    return tipoMap[tipo] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg> Info';
-  }
 
   private getEstadoInvitacionDisplay(estado: string): string {
     const estadoMap: Record<string, string> = {
@@ -517,6 +471,9 @@ export class EntrenadoresPage {
     const ejerciciosEntrenador = this.getEjerciciosByEntrenador(entrenadorData?.id || '');
     const gimnasioInfo = entrenadorData?.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
     
+    // Obtener notificaciones relacionadas con mensajes del entrenador
+    const notificacionesEntrenador = this.getNotificacionesMensajesEntrenador(entrenadorData?.id || '');
+    
     return [
       {
         name: 'nombre',
@@ -556,6 +513,13 @@ export class EntrenadoresPage {
         label: 'Estado',
         checkboxLabel: 'Entrenador Activo',
         colSpan: 2
+      },
+      {
+        name: 'notificacionesMensajes',
+        type: 'notificaciones-mensajes',
+        label: 'Notificaciones de Mensajes',
+        colSpan: 2,
+        notificaciones: notificacionesEntrenador
       },
       {
         name: 'clientesAsignados',
@@ -956,116 +920,11 @@ export class EntrenadoresPage {
   }
 
 
-  addNotificacion() {
-    const newNotificacion = {
-      id: 'n' + Date.now(),
-      usuarioId: '',
-      tipo: 'rutina_asignada' as const,
-      titulo: '',
-      mensaje: '',
-      leida: false,
-      fechaCreacion: new Date()
-    } as Notificacion;
-    this.notificacionManager.openCreateModal(newNotificacion);
-  }
-
-  openNotificacionModal(item: any) {
-    this.notificacionManager.openEditModal(item as Notificacion);
-  }
-
-  private createNotificacionEditForm(item: Notificacion): any {
-    return {
-      usuarioId: [item.usuarioId || '', Validators.required],
-      tipo: [item.tipo || 'rutina_asignada', Validators.required],
-      titulo: [item.titulo || '', Validators.required],
-      mensaje: [item.mensaje || '', Validators.required]
-    };
-  }
-
-  async saveNotificacion() {
-    this.isLoading.set(true);
-    const result = await this.notificacionManager.save({
-      leida: false,
-      fechaCreacion: new Date()
-    });
-    this.isLoading.set(false);
-    
-    if (result.success) {
-      this.toastService.log(`Notificación ${this.notificacionManager.isCreating() ? 'creada' : 'actualizada'}`);
-    } else {
-      this.toastService.log(`ERROR: ${result.error}`);
-    }
-  }
-
-  getNotificacionFormFields(): FormFieldConfig[] {
-    return [
-      {
-        name: 'usuarioId',
-        type: 'select',
-        label: 'Usuario Destinatario',
-        placeholder: 'Seleccionar usuario',
-        options: this.usuarios().map(user => ({
-          value: user.uid,
-          label: `${user.nombre || user.email || user.uid} (${user.role})`
-        })),
-        colSpan: 2
-      },
-      {
-        name: 'tipo',
-        type: 'select',
-        label: 'Tipo de Notificación',
-        placeholder: 'Seleccionar tipo',
-        options: [
-          { value: 'rutina_asignada', label: 'Rutina Asignada' },
-          { value: 'recordatorio', label: 'Recordatorio' },
-          { value: 'logro', label: 'Logro' },
-          { value: 'mensaje_nuevo', label: 'Mensaje Nuevo' },
-          { value: 'invitacion', label: 'Invitación' },
-          { value: 'rutina_completada', label: 'Rutina Completada' },
-          { value: 'nuevo_pr', label: 'Nuevo Récord Personal' }
-        ],
-        colSpan: 2
-      },
-      {
-        name: 'titulo',
-        type: 'text',
-        label: 'Título',
-        placeholder: 'Título de la notificación',
-        colSpan: 2
-      },
-      {
-        name: 'mensaje',
-        type: 'textarea',
-        label: 'Mensaje',
-        placeholder: 'Contenido de la notificación...',
-        rows: 3,
-        colSpan: 2
-      }
-    ];
-  }
-
-  async deleteNotificacion(id: string) {
-    const result = await this.notificacionManager.delete(id);
-    if (result.success) {
-      this.toastService.log('Notificación eliminada');
-    } else {
-      this.toastService.log(`ERROR: ${result.error}`);
-    }
-  }
-
-
   addMensaje(remitenteId?: string) {
     // Si estamos editando un entrenador, usar su ID como remitente
     const entrenadorActual = this.modalData();
     const remitenteIdFinal = remitenteId || entrenadorActual?.id || '';
-    
-    console.log('🔍 Debug addMensaje:', {
-      remitenteIdParam: remitenteId,
-      entrenadorActual: entrenadorActual,
-      entrenadorId: entrenadorActual?.id,
-      remitenteIdFinal: remitenteIdFinal
-    });
-    
+      
     const newMensaje = {
       id: 'm' + Date.now(),
       conversacionId: 'conv-' + Date.now(),
@@ -1080,7 +939,6 @@ export class EntrenadoresPage {
       fechaEnvio: new Date()
     } as Mensaje;
     
-    console.log('📧 Nuevo mensaje creado:', newMensaje);
     this.mensajeManager.openCreateModal(newMensaje);
   }
 
@@ -1089,8 +947,6 @@ export class EntrenadoresPage {
   }
 
   private createMensajeEditForm(item: Mensaje): any {
-    console.log('📝 Creando configuración de formulario de mensaje con item:', item);
-    
     // Si el remitenteId ya está pre-rellenado (viene del botón del modal), deshabilitar el campo
     const remitenteDisabled = !!item.remitenteId;
     
@@ -1104,8 +960,6 @@ export class EntrenadoresPage {
       tipo: [item.tipo || 'texto', Validators.required]
     };
     
-    console.log('📝 Configuración de formulario:', formConfig);
-    console.log('🔒 Campo remitente deshabilitado:', remitenteDisabled);
     return formConfig;
   }
 
@@ -1116,8 +970,19 @@ export class EntrenadoresPage {
     if (form) {
       // Usar getRawValue() para obtener también los campos deshabilitados
       const formValues = form.getRawValue();
+      
+      // Validar que se haya seleccionado un destinatario
+      if (!formValues.destinatarioId) {
+        this.isLoading.set(false);
+        this.toastService.log('ERROR: Debe seleccionar un destinatario');
+        return;
+      }
+      
       const remitenteUser = this.usuarios().find(u => u.uid === formValues.remitenteId);
       const destinatarioUser = this.usuarios().find(u => u.uid === formValues.destinatarioId);
+      
+      const isCreating = this.mensajeManager.isCreating();
+      const mensajeActual = this.mensajeManager.modalData();
       
       const result = await this.mensajeManager.save({
         remitenteTipo: remitenteUser?.role || Rol.ENTRENADOR,
@@ -1130,7 +995,41 @@ export class EntrenadoresPage {
       this.isLoading.set(false);
       
       if (result.success) {
-        this.toastService.log(`Mensaje ${this.mensajeManager.isCreating() ? 'creado' : 'actualizado'}`);
+        // Si es un mensaje nuevo, crear notificación automáticamente
+        if (isCreating && mensajeActual?.id) {
+          try {
+            const remitenteNombre = remitenteUser?.nombre || remitenteUser?.email || 'Usuario';
+            
+            console.log('🔔 Creando notificación desde ENTRENADOR:', {
+              mensajeId: mensajeActual.id,
+              remitenteId: formValues.remitenteId,
+              destinatarioId: formValues.destinatarioId,
+              usuarioIdNotificacion: formValues.destinatarioId,
+              mensaje: `${remitenteNombre} te ha enviado un mensaje`
+            });
+            
+            const notificacion: Notificacion = {
+              id: 'notif-' + Date.now(),
+              usuarioId: formValues.destinatarioId, // La notificación es para el destinatario
+              tipo: TipoNotificacion.MENSAJE_NUEVO,
+              titulo: 'Nuevo mensaje',
+              mensaje: `${remitenteNombre} te ha enviado un mensaje`,
+              leida: false,
+              fechaCreacion: new Date(),
+              datos: {
+                mensajeId: mensajeActual.id,
+                remitenteId: formValues.remitenteId
+              }
+            };
+            
+            await this.notificacionService.save(notificacion);
+            console.log('✅ Notificación guardada:', notificacion);
+          } catch (error) {
+            console.error('Error al crear notificación:', error);
+          }
+        }
+        
+        this.toastService.log(`Mensaje ${isCreating ? 'creado' : 'actualizado'}`);
       } else {
         this.toastService.log(`ERROR: ${result.error}`);
       }
@@ -1189,11 +1088,29 @@ export class EntrenadoresPage {
   }
 
   async deleteMensaje(id: string) {
-    const result = await this.mensajeManager.delete(id);
-    if (result.success) {
-      this.toastService.log('Mensaje eliminado');
-    } else {
-      this.toastService.log(`ERROR: ${result.error}`);
+    try {
+      // Primero eliminar el mensaje
+      const result = await this.mensajeManager.delete(id);
+      
+      if (result.success) {
+        // Luego eliminar todas las notificaciones relacionadas con este mensaje
+        const todasNotificaciones = this.notificacionService.notificaciones();
+        const notificacionesRelacionadas = todasNotificaciones.filter(notif => 
+          notif.datos?.['mensajeId'] === id
+        );
+        
+        // Eliminar cada notificación relacionada
+        for (const notif of notificacionesRelacionadas) {
+          await this.notificacionService.delete(notif.id);
+        }
+        
+        this.toastService.log(`Mensaje eliminado (con ${notificacionesRelacionadas.length} notificación(es))`);
+      } else {
+        this.toastService.log(`ERROR: ${result.error}`);
+      }
+    } catch (error) {
+      this.toastService.log('Error al eliminar mensaje');
+      console.error('Error al eliminar mensaje:', error);
     }
   }
 
@@ -1325,6 +1242,81 @@ export class EntrenadoresPage {
     } catch (error) {
       this.toastService.log('ERROR al eliminar conversación');
       console.error('Error al eliminar conversación:', error);
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA NOTIFICACIONES DE MENSAJES
+  // ========================================
+  
+  getNotificacionesMensajesEntrenador(entrenadorId: string): any[] {
+    if (!entrenadorId) return [];
+    
+    // Obtener todas las notificaciones del sistema
+    const todasLasNotificaciones = this.notificacionService.notificaciones();
+    
+    // Obtener todos los mensajes donde el entrenador es destinatario o remitente
+    const mensajesDelEntrenador = this.mensajes().filter(m => 
+      m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
+    );
+    
+    // Filtrar notificaciones que:
+    // 1. Sean para este entrenador (usuarioId coincide)
+    // 2. Y estén relacionadas con mensajes
+    const notificacionesDelEntrenador = todasLasNotificaciones.filter((notif: Notificacion) => {
+      // La notificación debe ser para este entrenador
+      const esParaEsteEntrenador = notif.usuarioId === entrenadorId;
+      
+      // La notificación debe estar relacionada con mensajes
+      const tipoStr = String(notif.tipo).toLowerCase();
+      const tituloStr = String(notif.titulo).toLowerCase();
+      const esRelacionadaConMensajes = 
+        tipoStr.includes('mensaje') || 
+        tituloStr.includes('mensaje');
+      
+      return esParaEsteEntrenador && esRelacionadaConMensajes;
+    });
+    
+    // Enriquecer notificaciones con información del mensaje
+    return notificacionesDelEntrenador.map((notif: Notificacion) => {
+      // Buscar el mensaje más relevante para esta notificación
+      const mensajeInfo = mensajesDelEntrenador.find(m => 
+        m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
+      );
+      
+      if (mensajeInfo) {
+        const remitente = this.usuarios().find(u => u.uid === mensajeInfo.remitenteId);
+        return {
+          ...notif,
+          mensajeInfo: {
+            id: mensajeInfo.id,
+            remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario desconocido'
+          }
+        };
+      }
+      
+      return notif;
+    });
+  }
+
+  async marcarNotificacionComoLeida(notifId: string) {
+    try {
+      // Marcar la notificación como leída usando el método del servicio
+      await this.notificacionService.marcarComoLeida(notifId);
+      
+      this.toastService.log('✓ Notificación marcada como leída');
+    } catch (error) {
+      this.toastService.log('ERROR al marcar notificación como leída');
+      console.error('Error al marcar notificación como leída:', error);
+    }
+  }
+
+  abrirMensaje(mensajeId: string) {
+    const mensaje = this.mensajes().find(m => m.id === mensajeId);
+    if (mensaje) {
+      this.openMensajeModal(mensaje);
+    } else {
+      this.toastService.log('ERROR: Mensaje no encontrado');
     }
   }
 }

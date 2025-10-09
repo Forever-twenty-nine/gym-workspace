@@ -23,6 +23,7 @@ export interface FormFieldConfig {
   gimnasio?: any;
   clientes?: any[];
   ejercicios?: any[];
+  notificaciones?: any[];
 }
 
 @Component({
@@ -49,6 +50,8 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Output() toggleDiaSemana = new EventEmitter<{ event: Event; value: string }>();
   @Output() toggleEjercicio = new EventEmitter<string>();
   @Output() customAction = new EventEmitter<void>();
+  @Output() marcarNotificacionLeida = new EventEmitter<string>();
+  @Output() verMensaje = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -141,5 +144,17 @@ export class ModalFormComponent implements OnInit, OnDestroy {
     if (!this.form) return 0;
     const fieldValue = this.form.get(fieldName)?.value;
     return Array.isArray(fieldValue) ? fieldValue.length : 0;
+  }
+
+  onMarcarNotificacionLeida(notifId: string) {
+    this.marcarNotificacionLeida.emit(notifId);
+  }
+
+  onVerMensaje(mensajeId: string) {
+    this.verMensaje.emit(mensajeId);
+  }
+
+  contarNoLeidas(notificaciones: any[]): number {
+    return notificaciones.filter(n => !n.leida).length;
   }
 }

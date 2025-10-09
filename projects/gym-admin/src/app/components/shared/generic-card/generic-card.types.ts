@@ -10,6 +10,7 @@ export interface CardConfig {
   counterColor?: ColorVariant;
   showChips?: string[];
   chipLabels?: Record<string, string>;
+  showArrowBetweenChips?: boolean;  // Nueva propiedad para controlar la flecha
 }
 
 export interface CardItem {

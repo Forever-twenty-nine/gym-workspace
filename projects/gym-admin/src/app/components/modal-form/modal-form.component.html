@@ -661,6 +661,88 @@
                   </div>
                 }
               }
+
+              <!-- Notificaciones del entrenador relacionadas con mensajes -->
+              @case ('notificaciones-mensajes') {
+                <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
+                  <div class="bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-3 border-b border-gray-200">
+                    <h4 class="font-semibold text-gray-800 flex items-center">
+                      <span class="mr-2">🔔</span>
+                      Notificaciones de Mensajes
+                    </h4>
+                  </div>
+                  @if (field.notificaciones && field.notificaciones.length > 0) {
+                    <div class="max-h-80 overflow-y-auto divide-y divide-gray-100">
+                      @for (notif of field.notificaciones; track notif.id) {
+                        <div class="p-4 hover:bg-blue-50 transition-colors duration-150"
+                             [class.bg-blue-50]="!notif.leida"
+                             [class.opacity-60]="notif.leida">
+                          <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2 mb-2">
+                                <span class="text-lg">💬</span>
+                                <h5 class="font-semibold text-gray-800 truncate">{{ notif.titulo }}</h5>
+                                @if (!notif.leida) {
+                                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
+                                    Nuevo
+                                  </span>
+                                }
+                              </div>
+                              <p class="text-sm text-gray-600 mb-2">{{ notif.mensaje }}</p>
+                              <div class="flex items-center gap-3 text-xs text-gray-500">
+                                <span>📅 {{ notif.fechaCreacion | date:'short' }}</span>
+                                @if (notif.mensajeInfo) {
+                                  <span class="text-blue-600">
+                                    De: {{ notif.mensajeInfo.remitenteNombre }}
+                                  </span>
+                                }
+                              </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                              @if (!notif.leida) {
+                                <button type="button"
+                                        (click)="onMarcarNotificacionLeida(notif.id)"
+                                        class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-150"
+                                        title="Marcar como leída">
+                                  ✓ Leída
+                                </button>
+                              }
+                              @if (notif.mensajeInfo) {
+                                <button type="button"
+                                        (click)="onVerMensaje(notif.mensajeInfo.id)"
+                                        class="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors duration-150"
+                                        title="Ver mensaje">
+                                  👁️ Ver
+                                </button>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-6 text-center text-gray-500">
+                      <span class="text-4xl mb-2 block">✅</span>
+                      <p class="text-sm font-medium">Sin notificaciones pendientes</p>
+                      <p class="text-xs text-gray-400 mt-1">No hay mensajes nuevos para este entrenador</p>
+                    </div>
+                  }
+                  
+                  <!-- Resumen -->
+                  @if (field.notificaciones && field.notificaciones.length > 0) {
+                    <div class="bg-gray-50 px-4 py-3 border-t border-gray-200">
+                      <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-600">
+                          Total: <strong class="text-gray-800">{{ field.notificaciones.length }}</strong> notificaciones
+                        </span>
+                        <span class="text-blue-600">
+                          No leídas: <strong class="text-blue-800">{{ contarNoLeidas(field.notificaciones) }}</strong>
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             }
           </div>
           }

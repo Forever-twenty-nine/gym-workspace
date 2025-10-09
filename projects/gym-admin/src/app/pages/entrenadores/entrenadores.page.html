@@ -32,16 +32,6 @@
       (delete)="deleteRutina($event)">
     </app-generic-card>
 
-    <!-- Card de Notificaciones -->
-    <app-generic-card
-      [config]="notificacionesCardConfig"
-      [items]="notificaciones()"
-      [idField]="'id'"
-      (create)="addNotificacion()"
-      (edit)="openNotificacionModal($event)"
-      (delete)="deleteNotificacion($event)">
-    </app-generic-card>
-
     <!-- Card de Mensajes -->
     <app-generic-card
       [config]="mensajesCardConfig"
@@ -95,6 +85,8 @@
     (close)="closeModal()"
     (save)="saveChanges()"
     (customAction)="addMensaje()"
+    (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
+    (verMensaje)="abrirMensaje($event)"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
@@ -127,22 +119,6 @@
     [isLoading]="isLoading()"
     (close)="closeRutinaModal()"
     (save)="saveRutinaChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
-  </app-modal-form>
-
-  <!-- Modal de notificaciones -->
-  <app-modal-form
-    [isOpen]="notificacionManager.isModalOpen()"
-    [modalType]="'notificacion'"
-    [isCreating]="notificacionManager.isCreating()"
-    [form]="notificacionManager.editForm()"
-    [formFields]="getNotificacionFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="notificacionManager.closeModal()"
-    (save)="saveNotificacion()"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>

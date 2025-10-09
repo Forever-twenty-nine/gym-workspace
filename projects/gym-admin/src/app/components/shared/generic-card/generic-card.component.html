@@ -42,7 +42,7 @@
                 </div>
               }
               
-              @if (config().showChips && config().showChips!.length === 2) {
+              @if (config().showChips && config().showChips!.length === 2 && config().showArrowBetweenChips) {
                 <div class="flex items-center gap-2">
                   @if (getChipValue(item, config().showChips![0]); as value1) {
                     <span class="text-sm font-medium text-gray-700">{{ value1 }}</span>
