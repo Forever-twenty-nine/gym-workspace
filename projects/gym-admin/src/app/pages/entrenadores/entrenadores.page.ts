@@ -11,10 +11,13 @@ import {
   NotificacionService,
   MensajeService,
   InvitacionService,
+  ConversacionService,
   Notificacion,
   TipoNotificacion,
   Mensaje,
+  TipoMensaje,
   Invitacion,
+  Conversacion,
   Entrenador, 
   Rol 
 } from 'gym-library';
@@ -49,6 +52,7 @@ export class EntrenadoresPage {
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
   private readonly invitacionService = inject(InvitacionService);
+  private readonly conversacionService = inject(ConversacionService);
   private readonly fb = inject(FormBuilder);
   private readonly displayHelper = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
@@ -913,6 +917,29 @@ export class EntrenadoresPage {
     this.mensajeManager.openEditModal(item as Mensaje);
   }
 
+  responderMensaje(datos: { conversacionId: string; remitenteId: string; destinatarioId: string }) {
+    // Cerrar el modal actual
+    this.mensajeManager.closeModal();
+    
+    // Crear un nuevo mensaje de respuesta con los datos invertidos
+    const nuevoMensaje: Mensaje = {
+      id: 'msg-' + Date.now(),
+      conversacionId: datos.conversacionId, // Mantener el mismo conversacionId
+      remitenteId: datos.remitenteId,       // Ya viene invertido del modal
+      remitenteTipo: this.usuarios().find(u => u.uid === datos.remitenteId)?.role || Rol.ENTRENADOR,
+      destinatarioId: datos.destinatarioId, // Ya viene invertido del modal
+      destinatarioTipo: this.usuarios().find(u => u.uid === datos.destinatarioId)?.role || Rol.ENTRENADO,
+      contenido: '',
+      tipo: TipoMensaje.TEXTO,
+      leido: false,
+      entregado: false,
+      fechaEnvio: new Date()
+    };
+    
+    // Abrir el modal en modo creación con los datos pre-rellenados
+    this.mensajeManager.openCreateModal(nuevoMensaje);
+  }
+
   private createMensajeEditForm(item: Mensaje): any {
     // Si el remitenteId ya está pre-rellenado (viene del botón del modal), deshabilitar el campo
     const remitenteDisabled = !!item.remitenteId;
@@ -962,6 +989,18 @@ export class EntrenadoresPage {
       this.isLoading.set(false);
       
       if (result.success) {
+        // Actualizar o crear conversación
+        if (isCreating && mensajeActual?.id) {
+          await this.actualizarOCrearConversacion(
+            mensajeActual.conversacionId,
+            formValues.remitenteId,
+            formValues.destinatarioId,
+            remitenteUser?.role || Rol.ENTRENADOR,
+            destinatarioUser?.role || Rol.ENTRENADO,
+            mensajeActual.contenido
+          );
+        }
+        
         // Si es un mensaje nuevo, crear notificación automáticamente
         if (isCreating && mensajeActual?.id) {
           try {
@@ -998,7 +1037,39 @@ export class EntrenadoresPage {
   }
 
   getMensajeFormFields(): FormFieldConfig[] {
-    return [
+    const mensajeActual = this.mensajeManager.modalData();
+    const conversacionId = mensajeActual?.conversacionId;
+    
+    // Obtener mensajes de la conversación si existe
+    let mensajesConversacion: any[] = [];
+    if (conversacionId && !this.mensajeManager.isCreating()) {
+      mensajesConversacion = this.mensajeService.mensajes()
+        .filter(m => m.conversacionId === conversacionId)
+        .sort((a, b) => a.fechaEnvio.getTime() - b.fechaEnvio.getTime())
+        .map(m => {
+          const remitente = this.usuarios().find(u => u.uid === m.remitenteId);
+          return {
+            ...m,
+            remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario',
+            esPropio: m.remitenteId === mensajeActual?.remitenteId
+          };
+        });
+    }
+    
+    const fields: FormFieldConfig[] = [];
+    
+    // Mostrar hilo de conversación solo si estamos editando un mensaje existente
+    if (!this.mensajeManager.isCreating() && mensajesConversacion.length > 0) {
+      fields.push({
+        name: 'conversacion-thread',
+        type: 'conversacion-thread',
+        label: 'Historial de Conversación',
+        colSpan: 2,
+        mensajesConversacion: mensajesConversacion
+      });
+    }
+    
+    fields.push(
       {
         name: 'remitenteId',
         type: 'select',
@@ -1042,7 +1113,9 @@ export class EntrenadoresPage {
         rows: 4,
         colSpan: 2
       }
-    ];
+    );
+    
+    return fields;
   }
 
   async deleteMensaje(id: string) {
@@ -1069,6 +1142,62 @@ export class EntrenadoresPage {
     } catch (error) {
       this.toastService.log('Error al eliminar mensaje');
       console.error('Error al eliminar mensaje:', error);
+    }
+  }
+
+  // ========================================
+  // MÉTODOS PARA CONVERSACIONES
+  // ========================================
+
+  async actualizarOCrearConversacion(
+    conversacionId: string,
+    remitenteId: string,
+    destinatarioId: string,
+    remitenteTipo: Rol,
+    destinatarioTipo: Rol,
+    ultimoMensaje: string
+  ) {
+    try {
+      const conversacionExistente = this.conversacionService.conversaciones()
+        .find(c => c.id === conversacionId);
+      
+      const entrenadorId = remitenteTipo === Rol.ENTRENADOR ? remitenteId : destinatarioId;
+      const entrenadoId = remitenteTipo === Rol.ENTRENADO ? remitenteId : destinatarioId;
+      
+      if (conversacionExistente) {
+        // Actualizar conversación existente
+        await this.conversacionService.save({
+          ...conversacionExistente,
+          ultimoMensaje: ultimoMensaje.substring(0, 100), // Limitar longitud
+          ultimoMensajeFecha: new Date(),
+          fechaUltimaActividad: new Date(),
+          // Incrementar contador de no leídos del destinatario
+          noLeidosEntrenador: destinatarioTipo === Rol.ENTRENADOR 
+            ? conversacionExistente.noLeidosEntrenador + 1 
+            : conversacionExistente.noLeidosEntrenador,
+          noLeidosEntrenado: destinatarioTipo === Rol.ENTRENADO
+            ? conversacionExistente.noLeidosEntrenado + 1
+            : conversacionExistente.noLeidosEntrenado
+        });
+      } else {
+        // Crear nueva conversación
+        const nuevaConversacion: Conversacion = {
+          id: conversacionId,
+          entrenadorId: entrenadorId,
+          entrenadoId: entrenadoId,
+          ultimoMensaje: ultimoMensaje.substring(0, 100),
+          ultimoMensajeFecha: new Date(),
+          noLeidosEntrenador: destinatarioTipo === Rol.ENTRENADOR ? 1 : 0,
+          noLeidosEntrenado: destinatarioTipo === Rol.ENTRENADO ? 1 : 0,
+          activa: true,
+          fechaCreacion: new Date(),
+          fechaUltimaActividad: new Date()
+        };
+        
+        await this.conversacionService.save(nuevaConversacion);
+      }
+    } catch (error) {
+      console.error('Error al actualizar conversación:', error);
     }
   }
 
@@ -1218,14 +1347,31 @@ export class EntrenadoresPage {
     // Enriquecer notificaciones con información del mensaje
     return notificacionesDelEntrenador.map((notif: Notificacion) => {
       // Buscar el mensaje más relevante para esta notificación
-      const mensajeInfo = mensajesDelEntrenador.find(m => 
-        m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
-      );
+      const mensajeId = notif.datos?.['mensajeId'];
+      const mensajeInfo = mensajeId 
+        ? mensajesDelEntrenador.find(m => m.id === mensajeId)
+        : mensajesDelEntrenador.find(m => 
+            m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
+          );
+      
+      // Obtener contador de no leídos de la conversación
+      let noLeidos = 0;
+      if (mensajeInfo?.conversacionId) {
+        const conversacion = this.conversacionService.conversaciones().find(c => c.id === mensajeInfo.conversacionId);
+        if (conversacion) {
+          const usuario = this.usuarios().find(u => u.uid === entrenadorId);
+          // Obtener el contador según el rol del usuario
+          noLeidos = usuario?.role === Rol.ENTRENADOR 
+            ? conversacion.noLeidosEntrenador 
+            : conversacion.noLeidosEntrenado;
+        }
+      }
       
       if (mensajeInfo) {
         const remitente = this.usuarios().find(u => u.uid === mensajeInfo.remitenteId);
         return {
           ...notif,
+          noLeidos,
           mensajeInfo: {
             id: mensajeInfo.id,
             remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario desconocido'
@@ -1233,7 +1379,7 @@ export class EntrenadoresPage {
         };
       }
       
-      return notif;
+      return { ...notif, noLeidos };
     });
   }
 
@@ -1252,9 +1398,47 @@ export class EntrenadoresPage {
   abrirMensaje(mensajeId: string) {
     const mensaje = this.mensajes().find(m => m.id === mensajeId);
     if (mensaje) {
+      // Marcar notificación como leída
+      this.marcarNotificacionesComoLeidas(mensajeId);
+      
+      // Decrementar contador de no leídos en la conversación
+      if (mensaje.conversacionId) {
+        this.decrementarNoLeidos(mensaje.conversacionId, mensaje.destinatarioId);
+      }
+      
       this.openMensajeModal(mensaje);
     } else {
       this.toastService.log('ERROR: Mensaje no encontrado');
+    }
+  }
+
+  private async marcarNotificacionesComoLeidas(mensajeId: string) {
+    const notificacionesMensaje = this.notificacionService.notificaciones()
+      .filter(n => n.datos?.['mensajeId'] === mensajeId && !n.leida);
+    
+    for (const notif of notificacionesMensaje) {
+      await this.notificacionService.save({ ...notif, leida: true });
+    }
+  }
+
+  private async decrementarNoLeidos(conversacionId: string, destinatarioId: string) {
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) return;
+    
+    const destinatario = this.usuarios().find(u => u.uid === destinatarioId);
+    if (!destinatario) return;
+    
+    // Decrementar el contador según el rol del destinatario
+    if (destinatario.role === Rol.ENTRENADOR && conversacion.noLeidosEntrenador > 0) {
+      await this.conversacionService.save({
+        ...conversacion,
+        noLeidosEntrenador: conversacion.noLeidosEntrenador - 1
+      });
+    } else if (destinatario.role === Rol.ENTRENADO && conversacion.noLeidosEntrenado > 0) {
+      await this.conversacionService.save({
+        ...conversacion,
+        noLeidosEntrenado: conversacion.noLeidosEntrenado - 1
+      });
     }
   }
 }

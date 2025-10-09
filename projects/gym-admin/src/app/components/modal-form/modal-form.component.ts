@@ -24,6 +24,7 @@ export interface FormFieldConfig {
   clientes?: any[];
   ejercicios?: any[];
   notificaciones?: any[];
+  mensajesConversacion?: any[];  // ← NUEVO: historial de mensajes
 }
 
 @Component({
@@ -52,6 +53,7 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Output() customAction = new EventEmitter<void>();
   @Output() marcarNotificacionLeida = new EventEmitter<string>();
   @Output() verMensaje = new EventEmitter<string>();
+  @Output() responderMensaje = new EventEmitter<any>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -152,6 +154,18 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onVerMensaje(mensajeId: string) {
     this.verMensaje.emit(mensajeId);
+  }
+
+  onResponderMensaje() {
+    // Emitir datos necesarios para responder: conversacionId, remitenteId, destinatarioId
+    if (this.form) {
+      const datos = {
+        conversacionId: this.form.get('conversacionId')?.value,
+        remitenteId: this.form.get('destinatarioId')?.value, // Invertir
+        destinatarioId: this.form.get('remitenteId')?.value  // Invertir
+      };
+      this.responderMensaje.emit(datos);
+    }
   }
 
   contarNoLeidas(notificaciones: any[]): number {
