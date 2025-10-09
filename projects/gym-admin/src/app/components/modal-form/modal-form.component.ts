@@ -24,7 +24,8 @@ export interface FormFieldConfig {
   clientes?: any[];
   ejercicios?: any[];
   notificaciones?: any[];
-  mensajesConversacion?: any[];  // ← NUEVO: historial de mensajes
+  mensajesConversacion?: any[];  // Historial de mensajes de una conversación
+  conversaciones?: any[];  // Lista de conversaciones del usuario
 }
 
 @Component({
@@ -54,6 +55,7 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Output() marcarNotificacionLeida = new EventEmitter<string>();
   @Output() verMensaje = new EventEmitter<string>();
   @Output() responderMensaje = new EventEmitter<any>();
+  @Output() verConversacion = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -156,9 +158,16 @@ export class ModalFormComponent implements OnInit, OnDestroy {
     this.verMensaje.emit(mensajeId);
   }
 
-  onResponderMensaje() {
-    // Emitir datos necesarios para responder: conversacionId, remitenteId, destinatarioId
-    if (this.form) {
+  onVerConversacion(conversacionId: string) {
+    this.verConversacion.emit(conversacionId);
+  }
+
+  onResponderMensaje(mensajeId?: string) {
+    // Si recibimos un mensajeId, lo emitimos para que el componente padre maneje la respuesta
+    if (mensajeId) {
+      this.responderMensaje.emit({ mensajeId });
+    } else if (this.form) {
+      // Emitir datos necesarios para responder: conversacionId, remitenteId, destinatarioId
       const datos = {
         conversacionId: this.form.get('conversacionId')?.value,
         remitenteId: this.form.get('destinatarioId')?.value, // Invertir

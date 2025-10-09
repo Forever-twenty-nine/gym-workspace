@@ -698,21 +698,21 @@
                                 </span>
                               }
                             </div>
-                            <div class="flex gap-2">
+                            <div class="flex gap-2 flex-wrap">
                               @if (!notif.leida) {
                                 <button type="button"
                                         (click)="onMarcarNotificacionLeida(notif.id)"
-                                        class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700"
+                                        class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 whitespace-nowrap"
                                         title="Marcar como leída">
-                                  Leída
+                                  ✓ Leído
                                 </button>
                               }
                               @if (notif.mensajeInfo) {
                                 <button type="button"
-                                        (click)="onVerMensaje(notif.mensajeInfo.id)"
-                                        class="px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded hover:bg-blue-200"
-                                        title="Ver mensaje">
-                                  Ver
+                                        (click)="onResponderMensaje(notif.mensajeInfo.id)"
+                                        class="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700 whitespace-nowrap"
+                                        title="Responder mensaje">
+                                  💬 Responder
                                 </button>
                               }
                             </div>
@@ -783,6 +783,52 @@
                   }
                 </div>
               }
+
+              <!-- Conversaciones (lista de conversaciones con últimos mensajes) -->
+              @case ('conversaciones') {
+                <div class="border border-gray-300 rounded-lg bg-white">
+                  <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                    <h4 class="font-medium text-gray-700 text-sm">
+                      💬 Conversaciones (Debug: {{ field.conversaciones ? field.conversaciones.length : 'null' }})
+                    </h4>
+                  </div>
+                  @if (field.conversaciones && field.conversaciones.length > 0) {
+                    <div class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+                      @for (conversacion of field.conversaciones; track conversacion.id) {
+                        <div class="p-4 hover:bg-gray-100 transition-colors cursor-pointer"
+                             (click)="onVerConversacion(conversacion.id)">
+                          <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-2 mb-1">
+                                <span class="text-sm font-semibold text-gray-900 truncate">
+                                  {{ conversacion.participantes.entrenador || conversacion.participantes.entrenado || 'Usuario' }}
+                                </span>
+                                @if (conversacion.noLeidos > 0) {
+                                  <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                    {{ conversacion.noLeidos }}
+                                  </span>
+                                }
+                              </div>
+                              <p class="text-xs text-gray-600 truncate">
+                                {{ conversacion.ultimoMensaje || 'Sin mensajes' }}
+                              </p>
+                            </div>
+                            <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                              <span class="text-xs text-gray-500">
+                                {{ conversacion.ultimoMensajeFecha | date:'dd/MM/yy HH:mm' }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="p-4 text-center text-gray-500">
+                      <p class="text-xs">No hay conversaciones</p>
+                    </div>
+                  }
+                </div>
+              }
             }
           </div>
           }
@@ -793,19 +839,11 @@
 
     <!-- Footer -->
     <div class="flex items-center justify-between gap-4 p-6 border-t border-gray-200 bg-white">
-      <div class="flex-1 flex gap-3">
+      <div class="flex-1">
         @if (showCustomAction) {
           <button type="button" (click)="onCustomAction()"
             class="px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
             {{ customActionIcon }} {{ customActionLabel }}
-          </button>
-        }
-        
-        <!-- Botón Responder solo para mensajes existentes con conversación -->
-        @if (!isCreating && form?.get('conversacionId')?.value && modalType === 'mensaje') {
-          <button type="button" (click)="onResponderMensaje()"
-            class="px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-teal-600 border border-transparent rounded-xl hover:from-green-700 hover:to-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
-            💬 Responder
           </button>
         }
       </div>

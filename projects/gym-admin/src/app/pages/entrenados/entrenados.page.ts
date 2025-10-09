@@ -350,13 +350,22 @@ export class EntrenadosPage {
 
   getFormFields(): FormFieldConfig[] {
     const clienteData = this.modalData();
+    
+    // Si no hay datos, retornar array vacío
+    if (!clienteData || !clienteData.id) {
+      return [];
+    }
+    
     const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
     const rutinasAsignadasAlCliente = this.getRutinasAsignadasAlCliente(clienteData?.id || '');
     const gimnasioAsociado = clienteData?.gimnasioId ? this.gimnasios().find(g => g.id === clienteData.gimnasioId) : null;
     const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
     
-    // Obtener notificaciones relacionadas con mensajes del entrenado
-    const notificacionesEntrenado = this.getNotificacionesMensajesEntrenado(clienteData?.id || '');
+    // Obtener notificaciones relacionadas con mensajes del entrenado (SOLO NO LEÍDAS)
+    const notificacionesEntrenado = this.getNotificacionesMensajesEntrenado(clienteData.id).filter(n => !n.leida);
+    
+    // Obtener conversaciones del entrenado
+    const conversacionesEntrenado = this.getConversacionesEntrenado(clienteData.id);
     
     return [
       {
@@ -417,9 +426,16 @@ export class EntrenadosPage {
       {
         name: 'notificacionesMensajes',
         type: 'notificaciones-mensajes',
-        label: 'Notificaciones de Mensajes',
+        label: 'Notificaciones Pendientes',
         colSpan: 2,
         notificaciones: notificacionesEntrenado
+      },
+      {
+        name: 'conversaciones',
+        type: 'conversaciones',
+        label: 'Conversaciones',
+        colSpan: 2,
+        conversaciones: conversacionesEntrenado
       },
       {
         name: 'fechaRegistro',
@@ -854,30 +870,69 @@ export class EntrenadosPage {
     this.isMensajeCreating.set(false);
   }
 
-  responderMensaje(datos: { conversacionId: string; remitenteId: string; destinatarioId: string }) {
-    // Cerrar el modal actual
-    this.closeMensajeModal();
+  responderMensaje(datos: any) {
+    // Si recibimos un mensajeId directamente (desde botón de notificación)
+    if (datos.mensajeId) {
+      const mensaje = this.mensajeService.mensajes().find(m => m.id === datos.mensajeId);
+      
+      if (!mensaje) {
+        this.toastService.log('Mensaje no encontrado');
+        return;
+      }
+      
+      // Cerrar modales abiertos
+      this.closeMensajeModal();
+      this.closeModal();
+      
+      // Crear un nuevo mensaje de respuesta con los datos invertidos
+      const nuevoMensaje: Mensaje = {
+        id: 'msg-' + Date.now(),
+        conversacionId: mensaje.conversacionId, // Mantener el mismo conversacionId
+        remitenteId: mensaje.destinatarioId,    // Invertir: quien recibió ahora envía
+        remitenteTipo: mensaje.destinatarioTipo, // Invertir
+        destinatarioId: mensaje.remitenteId,    // Invertir: quien envió ahora recibe
+        destinatarioTipo: mensaje.remitenteTipo, // Invertir
+        contenido: '',
+        tipo: TipoMensaje.TEXTO,
+        leido: false,
+        entregado: false,
+        fechaEnvio: new Date()
+      };
+      
+      // Abrir el modal en modo creación con los datos pre-rellenados
+      this.mensajeModalData.set(nuevoMensaje);
+      this.isMensajeModalOpen.set(true);
+      this.isMensajeCreating.set(true);
+      this.createMensajeEditForm(nuevoMensaje);
+      return;
+    }
     
-    // Crear un nuevo mensaje de respuesta con los datos invertidos
-    const nuevoMensaje: Mensaje = {
-      id: 'msg-' + Date.now(),
-      conversacionId: datos.conversacionId, // Mantener el mismo conversacionId
-      remitenteId: datos.remitenteId,       // Ya viene invertido del modal
-      remitenteTipo: this.usuarios().find(u => u.uid === datos.remitenteId)?.role || Rol.ENTRENADO,
-      destinatarioId: datos.destinatarioId, // Ya viene invertido del modal
-      destinatarioTipo: this.usuarios().find(u => u.uid === datos.destinatarioId)?.role || Rol.ENTRENADOR,
-      contenido: '',
-      tipo: TipoMensaje.TEXTO,
-      leido: false,
-      entregado: false,
-      fechaEnvio: new Date()
-    };
-    
-    // Abrir el modal en modo creación con los datos pre-rellenados
-    this.mensajeModalData.set(nuevoMensaje);
-    this.isMensajeModalOpen.set(true);
-    this.isMensajeCreating.set(true);
-    this.createMensajeEditForm(nuevoMensaje);
+    // Formato antiguo (desde modal de mensaje abierto)
+    if (datos.conversacionId) {
+      // Cerrar el modal actual
+      this.closeMensajeModal();
+      
+      // Crear un nuevo mensaje de respuesta con los datos invertidos
+      const nuevoMensaje: Mensaje = {
+        id: 'msg-' + Date.now(),
+        conversacionId: datos.conversacionId, // Mantener el mismo conversacionId
+        remitenteId: datos.remitenteId,       // Ya viene invertido del modal
+        remitenteTipo: this.usuarios().find(u => u.uid === datos.remitenteId)?.role || Rol.ENTRENADO,
+        destinatarioId: datos.destinatarioId, // Ya viene invertido del modal
+        destinatarioTipo: this.usuarios().find(u => u.uid === datos.destinatarioId)?.role || Rol.ENTRENADOR,
+        contenido: '',
+        tipo: TipoMensaje.TEXTO,
+        leido: false,
+        entregado: false,
+        fechaEnvio: new Date()
+      };
+      
+      // Abrir el modal en modo creación con los datos pre-rellenados
+      this.mensajeModalData.set(nuevoMensaje);
+      this.isMensajeModalOpen.set(true);
+      this.isMensajeCreating.set(true);
+      this.createMensajeEditForm(nuevoMensaje);
+    }
   }
 
   private createMensajeEditForm(item: any) {
@@ -983,39 +1038,7 @@ export class EntrenadosPage {
   }
 
   getMensajeFormFields(): FormFieldConfig[] {
-    const mensajeActual = this.mensajeModalData();
-    const conversacionId = mensajeActual?.conversacionId;
-    
-    // Obtener mensajes de la conversación si existe
-    let mensajesConversacion: any[] = [];
-    if (conversacionId && !this.isMensajeCreating()) {
-      mensajesConversacion = this.mensajeService.mensajes()
-        .filter(m => m.conversacionId === conversacionId)
-        .sort((a, b) => a.fechaEnvio.getTime() - b.fechaEnvio.getTime())
-        .map(m => {
-          const remitente = this.usuarios().find(u => u.uid === m.remitenteId);
-          return {
-            ...m,
-            remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario',
-            esPropio: m.remitenteId === mensajeActual?.remitenteId
-          };
-        });
-    }
-    
-    const fields: FormFieldConfig[] = [];
-    
-    // Mostrar hilo de conversación solo si estamos editando un mensaje existente
-    if (!this.isMensajeCreating() && mensajesConversacion.length > 0) {
-      fields.push({
-        name: 'conversacion-thread',
-        type: 'conversacion-thread',
-        label: 'Historial de Conversación',
-        colSpan: 2,
-        mensajesConversacion: mensajesConversacion
-      });
-    }
-    
-    fields.push(
+    const fields: FormFieldConfig[] = [
       {
         name: 'remitenteId',
         type: 'select',
@@ -1059,7 +1082,7 @@ export class EntrenadosPage {
         rows: 4,
         colSpan: 2
       }
-    );
+    ];
     
     return fields;
   }
@@ -1202,6 +1225,65 @@ export class EntrenadosPage {
     });
   }
 
+  getConversacionesEntrenado(entrenadoId: string) {
+    console.log('🔍 getConversacionesEntrenado - entrenadoId:', entrenadoId);
+    
+    // Si no hay ID, retornar array vacío
+    if (!entrenadoId) {
+      console.log('⚠️ No hay entrenadoId, retornando array vacío');
+      return [];
+    }
+    
+    // Obtener todas las conversaciones donde participa el entrenado
+    const todasConversaciones = this.conversacionService.conversaciones();
+    console.log('📚 Total conversaciones en sistema:', todasConversaciones.length);
+    
+    const conversaciones = todasConversaciones.filter(c => c.entrenadoId === entrenadoId);
+    console.log('💬 Conversaciones del entrenado:', conversaciones.length, conversaciones);
+    
+    const resultado = conversaciones.map(conversacion => {
+      // Obtener información del entrenador
+      const entrenador = this.usuarios().find(u => u.uid === conversacion.entrenadorId);
+      
+      // Obtener todos los mensajes de esta conversación
+      const mensajes = this.mensajeService.mensajes()
+        .filter(m => m.conversacionId === conversacion.id)
+        .sort((a, b) => {
+          const fechaA = a.fechaEnvio instanceof Date ? a.fechaEnvio : new Date(a.fechaEnvio);
+          const fechaB = b.fechaEnvio instanceof Date ? b.fechaEnvio : new Date(b.fechaEnvio);
+          return fechaA.getTime() - fechaB.getTime();
+        });
+      
+      return {
+        id: conversacion.id,
+        participantes: {
+          entrenador: entrenador ? (entrenador.displayName || entrenador.nombre || 'Entrenador') : 'Entrenador',
+          entrenadorId: conversacion.entrenadorId,
+          entrenadoId: conversacion.entrenadoId
+        },
+        ultimoMensaje: conversacion.ultimoMensaje,
+        ultimoMensajeFecha: conversacion.ultimoMensajeFecha,
+        noLeidos: conversacion.noLeidosEntrenado,
+        fechaUltimaActividad: conversacion.fechaUltimaActividad,
+        mensajes: mensajes
+      };
+    }).sort((a, b) => {
+      const fechaA = a.fechaUltimaActividad instanceof Date ? a.fechaUltimaActividad : new Date(a.fechaUltimaActividad);
+      const fechaB = b.fechaUltimaActividad instanceof Date ? b.fechaUltimaActividad : new Date(b.fechaUltimaActividad);
+      return fechaB.getTime() - fechaA.getTime();
+    });
+    
+    console.log('✅ Resultado final:', resultado);
+    console.table(resultado.map(r => ({
+      id: r.id,
+      entrenador: r.participantes.entrenador,
+      ultimoMensaje: r.ultimoMensaje?.substring(0, 50),
+      noLeidos: r.noLeidos,
+      fecha: r.ultimoMensajeFecha
+    })));
+    return resultado;
+  }
+
   marcarNotificacionComoLeida(notifId: string) {
     this.notificacionService.marcarComoLeida(notifId);
     this.toastService.log('Notificación marcada como leída');
@@ -1218,10 +1300,38 @@ export class EntrenadosPage {
         this.decrementarNoLeidos(mensaje.conversacionId, mensaje.destinatarioId);
       }
       
-      this.openMensajeModal(mensaje);
+      // En lugar de abrir el modal de edición, solo mostramos la conversación
+      // El usuario puede usar el botón "Responder" desde las notificaciones para responder
+      this.toastService.log('✓ Mensaje marcado como leído. Usa "Responder" para contestar.');
     } else {
       this.toastService.log('Mensaje no encontrado');
     }
+  }
+
+  abrirConversacion(conversacionId: string) {
+    // Obtener la conversación
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) {
+      this.toastService.log('Conversación no encontrada');
+      return;
+    }
+
+    // Obtener todos los mensajes de la conversación
+    const mensajes = this.mensajeService.mensajes()
+      .filter(m => m.conversacionId === conversacionId)
+      .sort((a, b) => {
+        const fechaA = a.fechaEnvio instanceof Date ? a.fechaEnvio : new Date(a.fechaEnvio);
+        const fechaB = b.fechaEnvio instanceof Date ? b.fechaEnvio : new Date(b.fechaEnvio);
+        return fechaA.getTime() - fechaB.getTime();
+      });
+
+    if (mensajes.length === 0) {
+      this.toastService.log('No hay mensajes en esta conversación');
+      return;
+    }
+
+    // Abrir el modal del primer mensaje para mostrar el hilo completo
+    this.openMensajeModal(mensajes[0]);
   }
 
   private async marcarNotificacionesComoLeidas(mensajeId: string) {
