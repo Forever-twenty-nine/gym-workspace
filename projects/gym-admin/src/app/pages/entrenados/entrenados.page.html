@@ -41,25 +41,9 @@
       (edit)="openMensajeModal($event)"
       (delete)="deleteMensaje($event)">
     </app-generic-card>
-
-    <!-- Card de Conversaciones -->
-    <app-generic-card
-      [config]="conversacionesCardConfig"
-      [items]="conversaciones()"
-      [idField]="'id'"
-      [canCreate]="false"
-      (edit)="openConversacionModal($event)"
-      (delete)="deleteConversacion($event)">
-    </app-generic-card>
   </section>
 
-  <!-- Toasts -->
-  <app-toast 
-    [toasts]="toastService.toasts()" 
-    (closeToast)="toastService.remove($event)">
-  </app-toast>
-
-  <!-- Modal de edición de entrenado -->
+  <!-- Modal de detalles del entrenado -->
   <app-modal-form
     [isOpen]="isModalOpen()"
     [modalType]="'entrenado'"

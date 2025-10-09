@@ -10,10 +10,8 @@ import {
   EjercicioService, 
   NotificacionService,
   MensajeService,
-  ConversacionService,
   Notificacion,
   Mensaje,
-  Conversacion,
   Entrenado, 
   Rol, 
   Objetivo,
@@ -22,7 +20,6 @@ import {
 import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
-import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
@@ -33,8 +30,7 @@ import { DisplayHelperService } from '../../services/display-helper.service';
     CommonModule,
     ReactiveFormsModule,
     GenericCardComponent,
-    ModalFormComponent,
-    ToastComponent
+    ModalFormComponent
   ],
   templateUrl: './entrenados.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -49,7 +45,6 @@ export class EntrenadosPage {
   private readonly ejercicioService = inject(EjercicioService);
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
-  private readonly conversacionService = inject(ConversacionService);
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly displayHelper = inject(DisplayHelperService);
@@ -185,17 +180,6 @@ export class EntrenadosPage {
     showArrowBetweenChips: true
   };
 
-  readonly conversacionesCardConfig: CardConfig = {
-    title: 'Conversaciones',
-    createButtonText: 'N/A',
-    createButtonColor: 'blue',
-    emptyStateTitle: 'No hay conversaciones activas',
-    displayField: 'titulo',
-    showCounter: true,
-    counterColor: 'blue',
-    showChips: ['entrenadorChip', 'entrenadoChip', 'mensajesChip']
-  };
-
   // Signals para el estado del componente
   readonly isModalOpen = signal(false);
   readonly modalData = signal<any>(null);
@@ -263,25 +247,6 @@ export class EntrenadosPage {
     return this.mensajes().filter(mensaje => {
       const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
       return remitente?.role === Rol.ENTRENADO;
-    });
-  });
-
-  // Signals para conversaciones (desde el servicio)
-  readonly conversaciones = computed(() => {
-    return this.conversacionService.conversaciones().map(conv => {
-      const entrenador = this.usuarios().find(u => u.uid === conv.entrenadorId);
-      const entrenado = this.usuarios().find(u => u.uid === conv.entrenadoId);
-      
-      const entrenadorNombre = entrenador?.nombre || entrenador?.email || `Entrenador ${conv.entrenadorId}`;
-      const entrenadoNombre = entrenado?.nombre || entrenado?.email || `Cliente ${conv.entrenadoId}`;
-      
-      return {
-        ...conv,
-        titulo: `${entrenadoNombre} ↔ ${entrenadorNombre}`,
-        entrenadorChip: `👨‍🏫 ${entrenadorNombre}`,
-        entrenadoChip: `👤 ${entrenadoNombre}`,
-        mensajesChip: `💬 Mensajes sin leer: ${conv.noLeidosEntrenador + conv.noLeidosEntrenado}`
-      };
     });
   });
 
@@ -1043,26 +1008,6 @@ export class EntrenadosPage {
     } catch (error) {
       this.toastService.log('Error al eliminar mensaje');
       console.error('Error al eliminar mensaje:', error);
-    }
-  }
-
-  // ========================================
-  // MÉTODOS PARA CONVERSACIONES
-  // ========================================
-  
-  openConversacionModal(item: any) {
-    // Mostrar detalles de la conversación
-    this.toastService.log(`Ver conversación: ${item.titulo || 'Conversación'}`);
-    // Aquí podrías abrir un modal con el historial de mensajes
-  }
-
-  async deleteConversacion(id: string) {
-    try {
-      await this.conversacionService.delete(id);
-      this.toastService.log('Conversación eliminada correctamente');
-    } catch (error) {
-      this.toastService.log('ERROR al eliminar conversación');
-      console.error('Error al eliminar conversación:', error);
     }
   }
 
