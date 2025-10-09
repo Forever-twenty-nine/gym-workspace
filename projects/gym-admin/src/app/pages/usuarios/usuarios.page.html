@@ -18,8 +18,8 @@
       [items]="mensajes()"
       [idField]="'id'"
       [canCreate]="false"
-      (edit)="openMensajeModal($event)"
-      (delete)="deleteMensaje($event)">
+      [canEdit]="false"
+      [canDelete]="false">
     </app-generic-card>
   </section>
 

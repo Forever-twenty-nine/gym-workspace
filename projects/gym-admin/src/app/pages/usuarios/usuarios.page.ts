@@ -60,8 +60,8 @@ export class UsuariosPage {
       return {
         ...mensaje,
         titulo,
-        remitenteChip: `De: ${remitenteNombre}`,
-        destinatarioChip: `Para: ${destinatarioNombre}`
+        remitenteChip: remitenteNombre,
+        destinatarioChip: destinatarioNombre
       };
     });
   });

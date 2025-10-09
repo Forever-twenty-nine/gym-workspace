@@ -57,7 +57,7 @@ export class DisplayHelperService {
    */
   getTituloMensaje(tipo: string): string {
     const tituloMap: Record<string, string> = {
-      'texto': 'Mensaje de texto',
+      'texto': 'Texto',
       'imagen': 'Imagen compartida',
       'video': 'Video compartido',
       'audio': 'Audio compartido'

@@ -13,6 +13,8 @@ export class GenericCardComponent {
   config = input.required<CardConfig>();
   items = input<CardItem[]>([]);
   canCreate = input<boolean>(true);
+  canEdit = input<boolean>(true);
+  canDelete = input<boolean>(true);
   validationMessage = input<string>('');
   idField = input<string>('id');
   

@@ -42,7 +42,19 @@
                 </div>
               }
               
-              @if (config().showChips && config().showChips!.length > 0) {
+              @if (config().showChips && config().showChips!.length === 2) {
+                <div class="flex items-center gap-2">
+                  @if (getChipValue(item, config().showChips![0]); as value1) {
+                    <span class="text-sm font-medium text-gray-700">{{ value1 }}</span>
+                  }
+                  <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                  </svg>
+                  @if (getChipValue(item, config().showChips![1]); as value2) {
+                    <span class="text-sm font-medium text-gray-700">{{ value2 }}</span>
+                  }
+                </div>
+              } @else if (config().showChips && config().showChips!.length > 0) {
                 <div class="flex items-center gap-2">
                   @for (chipField of config().showChips!; track chipField) {
                     @if (getChipValue(item, chipField); as value) {
@@ -59,16 +71,20 @@
             </div>
             
             <div class="flex gap-2 ml-4">
-              <button 
-                class="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded border border-blue-200 hover:bg-blue-100 transition-colors"
-                (click)="edit.emit(item)">
-                Editar
-              </button>
-              <button 
-                class="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded border border-red-200 hover:bg-red-100 transition-colors"
-                (click)="delete.emit(getItemId(item))">
-                Eliminar
-              </button>
+              @if (canEdit()) {
+                <button 
+                  class="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded border border-blue-200 hover:bg-blue-100 transition-colors"
+                  (click)="edit.emit(item)">
+                  Editar
+                </button>
+              }
+              @if (canDelete()) {
+                <button 
+                  class="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded border border-red-200 hover:bg-red-100 transition-colors"
+                  (click)="delete.emit(getItemId(item))">
+                  Eliminar
+                </button>
+              }
             </div>
           </div>
         </div>
