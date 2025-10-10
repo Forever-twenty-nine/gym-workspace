@@ -11,9 +11,11 @@ import {
   NotificacionService,
   MensajeService,
   ConversacionService,
+  InvitacionService,
   Notificacion,
   Mensaje,
   Conversacion,
+  Invitacion,
   Entrenado, 
   Rol, 
   Objetivo,
@@ -49,6 +51,7 @@ export class EntrenadosPage {
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
   private readonly conversacionService = inject(ConversacionService);
+  private readonly invitacionService = inject(InvitacionService);
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly displayHelper = inject(DisplayHelperService);
@@ -367,6 +370,9 @@ export class EntrenadosPage {
     // Obtener conversaciones del entrenado
     const conversacionesEntrenado = this.getConversacionesEntrenado(clienteData.id);
     
+    // Obtener invitaciones pendientes del entrenado
+    const invitacionesPendientes = this.getInvitacionesPendientesEntrenado(clienteData.id);
+    
     return [
       {
         name: 'nombre',
@@ -429,6 +435,13 @@ export class EntrenadosPage {
         label: 'Notificaciones Pendientes',
         colSpan: 2,
         notificaciones: notificacionesEntrenado
+      },
+      {
+        name: 'invitacionesPendientes',
+        type: 'notificaciones-invitaciones',
+        label: 'Invitaciones de Entrenadores',
+        colSpan: 2,
+        invitaciones: invitacionesPendientes
       },
       {
         name: 'conversaciones',
@@ -1038,7 +1051,44 @@ export class EntrenadosPage {
   }
 
   getMensajeFormFields(): FormFieldConfig[] {
-    const fields: FormFieldConfig[] = [
+    const fields: FormFieldConfig[] = [];
+
+    // Si estamos viendo un mensaje (no creando), mostrar el hilo de conversación
+    if (!this.isMensajeCreating() && this.mensajeModalData()) {
+      const mensajeActual = this.mensajeModalData();
+      const conversacionId = mensajeActual?.conversacionId;
+
+      if (conversacionId) {
+        // Obtener todos los mensajes de la conversación
+        const mensajesConversacion = this.mensajeService.mensajes()
+          .filter(m => m.conversacionId === conversacionId)
+          .sort((a, b) => {
+            const fechaA = a.fechaEnvio instanceof Date ? a.fechaEnvio : new Date(a.fechaEnvio);
+            const fechaB = b.fechaEnvio instanceof Date ? b.fechaEnvio : new Date(b.fechaEnvio);
+            return fechaA.getTime() - fechaB.getTime();
+          })
+          .map(msg => {
+            const remitente = this.usuarios().find(u => u.uid === msg.remitenteId);
+            const usuarioActual = this.usuarios().find(u => u.uid === mensajeActual.destinatarioId);
+            return {
+              ...msg,
+              remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario',
+              esPropio: msg.remitenteId === usuarioActual?.uid
+            };
+          });
+
+        fields.push({
+          name: 'conversacion-thread',
+          type: 'conversacion-thread',
+          label: '',
+          colSpan: 2,
+          mensajesConversacion
+        });
+      }
+    }
+
+    // Campos del formulario
+    fields.push(
       {
         name: 'remitenteId',
         type: 'select',
@@ -1082,7 +1132,7 @@ export class EntrenadosPage {
         rows: 4,
         colSpan: 2
       }
-    ];
+    );
     
     return fields;
   }
@@ -1284,6 +1334,35 @@ export class EntrenadosPage {
     return resultado;
   }
 
+  // Obtener invitaciones pendientes del entrenado
+  getInvitacionesPendientesEntrenado(entrenadoId: string) {
+    if (!entrenadoId) return [];
+    
+    // Obtener notificaciones de invitación no leídas para este entrenado
+    const notificacionesInvitacion = this.notificacionService.notificaciones()
+      .filter(n => 
+        n.tipo === TipoNotificacion.INVITACION && 
+        n.usuarioId === entrenadoId && 
+        !n.leida
+      );
+    
+    // Mapear cada notificación a su invitación correspondiente
+    return notificacionesInvitacion.map(notif => {
+      const invitacionId = notif.datos?.['invitacionId'];
+      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      
+      return {
+        id: notif.id,  // ID de la notificación
+        invitacionId: invitacionId,
+        titulo: notif.titulo,
+        mensaje: notif.mensaje,
+        entrenadorNombre: notif.datos?.['entrenadorNombre'] || 'Entrenador',
+        franjaHoraria: invitacion?.franjaHoraria,
+        fechaCreacion: notif.fechaCreacion
+      };
+    }).filter(inv => inv.invitacionId);  // Filtrar invitaciones que realmente existen
+  }
+
   marcarNotificacionComoLeida(notifId: string) {
     this.notificacionService.marcarComoLeida(notifId);
     this.toastService.log('Notificación marcada como leída');
@@ -1334,6 +1413,70 @@ export class EntrenadosPage {
     this.openMensajeModal(mensajes[0]);
   }
 
+  async marcarConversacionLeida(conversacionId: string) {
+    // Obtener la conversación
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) {
+      this.toastService.log('Conversación no encontrada');
+      return;
+    }
+
+    // Resetear el contador de no leídos del entrenador (ya que estamos en la página de entrenados)
+    await this.conversacionService.save({
+      ...conversacion,
+      noLeidosEntrenador: 0
+    });
+
+    // Marcar todas las notificaciones relacionadas con esta conversación como leídas
+    const notificacionesConversacion = this.notificacionService.notificaciones()
+      .filter(n => {
+        const mensajeId = n.datos?.['mensajeId'];
+        if (!mensajeId) return false;
+        const mensaje = this.mensajeService.mensajes().find(m => m.id === mensajeId);
+        return mensaje?.conversacionId === conversacionId && !n.leida;
+      });
+    
+    for (const notif of notificacionesConversacion) {
+      await this.notificacionService.save({ ...notif, leida: true });
+    }
+
+    this.toastService.log('✓ Conversación marcada como leída');
+  }
+
+  responderConversacion(conversacionId: string) {
+    // Obtener la conversación
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) {
+      this.toastService.log('Conversación no encontrada');
+      return;
+    }
+
+    // Cerrar el modal principal si está abierto
+    this.closeModal();
+
+    // Crear un nuevo mensaje de respuesta
+    // En la página de entrenados, el entrenador responde al entrenado
+    const nuevoMensaje: Mensaje = {
+      id: 'msg-' + Date.now(),
+      conversacionId: conversacion.id,
+      remitenteId: conversacion.entrenadorId,
+      remitenteTipo: Rol.ENTRENADOR,
+      destinatarioId: conversacion.entrenadoId,
+      destinatarioTipo: Rol.ENTRENADO,
+      contenido: '',
+      tipo: TipoMensaje.TEXTO,
+      leido: false,
+      entregado: false,
+      fechaEnvio: new Date()
+    };
+
+    // Abrir el modal de mensaje en modo creación con los datos pre-rellenados
+    this.mensajeModalData.set(nuevoMensaje);
+    this.isMensajeModalOpen.set(true);
+    this.isMensajeCreating.set(true);
+    this.createMensajeEditForm(nuevoMensaje);
+  }
+
   private async marcarNotificacionesComoLeidas(mensajeId: string) {
     const notificacionesMensaje = this.notificacionService.notificaciones()
       .filter(n => n.datos?.['mensajeId'] === mensajeId && !n.leida);
@@ -1361,6 +1504,103 @@ export class EntrenadosPage {
         ...conversacion,
         noLeidosEntrenado: conversacion.noLeidosEntrenado - 1
       });
+    }
+  }
+
+  // Métodos para manejar invitaciones
+  async aceptarInvitacion(notificacionId: string) {
+    this.isLoading.set(true);
+    
+    try {
+      // Obtener la notificación y la invitación asociada
+      const notificacion = this.notificacionService.notificaciones().find(n => n.id === notificacionId);
+      if (!notificacion) {
+        this.toastService.log('ERROR: Notificación no encontrada');
+        return;
+      }
+      
+      const invitacionId = notificacion.datos?.['invitacionId'];
+      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      
+      if (!invitacion) {
+        this.toastService.log('ERROR: Invitación no encontrada');
+        return;
+      }
+      
+      // Obtener el entrenado asociado a esta notificación
+      const entrenado = this.entrenadoService.entrenados().find(e => e.id === invitacion.entrenadoId);
+      if (!entrenado) {
+        this.toastService.log('ERROR: Entrenado no encontrado');
+        return;
+      }
+      
+      // Crear la asociación entrenador-entrenado
+      await this.entrenadoService.save({
+        ...entrenado,
+        entrenadorId: invitacion.entrenadorId
+      });
+      
+      // Actualizar el estado de la invitación a 'aceptada'
+      await this.invitacionService.save({
+        ...invitacion,
+        estado: 'aceptada',
+        fechaRespuesta: new Date()
+      });
+      
+      // Marcar la notificación como leída
+      await this.notificacionService.save({
+        ...notificacion,
+        leida: true
+      });
+      
+      this.toastService.log('✓ Invitación aceptada. Ahora tienes un entrenador asignado');
+      this.closeModal();
+    } catch (error) {
+      console.error('Error al aceptar invitación:', error);
+      this.toastService.log('ERROR: No se pudo aceptar la invitación');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async rechazarInvitacion(notificacionId: string) {
+    this.isLoading.set(true);
+    
+    try {
+      // Obtener la notificación y la invitación asociada
+      const notificacion = this.notificacionService.notificaciones().find(n => n.id === notificacionId);
+      if (!notificacion) {
+        this.toastService.log('ERROR: Notificación no encontrada');
+        return;
+      }
+      
+      const invitacionId = notificacion.datos?.['invitacionId'];
+      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      
+      if (!invitacion) {
+        this.toastService.log('ERROR: Invitación no encontrada');
+        return;
+      }
+      
+      // Actualizar el estado de la invitación a 'rechazada'
+      await this.invitacionService.save({
+        ...invitacion,
+        estado: 'rechazada',
+        fechaRespuesta: new Date()
+      });
+      
+      // Marcar la notificación como leída
+      await this.notificacionService.save({
+        ...notificacion,
+        leida: true
+      });
+      
+      this.toastService.log('Invitación rechazada');
+    } catch (error) {
+      console.error('Error al rechazar invitación:', error);
+      this.toastService.log('ERROR: No se pudo rechazar la invitación');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 }

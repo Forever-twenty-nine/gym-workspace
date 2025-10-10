@@ -12,6 +12,7 @@ import {
   MensajeService,
   InvitacionService,
   ConversacionService,
+  AuthService,
   Notificacion,
   TipoNotificacion,
   Mensaje,
@@ -53,6 +54,7 @@ export class EntrenadoresPage {
   private readonly mensajeService = inject(MensajeService);
   private readonly invitacionService = inject(InvitacionService);
   private readonly conversacionService = inject(ConversacionService);
+  private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
   private readonly displayHelper = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
@@ -97,6 +99,31 @@ export class EntrenadoresPage {
     }));
   });
 
+  readonly entrenadoresBase = computed(() => {
+    return this.entrenadorService.entrenadores().map(entrenador => {
+      const usuario = this.usuarios().find(u => u.uid === entrenador.id);
+      return {
+        ...entrenador,
+        displayName: usuario?.nombre || usuario?.email || `Usuario ${entrenador.id}`
+      };
+    });
+  });
+
+  readonly entrenadores = computed(() => {
+    return this.entrenadoresBase().map(entrenador => {
+      const ejerciciosCount = this.ejercicios().filter(e => e.creadorId === entrenador.id).length;
+      const rutinasCount = this.rutinas().filter(r => r.creadorId === entrenador.id).length;
+      const clientesCount = this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenador.id).length;
+      
+      return {
+        ...entrenador,
+        ejerciciosCount,
+        rutinasCount,
+        clientesCount
+      };
+    });
+  });
+
   readonly ejercicios = computed(() => {
     return this.ejercicioService.ejercicios().map(ejercicio => {
       let creadorName = null;
@@ -136,48 +163,15 @@ export class EntrenadoresPage {
     });
   });
 
-  readonly entrenadoresBase = computed(() => {
-    return this.entrenadorService.entrenadores().map(entrenador => {
-      const usuario = this.usuarios().find(u => u.uid === entrenador.id);
-      return {
-        ...entrenador,
-        displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
-      };
-    });
-  });
-
-  readonly entrenadores = computed(() => {
-    return this.entrenadoresBase().map(entrenador => {
-      const ejerciciosCreados = this.ejercicios().filter(e => 
-        e.creadorId === entrenador.id && e.creadorTipo === 'entrenador'
-      ).length;
-      
-      const clientesAsignados = this.entrenadoService.entrenados().filter(c => 
-        c.entrenadorId === entrenador.id
-      ).length;
-      
-      const rutinasCreadas = this.rutinas().filter(r => 
-        r.creadorId === entrenador.id
-      ).length;
-      
-      return {
-        ...entrenador,
-        ejerciciosCount: ejerciciosCreados,
-        clientesCount: clientesAsignados,
-        rutinasCount: rutinasCreadas
-      };
-    });
-  });
-
   // Configuración de los cards
   readonly entrenadoresCardConfig: CardConfig = {
     title: 'Entrenadores',
-    createButtonText: 'N/A',
-    createButtonColor: 'orange',
-    emptyStateTitle: 'No hay entrenadores registrados',
+    createButtonText: 'Crear Entrenador',
+    createButtonColor: 'blue',
+    emptyStateTitle: 'No hay entrenadores',
     displayField: 'displayName',
     showCounter: true,
-    counterColor: 'orange',
+    counterColor: 'blue',
     showChips: ['ejerciciosCount', 'clientesCount', 'rutinasCount']
   };
 
@@ -213,17 +207,6 @@ export class EntrenadoresPage {
     counterColor: 'purple',
     showChips: ['remitenteChip', 'destinatarioChip'],
     showArrowBetweenChips: true
-  };
-
-  readonly invitacionesCardConfig: CardConfig = {
-    title: 'Invitaciones',
-    createButtonText: 'Nueva Invitación',
-    createButtonColor: 'orange',
-    emptyStateTitle: 'No hay invitaciones',
-    displayField: 'mensaje',
-    showCounter: true,
-    counterColor: 'orange',
-    showChips: ['estado', 'tipo']
   };
 
   // Signals para el estado del componente
@@ -275,38 +258,6 @@ export class EntrenadoresPage {
   });
 
   // Signals para invitaciones (desde el servicio)
-  readonly invitaciones = computed(() => {
-    return this.invitacionService.invitaciones().map(inv => {
-      const estadoDisplay = this.displayHelper.getEstadoInvitacionDisplay(inv.estado);
-      const tipoDisplay = this.displayHelper.getFranjaHorariaDisplay(inv.franjaHoraria);
-      
-      return {
-        ...inv,
-        mensaje: inv.mensaje || `Invitación para ${inv.email}`,
-        tipo: tipoDisplay,
-        estado: estadoDisplay
-      };
-    });
-  });
-
-  private getEstadoInvitacionDisplay(estado: string): string {
-    const estadoMap: Record<string, string> = {
-      'pendiente': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg> Pendiente',
-      'aceptada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg> Aceptada',
-      'rechazada': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg> Rechazada'
-    };
-    return estadoMap[estado] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg> Pendiente';
-  }
-
-  private getTipoInvitacionDisplay(franja?: string): string {
-    if (!franja) return '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg> General';
-    const tipoMap: Record<string, string> = {
-      'mañana': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg> Mañana',
-      'tarde': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg> Tarde',
-      'noche': '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg> Noche'
-    };
-    return tipoMap[franja] || '<svg class="inline w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg> General';
-  }
 
   async deleteEntrenador(id: string) {
     await this.entrenadorService.delete(id);
@@ -1088,7 +1039,44 @@ export class EntrenadoresPage {
   }
 
   getMensajeFormFields(): FormFieldConfig[] {
-    const fields: FormFieldConfig[] = [
+    const fields: FormFieldConfig[] = [];
+
+    // Si estamos viendo un mensaje (no creando), mostrar el hilo de conversación
+    if (!this.mensajeManager.isCreating() && this.mensajeManager.modalData()) {
+      const mensajeActual = this.mensajeManager.modalData();
+      const conversacionId = mensajeActual?.conversacionId;
+
+      if (conversacionId) {
+        // Obtener todos los mensajes de la conversación
+        const mensajesConversacion = this.mensajes()
+          .filter(m => m.conversacionId === conversacionId)
+          .sort((a, b) => {
+            const fechaA = a.fechaEnvio instanceof Date ? a.fechaEnvio : new Date(a.fechaEnvio);
+            const fechaB = b.fechaEnvio instanceof Date ? b.fechaEnvio : new Date(b.fechaEnvio);
+            return fechaA.getTime() - fechaB.getTime();
+          })
+          .map(msg => {
+            const remitente = this.usuarios().find(u => u.uid === msg.remitenteId);
+            const usuarioActual = this.usuarios().find(u => u.uid === mensajeActual.destinatarioId);
+            return {
+              ...msg,
+              remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario',
+              esPropio: msg.remitenteId === usuarioActual?.uid
+            };
+          });
+
+        fields.push({
+          name: 'conversacion-thread',
+          type: 'conversacion-thread',
+          label: '',
+          colSpan: 2,
+          mensajesConversacion
+        });
+      }
+    }
+
+    // Campos del formulario
+    fields.push(
       {
         name: 'remitenteId',
         type: 'select',
@@ -1132,7 +1120,7 @@ export class EntrenadoresPage {
         rows: 4,
         colSpan: 2
       }
-    ];
+    );
     
     return fields;
   }
@@ -1221,16 +1209,23 @@ export class EntrenadoresPage {
   }
 
   addInvitacion() {
+    // Obtener el entrenador del modal actual
+    const entrenadorActual = this.modalData();
+    if (!entrenadorActual || !entrenadorActual.id) {
+      this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
+      return;
+    }
+
     const newInvitacion = {
       id: 'inv-' + Date.now(),
-      invitadorId: '',
+      entrenadorId: entrenadorActual.id,
       email: '',
-      estado: 'pendiente' as const,
+      estado: 'pendiente',
       mensaje: '',
-      franjaHoraria: 'mañana' as 'mañana' | 'tarde' | 'noche',
+      franjaHoraria: 'mañana',
       fechaEnvio: new Date()
-    } as Invitacion;
-    this.invitacionManager.openCreateModal(newInvitacion);
+    };
+    this.invitacionManager.openCreateModal(newInvitacion as any);
   }
 
   openInvitacionModal(item: any) {
@@ -1239,7 +1234,6 @@ export class EntrenadoresPage {
 
   private createInvitacionEditForm(item: Invitacion): any {
     return {
-      invitadorId: [item.invitadorId || '', Validators.required],
       email: [item.email || '', [Validators.required, Validators.email]],
       mensaje: [item.mensaje || ''],
       franjaHoraria: [item.franjaHoraria || 'mañana', Validators.required]
@@ -1248,14 +1242,47 @@ export class EntrenadoresPage {
 
   async saveInvitacion() {
     this.isLoading.set(true);
+    
+    const isCreating = this.invitacionManager.isCreating();
+    const invitacionData = this.invitacionManager.editForm()?.getRawValue();
+    
     const result = await this.invitacionManager.save({
       estado: 'pendiente' as const,
       fechaEnvio: new Date()
     });
+    
     this.isLoading.set(false);
     
-    if (result.success) {
-      this.toastService.log(`Invitación ${this.invitacionManager.isCreating() ? 'creada' : 'actualizada'}`);
+    if (result.success && isCreating && invitacionData) {
+      // Crear notificación para el entrenado
+      const entrenadorActual = this.authService.currentUser();
+      const entrenadoId = invitacionData.entrenadoId;
+      
+      if (entrenadorActual && entrenadoId) {
+        // Obtener el ID de la invitación recién creada del modal data
+        const invitacionId = this.invitacionManager.modalData()?.id;
+        
+        const nuevaNotificacion: Notificacion = {
+          id: 'not-inv-' + Date.now(),
+          usuarioId: entrenadoId,  // Notificación para el entrenado
+          tipo: TipoNotificacion.INVITACION,
+          titulo: 'Nueva invitación de entrenador',
+          mensaje: invitacionData.mensaje || '¡Un entrenador quiere trabajar contigo!',
+          leida: false,
+          fechaCreacion: new Date(),
+          datos: {
+            invitacionId: invitacionId,
+            entrenadorId: entrenadorActual.uid,
+            entrenadorNombre: entrenadorActual.nombre || entrenadorActual.email
+          }
+        };
+        
+        await this.notificacionService.save(nuevaNotificacion);
+      }
+      
+      this.toastService.log('Invitación creada y notificación enviada');
+    } else if (result.success) {
+      this.toastService.log('Invitación actualizada');
     } else {
       this.toastService.log(`ERROR: ${result.error}`);
     }
@@ -1264,27 +1291,16 @@ export class EntrenadoresPage {
   getInvitacionFormFields(): FormFieldConfig[] {
     return [
       {
-        name: 'invitadorId',
-        type: 'select',
-        label: 'Invitador',
-        placeholder: 'Seleccionar invitador',
-        options: this.usuarios().map(user => ({
-          value: user.uid,
-          label: `${user.nombre || user.email || user.uid} (${user.role})`
-        })),
-        colSpan: 1
-      },
-      {
         name: 'email',
         type: 'text',
         label: 'Email del Invitado',
         placeholder: 'ejemplo@email.com',
-        colSpan: 1
+        colSpan: 2
       },
       {
         name: 'franjaHoraria',
         type: 'select',
-        label: 'Franja Horaria',
+        label: 'Franja Horaria Preferida',
         placeholder: 'Seleccionar franja horaria',
         options: [
           { value: 'mañana', label: 'Mañana (6:00 - 12:00)' },
@@ -1297,7 +1313,7 @@ export class EntrenadoresPage {
         name: 'mensaje',
         type: 'textarea',
         label: 'Mensaje Personalizado',
-        placeholder: 'Agrega un mensaje personal a la invitación (opcional)...',
+        placeholder: '¡Hola! Me gustaría ser tu entrenador...',
         rows: 4,
         colSpan: 2
       }
@@ -1509,6 +1525,67 @@ export class EntrenadoresPage {
 
     // Abrir el modal del primer mensaje para mostrar el hilo completo
     this.openMensajeModal(mensajes[0]);
+  }
+
+  async marcarConversacionLeida(conversacionId: string) {
+    // Obtener la conversación
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) {
+      this.toastService.log('Conversación no encontrada');
+      return;
+    }
+
+    // Resetear el contador de no leídos del entrenado (ya que estamos en la página de entrenadores)
+    await this.conversacionService.save({
+      ...conversacion,
+      noLeidosEntrenado: 0
+    });
+
+    // Marcar todas las notificaciones relacionadas con esta conversación como leídas
+    const notificacionesConversacion = this.notificacionService.notificaciones()
+      .filter(n => {
+        const mensajeId = n.datos?.['mensajeId'];
+        if (!mensajeId) return false;
+        const mensaje = this.mensajes().find(m => m.id === mensajeId);
+        return mensaje?.conversacionId === conversacionId && !n.leida;
+      });
+    
+    for (const notif of notificacionesConversacion) {
+      await this.notificacionService.save({ ...notif, leida: true });
+    }
+
+    this.toastService.log('✓ Conversación marcada como leída');
+  }
+
+  responderConversacion(conversacionId: string) {
+    // Obtener la conversación
+    const conversacion = this.conversacionService.conversaciones().find(c => c.id === conversacionId);
+    if (!conversacion) {
+      this.toastService.log('Conversación no encontrada');
+      return;
+    }
+
+    // Cerrar el modal principal si está abierto
+    this.closeModal();
+
+    // Crear un nuevo mensaje de respuesta
+    // En la página de entrenadores, el entrenado responde al entrenador
+    const nuevoMensaje: Mensaje = {
+      id: 'msg-' + Date.now(),
+      conversacionId: conversacion.id,
+      remitenteId: conversacion.entrenadoId,
+      remitenteTipo: Rol.ENTRENADO,
+      destinatarioId: conversacion.entrenadorId,
+      destinatarioTipo: Rol.ENTRENADOR,
+      contenido: '',
+      tipo: TipoMensaje.TEXTO,
+      leido: false,
+      entregado: false,
+      fechaEnvio: new Date()
+    };
+
+    // Abrir el modal en modo creación con los datos pre-rellenados
+    this.mensajeManager.openCreateModal(nuevoMensaje);
   }
 
   private async marcarNotificacionesComoLeidas(mensajeId: string) {

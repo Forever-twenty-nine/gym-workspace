@@ -26,6 +26,7 @@ export interface FormFieldConfig {
   notificaciones?: any[];
   mensajesConversacion?: any[];  // Historial de mensajes de una conversación
   conversaciones?: any[];  // Lista de conversaciones del usuario
+  invitaciones?: any[];  // Lista de invitaciones pendientes
 }
 
 @Component({
@@ -46,16 +47,24 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Input() showCustomAction: boolean = false;
   @Input() customActionLabel: string = 'Acción';
   @Input() customActionIcon: string = '⚡';
+  @Input() showCustomAction2: boolean = false;
+  @Input() customAction2Label: string = 'Acción 2';
+  @Input() customAction2Icon: string = '🔧';
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
   @Output() toggleDiaSemana = new EventEmitter<{ event: Event; value: string }>();
   @Output() toggleEjercicio = new EventEmitter<string>();
   @Output() customAction = new EventEmitter<void>();
+  @Output() customAction2 = new EventEmitter<void>();
   @Output() marcarNotificacionLeida = new EventEmitter<string>();
   @Output() verMensaje = new EventEmitter<string>();
   @Output() responderMensaje = new EventEmitter<any>();
   @Output() verConversacion = new EventEmitter<string>();
+  @Output() marcarConversacionLeida = new EventEmitter<string>();
+  @Output() responderConversacion = new EventEmitter<string>();
+  @Output() aceptarInvitacion = new EventEmitter<string>();
+  @Output() rechazarInvitacion = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -100,6 +109,10 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onCustomAction() {
     this.customAction.emit();
+  }
+
+  onCustomAction2() {
+    this.customAction2.emit();
   }
 
   isEjercicioSelected(ejercicioId: string): boolean {
@@ -160,6 +173,22 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onVerConversacion(conversacionId: string) {
     this.verConversacion.emit(conversacionId);
+  }
+
+  onMarcarConversacionLeida(conversacionId: string) {
+    this.marcarConversacionLeida.emit(conversacionId);
+  }
+
+  onResponderConversacion(conversacionId: string) {
+    this.responderConversacion.emit(conversacionId);
+  }
+
+  onAceptarInvitacion(invitacionId: string) {
+    this.aceptarInvitacion.emit(invitacionId);
+  }
+
+  onRechazarInvitacion(invitacionId: string) {
+    this.rechazarInvitacion.emit(invitacionId);
   }
 
   onResponderMensaje(mensajeId?: string) {

@@ -133,11 +133,20 @@ export class InvitacionService {
     }
 
     /**
-     * 🔍 Obtiene invitaciones por invitador
+     * 🔍 Obtiene invitaciones por entrenador
      */
-    getInvitacionesByInvitador(invitadorId: string): Signal<Invitacion[]> {
+    getInvitacionesByEntrenador(entrenadorId: string): Signal<Invitacion[]> {
         return computed(() => 
-            this._invitaciones().filter(inv => inv.invitadorId === invitadorId)
+            this._invitaciones().filter(inv => inv.entrenadorId === entrenadorId)
+        );
+    }
+
+    /**
+     * 🔍 Obtiene invitaciones por entrenado
+     */
+    getInvitacionesByEntrenado(entrenadoId: string): Signal<Invitacion[]> {
+        return computed(() => 
+            this._invitaciones().filter(inv => inv.entrenadoId === entrenadoId)
         );
     }
 
@@ -153,11 +162,11 @@ export class InvitacionService {
     /**
      * 📊 Obtiene invitaciones pendientes
      */
-    getInvitacionesPendientes(invitadorId?: string): Signal<Invitacion[]> {
+    getInvitacionesPendientes(entrenadorId?: string): Signal<Invitacion[]> {
         return computed(() => 
             this._invitaciones().filter(inv => 
                 inv.estado === 'pendiente' && 
-                (!invitadorId || inv.invitadorId === invitadorId)
+                (!entrenadorId || inv.entrenadorId === entrenadorId)
             )
         );
     }
@@ -174,11 +183,11 @@ export class InvitacionService {
     /**
      * 📊 Contador de invitaciones pendientes
      */
-    getContadorPendientes(invitadorId?: string): Signal<number> {
+    getContadorPendientes(entrenadorId?: string): Signal<number> {
         return computed(() => 
             this._invitaciones().filter(inv => 
                 inv.estado === 'pendiente' && 
-                (!invitadorId || inv.invitadorId === invitadorId)
+                (!entrenadorId || inv.entrenadorId === entrenadorId)
             ).length
         );
     }

@@ -43,16 +43,6 @@
     </app-generic-card>
 
     <!-- Card de Conversaciones -->
-
-    <!-- Card de Invitaciones -->
-    <app-generic-card
-      [config]="invitacionesCardConfig"
-      [items]="invitaciones()"
-      [idField]="'id'"
-      (create)="addInvitacion()"
-      (edit)="openInvitacionModal($event)"
-      (delete)="deleteInvitacion($event)">
-    </app-generic-card>
   </section>
 
   <!-- Toasts -->
@@ -74,13 +64,19 @@
     [showCustomAction]="!isCreating() && modalData() !== null"
     [customActionLabel]="'Enviar Mensaje'"
     [customActionIcon]="'💬'"
+    [showCustomAction2]="!isCreating() && modalData() !== null"
+    [customAction2Label]="'Enviar Invitación'"
+    [customAction2Icon]="'🤝'"
     (close)="closeModal()"
     (save)="saveChanges()"
     (customAction)="addMensaje()"
+    (customAction2)="addInvitacion()"
     (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
     (verMensaje)="abrirMensaje($event)"
     (responderMensaje)="responderMensaje($event)"
     (verConversacion)="abrirConversacion($event)"
+    (marcarConversacionLeida)="marcarConversacionLeida($event)"
+    (responderConversacion)="responderConversacion($event)"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
