@@ -1,9 +1,6 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
   IonContent,
   IonCard,
   IonCardHeader,
@@ -22,6 +19,7 @@ import {
   fitnessOutline, 
   personOutline, 
   checkmarkCircleOutline,
+  checkmarkCircle,
   timeOutline
 } from 'ionicons/icons';
 import { EntrenadoService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
@@ -34,9 +32,6 @@ import { Entrenado, Rutina } from 'gym-library';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -66,6 +61,11 @@ export class DashboardPage implements OnInit {
   nombreEntrenado = computed(() => {
     const user = this.userService.user();
     return user?.nombre || 'Entrenado';
+  });
+
+  tipoPlan = computed(() => {
+    const user = this.userService.user();
+    return user?.plan === 'premium' ? 'Plan Premium' : 'Plan Gratuito';
   });
 
   objetivoActual = computed(() => {
@@ -99,6 +99,7 @@ export class DashboardPage implements OnInit {
       fitnessOutline,
       personOutline,
       checkmarkCircleOutline,
+      checkmarkCircle,
       timeOutline
     });
   }
