@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Rutinas</ion-title>
+    <!-- <ion-title>Rutinas</ion-title> -->
   </ion-toolbar>
 </ion-header>
 
@@ -140,7 +140,7 @@
 </ion-content>
 
 <!-- Modal de detalles -->
-<ion-modal [isOpen]="modalAbierto()" (didDismiss)="cerrarModal()">
+<ion-modal [isOpen]="modalAbierto()" (didDismiss)="cerrarModal()" class="rutina-modal">
   <ng-template>
     @if (rutinaSeleccionada()) {
       <ion-header>

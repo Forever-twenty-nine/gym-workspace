@@ -215,3 +215,52 @@
     flex: 1 1 45%;
   }
 }
+
+/* Estilos del modal personalizado */
+.rutina-modal {
+  --width: 90vw;
+  --height: 85vh;
+  --max-width: 600px;
+  --max-height: 80vh;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.rutina-modal::part(content) {
+  margin: auto;
+  transform: translateY(10vh);
+}
+
+.rutina-modal::part(backdrop) {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Asegurar que el contenido del modal sea scrollable */
+.rutina-modal ion-content {
+  --padding-bottom: 20px;
+}
+
+/* Responsive para el modal */
+@media (max-width: 768px) {
+  .rutina-modal {
+    --width: 95vw;
+    --height: 90vh;
+    --max-height: 85vh;
+  }
+  
+  .rutina-modal::part(content) {
+    transform: translateY(5vh);
+  }
+}
+
+@media (max-width: 480px) {
+  .rutina-modal {
+    --width: 98vw;
+    --height: 95vh;
+    --max-height: 90vh;
+  }
+  
+  .rutina-modal::part(content) {
+    transform: translateY(2vh);
+  }
+}

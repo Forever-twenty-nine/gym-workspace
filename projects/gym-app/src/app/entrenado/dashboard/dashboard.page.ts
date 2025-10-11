@@ -9,8 +9,7 @@ import {
   IonLabel,
   IonList,
   IonChip,
-  IonAvatar
-} from '@ionic/angular/standalone';
+  IonAvatar, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   statsChartOutline,
@@ -29,7 +28,7 @@ import { Entrenado, Rutina } from 'gym-library';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.css'],
   standalone: true,
-  imports: [
+  imports: [ IonToolbar, IonHeader, 
     CommonModule,
     IonContent,
     IonCard,

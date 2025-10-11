@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Mi Perfil</ion-title>
+    <!-- <ion-title>Mi Perfil</ion-title> -->
   </ion-toolbar>
 </ion-header>
 
@@ -12,9 +12,9 @@
   </ion-header>
 
   @if (currentUser(); as user) {
-    <!-- Tarjeta de información personal -->
+    <!-- Tarjeta de información personal compacta -->
     <ion-card class="profile-card">
-      <ion-card-content>
+      <ion-card-content class="profile-content">
         <div class="profile-header">
           <ion-avatar class="profile-avatar">
             <div class="avatar-placeholder">
@@ -32,84 +32,82 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Información de contacto -->
-    <ion-card>
-      <ion-card-header>
+    <!-- Información de contacto en grid -->
+    <ion-card class="info-card">
+      <ion-card-header class="card-header-compact">
         <ion-card-title>
           <ion-icon name="person-outline"></ion-icon>
           Información Personal
         </ion-card-title>
       </ion-card-header>
-      <ion-card-content>
-        <ion-list [inset]="true">
-          @if (user.email) {
-            <ion-item>
-              <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
-              <ion-label>
-                <p>Email</p>
-                <h3>{{ user.email }}</h3>
-              </ion-label>
-            </ion-item>
-          }
+      <ion-card-content class="info-grid">
+        @if (user.email) {
+          <div class="info-item">
+            <ion-icon name="mail-outline" color="primary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ user.email }}</span>
+            </div>
+          </div>
+        }
 
-          @if (user.gimnasioId) {
-            <ion-item>
-              <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
-              <ion-label>
-                <p>Gimnasio</p>
-                <h3>{{ user.gimnasioId }}</h3>
-              </ion-label>
-            </ion-item>
-          }
+        @if (user.gimnasioId) {
+          <div class="info-item">
+            <ion-icon name="fitness-outline" color="primary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Gimnasio</span>
+              <span class="info-value">{{ user.gimnasioId }}</span>
+            </div>
+          </div>
+        }
 
-          @if (user.entrenadorId) {
-            <ion-item>
-              <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-              <ion-label>
-                <p>Entrenador Asignado</p>
-                <h3>{{ user.entrenadorId }}</h3>
-              </ion-label>
-            </ion-item>
-          }
+        @if (user.entrenadorId) {
+          <div class="info-item">
+            <ion-icon name="person-outline" color="primary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Entrenador</span>
+              <span class="info-value">{{ user.entrenadorId }}</span>
+            </div>
+          </div>
+        }
 
-          @if (user.plan) {
-            <ion-item>
-              <ion-icon name="trophy-outline" slot="start" color="tertiary"></ion-icon>
-              <ion-label>
-                <p>Plan</p>
-                <h3>{{ user.plan }}</h3>
-              </ion-label>
-            </ion-item>
-          }
+        @if (user.plan) {
+          <div class="info-item">
+            <ion-icon name="trophy-outline" color="tertiary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Plan</span>
+              <span class="info-value">{{ user.plan }}</span>
+            </div>
+          </div>
+        }
 
-          <ion-item lines="none">
-            <ion-icon name="shield-outline" slot="start" color="primary"></ion-icon>
-            <ion-label>
-              <p>ID de Usuario</p>
-              <h3 class="user-id">{{ user.uid }}</h3>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+        <div class="info-item">
+          <ion-icon name="shield-outline" color="primary"></ion-icon>
+          <div class="info-text">
+            <span class="info-label">ID Usuario</span>
+            <span class="info-value user-id">{{ user.uid }}</span>
+          </div>
+        </div>
       </ion-card-content>
     </ion-card>
 
     <!-- Estadísticas -->
     @if (user.role === 'entrenado') {
       @if (estadisticas(); as stats) {
-        <ion-card>
-          <ion-card-header>
+        <ion-card class="stats-card">
+          <ion-card-header class="card-header-compact">
             <ion-card-title>
               <ion-icon name="stats-chart-outline"></ion-icon>
-              Mis Estadísticas
+              Estadísticas
             </ion-card-title>
           </ion-card-header>
-          <ion-card-content>
+          <ion-card-content class="stats-content">
             <div class="stats-grid">
               <div class="stat-item">
                 <ion-icon name="fitness-outline" color="primary"></ion-icon>
                 <div class="stat-info">
                   <h2>{{ stats.totalRutinas }}</h2>
-                  <p>Rutinas Totales</p>
+                  <p>Rutinas</p>
                 </div>
               </div>
               
@@ -143,14 +141,12 @@
     }
 
     <!-- Acciones de la cuenta -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Cuenta</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
+    <ion-card class="account-card">
+      <ion-card-content class="account-content">
         <ion-button 
           expand="block" 
           color="danger" 
+          fill="outline"
           (click)="logout()">
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Cerrar Sesión

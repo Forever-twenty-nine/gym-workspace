@@ -3,7 +3,7 @@
  * Simplificado a solo 3 tabs esenciales.
  */
 export enum EntrenadoTabsSet {
-  BASICO = 'basico'           // Tabs básicos: Entrenamientos, Ejercicios, Perfil
+  BASICO = 'basico'           // Tabs básicos: Rutinas, Ejercicios, Perfil
 }
 
 /**
@@ -12,7 +12,7 @@ export enum EntrenadoTabsSet {
  */
 export const ENTRENADO_TABS_CONFIG = {
   [EntrenadoTabsSet.BASICO]: [
-    'entrenamientos',
+    'rutinas',
     'ejercicios', 
     'perfil'
   ]

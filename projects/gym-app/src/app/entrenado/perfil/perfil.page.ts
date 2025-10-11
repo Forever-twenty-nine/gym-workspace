@@ -8,14 +8,11 @@ import {
   IonContent, 
   IonButton,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonBadge,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonList,
   IonAvatar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -45,14 +42,11 @@ import { UserService, AuthService, User, RutinaService, Rutina, Rol } from 'gym-
     IonContent, 
     IonButton,
     IonIcon,
-    IonItem,
-    IonLabel,
     IonBadge,
     IonCard,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonList,
     IonAvatar
   ],
 })

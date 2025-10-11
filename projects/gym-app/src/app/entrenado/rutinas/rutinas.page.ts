@@ -43,9 +43,9 @@ import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } 
 import { CronometroRutinaComponent } from '../components/cronometro-rutina/cronometro-rutina.component';
 
 @Component({
-  selector: 'app-entrenamientos',
-  templateUrl: './entrenamientos.page.html',
-  styleUrls: ['./entrenamientos.page.css'],
+  selector: 'app-rutinas',
+  templateUrl: './rutinas.page.html',
+  styleUrls: ['./rutinas.page.css'],
   standalone: true,
   imports: [
     CommonModule,
@@ -68,7 +68,7 @@ import { CronometroRutinaComponent } from '../components/cronometro-rutina/crono
     CronometroRutinaComponent
   ],
 })
-export class EntrenamientosPage implements OnInit, OnDestroy {
+export class RutinasPage implements OnInit, OnDestroy {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
