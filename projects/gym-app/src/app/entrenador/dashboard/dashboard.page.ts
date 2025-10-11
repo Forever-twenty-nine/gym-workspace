@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonHeader, 
@@ -16,10 +16,17 @@ import {
   IonList,
   IonGrid,
   IonRow,
-  IonCol
+  IonCol,
+  IonAvatar,
+  IonChip
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } from 'ionicons/icons';
+import { AuthService } from 'gym-library';
+import { EntrenadoService } from 'gym-library';
+import { RutinaService } from 'gym-library';
+import { EjercicioService } from 'gym-library';
+import { Entrenado } from 'gym-library';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,7 +36,6 @@ import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } fro
     CommonModule,
     IonHeader,
     IonToolbar,
-    IonTitle,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -40,12 +46,16 @@ import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } fro
     IonItem,
     IonLabel,
     IonList,
-    IonGrid,
-    IonRow,
-    IonCol
+    IonAvatar,
+    IonChip
   ],
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit {
+  private authService = inject(AuthService);
+  private entrenadoService = inject(EntrenadoService);
+  private rutinaService = inject(RutinaService);
+  private ejercicioService = inject(EjercicioService);
+
   stats = {
     entrenadosActivos: 15,
     entrenamientosHoy: 8,
@@ -53,14 +63,32 @@ export class DashboardPage {
     horasEntrenamiento: 32
   };
 
-  entrenadosRecientes = [
-    { nombre: 'Ana García', ultimoEntrenamiento: '2025-01-28', estado: 'activo' },
-    { nombre: 'Carlos López', ultimoEntrenamiento: '2025-01-27', estado: 'activo' },
-    { nombre: 'María Rodríguez', ultimoEntrenamiento: '2025-01-26', estado: 'pendiente' }
-  ];
+  entrenador = computed(() => {
+    const user = this.authService.currentUser();
+    return user ? { nombre: user.nombre || 'Entrenador', plan: user.plan ? `Plan ${user.plan}` : 'Plan Básico' } : { nombre: 'Entrenador', plan: 'Plan Básico' };
+  });
+
+  entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId) : [];
+  });
+
+  rutinasCreadas: Signal<any[]> = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    return entrenadorId ? this.rutinaService.getRutinasByCreador(entrenadorId)() : [];
+  });
+
+  ejerciciosCreados: Signal<any[]> = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    return entrenadorId ? this.ejercicioService.getEjerciciosByCreador(entrenadorId)() : [];
+  });
 
   constructor() {
     addIcons({ peopleOutline, fitnessOutline, statsChartOutline, calendarOutline });
+  }
+
+  ngOnInit() {
+    // Inicializar si es necesario
   }
 
   verCliente(entrenado: any) {

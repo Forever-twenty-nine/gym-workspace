@@ -12,14 +12,19 @@ export const routes: Routes = [
           import('../dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
-        path: 'clientes',
+        path: 'rutinas',
         loadComponent: () =>
-          import('../../components/tab2/tab2.page').then((m) => m.Tab2Page), // Reutilizamos tab2 como clientes
+          import('../rutinas/rutinas.page').then((m) => m.RutinasPage),
+      },
+      {
+        path: 'ejercicios',
+        loadComponent: () =>
+          import('../ejercicios/ejercicios.page').then((m) => m.EjerciciosPage),
       },
       {
         path: 'perfil',
         loadComponent: () =>
-          import('../../components/tab3/tab3.page').then((m) => m.Tab3Page), // Reutilizamos tab3 como perfil
+          import('../../components/tab3/tab3.page').then((m) => m.Tab3Page), 
       },
       {
         path: '',

@@ -11,7 +11,9 @@ import { addIcons } from 'ionicons';
 import { 
   statsChartOutline, 
   peopleOutline, 
-  personOutline 
+  personOutline ,
+  barbellOutline,
+  fitnessOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -33,7 +35,9 @@ export class EntrenadorTabsPage {
     addIcons({
       statsChartOutline,
       peopleOutline,
-      personOutline
+      personOutline,
+      barbellOutline,
+      fitnessOutline
     });
   }
 }

@@ -97,15 +97,18 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
 
   private mapToFirestore(rutina: Rutina): any {
     const data: any = {
-      entrenadoId: rutina.entrenadoId,
       nombre: rutina.nombre,
       ejercicios: rutina.ejercicios || [],
-      activa: rutina.activa,
+      activa: rutina.activa ?? true,
       DiasSemana: rutina.DiasSemana || [],
-      completado: rutina.completado
+      completado: rutina.completado ?? false
     };
 
     // Solo incluir campos opcionales si tienen valor válido
+    if (rutina.entrenadoId) {
+      data.entrenadoId = rutina.entrenadoId;
+    }
+    
     if (rutina.duracion && rutina.duracion > 0) {
       data.duracion = rutina.duracion;
     }

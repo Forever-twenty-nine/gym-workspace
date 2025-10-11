@@ -1,0 +1,114 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Rutinas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <!-- Lista de Rutinas -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Mis Rutinas</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          @for (rutina of rutinasCreadas(); track rutina.id) {
+            <ion-item button (click)="verRutina(rutina)">
+              <ion-label>
+                <h3>{{ rutina.nombre }}</h3>
+                <p>Duración: {{ rutina.duracion }} min</p>
+              </ion-label>
+              <ion-button fill="clear" slot="end" color="primary" (click)="verRutina(rutina); $event.stopPropagation()">
+                <ion-icon name="pencil"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" slot="end" color="danger" (click)="deleteRutina(rutina.id); $event.stopPropagation()">
+                <ion-icon name="trash"></ion-icon>
+              </ion-button>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Acciones -->
+    <ion-card>
+      <ion-card-content>
+        <ion-button expand="block" fill="solid" color="primary" (click)="crearRutina()">
+          <ion-icon name="fitness-outline" slot="start"></ion-icon>
+          Crear Nueva Rutina
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Modal para crear/editar rutina -->
+  <ion-modal [isOpen]="isRutinaModalOpen()" (willDismiss)="closeRutinaModal()" [breakpoints]="[0, 0.75]" [initialBreakpoint]="0.75">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isRutinaCreating() ? 'Crear Rutina' : 'Editar Rutina' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeRutinaModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        @if (rutinaEditForm()) {
+          <form [formGroup]="rutinaEditForm()!" (ngSubmit)="saveRutinaChanges()">
+          <ion-item>
+            <ion-input
+              label="Nombre"
+              labelPlacement="stacked"
+              formControlName="nombre"
+              placeholder="Nombre de la rutina"
+            ></ion-input>
+          </ion-item>
+          
+          <ion-item>
+            <ion-textarea
+              label="Descripción"
+              labelPlacement="stacked"
+              formControlName="descripcion"
+              placeholder="Descripción de la rutina..."
+              rows="3"
+            ></ion-textarea>
+          </ion-item>
+
+          <!-- Días de la semana - simplificado -->
+          <ion-item>
+            <ion-label>Días de la Semana</ion-label>
+            <ion-select formControlName="diasSemana" multiple>
+              <ion-select-option value="0">Domingo</ion-select-option>
+              <ion-select-option value="1">Lunes</ion-select-option>
+              <ion-select-option value="2">Martes</ion-select-option>
+              <ion-select-option value="3">Miércoles</ion-select-option>
+              <ion-select-option value="4">Jueves</ion-select-option>
+              <ion-select-option value="5">Viernes</ion-select-option>
+              <ion-select-option value="6">Sábado</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- Ejercicios - simplificado -->
+          <ion-item>
+            <ion-label>Ejercicios</ion-label>
+            <ion-select formControlName="ejercicios" multiple>
+              @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
+                <ion-select-option [value]="ejercicio.id">
+                  {{ ejercicio.nombre }} ({{ ejercicio.series }}x{{ ejercicio.repeticiones }})
+                </ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-button expand="block" type="submit" [disabled]="!rutinaEditForm()?.valid">
+            {{ isRutinaCreating() ? 'Crear' : 'Guardar' }}
+          </ion-button>
+        </form>
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
