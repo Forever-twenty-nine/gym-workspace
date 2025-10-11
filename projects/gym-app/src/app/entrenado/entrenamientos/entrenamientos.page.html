@@ -1,60 +1,27 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Mis Rutinas</ion-title>
+    <ion-title>Rutinas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Mis Rutinas</ion-title>
+      <ion-title size="large">Rutinas</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Cronómetro flotante -->
+  <!-- Cronómetro en pantalla completa -->
   @if (cronometroActivo()) {
-    <div class="cronometro-flotante">
-      <ion-card style="margin: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-        <ion-card-header style="padding: 12px;">
-          <ion-card-title style="font-size: 14px; display: flex; align-items: center; gap: 8px;">
-            <ion-icon name="timer-outline" style="font-size: 20px; color: var(--ion-color-primary);"></ion-icon>
-            {{ rutinaEnCurso()?.nombre || 'Entrenamiento' }}
-          </ion-card-title>
-        </ion-card-header>
-        <ion-card-content style="padding: 12px; padding-top: 0;">
-          <div style="text-align: center; margin-bottom: 12px;">
-            <div style="font-size: 32px; font-weight: bold; color: var(--ion-color-primary); font-family: monospace;">
-              {{ formatearTiempoCronometro(tiempoTranscurrido()) }}
-            </div>
-            <div style="font-size: 12px; color: var(--ion-color-medium); margin-top: 4px;">
-              @if (cronometroPausado()) {
-                <ion-chip color="warning" style="margin: 0; height: 20px; font-size: 10px;">
-                  <ion-icon name="pause-outline" style="font-size: 12px;"></ion-icon>
-                  <span style="margin-left: 4px;">Pausado</span>
-                </ion-chip>
-              } @else {
-                <ion-chip color="success" style="margin: 0; height: 20px; font-size: 10px;">
-                  <ion-icon name="play-outline" style="font-size: 12px;"></ion-icon>
-                  <span style="margin-left: 4px;">En progreso</span>
-                </ion-chip>
-              }
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; justify-content: center;">
-            <ion-button size="small" fill="outline" (click)="pausarCronometro()">
-              <ion-icon [name]="cronometroPausado() ? 'play-outline' : 'pause-outline'" slot="icon-only"></ion-icon>
-            </ion-button>
-            <ion-button size="small" color="success" (click)="finalizarEntrenamiento()">
-              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-              Finalizar
-            </ion-button>
-            <ion-button size="small" color="danger" fill="outline" (click)="detenerCronometro()">
-              <ion-icon name="stop-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-          </div>
-        </ion-card-content>
-      </ion-card>
-    </div>
+    <app-cronometro-rutina
+      [nombreRutina]="rutinaEnCurso()?.nombre || 'Rutina'"
+      [tiempoTranscurrido]="tiempoTranscurrido()"
+      [pausado]="cronometroPausado()"
+      [cantidadEjercicios]="rutinaEnCurso()?.ejercicios?.length || 0"
+      (pausar)="pausarCronometro()"
+      (finalizar)="finalizarEntrenamiento()"
+      (detener)="detenerCronometro()">
+    </app-cronometro-rutina>
   }
 
   <div class="entrenamientos-container">
@@ -332,7 +299,7 @@
                 (click)="iniciarEntrenamiento(rutinaSeleccionada()!)"
                 [disabled]="rutinaSeleccionada()!.completado">
                 <ion-icon name="timer-outline" slot="start"></ion-icon>
-                {{ rutinaSeleccionada()!.completado ? 'Completada' : 'Iniciar entrenamiento' }}
+                {{ rutinaSeleccionada()!.completado ? 'Completada' : 'Iniciar rutina' }}
               </ion-button>
               <p style="text-align: center; font-size: 12px; color: var(--ion-color-medium); margin: 8px 0 12px 0;">
                 Se iniciará el cronómetro al comenzar
@@ -343,7 +310,7 @@
                 color="warning"
                 disabled>
                 <ion-icon name="timer-outline" slot="start"></ion-icon>
-                Entrenamiento en curso
+                Rutina en curso
               </ion-button>
             } @else {
               <ion-button 
@@ -351,7 +318,7 @@
                 color="medium"
                 disabled>
                 <ion-icon name="play-outline" slot="start"></ion-icon>
-                Ya hay un entrenamiento activo
+                Ya hay una rutina activa
               </ion-button>
             }
             

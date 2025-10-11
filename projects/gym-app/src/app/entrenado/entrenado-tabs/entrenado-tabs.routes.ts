@@ -19,7 +19,7 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('../../components/tab3/tab3.page').then((m) => m.Tab3Page), 
+          import('../perfil/perfil.page').then((m) => m.PerfilPage), 
       },
       {
         path: '',

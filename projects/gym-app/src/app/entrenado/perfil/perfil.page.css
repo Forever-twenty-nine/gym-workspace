@@ -1,0 +1,235 @@
+/* Tarjeta de perfil principal */
+.profile-card {
+  margin-top: 0;
+  background: linear-gradient(135deg, var(--ion-color-primary-tint) 0%, var(--ion-color-primary) 100%);
+  color: white;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 10px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-info h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-info ion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.profile-info ion-badge ion-icon {
+  font-size: 16px;
+}
+
+/* Títulos de tarjetas */
+ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+ion-card-title ion-icon {
+  font-size: 24px;
+}
+
+/* Lista de información */
+ion-list ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin: 8px 0;
+}
+
+ion-list ion-item ion-icon {
+  font-size: 24px;
+  margin-right: 12px;
+}
+
+ion-list ion-item p {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+ion-list ion-item h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--ion-text-color);
+}
+
+.user-id {
+  font-size: 12px !important;
+  font-family: monospace;
+  word-break: break-all;
+  color: var(--ion-color-medium) !important;
+}
+
+/* Grid de estadísticas */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.stat-item ion-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-info h2 {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.stat-info p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Botón de cerrar sesión */
+ion-button {
+  margin-top: 8px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .profile-info h2 {
+    font-size: 20px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-item {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+ion-card {
+  animation: slideDown 0.3s ease-out;
+}
+
+.stat-item {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.stat-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stat-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stat-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stat-item:nth-child(4) {
+  animation-delay: 0.4s;
+}

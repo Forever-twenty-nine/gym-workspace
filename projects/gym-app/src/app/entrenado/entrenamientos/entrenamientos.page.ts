@@ -40,6 +40,7 @@ import {
   timerOutline
 } from 'ionicons/icons';
 import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } from 'gym-library';
+import { CronometroRutinaComponent } from '../components/cronometro-rutina/cronometro-rutina.component';
 
 @Component({
   selector: 'app-entrenamientos',
@@ -63,7 +64,8 @@ import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } 
     IonLabel,
     IonList,
     IonModal,
-    IonChip
+    IonChip,
+    CronometroRutinaComponent
   ],
 })
 export class EntrenamientosPage implements OnInit, OnDestroy {
@@ -276,7 +278,7 @@ export class EntrenamientosPage implements OnInit, OnDestroy {
       this.marcarCompletado(rutina);
     }
     
-    console.log(`✅ Entrenamiento finalizado en ${this.formatearTiempoCronometro(tiempoFinal)}`);
+    console.log(`✅ Rutina finalizada en ${this.formatearTiempoCronometro(tiempoFinal)}`);
   }
 
   /**

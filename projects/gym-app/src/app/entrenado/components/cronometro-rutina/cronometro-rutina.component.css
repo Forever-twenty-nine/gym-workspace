@@ -1,0 +1,270 @@
+/* Contenedor principal en pantalla completa */
+.cronometro-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Contenido centrado */
+.cronometro-content {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+/* Header de la rutina */
+.rutina-header {
+  text-align: center;
+  color: white;
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rutina-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.9;
+}
+
+.rutina-nombre {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Información de ejercicios */
+.ejercicios-info {
+  animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+.ejercicios-info ion-chip {
+  font-size: 16px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  --color: white;
+}
+
+/* Contenedor del tiempo */
+.tiempo-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  animation: scaleIn 0.6s ease-out 0.3s both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Display del tiempo */
+.tiempo-display {
+  font-size: 80px;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  color: white;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  letter-spacing: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 24px 40px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  min-width: 320px;
+  text-align: center;
+}
+
+/* Estado del cronómetro */
+.estado-cronometro {
+  display: flex;
+  justify-content: center;
+}
+
+.estado-chip {
+  font-size: 14px;
+  height: 32px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+/* Controles */
+.controles-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp 0.6s ease-out 0.4s both;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.control-button {
+  --border-radius: 12px;
+  height: 56px;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.control-button ion-icon {
+  font-size: 24px;
+}
+
+/* Botón de pausar/reanudar */
+.control-button:nth-child(1) {
+  --background: rgba(255, 255, 255, 0.15);
+  --background-hover: rgba(255, 255, 255, 0.25);
+  --background-activated: rgba(255, 255, 255, 0.3);
+  --color: white;
+  --border-color: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+/* Botón finalizar */
+.control-button:nth-child(2) {
+  --background: rgba(16, 185, 129, 0.9);
+  --background-hover: rgba(16, 185, 129, 1);
+  --background-activated: rgba(5, 150, 105, 1);
+}
+
+/* Botón cancelar */
+.control-button:nth-child(3) {
+  --background: rgba(239, 68, 68, 0.15);
+  --background-hover: rgba(239, 68, 68, 0.25);
+  --background-activated: rgba(239, 68, 68, 0.3);
+  --color: white;
+  --border-color: rgba(239, 68, 68, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+/* Mensaje motivacional */
+.mensaje-motivacional {
+  text-align: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 500;
+  opacity: 0.9;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 576px) {
+  .tiempo-display {
+    font-size: 64px;
+    padding: 20px 32px;
+    min-width: 280px;
+    letter-spacing: 2px;
+  }
+
+  .rutina-nombre {
+    font-size: 24px;
+  }
+
+  .rutina-icon {
+    font-size: 40px;
+  }
+
+  .control-button {
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .mensaje-motivacional {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .tiempo-display {
+    font-size: 52px;
+    padding: 16px 24px;
+    min-width: 240px;
+  }
+
+  .control-button {
+    height: 48px;
+    font-size: 15px;
+  }
+}
+
+/* Modo paisaje en móviles */
+@media (max-height: 600px) and (orientation: landscape) {
+  .cronometro-content {
+    gap: 16px;
+  }
+
+  .tiempo-display {
+    font-size: 48px;
+    padding: 12px 24px;
+  }
+
+  .rutina-nombre {
+    font-size: 20px;
+  }
+
+  .control-button {
+    height: 44px;
+  }
+
+  .mensaje-motivacional {
+    display: none;
+  }
+}
