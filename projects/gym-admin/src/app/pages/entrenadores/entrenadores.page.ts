@@ -140,6 +140,20 @@ export class EntrenadoresPage {
     });
   });
 
+  // Computed para ejercicios filtrados por el entrenador actual en el modal de rutina
+  readonly ejerciciosFiltradosParaRutina = computed(() => {
+    const rutinaData = this.rutinaModalData();
+    const creadorId = rutinaData?.creadorId;
+    
+    if (!creadorId) {
+      return this.ejercicios();
+    }
+    
+    return this.ejercicios().filter(ej => 
+      ej.creadorId === creadorId && ej.creadorTipo === 'entrenador'
+    );
+  });
+
   readonly rutinas = computed(() => {
     return this.rutinaService.rutinas().map(rutina => {
       let creadorName = null;
@@ -184,17 +198,6 @@ export class EntrenadoresPage {
     showCounter: true,
     counterColor: 'green',
     showChips: ['creadorName']
-  };
-
-  readonly rutinasCardConfig: CardConfig = {
-    title: 'Rutinas',
-    createButtonText: 'Crear Rutina',
-    createButtonColor: 'purple',
-    emptyStateTitle: 'No hay rutinas creadas',
-    displayField: 'nombre',
-    showCounter: true,
-    counterColor: 'purple',
-    showChips: ['creadorName', 'asignadoName']
   };
 
   readonly mensajesCardConfig: CardConfig = {
@@ -474,13 +477,12 @@ export class EntrenadoresPage {
       },
       {
         name: 'rutinasAsociadas',
-        type: 'rutinas-multiselect',
-        label: `Rutinas del Entrenador (${rutinasEntrenador.length} disponibles)`,
+        type: 'rutinas-info',
+        label: `Rutinas del Entrenador (${rutinasEntrenador.length})`,
         colSpan: 2,
-        options: rutinasEntrenador.map(rutina => ({
-          value: rutina.id,
-          label: rutina.nombre,
-          extra: this.usuarios().find(u => u.uid === rutina.asignadoId)?.nombre || 'Sin entrenado'
+        rutinas: rutinasEntrenador.map(rutina => ({
+          ...rutina,
+          asignadoNombre: this.usuarios().find(u => u.uid === rutina.asignadoId)?.nombre || 'Sin asignar'
         }))
       },
       {
@@ -539,6 +541,10 @@ export class EntrenadoresPage {
 
   private createEmptyEjercicio(): any {
     const timestamp = Date.now();
+    
+    // Obtener el primer entrenador disponible como creador por defecto
+    const primerEntrenador = this.entrenadores()[0];
+    
     return {
       id: 'e' + timestamp,
       nombre: '',
@@ -547,7 +553,9 @@ export class EntrenadoresPage {
       peso: 0,
       serieSegundos: 0,
       descansoSegundos: 0,
-      descripcion: ''
+      descripcion: '',
+      creadorId: primerEntrenador?.id || '',
+      creadorTipo: 'entrenador'
     };
   }
 
@@ -589,6 +597,17 @@ export class EntrenadoresPage {
 
     try {
       let updatedData = { ...originalData, ...form.value };
+      
+      // Si se especificó un creadorId, buscar su rol y establecer creadorTipo
+      if (updatedData.creadorId) {
+        const creador = this.usuarios().find(u => u.uid === updatedData.creadorId);
+        if (creador && creador.role) {
+          updatedData.creadorTipo = creador.role.toLowerCase();
+        }
+      } else {
+        // Si no hay creadorId, eliminar también creadorTipo
+        delete updatedData.creadorTipo;
+      }
       
       await this.ejercicioService.save(updatedData);
       
@@ -676,20 +695,64 @@ export class EntrenadoresPage {
       {
         name: 'creadorId',
         type: 'select',
-        label: 'Creador del Ejercicio',
-        placeholder: 'Seleccionar creador (opcional)',
+        label: 'Entrenador Creador',
+        placeholder: 'Seleccionar entrenador',
         options: [
-          { value: '', label: '-- Sin creador --' },
+          { value: '', label: '-- Seleccionar entrenador --' },
           ...this.usuarios()
-            .filter(user => EjercicioService.canCreateEjercicio(user.role as Rol))
+            .filter(user => user.role === Rol.ENTRENADOR)
             .map(user => ({
               value: user.uid,
-              label: `${user.nombre || user.email || user.uid} (${user.role})`
+              label: `${user.nombre || user.email || user.uid}`
             }))
         ],
         colSpan: 2
       }
     ];
+  }
+  
+  // ========================================
+  // MÉTODOS PARA RUTINAS
+  // ========================================
+  
+  addRutinaParaEntrenador() {
+    const entrenadorActual = this.modalData();
+    if (!entrenadorActual || !entrenadorActual.id) {
+      this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
+      return;
+    }
+    
+    // Crear rutina con el entrenador ya seteado
+    const timestamp = Date.now();
+    const newItem = {
+      id: 'r' + timestamp,
+      nombre: '',
+      diasSemana: [],
+      descripcion: '',
+      ejercicios: [],
+      creadorId: entrenadorActual.id,
+      asignadoId: ''
+    };
+    
+    this.rutinaModalData.set(newItem);
+    this.isRutinaModalOpen.set(true);
+    this.isRutinaCreating.set(true);
+    this.createRutinaEditForm(newItem);
+  }
+  
+  editarRutinaDesdeEntrenador(rutinaId: string) {
+    console.log('🔍 Editando rutina:', rutinaId);
+    console.log('📋 Rutinas disponibles:', this.rutinas());
+    
+    const rutina = this.rutinas().find(r => r.id === rutinaId);
+    if (!rutina) {
+      this.toastService.log('ERROR: Rutina no encontrada');
+      console.error('❌ Rutina no encontrada con ID:', rutinaId);
+      return;
+    }
+    
+    console.log('✅ Rutina encontrada:', rutina);
+    this.openRutinaModal(rutina);
   }
   
   addSampleRutina() {
@@ -768,7 +831,26 @@ export class EntrenadoresPage {
     try {
       let updatedData = { ...originalData, ...form.value };
       
-      await this.rutinaService.save(updatedData);
+      // Limpiar campos undefined para evitar errores de Firestore
+      const rutinaToSave: any = {
+        id: updatedData.id,
+        nombre: updatedData.nombre || '',
+        descripcion: updatedData.descripcion || '',
+        diasSemana: updatedData.diasSemana || [],
+        ejercicios: updatedData.ejercicios || [],
+        creadorId: updatedData.creadorId || '',
+        asignadoId: updatedData.asignadoId || '',
+        activa: updatedData.activa ?? true,
+        completado: updatedData.completado ?? false,
+        fechaAsignacion: updatedData.fechaAsignacion || new Date()
+      };
+      
+      // Solo agregar entrenadoId si asignadoId existe y no está vacío
+      if (rutinaToSave.asignadoId) {
+        rutinaToSave.entrenadoId = rutinaToSave.asignadoId;
+      }
+      
+      await this.rutinaService.save(rutinaToSave);
       
       let logMessage = `Rutina ${this.isRutinaCreating() ? 'creada' : 'actualizada'}: ${updatedData.nombre}`;
       
@@ -794,6 +876,21 @@ export class EntrenadoresPage {
   }
 
   getRutinaFormFields(): FormFieldConfig[] {
+    const rutinaData = this.rutinaModalData();
+    const creadorId = rutinaData?.creadorId;
+    
+    // Filtrar ejercicios: solo mostrar los creados por el entrenador seleccionado
+    const ejerciciosDelEntrenador = creadorId 
+      ? this.ejercicios().filter(ej => ej.creadorId === creadorId && ej.creadorTipo === 'entrenador')
+      : this.ejercicios();
+    
+    // Si el creadorId está seteado, obtener el nombre del entrenador
+    const creadorNombre = creadorId 
+      ? this.usuarios().find(u => u.uid === creadorId)?.nombre || 
+        this.usuarios().find(u => u.uid === creadorId)?.email || 
+        'Entrenador'
+      : '';
+    
     return [
       {
         name: 'nombre',
@@ -819,23 +916,20 @@ export class EntrenadoresPage {
       {
         name: 'ejercicios',
         type: 'ejercicios-multiselect',
-        label: 'Ejercicios de la Rutina',
-        colSpan: 2
+        label: `Ejercicios Disponibles (${ejerciciosDelEntrenador.length})`,
+        colSpan: 2,
+        options: ejerciciosDelEntrenador.map(ejercicio => ({
+          value: ejercicio.id,
+          label: ejercicio.nombre,
+          extra: `${ejercicio.series}x${ejercicio.repeticiones}`
+        }))
       },
       {
         name: 'creadorId',
-        type: 'select',
-        label: 'Creador de la Rutina',
-        placeholder: 'Seleccionar creador (opcional)',
-        options: [
-          { value: '', label: '-- Sin creador --' },
-          ...this.usuarios()
-            .filter(user => user.role === Rol.ENTRENADOR || user.role === Rol.GIMNASIO)
-            .map(user => ({
-              value: user.uid,
-              label: `${user.nombre || user.email || user.uid} (${user.role})`
-            }))
-        ],
+        type: 'text',
+        label: 'Entrenador',
+        placeholder: creadorNombre || 'Sin entrenador',
+        readonly: true,
         colSpan: 1
       },
       {
@@ -1354,22 +1448,15 @@ export class EntrenadoresPage {
   getNotificacionesMensajesEntrenador(entrenadorId: string): any[] {
     if (!entrenadorId) return [];
     
-    // Obtener todas las notificaciones del sistema
     const todasLasNotificaciones = this.notificacionService.notificaciones();
     
-    // Obtener todos los mensajes donde el entrenador es destinatario o remitente
     const mensajesDelEntrenador = this.mensajes().filter(m => 
       m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
     );
     
-    // Filtrar notificaciones que:
-    // 1. Sean para este entrenador (usuarioId coincide)
-    // 2. Y estén relacionadas con mensajes
     const notificacionesDelEntrenador = todasLasNotificaciones.filter((notif: Notificacion) => {
-      // La notificación debe ser para este entrenador
       const esParaEsteEntrenador = notif.usuarioId === entrenadorId;
       
-      // La notificación debe estar relacionada con mensajes
       const tipoStr = String(notif.tipo).toLowerCase();
       const tituloStr = String(notif.titulo).toLowerCase();
       const esRelacionadaConMensajes = 
@@ -1379,23 +1466,19 @@ export class EntrenadoresPage {
       return esParaEsteEntrenador && esRelacionadaConMensajes;
     });
     
-    // Enriquecer notificaciones con información del mensaje
     return notificacionesDelEntrenador.map((notif: Notificacion) => {
-      // Buscar el mensaje más relevante para esta notificación
       const mensajeId = notif.datos?.['mensajeId'];
       const mensajeInfo = mensajeId 
         ? mensajesDelEntrenador.find(m => m.id === mensajeId)
         : mensajesDelEntrenador.find(m => 
             m.destinatarioId === entrenadorId || m.remitenteId === entrenadorId
           );
-      
-      // Obtener contador de no leídos de la conversación
+
       let noLeidos = 0;
       if (mensajeInfo?.conversacionId) {
         const conversacion = this.conversacionService.conversaciones().find(c => c.id === mensajeInfo.conversacionId);
         if (conversacion) {
           const usuario = this.usuarios().find(u => u.uid === entrenadorId);
-          // Obtener el contador según el rol del usuario
           noLeidos = usuario?.role === Rol.ENTRENADOR 
             ? conversacion.noLeidosEntrenador 
             : conversacion.noLeidosEntrenado;
@@ -1419,21 +1502,16 @@ export class EntrenadoresPage {
   }
 
   getConversacionesEntrenador(entrenadorId: string) {
-    console.log('🔍 getConversacionesEntrenador - entrenadorId:', entrenadorId);
     
-    // Si no hay ID, retornar array vacío
     if (!entrenadorId) {
-      console.log('⚠️ No hay entrenadorId, retornando array vacío');
+      console.error('⚠️ No hay entrenadorId, retornando array vacío');
       return [];
     }
     
     // Obtener todas las conversaciones donde participa el entrenador
     const todasConversaciones = this.conversacionService.conversaciones();
-    console.log('📚 Total conversaciones en sistema:', todasConversaciones.length);
     
     const conversaciones = todasConversaciones.filter(c => c.entrenadorId === entrenadorId);
-    console.log('💬 Conversaciones del entrenador:', conversaciones.length, conversaciones);
-    
     const resultado = conversaciones.map(conversacion => {
       // Obtener información del entrenado
       const entrenado = this.usuarios().find(u => u.uid === conversacion.entrenadoId);
@@ -1466,7 +1544,6 @@ export class EntrenadoresPage {
       return fechaB.getTime() - fechaA.getTime();
     });
     
-    console.log('✅ Resultado final:', resultado);
     return resultado;
   }
 

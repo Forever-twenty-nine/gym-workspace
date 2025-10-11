@@ -65,6 +65,7 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Output() responderConversacion = new EventEmitter<string>();
   @Output() aceptarInvitacion = new EventEmitter<string>();
   @Output() rechazarInvitacion = new EventEmitter<string>();
+  @Output() editarRutina = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -181,6 +182,11 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onResponderConversacion(conversacionId: string) {
     this.responderConversacion.emit(conversacionId);
+  }
+
+  onEditarRutina(rutinaId: string) {
+    console.log('🎯 Modal emitiendo editarRutina con ID:', rutinaId);
+    this.editarRutina.emit(rutinaId);
   }
 
   onAceptarInvitacion(invitacionId: string) {

@@ -22,16 +22,6 @@
       (delete)="deleteEjercicio($event)">
     </app-generic-card>
 
-    <!-- Card de Rutinas -->
-    <app-generic-card
-      [config]="rutinasCardConfig"
-      [items]="rutinas()"
-      [idField]="'id'"
-      (create)="addSampleRutina()"
-      (edit)="openRutinaModal($event)"
-      (delete)="deleteRutina($event)">
-    </app-generic-card>
-
     <!-- Card de Mensajes -->
     <app-generic-card
       [config]="mensajesCardConfig"
@@ -62,21 +52,20 @@
     [selectedEjercicios]="[]"
     [isLoading]="isLoading()"
     [showCustomAction]="!isCreating() && modalData() !== null"
-    [customActionLabel]="'Enviar Mensaje'"
-    [customActionIcon]="'💬'"
+    [customActionLabel]="'Crear Rutina'"
     [showCustomAction2]="!isCreating() && modalData() !== null"
-    [customAction2Label]="'Enviar Invitación'"
-    [customAction2Icon]="'🤝'"
+    [customAction2Label]="'Enviar Mensaje'"
     (close)="closeModal()"
     (save)="saveChanges()"
-    (customAction)="addMensaje()"
-    (customAction2)="addInvitacion()"
+    (customAction)="addRutinaParaEntrenador()"
+    (customAction2)="addMensaje()"
     (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
     (verMensaje)="abrirMensaje($event)"
     (responderMensaje)="responderMensaje($event)"
     (verConversacion)="abrirConversacion($event)"
     (marcarConversacionLeida)="marcarConversacionLeida($event)"
     (responderConversacion)="responderConversacion($event)"
+    (editarRutina)="editarRutinaDesdeEntrenador($event)"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
@@ -104,7 +93,7 @@
     [isCreating]="isRutinaCreating()"
     [form]="rutinaEditForm()"
     [formFields]="getRutinaFormFields()"
-    [ejercicios]="ejercicios()"
+    [ejercicios]="ejerciciosFiltradosParaRutina()"
     [selectedEjercicios]="rutinaModalData()?.ejercicios || []"
     [isLoading]="isLoading()"
     (close)="closeRutinaModal()"

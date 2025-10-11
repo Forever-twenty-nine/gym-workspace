@@ -259,42 +259,32 @@
                 </div>
               }
 
-              <!-- Información de rutinas del cliente (vista detallada) -->
+              <!-- Información de rutinas del entrenador (clickeable para editar) -->
               @case ('rutinas-info') {
                 <div class="border border-gray-300 rounded-xl bg-white shadow-inner">
                   @if (field.rutinas && field.rutinas.length > 0) {
-                    <div class="max-h-60 overflow-y-auto">
+                    <div class="max-h-60 overflow-y-auto divide-y divide-gray-100">
                       @for (rutina of field.rutinas; track rutina.id) {
-                        <div class="p-4 border-b border-gray-200 last:border-b-0 hover:bg-blue-50 transition-colors duration-150">
-                          <div class="flex justify-between items-center">
-                            <h4 class="font-medium text-gray-800">{{ rutina.nombre }}</h4>
-                            <div class="flex gap-2">
-                              @if (rutina.activa) {
-                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">Activa</span>
+                        <div class="px-4 py-3 hover:bg-purple-50 transition-colors duration-150 cursor-pointer group"
+                             (click)="onEditarRutina(rutina.id)">
+                          <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-800 group-hover:text-purple-600">
+                              {{ rutina.nombre }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                              @if (rutina.asignadoNombre) {
+                                Asignada a {{ rutina.asignadoNombre }}
                               } @else {
-                                <span class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded">Inactiva</span>
+                                Sin asignar
                               }
-                              @if (rutina.completado) {
-                                <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Completada</span>
-                              }
-                            </div>
-                          </div>
-                          <div class="text-sm text-gray-600 mt-2">
-                            <p><strong>Fecha asignación:</strong> {{ rutina.fechaAsignacion | date:'short' }}</p>
-                            @if (rutina.ejercicios && rutina.ejercicios.length > 0) {
-                              <p><strong>Ejercicios:</strong> {{ rutina.ejercicios.length }}</p>
-                            }
-                            @if (rutina.DiasSemana && rutina.DiasSemana.length > 0) {
-                              <p><strong>Días:</strong> {{ getDiasSemanaNombres(rutina.DiasSemana) }}</p>
-                            }
+                            </span>
                           </div>
                         </div>
                       }
                     </div>
                   } @else {
                     <div class="p-4 text-center text-gray-500">
-                      <p class="text-sm">No hay rutinas asignadas</p>
-                      <p class="text-xs text-gray-400 mt-1">Este cliente no tiene rutinas asociadas</p>
+                      <p class="text-sm">No hay rutinas creadas</p>
                     </div>
                   }
                 </div>
@@ -843,7 +833,7 @@
                           <!-- Botones de acción -->
                           <div class="flex gap-2 mt-2">
                             <button type="button"
-                                    (click)="onVerConversacion(conversacion.id)"
+                                    (click)="onVerConversacion(conversacion.id); $event.stopPropagation()"
                                     class="flex-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
                                     title="Ver conversación completa">
                                     👁️ Ver Conversación
