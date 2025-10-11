@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { 
   IonContent,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
   IonIcon,
   IonItem,
@@ -20,7 +18,8 @@ import {
   personOutline, 
   checkmarkCircleOutline,
   checkmarkCircle,
-  timeOutline
+  timeOutline,
+  time
 } from 'ionicons/icons';
 import { EntrenadoService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
@@ -34,8 +33,6 @@ import { Entrenado, Rutina } from 'gym-library';
     CommonModule,
     IonContent,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
     IonIcon,
     IonItem,
@@ -80,17 +77,27 @@ export class DashboardPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas que están EXPLÍCITAMENTE asignadas a este entrenado
-    // Solo usar la lógica nueva (asignadoId + asignadoTipo) para evitar datos corruptos
-    const rutinasDelEntrenado = rutinas.filter(rutina => 
-      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.ENTRENADO
-    );
+    // Filtrar rutinas asignadas a este entrenado
+    // Buscar en ambos campos: asignadoId (nuevo) y entrenadoId (legacy)
+    const rutinasDelEntrenado = rutinas.filter(rutina => {
+      const coincideId = rutina.asignadoId === userId || rutina.entrenadoId === userId;
+      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
+      return coincideId && coincideTipo;
+    });
     
-    return rutinasDelEntrenado.map(rutina => ({
-      nombre: rutina.nombre,
-      fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
-      completada: rutina.completado || false
-    }));
+    return rutinasDelEntrenado.map(rutina => {
+      // Obtener el nombre del creador (entrenador que asignó la rutina)
+      const allUsers = this.userService.users();
+      const creador = allUsers.find(u => u.uid === rutina.creadorId);
+      const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
+      
+      return {
+        nombre: rutina.nombre,
+        fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
+        completada: rutina.completado || false,
+        asignadoPor: asignadoPor
+      };
+    });
   });
 
   constructor() { 
@@ -100,7 +107,8 @@ export class DashboardPage implements OnInit {
       personOutline,
       checkmarkCircleOutline,
       checkmarkCircle,
-      timeOutline
+      timeOutline,
+      time
     });
   }
 

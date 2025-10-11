@@ -94,7 +94,7 @@
     [form]="rutinaEditForm()"
     [formFields]="getRutinaFormFields()"
     [ejercicios]="ejerciciosFiltradosParaRutina()"
-    [selectedEjercicios]="rutinaModalData()?.ejercicios || []"
+    [selectedEjercicios]="ejerciciosSeleccionadosIds()"
     [isLoading]="isLoading()"
     (close)="closeRutinaModal()"
     (save)="saveRutinaChanges()"

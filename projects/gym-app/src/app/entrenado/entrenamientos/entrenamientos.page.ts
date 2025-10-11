@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect, Injector, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonHeader, 
@@ -33,9 +33,13 @@ import {
   close,
   checkmarkCircleOutline,
   closeCircleOutline,
-  listOutline
+  listOutline,
+  documentTextOutline,
+  pauseOutline,
+  stopOutline,
+  timerOutline
 } from 'ionicons/icons';
-import { RutinaService, AuthService, Rol, Rutina } from 'gym-library';
+import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } from 'gym-library';
 
 @Component({
   selector: 'app-entrenamientos',
@@ -58,12 +62,14 @@ import { RutinaService, AuthService, Rol, Rutina } from 'gym-library';
     IonItem,
     IonLabel,
     IonList,
-    IonModal
+    IonModal,
+    IonChip
   ],
 })
-export class EntrenamientosPage implements OnInit {
+export class EntrenamientosPage implements OnInit, OnDestroy {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
+  private ejercicioService = inject(EjercicioService);
   private injector = inject(Injector);
 
   // Señal para todas las rutinas
@@ -73,6 +79,14 @@ export class EntrenamientosPage implements OnInit {
   rutinaSeleccionada = signal<any>(null);
   modalAbierto = signal<boolean>(false);
 
+  // Señales para el cronómetro
+  cronometroActivo = signal<boolean>(false);
+  cronometroPausado = signal<boolean>(false);
+  tiempoTranscurrido = signal<number>(0); // en segundos
+  rutinaEnCurso = signal<any>(null);
+  private intervaloId: any = null;
+  private tiempoInicio: number = 0;
+
   // Computed para rutinas del entrenado actual
   rutinas = computed(() => {
     const currentUser = this.authService.currentUser();
@@ -81,10 +95,13 @@ export class EntrenamientosPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar solo las rutinas asignadas a este entrenado
-    return rutinas.filter(rutina => 
-      rutina.asignadoId === userId && rutina.asignadoTipo === Rol.ENTRENADO
-    );
+    // Filtrar rutinas asignadas a este entrenado
+    // Buscar en ambos campos: asignadoId (nuevo) y entrenadoId (legacy)
+    return rutinas.filter(rutina => {
+      const coincideId = rutina.asignadoId === userId || rutina.entrenadoId === userId;
+      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
+      return coincideId && coincideTipo;
+    });
   });
 
   constructor() {
@@ -101,7 +118,11 @@ export class EntrenamientosPage implements OnInit {
       close,
       checkmarkCircleOutline,
       closeCircleOutline,
-      listOutline
+      listOutline,
+      documentTextOutline,
+      pauseOutline,
+      stopOutline,
+      timerOutline
     });
   }
 
@@ -146,6 +167,33 @@ export class EntrenamientosPage implements OnInit {
   }
 
   /**
+   * Obtiene el objeto ejercicio completo a partir de su ID
+   */
+  getEjercicioById(ejercicioId: string): Ejercicio | undefined {
+    return this.ejercicioService.ejercicios().find(ej => ej.id === ejercicioId);
+  }
+
+  /**
+   * Computed que convierte los IDs de ejercicios de la rutina seleccionada a objetos completos
+   */
+  ejerciciosCompletos = computed(() => {
+    const rutina = this.rutinaSeleccionada();
+    if (!rutina?.ejercicios) return [];
+    
+    const todosEjercicios = this.ejercicioService.ejercicios();
+    
+    // Si los ejercicios son strings (IDs), buscar los objetos completos
+    return rutina.ejercicios
+      .map((ej: any) => {
+        if (typeof ej === 'string') {
+          return todosEjercicios.find(ejercicio => ejercicio.id === ej);
+        }
+        return ej; // Ya es un objeto completo
+      })
+      .filter((ej: any) => ej !== undefined); // Filtrar ejercicios no encontrados
+  });
+
+  /**
    * Abre el modal con los detalles de la rutina
    */
   abrirDetalles(rutina: any): void {
@@ -173,12 +221,77 @@ export class EntrenamientosPage implements OnInit {
   }
 
   iniciarEntrenamiento(rutina: any) {
-    // Lógica para iniciar la rutina
-    console.log('Iniciar rutina:', rutina);
+    // Iniciar cronómetro
+    this.rutinaEnCurso.set(rutina);
+    this.cronometroActivo.set(true);
+    this.cronometroPausado.set(false);
+    this.tiempoTranscurrido.set(0);
+    this.tiempoInicio = Date.now();
+    
+    // Iniciar el intervalo del cronómetro
+    this.intervaloId = setInterval(() => {
+      if (!this.cronometroPausado()) {
+        const tiempoActual = Math.floor((Date.now() - this.tiempoInicio) / 1000);
+        this.tiempoTranscurrido.set(tiempoActual);
+      }
+    }, 1000);
+    
     // Cerrar modal si está abierto
     if (this.modalAbierto()) {
       this.cerrarModal();
     }
+  }
+
+  pausarCronometro() {
+    this.cronometroPausado.set(!this.cronometroPausado());
+    
+    if (!this.cronometroPausado()) {
+      // Al reanudar, ajustar el tiempo de inicio
+      const tiempoTranscurridoMs = this.tiempoTranscurrido() * 1000;
+      this.tiempoInicio = Date.now() - tiempoTranscurridoMs;
+    }
+  }
+
+  detenerCronometro() {
+    if (this.intervaloId) {
+      clearInterval(this.intervaloId);
+      this.intervaloId = null;
+    }
+    
+    this.cronometroActivo.set(false);
+    this.cronometroPausado.set(false);
+    this.tiempoTranscurrido.set(0);
+    this.rutinaEnCurso.set(null);
+  }
+
+  finalizarEntrenamiento() {
+    const tiempoFinal = this.tiempoTranscurrido();
+    const rutina = this.rutinaEnCurso();
+    
+    // Detener cronómetro
+    this.detenerCronometro();
+    
+    // Marcar rutina como completada
+    if (rutina) {
+      this.marcarCompletado(rutina);
+    }
+    
+    console.log(`✅ Entrenamiento finalizado en ${this.formatearTiempoCronometro(tiempoFinal)}`);
+  }
+
+  /**
+   * Formatea el tiempo del cronómetro en formato HH:MM:SS
+   */
+  formatearTiempoCronometro(segundos: number): string {
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segs = segundos % 60;
+    
+    const horasStr = horas.toString().padStart(2, '0');
+    const minutosStr = minutos.toString().padStart(2, '0');
+    const segsStr = segs.toString().padStart(2, '0');
+    
+    return `${horasStr}:${minutosStr}:${segsStr}`;
   }
 
   async marcarCompletado(rutina: any) {
@@ -197,6 +310,13 @@ export class EntrenamientosPage implements OnInit {
       }
     } catch (error) {
       console.error('Error al marcar rutina como completada:', error);
+    }
+  }
+
+  ngOnDestroy() {
+    // Limpiar el intervalo del cronómetro al destruir el componente
+    if (this.intervaloId) {
+      clearInterval(this.intervaloId);
     }
   }
 }

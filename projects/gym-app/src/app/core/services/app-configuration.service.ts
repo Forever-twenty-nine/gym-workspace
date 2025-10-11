@@ -1,12 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { 
   EntrenadoService, 
-  RutinaService, 
+  RutinaService,
+  EjercicioService,
   AuthService, 
   StorageService 
 } from 'gym-library';
 import { EntrenadoFirestoreAdapter } from '../adapters/entrenado-firestore.adapter';
 import { RutinaFirestoreAdapter } from '../adapters/rutina-firestore.adapter';
+import { EjercicioFirestoreAdapter } from '../adapters/ejercicio-firestore.adapter';
 import { FirebaseAuthAdapter } from '../adapters/firebase-auth.adapter';
 import { IonicStorageAdapter } from '../adapters/ionic-storage.adapter';
 
@@ -16,11 +18,13 @@ import { IonicStorageAdapter } from '../adapters/ionic-storage.adapter';
 export class AppConfigurationService {
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
+  private ejercicioService = inject(EjercicioService);
   private authService = inject(AuthService);
   private storageService = inject(StorageService);
 
   private entrenadoAdapter = inject(EntrenadoFirestoreAdapter);
   private rutinaAdapter = inject(RutinaFirestoreAdapter);
+  private ejercicioAdapter = inject(EjercicioFirestoreAdapter);
   private authAdapter = inject(FirebaseAuthAdapter);
   private storageAdapter = inject(IonicStorageAdapter);
 
@@ -29,6 +33,7 @@ export class AppConfigurationService {
       // Configurar adaptadores (sin llamar a checkCurrentUser automáticamente)
       this.entrenadoService.setFirestoreAdapter(this.entrenadoAdapter);
       this.rutinaService.setFirestoreAdapter(this.rutinaAdapter);
+      this.ejercicioService.setFirestoreAdapter(this.ejercicioAdapter);
       
       // Para auth, configurar el adaptador sin verificar usuario todavía
       // (evita llamadas a Firebase fuera del contexto de inyección)

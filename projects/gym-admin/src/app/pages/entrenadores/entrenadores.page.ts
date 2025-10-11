@@ -19,7 +19,8 @@ import {
   TipoMensaje,
   Invitacion,
   Conversacion,
-  Entrenador, 
+  Entrenador,
+  Ejercicio,
   Rol 
 } from 'gym-library';
 import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
@@ -151,6 +152,17 @@ export class EntrenadoresPage {
     
     return this.ejercicios().filter(ej => 
       ej.creadorId === creadorId && ej.creadorTipo === 'entrenador'
+    );
+  });
+
+  // Computed para obtener los IDs de los ejercicios seleccionados en la rutina
+  readonly ejerciciosSeleccionadosIds = computed(() => {
+    const rutinaData = this.rutinaModalData();
+    if (!rutinaData?.ejercicios) return [];
+    
+    // Los ejercicios pueden venir como objetos completos o como IDs
+    return rutinaData.ejercicios.map((ej: Ejercicio | string) => 
+      typeof ej === 'string' ? ej : ej.id
     );
   });
 

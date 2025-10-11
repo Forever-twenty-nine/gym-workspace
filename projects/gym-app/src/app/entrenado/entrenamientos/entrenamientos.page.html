@@ -11,6 +11,52 @@
     </ion-toolbar>
   </ion-header>
 
+  <!-- Cronómetro flotante -->
+  @if (cronometroActivo()) {
+    <div class="cronometro-flotante">
+      <ion-card style="margin: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <ion-card-header style="padding: 12px;">
+          <ion-card-title style="font-size: 14px; display: flex; align-items: center; gap: 8px;">
+            <ion-icon name="timer-outline" style="font-size: 20px; color: var(--ion-color-primary);"></ion-icon>
+            {{ rutinaEnCurso()?.nombre || 'Entrenamiento' }}
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content style="padding: 12px; padding-top: 0;">
+          <div style="text-align: center; margin-bottom: 12px;">
+            <div style="font-size: 32px; font-weight: bold; color: var(--ion-color-primary); font-family: monospace;">
+              {{ formatearTiempoCronometro(tiempoTranscurrido()) }}
+            </div>
+            <div style="font-size: 12px; color: var(--ion-color-medium); margin-top: 4px;">
+              @if (cronometroPausado()) {
+                <ion-chip color="warning" style="margin: 0; height: 20px; font-size: 10px;">
+                  <ion-icon name="pause-outline" style="font-size: 12px;"></ion-icon>
+                  <span style="margin-left: 4px;">Pausado</span>
+                </ion-chip>
+              } @else {
+                <ion-chip color="success" style="margin: 0; height: 20px; font-size: 10px;">
+                  <ion-icon name="play-outline" style="font-size: 12px;"></ion-icon>
+                  <span style="margin-left: 4px;">En progreso</span>
+                </ion-chip>
+              }
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: center;">
+            <ion-button size="small" fill="outline" (click)="pausarCronometro()">
+              <ion-icon [name]="cronometroPausado() ? 'play-outline' : 'pause-outline'" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button size="small" color="success" (click)="finalizarEntrenamiento()">
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              Finalizar
+            </ion-button>
+            <ion-button size="small" color="danger" fill="outline" (click)="detenerCronometro()">
+              <ion-icon name="stop-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  }
+
   <div class="entrenamientos-container">
     <ion-list>
       @if (rutinas().length === 0) {
@@ -23,7 +69,7 @@
         </ion-card>
       }
       
-      @for (rutina of rutinas(); track rutina.id) {
+      @for (rutina of rutinas(); track $index) {
         <ion-card class="rutina-card" (click)="abrirDetalles(rutina)">
           <ion-card-header>
             <div class="card-header-content">
@@ -31,36 +77,91 @@
                 <ion-icon name="fitness-outline"></ion-icon>
                 {{ rutina.nombre }}
               </ion-card-title>
-              @if (rutina.completado) {
-                <ion-icon name="checkmark-circle" color="success" class="completado-icon"></ion-icon>
-              }
+              <div style="display: flex; gap: 8px; align-items: center;">
+                @if (rutina.activa) {
+                  <ion-chip color="success" style="margin: 0;">
+                    <ion-icon name="checkmark-circle"></ion-icon>
+                    <ion-label>Activa</ion-label>
+                  </ion-chip>
+                }
+                @if (rutina.completado) {
+                  <ion-chip color="primary" style="margin: 0;">
+                    <ion-icon name="trophy-outline"></ion-icon>
+                    <ion-label>Completada</ion-label>
+                  </ion-chip>
+                }
+              </div>
             </div>
           </ion-card-header>
           
           <ion-card-content>
-            <div class="info-resumida">
-              <div class="info-item">
-                <ion-icon name="time-outline"></ion-icon>
-                <span>{{ rutina.duracion || 30 }} min</span>
-              </div>
-              
-              <div class="info-item">
-                <ion-icon name="fitness-outline"></ion-icon>
-                <span>{{ rutina.ejercicios?.length || 0 }} ejercicios</span>
-              </div>
-
-              <div class="info-item">
-                <ion-icon name="flame-outline"></ion-icon>
-                <span>~{{ calcularCaloriasEstimadas(rutina.duracion) }} kcal</span>
+            <!-- Información de asignación -->
+            <div class="info-asignacion" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--ion-color-light);">
+              <div style="display: flex; align-items: center; gap: 8px; color: var(--ion-color-medium); font-size: 13px;">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <span>{{ formatearFecha(rutina.fechaAsignacion) }}</span>
               </div>
             </div>
+
+            <!-- Días programados -->
+            @if (rutina.DiasSemana && rutina.DiasSemana.length > 0) {
+              <div class="info-dias" style="margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                  <ion-icon name="calendar-outline" style="font-size: 16px; color: var(--ion-color-primary);"></ion-icon>
+                  <span style="font-size: 12px; font-weight: 600; color: var(--ion-color-dark);">Días programados:</span>
+                </div>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                  @for (dia of rutina.DiasSemana; track $index) {
+                    <ion-chip color="primary" style="margin: 0; font-size: 11px; height: 24px;">
+                      {{ ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][dia] }}
+                    </ion-chip>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Estadísticas -->
+            <div class="info-resumida">
+              @if (rutina.duracion) {
+                <div class="info-item">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <span>{{ rutina.duracion }} min</span>
+                </div>
+              }
+              
+              @if (rutina.ejercicios && rutina.ejercicios.length > 0) {
+                <div class="info-item">
+                  <ion-icon name="fitness-outline"></ion-icon>
+                  <span>{{ rutina.ejercicios.length }} ejercicios</span>
+                </div>
+              }
+
+              @if (rutina.duracion) {
+                <div class="info-item">
+                  <ion-icon name="flame-outline"></ion-icon>
+                  <span>~{{ calcularCaloriasEstimadas(rutina.duracion) }} kcal</span>
+                </div>
+              }
+            </div>
+
+            <!-- Notas/Descripción (preview) -->
+            @if (rutina.notas) {
+              <div class="notas-preview" style="margin-top: 12px; padding: 10px; background: var(--ion-color-light); border-radius: 8px;">
+                <div style="display: flex; align-items: start; gap: 8px;">
+                  <ion-icon name="document-text-outline" style="font-size: 16px; color: var(--ion-color-medium); margin-top: 2px;"></ion-icon>
+                  <p style="margin: 0; font-size: 13px; color: var(--ion-color-medium); line-height: 1.4;">
+                    {{ rutina.notas.length > 80 ? (rutina.notas.substring(0, 80) + '...') : rutina.notas }}
+                  </p>
+                </div>
+              </div>
+            }
 
             <div class="accion-rapida">
               <ion-button 
                 fill="clear" 
                 size="small"
                 (click)="verDetalles($event, rutina)">
-                Ver más
+                Ver detalles completos
                 <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
               </ion-button>
             </div>
@@ -100,29 +201,35 @@
           <div class="modal-section">
             <h3>Información general</h3>
             <ion-list lines="none">
-              <ion-item>
-                <ion-icon name="time-outline" slot="start"></ion-icon>
-                <ion-label>
-                  <h4>Duración</h4>
-                  <p>{{ rutinaSeleccionada()!.duracion || 30 }} minutos</p>
-                </ion-label>
-              </ion-item>
+              @if (rutinaSeleccionada()!.duracion) {
+                <ion-item>
+                  <ion-icon name="time-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h4>Duración</h4>
+                    <p>{{ rutinaSeleccionada()!.duracion }} minutos</p>
+                  </ion-label>
+                </ion-item>
+              }
 
-              <ion-item>
-                <ion-icon name="fitness-outline" slot="start"></ion-icon>
-                <ion-label>
-                  <h4>Ejercicios</h4>
-                  <p>{{ rutinaSeleccionada()!.ejercicios?.length || 0 }} ejercicios</p>
-                </ion-label>
-              </ion-item>
+              @if (ejerciciosCompletos().length > 0) {
+                <ion-item>
+                  <ion-icon name="fitness-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h4>Ejercicios</h4>
+                    <p>{{ ejerciciosCompletos().length }} ejercicios</p>
+                  </ion-label>
+                </ion-item>
+              }
 
-              <ion-item>
-                <ion-icon name="flame-outline" slot="start"></ion-icon>
-                <ion-label>
-                  <h4>Calorías estimadas</h4>
-                  <p>~{{ calcularCaloriasEstimadas(rutinaSeleccionada()!.duracion) }} kcal</p>
-                </ion-label>
-              </ion-item>
+              @if (rutinaSeleccionada()!.duracion) {
+                <ion-item>
+                  <ion-icon name="flame-outline" slot="start"></ion-icon>
+                  <ion-label>
+                    <h4>Calorías estimadas</h4>
+                    <p>~{{ calcularCaloriasEstimadas(rutinaSeleccionada()!.duracion) }} kcal</p>
+                  </ion-label>
+                </ion-item>
+              }
 
               <ion-item>
                 <ion-icon name="calendar-outline" slot="start"></ion-icon>
@@ -154,31 +261,47 @@
           }
 
           <!-- Lista de ejercicios -->
-          @if (rutinaSeleccionada()!.ejercicios && rutinaSeleccionada()!.ejercicios!.length > 0) {
+          @if (ejerciciosCompletos().length > 0) {
             <div class="modal-section">
               <h3>
                 <ion-icon name="list-outline"></ion-icon>
-                Ejercicios ({{ rutinaSeleccionada()!.ejercicios!.length }})
+                Ejercicios ({{ ejerciciosCompletos().length }})
               </h3>
               <ion-list>
-                @for (ejercicio of rutinaSeleccionada()!.ejercicios; track ejercicio.id; let idx = $index) {
+                @for (ejercicio of ejerciciosCompletos(); track $index; let idx = $index) {
                   <ion-item lines="full" class="ejercicio-item">
                     <div class="ejercicio-numero" slot="start">{{ idx + 1 }}</div>
                     <ion-label>
-                      <h4>{{ ejercicio.nombre }}</h4>
+                      <h4>{{ ejercicio.nombre || 'Ejercicio sin nombre' }}</h4>
                       @if (ejercicio.descripcion) {
                         <p class="ejercicio-descripcion">{{ ejercicio.descripcion }}</p>
                       }
                       <div class="ejercicio-detalles">
-                        <span><strong>{{ ejercicio.series }}</strong> series</span>
-                        <span class="separador">•</span>
-                        <span><strong>{{ ejercicio.repeticiones }}</strong> reps</span>
+                        @if (ejercicio.series) {
+                          <span><strong>{{ ejercicio.series }}</strong> series</span>
+                        }
+                        @if (ejercicio.repeticiones) {
+                          @if (ejercicio.series) {
+                            <span class="separador">•</span>
+                          }
+                          <span><strong>{{ ejercicio.repeticiones }}</strong> reps</span>
+                        }
                         @if (ejercicio.peso) {
-                          <span class="separador">•</span>
+                          @if (ejercicio.series || ejercicio.repeticiones) {
+                            <span class="separador">•</span>
+                          }
                           <span><strong>{{ ejercicio.peso }}</strong> kg</span>
                         }
+                        @if (ejercicio.serieSegundos) {
+                          @if (ejercicio.series || ejercicio.repeticiones || ejercicio.peso) {
+                            <span class="separador">•</span>
+                          }
+                          <span><strong>{{ ejercicio.serieSegundos }}</strong>s por serie</span>
+                        }
                         @if (ejercicio.descansoSegundos) {
-                          <span class="separador">•</span>
+                          @if (ejercicio.series || ejercicio.repeticiones || ejercicio.peso || ejercicio.serieSegundos) {
+                            <span class="separador">•</span>
+                          }
                           <span>Descanso: <strong>{{ ejercicio.descansoSegundos }}s</strong></span>
                         }
                       </div>
@@ -187,18 +310,50 @@
                 }
               </ion-list>
             </div>
+          } @else {
+            <div class="modal-section">
+              <h3>
+                <ion-icon name="list-outline"></ion-icon>
+                Ejercicios
+              </h3>
+              <div style="text-align: center; padding: 24px; background: var(--ion-color-light); border-radius: 12px;">
+                <ion-icon name="fitness-outline" style="font-size: 48px; color: var(--ion-color-medium); margin-bottom: 8px;"></ion-icon>
+                <p style="margin: 0; color: var(--ion-color-medium);">Esta rutina no tiene ejercicios asignados</p>
+              </div>
+            </div>
           }
 
           <!-- Botones de acción -->
           <div class="modal-actions">
-            <ion-button 
-              expand="block" 
-              color="primary"
-              (click)="iniciarEntrenamiento(rutinaSeleccionada()!)"
-              [disabled]="rutinaSeleccionada()!.completado">
-              <ion-icon name="play-outline" slot="start"></ion-icon>
-              {{ rutinaSeleccionada()!.completado ? 'Completada' : 'Iniciar rutina' }}
-            </ion-button>
+            @if (!cronometroActivo()) {
+              <ion-button 
+                expand="block" 
+                color="primary"
+                (click)="iniciarEntrenamiento(rutinaSeleccionada()!)"
+                [disabled]="rutinaSeleccionada()!.completado">
+                <ion-icon name="timer-outline" slot="start"></ion-icon>
+                {{ rutinaSeleccionada()!.completado ? 'Completada' : 'Iniciar entrenamiento' }}
+              </ion-button>
+              <p style="text-align: center; font-size: 12px; color: var(--ion-color-medium); margin: 8px 0 12px 0;">
+                Se iniciará el cronómetro al comenzar
+              </p>
+            } @else if (rutinaEnCurso()?.id === rutinaSeleccionada()!.id) {
+              <ion-button 
+                expand="block" 
+                color="warning"
+                disabled>
+                <ion-icon name="timer-outline" slot="start"></ion-icon>
+                Entrenamiento en curso
+              </ion-button>
+            } @else {
+              <ion-button 
+                expand="block" 
+                color="medium"
+                disabled>
+                <ion-icon name="play-outline" slot="start"></ion-icon>
+                Ya hay un entrenamiento activo
+              </ion-button>
+            }
             
             <ion-button 
               expand="block" 

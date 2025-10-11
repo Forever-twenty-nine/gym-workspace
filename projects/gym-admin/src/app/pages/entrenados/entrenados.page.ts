@@ -10,6 +10,7 @@ import {
   MensajeService,
   ConversacionService,
   InvitacionService,
+  RutinaService,
   Notificacion,
   Mensaje,
   Conversacion,
@@ -48,6 +49,7 @@ export class EntrenadosPage {
   private readonly mensajeService = inject(MensajeService);
   private readonly conversacionService = inject(ConversacionService);
   private readonly invitacionService = inject(InvitacionService);
+  private readonly rutinaService = inject(RutinaService);
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly displayHelper = inject(DisplayHelperService);
@@ -96,6 +98,11 @@ export class EntrenadosPage {
         gimnasioName
       };
     });
+  });
+
+  // Rutinas del sistema
+  readonly rutinas = computed(() => {
+    return this.rutinaService.rutinas();
   });
 
   // Configuración de los cards
@@ -288,6 +295,21 @@ export class EntrenadosPage {
     // Obtener invitaciones pendientes del entrenado
     const invitacionesPendientes = this.getInvitacionesPendientesEntrenado(clienteData.id);
     
+    // Obtener rutinas asignadas al entrenado
+    const rutinasAsignadas = this.rutinas().filter(rutina => {
+      // Buscar en ambos campos: asignadoId (nuevo) y entrenadoId (legacy)
+      const coincideId = rutina.asignadoId === clienteData.id || rutina.entrenadoId === clienteData.id;
+      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
+      return coincideId && coincideTipo;
+    }).map(rutina => {
+      const creador = this.usuarios().find(u => u.uid === rutina.creadorId);
+      return {
+        ...rutina,
+        asignadoNombre: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Entrenado',
+        creadorNombre: creador?.nombre || creador?.email || 'Desconocido'
+      };
+    });
+    
     return [
       {
         name: 'nombre',
@@ -343,6 +365,13 @@ export class EntrenadosPage {
         label: 'Estado',
         checkboxLabel: 'Cliente Activo',
         colSpan: 1
+      },
+      {
+        name: 'rutinasAsignadas',
+        type: 'rutinas-simple',
+        label: 'Rutinas Asignadas',
+        colSpan: 2,
+        rutinas: rutinasAsignadas
       },
       {
         name: 'notificacionesMensajes',
@@ -825,20 +854,15 @@ export class EntrenadosPage {
   }
 
   getConversacionesEntrenado(entrenadoId: string) {
-    console.log('🔍 getConversacionesEntrenado - entrenadoId:', entrenadoId);
-    
     // Si no hay ID, retornar array vacío
     if (!entrenadoId) {
-      console.log('⚠️ No hay entrenadoId, retornando array vacío');
       return [];
     }
     
     // Obtener todas las conversaciones donde participa el entrenado
     const todasConversaciones = this.conversacionService.conversaciones();
-    console.log('📚 Total conversaciones en sistema:', todasConversaciones.length);
     
     const conversaciones = todasConversaciones.filter(c => c.entrenadoId === entrenadoId);
-    console.log('💬 Conversaciones del entrenado:', conversaciones.length, conversaciones);
     
     const resultado = conversaciones.map(conversacion => {
       // Obtener información del entrenador
@@ -872,14 +896,6 @@ export class EntrenadosPage {
       return fechaB.getTime() - fechaA.getTime();
     });
     
-    console.log('✅ Resultado final:', resultado);
-    console.table(resultado.map(r => ({
-      id: r.id,
-      entrenador: r.participantes.entrenador,
-      ultimoMensaje: r.ultimoMensaje?.substring(0, 50),
-      noLeidos: r.noLeidos,
-      fecha: r.ultimoMensajeFecha
-    })));
     return resultado;
   }
 
