@@ -3,5 +3,8 @@
   <app-navbar></app-navbar>
 
   <!-- Contenido de la página -->
-  <router-outlet></router-outlet>
+  <main [ngClass]="isCollapsed() ? 'pl-16' : 'pl-64'" class="transition-all duration-300 p-6 min-h-screen">
+    <app-header></app-header>
+    <router-outlet></router-outlet>
+  </main>
 </div>

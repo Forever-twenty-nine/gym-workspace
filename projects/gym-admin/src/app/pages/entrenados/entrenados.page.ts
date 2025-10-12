@@ -25,6 +25,7 @@ import { GenericCardComponent } from '../../components/shared/generic-card/gener
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastService } from '../../services/toast.service';
+import { PageTitleService } from '../../services/page-title.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
 
@@ -53,6 +54,7 @@ export class EntrenadosPage {
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly displayHelper = inject(DisplayHelperService);
+  private readonly pageTitleService = inject(PageTitleService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -186,6 +188,10 @@ export class EntrenadosPage {
       return remitente?.role === Rol.ENTRENADO;
     });
   });
+
+  constructor() {
+    this.pageTitleService.setTitle('Entrenados');
+  }
 
   async deleteEntrenado(id: string) {
     await this.entrenadoService.delete(id);

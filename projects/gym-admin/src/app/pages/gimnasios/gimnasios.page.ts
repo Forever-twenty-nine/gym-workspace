@@ -7,6 +7,7 @@ import { CardConfig } from '../../components/shared/generic-card/generic-card.ty
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { ToastService } from '../../services/toast.service';
+import { PageTitleService } from '../../services/page-title.service';
 
 @Component({
   selector: 'app-gimnasios-page',
@@ -28,6 +29,7 @@ export class GimnasiosPage {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
+  private readonly pageTitleService = inject(PageTitleService);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -65,6 +67,10 @@ export class GimnasiosPage {
   readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
+
+  constructor() {
+    this.pageTitleService.setTitle('Gimnasios');
+  }
 
   async deleteGimnasio(id: string) {
     await this.gimnasioService.delete(id);

@@ -9,6 +9,7 @@ import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
 import { DisplayHelperService } from '../../services/display-helper.service';
 import { ToastService } from '../../services/toast.service';
+import { PageTitleService } from '../../services/page-title.service';
 
 @Component({
   selector: 'app-usuarios-page',
@@ -29,10 +30,15 @@ export class UsuariosPage {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
   private readonly mensajeService = inject(MensajeService);
-  private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
   private readonly fb = inject(FormBuilder);
-  private readonly displayHelper = inject(DisplayHelperService);
+  private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
+  private readonly displayHelperService = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
+  private readonly pageTitleService = inject(PageTitleService);
+
+  constructor() {
+    this.pageTitleService.setTitle('Usuarios');
+  }
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -55,7 +61,7 @@ export class UsuariosPage {
       const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
       const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
       
-      const titulo = this.displayHelper.getTituloMensaje(mensaje.tipo);
+      const titulo = this.displayHelperService.getTituloMensaje(mensaje.tipo);
       
       return {
         ...mensaje,

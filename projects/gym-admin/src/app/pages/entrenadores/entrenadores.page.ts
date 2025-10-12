@@ -31,6 +31,7 @@ import { EntrenadorStatsComponent } from '../../components/entrenador-stats/entr
 import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
+import { PageTitleService } from '../../services/page-title.service';
 
 @Component({
   selector: 'app-entrenadores-page',
@@ -61,12 +62,14 @@ export class EntrenadoresPage {
   private readonly fb = inject(FormBuilder);
   private readonly displayHelper = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
+  private readonly pageTitleService = inject(PageTitleService);
 
   // Modal managers para mensajes e invitaciones
   readonly mensajeManager: GenericModalManager<Mensaje>;
   readonly invitacionManager: GenericModalManager<Invitacion>;
 
   constructor() {
+    this.pageTitleService.setTitle('Entrenadores');
     // Inicializar modal managers
     this.mensajeManager = new GenericModalManager<Mensaje>(
       this.fb,

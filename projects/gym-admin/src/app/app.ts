@@ -1,19 +1,26 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { HeaderComponent } from './components/shared/header/header.component';
+import { SidebarService } from './services/sidebar.service';
 
 @Component({
   selector: 'app-root',
   imports: [ 
     CommonModule,
     RouterOutlet,
-    NavbarComponent
+    NavbarComponent,
+    HeaderComponent
   ],
   templateUrl: './app.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class App {
+  private sidebarService = inject(SidebarService);
+
+  isCollapsed = this.sidebarService.isCollapsed;
+
   // Componente raíz simplificado
   // La lógica específica de cada sección está en sus respectivas páginas:
   // - EntrenadosPage: /pages/entrenados/entrenados.page.ts
