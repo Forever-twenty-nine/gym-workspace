@@ -27,6 +27,7 @@ import { GenericCardComponent } from '../../components/shared/generic-card/gener
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
+import { EntrenadorStatsComponent } from '../../components/entrenador-stats/entrenador-stats.component';
 import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
@@ -38,7 +39,8 @@ import { DisplayHelperService } from '../../services/display-helper.service';
     ReactiveFormsModule,
     GenericCardComponent,
     ModalFormComponent,
-    ToastComponent
+    ToastComponent,
+    EntrenadorStatsComponent
   ],
   templateUrl: './entrenadores.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -243,6 +245,9 @@ export class EntrenadoresPage {
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
 
+  // Signals para modal de selección de contenido
+  readonly isContentModalOpen = signal(false);
+
   // Signals para mensajes (desde el servicio)
   readonly mensajes = computed(() => {
     return this.mensajeService.mensajes().map(mensaje => {
@@ -274,16 +279,22 @@ export class EntrenadoresPage {
 
   // Signals para invitaciones (desde el servicio)
 
-  async deleteEntrenador(id: string) {
-    await this.entrenadorService.delete(id);
-    this.toastService.log(`Entrenador eliminado: ${id}`);
-  }
-
   openDetailsModal(item: any) {
     this.modalData.set(item);
     this.isModalOpen.set(true);
     this.isCreating.set(false);
     this.createEditForm(item);
+    
+    // Actualizar el control de clientes después de crear el form
+    const clientesEntrenador = this.getEntrenadosByEntrenador(item.id);
+    const clientesText = clientesEntrenador.length > 0 
+      ? clientesEntrenador.map(entrenado => {
+          const usuario = this.usuarios().find(u => u.uid === entrenado.id);
+          return usuario?.nombre || usuario?.email || `Cliente ${entrenado.id}`;
+        }).join('\n')
+      : 'No hay clientes asignados';
+    
+    this.editForm()?.get('clientesAsignados')?.setValue(clientesText);
   }
 
   closeModal() {
@@ -402,14 +413,17 @@ export class EntrenadoresPage {
 
   getFormFields(): FormFieldConfig[] {
     const entrenadorData = this.modalData();
+    console.log('getFormFields called with entrenadorData:', entrenadorData);
     
     // Si no hay datos, retornar array vacío
     if (!entrenadorData || !entrenadorData.id) {
+      console.log('No entrenadorData or id, returning empty array');
       return [];
     }
     
     const usuarioEntrenador = this.usuarios().find(u => u.uid === entrenadorData.id);
     const clientesEntrenador = this.getEntrenadosByEntrenador(entrenadorData.id);
+    console.log('clientesEntrenador:', clientesEntrenador);
     const rutinasEntrenador = this.getRutinasByEntrenador(entrenadorData.id);
     const ejerciciosEntrenador = this.getEjerciciosByEntrenador(entrenadorData.id);
     const gimnasioInfo = entrenadorData.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
@@ -476,16 +490,17 @@ export class EntrenadoresPage {
       },
       {
         name: 'clientesAsignados',
-        type: 'clientes-simple',
+        type: 'textarea',
         label: `Entrenados Asignados (${clientesEntrenador.length})`,
         colSpan: 2,
-        clientes: clientesEntrenador.map(entrenado => {
-          const usuario = this.usuarios().find(u => u.uid === entrenado.id);
-          return {
-            id: entrenado.id,
-            nombre: usuario?.nombre || usuario?.email || `Cliente ${entrenado.id}`
-          };
-        })
+        readonly: true,
+        rows: 5,
+        placeholder: clientesEntrenador.length > 0 
+          ? clientesEntrenador.map(entrenado => {
+              const usuario = this.usuarios().find(u => u.uid === entrenado.id);
+              return usuario?.nombre || usuario?.email || `Cliente ${entrenado.id}`;
+            }).join('\n')
+          : 'No hay clientes asignados'
       },
       {
         name: 'rutinasAsociadas',
@@ -516,18 +531,7 @@ export class EntrenadoresPage {
     // No se usa en entrenadores
   }
 
-  // ========================================
-  // MÉTODOS PARA EJERCICIOS
-  // ========================================
-  
-  addSampleEjercicio() {
-    this.openCreateEjercicioModal();
-  }
-
-  async deleteEjercicio(id: string) {
-    await this.ejercicioService.delete(id);
-    this.toastService.log(`Ejercicio eliminado: ${id}`);
-  }
+ 
 
   openEjercicioModal(item: any) {
     this.ejercicioModalData.set(item);
@@ -750,6 +754,72 @@ export class EntrenadoresPage {
     this.isRutinaModalOpen.set(true);
     this.isRutinaCreating.set(true);
     this.createRutinaEditForm(newItem);
+  }
+
+  addEjercicioParaEntrenador() {
+    const entrenadorActual = this.modalData();
+    if (!entrenadorActual || !entrenadorActual.id) {
+      this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
+      return;
+    }
+    
+    // Crear ejercicio con el entrenador como creador
+    const timestamp = Date.now();
+    const newItem = {
+      id: 'ej-' + timestamp,
+      nombre: '',
+      descripcion: '',
+      series: 3,
+      repeticiones: 10,
+      peso: 0,
+      descansoSegundos: 60,
+      serieSegundos: 30,
+      creadorId: entrenadorActual.id,
+      creadorTipo: Rol.ENTRENADOR,
+      fechaCreacion: new Date()
+    };
+    
+    this.ejercicioModalData.set(newItem);
+    this.isEjercicioModalOpen.set(true);
+    this.isEjercicioCreating.set(true);
+    this.createEjercicioEditForm(newItem);
+  }
+
+  openCreateContentModal() {
+    this.isContentModalOpen.set(true);
+  }
+
+  selectContentType(type: 'rutina' | 'ejercicio' | 'invitacion') {
+    this.isContentModalOpen.set(false);
+    
+    if (type === 'rutina') {
+      this.addRutinaParaEntrenador();
+    } else if (type === 'ejercicio') {
+      this.addEjercicioParaEntrenador();
+    } else if (type === 'invitacion') {
+      this.addInvitacionParaEntrenador();
+    }
+  }
+
+  addInvitacionParaEntrenador() {
+    const entrenadorActual = this.modalData();
+    if (!entrenadorActual || !entrenadorActual.id) {
+      this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
+      return;
+    }
+    
+    // Crear invitación con el entrenador preseleccionado
+    const newInvitacion = {
+      id: 'inv-' + Date.now(),
+      entrenadorId: entrenadorActual.id,
+      entrenadoId: '',
+      email: '',
+      estado: 'pendiente',
+      mensaje: '',
+      franjaHoraria: 'mañana',
+      fechaEnvio: new Date()
+    };
+    this.invitacionManager.openCreateModal(newInvitacion as any);
   }
   
   editarRutinaDesdeEntrenador(rutinaId: string) {

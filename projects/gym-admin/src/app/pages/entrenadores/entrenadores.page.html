@@ -1,35 +1,18 @@
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-3xl font-bold text-white mb-6">Entrenadores</h1>
+
+  <!-- Estadísticas Globales -->
+  <app-entrenador-stats></app-entrenador-stats>
   
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <section class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
     <!-- Card de Entrenadores -->
     <app-generic-card
       [config]="entrenadoresCardConfig"
       [items]="entrenadores()"
       [idField]="'id'"
       [canCreate]="false"
-      (edit)="openDetailsModal($event)"
-      (delete)="deleteEntrenador($event)">
-    </app-generic-card>
-
-    <!-- Card de Ejercicios -->
-    <app-generic-card
-      [config]="ejerciciosCardConfig"
-      [items]="ejercicios()"
-      [idField]="'id'"
-      (create)="addSampleEjercicio()"
-      (edit)="openEjercicioModal($event)"
-      (delete)="deleteEjercicio($event)">
-    </app-generic-card>
-
-    <!-- Card de Mensajes -->
-    <app-generic-card
-      [config]="mensajesCardConfig"
-      [items]="mensajesFiltrados()"
-      [idField]="'id'"
-      [canCreate]="false"
-      (edit)="openMensajeModal($event)"
-      (delete)="deleteMensaje($event)">
+      [canDelete]="false"
+      (edit)="openDetailsModal($event)">
     </app-generic-card>
 
     <!-- Card de Conversaciones -->
@@ -52,12 +35,12 @@
     [selectedEjercicios]="[]"
     [isLoading]="isLoading()"
     [showCustomAction]="!isCreating() && modalData() !== null"
-    [customActionLabel]="'Crear Rutina'"
+    [customActionLabel]="'Crear Contenido'"
     [showCustomAction2]="!isCreating() && modalData() !== null"
     [customAction2Label]="'Enviar Mensaje'"
     (close)="closeModal()"
     (save)="saveChanges()"
-    (customAction)="addRutinaParaEntrenador()"
+    (customAction)="openCreateContentModal()"
     (customAction2)="addMensaje()"
     (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
     (verMensaje)="abrirMensaje($event)"
@@ -134,4 +117,36 @@
     (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
+
+  <!-- Modal de selección de contenido -->
+  @if (isContentModalOpen()) {
+    <div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" (click)="isContentModalOpen.set(false)">
+      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 scale-100" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+          <h2 class="text-xl font-bold text-gray-800">¿Qué deseas crear?</h2>
+          <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110" (click)="isContentModalOpen.set(false)"
+            title="Cerrar">
+            ✕
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <button 
+            class="w-full p-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 flex items-center gap-3"
+            (click)="selectContentType('rutina')">
+            📋 <span class="font-medium">Crear Rutina</span>
+          </button>
+          <button 
+            class="w-full p-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors duration-200 flex items-center gap-3"
+            (click)="selectContentType('ejercicio')">
+            🏋️ <span class="font-medium">Crear Ejercicio</span>
+          </button>
+          <button 
+            class="w-full p-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors duration-200 flex items-center gap-3"
+            (click)="selectContentType('invitacion')">
+            📨 <span class="font-medium">Crear Invitación</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

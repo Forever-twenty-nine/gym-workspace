@@ -87,7 +87,7 @@ export class EntrenadosPage {
     return this.entrenadoService.entrenados().map(entrenado => {
       const usuario = this.usuarios().find(u => u.uid === entrenado.id);
       const entrenador = this.entrenadores().find(e => e.id === entrenado.entrenadorId);
-      const entrenadorName = entrenador?.displayName || (entrenado.entrenadorId ? `Entrenador ${entrenado.entrenadorId}` : null);
+      const entrenadorName = entrenador?.displayName || (entrenado.entrenadorId ? `Entrenador ${entrenado.entrenadorId}` : 'Sin asignar');
       const gimnasio = this.gimnasios().find(g => g.id === entrenado.gimnasioId);
       const gimnasioName = gimnasio?.displayName || (entrenado.gimnasioId ? `Gimnasio ${entrenado.gimnasioId}` : null);
       
