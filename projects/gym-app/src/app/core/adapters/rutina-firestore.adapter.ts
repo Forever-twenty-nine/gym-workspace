@@ -6,9 +6,11 @@ import {
   doc, 
   deleteDoc, 
   setDoc,
+  updateDoc,
   Timestamp,
   collectionData,
-  docData
+  docData,
+  deleteField
 } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Rutina, IRutinaFirestoreAdapter } from 'gym-library';
@@ -60,11 +62,16 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   async save(rutina: Rutina): Promise<void> {
     const dataToSave = this.mapToFirestore(rutina);
     
+    console.log('Guardando rutina en Firestore:', rutina.id, dataToSave);
+    
     if (rutina.id) {
       const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
       await setDoc(rutinaRef, dataToSave, { merge: true });
+      console.log('Rutina actualizada en Firestore');
     } else {
-      await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+      const rutinaRef = doc(collection(this.firestore, this.COLLECTION));
+      await setDoc(rutinaRef, dataToSave);
+      console.log('Nueva rutina creada en Firestore');
     }
   }
 
@@ -88,7 +95,8 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       // Nuevos campos
       creadorId: data.creadorId,
       creadorTipo: data.creadorTipo,
-      asignadoId: data.asignadoId,
+      asignadoId: data.asignadoId,  // Mantener compatibilidad con datos existentes
+      asignadoIds: data.asignadoIds || (data.asignadoId ? [data.asignadoId] : []),
       asignadoTipo: data.asignadoTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
@@ -121,23 +129,39 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       data.fechaAsignacion = rutina.fechaAsignacion instanceof Date 
         ? Timestamp.fromDate(rutina.fechaAsignacion)
         : rutina.fechaAsignacion;
+    } else if (rutina.fechaAsignacion === undefined) {
+      data.fechaAsignacion = deleteField();
     }
 
     // Nuevos campos opcionales
     if (rutina.creadorId) {
       data.creadorId = rutina.creadorId;
+    } else if (rutina.creadorId === undefined) {
+      data.creadorId = deleteField();
     }
     
     if (rutina.creadorTipo) {
       data.creadorTipo = rutina.creadorTipo;
+    } else if (rutina.creadorTipo === undefined) {
+      data.creadorTipo = deleteField();
     }
     
     if (rutina.asignadoId) {
       data.asignadoId = rutina.asignadoId;
+    } else if (rutina.asignadoId === undefined) {
+      data.asignadoId = deleteField();
+    }
+    
+    if (rutina.asignadoIds && rutina.asignadoIds.length > 0) {
+      data.asignadoIds = rutina.asignadoIds;
+    } else if (rutina.asignadoIds !== undefined) {
+      data.asignadoIds = deleteField();
     }
     
     if (rutina.asignadoTipo) {
       data.asignadoTipo = rutina.asignadoTipo;
+    } else if (rutina.asignadoTipo === undefined) {
+      data.asignadoTipo = deleteField();
     }
     
     if (rutina.fechaCreacion) {

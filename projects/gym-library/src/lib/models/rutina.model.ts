@@ -15,8 +15,9 @@ export interface Rutina {
     // Información del creador (opcional)
     creadorId?: string; 
     creadorTipo?: Rol;
-    // Informacion del asignado (opcional)
-    asignadoId?: string;
+    // Información del asignado (opcional) - puede ser uno o múltiples
+    asignadoId?: string;  // Mantener para compatibilidad
+    asignadoIds?: string[];  // Nuevo campo para múltiples asignados
     asignadoTipo?: Rol;
     // Metadatos
     fechaCreacion?: Date;

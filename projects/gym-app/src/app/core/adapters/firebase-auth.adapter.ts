@@ -1,5 +1,5 @@
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { Auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, authState, User as FirebaseUser } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, authState, User as FirebaseUser, createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { Firestore, doc, getDoc } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { User } from 'gym-library';
@@ -8,6 +8,7 @@ import { Rol } from 'gym-library';
 interface IAuthAdapter {
   loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }>;
   loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
+  registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
   logout(): Promise<void>;
   getCurrentUser(): Promise<User | null>;
   isAuthenticated(): Promise<boolean>;
@@ -125,6 +126,41 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
 
   async isAuthenticated(): Promise<boolean> {
     return !!this.authStateSignal();
+  }
+
+  async registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      const firebaseUser = userCredential.user;
+
+      if (firebaseUser) {
+        // Crear usuario básico
+        const newUser: User = {
+          uid: firebaseUser.uid,
+          nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
+          email: firebaseUser.email || '',
+          role: this.inferRoleFromEmail(email),
+          onboarded: false
+        };
+
+        return { success: true, user: newUser };
+      } else {
+        return { success: false, error: 'No se pudo crear la cuenta' };
+      }
+    } catch (error: any) {
+      console.error('Error en registro con email:', error);
+      
+      let errorMessage = 'Error al crear la cuenta';
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este email ya está registrado';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'El email no tiene un formato válido';
+      }
+      
+      return { success: false, error: errorMessage };
+    }
   }
 
   private inferRoleFromEmail(email: string): Rol {

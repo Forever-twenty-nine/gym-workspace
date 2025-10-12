@@ -17,7 +17,7 @@ import {
   checkmarkCircleOutline,
   arrowBackOutline
 } from 'ionicons/icons';
-import { AuthService } from 'gym-library';
+import { AuthService, UserService } from 'gym-library';
 
 @Component({
   selector: 'app-register',
@@ -43,7 +43,8 @@ export class RegisterPage {
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {
     addIcons({
       lockClosedOutline,
@@ -178,8 +179,63 @@ export class RegisterPage {
    * Registra un nuevo usuario
    */
   async register() {
-    // solo mock
-    this.router.navigate(['/onboarding']);
+    if (this.registerForm.invalid) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isSubmitDisabled = true;
+
+    try {
+      const { email, password } = this.registerForm.value;
+
+      // Crear cuenta en Firebase Auth
+      const result = await this.authService.registerWithEmail(email, password);
+      
+      if (!result) {
+        throw new Error('Error al crear la cuenta');
+      }
+
+      // Crear perfil de usuario en Firestore
+      const userData = {
+        nombre: '', // Se completará en onboarding
+        rol: 'ENTRENADO', // Por defecto, puede cambiarse después
+        fechaCreacion: new Date(),
+        activo: true
+      };
+
+      // Usar el UID del usuario actual (después del registro exitoso)
+      const currentUser = this.authService.currentUser();
+      if (currentUser) {
+        await this.userService.updateUser(currentUser.uid, userData);
+      }
+
+      this.successMessage = 'Cuenta creada exitosamente. Redirigiendo...';
+
+      // Pequeño delay para mostrar el mensaje de éxito
+      setTimeout(() => {
+        this.router.navigate(['/onboarding']);
+      }, 1500);
+
+    } catch (error: any) {
+      console.error('Error al registrar usuario:', error);
+
+      // Manejar diferentes tipos de errores
+      if (error.code === 'auth/email-already-in-use') {
+        this.errorMessage = 'Este email ya está registrado. Intenta iniciar sesión.';
+      } else if (error.code === 'auth/weak-password') {
+        this.errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+      } else if (error.code === 'auth/invalid-email') {
+        this.errorMessage = 'El email no tiene un formato válido.';
+      } else if (error.code === 'auth/network-request-failed') {
+        this.errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+      } else {
+        this.errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
+      }
+
+      this.isSubmitDisabled = false;
+    }
   }
 
   /**

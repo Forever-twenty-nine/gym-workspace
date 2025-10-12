@@ -21,12 +21,11 @@ import {
   IonInput,
   IonTextarea,
   IonSelect,
-  IonSelectOption,
-  IonLoading
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline } from 'ionicons/icons';
-import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado } from 'gym-library';
+import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
+import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol } from 'gym-library';
 
 @Component({
   selector: 'app-entrenados',
@@ -55,8 +54,7 @@ import { AuthService, EntrenadoService, UserService, NotificacionService, Entren
     IonInput,
     IonTextarea,
     IonSelect,
-    IonSelectOption,
-    IonLoading
+    IonSelectOption
   ],
   styles: [`
     .entrenado-detail {
@@ -115,6 +113,7 @@ export class EntrenadosPage implements OnInit {
   private entrenadoService = inject(EntrenadoService);
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
+  private rutinaService = inject(RutinaService);
   private fb = inject(FormBuilder);
 
   isModalOpen = signal(false);
@@ -131,13 +130,18 @@ export class EntrenadosPage implements OnInit {
     })
   );
 
+  // Señales para gestión de rutinas
+  isRutinasModalOpen = signal(false);
+  rutinasEntrenado = signal<Rutina[]>([]);
+  rutinasDisponibles = signal<Rutina[]>([]);
+
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId) : [];
   });
 
   constructor() {
-    addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline });
+    addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline });
   }
 
   ngOnInit() {
@@ -152,6 +156,15 @@ export class EntrenadosPage implements OnInit {
   closeModal() {
     this.isModalOpen.set(false);
     this.selectedEntrenado.set(null);
+  }
+
+  getRutinasAsignadasCount(entrenadoId: string): number {
+    const rutinas = this.rutinaService.rutinas();
+    return rutinas.filter(rutina => 
+      (rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) ||
+      (rutina.asignadoId === entrenadoId) || // Compatibilidad con datos antiguos
+      rutina.entrenadoId === entrenadoId
+    ).length;
   }
 
   getUserName(userId: string): string {
@@ -201,6 +214,114 @@ export class EntrenadosPage implements OnInit {
       console.error('Error al enviar invitación:', error);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  // Métodos para gestión de rutinas
+  openRutinasModal(entrenado: Entrenado) {
+    this.selectedEntrenado.set(entrenado);
+    this.cargarRutinasEntrenado(entrenado.id);
+    this.cargarRutinasDisponibles();
+    this.isRutinasModalOpen.set(true);
+  }
+
+  closeRutinasModal() {
+    this.isRutinasModalOpen.set(false);
+    this.selectedEntrenado.set(null);
+    this.rutinasEntrenado.set([]);
+    this.rutinasDisponibles.set([]);
+  }
+
+  private cargarRutinasEntrenado(entrenadoId: string) {
+    const rutinas = this.rutinaService.rutinas();
+    const rutinasEntrenado = rutinas.filter(rutina => 
+      (rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) ||
+      (rutina.asignadoId === entrenadoId) || // Compatibilidad con datos antiguos
+      rutina.entrenadoId === entrenadoId
+    );
+    this.rutinasEntrenado.set(rutinasEntrenado);
+  }
+
+  private cargarRutinasDisponibles() {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    const entrenadoId = this.selectedEntrenado()?.id;
+    if (!entrenadorId || !entrenadoId) return;
+
+    const rutinas = this.rutinaService.rutinas();
+    const rutinasEntrenador = rutinas.filter(rutina => 
+      rutina.creadorId === entrenadorId && 
+      !(rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) &&
+      rutina.asignadoId !== entrenadoId // Compatibilidad con datos antiguos
+    );
+    this.rutinasDisponibles.set(rutinasEntrenador);
+  }
+
+  async asignarRutina(rutina: Rutina) {
+    if (!this.selectedEntrenado()) return;
+
+    console.log('Asignando rutina:', rutina.nombre, 'a entrenado:', this.selectedEntrenado()!.id);
+
+    try {
+      // Si ya está asignada a este entrenado, no hacer nada
+      const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
+      if (asignadoIds.includes(this.selectedEntrenado()!.id)) {
+        console.log('La rutina ya está asignada a este entrenado');
+        return;
+      }
+
+      const rutinaActualizada: Rutina = {
+        ...rutina,
+        asignadoIds: [...asignadoIds, this.selectedEntrenado()!.id],
+        asignadoTipo: Rol.ENTRENADO,
+        fechaAsignacion: new Date()
+      };
+
+      console.log('Rutina actualizada:', rutinaActualizada);
+      await this.rutinaService.save(rutinaActualizada);
+      console.log('Rutina guardada exitosamente');
+
+      // Esperar un momento para que el listener se actualice
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
+      this.cargarRutinasDisponibles();
+      
+      console.log('Listas recargadas');
+    } catch (error) {
+      console.error('Error al asignar rutina:', error);
+    }
+  }
+
+  async desasignarRutina(rutina: Rutina) {
+    console.log('Desasignando rutina:', rutina.nombre);
+
+    try {
+      const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
+      const nuevosAsignados = asignadoIds.filter(id => id !== this.selectedEntrenado()!.id);
+
+      const rutinaActualizada: Rutina = {
+        ...rutina,
+        asignadoIds: nuevosAsignados.length > 0 ? nuevosAsignados : undefined,
+        // Si no quedan asignados, limpiar también asignadoTipo y fechaAsignacion
+        ...(nuevosAsignados.length === 0 && {
+          asignadoTipo: undefined,
+          fechaAsignacion: undefined as any
+        })
+      };
+
+      console.log('Rutina actualizada para desasignar:', rutinaActualizada);
+      await this.rutinaService.save(rutinaActualizada);
+      console.log('Rutina desasignada exitosamente');
+
+      // Esperar un momento para que el listener se actualice
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
+      this.cargarRutinasDisponibles();
+      
+      console.log('Listas recargadas después de desasignar');
+    } catch (error) {
+      console.error('Error al desasignar rutina:', error);
     }
   }
 }

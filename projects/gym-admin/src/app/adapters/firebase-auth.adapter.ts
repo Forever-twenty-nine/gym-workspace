@@ -94,6 +94,15 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
       return { success: false, error: 'No se pudo crear el usuario en Firebase Auth' };
     } catch (error: any) {
       console.error('❌ FirebaseAuthAdapter: Error creando usuario:', error);
+      
+      // Si el usuario ya existe, informar al administrador
+      if (error.code === 'auth/email-already-in-use') {
+        return { 
+          success: false, 
+          error: 'Este email ya está registrado. El usuario debe iniciar sesión primero desde la app móvil antes de poder ser administrado desde aquí.' 
+        };
+      }
+      
       return { success: false, error: this.getErrorMessage(error) };
     }
   }

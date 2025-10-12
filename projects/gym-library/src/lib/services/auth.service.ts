@@ -4,6 +4,7 @@ import { User } from '../models/user.model';
 export interface IAuthAdapter {
   loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }>;
   loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
+  registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
   logout(): Promise<void>;
   getCurrentUser(): Promise<User | null>;
   isAuthenticated(): Promise<boolean>;
@@ -109,6 +110,36 @@ export class AuthService {
         return true;
       } else {
         this._error.set(result.error || 'Error desconocido en login con email');
+        return false;
+      }
+    } catch (error: any) {
+      this._error.set(error.message || 'Error desconocido');
+      return false;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * Registra un nuevo usuario con email y contraseña
+   */
+  async registerWithEmail(email: string, password: string): Promise<boolean> {
+    if (!this.authAdapter) {
+      throw new Error('Auth adapter no configurado');
+    }
+
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    try {
+      const result = await this.authAdapter.registerWithEmail(email, password);
+      
+      if (result.success && result.user) {
+        this._currentUser.set(result.user);
+        this._isAuthenticated.set(true);
+        return true;
+      } else {
+        this._error.set(result.error || 'Error desconocido en registro con email');
         return false;
       }
     } catch (error: any) {

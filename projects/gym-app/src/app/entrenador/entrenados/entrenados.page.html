@@ -17,10 +17,19 @@
               <ion-label>
                 <h3>{{ getUserName(entrenado.id) }}</h3>
                 <p>Objetivo: {{ entrenado.objetivo }}</p>
+                <p style="font-size: 0.9em; color: var(--ion-color-primary);">
+                  <ion-icon name="fitness-outline" style="font-size: 14px;"></ion-icon>
+                  {{ getRutinasAsignadasCount(entrenado.id) }} rutinas asignadas
+                </p>
               </ion-label>
-              <ion-button fill="clear" slot="end" color="primary">
-                Ver
-              </ion-button>
+              <div slot="end" style="display: flex; gap: 8px;">
+                <ion-button fill="clear" color="secondary" (click)="$event.stopPropagation(); openRutinasModal(entrenado)">
+                  <ion-icon name="fitness-outline"></ion-icon>
+                </ion-button>
+                <ion-button fill="clear" color="primary">
+                  Ver
+                </ion-button>
+              </div>
             </ion-item>
           }
         </ion-list>
@@ -148,15 +157,89 @@
           </ion-textarea>
         </ion-item>
 
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="invitacionForm().invalid || isLoading()"
-          class="ion-margin-top">
-          <ion-loading *ngIf="isLoading()" slot="start"></ion-loading>
-          Enviar Invitación
-        </ion-button>
       </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal de gestión de rutinas -->
+<ion-modal [isOpen]="isRutinasModalOpen()" (willDismiss)="closeRutinasModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Rutinas de {{ selectedEntrenado() ? getUserName(selectedEntrenado()!.id) : '' }}</ion-title>
+        <ion-button slot="end" fill="clear" color="light" (click)="closeRutinasModal()">
+          <ion-icon name="close"></ion-icon>
+        </ion-button>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <!-- Rutinas asignadas -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Rutinas Asignadas</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          @if (rutinasEntrenado().length > 0) {
+            <ion-list>
+              @for (rutina of rutinasEntrenado(); track rutina.id) {
+                <ion-item>
+                  <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
+                  <ion-label>
+                    <h3>{{ rutina.nombre }}</h3>
+                    <p>Asignada: {{ rutina.fechaAsignacion | date:'dd/MM/yyyy' }}</p>
+                    @if (rutina.asignadoIds && rutina.asignadoIds.length > 1) {
+                      <p style="font-size: 0.9em; color: var(--ion-color-secondary);">
+                        Compartida con {{ rutina.asignadoIds.length - 1 }} entrenado(s) más
+                      </p>
+                    }
+                  </ion-label>
+                  @if ((rutina.asignadoIds && rutina.asignadoIds.includes(selectedEntrenado()!.id)) || rutina.asignadoId === selectedEntrenado()!.id) {
+                    <ion-button fill="outline" color="danger" slot="end" (click)="desasignarRutina(rutina)">
+                      <ion-icon name="remove-circle-outline"></ion-icon>
+                      Quitar
+                    </ion-button>
+                  }
+                </ion-item>
+              }
+            </ion-list>
+          } @else {
+            <p style="text-align: center; color: var(--ion-color-medium); padding: 20px;">
+              No hay rutinas asignadas
+            </p>
+          }
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Rutinas disponibles para asignar -->
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>Rutinas Disponibles</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          @if (rutinasDisponibles().length > 0) {
+            <ion-list>
+              @for (rutina of rutinasDisponibles(); track rutina.id) {
+                <ion-item>
+                  <ion-icon name="fitness-outline" slot="start" color="secondary"></ion-icon>
+                  <ion-label>
+                    <h3>{{ rutina.nombre }}</h3>
+                    <p>{{ rutina.ejercicios?.length || 0 }} ejercicios</p>
+                  </ion-label>
+                  <ion-button fill="solid" color="primary" slot="end" (click)="asignarRutina(rutina)">
+                    <ion-icon name="add-circle-outline"></ion-icon>
+                    Asignar
+                  </ion-button>
+                </ion-item>
+              }
+            </ion-list>
+          } @else {
+            <p style="text-align: center; color: var(--ion-color-medium); padding: 20px;">
+              No hay rutinas disponibles para asignar
+            </p>
+          }
+        </ion-card-content>
+      </ion-card>
     </ion-content>
   </ng-template>
 </ion-modal>
