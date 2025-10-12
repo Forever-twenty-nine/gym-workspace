@@ -7,16 +7,30 @@ export interface Notificacion {
     titulo: string;
     mensaje: string;
     leida: boolean;
-    
+
     // Datos adicionales según tipo (opcional)
     datos?: {
-        rutinaId?: string;
-        entrenadoId?: string;
+        // Para invitaciones
         entrenadorId?: string;
-        ejercicioId?: string;
+        entrenadorNombre?: string;
+        emailInvitado?: string;
+        estadoInvitacion?: 'pendiente' | 'aceptada' | 'rechazada';
+        fechaRespuesta?: Date;
+
+        // Para rutinas
+        rutinaId?: string;
+        rutinaNombre?: string;
+
+        // Para mensajes
+        mensajeId?: string;
+        conversacionId?: string;
+        remitenteId?: string;
+        remitenteNombre?: string;
+
+        // Genérico para otros tipos
         [key: string]: any;
     };
-    
+
     // Metadata
     fechaCreacion: Date;
     fechaLeida?: Date;

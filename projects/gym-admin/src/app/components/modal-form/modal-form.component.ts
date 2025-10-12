@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Ejercicio } from 'gym-library';
@@ -27,6 +27,7 @@ export interface FormFieldConfig {
   mensajesConversacion?: any[];  // Historial de mensajes de una conversación
   conversaciones?: any[];  // Lista de conversaciones del usuario
   invitaciones?: any[];  // Lista de invitaciones pendientes
+  showClearButton?: boolean;  // Mostrar botón para limpiar/clear
 }
 
 @Component({
@@ -35,7 +36,7 @@ export interface FormFieldConfig {
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './modal-form.component.html'
 })
-export class ModalFormComponent implements OnInit, OnDestroy {
+export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isOpen: boolean = false;
   @Input() modalType: string = '';
   @Input() isCreating: boolean = true;
@@ -66,6 +67,7 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Output() aceptarInvitacion = new EventEmitter<string>();
   @Output() rechazarInvitacion = new EventEmitter<string>();
   @Output() editarRutina = new EventEmitter<string>();
+  @Output() clearField = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -80,6 +82,13 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   ngOnInit() {
     if (this.isOpen) {
       document.body.style.overflow = 'hidden';
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['formFields'] && this.formFields) {
+      // Debug: loggear notificaciones cuando cambian los formFields
+      const notificacionesField = this.formFields.find(f => f.name === 'notificacionesMensajes');
     }
   }
 
@@ -185,16 +194,15 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   }
 
   onEditarRutina(rutinaId: string) {
-    console.log('🎯 Modal emitiendo editarRutina con ID:', rutinaId);
     this.editarRutina.emit(rutinaId);
   }
 
-  onAceptarInvitacion(invitacionId: string) {
-    this.aceptarInvitacion.emit(invitacionId);
+  onAceptarInvitacion(entrenadorId: string) {
+    this.aceptarInvitacion.emit(entrenadorId);
   }
 
-  onRechazarInvitacion(invitacionId: string) {
-    this.rechazarInvitacion.emit(invitacionId);
+  onRechazarInvitacion(entrenadorId: string) {
+    this.rechazarInvitacion.emit(entrenadorId);
   }
 
   onResponderMensaje(mensajeId?: string) {
@@ -210,6 +218,10 @@ export class ModalFormComponent implements OnInit, OnDestroy {
       };
       this.responderMensaje.emit(datos);
     }
+  }
+
+  onClearField(fieldName: string) {
+    this.clearField.emit(fieldName);
   }
 
   contarNoLeidas(notificaciones: any[]): number {

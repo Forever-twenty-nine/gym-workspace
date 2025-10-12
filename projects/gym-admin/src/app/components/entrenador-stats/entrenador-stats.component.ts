@@ -4,8 +4,9 @@ import {
   MensajeService,
   RutinaService,
   EjercicioService,
-  InvitacionService,
+  NotificacionService,
   EntrenadorService,
+  TipoNotificacion,
   Rol
 } from 'gym-library';
 
@@ -64,7 +65,7 @@ export class EntrenadorStatsComponent {
   private mensajeService = inject(MensajeService);
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
-  private invitacionService = inject(InvitacionService);
+  private notificacionService = inject(NotificacionService);
   private entrenadorService = inject(EntrenadorService);
 
   // Lista de IDs de entrenadores para filtrar
@@ -91,6 +92,10 @@ export class EntrenadorStatsComponent {
   });
 
   totalInvitaciones = computed(() => {
-    return this.invitacionService.invitaciones().length;
+    return this.notificacionService.notificaciones().filter(n =>
+      n.tipo === TipoNotificacion.INVITACION_PENDIENTE ||
+      n.tipo === TipoNotificacion.INVITACION_ACEPTADA ||
+      n.tipo === TipoNotificacion.INVITACION_RECHAZADA
+    ).length;
   });
 }

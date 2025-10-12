@@ -10,14 +10,12 @@ import {
   EjercicioService, 
   NotificacionService,
   MensajeService,
-  InvitacionService,
   ConversacionService,
   AuthService,
   Notificacion,
   TipoNotificacion,
   Mensaje,
   TipoMensaje,
-  Invitacion,
   Conversacion,
   Entrenador,
   Ejercicio,
@@ -56,7 +54,6 @@ export class EntrenadoresPage {
   private readonly ejercicioService = inject(EjercicioService);
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
-  private readonly invitacionService = inject(InvitacionService);
   private readonly conversacionService = inject(ConversacionService);
   private readonly authService = inject(AuthService);
   private readonly fb = inject(FormBuilder);
@@ -66,7 +63,6 @@ export class EntrenadoresPage {
 
   // Modal managers para mensajes e invitaciones
   readonly mensajeManager: GenericModalManager<Mensaje>;
-  readonly invitacionManager: GenericModalManager<Invitacion>;
 
   constructor() {
     this.pageTitleService.setTitle('Entrenadores');
@@ -76,13 +72,6 @@ export class EntrenadoresPage {
       (item) => this.createMensajeEditForm(item),
       (data) => this.mensajeService.save(data),
       (id) => this.mensajeService.delete(id)
-    );
-
-    this.invitacionManager = new GenericModalManager<Invitacion>(
-      this.fb,
-      (item) => this.createInvitacionEditForm(item),
-      (data) => this.invitacionService.save(data),
-      (id) => this.invitacionService.delete(id)
     );
   }
 
@@ -194,6 +183,26 @@ export class EntrenadoresPage {
     });
   });
 
+  // Computed para invitaciones del entrenador actual
+  readonly invitacionesEntrenador = computed(() => {
+    const entrenadorActual = this.modalData();
+    if (!entrenadorActual?.id) return [];
+    
+    return this.notificacionService.getInvitacionesPorEntrenador(entrenadorActual.id)()
+      .map(notif => {
+        const entrenado = this.entrenadoService.entrenados().find(e => e.id === notif.usuarioId);
+        const usuarioEntrenado = entrenado ? this.usuarios().find(u => u.uid === entrenado.id) : null;
+        
+        return {
+          ...notif,
+          titulo: `Invitación a ${usuarioEntrenado?.nombre || usuarioEntrenado?.email || 'cliente'}`,
+          entrenadorNombre: entrenadorActual.displayName || 'Entrenador',
+          invitacionId: notif.id,
+          estado: notif.datos?.estadoInvitacion || 'pendiente'
+        };
+      });
+  });
+
   // Configuración de los cards
   readonly entrenadoresCardConfig: CardConfig = {
     title: 'Entrenadores',
@@ -235,6 +244,15 @@ export class EntrenadoresPage {
   readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
+
+  // Signal para form de invitaciones
+  readonly invitacionForm = signal<FormGroup>(
+    this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      mensaje: [''],
+      franjaHoraria: ['mañana']
+    })
+  );
   
   // Signals para ejercicios
   readonly isEjercicioModalOpen = signal(false);
@@ -288,8 +306,8 @@ export class EntrenadoresPage {
     this.isCreating.set(false);
     this.createEditForm(item);
     
-    // Actualizar el control de clientes después de crear el form
     const clientesEntrenador = this.getEntrenadosByEntrenador(item.id);
+    
     const clientesText = clientesEntrenador.length > 0 
       ? clientesEntrenador.map(entrenado => {
           const usuario = this.usuarios().find(u => u.uid === entrenado.id);
@@ -384,7 +402,10 @@ export class EntrenadoresPage {
   }
 
   getEntrenadosByEntrenador(entrenadorId: string) {
-    return this.entrenadoService.entrenados().filter(entrenado => entrenado.entrenadorId === entrenadorId);
+    const todosEntrenados = this.entrenadoService.entrenados();
+    const filtrados = todosEntrenados.filter(entrenado => entrenado.entrenadorId === entrenadorId);
+    
+    return filtrados;
   }
 
   getRutinasByEntrenador(entrenadorId: string) {
@@ -416,17 +437,14 @@ export class EntrenadoresPage {
 
   getFormFields(): FormFieldConfig[] {
     const entrenadorData = this.modalData();
-    console.log('getFormFields called with entrenadorData:', entrenadorData);
     
     // Si no hay datos, retornar array vacío
     if (!entrenadorData || !entrenadorData.id) {
-      console.log('No entrenadorData or id, returning empty array');
       return [];
     }
     
     const usuarioEntrenador = this.usuarios().find(u => u.uid === entrenadorData.id);
     const clientesEntrenador = this.getEntrenadosByEntrenador(entrenadorData.id);
-    console.log('clientesEntrenador:', clientesEntrenador);
     const rutinasEntrenador = this.getRutinasByEntrenador(entrenadorData.id);
     const ejerciciosEntrenador = this.getEjerciciosByEntrenador(entrenadorData.id);
     const gimnasioInfo = entrenadorData.gimnasioId ? this.getGimnasioInfo(entrenadorData.gimnasioId) : null;
@@ -521,6 +539,13 @@ export class EntrenadoresPage {
         label: `Ejercicios Creados (${ejerciciosEntrenador.length})`,
         colSpan: 2,
         ejercicios: ejerciciosEntrenador
+      },
+      {
+        name: 'invitacionesEnviadas',
+        type: 'invitaciones-list',
+        label: `Invitaciones Enviadas (${this.invitacionesEntrenador().length})`,
+        colSpan: 2,
+        invitaciones: this.invitacionesEntrenador()
       }
     ];
   }
@@ -800,43 +825,21 @@ export class EntrenadoresPage {
     } else if (type === 'ejercicio') {
       this.addEjercicioParaEntrenador();
     } else if (type === 'invitacion') {
-      this.addInvitacionParaEntrenador();
+      this.addInvitacion();
     }
   }
 
   addInvitacionParaEntrenador() {
-    const entrenadorActual = this.modalData();
-    if (!entrenadorActual || !entrenadorActual.id) {
-      this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
-      return;
-    }
-    
-    // Crear invitación con el entrenador preseleccionado
-    const newInvitacion = {
-      id: 'inv-' + Date.now(),
-      entrenadorId: entrenadorActual.id,
-      entrenadoId: '',
-      email: '',
-      estado: 'pendiente',
-      mensaje: '',
-      franjaHoraria: 'mañana',
-      fechaEnvio: new Date()
-    };
-    this.invitacionManager.openCreateModal(newInvitacion as any);
+    this.toastService.log('Las invitaciones se crean desde el modal del entrenador');
   }
   
   editarRutinaDesdeEntrenador(rutinaId: string) {
-    console.log('🔍 Editando rutina:', rutinaId);
-    console.log('📋 Rutinas disponibles:', this.rutinas());
-    
     const rutina = this.rutinas().find(r => r.id === rutinaId);
     if (!rutina) {
       this.toastService.log('ERROR: Rutina no encontrada');
-      console.error('❌ Rutina no encontrada con ID:', rutinaId);
       return;
     }
     
-    console.log('✅ Rutina encontrada:', rutina);
     this.openRutinaModal(rutina);
   }
   
@@ -1024,12 +1027,15 @@ export class EntrenadoresPage {
         placeholder: 'Seleccionar entrenado (opcional)',
         options: [
           { value: '', label: '-- No asignado --' },
-          ...this.usuarios()
-            .filter(user => user.role === Rol.ENTRENADO)
-            .map(user => ({
-              value: user.uid,
-              label: `${user.nombre || user.email || user.uid}`
-            }))
+          ...this.entrenadoService.entrenados()
+            .filter((entrenado: any) => entrenado.entrenadorId === creadorId)
+            .map((entrenado: any) => {
+              const usuario = this.usuarios().find(u => u.uid === entrenado.id);
+              return {
+                value: entrenado.id,
+                label: `${usuario?.nombre || usuario?.email || entrenado.id}`
+              };
+            })
         ],
         colSpan: 1
       }
@@ -1390,81 +1396,59 @@ export class EntrenadoresPage {
   addInvitacion() {
     // Obtener el entrenador del modal actual
     const entrenadorActual = this.modalData();
+
     if (!entrenadorActual || !entrenadorActual.id) {
       this.toastService.log('ERROR: Debe seleccionar un entrenador primero');
       return;
     }
 
-    const newInvitacion = {
-      id: 'inv-' + Date.now(),
-      entrenadorId: entrenadorActual.id,
-      email: '',
-      estado: 'pendiente',
-      mensaje: '',
-      franjaHoraria: 'mañana',
-      fechaEnvio: new Date()
-    };
-    this.invitacionManager.openCreateModal(newInvitacion as any);
+    // Abrir modal simple para invitación
+    this.isModalOpen.set(true);
+    this.modalData.set({
+      ...entrenadorActual,
+      mode: 'invitacion'
+    });
+  }
+
+  async saveInvitacionDirectly(entrenadorActual: any) {
+    this.isLoading.set(true);
+
+    // Obtener datos del formulario
+    const data = this.invitacionForm().value;
+
+    // Buscar el usuario por email
+    const usuarioInvitado = this.usuarios().find(u => u.email === data.email);
+    const usuarioId = usuarioInvitado?.uid;
+
+    if (!usuarioId) {
+      this.toastService.log('ERROR: No se encontró un usuario con ese email');
+      this.isLoading.set(false);
+      return;
+    }
+
+    try {
+      // Crear invitación usando el método especializado
+      await this.notificacionService.crearInvitacion(entrenadorActual.id, usuarioId, data.mensaje);
+
+      this.toastService.log('Invitación enviada exitosamente');
+      this.isModalOpen.set(false);
+      this.invitacionForm().reset(); // Limpiar el formulario
+
+    } catch (error) {
+      console.error('❌ Error al guardar notificación:', error);
+      this.toastService.log('ERROR al enviar invitación');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   openInvitacionModal(item: any) {
-    this.invitacionManager.openEditModal(item as Invitacion);
-  }
-
-  private createInvitacionEditForm(item: Invitacion): any {
-    return {
-      email: [item.email || '', [Validators.required, Validators.email]],
-      mensaje: [item.mensaje || ''],
-      franjaHoraria: [item.franjaHoraria || 'mañana', Validators.required]
-    };
+    this.toastService.log('Las invitaciones se gestionan desde las notificaciones');
   }
 
   async saveInvitacion() {
-    this.isLoading.set(true);
-    
-    const isCreating = this.invitacionManager.isCreating();
-    const invitacionData = this.invitacionManager.editForm()?.getRawValue();
-    
-    const result = await this.invitacionManager.save({
-      estado: 'pendiente' as const,
-      fechaEnvio: new Date()
-    });
-    
-    this.isLoading.set(false);
-    
-    if (result.success && isCreating && invitacionData) {
-      // Crear notificación para el entrenado
-      const entrenadorActual = this.authService.currentUser();
-      const entrenadoId = invitacionData.entrenadoId;
-      
-      if (entrenadorActual && entrenadoId) {
-        // Obtener el ID de la invitación recién creada del modal data
-        const invitacionId = this.invitacionManager.modalData()?.id;
-        
-        const nuevaNotificacion: Notificacion = {
-          id: 'not-inv-' + Date.now(),
-          usuarioId: entrenadoId,  // Notificación para el entrenado
-          tipo: TipoNotificacion.INVITACION,
-          titulo: 'Nueva invitación de entrenador',
-          mensaje: invitacionData.mensaje || '¡Un entrenador quiere trabajar contigo!',
-          leida: false,
-          fechaCreacion: new Date(),
-          datos: {
-            invitacionId: invitacionId,
-            entrenadorId: entrenadorActual.uid,
-            entrenadorNombre: entrenadorActual.nombre || entrenadorActual.email
-          }
-        };
-        
-        await this.notificacionService.save(nuevaNotificacion);
-      }
-      
-      this.toastService.log('Invitación creada y notificación enviada');
-    } else if (result.success) {
-      this.toastService.log('Invitación actualizada');
-    } else {
-      this.toastService.log(`ERROR: ${result.error}`);
-    }
+    // Este método ya no se usa - las invitaciones se crean directamente como notificaciones
+    this.toastService.log('Las invitaciones ahora se crean directamente como notificaciones');
   }
 
   getInvitacionFormFields(): FormFieldConfig[] {
@@ -1500,17 +1484,17 @@ export class EntrenadoresPage {
   }
 
   async deleteInvitacion(id: string) {
-    const result = await this.invitacionManager.delete(id);
-    if (result.success) {
+    try {
+      await this.notificacionService.delete(id);
       this.toastService.log('Invitación eliminada');
-    } else {
-      this.toastService.log(`ERROR: ${result.error}`);
+    } catch (error) {
+      this.toastService.log('ERROR al eliminar invitación');
     }
   }
 
   async aceptarInvitacion(id: string) {
     try {
-      await this.invitacionService.aceptar(id);
+      await this.notificacionService.aceptarInvitacion(id);
       this.toastService.log('Invitación aceptada');
     } catch (error) {
       this.toastService.log('ERROR al aceptar invitación');
@@ -1519,7 +1503,7 @@ export class EntrenadoresPage {
 
   async rechazarInvitacion(id: string) {
     try {
-      await this.invitacionService.rechazar(id);
+      await this.notificacionService.rechazarInvitacion(id);
       this.toastService.log('Invitación rechazada');
     } catch (error) {
       this.toastService.log('ERROR al rechazar invitación');

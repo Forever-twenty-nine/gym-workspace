@@ -1,5 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
 import { Notificacion } from '../models/notificacion.model';
+import { TipoNotificacion } from '../enums/tipo-notificacion.enum';
 
 export interface INotificacionFirestoreAdapter {
   initializeListener(onUpdate: (notificaciones: Notificacion[]) => void): void;
@@ -175,9 +176,101 @@ export class NotificacionService {
     }
 
     /**
-     * 📊 Obtiene el conteo total de notificaciones
+     * 🎯 INVITACIONES - Crear invitación pendiente
      */
-    get notificacionCount(): Signal<number> {
-        return computed(() => this._notificaciones().length);
+    async crearInvitacion(entrenadorId: string, entrenadoId: string, mensaje?: string): Promise<void> {
+        const notificacion: Notificacion = {
+            id: `inv-${entrenadorId}-${entrenadoId}-${Date.now()}`,
+            usuarioId: entrenadoId,
+            tipo: TipoNotificacion.INVITACION_PENDIENTE,
+            titulo: 'Nueva invitación de entrenador',
+            mensaje: mensaje || '¡Un entrenador quiere trabajar contigo!',
+            leida: false,
+            fechaCreacion: new Date(),
+            datos: {
+                entrenadorId,
+                estadoInvitacion: 'pendiente'
+            }
+        };
+
+        await this.save(notificacion);
+    }
+
+    /**
+     * ✅ Aceptar invitación
+     */
+    async aceptarInvitacion(notificacionId: string): Promise<void> {
+        const notificacion = this._notificaciones().find(n => n.id === notificacionId);
+        if (!notificacion || notificacion.tipo !== TipoNotificacion.INVITACION_PENDIENTE) {
+            throw new Error('Notificación de invitación no encontrada');
+        }
+
+        // Actualizar la notificación
+        const notificacionActualizada: Notificacion = {
+            ...notificacion,
+            tipo: TipoNotificacion.INVITACION_ACEPTADA,
+            titulo: 'Invitación aceptada',
+            mensaje: '¡Ahora tienes un entrenador asignado!',
+            leida: true,
+            fechaLeida: new Date(),
+            datos: {
+                ...notificacion.datos,
+                estadoInvitacion: 'aceptada',
+                fechaRespuesta: new Date()
+            }
+        };
+
+        await this.save(notificacionActualizada);
+    }
+
+    /**
+     * ❌ Rechazar invitación
+     */
+    async rechazarInvitacion(notificacionId: string): Promise<void> {
+        const notificacion = this._notificaciones().find(n => n.id === notificacionId);
+        if (!notificacion || notificacion.tipo !== TipoNotificacion.INVITACION_PENDIENTE) {
+            throw new Error('Notificación de invitación no encontrada');
+        }
+
+        // Actualizar la notificación
+        const notificacionActualizada: Notificacion = {
+            ...notificacion,
+            tipo: TipoNotificacion.INVITACION_RECHAZADA,
+            titulo: 'Invitación rechazada',
+            mensaje: 'La invitación ha sido rechazada',
+            leida: true,
+            fechaLeida: new Date(),
+            datos: {
+                ...notificacion.datos,
+                estadoInvitacion: 'rechazada',
+                fechaRespuesta: new Date()
+            }
+        };
+
+        await this.save(notificacionActualizada);
+    }
+
+    /**
+     * 📋 Obtener invitaciones por entrenador
+     */
+    getInvitacionesPorEntrenador(entrenadorId: string): Signal<Notificacion[]> {
+        return computed(() =>
+            this._notificaciones().filter(notif =>
+                notif.datos?.entrenadorId === entrenadorId &&
+                notif.tipo.startsWith('invitacion_')
+            )
+        );
+    }
+
+    /**
+     * 📋 Obtener invitaciones por entrenado
+     */
+    getInvitacionesPorEntrenado(entrenadoId: string): Signal<Notificacion[]> {
+        return computed(() =>
+            this._notificaciones().filter(notif =>
+                notif.usuarioId === entrenadoId &&
+                notif.tipo.startsWith('invitacion_')
+            )
+        );
     }
 }

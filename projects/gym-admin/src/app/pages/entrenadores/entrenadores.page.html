@@ -45,7 +45,9 @@
     (responderConversacion)="responderConversacion($event)"
     (editarRutina)="editarRutinaDesdeEntrenador($event)"
     (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
+    (toggleEjercicio)="toggleEjercicio($event)"
+    (aceptarInvitacion)="aceptarInvitacion($event)"
+    (rechazarInvitacion)="rechazarInvitacion($event)">
   </app-modal-form>
 
   <!-- Modal de ejercicios -->
@@ -98,20 +100,22 @@
   </app-modal-form>
 
   <!-- Modal de invitaciones -->
-  <app-modal-form
-    [isOpen]="invitacionManager.isModalOpen()"
-    [modalType]="'invitacion'"
-    [isCreating]="invitacionManager.isCreating()"
-    [form]="invitacionManager.editForm()"
-    [formFields]="getInvitacionFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="invitacionManager.closeModal()"
-    (save)="saveInvitacion()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
-  </app-modal-form>
+  @if (isModalOpen() && modalData()?.mode === 'invitacion') {
+    <app-modal-form
+      [isOpen]="isModalOpen()"
+      [modalType]="'invitacion'"
+      [isCreating]="true"
+      [form]="invitacionForm()"
+      [formFields]="getInvitacionFormFields()"
+      [ejercicios]="[]"
+      [selectedEjercicios]="[]"
+      [isLoading]="isLoading()"
+      (close)="isModalOpen.set(false)"
+      (save)="saveInvitacionDirectly(modalData())"
+      (toggleDiaSemana)="onToggleDiaSemana($event)"
+      (toggleEjercicio)="toggleEjercicio($event)">
+    </app-modal-form>
+  }
 
   <!-- Modal de selección de contenido -->
   @if (isContentModalOpen()) {

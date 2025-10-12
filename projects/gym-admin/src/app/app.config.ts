@@ -14,7 +14,6 @@ import {
   GimnasioService,
   NotificacionService,
   MensajeService,
-  InvitacionService,
   ConversacionService,
   ENTRENADOR_FIRESTORE_ADAPTER, 
   GIMNASIO_FIRESTORE_ADAPTER 
@@ -27,7 +26,6 @@ import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adap
 import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
 import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.adapter';
 import { MensajeFirestoreAdapter } from './adapters/mensaje-firestore.adapter';
-import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
 import { ConversacionFirestoreAdapter } from './adapters/conversacion-firestore.adapter';
 
 import { routes } from './app.routes';
@@ -42,7 +40,6 @@ function initializeServiceAdapters(
   gimnasioService: GimnasioService,
   notificacionService: NotificacionService,
   mensajeService: MensajeService,
-  invitacionService: InvitacionService,
   conversacionService: ConversacionService,
   entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
@@ -52,7 +49,6 @@ function initializeServiceAdapters(
   gimnasioAdapter: GimnasioFirestoreAdapter,
   notificacionAdapter: NotificacionFirestoreAdapter,
   mensajeAdapter: MensajeFirestoreAdapter,
-  invitacionAdapter: InvitacionFirestoreAdapter,
   conversacionAdapter: ConversacionFirestoreAdapter
 ) {
   return () => {
@@ -65,7 +61,6 @@ function initializeServiceAdapters(
     gimnasioService.setFirestoreAdapter(gimnasioAdapter);
     notificacionService.setFirestoreAdapter(notificacionAdapter);
     mensajeService.setFirestoreAdapter(mensajeAdapter);
-    invitacionService.setFirestoreAdapter(invitacionAdapter);
     conversacionService.setFirestoreAdapter(conversacionAdapter);
     
     return Promise.resolve();
@@ -107,7 +102,6 @@ export const appConfig: ApplicationConfig = {
         GimnasioService,
         NotificacionService,
         MensajeService,
-        InvitacionService,
         ConversacionService,
         EntrenadoFirestoreAdapter, 
         UserFirestoreAdapter,
@@ -117,7 +111,6 @@ export const appConfig: ApplicationConfig = {
         GimnasioFirestoreAdapter,
         NotificacionFirestoreAdapter,
         MensajeFirestoreAdapter,
-        InvitacionFirestoreAdapter,
         ConversacionFirestoreAdapter
       ],
       multi: true

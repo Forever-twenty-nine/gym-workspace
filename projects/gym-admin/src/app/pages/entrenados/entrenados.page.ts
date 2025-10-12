@@ -9,12 +9,10 @@ import {
   NotificacionService,
   MensajeService,
   ConversacionService,
-  InvitacionService,
   RutinaService,
   Notificacion,
   Mensaje,
   Conversacion,
-  Invitacion,
   Entrenado, 
   Rol, 
   Objetivo,
@@ -49,7 +47,6 @@ export class EntrenadosPage {
   private readonly notificacionService = inject(NotificacionService);
   private readonly mensajeService = inject(MensajeService);
   private readonly conversacionService = inject(ConversacionService);
-  private readonly invitacionService = inject(InvitacionService);
   private readonly rutinaService = inject(RutinaService);
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
@@ -293,13 +290,10 @@ export class EntrenadosPage {
     const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
     
     // Obtener notificaciones relacionadas con mensajes del entrenado (SOLO NO LEÍDAS)
-    const notificacionesEntrenado = this.getNotificacionesMensajesEntrenado(clienteData.id).filter(n => !n.leida);
+    const notificacionesEntrenado = this.getNotificacionesEntrenado(clienteData.id).filter(n => !n.leida);
     
     // Obtener conversaciones del entrenado
     const conversacionesEntrenado = this.getConversacionesEntrenado(clienteData.id);
-    
-    // Obtener invitaciones pendientes del entrenado
-    const invitacionesPendientes = this.getInvitacionesPendientesEntrenado(clienteData.id);
     
     // Obtener rutinas asignadas al entrenado
     const rutinasAsignadas = this.rutinas().filter(rutina => {
@@ -355,7 +349,8 @@ export class EntrenadosPage {
         label: 'Entrenador Asociado',
         placeholder: entrenadorAsociado?.displayName || 'Sin entrenador asignado',
         readonly: true,
-        colSpan: 1
+        colSpan: 1,
+        showClearButton: !!entrenadorAsociado
       },
       {
         name: 'objetivo',
@@ -385,13 +380,6 @@ export class EntrenadosPage {
         label: 'Notificaciones Pendientes',
         colSpan: 2,
         notificaciones: notificacionesEntrenado
-      },
-      {
-        name: 'invitacionesPendientes',
-        type: 'notificaciones-invitaciones',
-        label: 'Invitaciones de Entrenadores',
-        colSpan: 2,
-        invitaciones: invitacionesPendientes
       },
       {
         name: 'conversaciones',
@@ -804,23 +792,21 @@ export class EntrenadosPage {
   // MÉTODOS PARA NOTIFICACIONES EN MODAL
   // ========================================
 
-  getNotificacionesMensajesEntrenado(entrenadoId: string): any[] {
+  getNotificacionesEntrenado(entrenadoId: string): any[] {
     if (!entrenadoId) return [];
     
     const todasNotificaciones = this.notificacionService.notificaciones();
-
-    const notificacionesRelacionadas = todasNotificaciones.filter(notif => {
-
-      const esParaEsteEntrenado = notif.usuarioId === entrenadoId;
-
-      const tipoStr = String(notif.tipo).toLowerCase();
-      const tituloStr = String(notif.titulo).toLowerCase();
-      const esRelacionadaConMensajes = 
-        tipoStr.includes('mensaje') || 
-        tituloStr.includes('mensaje');
     
-      return esParaEsteEntrenado && esRelacionadaConMensajes;
+    const notificacionesRelacionadas = todasNotificaciones.filter(notif => {
+      return notif.usuarioId === entrenadoId;
     });
+    
+    // También mostrar invitaciones existentes
+    const invitacionesExistentes = this.notificacionService.notificaciones().filter(n =>
+      n.tipo === TipoNotificacion.INVITACION_PENDIENTE ||
+      n.tipo === TipoNotificacion.INVITACION_ACEPTADA ||
+      n.tipo === TipoNotificacion.INVITACION_RECHAZADA
+    );
     
     return notificacionesRelacionadas.map(notif => {
       const remitenteId = notif.datos?.['remitenteId'];
@@ -911,24 +897,24 @@ export class EntrenadosPage {
     
     // Obtener notificaciones de invitación no leídas para este entrenado
     const notificacionesInvitacion = this.notificacionService.notificaciones()
-      .filter(n => 
-        n.tipo === TipoNotificacion.INVITACION && 
-        n.usuarioId === entrenadoId && 
+      .filter(n =>
+        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+        n.usuarioId === entrenadoId &&
         !n.leida
       );
-    
+
     // Mapear cada notificación a su invitación correspondiente
     return notificacionesInvitacion.map(notif => {
-      const invitacionId = notif.datos?.['invitacionId'];
-      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      // La invitación ahora es la notificación misma
+      const invitacion = notif;
       
       return {
         id: notif.id,  // ID de la notificación
-        invitacionId: invitacionId,
+        invitacionId: notif.id,  // La invitación ahora es la notificación
         titulo: notif.titulo,
         mensaje: notif.mensaje,
         entrenadorNombre: notif.datos?.['entrenadorNombre'] || 'Entrenador',
-        franjaHoraria: invitacion?.franjaHoraria,
+        franjaHoraria: notif.datos?.['franjaHoraria'] || 'mañana',
         fechaCreacion: notif.fechaCreacion
       };
     }).filter(inv => inv.invitacionId);  // Filtrar invitaciones que realmente existen
@@ -1079,50 +1065,39 @@ export class EntrenadosPage {
   }
 
   // Métodos para manejar invitaciones
-  async aceptarInvitacion(notificacionId: string) {
+  async aceptarInvitacion(entrenadorId: string) {
     this.isLoading.set(true);
     
     try {
-      // Obtener la notificación y la invitación asociada
-      const notificacion = this.notificacionService.notificaciones().find(n => n.id === notificacionId);
-      if (!notificacion) {
-        this.toastService.log('ERROR: Notificación no encontrada');
+      // Obtener el entrenado actual del modal
+      const entrenadoActual = this.modalData();
+      if (!entrenadoActual || !entrenadoActual.id) {
+        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
         return;
       }
       
-      const invitacionId = notificacion.datos?.['invitacionId'];
-      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      // Buscar la notificación de invitación pendiente
+      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
+        notif.usuarioId === entrenadoActual.id &&
+        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+        notif.datos?.entrenadorId === entrenadorId
+      );
       
-      if (!invitacion) {
+      if (!invitacionNotif) {
         this.toastService.log('ERROR: Invitación no encontrada');
         return;
       }
       
-      // Obtener el entrenado asociado a esta notificación
-      const entrenado = this.entrenadoService.entrenados().find(e => e.id === invitacion.entrenadoId);
-      if (!entrenado) {
-        this.toastService.log('ERROR: Entrenado no encontrado');
-        return;
-      }
+      // Aceptar la invitación usando el nuevo método unificado
+      await this.notificacionService.aceptarInvitacion(invitacionNotif.id);
       
       // Crear la asociación entrenador-entrenado
-      await this.entrenadoService.save({
-        ...entrenado,
-        entrenadorId: invitacion.entrenadorId
-      });
+      const entrenadoActualizado = {
+        ...entrenadoActual,
+        entrenadorId: entrenadorId
+      };
       
-      // Actualizar el estado de la invitación a 'aceptada'
-      await this.invitacionService.save({
-        ...invitacion,
-        estado: 'aceptada',
-        fechaRespuesta: new Date()
-      });
-      
-      // Marcar la notificación como leída
-      await this.notificacionService.save({
-        ...notificacion,
-        leida: true
-      });
+      await this.entrenadoService.save(entrenadoActualizado);
       
       this.toastService.log('✓ Invitación aceptada. Ahora tienes un entrenador asignado');
       this.closeModal();
@@ -1134,42 +1109,92 @@ export class EntrenadosPage {
     }
   }
 
-  async rechazarInvitacion(notificacionId: string) {
+  async rechazarInvitacion(entrenadorId: string) {
     this.isLoading.set(true);
     
     try {
-      // Obtener la notificación y la invitación asociada
-      const notificacion = this.notificacionService.notificaciones().find(n => n.id === notificacionId);
-      if (!notificacion) {
-        this.toastService.log('ERROR: Notificación no encontrada');
+      // Obtener el entrenado actual del modal
+      const entrenadoActual = this.modalData();
+      if (!entrenadoActual || !entrenadoActual.id) {
+        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
         return;
       }
       
-      const invitacionId = notificacion.datos?.['invitacionId'];
-      const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+      // Buscar la notificación de invitación pendiente
+      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
+        notif.usuarioId === entrenadoActual.id &&
+        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+        notif.datos?.entrenadorId === entrenadorId
+      );
       
-      if (!invitacion) {
+      if (!invitacionNotif) {
         this.toastService.log('ERROR: Invitación no encontrada');
         return;
       }
       
-      // Actualizar el estado de la invitación a 'rechazada'
-      await this.invitacionService.save({
-        ...invitacion,
-        estado: 'rechazada',
-        fechaRespuesta: new Date()
-      });
-      
-      // Marcar la notificación como leída
-      await this.notificacionService.save({
-        ...notificacion,
-        leida: true
-      });
+      // Rechazar la invitación usando el nuevo método unificado
+      await this.notificacionService.rechazarInvitacion(invitacionNotif.id);
       
       this.toastService.log('Invitación rechazada');
     } catch (error) {
       console.error('Error al rechazar invitación:', error);
       this.toastService.log('ERROR: No se pudo rechazar la invitación');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  // Método para manejar el evento clearField del modal
+  onClearField(fieldName: string) {
+    if (fieldName === 'entrenadorInfo') {
+      this.confirmarLimpiarAsociacion();
+    }
+  }
+
+  // Método para confirmar y limpiar la asociación entrenador-entrenado
+  confirmarLimpiarAsociacion() {
+    const entrenadoActual = this.modalData();
+    if (!entrenadoActual || !entrenadoActual.entrenadorId) {
+      this.toastService.log('ERROR: No hay entrenador asignado para limpiar');
+      return;
+    }
+
+    const entrenador = this.entrenadores().find(e => e.id === entrenadoActual.entrenadorId);
+    const entrenadorNombre = entrenador?.displayName || 'el entrenador';
+
+    const confirmacion = confirm(
+      `¿Estás seguro de que quieres limpiar la asociación entre "${entrenadoActual.displayName}" y ${entrenadorNombre}?\n\nEsta acción no se puede deshacer.`
+    );
+
+    if (confirmacion) {
+      this.limpiarAsociacionEntrenador();
+    }
+  }
+
+  // Método para limpiar la asociación entrenador-entrenado
+  async limpiarAsociacionEntrenador() {
+    this.isLoading.set(true);
+
+    try {
+      const entrenadoActual = this.modalData();
+      if (!entrenadoActual || !entrenadoActual.id) {
+        this.toastService.log('ERROR: No se pudo identificar el entrenado');
+        return;
+      }
+
+      // Limpiar el entrenadorId del entrenado
+      const entrenadoActualizado = {
+        ...entrenadoActual,
+        entrenadorId: null
+      };
+
+      await this.entrenadoService.save(entrenadoActualizado);
+
+      this.toastService.log('✓ Asociación con entrenador limpiada exitosamente');
+      this.closeModal();
+    } catch (error) {
+      console.error('Error al limpiar asociación:', error);
+      this.toastService.log('ERROR: No se pudo limpiar la asociación');
     } finally {
       this.isLoading.set(false);
     }

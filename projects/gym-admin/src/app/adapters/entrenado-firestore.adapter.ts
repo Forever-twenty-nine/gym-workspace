@@ -6,10 +6,12 @@ import {
   doc, 
   deleteDoc, 
   setDoc,
+  updateDoc,
   onSnapshot,
   Timestamp,
   QuerySnapshot,
-  DocumentSnapshot
+  DocumentSnapshot,
+  deleteField
 } from '@angular/fire/firestore';
 import { Entrenado } from 'gym-library';
 
@@ -49,9 +51,9 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     const dataToSave = this.mapToFirestore(entrenado);
     
     if (entrenado.id) {
-      // Actualizar entrenado existente
+      // Actualizar entrenado existente usando updateDoc para poder eliminar campos
       const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
-      await setDoc(entrenadoRef, dataToSave, { merge: true });
+      await updateDoc(entrenadoRef, dataToSave);
     } else {
       // Crear nuevo entrenado
       await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
@@ -85,18 +87,18 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       activo: entrenado.activo
     };
 
-    // Solo incluir campos si no son undefined
-    if (entrenado.gimnasioId !== undefined && entrenado.gimnasioId !== null) {
-      data.gimnasioId = entrenado.gimnasioId;
+    // Incluir campos, usando delete si son null
+    if (entrenado.gimnasioId !== undefined) {
+      data.gimnasioId = entrenado.gimnasioId !== null ? entrenado.gimnasioId : deleteField();
     }
     
-    if (entrenado.entrenadorId !== undefined && entrenado.entrenadorId !== null) {
-      data.entrenadorId = entrenado.entrenadorId;
+    if (entrenado.entrenadorId !== undefined) {
+      data.entrenadorId = entrenado.entrenadorId !== null ? entrenado.entrenadorId : deleteField();
     }
 
-    // Solo incluir objetivo si no es undefined o null
-    if (entrenado.objetivo !== undefined && entrenado.objetivo !== null) {
-      data.objetivo = entrenado.objetivo;
+    // Solo incluir objetivo si no es undefined
+    if (entrenado.objetivo !== undefined) {
+      data.objetivo = entrenado.objetivo !== null ? entrenado.objetivo : deleteField();
     }
 
     if (entrenado.fechaRegistro) {
