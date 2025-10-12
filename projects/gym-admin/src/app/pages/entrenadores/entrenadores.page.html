@@ -4,15 +4,11 @@
   <app-entrenador-stats></app-entrenador-stats>
   
   <section class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
-    <!-- Card de Entrenadores -->
-    <app-generic-card
-      [config]="entrenadoresCardConfig"
+    <!-- Tabla de Entrenadores -->
+    <app-entrenadores-table
       [items]="entrenadores()"
-      [idField]="'id'"
-      [canCreate]="false"
-      [canDelete]="false"
       (edit)="openDetailsModal($event)">
-    </app-generic-card>
+    </app-entrenadores-table>
 
     <!-- Card de Conversaciones -->
   </section>

@@ -23,11 +23,11 @@ import {
   Ejercicio,
   Rol 
 } from 'gym-library';
-import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
 import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { EntrenadorStatsComponent } from '../../components/entrenador-stats/entrenador-stats.component';
+import { EntrenadoresTableComponent } from '../../components/entrenadores-table/entrenadores-table.component';
 import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
@@ -38,10 +38,10 @@ import { PageTitleService } from '../../services/page-title.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    GenericCardComponent,
     ModalFormComponent,
     ToastComponent,
-    EntrenadorStatsComponent
+    EntrenadorStatsComponent,
+    EntrenadoresTableComponent
   ],
   templateUrl: './entrenadores.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
