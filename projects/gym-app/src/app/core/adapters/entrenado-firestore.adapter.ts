@@ -86,6 +86,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     return {
       id: data.id,
       gimnasioId: data.gimnasioId || '',
+      entrenadorId: data.entrenadorId || null,
       activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || null
@@ -95,6 +96,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
       gimnasioId: entrenado.gimnasioId,
+      entrenadorId: entrenado.entrenadorId,
       activo: entrenado.activo,
       objetivo: entrenado.objetivo
     };

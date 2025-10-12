@@ -49,6 +49,14 @@ import { AuthService, EjercicioService } from 'gym-library';
     IonInput,
     IonTextarea
   ],
+  styles: [`
+    .ejercicio-modal {
+      --width: 95%;
+      --max-width: 600px;
+      --border-radius: 16px;
+      --backdrop-opacity: 0.3;
+    }
+  `]
 })
 export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);

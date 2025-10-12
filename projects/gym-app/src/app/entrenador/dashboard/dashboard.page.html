@@ -39,12 +39,9 @@
           @for (entrenado of entrenadosAsociados(); track entrenado.id) {
             <ion-item button (click)="verCliente(entrenado)">
               <ion-label>
-                <h3>{{ entrenado.id }}</h3>
+                <h3>{{ getUserName(entrenado.id) }}</h3>
                 <p>Objetivo: {{ entrenado.objetivo }}</p>
               </ion-label>
-              <ion-button fill="clear" slot="end" color="primary">
-                Ver
-              </ion-button>
             </ion-item>
           }
         </ion-list>
@@ -59,14 +56,11 @@
       <ion-card-content>
         <ion-list>
           @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
-            <ion-item button>
+            <ion-item>
               <ion-label>
                 <h3>{{ ejercicio.nombre }}</h3>
                 <p>{{ ejercicio.descripcion }}</p>
               </ion-label>
-              <ion-button fill="clear" slot="end" color="primary">
-                Ver
-              </ion-button>
             </ion-item>
           }
         </ion-list>
@@ -81,14 +75,11 @@
       <ion-card-content>
         <ion-list>
           @for (rutina of rutinasCreadas(); track rutina.id) {
-            <ion-item button>
+            <ion-item>
               <ion-label>
                 <h3>{{ rutina.nombre }}</h3>
                 <p>Duración: {{ rutina.duracion }} min</p>
               </ion-label>
-              <ion-button fill="clear" slot="end" color="primary">
-                Ver
-              </ion-button>
             </ion-item>
           }
         </ion-list>

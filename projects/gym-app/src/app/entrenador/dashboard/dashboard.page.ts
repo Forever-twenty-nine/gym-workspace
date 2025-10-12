@@ -26,6 +26,7 @@ import { AuthService } from 'gym-library';
 import { EntrenadoService } from 'gym-library';
 import { RutinaService } from 'gym-library';
 import { EjercicioService } from 'gym-library';
+import { UserService } from 'gym-library';
 import { Entrenado } from 'gym-library';
 
 @Component({
@@ -55,6 +56,7 @@ export class DashboardPage implements OnInit {
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
+  private userService = inject(UserService);
 
   stats = {
     entrenadosActivos: 15,
@@ -93,6 +95,12 @@ export class DashboardPage implements OnInit {
 
   verCliente(entrenado: any) {
     // Navegar al detalle del entrenado
+  }
+
+  getUserName(userId: string): string {
+    const users = this.userService.users();
+    const user = users.find(u => u.uid === userId);
+    return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
   }
 
   crearNuevoEntrenamiento() {

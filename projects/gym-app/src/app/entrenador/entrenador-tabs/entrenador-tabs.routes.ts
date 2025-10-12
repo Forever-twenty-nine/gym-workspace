@@ -12,10 +12,16 @@ export const routes: Routes = [
           import('../dashboard/dashboard.page').then((m) => m.DashboardPage),
       },
       {
+        path: 'entrenados',
+        loadComponent: () =>
+          import('../entrenados/entrenados.page').then((m) => m.EntrenadosPage),
+      },
+      {
         path: 'rutinas',
         loadComponent: () =>
           import('../rutinas/rutinas.page').then((m) => m.RutinasPage),
       },
+      
       {
         path: 'ejercicios',
         loadComponent: () =>

@@ -43,7 +43,7 @@
   </div>
 
   <!-- Modal para crear/editar ejercicio -->
-  <ion-modal [isOpen]="isEjercicioModalOpen()" (willDismiss)="closeEjercicioModal()" [breakpoints]="[0, 0.75]" [initialBreakpoint]="0.75">
+  <ion-modal [isOpen]="isEjercicioModalOpen()" (willDismiss)="closeEjercicioModal()" [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9" [backdropDismiss]="true" class="ejercicio-modal">
     <ng-template>
       <ion-header>
         <ion-toolbar>

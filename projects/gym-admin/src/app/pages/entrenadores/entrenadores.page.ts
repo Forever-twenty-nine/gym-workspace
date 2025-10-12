@@ -438,8 +438,8 @@ export class EntrenadoresPage {
   getFormFields(): FormFieldConfig[] {
     const entrenadorData = this.modalData();
     
-    // Si no hay datos, retornar array vacío
-    if (!entrenadorData || !entrenadorData.id) {
+    // Si no hay datos o no es modo entrenador, retornar array vacío
+    if (!entrenadorData || !entrenadorData.id || entrenadorData.mode === 'invitacion') {
       return [];
     }
     

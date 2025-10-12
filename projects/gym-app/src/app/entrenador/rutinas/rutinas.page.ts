@@ -55,6 +55,14 @@ import { AuthService, RutinaService, EjercicioService } from 'gym-library';
     IonSelect,
     IonSelectOption
   ],
+  styles: [`
+    .rutina-modal {
+      --width: 95%;
+      --max-width: 600px;
+      --border-radius: 16px;
+      --backdrop-opacity: 0.3;
+    }
+  `]
 })
 export class RutinasPage implements OnInit {
   private authService = inject(AuthService);
