@@ -9,7 +9,11 @@ import {
   IonLabel,
   IonList,
   IonChip,
-  IonAvatar, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
+  IonAvatar, IonHeader, IonToolbar, IonTitle,
+  IonButton,
+  IonBadge,
+  IonText
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
   statsChartOutline,
@@ -18,9 +22,12 @@ import {
   checkmarkCircleOutline,
   checkmarkCircle,
   timeOutline,
-  time
+  time,
+  notificationsOutline,
+  checkmarkCircle as checkmarkCircleIcon,
+  closeCircleOutline
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, Rol } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -38,7 +45,9 @@ import { Entrenado, Rutina } from 'gym-library';
     IonLabel,
     IonList,
     IonChip,
-    IonAvatar
+    IonAvatar,
+    IonButton,
+    IonBadge
   ]
 })
 export class DashboardPage implements OnInit {
@@ -47,6 +56,7 @@ export class DashboardPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private notificacionService = inject(NotificacionService);
   private injector = inject(Injector);
 
   // Signals para datos reactivos
@@ -99,6 +109,18 @@ export class DashboardPage implements OnInit {
     });
   });
 
+  // Invitaciones pendientes del usuario actual
+  invitacionesPendientes = computed(() => {
+    const userId = this.authService.currentUser()?.uid;
+    if (!userId) return [];
+
+    return this.notificacionService.notificaciones().filter(n =>
+      n.usuarioId === userId &&
+      n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+      n.datos?.estadoInvitacion === 'pendiente'
+    );
+  });
+
   constructor() { 
     addIcons({
       statsChartOutline,
@@ -107,7 +129,10 @@ export class DashboardPage implements OnInit {
       checkmarkCircleOutline,
       checkmarkCircle,
       timeOutline,
-      time
+      time,
+      notificationsOutline,
+      checkmarkCircleIcon,
+      closeCircleOutline
     });
   }
 
@@ -143,6 +168,42 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  async aceptarInvitacion(notificacion: any) {
+    if (!notificacion.datos?.entrenadorId) return;
+
+    try {
+      // 1. Aceptar la invitación
+      await this.notificacionService.aceptarInvitacion(notificacion.id);
+
+      // 2. Crear la relación entrenador-entrenado
+      const currentUser = this.authService.currentUser();
+      if (currentUser?.uid) {
+        const relacionEntrenador: Entrenado = {
+          id: currentUser.uid,
+          gimnasioId: '', // Dejar en blanco como pidió el usuario
+          entrenadorId: notificacion.datos.entrenadorId,
+          activo: true,
+          fechaRegistro: new Date(),
+          objetivo: Objetivo.MANTENER_PESO
+        };
+
+        await this.entrenadoService.save(relacionEntrenador);
+      }
+
+      // Aquí puedes agregar lógica adicional como mostrar mensaje de éxito
+
+    } catch (error) {
+      console.error('Error al aceptar invitación:', error);
+    }
+  }
+
+  async rechazarInvitacion(notificacion: any) {
+    try {
+      await this.notificacionService.rechazarInvitacion(notificacion.id);
+    } catch (error) {
+      console.error('Error al rechazar invitación:', error);
+    }
+  }
 
   verRutina(rutina: any) {
     // Navegar al detalle de la rutina

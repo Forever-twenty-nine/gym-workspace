@@ -11,6 +11,8 @@ import { environment } from './environments/environment';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
+//config
+import { appProviders } from './app/core/app.config';
 
 applyInitialTheme();
 
@@ -28,5 +30,7 @@ bootstrapApplication(AppComponent, {
       auth.useDeviceLanguage();
       return auth;
     }),
+    // app config
+    ...appProviders
   ],
 });

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { 
   IonHeader, 
   IonToolbar, 
@@ -16,14 +17,16 @@ import {
   IonList,
   IonModal,
   IonAvatar,
-  IonPopover
+  IonPopover,
+  IonInput,
+  IonTextarea,
+  IonSelect,
+  IonSelectOption,
+  IonLoading
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business } from 'ionicons/icons';
-import { AuthService } from 'gym-library';
-import { EntrenadoService } from 'gym-library';
-import { UserService } from 'gym-library';
-import { Entrenado } from 'gym-library';
+import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline } from 'ionicons/icons';
+import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado } from 'gym-library';
 
 @Component({
   selector: 'app-entrenados',
@@ -32,6 +35,7 @@ import { Entrenado } from 'gym-library';
   imports: [
     CommonModule,
     DatePipe,
+    ReactiveFormsModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -46,7 +50,13 @@ import { Entrenado } from 'gym-library';
     IonLabel,
     IonList,
     IonAvatar,
-    IonPopover
+    IonPopover,
+    IonModal,
+    IonInput,
+    IonTextarea,
+    IonSelect,
+    IonSelectOption,
+    IonLoading
   ],
   styles: [`
     .entrenado-detail {
@@ -104,9 +114,22 @@ export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
   private userService = inject(UserService);
+  private notificacionService = inject(NotificacionService);
+  private fb = inject(FormBuilder);
 
   isModalOpen = signal(false);
   selectedEntrenado = signal<Entrenado | null>(null);
+
+  // Señales para invitación
+  isInvitacionModalOpen = signal(false);
+  isLoading = signal(false);
+  invitacionForm = signal<FormGroup>(
+    this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      mensaje: [''],
+      franjaHoraria: ['mañana']
+    })
+  );
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
@@ -114,7 +137,7 @@ export class EntrenadosPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business });
+    addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline });
   }
 
   ngOnInit() {
@@ -135,5 +158,49 @@ export class EntrenadosPage implements OnInit {
     const users = this.userService.users();
     const user = users.find(u => u.uid === userId);
     return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
+  }
+
+  openInvitacionModal() {
+    this.isInvitacionModalOpen.set(true);
+  }
+
+  closeInvitacionModal() {
+    this.isInvitacionModalOpen.set(false);
+    this.invitacionForm().reset();
+  }
+
+  async saveInvitacion() {
+    if (this.invitacionForm().invalid) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    const data = this.invitacionForm().value;
+    const entrenadorId = this.authService.currentUser()?.uid;
+
+    if (!entrenadorId) {
+      this.isLoading.set(false);
+      return;
+    }
+
+    // Buscar el usuario por email
+    const usuarioInvitado = this.userService.users().find(u => u.email === data.email);
+    const usuarioId = usuarioInvitado?.uid;
+
+    if (!usuarioId) {
+      // Aquí podrías mostrar un toast de error
+      console.error('No se encontró un usuario con ese email');
+      this.isLoading.set(false);
+      return;
+    }
+
+    try {
+      await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje);
+      this.closeInvitacionModal();
+    } catch (error) {
+      console.error('Error al enviar invitación:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 }

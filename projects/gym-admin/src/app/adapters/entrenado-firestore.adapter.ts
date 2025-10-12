@@ -51,9 +51,9 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     const dataToSave = this.mapToFirestore(entrenado);
     
     if (entrenado.id) {
-      // Actualizar entrenado existente usando updateDoc para poder eliminar campos
+      // Usar setDoc con merge para upsert (crear si no existe, actualizar si existe)
       const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
-      await updateDoc(entrenadoRef, dataToSave);
+      await setDoc(entrenadoRef, dataToSave, { merge: true });
     } else {
       // Crear nuevo entrenado
       await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);

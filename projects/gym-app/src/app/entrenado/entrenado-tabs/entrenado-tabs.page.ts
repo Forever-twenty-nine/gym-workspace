@@ -10,7 +10,8 @@ import {
 import { addIcons } from 'ionicons';
 import { 
   fitnessOutline, 
-  personOutline, statsChartOutline } from 'ionicons/icons';
+  personOutline, 
+  statsChartOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-entrenado-tabs',
