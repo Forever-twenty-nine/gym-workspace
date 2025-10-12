@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { SidebarComponent } from './components/shared/sidebar/sidebar.component';
 import { HeaderComponent } from './components/shared/header/header.component';
 import { SidebarService } from './services/sidebar.service';
 
@@ -10,7 +10,7 @@ import { SidebarService } from './services/sidebar.service';
   imports: [ 
     CommonModule,
     RouterOutlet,
-    NavbarComponent,
+    SidebarComponent,
     HeaderComponent
   ],
   templateUrl: './app.html',

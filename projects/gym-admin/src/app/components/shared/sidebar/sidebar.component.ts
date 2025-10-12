@@ -4,12 +4,12 @@ import { NgClass } from '@angular/common';
 import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive, NgClass],
-  templateUrl: './navbar.component.html',
+  templateUrl: './sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavbarComponent {
+export class SidebarComponent {
   private sidebarService = inject(SidebarService);
   isCollapsed = this.sidebarService.isCollapsed;
 
