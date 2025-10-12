@@ -37,7 +37,7 @@
       <ion-card-content>
         <ion-list>
           @for (entrenado of entrenadosAsociados(); track entrenado.id) {
-            <ion-item button (click)="verCliente(entrenado)">
+            <ion-item>
               <ion-label>
                 <h3>{{ getUserName(entrenado.id) }}</h3>
                 <p>Objetivo: {{ entrenado.objetivo }}</p>

@@ -42,7 +42,6 @@ import { Entrenado } from 'gym-library';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonButton,
     IonIcon,
     IonItem,
     IonLabel,
@@ -88,13 +87,8 @@ export class DashboardPage implements OnInit {
   constructor() {
     addIcons({ peopleOutline, fitnessOutline, statsChartOutline, calendarOutline });
   }
-
-  ngOnInit() {
-    // Inicializar si es necesario
-  }
-
-  verCliente(entrenado: any) {
-    // Navegar al detalle del entrenado
+  ngOnInit(): void {
+   
   }
 
   getUserName(userId: string): string {
@@ -103,12 +97,5 @@ export class DashboardPage implements OnInit {
     return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
   }
 
-  crearNuevoEntrenamiento() {
-    // Crear nuevo entrenamiento
-  }
-
-  crearEntrenamiento() {
-    // Alias para crearNuevoEntrenamiento
-    this.crearNuevoEntrenamiento();
-  }
+  
 }

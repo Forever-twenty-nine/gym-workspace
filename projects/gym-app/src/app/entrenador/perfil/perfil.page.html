@@ -1,0 +1,95 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mi Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Mi Perfil</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  @if (currentUser()) {
+    <div class="perfil-detail">
+      <!-- Avatar y nombre principal -->
+      <div class="avatar-section">
+        <ion-avatar class="large-avatar">
+          <ion-icon name="person" size="large"></ion-icon>
+        </ion-avatar>
+        <h2 class="perfil-name">{{ currentUser()!.nombre }}</h2>
+      </div>
+
+      <!-- Estadísticas rápidas -->
+      <div class="stats-section">
+        <div class="stat-card">
+          <span class="stat-number">{{ entrenadosCount() }}</span>
+          <span class="stat-label">Entrenados</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">5</span>
+          <span class="stat-label">Rutinas</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">12</span>
+          <span class="stat-label">Ejercicios</span>
+        </div>
+      </div>
+
+      <!-- Información detallada -->
+      <ion-list lines="none" class="detail-list">
+        <ion-item>
+          <ion-icon name="trophy" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Rol</h3>
+            <p>
+              <ion-badge [color]="getBadgeColor(currentUser()!.role ?? '')">
+                {{ getRoleDisplayName(currentUser()!.role ?? '') }}
+              </ion-badge>
+            </p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="checkmark-circle" slot="start" color="success"></ion-icon>
+          <ion-label>
+            <h3>Estado</h3>
+            <p>Sesión activa</p>
+          </ion-label>
+        </ion-item>
+
+        @if (currentUser()!.email) {
+          <ion-item>
+            <ion-icon name="mail" slot="start" color="secondary"></ion-icon>
+            <ion-label>
+              <h3>Email</h3>
+              <p>{{ currentUser()!.email }}</p>
+            </ion-label>
+          </ion-item>
+        }
+
+        @if (currentUser()!.plan) {
+          <ion-item>
+            <ion-icon name="star" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <h3>Plan</h3>
+              <p>{{ currentUser()!.plan }}</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+
+      <!-- Botón de cerrar sesión -->
+      <ion-button
+        expand="block"
+        fill="outline"
+        color="danger"
+        (click)="logout()"
+        class="logout-button">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar Sesión
+      </ion-button>
+    </div>
+  }
+</ion-content>
