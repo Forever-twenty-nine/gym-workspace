@@ -117,7 +117,14 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
       const userSnap = await getDoc(userDocRef);
       
       if (userSnap.exists()) {
-        return userSnap.data() as User;
+        const userData = userSnap.data() as User;
+        // Asegurar que el uid esté incluido
+        const completeUser = {
+          ...userData,
+          uid: firebaseUser.uid
+        };
+        console.log('🔥 FirebaseAuthAdapter getCurrentUser - Usuario completo:', completeUser);
+        return completeUser;
       }
       
       return null;

@@ -176,9 +176,11 @@ export class NotificacionService {
     }
 
     /**
-     * 🎯 INVITACIONES - Crear invitación pendiente
+     * 📨 Crear invitación de entrenador a entrenado
      */
-    async crearInvitacion(entrenadorId: string, entrenadoId: string, mensaje?: string): Promise<void> {
+    async crearInvitacion(entrenadorId: string, entrenadoId: string, mensaje?: string, entrenadorNombre?: string): Promise<void> {
+        console.log('📨 Creando invitación:', { entrenadorId, entrenadoId, mensaje, entrenadorNombre });
+        
         const notificacion: Notificacion = {
             id: `inv-${entrenadorId}-${entrenadoId}-${Date.now()}`,
             usuarioId: entrenadoId,
@@ -189,11 +191,14 @@ export class NotificacionService {
             fechaCreacion: new Date(),
             datos: {
                 entrenadorId,
+                entrenadorNombre: entrenadorNombre || 'Entrenador',
                 estadoInvitacion: 'pendiente'
             }
         };
 
+        console.log('📝 Notificación a guardar:', notificacion);
         await this.save(notificacion);
+        console.log('✅ Notificación guardada');
     }
 
     /**

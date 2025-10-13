@@ -1,5 +1,7 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Auth, user } from '@angular/fire/auth';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { 
   IonContent,
   IonCard,
@@ -58,10 +60,29 @@ export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private notificacionService = inject(NotificacionService);
   private injector = inject(Injector);
+  private auth = inject(Auth);
 
   // Signals para datos reactivos
-  entrenado = signal<Entrenado | null>(null);
   todasLasRutinas = signal<Rutina[]>([]);
+  
+  // Signal para el UID de Firebase Auth
+  firebaseUserSignal = toSignal(user(this.auth), { initialValue: null });
+  
+  // Signal para el usuario actual que se actualiza automáticamente
+  currentUserSignal = computed(() => this.authService.currentUser());
+  
+  // Signal computado para los datos del entrenado
+  entrenadoDataSignal = computed(() => {
+    const firebaseUser = this.firebaseUserSignal();
+    const userId = firebaseUser?.uid;
+    
+    if (userId) {
+      const entrenadoSignal = this.entrenadoService.getEntrenado(userId);
+      return entrenadoSignal(); // Llamar al signal para obtener el valor
+    }
+    
+    return null;
+  });
   
   // Computed signals para UI
   nombreEntrenado = computed(() => {
@@ -75,8 +96,20 @@ export class DashboardPage implements OnInit {
   });
 
   objetivoActual = computed(() => {
-    const entrenadoData = this.entrenado();
-    return entrenadoData?.objetivo || 'Sin objetivo definido';
+    const entrenadoData = this.entrenadoDataSignal();
+    const invitaciones = this.invitacionesPendientes();
+    
+    if (entrenadoData?.objetivo) {
+      return entrenadoData.objetivo;
+    }
+    
+    // Si no hay objetivo pero hay invitaciones pendientes
+    if (invitaciones.length > 0) {
+      return 'Acepta una invitación para definir tu objetivo';
+    }
+    
+    // Si no hay objetivo ni invitaciones
+    return 'Busca un entrenador para definir tu objetivo';
   });
 
   rutinasAsignadas = computed(() => {
@@ -109,16 +142,27 @@ export class DashboardPage implements OnInit {
     });
   });
 
-  // Invitaciones pendientes del usuario actual
+      // Invitaciones pendientes del usuario actual
   invitacionesPendientes = computed(() => {
-    const userId = this.authService.currentUser()?.uid;
-    if (!userId) return [];
+    // Obtener el uid directamente de Firebase Auth
+    const firebaseUser = this.firebaseUserSignal();
+    const userId = firebaseUser?.uid;
+    
+    if (!userId) {
+      return [];
+    }
 
-    return this.notificacionService.notificaciones().filter(n =>
-      n.usuarioId === userId &&
-      n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-      n.datos?.estadoInvitacion === 'pendiente'
-    );
+    const allNotificaciones = this.notificacionService.notificaciones();
+    
+    const filtered = allNotificaciones.filter(n => {
+      const matches = n.usuarioId === userId &&
+        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+        n.datos?.estadoInvitacion === 'pendiente';
+      
+      return matches;
+    });
+
+    return filtered;
   });
 
   constructor() { 
@@ -139,23 +183,16 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
     // Obtener el usuario actual y suscribirse a sus datos
     const currentUser = this.authService.currentUser();
-    const userId = currentUser?.uid;
     
-    if (userId) {
-      // Obtener el signal del entrenado (esto llama a subscribeToEntrenado una sola vez)
-      const entrenadoSignal = this.entrenadoService.getEntrenado(userId);
-      
-      // Sincronizar el signal local con el del servicio usando el injector
-      effect(() => {
-        const entrenadoData = entrenadoSignal();
-        this.entrenado.set(entrenadoData);
-      }, { injector: this.injector });
-    }
-
     // Sincronizar rutinas
     effect(() => {
       const rutinas = this.rutinaService.rutinas();
       this.todasLasRutinas.set(rutinas);
+    }, { injector: this.injector });
+    
+    // Verificar notificaciones
+    effect(() => {
+      const notificaciones = this.notificacionService.notificaciones();
     }, { injector: this.injector });
   }
 
@@ -175,19 +212,33 @@ export class DashboardPage implements OnInit {
       // 1. Aceptar la invitación
       await this.notificacionService.aceptarInvitacion(notificacion.id);
 
-      // 2. Crear la relación entrenador-entrenado
+      // 2. Crear/actualizar la relación entrenador-entrenado
       const currentUser = this.authService.currentUser();
       if (currentUser?.uid) {
-        const relacionEntrenador: Entrenado = {
-          id: currentUser.uid,
-          gimnasioId: '', // Dejar en blanco como pidió el usuario
-          entrenadorId: notificacion.datos.entrenadorId,
-          activo: true,
-          fechaRegistro: new Date(),
-          objetivo: Objetivo.MANTENER_PESO
-        };
-
-        await this.entrenadoService.save(relacionEntrenador);
+        // Obtener el entrenado actual directamente del servicio
+        const entrenadoSignal = this.entrenadoService.getEntrenado(currentUser.uid);
+        const entrenadoExistente = entrenadoSignal();
+        
+        if (entrenadoExistente) {
+          // Actualizar el entrenado existente con el entrenadorId
+          const entrenadoActualizado = {
+            ...entrenadoExistente,
+            entrenadorId: notificacion.datos.entrenadorId,
+            activo: true
+          };
+          await this.entrenadoService.save(entrenadoActualizado);
+        } else {
+          // Crear nuevo entrenado si no existe
+          const nuevoEntrenado: Entrenado = {
+            id: currentUser.uid,
+            gimnasioId: '', // Dejar en blanco como pidió el usuario
+            entrenadorId: notificacion.datos.entrenadorId,
+            activo: true,
+            fechaRegistro: new Date(),
+            objetivo: Objetivo.MANTENER_PESO
+          };
+          await this.entrenadoService.save(nuevoEntrenado);
+        }
       }
 
       // Aquí puedes agregar lógica adicional como mostrar mensaje de éxito

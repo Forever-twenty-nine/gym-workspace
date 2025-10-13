@@ -145,12 +145,10 @@ export class EntrenadorService {
     try {
       if (this.adapter.createWithId) {
         await this.adapter.createWithId(id, entrenadorData);
-        console.log('✅ Entrenador creado con ID específico:', id);
       } else {
         throw new Error('El adaptador no soporta createWithId');
       }
     } catch (error) {
-      console.error('❌ Error al crear entrenador con ID:', error);
       this._error.set('Error al crear entrenador');
       throw error;
     } finally {

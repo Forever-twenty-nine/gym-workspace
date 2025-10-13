@@ -188,6 +188,9 @@ export class EntrenadosPage {
 
   constructor() {
     this.pageTitleService.setTitle('Entrenados');
+    
+    // Inicializar el listener de entrenadores (necesario para las listas desplegables)
+    this.entrenadorService.initializeListener();
   }
 
   async deleteEntrenado(id: string) {

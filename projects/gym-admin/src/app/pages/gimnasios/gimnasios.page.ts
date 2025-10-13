@@ -70,6 +70,9 @@ export class GimnasiosPage {
 
   constructor() {
     this.pageTitleService.setTitle('Gimnasios');
+    
+    // Inicializar el listener de entrenadores (necesario para asignar entrenadores a gimnasios)
+    this.entrenadorService.initializeListener();
   }
 
   async deleteGimnasio(id: string) {

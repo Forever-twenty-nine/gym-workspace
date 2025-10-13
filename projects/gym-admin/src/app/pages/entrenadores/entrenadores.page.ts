@@ -66,6 +66,10 @@ export class EntrenadoresPage {
 
   constructor() {
     this.pageTitleService.setTitle('Entrenadores');
+    
+    // Inicializar el listener de entrenadores
+    this.entrenadorService.initializeListener();
+    
     // Inicializar modal managers
     this.mensajeManager = new GenericModalManager<Mensaje>(
       this.fb,

@@ -196,22 +196,33 @@ export class EntrenadosPage implements OnInit {
       return;
     }
 
+    console.log('📨 Enviando invitación:', data);
+
     // Buscar el usuario por email
     const usuarioInvitado = this.userService.users().find(u => u.email === data.email);
     const usuarioId = usuarioInvitado?.uid;
 
     if (!usuarioId) {
-      // Aquí podrías mostrar un toast de error
-      console.error('No se encontró un usuario con ese email');
+      console.error('❌ No se encontró un usuario con ese email');
       this.isLoading.set(false);
       return;
     }
 
+    console.log('👤 Usuario invitado encontrado:', usuarioInvitado);
+
+    // Obtener el nombre del entrenador actual
+    const entrenadorActual = this.userService.users().find(u => u.uid === entrenadorId);
+    const entrenadorNombre = entrenadorActual?.nombre || entrenadorActual?.email || 'Entrenador';
+
+    console.log('🏋️ Entrenador:', entrenadorActual, 'Nombre:', entrenadorNombre);
+
     try {
-      await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje);
+      console.log('📝 Creando invitación...');
+      await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje, entrenadorNombre);
+      console.log('✅ Invitación creada exitosamente');
       this.closeInvitacionModal();
     } catch (error) {
-      console.error('Error al enviar invitación:', error);
+      console.error('❌ Error al enviar invitación:', error);
     } finally {
       this.isLoading.set(false);
     }

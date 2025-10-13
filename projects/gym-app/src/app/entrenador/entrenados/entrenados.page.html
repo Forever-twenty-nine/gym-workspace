@@ -157,6 +157,15 @@
           </ion-textarea>
         </ion-item>
 
+        <ion-button 
+          expand="block" 
+          type="submit" 
+          [disabled]="invitacionForm().invalid || isLoading()"
+          class="ion-margin-top">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          Enviar Invitación
+        </ion-button>
+
       </form>
     </ion-content>
   </ng-template>
