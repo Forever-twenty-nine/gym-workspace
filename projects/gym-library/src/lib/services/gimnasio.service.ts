@@ -26,29 +26,26 @@ export class GimnasioService {
      */
     setFirestoreAdapter(adapter: IGimnasioFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar automáticamente, se hará manualmente cuando sea necesario
     }
 
     /**
-     * 🔄 Inicializa el listener de Firestore de forma segura
+     * � Inicializa el listener de gimnasios (llamar manualmente cuando sea necesario)
      */
-    private initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
-
-        this.firestoreAdapter.subscribeToGimnasios((gimnasios) => {
-            this._gimnasios.set(gimnasios);
-        });
-
-        this.isListenerInitialized = true;
+    initializeListener(): void {
+        if (!this.isListenerInitialized && this.firestoreAdapter) {
+            this.firestoreAdapter.subscribeToGimnasios((gimnasios) => {
+                this._gimnasios.set(gimnasios);
+            });
+            this.isListenerInitialized = true;
+        }
     }
 
     /**
      * 📊 Signal readonly con todos los gimnasios
      */
     get gimnasios(): Signal<Gimnasio[]> {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
-            this.initializeListener();
-        }
+        // No inicializar automáticamente, debe hacerse manualmente
         return this._gimnasios.asReadonly();
     }
 

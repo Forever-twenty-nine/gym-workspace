@@ -52,7 +52,8 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   }
 
   async updateUser(uid: string, userData: Partial<User>): Promise<void> {
-    // Implementar si es necesario
+    const userDoc = doc(this.firestore, this.COLLECTION, uid);
+    await setDoc(userDoc, userData, { merge: true });
   }
 
   async deleteUser(uid: string): Promise<void> {

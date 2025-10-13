@@ -1,9 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, EntrenadoService, EntrenadorService, GimnasioService, MensajeService, Rol } from 'gym-library';
-import { GenericCardComponent } from '../../components/shared/generic-card/generic-card.component';
-import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
+import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol } from 'gym-library';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
@@ -16,7 +14,6 @@ import { PageTitleService } from '../../services/page-title.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    GenericCardComponent,
     ModalFormComponent,
     ToastComponent
   ],
@@ -29,7 +26,6 @@ export class UsuariosPage {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
-  private readonly mensajeService = inject(MensajeService);
   private readonly fb = inject(FormBuilder);
   private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
   private readonly displayHelperService = inject(DisplayHelperService);
@@ -52,47 +48,7 @@ export class UsuariosPage {
     });
   });
 
-  // Signals para mensajes (todos los mensajes sin filtro)
-  readonly mensajes = computed(() => {
-    return this.mensajeService.mensajes().map(mensaje => {
-      const remitente = this.usuarios().find(u => u.uid === mensaje.remitenteId);
-      const destinatario = this.usuarios().find(u => u.uid === mensaje.destinatarioId);
-      
-      const remitenteNombre = remitente?.nombre || remitente?.email || `Usuario ${mensaje.remitenteId}`;
-      const destinatarioNombre = destinatario?.nombre || destinatario?.email || `Usuario ${mensaje.destinatarioId}`;
-      
-      const titulo = this.displayHelperService.getTituloMensaje(mensaje.tipo);
-      
-      return {
-        ...mensaje,
-        titulo,
-        remitenteChip: remitenteNombre,
-        destinatarioChip: destinatarioNombre
-      };
-    });
-  });
 
-  // Configuración del card
-  readonly usuariosCardConfig: CardConfig = {
-    title: 'Usuarios',
-    createButtonText: 'Crear Usuario',
-    createButtonColor: 'blue',
-    emptyStateTitle: 'No hay usuarios creados',
-    displayField: 'displayName',
-    showCounter: true,
-    counterColor: 'blue'
-  };
-
-  readonly mensajesCardConfig: CardConfig = {
-    title: 'Todos los Mensajes',
-    createButtonText: 'N/A',
-    createButtonColor: 'purple',
-    emptyStateTitle: 'No hay mensajes en el sistema',
-    displayField: 'titulo',
-    showCounter: true,
-    counterColor: 'purple',
-    showChips: ['remitenteChip', 'destinatarioChip']
-  };
 
   // Signals para el estado del componente
   readonly isModalOpen = signal(false);
@@ -373,26 +329,6 @@ export class UsuariosPage {
           colSpan: 2
         }
       ];
-    }
-  }
-
-  // ========================================
-  // MÉTODOS PARA MENSAJES
-  // ========================================
-  
-  openMensajeModal(item: any) {
-    // Abrir modal en modo solo lectura
-    this.toastService.log(`Ver mensaje: ${item.titulo || 'Mensaje'}`);
-    // Aquí podrías implementar un modal de visualización si lo necesitas
-  }
-
-  async deleteMensaje(id: string) {
-    try {
-      await this.mensajeService.delete(id);
-      this.toastService.log('Mensaje eliminado correctamente');
-    } catch (error) {
-      this.toastService.log('ERROR al eliminar mensaje');
-      console.error('Error al eliminar mensaje:', error);
     }
   }
 

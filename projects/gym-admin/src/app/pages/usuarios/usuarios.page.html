@@ -1,25 +1,70 @@
 <div class="w-full px-4 py-8">
   
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Card de Usuarios -->
-    <app-generic-card
-      [config]="usuariosCardConfig"
-      [items]="usuarios()"
-      [idField]="'uid'"
-      (create)="addSampleUsuario()"
-      (edit)="openDetailsModal($event)"
-      (delete)="deleteUsuario($event)">
-    </app-generic-card>
+  <section class="bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold text-gray-800">Usuarios</h2>
+      <button
+        type="button"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+        (click)="addSampleUsuario()">
+        Crear Usuario
+      </button>
+    </div>
 
-    <!-- Card de Mensajes (Todos) -->
-    <app-generic-card
-      [config]="mensajesCardConfig"
-      [items]="mensajes()"
-      [idField]="'id'"
-      [canCreate]="false"
-      [canEdit]="false"
-      [canDelete]="false">
-    </app-generic-card>
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email Verificado</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Onboarded</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let usuario of usuarios()" class="hover:bg-gray-50">
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+              {{ usuario.displayName }}
+              <span *ngIf="usuario.needsReview" class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                Revisar
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ usuario.email }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ usuario.role || 'Sin asignar' }}</td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <span [class]="usuario.emailVerified ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800' : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'">
+                {{ usuario.emailVerified ? 'Verificado' : 'No verificado' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap">
+              <span [class]="usuario.onboarded ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800' : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'">
+                {{ usuario.onboarded ? 'Completado' : 'Pendiente' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ usuario.plan || 'Sin plan' }}</td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+              <button
+                class="text-indigo-600 hover:text-indigo-900 mr-3"
+                (click)="openDetailsModal(usuario)">
+                Editar
+              </button>
+              <button
+                class="text-red-600 hover:text-red-900"
+                (click)="deleteUsuario(usuario.uid)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="usuarios().length === 0" class="text-center py-8 text-gray-500">
+      No hay usuarios creados
+    </div>
   </section>
 
   <!-- Toasts -->

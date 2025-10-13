@@ -96,10 +96,16 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
       gimnasioId: entrenado.gimnasioId,
-      entrenadorId: entrenado.entrenadorId,
-      activo: entrenado.activo,
-      objetivo: entrenado.objetivo
+      activo: entrenado.activo
     };
+
+    if (entrenado.entrenadorId !== undefined) {
+      data.entrenadorId = entrenado.entrenadorId;
+    }
+
+    if (entrenado.objetivo !== undefined) {
+      data.objetivo = entrenado.objetivo;
+    }
 
     if (entrenado.fechaRegistro) {
       data.fechaRegistro = entrenado.fechaRegistro instanceof Date 

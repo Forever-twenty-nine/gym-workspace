@@ -24,7 +24,7 @@ import {
   fitnessOutline,
   rocketOutline
 } from 'ionicons/icons';
-import { AuthService, Objetivo } from 'gym-library';
+import { AuthService, UserService, EntrenadoService, EntrenadorService, GimnasioService, Objetivo, Rol, Entrenado, Entrenador, Gimnasio } from 'gym-library';
 
 // Configuración del onboarding
 const ONBOARDING_CONFIG = {
@@ -65,7 +65,7 @@ export class OnboardingPage {
   formData = signal({
     nombre: '',
     role: 'entrenado' as 'entrenado' | 'entrenador' | 'gimnasio',
-    objetivo: '' as keyof typeof Objetivo | ''
+    objetivo: 'MANTENER_PESO' as keyof typeof Objetivo | ''
   });
 
   errorMessage = signal('');
@@ -86,6 +86,10 @@ export class OnboardingPage {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
+    private entrenadoService: EntrenadoService,
+    private entrenadorService: EntrenadorService,
+    private gimnasioService: GimnasioService,
     private router: Router
   ) {
     addIcons({
@@ -209,8 +213,111 @@ export class OnboardingPage {
    * Completa el proceso de onboarding
    */
   async completeOnboarding() {
-    //solo mock
-    this.router.navigate(['/welcome']);
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    try {
+      const currentUser = this.authService.currentUser();
+      if (!currentUser) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      const uid = currentUser.uid;
+      const formData = this.formData();
+
+      // Validar que todos los campos requeridos estén completos
+      if (!formData.nombre?.trim()) {
+        throw new Error('El nombre es requerido');
+      }
+      if (!formData.role) {
+        throw new Error('El rol es requerido');
+      }
+      if (formData.role === 'entrenado' && !formData.objetivo) {
+        throw new Error('El objetivo es requerido para entrenados');
+      }
+
+
+      // Actualizar el documento de usuario
+      const userUpdateData: any = {
+        nombre: formData.nombre,
+        role: this.mapRoleToEnum(formData.role),
+        onboarded: true
+      };
+
+      await this.userService.updateUser(uid, userUpdateData);
+
+      // Crear documento específico según el rol
+      await this.createRoleSpecificDocument(uid, formData);
+
+      // Redirigir según el rol
+      this.redirectToRolePage();
+
+    } catch (error: any) {
+      console.error('Error en onboarding:', error);
+      this.errorMessage.set(error.message || 'Error al completar el registro. Inténtalo de nuevo.');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  /**
+   * Mapea el rol del formulario al enum Rol
+   */
+  private mapRoleToEnum(role: string): Rol {
+    switch (role) {
+      case 'entrenado':
+        return Rol.ENTRENADO;
+      case 'entrenador':
+        return Rol.ENTRENADOR;
+      case 'gimnasio':
+        return Rol.GIMNASIO;
+      default:
+        return Rol.ENTRENADO;
+    }
+  }
+
+  /**
+   * Crea el documento específico según el rol
+   */
+  private async createRoleSpecificDocument(uid: string, formData: any): Promise<void> {
+    const role = formData.role;
+
+    switch (role) {
+      case 'entrenado':
+        const clienteData: Entrenado = {
+          id: uid,
+          gimnasioId: '', // Se asignará después cuando se una a un gimnasio
+          activo: true,
+          fechaRegistro: new Date(),
+          objetivo: this.mapObjetivoToEnum(formData.objetivo)
+        };
+        
+        await this.entrenadoService.save(clienteData);
+        break;
+
+      case 'entrenador':
+        const entrenadorData: Omit<Entrenador, 'id'> = {
+          gimnasioId: '', // Se asignará después
+          activo: true,
+          entrenados: [],
+          rutinas: []
+        };
+        await this.entrenadorService.createWithId(uid, entrenadorData);
+        break;
+
+      case 'gimnasio':
+        const gimnasioData: Gimnasio = {
+          id: uid,
+          nombre: formData.nombre || 'Gimnasio',
+          direccion: '',
+          activo: true
+        };
+        await this.gimnasioService.save(gimnasioData);
+        break;
+
+      default:
+        throw new Error(`Rol no soportado: ${role}`);
+    }
   }
 
   /**
@@ -266,9 +373,17 @@ export class OnboardingPage {
   }
 
   /**
-   * Calcula el progreso del onboarding
+   * Mapea la cadena del formulario al enum Objetivo
    */
-  getProgress(): number {
-    return this.progress();
+  private mapObjetivoToEnum(objetivo: string | keyof typeof Objetivo | ''): Objetivo {
+    switch (objetivo) {
+      case 'BAJAR_PESO':
+        return Objetivo.BAJAR_PESO;
+      case 'AUMENTAR_MUSCULO':
+        return Objetivo.AUMENTAR_MUSCULO;
+      case 'MANTENER_PESO':
+      default:
+        return Objetivo.MANTENER_PESO;
+    }
   }
 }

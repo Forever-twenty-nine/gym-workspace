@@ -12,7 +12,7 @@
         </p>
       </ion-text>
       <ion-progress-bar
-        [value]="getProgress() / 100"
+        [value]="progress() / 100"
         color="primary">
       </ion-progress-bar>
     </div>
@@ -111,42 +111,36 @@
     @if (showStep2()) {
       <div>
         <!-- Campo Objetivo -->
-            <ion-item
-              class="mb-4 rounded-lg bg-[--ion-color-light]">
-              <ion-icon
-                name="bookmark-outline"
-                slot="start"
-                size="default"
-                aria-hidden="true"
-                class="mr-3 pt-6">
-              </ion-icon>
-              <ion-label
-                position="stacked">
-                Objetivo Principal *
-              </ion-label>
-              <ion-select
-                [ngModel]="formData().objetivo"
-                (ngModelChange)="updateFormField('objetivo', $event)"
-                placeholder="¿Cuál es tu meta?"
-                class="">
-                <ion-select-option value="BAJAR_PESO">{{ objetivos.BAJAR_PESO }}</ion-select-option>
-                <ion-select-option value="AUMENTAR_MUSCULO">{{ objetivos.AUMENTAR_MUSCULO }}</ion-select-option>
-                <ion-select-option value="MANTENER_PESO">{{ objetivos.MANTENER_PESO }}</ion-select-option>
-              </ion-select>
-            </ion-item>
+        <ion-item class="mb-4 rounded-lg">
+          <ion-icon
+            name="bookmark-outline"
+            slot="start"
+            size="default"
+            aria-hidden="true"
+            class="mr-3 pt-6">
+          </ion-icon>
+          <ion-label position="stacked">
+            Objetivo Principal *
+          </ion-label>
+          <ion-select
+            [ngModel]="formData().objetivo"
+            (ngModelChange)="updateFormField('objetivo', $event)"
+            placeholder="¿Cuál es tu meta?">
+            <ion-select-option value="BAJAR_PESO">{{ objetivos.BAJAR_PESO }}</ion-select-option>
+            <ion-select-option value="AUMENTAR_MUSCULO">{{ objetivos.AUMENTAR_MUSCULO }}</ion-select-option>
+            <ion-select-option value="MANTENER_PESO">{{ objetivos.MANTENER_PESO }}</ion-select-option>
+          </ion-select>
+        </ion-item>
 
-            <!-- Descripción del objetivo -->
-            @if (formData().role) {
-              <ion-card
-                color="warning"
-                class="!mx-0">
-                <p
-                  class="text-center my-4 mx-0 p-3 text-base">
-                  <ion-icon name="rocket-outline"></ion-icon>
-                  <span class="block">{{ getObjetivoDescription(formData().objetivo) }}</span>
-                </p>
-              </ion-card>
-            }
+        <!-- Descripción del objetivo -->
+        @if (formData().objetivo) {
+          <ion-card color="warning" class="!mx-0">
+            <p class="text-center my-4 mx-0 p-3 text-base">
+              <ion-icon name="rocket-outline"></ion-icon>
+              <span class="block">{{ getObjetivoDescription(formData().objetivo) }}</span>
+            </p>
+          </ion-card>
+        }
       </div>
     }
 
@@ -169,17 +163,12 @@
           [disabled]="isLoading()">
           @if (isLoading()) {
             <span>Configurando...</span>
+          } @else if (currentStep() < totalSteps()) {
+            <span>Continuar</span>
+            <ion-icon name="arrow-forward-outline" slot="end" size="small" class="ml-1"></ion-icon>
           } @else {
-            @if (!isLoading() && (currentStep() < totalSteps() || formData().role !== 'entrenado')) {
-              <ion-icon name="arrow-forward-outline" slot="end" size="small" class="ml-1"></ion-icon>
-            } @if (!isLoading() && currentStep() === totalSteps() && formData().role === 'entrenado') {
-              <ion-icon name="checkmark-circle-outline" slot="end" size="small" class="ml-1"></ion-icon>
-            }
-            @if (currentStep() < totalSteps() && formData().role === 'entrenado') {
-              <span>Continuar</span>
-            } @else {
-              <span>Finalizar</span>
-            }
+            <span>Finalizar</span>
+            <ion-icon name="checkmark-circle-outline" slot="end" size="small" class="ml-1"></ion-icon>
           }
         </ion-button>
 

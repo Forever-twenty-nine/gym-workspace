@@ -75,11 +75,22 @@ export class EntrenadorService {
   );
   
   private unsubscribe: (() => void) | null = null;
+  private isListenerInitialized = false;
   
   constructor() {
-    this.loadEntrenadores();
+    // No cargar automáticamente, se hará manualmente cuando sea necesario
   }
   
+  /**
+   * 📥 Inicializa el listener de entrenadores (llamar manualmente cuando sea necesario)
+   */
+  initializeListener(): void {
+    if (!this.isListenerInitialized) {
+      this.loadEntrenadores();
+      this.isListenerInitialized = true;
+    }
+  }
+
   /**
    * 📥 Carga inicial de entrenadores con listener en tiempo real
    */
@@ -215,9 +226,11 @@ export class EntrenadorService {
   /**
    * 🧹 Limpia los recursos del servicio
    */
-  ngOnDestroy(): void {
+  destroy(): void {
     if (this.unsubscribe) {
       this.unsubscribe();
+      this.unsubscribe = null;
+      this.isListenerInitialized = false;
     }
   }
 }

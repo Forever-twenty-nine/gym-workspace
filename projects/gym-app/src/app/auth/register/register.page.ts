@@ -17,7 +17,7 @@ import {
   checkmarkCircleOutline,
   arrowBackOutline
 } from 'ionicons/icons';
-import { AuthService, UserService } from 'gym-library';
+import { AuthService, UserService, Rol } from 'gym-library';
 
 @Component({
   selector: 'app-register',
@@ -200,7 +200,9 @@ export class RegisterPage {
       // Crear perfil de usuario en Firestore
       const userData = {
         nombre: '', // Se completará en onboarding
-        rol: 'ENTRENADO', // Por defecto, puede cambiarse después
+        email: email,
+        emailVerified: false,
+        role: Rol.ENTRENADO, // Por defecto, puede cambiarse después
         fechaCreacion: new Date(),
         activo: true
       };
