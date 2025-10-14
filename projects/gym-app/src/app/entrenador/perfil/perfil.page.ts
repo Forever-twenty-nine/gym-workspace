@@ -19,8 +19,9 @@ import {
   IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { person, trophy, checkmarkCircle, mail, star, logOutOutline } from 'ionicons/icons';
-import { AuthService, UserService, EntrenadoService } from 'gym-library';
+import { person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline } from 'ionicons/icons';
+import { AuthService, UserService } from 'gym-library';
+import { Rol } from 'gym-library';
 
 @Component({
   selector: 'app-perfil',
@@ -32,128 +33,179 @@ import { AuthService, UserService, EntrenadoService } from 'gym-library';
     IonToolbar,
     IonTitle,
     IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
     IonButton,
     IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
     IonAvatar,
     IonBadge
   ],
   styles: [`
-    .perfil-detail {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 20px;
-    }
-
-    .avatar-section {
-      text-align: center;
-    }
-
-    .large-avatar {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 15px;
-      border: 3px solid var(--ion-color-primary);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .perfil-name {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--ion-color-primary);
-      margin: 0;
-      text-align: center;
-    }
-
-    .detail-list {
-      width: 100%;
-      background: transparent;
-      margin-top: 10px;
-    }
-
-    .detail-list ion-item {
-      --border-radius: 12px;
-      margin-bottom: 8px;
-      --background: rgba(255, 255, 255, 0.8);
+    /* Estilos para el perfil unificado */
+    .profile-card {
+      margin: 16px;
+      border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .logout-button {
-      margin-top: 30px;
-      --border-radius: 12px;
-      font-weight: 600;
-      height: 50px;
+    .profile-content {
+      padding: 16px;
     }
 
-    .stats-section {
-      width: 100%;
+    .profile-header {
       display: flex;
-      justify-content: space-around;
-      gap: 15px;
-      margin: 20px 0;
+      align-items: center;
+      gap: 16px;
     }
 
-    .stat-card {
-      flex: 1;
-      text-align: center;
-      padding: 15px;
-      background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--ion-color-secondary) 100%);
-      border-radius: 12px;
+    .profile-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
       color: white;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-weight: bold;
+      font-size: 1.2rem;
     }
 
-    .stat-number {
-      font-size: 2rem;
-      font-weight: 700;
+    .profile-info h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--ion-color-primary);
+    }
+
+    .info-card {
+      margin: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header-compact {
+      padding: 12px 16px 8px;
+    }
+
+    .card-header-compact ion-card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 12px;
+      padding: 8px 16px 16px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .info-text {
+      flex: 1;
+    }
+
+    .info-label {
       display: block;
-      margin-bottom: 5px;
+      font-size: 0.8rem;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .stat-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
+    .info-value {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--ion-color-dark);
       font-weight: 500;
+    }
+
+    .user-id {
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: var(--ion-color-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .account-card {
+      margin: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-content {
+      padding: 16px;
+    }
+
+    .account-content ion-button {
+      --border-radius: 8px;
+      font-weight: 600;
+      height: 44px;
     }
   `]
 })
 export class PerfilPage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
-  private entrenadoService = inject(EntrenadoService);
   private router = inject(Router);
 
   currentUser = computed(() => this.authService.currentUser());
 
-  entrenadosCount: Signal<number> = computed(() => {
-    const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId).length : 0;
-  });
-
   constructor() {
-    addIcons({ person, trophy, checkmarkCircle, mail, star, logOutOutline });
+    addIcons({ person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline });
   }
 
   ngOnInit() {}
 
-  getBadgeColor(role: string): string {
+  getBadgeColor(role?: string): string {
     switch (role) {
-      case 'entrenador': return 'primary';
-      case 'admin': return 'danger';
-      default: return 'medium';
+      case 'gimnasio':
+        return 'danger';
+      case 'entrenado':
+        return 'success';
+      case 'entrenador':
+        return 'warning';
+      case 'user':
+        return 'secondary';
+      default:
+        return 'medium';
     }
   }
 
-  getRoleDisplayName(role: string): string {
+  getRoleDisplayName(role?: string): string {
     switch (role) {
-      case 'entrenador': return 'Entrenador';
-      case 'admin': return 'Administrador';
-      default: return 'Usuario';
+      case 'gimnasio':
+        return 'Gimnasio';
+      case 'entrenado':
+        return 'Entrenado';
+      case 'entrenador':
+        return 'Entrenador';
+      case 'user':
+        return 'Usuario';
+      default:
+        return 'Usuario';
     }
+  }
+
+  getIniciales(nombre?: string): string {
+    if (!nombre) return 'U';
+    return nombre
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .join('')
+      .substring(0, 2);
   }
 
   async logout() {

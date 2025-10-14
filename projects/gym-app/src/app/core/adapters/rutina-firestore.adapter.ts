@@ -60,20 +60,24 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   }
 
   async save(rutina: Rutina): Promise<void> {
-    const dataToSave = this.mapToFirestore(rutina);
-    
-    if (rutina.id) {
-      const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
-      await setDoc(rutinaRef, dataToSave, { merge: true });
-    } else {
-      const rutinaRef = doc(collection(this.firestore, this.COLLECTION));
-      await setDoc(rutinaRef, dataToSave);
-    }
+    return runInInjectionContext(this.injector, async () => {
+      const dataToSave = this.mapToFirestore(rutina);
+      
+      if (rutina.id) {
+        const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
+        await setDoc(rutinaRef, dataToSave, { merge: true });
+      } else {
+        const rutinaRef = doc(collection(this.firestore, this.COLLECTION));
+        await setDoc(rutinaRef, dataToSave);
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const rutinaRef = doc(this.firestore, this.COLLECTION, id);
-    await deleteDoc(rutinaRef);
+    return runInInjectionContext(this.injector, async () => {
+      const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(rutinaRef);
+    });
   }
 
   private mapFromFirestore(data: any): Rutina {

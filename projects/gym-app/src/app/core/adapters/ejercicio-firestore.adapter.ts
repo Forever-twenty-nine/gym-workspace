@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
   collection, 
@@ -23,40 +23,49 @@ interface IEjercicioFirestoreAdapter {
 export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
   private readonly COLLECTION = 'ejercicios';
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
 
   initializeListener(onUpdate: (ejercicios: Ejercicio[]) => void): void {
-    const col = collection(this.firestore, this.COLLECTION);
-    onSnapshot(col, (snap: QuerySnapshot) => {
-      const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-      onUpdate(list);
+    runInInjectionContext(this.injector, () => {
+      const col = collection(this.firestore, this.COLLECTION);
+      onSnapshot(col, (snap: QuerySnapshot) => {
+        const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        onUpdate(list);
+      });
     });
   }
 
   subscribeToEjercicio(id: string, onUpdate: (ejercicio: Ejercicio | null) => void): void {
-    const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
-    onSnapshot(ejercicioRef, (doc: DocumentSnapshot) => {
-      if (doc.exists()) {
-        onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-      } else {
-        onUpdate(null);
-      }
+    runInInjectionContext(this.injector, () => {
+      const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
+      onSnapshot(ejercicioRef, (doc: DocumentSnapshot) => {
+        if (doc.exists()) {
+          onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
+        } else {
+          onUpdate(null);
+        }
+      });
     });
   }
 
   async save(ejercicio: Ejercicio): Promise<void> {
-    const dataToSave = this.mapToFirestore(ejercicio);
-    
-    if (ejercicio.id) {
-      const ejercicioRef = doc(this.firestore, this.COLLECTION, ejercicio.id);
-      await setDoc(ejercicioRef, dataToSave, { merge: true });
-    } else {
-      await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
-    }
+    return runInInjectionContext(this.injector, async () => {
+      const dataToSave = this.mapToFirestore(ejercicio);
+      
+      if (ejercicio.id) {
+        const ejercicioRef = doc(this.firestore, this.COLLECTION, ejercicio.id);
+        await setDoc(ejercicioRef, dataToSave, { merge: true });
+      } else {
+        await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
-    await deleteDoc(ejercicioRef);
+    return runInInjectionContext(this.injector, async () => {
+      const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(ejercicioRef);
+    });
   }
 
   private mapFromFirestore(data: any): Ejercicio {

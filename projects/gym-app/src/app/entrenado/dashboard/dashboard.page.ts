@@ -1,6 +1,6 @@
-import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect, Injector, runInInjectionContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Auth, user } from '@angular/fire/auth';
+import { Auth, user, User as FirebaseUser } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { 
   IonContent,
@@ -66,7 +66,7 @@ export class DashboardPage implements OnInit {
   todasLasRutinas = signal<Rutina[]>([]);
   
   // Signal para el UID de Firebase Auth
-  firebaseUserSignal = toSignal(user(this.auth), { initialValue: null });
+  firebaseUserSignal = toSignal(runInInjectionContext(this.injector, () => user(this.auth)), { initialValue: null as FirebaseUser | null });
   
   // Signal para el usuario actual que se actualiza automáticamente
   currentUserSignal = computed(() => this.authService.currentUser());

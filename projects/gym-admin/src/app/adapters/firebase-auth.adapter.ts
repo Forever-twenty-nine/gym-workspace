@@ -1,14 +1,18 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { 
   Auth, 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
   signOut, 
+  authState,
   onAuthStateChanged,
   updateProfile,
-  UserCredential
+  UserCredential,
+  User as FirebaseUser
 } from '@angular/fire/auth';
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { computed, Signal } from '@angular/core';
 import { User, Rol, Entrenado, Objetivo } from 'gym-library';
 
 interface IAuthAdapter {
@@ -21,79 +25,87 @@ interface IAuthAdapter {
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseAuthAdapter implements IAuthAdapter {
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
+  private readonly auth = inject(Auth);
+  private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
+  
+  // Signal para el estado de autenticación (lazy initialization en contexto de inyección)
+  private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = runInInjectionContext(
+    this.injector,
+    () => toSignal(authState(this.auth))
+  );
 
-  /**
-   * Crea un nuevo usuario con email y contraseña en Firebase Auth
-   * y guarda los datos adicionales en Firestore
-   */
+  // Computed signal para verificar autenticación (más reactivo)
+  readonly isAuthenticatedSignal = computed(() => !!this.authStateSignal());
+
   async createUserWithEmailAndPassword(
     email: string, 
     password: string, 
     userData: Partial<User>
   ): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      // Crear usuario en Firebase Auth
-      const userCredential: UserCredential = await createUserWithEmailAndPassword(
-        this.auth, 
-        email, 
-        password
-      );
-      
-      const firebaseUser = userCredential.user;
-      
-      if (firebaseUser) {
-        // Actualizar perfil de Firebase Auth con el nombre
-        if (userData.nombre) {
-          await updateProfile(firebaseUser, {
-            displayName: userData.nombre
-          });
-        }
+      return await runInInjectionContext(this.injector, async () => {
+        // Crear usuario en Firebase Auth
+        const userCredential: UserCredential = await createUserWithEmailAndPassword(
+          this.auth, 
+          email, 
+          password
+        );
+        
+        const firebaseUser = userCredential.user;
+        
+        if (firebaseUser) {
+          // Actualizar perfil de Firebase Auth con el nombre
+          if (userData.nombre) {
+            await updateProfile(firebaseUser, {
+              displayName: userData.nombre
+            });
+          }
 
-        // Crear objeto User mínimo - solo datos básicos sin inferencias
-        const newUser: User = {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email || email,
-          emailVerified: firebaseUser.emailVerified
-        };
+          // Crear objeto User mínimo - solo datos básicos sin inferencias
+          const newUser: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || email,
+            emailVerified: firebaseUser.emailVerified
+          };
 
-        // Solo agregar campos que estén explícitamente definidos en userData
-        if (userData.nombre !== undefined) {
-          newUser.nombre = userData.nombre;
-        }
-        if (userData.role !== undefined) {
-          newUser.role = userData.role;
-        }
-        if (userData.entrenadorId !== undefined) {
-          newUser.entrenadorId = userData.entrenadorId;
-        }
-        if (userData.gimnasioId !== undefined) {
-          newUser.gimnasioId = userData.gimnasioId;
-        }
-        if (userData.plan !== undefined) {
-          newUser.plan = userData.plan;
-        }
-        if ((userData as any).entrenadoId !== undefined) {
-          (newUser as any).entrenadoId = (userData as any).entrenadoId;
-        }
-        if (userData.onboarded !== undefined) {
-          newUser.onboarded = userData.onboarded;
-        }
+          // Solo agregar campos que estén explícitamente definidos en userData
+          if (userData.nombre !== undefined) {
+            newUser.nombre = userData.nombre;
+          }
+          if (userData.role !== undefined) {
+            newUser.role = userData.role;
+          }
+          if (userData.entrenadorId !== undefined) {
+            newUser.entrenadorId = userData.entrenadorId;
+          }
+          if (userData.gimnasioId !== undefined) {
+            newUser.gimnasioId = userData.gimnasioId;
+          }
+          if (userData.plan !== undefined) {
+            newUser.plan = userData.plan;
+          }
+          if ((userData as any).entrenadoId !== undefined) {
+            (newUser as any).entrenadoId = (userData as any).entrenadoId;
+          }
+          if (userData.onboarded !== undefined) {
+            newUser.onboarded = userData.onboarded;
+          }
 
-        // No crear documentos automáticamente al registrar usuario
-        // Los documentos específicos (cliente, gimnasio, entrenador) se crearán al editar el rol
+          // No crear documentos automáticamente al registrar usuario
+          // Los documentos específicos (cliente, gimnasio, entrenador) se crearán al editar el rol
 
-        // Guardar datos adicionales en Firestore
-        const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
-        await setDoc(userDocRef, newUser);
+          // Guardar datos adicionales en Firestore
+          const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
+          await setDoc(userDocRef, newUser);
 
-        return { success: true, user: newUser };
-      }
-      
-      return { success: false, error: 'No se pudo crear el usuario en Firebase Auth' };
+          return { success: true, user: newUser };
+        }
+        
+        return { success: false, error: 'No se pudo crear el usuario en Firebase Auth' };
+      });
     } catch (error: any) {
-      console.error('❌ FirebaseAuthAdapter: Error creando usuario:', error);
+      console.error('❌ FirebaseAuthAdapter: Error creando usuario:', error.code || error.message);
       
       // Si el usuario ya existe, informar al administrador
       if (error.code === 'auth/email-already-in-use') {
@@ -109,72 +121,71 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
 
   async loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      const cred = await signInWithEmailAndPassword(this.auth, email, password);
-      const firebaseUser = cred.user;
-      
-      if (firebaseUser) {
-        const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
-        const userSnap = await getDoc(userDocRef);
-        let user: User;
+      return await runInInjectionContext(this.injector, async () => {
+        const cred = await signInWithEmailAndPassword(this.auth, email, password);
+        const firebaseUser = cred.user;
         
-        if (userSnap.exists()) {
-          user = userSnap.data() as User;
-        } else {
-          // Si no existe documento en Firestore, crear usuario mínimo
-          user = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email || '',
-            emailVerified: firebaseUser.emailVerified
-          };
+        if (firebaseUser) {
+          const user = await this.getUserData(firebaseUser);
+          return { success: true, user };
         }
         
-        return { success: true, user };
-      }
-      
-      return { success: false, error: 'No se pudo obtener información del usuario' };
+        return { success: false, error: 'No se pudo obtener información del usuario' };
+      });
     } catch (error: any) {
       return { success: false, error: this.getErrorMessage(error) };
     }
   }
 
   async logout(): Promise<void> {
-    await signOut(this.auth);
+    await runInInjectionContext(this.injector, async () => {
+      await signOut(this.auth);
+    });
   }
 
   async getCurrentUser(): Promise<User | null> {
-    return new Promise((resolve) => {
-      const unsubscribe = onAuthStateChanged(this.auth, async (firebaseUser) => {
-        unsubscribe();
-        
-        if (firebaseUser) {
-          try {
-            const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
-            const userSnap = await getDoc(userDocRef);
-            
-            if (userSnap.exists()) {
-              resolve(userSnap.data() as User);
-            } else {
-              // Si no existe documento en Firestore, devolver usuario mínimo
-              resolve({
-                uid: firebaseUser.uid,
-                email: firebaseUser.email || '',
-                emailVerified: firebaseUser.emailVerified
-              });
-            }
-          } catch (error) {
-            console.error('Error obteniendo usuario:', error);
-            resolve(null);
-          }
-        } else {
-          resolve(null);
-        }
-      });
+    return runInInjectionContext(this.injector, async () => {
+      const firebaseUser = this.authStateSignal();
+      
+      if (!firebaseUser) {
+        return null;
+      }
+      
+      return await this.getUserData(firebaseUser);
     });
   }
 
   async isAuthenticated(): Promise<boolean> {
-    const user = await this.getCurrentUser();
-    return user !== null;
+    return runInInjectionContext(this.injector, () => {
+      return this.isAuthenticatedSignal();
+    });
+  }
+
+  // Método privado reutilizable para obtener datos del usuario
+  private async getUserData(firebaseUser: FirebaseUser): Promise<User> {
+    return runInInjectionContext(this.injector, async () => {
+      const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
+      const userSnap = await getDoc(userDocRef);
+      
+      let userData: User;
+      
+      if (userSnap.exists()) {
+        userData = userSnap.data() as User;
+      } else {
+        // Si no existe documento en Firestore, devolver usuario mínimo
+        userData = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          emailVerified: firebaseUser.emailVerified
+        };
+      }
+      
+      // Asegurar que el uid esté incluido
+      return {
+        ...userData,
+        uid: firebaseUser.uid
+      };
+    });
   }
 
   /**

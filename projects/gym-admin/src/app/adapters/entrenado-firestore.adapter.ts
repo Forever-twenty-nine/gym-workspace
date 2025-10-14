@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
   collection, 
@@ -26,43 +26,52 @@ interface IEntrenadoFirestoreAdapter {
 export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private readonly COLLECTION = 'entrenados';
   private firestore = inject(Firestore);
+  private injector = inject(Injector);
 
   initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void {
-    const entrenadosCol = collection(this.firestore, this.COLLECTION);
-    
-    onSnapshot(entrenadosCol, (snapshot: QuerySnapshot) => {
-      const list = snapshot.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-      onUpdate(list);
+    runInInjectionContext(this.injector, () => {
+      const entrenadosCol = collection(this.firestore, this.COLLECTION);
+      
+      onSnapshot(entrenadosCol, (snapshot: QuerySnapshot) => {
+        const list = snapshot.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        onUpdate(list);
+      });
     });
   }
 
   subscribeToEntrenado(id: string, onUpdate: (entrenado: Entrenado | null) => void): void {
-    const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
-    onSnapshot(entrenadoRef, (doc: DocumentSnapshot) => {
-      if (doc.exists()) {
-        onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-      } else {
-        onUpdate(null);
-      }
+    runInInjectionContext(this.injector, () => {
+      const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+      onSnapshot(entrenadoRef, (doc: DocumentSnapshot) => {
+        if (doc.exists()) {
+          onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
+        } else {
+          onUpdate(null);
+        }
+      });
     });
   }
 
   async save(entrenado: Entrenado): Promise<void> {
-    const dataToSave = this.mapToFirestore(entrenado);
-    
-    if (entrenado.id) {
-      // Usar setDoc con merge para upsert (crear si no existe, actualizar si existe)
-      const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
-      await setDoc(entrenadoRef, dataToSave, { merge: true });
-    } else {
-      // Crear nuevo entrenado
-      await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
-    }
+    return runInInjectionContext(this.injector, async () => {
+      const dataToSave = this.mapToFirestore(entrenado);
+      
+      if (entrenado.id) {
+        // Usar setDoc con merge para upsert (crear si no existe, actualizar si existe)
+        const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
+        await setDoc(entrenadoRef, dataToSave, { merge: true });
+      } else {
+        // Crear nuevo entrenado
+        await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
-    await deleteDoc(entrenadoRef);
+    return runInInjectionContext(this.injector, async () => {
+      const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(entrenadoRef);
+    });
   }
 
   /**

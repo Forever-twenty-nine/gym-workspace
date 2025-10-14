@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { 
   Firestore,
   collection,
@@ -27,33 +27,38 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   private readonly COLLECTION_NAME = 'usuarios';
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private injector = inject(Injector);
   private firebaseAuthAdapter = inject(FirebaseAuthAdapter);
 
   initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void {
-    const usersCol = collection(this.firestore, this.COLLECTION_NAME);
-    
-    onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
+    runInInjectionContext(this.injector, () => {
+      const usersCol = collection(this.firestore, this.COLLECTION_NAME);
+      
+      onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
+        const usersList = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          uid: doc.id
+        } as User));
+        
+        onUpdate(usersList);
+      }, (error) => {
+        onError(error.message);
+      });
+    });
+  }
+
+  async getUsers(): Promise<User[]> {
+    return runInInjectionContext(this.injector, async () => {
+      const usersCol = collection(this.firestore, this.COLLECTION_NAME);
+      const snapshot = await getDocs(usersCol);
+      
       const usersList = snapshot.docs.map(doc => ({
         ...doc.data(),
         uid: doc.id
       } as User));
       
-      onUpdate(usersList);
-    }, (error) => {
-      onError(error.message);
+      return usersList;
     });
-  }
-
-  async getUsers(): Promise<User[]> {
-    const usersCol = collection(this.firestore, this.COLLECTION_NAME);
-    const snapshot = await getDocs(usersCol);
-    
-    const usersList = snapshot.docs.map(doc => ({
-      ...doc.data(),
-      uid: doc.id
-    } as User));
-    
-    return usersList;
   }
 
   async addUser(user: Omit<User, 'uid'>, password?: string): Promise<string> {
@@ -81,12 +86,16 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   }
 
   async updateUser(uid: string, userData: Partial<User>): Promise<void> {
-    const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
-    await setDoc(userDoc, userData, { merge: true });
+    return runInInjectionContext(this.injector, async () => {
+      const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
+      await setDoc(userDoc, userData, { merge: true });
+    });
   }
 
   async deleteUser(uid: string): Promise<void> {
-    const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
-    await deleteDoc(userDoc);
+    return runInInjectionContext(this.injector, async () => {
+      const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
+      await deleteDoc(userDoc);
+    });
   }
 }

@@ -61,11 +61,15 @@ export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
   }
 
   async save(gimnasio: Gimnasio): Promise<void> {
-    await setDoc(doc(this.firestore, this.COLLECTION, gimnasio.id), this.mapToFirestore(gimnasio));
+    return runInInjectionContext(this.injector, async () => {
+      await setDoc(doc(this.firestore, this.COLLECTION, gimnasio.id), this.mapToFirestore(gimnasio));
+    });
   }
 
   async delete(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, this.COLLECTION, id));
+    return runInInjectionContext(this.injector, async () => {
+      await deleteDoc(doc(this.firestore, this.COLLECTION, id));
+    });
   }
 
   private mapToFirestore(gimnasio: Gimnasio): any {

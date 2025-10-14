@@ -27,17 +27,19 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   private injector = inject(Injector);
 
   initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void {
-    const usersCol = collection(this.firestore, this.COLLECTION);
-    
-    onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
-      const usersList = snapshot.docs.map(doc => ({
-        ...doc.data(),
-        uid: doc.id
-      } as User));
+    runInInjectionContext(this.injector, () => {
+      const usersCol = collection(this.firestore, this.COLLECTION);
       
-      onUpdate(usersList);
-    }, (error) => {
-      onError(error.message);
+      onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
+        const usersList = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          uid: doc.id
+        } as User));
+        
+        onUpdate(usersList);
+      }, (error) => {
+        onError(error.message);
+      });
     });
   }
 
@@ -52,8 +54,10 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   }
 
   async updateUser(uid: string, userData: Partial<User>): Promise<void> {
-    const userDoc = doc(this.firestore, this.COLLECTION, uid);
-    await setDoc(userDoc, userData, { merge: true });
+    return runInInjectionContext(this.injector, async () => {
+      const userDoc = doc(this.firestore, this.COLLECTION, uid);
+      await setDoc(userDoc, userData, { merge: true });
+    });
   }
 
   async deleteUser(uid: string): Promise<void> {

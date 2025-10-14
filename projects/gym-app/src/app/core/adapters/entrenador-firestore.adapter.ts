@@ -67,21 +67,29 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
   }
 
   async create(entrenador: Omit<Entrenador, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, this.COLLECTION), this.mapToFirestore(entrenador));
-    return docRef.id;
+    return runInInjectionContext(this.injector, async () => {
+      const docRef = await addDoc(collection(this.firestore, this.COLLECTION), this.mapToFirestore(entrenador));
+      return docRef.id;
+    });
   }
 
   async createWithId(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void> {
-    await setDoc(doc(this.firestore, this.COLLECTION, id), this.mapToFirestore(entrenador));
+    return runInInjectionContext(this.injector, async () => {
+      await setDoc(doc(this.firestore, this.COLLECTION, id), this.mapToFirestore(entrenador));
+    });
   }
 
   async update(id: string, entrenador: Partial<Entrenador>): Promise<void> {
-    const dataToUpdate = this.mapPartialToFirestore(entrenador);
-    await updateDoc(doc(this.firestore, this.COLLECTION, id), dataToUpdate);
+    return runInInjectionContext(this.injector, async () => {
+      const dataToUpdate = this.mapPartialToFirestore(entrenador);
+      await updateDoc(doc(this.firestore, this.COLLECTION, id), dataToUpdate);
+    });
   }
 
   async delete(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, this.COLLECTION, id));
+    return runInInjectionContext(this.injector, async () => {
+      await deleteDoc(doc(this.firestore, this.COLLECTION, id));
+    });
   }
 
   private mapToFirestore(entrenador: Omit<Entrenador, 'id'> | Entrenador): any {

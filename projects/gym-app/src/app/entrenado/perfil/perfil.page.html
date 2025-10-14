@@ -91,55 +91,6 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Estadísticas -->
-    @if (user.role === 'entrenado') {
-      @if (estadisticas(); as stats) {
-        <ion-card class="stats-card">
-          <ion-card-header class="card-header-compact">
-            <ion-card-title>
-              <ion-icon name="stats-chart-outline"></ion-icon>
-              Estadísticas
-            </ion-card-title>
-          </ion-card-header>
-          <ion-card-content class="stats-content">
-            <div class="stats-grid">
-              <div class="stat-item">
-                <ion-icon name="fitness-outline" color="primary"></ion-icon>
-                <div class="stat-info">
-                  <h2>{{ stats.totalRutinas }}</h2>
-                  <p>Rutinas</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-                <div class="stat-info">
-                  <h2>{{ stats.completadas }}</h2>
-                  <p>Completadas</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="time-outline" color="warning"></ion-icon>
-                <div class="stat-info">
-                  <h2>{{ stats.activas }}</h2>
-                  <p>Activas</p>
-                </div>
-              </div>
-              
-              <div class="stat-item">
-                <ion-icon name="trophy-outline" color="tertiary"></ion-icon>
-                <div class="stat-info">
-                  <h2>{{ stats.totalEjercicios }}</h2>
-                  <p>Ejercicios</p>
-                </div>
-              </div>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      }
-    }
-
     <!-- Acciones de la cuenta -->
     <ion-card class="account-card">
       <ion-card-content class="account-content">

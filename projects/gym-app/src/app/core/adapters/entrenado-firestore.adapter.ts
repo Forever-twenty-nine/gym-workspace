@@ -65,21 +65,25 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   }
 
   async save(entrenado: Entrenado): Promise<void> {
-    const dataToSave = this.mapToFirestore(entrenado);
-    
-    if (entrenado.id) {
-      // Actualizar entrenado existente
-      const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
-      await setDoc(entrenadoRef, dataToSave, { merge: true });
-    } else {
-      // Crear nuevo entrenado
-      await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
-    }
+    return runInInjectionContext(this.injector, async () => {
+      const dataToSave = this.mapToFirestore(entrenado);
+      
+      if (entrenado.id) {
+        // Actualizar entrenado existente
+        const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
+        await setDoc(entrenadoRef, dataToSave, { merge: true });
+      } else {
+        // Crear nuevo entrenado
+        await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
-    await deleteDoc(entrenadoRef);
+    return runInInjectionContext(this.injector, async () => {
+      const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(entrenadoRef);
+    });
   }
 
   private mapFromFirestore(data: any): Entrenado {
