@@ -23,7 +23,10 @@
     "dev": "npm run library:build && npm run dev:parallel",
     "dev:parallel": "concurrently \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "dev:all": "concurrently \"npm run library:watch\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"lib,admin,app\" --prefix-colors \"yellow,cyan,magenta\"",
-    "dev:with-emulator": "concurrently \"npm run emulator:start\" \"npm run dev:all\" --names \"emulator,dev\" --prefix-colors \"green,yellow\"",
+    "dev:with-emulator": "npm run library:build && concurrently \"npm run emulator:start\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"emulator,admin,app\" --prefix-colors \"green,cyan,magenta\"",
+    "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
+    "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
+    "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -- --configuration=firebase",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {

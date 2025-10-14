@@ -5,6 +5,7 @@ import { firebaseSecrets } from './environment.secrets';
 
 export const productionEnvironment: Environment = {
   production: true,
+  useEmulator: false,
   firebase: firebaseSecrets || {
     apiKey: 'TU_API_KEY_PROD',
     authDomain: 'TU_AUTH_DOMAIN_PROD',
