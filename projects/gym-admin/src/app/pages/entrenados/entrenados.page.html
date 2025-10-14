@@ -1,25 +1,12 @@
 <div class="w-full px-4 py-8">
   
-  <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Card de Entrenados -->
-    <app-generic-card
-      [config]="entrenadosCardConfig"
-      [items]="entrenados()"
-      [idField]="'id'"
-      [canCreate]="false"
-      (edit)="openDetailsModal($event)"
-      (delete)="deleteEntrenado($event)">
-    </app-generic-card>
-
-    <!-- Card de Mensajes -->
-    <app-generic-card
-      [config]="mensajesCardConfig"
-      [items]="mensajesFiltrados()"
-      [idField]="'id'"
-      [canCreate]="false"
-      (edit)="openMensajeModal($event)"
-      (delete)="deleteMensaje($event)">
-    </app-generic-card>
+  <section class="grid grid-cols-1 gap-6">
+    <!-- Tabla de Entrenados -->
+        <!-- Tabla de Entrenados -->
+    <app-entrenados-table
+      [entrenados]="entrenados()"
+      (edit)="openDetailsModal($event)">
+    </app-entrenados-table>
   </section>
 
   <!-- Modal de detalles del entrenado -->
@@ -32,37 +19,11 @@
     [ejercicios]="[]"
     [selectedEjercicios]="[]"
     [isLoading]="isLoading()"
-    [showCustomAction]="!isCreating() && modalData() !== null"
-    [customActionLabel]="'Enviar Mensaje'"
-    [customActionIcon]="'💬'"
     (close)="closeModal()"
     (save)="saveChanges()"
-    (customAction)="addMensaje()"
     (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
-    (verMensaje)="abrirMensaje($event)"
-    (responderMensaje)="responderMensaje($event)"
-    (verConversacion)="abrirConversacion($event)"
-    (marcarConversacionLeida)="marcarConversacionLeida($event)"
-    (responderConversacion)="responderConversacion($event)"
     (aceptarInvitacion)="aceptarInvitacion($event)"
     (rechazarInvitacion)="rechazarInvitacion($event)"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)"
     (clearField)="onClearField($event)">
-  </app-modal-form>
-
-  <!-- Modal de mensajes -->
-  <app-modal-form
-    [isOpen]="isMensajeModalOpen()"
-    [modalType]="'mensaje'"
-    [isCreating]="isMensajeCreating()"
-    [form]="mensajeEditForm()"
-    [formFields]="getMensajeFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeMensajeModal()"
-    (save)="saveMensajeChanges()"
-    (responderMensaje)="responderMensaje($event)">
   </app-modal-form>
 </div>

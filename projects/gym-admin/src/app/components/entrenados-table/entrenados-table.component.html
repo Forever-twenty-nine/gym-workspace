@@ -1,0 +1,77 @@
+<div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
+      <tr>
+        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Entrenador</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Gimnasio</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Estado</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Objetivo</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Fecha Registro</th>
+        <th class="px-8 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-100">
+      @for (entrenado of entrenados(); track entrenado.id) {
+        <tr class="hover:bg-blue-50 transition-colors duration-200">
+          <td class="px-8 py-5 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-10 w-10">
+                <div class="h-10 w-10 rounded-full bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
+                  <span class="text-white font-medium text-sm">{{ entrenado.displayName.charAt(0).toUpperCase() }}</span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <div class="text-sm font-medium text-gray-900">{{ entrenado.displayName }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-5 whitespace-nowrap text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              {{ entrenado.entrenadorName || 'Sin asignar' }}
+            </span>
+          </td>
+          <td class="px-6 py-5 whitespace-nowrap text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+              {{ entrenado.gimnasioName || 'Sin asignar' }}
+            </span>
+          </td>
+          <td class="px-6 py-5 whitespace-nowrap text-center">
+            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                  [class]="entrenado.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              {{ entrenado.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="px-6 py-5 whitespace-nowrap text-center">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
+              {{ entrenado.objetivo || 'Sin objetivo' }}
+            </span>
+          </td>
+          <td class="px-6 py-5 whitespace-nowrap text-center text-sm text-gray-500">
+            {{ entrenado.fechaRegistro | date:'short' }}
+          </td>
+          <td class="px-8 py-5 whitespace-nowrap text-right">
+            <button
+              (click)="onEdit(entrenado.id)"
+              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              Editar
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (entrenados().length === 0) {
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay entrenados</h3>
+      <p class="mt-1 text-sm text-gray-500">Comienza agregando tu primer entrenado.</p>
+    </div>
+  }
+</div>

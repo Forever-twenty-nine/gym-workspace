@@ -16,7 +16,7 @@ import {
 import { IConversacionFirestoreAdapter, Conversacion } from 'gym-library';
 
 /**
- * 💬 Adaptador de Firestore para Conversaciones
+ * Adaptador de Firestore para Conversaciones
  * Implementa la interfaz IConversacionFirestoreAdapter para gym-admin
  */
 @Injectable({ providedIn: 'root' })
@@ -25,7 +25,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
   private readonly COLLECTION_NAME = 'conversaciones';
 
   /**
-   * 🔄 Inicializa el listener en tiempo real
+   * Inicializa el listener en tiempo real
    */
   initializeListener(onUpdate: (conversaciones: Conversacion[]) => void): void {
     const conversacionesCol = collection(this.firestore, this.COLLECTION_NAME);
@@ -61,7 +61,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
   }
 
   /**
-   * 📊 Suscripción a una conversación específica
+   * Suscripción a una conversación específica
    */
   subscribeToConversacion(id: string, onUpdate: (conversacion: Conversacion | null) => void): void {
     const conversacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
@@ -98,7 +98,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
   }
 
   /**
-   * 💾 Guarda o actualiza una conversación
+   * Guarda o actualiza una conversación
    */
   async save(conversacion: Conversacion): Promise<void> {
     try {
@@ -129,7 +129,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
   }
 
   /**
-   * 🗑️ Elimina una conversación
+   * Elimina una conversación
    */
   async delete(id: string): Promise<void> {
     try {
@@ -142,7 +142,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
   }
 
   /**
-   * 📝 Actualiza el último mensaje de la conversación
+   * Actualiza el último mensaje de la conversación
    */
   async actualizarUltimoMensaje(id: string, mensaje: string, fecha: Date): Promise<void> {
     try {
@@ -153,13 +153,13 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
         fechaUltimaActividad: Timestamp.now()
       });
     } catch (error) {
-      console.error('❌ ConversacionFirestoreAdapter: Error al actualizar último mensaje:', error);
+      console.error('ConversacionFirestoreAdapter: Error al actualizar último mensaje:', error);
       throw error;
     }
   }
 
   /**
-   * 🔢 Incrementa el contador de no leídos
+   * Incrementa el contador de no leídos
    */
   async incrementarNoLeidos(id: string, tipo: 'entrenador' | 'entrenado'): Promise<void> {
     try {
@@ -170,13 +170,13 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
         fechaUltimaActividad: Timestamp.now()
       });
     } catch (error) {
-      console.error('❌ ConversacionFirestoreAdapter: Error al incrementar no leídos:', error);
+      console.error('ConversacionFirestoreAdapter: Error al incrementar no leídos:', error);
       throw error;
     }
   }
 
   /**
-   * 🔄 Resetea el contador de no leídos
+   * Resetea el contador de no leídos
    */
   async resetearNoLeidos(id: string, tipo: 'entrenador' | 'entrenado'): Promise<void> {
     try {
@@ -186,7 +186,7 @@ export class ConversacionFirestoreAdapter implements IConversacionFirestoreAdapt
         [campo]: 0
       });
     } catch (error) {
-      console.error('❌ ConversacionFirestoreAdapter: Error al resetear no leídos:', error);
+      console.error('ConversacionFirestoreAdapter: Error al resetear no leídos:', error);
       throw error;
     }
   }
