@@ -196,30 +196,21 @@ export class EntrenadosPage implements OnInit {
       return;
     }
 
-    console.log('📨 Enviando invitación:', data);
-
     // Buscar el usuario por email
     const usuarioInvitado = this.userService.users().find(u => u.email === data.email);
     const usuarioId = usuarioInvitado?.uid;
 
     if (!usuarioId) {
-      console.error('❌ No se encontró un usuario con ese email');
       this.isLoading.set(false);
       return;
     }
-
-    console.log('👤 Usuario invitado encontrado:', usuarioInvitado);
 
     // Obtener el nombre del entrenador actual
     const entrenadorActual = this.userService.users().find(u => u.uid === entrenadorId);
     const entrenadorNombre = entrenadorActual?.nombre || entrenadorActual?.email || 'Entrenador';
 
-    console.log('🏋️ Entrenador:', entrenadorActual, 'Nombre:', entrenadorNombre);
-
     try {
-      console.log('📝 Creando invitación...');
       await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje, entrenadorNombre);
-      console.log('✅ Invitación creada exitosamente');
       this.closeInvitacionModal();
     } catch (error) {
       console.error('❌ Error al enviar invitación:', error);
@@ -270,13 +261,10 @@ export class EntrenadosPage implements OnInit {
   async asignarRutina(rutina: Rutina) {
     if (!this.selectedEntrenado()) return;
 
-    console.log('Asignando rutina:', rutina.nombre, 'a entrenado:', this.selectedEntrenado()!.id);
-
     try {
       // Si ya está asignada a este entrenado, no hacer nada
       const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
       if (asignadoIds.includes(this.selectedEntrenado()!.id)) {
-        console.log('La rutina ya está asignada a este entrenado');
         return;
       }
 
@@ -287,9 +275,7 @@ export class EntrenadosPage implements OnInit {
         fechaAsignacion: new Date()
       };
 
-      console.log('Rutina actualizada:', rutinaActualizada);
       await this.rutinaService.save(rutinaActualizada);
-      console.log('Rutina guardada exitosamente');
 
       // Esperar un momento para que el listener se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -297,15 +283,12 @@ export class EntrenadosPage implements OnInit {
       this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
       this.cargarRutinasDisponibles();
       
-      console.log('Listas recargadas');
     } catch (error) {
       console.error('Error al asignar rutina:', error);
     }
   }
 
   async desasignarRutina(rutina: Rutina) {
-    console.log('Desasignando rutina:', rutina.nombre);
-
     try {
       const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
       const nuevosAsignados = asignadoIds.filter(id => id !== this.selectedEntrenado()!.id);
@@ -320,9 +303,7 @@ export class EntrenadosPage implements OnInit {
         })
       };
 
-      console.log('Rutina actualizada para desasignar:', rutinaActualizada);
       await this.rutinaService.save(rutinaActualizada);
-      console.log('Rutina desasignada exitosamente');
 
       // Esperar un momento para que el listener se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -330,7 +311,6 @@ export class EntrenadosPage implements OnInit {
       this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
       this.cargarRutinasDisponibles();
       
-      console.log('Listas recargadas después de desasignar');
     } catch (error) {
       console.error('Error al desasignar rutina:', error);
     }

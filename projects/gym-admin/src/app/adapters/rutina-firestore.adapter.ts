@@ -76,6 +76,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       creadorId: data.creadorId,
       creadorTipo: data.creadorTipo,
       asignadoId: data.asignadoId,
+      asignadoIds: data.asignadoIds || [],
       asignadoTipo: data.asignadoTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
@@ -118,6 +119,10 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
     
     if (rutina.asignadoId) {
       data.asignadoId = rutina.asignadoId;
+    }
+    
+    if (rutina.asignadoIds && rutina.asignadoIds.length > 0) {
+      data.asignadoIds = rutina.asignadoIds;
     }
     
     if (rutina.asignadoTipo) {

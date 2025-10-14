@@ -300,8 +300,11 @@ export class EntrenadosPage {
     
     // Obtener rutinas asignadas al entrenado
     const rutinasAsignadas = this.rutinas().filter(rutina => {
-      // Buscar en ambos campos: asignadoId (nuevo) y entrenadoId (legacy)
-      const coincideId = rutina.asignadoId === clienteData.id || rutina.entrenadoId === clienteData.id;
+      // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
+      const coincideId = 
+        (rutina.asignadoIds && rutina.asignadoIds.includes(clienteData.id)) ||
+        rutina.asignadoId === clienteData.id || 
+        rutina.entrenadoId === clienteData.id;
       const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
       return coincideId && coincideTipo;
     }).map(rutina => {

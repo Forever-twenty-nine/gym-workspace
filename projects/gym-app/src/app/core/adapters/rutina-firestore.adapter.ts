@@ -62,16 +62,12 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   async save(rutina: Rutina): Promise<void> {
     const dataToSave = this.mapToFirestore(rutina);
     
-    console.log('Guardando rutina en Firestore:', rutina.id, dataToSave);
-    
     if (rutina.id) {
       const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
       await setDoc(rutinaRef, dataToSave, { merge: true });
-      console.log('Rutina actualizada en Firestore');
     } else {
       const rutinaRef = doc(collection(this.firestore, this.COLLECTION));
       await setDoc(rutinaRef, dataToSave);
-      console.log('Nueva rutina creada en Firestore');
     }
   }
 

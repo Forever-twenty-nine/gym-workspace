@@ -122,7 +122,6 @@ export class EntrenadorService {
     
     try {
       const id = await this.adapter.create(entrenadorData);
-      console.log('✅ Entrenador creado:', id);
       return id;
     } catch (error) {
       console.error('❌ Error al crear entrenador:', error);

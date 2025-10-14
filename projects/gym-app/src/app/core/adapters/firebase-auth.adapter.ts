@@ -123,7 +123,6 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
           ...userData,
           uid: firebaseUser.uid
         };
-        console.log('🔥 FirebaseAuthAdapter getCurrentUser - Usuario completo:', completeUser);
         return completeUser;
       }
       

@@ -71,7 +71,6 @@ export class AppConfigurationService {
       this.userService.setFirestoreAdapter(this.userAdapter);
       this.notificacionService.setFirestoreAdapter(this.notificacionAdapter);
       this.dataServicesConfigured = true;
-      console.log('✅ Servicios de datos configurados');
     } catch (error) {
       console.error('❌ Error configurando servicios de datos:', error);
       throw error;

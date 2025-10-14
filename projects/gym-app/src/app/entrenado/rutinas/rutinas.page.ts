@@ -98,9 +98,12 @@ export class RutinasPage implements OnInit, OnDestroy {
     if (!userId || !rutinas.length) return [];
     
     // Filtrar rutinas asignadas a este entrenado
-    // Buscar en ambos campos: asignadoId (nuevo) y entrenadoId (legacy)
+    // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
     return rutinas.filter(rutina => {
-      const coincideId = rutina.asignadoId === userId || rutina.entrenadoId === userId;
+      const coincideId = 
+        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
+        rutina.asignadoId === userId || 
+        rutina.entrenadoId === userId;
       const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
       return coincideId && coincideTipo;
     });
@@ -277,8 +280,6 @@ export class RutinasPage implements OnInit, OnDestroy {
     if (rutina) {
       this.marcarCompletado(rutina);
     }
-    
-    console.log(`✅ Rutina finalizada en ${this.formatearTiempoCronometro(tiempoFinal)}`);
   }
 
   /**
