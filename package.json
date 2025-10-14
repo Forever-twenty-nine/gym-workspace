@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "emulator:start": "npx firebase emulators:start",
+    "emulator:start": "npx firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
     "emulator:export": "npx firebase emulators:export ./emulator-data",
     "emulator:import": "npx firebase emulators:start --import=./emulator-data",
     "gym-admin:serve": "cd projects/gym-admin && npm run start",

@@ -66,6 +66,8 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
       );
       
       if (authResult.success && authResult.user) {
+        // También guardar en Firestore
+        await this.updateUser(authResult.user.uid, user);
         return authResult.user.uid;
       } else {
         throw new Error(authResult.error || 'Error creando usuario con Firebase Auth');
