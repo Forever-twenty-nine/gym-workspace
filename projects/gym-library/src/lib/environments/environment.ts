@@ -1,15 +1,18 @@
 import { Environment } from '../models/environment.model';
 
+// @ts-ignore
+import { firebaseSecrets } from './environment.secrets';
+
 export const developmentEnvironment: Environment = {
   production: false,
   useEmulator: true,
-  firebase: {
-    apiKey: 'AIzaSyAQGJ4j2Xy-B9bnjiEqfaLDO6l9X826538',
-    authDomain: 'gym-app-81f5c.firebaseapp.com',
-    projectId: 'gym-app-81f5c',
-    storageBucket: 'gym-app-81f5c.firebasestorage.app',
-    messagingSenderId: '565257464641',
-    appId: '1:565257464641:web:fb4167ded515181caa0fc0',
-    measurementId: 'G-JE52SMY3DP',
+  firebase: firebaseSecrets || {
+    apiKey: 'demo',
+    authDomain: 'demo.firebaseapp.com',
+    projectId: 'demo-project',
+    storageBucket: 'demo-project.appspot.com',
+    messagingSenderId: '123456789',
+    appId: '1:123456789:web:demo',
+    measurementId: 'G-DEMO',
   },
 };

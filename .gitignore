@@ -204,6 +204,9 @@ pids
 .env.test.local
 .env.production.local
 
+# Firebase secrets
+**/environment.secrets.ts
+
 # Firebase
 .firebase/
 firebase-debug.log
