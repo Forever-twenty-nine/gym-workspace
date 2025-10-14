@@ -2,6 +2,7 @@ import { Environment } from '../models/environment.model';
 
 export const developmentEnvironment: Environment = {
   production: false,
+  useEmulator: true,
   firebase: {
     apiKey: 'AIzaSyAQGJ4j2Xy-B9bnjiEqfaLDO6l9X826538',
     authDomain: 'gym-app-81f5c.firebaseapp.com',

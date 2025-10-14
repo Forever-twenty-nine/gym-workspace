@@ -7,6 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "emulator:start": "npx firebase emulators:start",
+    "emulator:export": "npx firebase emulators:export ./emulator-data",
+    "emulator:import": "npx firebase emulators:start --import=./emulator-data",
     "gym-admin:serve": "cd projects/gym-admin && npm run start",
     "gym-admin:build": "cd projects/gym-admin && npm run build",
     "gym-admin:test": "cd projects/gym-admin && npm run test",
@@ -20,6 +23,7 @@
     "dev": "npm run library:build && npm run dev:parallel",
     "dev:parallel": "concurrently \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "dev:all": "concurrently \"npm run library:watch\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"lib,admin,app\" --prefix-colors \"yellow,cyan,magenta\"",
+    "dev:with-emulator": "concurrently \"npm run emulator:start\" \"npm run dev:all\" --names \"emulator,dev\" --prefix-colors \"green,yellow\"",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {

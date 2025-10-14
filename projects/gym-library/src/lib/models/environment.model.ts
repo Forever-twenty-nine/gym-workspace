@@ -10,5 +10,6 @@ export interface FirebaseConfig {
 
 export interface Environment {
   production: boolean;
+  useEmulator?: boolean;
   firebase: FirebaseConfig;
 }
