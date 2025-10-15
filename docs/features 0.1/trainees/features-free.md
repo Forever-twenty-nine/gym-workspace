@@ -1,18 +1,19 @@
 # Entrenados - Features Free
 
 ## Rutinas
-- Ver rutinas asignadas por entrenador
-- Iniciar y y completar rutinas con cronometro
-- Ver detalles simples de ejercios (series, reps, peso)
+- Ver rutinas asignadas por entrenador ✅ 
+- Iniciar y y completar rutinas con cronometro✅ 
+- Ver detalles simples de ejercicios (series, reps, peso) ✅ 
 - opcion visual de progreso (check list)
 - nivel de usuario por completar rutinas
 
 ---
 
 ## Progreso
-- Contador de rutinas completadas
-- Racha de entrenamiento (días consecutivos)
+- Contador de rutinas completadas✅ 
+- Racha de entrenamiento (días consecutivos) 
 - Progreso básico por rutina (% completado)
+---
 
 ## Social
 - Compartir progreso en RRSS (Instagram, Facebook, Twitter)
