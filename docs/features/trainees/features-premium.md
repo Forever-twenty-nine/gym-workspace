@@ -1,8 +1,8 @@
-# 💪 Entrenados - Features Premium
+# Entrenados - Features Premium
 
-### ✅ Todo lo de Free +
+### Todo lo de Free +
 
-**Rutinas:**
+## Rutinas
 - Búsqueda y filtros en historial
 - Rutinas personalizadas avanzadas 
 - Duplicar y editar rutinas existentes
@@ -10,7 +10,9 @@
 - **Crear sus propias rutinas personalizadas**
 - **Crear biblioteca de ejercicios personalizados**
 
-**Estadísticas Avanzadas:**
+---
+
+## Estadísticas Avanzadas
 - Gráficas de progreso temporal (líneas, barras)
 - Desempeño (pr, volumen comparativas mensuales)
 - constancias (tiempo total entrenado, racha y frecuencia)
@@ -18,10 +20,16 @@
 - Analizis de debiliades (grupo menos trabajados)
 - mostrar los pr en formato medallas
 
-**Exportación:**
+---
+
+## Exportación
 - Descargar rutinas en PDF (sin watermark)
 - Exportar historial a Excel/CSV
 - Generar imágenes optimizadas para RRSS (sin marca)
 
-**Comunicación:**
+---
+
+## Comunicación
 - Chat directo con entrenador (si entrenador tiene Plan Pro)
+
+---

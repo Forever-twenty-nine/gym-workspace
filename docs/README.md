@@ -1,46 +1,22 @@
-# 📚 Documentación - Gym Workspace
+# Documentación - Gym Workspace
 
-> Centro de documentación para el proyecto Gym App
+Esta carpeta contiene toda la documentación del proyecto Gym Workspace, organizada por temas.
 
-## � Estructura de la Documentación
+## Estructura
 
-```
-docs/
-├── README.md                    # Este archivo
-├── architecture/
-│   ├── overview.md             # Visión general de la arquitectura
-│   ├── gym-admin.md            # Arquitectura del panel administrativo
-│   ├── gym-app.md              # Arquitectura de la app móvil
-│   └── gym-library.md          # Arquitectura de la librería compartida
-├── features/
-│   ├── README.md               # Información general de features
-│   ├── trainees/
-│   │   ├── features-free.md    # Features gratuitas para trainees
-│   │   └── features-premium.md # Features premium para trainees
-│   └── trainers/
-│       ├── features-free.md    # Features gratuitas para trainers
-│       └── features-premium.md # Features premium para trainers
-├── to-do/
-│   └── security.md             # Tareas pendientes de seguridad
-└── Future/
-    └── gyms/
-        ├── features-business.md # Features para gimnasios business
-        └── features-free.md     # Features gratuitas para gimnasios
-```
+- **architecture/**: Arquitectura del sistema
+  - `overview.md`: Visión general del monorepo y proyectos
+  - `gym-admin.md`: Detalles de la aplicación web administrativa
+  - `gym-app.md`: Detalles de la aplicación móvil
+  - `gym-library.md`: Detalles de la librería compartida
 
-## 🛠️ Tecnologías
+- **features/**: Especificaciones funcionales
+  - `README.md`: Estructura de funcionalidades por usuario
+  - `trainees/`: Funcionalidades para usuarios entrenados
+  - `trainers/`: Funcionalidades para entrenadores
 
-- **Frontend**: Angular 20, Ionic 8, TypeScript 5.8
-- **Backend**: Firebase (Auth, Firestore, Storage)
-- **Mobile**: Capacitor, Android SDK
-- **Testing**: Jasmine, Karma
+- **to-do/**: Tareas pendientes
+  - `security.md`: Recomendaciones de seguridad
 
-## 📱 Proyectos
-
-- **gym-library**: Librería compartida
-- **gym-admin**: Panel administrativo web
-- **gym-app**: App móvil Ionic
-
----
-
-**Estado del Proyecto:** En Desarrollo Activo 🚧
+- **Future/**: Documentación en desarrollo
+  - `gyms/`: Funcionalidades futuras para gimnasios

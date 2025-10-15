@@ -1,10 +1,9 @@
-# 💎 👨‍🏫 Entrenadores - Plan Premium
+# Entrenadores - Plan Premium
 
-✅ Incluye **todas las funcionalidades del Plan Free**, más:
-
+### Todo lo de Free +
 ---
 
-## 👥 Gestión de Clientes
+## Gestión de Clientes
 
 - Sin límite de clientes activos  
 - Ver historial completo y métricas detalladas por cliente  
@@ -14,7 +13,7 @@
 
 ---
 
-## 🏋️ Rutinas
+## Rutinas
 
 - Rutinas ilimitadas (crear, duplicar, archivar)  
 - Editor avanzado con bloques de superseries, descansos y temporizadores  
@@ -25,7 +24,7 @@
 
 ---
 
-## 🧱 Ejercicios
+## Ejercicios
 
 - Ejercicios ilimitados  
 - Campos ampliados: tiempo, descanso, dificultad, grupo muscular  
@@ -34,17 +33,17 @@
 
 ---
 
-## 📊 Dashboard y Estadísticas
+## Dashboard y Estadísticas
 
 - Estadísticas avanzadas por cliente y globales del gimnasio  
 - Gráficos interactivos de progreso general y desempeño  
 - Volumen total entrenado, frecuencia y adherencia  
-- Comparativas entre clientes (ranking de actividad 🏆)  
+- Comparativas entre clientes (ranking de actividad )  
 - Alertas automáticas de progreso o estancamiento  
 
 ---
 
-## 💬 Comunicación
+## Comunicación
 
 - Chat directo y en tiempo real con clientes Premium  
 - Mensajes automatizados de motivación o seguimiento  
@@ -52,7 +51,7 @@
 
 ---
 
-## 📤 Exportación y Branding
+## Exportación y Branding
 
 - Exportar reportes en PDF/Excel  
 - Generar informes automáticos semanales o mensuales  
@@ -61,5 +60,3 @@
 - Generación de imágenes sin marca para RRSS  
 
 ---
-
-

@@ -1,35 +1,38 @@
-# 👨‍🏫 Entrenadores - Features Free
+# Entrenadores - Features Free
 
-**Sistema de invitación de entrenados:**
 
-El entrenador gestiona su base de entrenados mediante invitaciones:
-
-1. **Generar invitación:** mediante invitacion interna usando mail
-
-### ✅ Funcionalidades Incluidas
-
-**Gestión de Clientes:**
+## Gestión de Clientes
 - Invitar clientes por notificacion interna (máximo 3 activos)
 - Ver lista de clientes activos/inactivos
 - Ver perfil básico de cliente
 
-**Rutinas:**
+---
+
+## Rutinas
+
 - Crear rutinas personalizadas (máximo 5 activas)
 - Editor de rutinas con biblioteca de ejercicios
 - Asignar rutinas a clientes
 - Ver progreso básico de cliente por rutina
 
-**Ejercicios**
+---
+
+## Ejercicios
 - Crear ejercicios simples (maximo 10 activos)
 - solo nombre,detalle, serie, repeticiones, peso (sin tiempo)
 
-**Dashboard:**
+---
+
+## Dashboard
+
 - Vista general de clientes
 - Rutinas creadas 
 - Ejercicios creados
 - Actividad reciente
 
-### ❌ Restricciones
+---
+
+## Restricciones
 
 - Máximo 3 clientes activos simultáneos
 - Máximo 5 rutinas activas (borrador o publicadas)
