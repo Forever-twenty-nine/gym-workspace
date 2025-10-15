@@ -4,9 +4,9 @@
 
 ## 🔗 Modelo de Trabajo
 
-**Sistema de invitación de clientes:**
+**Sistema de invitación de entrenados:**
 
-El entrenador gestiona su base de clientes mediante invitaciones:
+El entrenador gestiona su base de entrenados mediante invitaciones:
 
 1. **Generar invitación:** Crear link único con token
 2. **Enviar email:** Sistema envía email automático al cliente
@@ -44,7 +44,6 @@ El entrenador gestiona su base de clientes mediante invitaciones:
 - Sin calendario integrado
 - Sin estadísticas avanzadas por cliente
 - Sin branding personalizado
-- Sin acceso a marketplace
 - Sin exportación de reportes
 
 ---
