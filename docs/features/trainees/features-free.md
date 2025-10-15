@@ -1,16 +1,11 @@
 # 💪 Entrenados - Features Free
 
-> Funcionalidades por plan para usuarios finales
-
-## 🆓 Plan Free
-
-### ✅ Funcionalidades Incluidas
-
 **Rutinas:**
 - Ver rutinas asignadas por entrenador
-- Iniciar y registrar ejercicios completados
-- Ver detalles de cada ejercicio (series, reps, peso, notas)
-- Historial limitado: últimas 2 rutinas
+- Iniciar y y completar rutinas con cronometro
+- Ver detalles simples de ejercios (series, reps, peso)
+- opcion visual de progreso (check list)
+- nivel de usuario por completar rutinas
 
 **Progreso:**
 - Contador de rutinas completadas
@@ -19,24 +14,12 @@
 
 **Social:**
 - Compartir progreso en RRSS (Instagram, Facebook, Twitter)
-- Incluye watermark "Powered by [App]"
+- Incluye watermark “Exportá tu progreso completo en PDF watermark — desbloqueá con Premium ”
 
 **Notificaciones:**
+- invitacion a conectarse con el entrenador
 - Push: Nueva rutina asignada
 - Push: Recordatorio de entrenamiento (configurable)
-- Email: Resumen semanal
 
-### ❌ Restricciones
-
-- Solo 2 rutinas en historial (las más recientes)
-- Sin estadísticas avanzadas
-- Sin exportación PDF/Excel
-- Watermark obligatorio al compartir
-- Anuncios intersticiales cada X acciones
-
----
-
-**Ver también:**
-- [Especificaciones Técnicas](technical.md)
-- [Entrenadores](../trainers/features.md)
-- [Gimnasios](../gyms/features.md)
+**Comunicación:**
+- Chat unidirecional con limites
