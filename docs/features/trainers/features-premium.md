@@ -1,4 +1,4 @@
-# 👨‍🏫 Entrenadores - Features
+# 👨‍🏫 Entrenadores - Features Premium
 
 > Listado de funcionalidades por plan
 
@@ -14,38 +14,6 @@ El entrenador gestiona su base de clientes mediante invitaciones:
 4. **Vinculación automática:** Cliente queda conectado al entrenador
 
 > **Importante:** No hay directorios públicos ni búsqueda de entrenadores.
-
-## 🆓 Plan Free
-
-### ✅ Funcionalidades Incluidas
-
-**Gestión de Clientes:**
-- Invitar clientes por email (máximo 3 activos)
-- Ver lista de clientes activos/inactivos
-- Ver perfil básico de cliente
-- Ver última actividad de cliente
-
-**Rutinas:**
-- Crear rutinas personalizadas (máximo 5 activas)
-- Editor de rutinas con biblioteca de ejercicios
-- Asignar rutinas a clientes
-- Ver progreso básico de cliente por rutina
-
-**Dashboard:**
-- Vista general de clientes
-- Rutinas creadas (count)
-- Actividad reciente
-
-### ❌ Restricciones
-
-- Máximo 3 clientes activos simultáneos
-- Máximo 5 rutinas activas (borrador o publicadas)
-- Sin chat en tiempo real
-- Sin calendario integrado
-- Sin estadísticas avanzadas por cliente
-- Sin branding personalizado
-- Sin acceso a marketplace
-- Sin exportación de reportes
 
 ## 💼 Plan Pro
 
@@ -308,7 +276,7 @@ CONVERSACIÓN CON ANA LÓPEZ
 │     │10am │     │10am │     │10am │     │
 │     │Ana  │     │Pedro│     │Laura│     │
 ├─────┼─────┼─────┼─────┼─────┼─────┼─────┤
-│  8  │  9  │ 10  │ 11  │ 12  │ 13  │ 14  │
+│  8  │  9  │ 10  │ 11  │ 12  │ 13  │  14 │
 │     │ 🏋️  │     │ 💻  │     │ 🏋️  │     │
 │     │10am │     │4pm  │     │10am │     │
 │     │Ana  │     │Zoom │     │Ana  │     │
