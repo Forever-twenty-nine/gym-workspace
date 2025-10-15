@@ -420,12 +420,6 @@ CONVERSACIÓN CON ANA LÓPEZ
 
 ## 🎯 Features Futuros (Roadmap)
 
-### Fase 3: Monetización Avanzada
-- [ ] Suscripciones recurrentes a clientes
-- [ ] Bundles de rutinas (paquetes)
-- [ ] Programa de afiliados
-- [ ] Cupones de descuento
-
 ### Fase 4: Crecimiento
 - [ ] API para integraciones externas
 - [ ] Análisis con IA (sugerencias automáticas)

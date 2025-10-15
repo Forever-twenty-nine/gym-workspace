@@ -628,12 +628,6 @@ curl -X GET https://api.gymapp.com/gym/stats \
 - [ ] Análisis de sentimiento (reviews)
 - [ ] Benchmarking automático vs competencia
 
-### Fase 5: Monetización Avanzada
-- [ ] Marketplace exclusivo del gimnasio
-- [ ] Programa de referidos corporativo
-- [ ] Certificaciones propias del gym
-- [ ] Eventos y challenges del gimnasio
-
 ---
 
 **Ver también:**
