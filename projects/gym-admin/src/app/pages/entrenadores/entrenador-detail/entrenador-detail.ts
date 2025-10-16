@@ -36,6 +36,7 @@ export class EntrenadorDetail implements OnInit {
   private readonly pageTitleService = inject(PageTitleService);
   readonly entrenadorService = inject(EntrenadorService);
 
+
   entrenadorId = signal<string>('');
   entrenador = computed(() => {
     const id = this.entrenadorId();
@@ -44,22 +45,15 @@ export class EntrenadorDetail implements OnInit {
 
   readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenadorWithCreator(this.entrenadorId())());
 
-  // Computed para ejercicios filtrados por el entrenador actual en el modal de rutina
-  readonly ejerciciosFiltradosParaRutina = computed(() => {
-    const rutinaData = this.rutinaModalData();
-    const creadorId = rutinaData?.creadorId;
-
-    if (!creadorId) {
-      return this.ejercicios();
-    }
-
-    return this.ejercicios().filter((ej: any) =>
-      ej.creadorId === creadorId && ej.creadorTipo === 'entrenador'
-    );
-  });
-
   // Signals para el estado del componente
-  readonly editForm = signal<FormGroup | null>(null);
+  readonly editForm = computed(() => {
+    const entrenador = this.entrenador();
+    if (!entrenador) return null;
+    const formConfig: any = {
+      activo: new FormControl(entrenador.activo || false),
+    };
+    return new FormGroup(formConfig);
+  });
   readonly isLoading = signal(false);
 
   // Signals para rutinas
@@ -83,29 +77,17 @@ export class EntrenadorDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);
-      // Esperar un poco para que los datos se carguen
       setTimeout(() => {
         const entrenador = this.entrenador();
         if (entrenador) {
           this.pageTitleService.setTitle(`Entrenador: ${entrenador.displayName || id}`);
-          this.createEditForm(entrenador);
         } else {
-          // Si no se encuentra, redirigir
           this.router.navigate(['/entrenadores']);
         }
-      }, 1000); // Ajustar el tiempo si es necesario
+      }, 0);
     } else {
       this.router.navigate(['/entrenadores']);
     }
-  }
-
-  private createEditForm(item: any) {
-    const formConfig: any = {
-      activo: new FormControl(item?.activo || false),
-      rutinasAsociadas: new FormControl(item?.rutinas || []),
-    };
-
-    this.editForm.set(new FormGroup(formConfig));
   }
 
   async saveChanges() {
@@ -168,8 +150,18 @@ export class EntrenadorDetail implements OnInit {
     ];
   }
 
-  addRutinaParaEntrenador() {
-    this.openCreateRutinaModal();
+
+
+  toggleModalRutinas() {
+    if (this.isRutinaModalOpen()) {
+      this.isRutinaModalOpen.set(false);
+      this.isRutinaCreating.set(false);
+      this.rutinaModalData.set(null);
+    } else {
+      this.isRutinaModalOpen.set(true);
+      this.isRutinaCreating.set(true);
+      this.rutinaModalData.set(null);
+    }
   }
 
   addEjercicioParaEntrenador() {
@@ -189,24 +181,6 @@ export class EntrenadorDetail implements OnInit {
 
   closeInvitacionModal() {
     this.isInvitacionModalOpen.set(false);
-  }
-
-  openRutinaModal(item: any) {
-    this.rutinaModalData.set(item);
-    this.isRutinaModalOpen.set(true);
-    this.isRutinaCreating.set(false);
-  }
-
-  openCreateRutinaModal() {
-    this.rutinaModalData.set(null); // No crear objeto aquí, el modal lo maneja
-    this.isRutinaModalOpen.set(true);
-    this.isRutinaCreating.set(true);
-  }
-
-  closeRutinaModal() {
-    this.isRutinaModalOpen.set(false);
-    this.rutinaModalData.set(null);
-    this.isRutinaCreating.set(false);
   }
 
   addMensaje(remitenteId?: string) {

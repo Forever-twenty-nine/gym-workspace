@@ -93,7 +93,7 @@
         <div class="bg-gray-50 rounded-xl p-4">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-gray-800">Rutinas</h3>
-            <button type="button" (click)="addRutinaParaEntrenador()"
+            <button type="button" (click)="toggleModalRutinas()"
               class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2">
               <span>+</span>
               <span>Crear Rutina</span>
@@ -154,8 +154,8 @@
 
   <!-- Modal de rutinas -->
   <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()"
-    [ejercicios]="ejerciciosFiltradosParaRutina()" [creadorId]="entrenadorId()"
-    (close)="closeRutinaModal()">
+    [ejercicios]="ejercicios()" [creadorId]="entrenadorId()"
+    (close)="toggleModalRutinas()">
   </app-rutina-modal>
 
   <!-- Modal de mensajes -->
