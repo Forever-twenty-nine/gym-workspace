@@ -16,7 +16,6 @@ export interface Usuario {
   selector: 'app-usuarios-table',
   imports: [CommonModule],
   templateUrl: './usuarios-table.html',
-  styleUrl: './usuarios-table.css'
 })
 export class UsuariosTable {
   usuarios = input<Usuario[]>([]);

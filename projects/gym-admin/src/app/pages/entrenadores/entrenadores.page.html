@@ -1,148 +1,95 @@
-<div class="w-full px-4 py-8">
-  
-  <section class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
-    <!-- Tabla de Entrenadores -->
-    <app-entrenadores-table
-      [items]="entrenadores()"
-      (edit)="openDetailsModal($event)">
-    </app-entrenadores-table>
+<div class="w-full p-4">
 
-    <!-- Card de Conversaciones -->
+  <section class="bg-white rounded-lg shadow-md">
+    <!-- Tabla de Entrenadores -->
+    <app-entrenadores-table [items]="entrenadores()" (edit)="openDetailsModal($event)">
+    </app-entrenadores-table>
   </section>
 
   <!-- Toasts -->
-  <app-toast 
-    [toasts]="toastService.toasts()" 
-    (closeToast)="toastService.remove($event)">
+  <app-toast [toasts]="toastService.toasts()" (closeToast)="toastService.remove($event)">
   </app-toast>
 
   <!-- Modal de edición de entrenador -->
-  <app-modal-form
-    [isOpen]="isModalOpen()"
-    [modalType]="'entrenador'"
-    [isCreating]="isCreating()"
-    [form]="editForm()"
-    [formFields]="getFormFields()"
-    [ejercicios]="ejercicios()"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    [showCustomAction]="!isCreating() && modalData() !== null"
-    [customActionLabel]="'Crear Contenido'"
-    [showCustomAction2]="!isCreating() && modalData() !== null"
-    [customAction2Label]="'Enviar Mensaje'"
-    (close)="closeModal()"
-    (save)="saveChanges()"
-    (customAction)="openCreateContentModal()"
-    (customAction2)="addMensaje()"
-    (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
-    (verMensaje)="abrirMensaje($event)"
-    (responderMensaje)="responderMensaje($event)"
-    (verConversacion)="abrirConversacion($event)"
-    (marcarConversacionLeida)="marcarConversacionLeida($event)"
-    (responderConversacion)="responderConversacion($event)"
-    (editarRutina)="editarRutinaDesdeEntrenador($event)"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)"
-    (aceptarInvitacion)="aceptarInvitacion($event)"
-    (rechazarInvitacion)="rechazarInvitacion($event)">
+  <app-modal-form [isOpen]="isModalOpen()" [modalType]="'entrenador'" [isCreating]="isCreating()" [form]="editForm()"
+    [formFields]="getFormFields()" [ejercicios]="ejercicios()" [selectedEjercicios]="[]" [isLoading]="isLoading()"
+    [showCustomAction]="!isCreating() && modalData() !== null" [customActionLabel]="'Crear Contenido'"
+    [showCustomAction2]="!isCreating() && modalData() !== null" [customAction2Label]="'Enviar Mensaje'"
+    (close)="closeModal()" (save)="saveChanges()" (customAction)="openCreateContentModal()"
+    (customAction2)="addMensaje()" (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
+    (verMensaje)="abrirMensaje($event)" (responderMensaje)="responderMensaje($event)"
+    (verConversacion)="abrirConversacion($event)" (marcarConversacionLeida)="marcarConversacionLeida($event)"
+    (responderConversacion)="responderConversacion($event)" (editarRutina)="editarRutinaDesdeEntrenador($event)"
+    (toggleDiaSemana)="onToggleDiaSemana($event)" (toggleEjercicio)="toggleEjercicio($event)"
+    (aceptarInvitacion)="aceptarInvitacion($event)" (rechazarInvitacion)="rechazarInvitacion($event)"
+    (editEjercicio)="editEjercicio($event)" (deleteEjercicio)="deleteEjercicio($event)">
   </app-modal-form>
 
   <!-- Modal de ejercicios -->
-  <app-modal-form
-    [isOpen]="isEjercicioModalOpen()"
-    [modalType]="'ejercicio'"
-    [isCreating]="isEjercicioCreating()"
-    [form]="ejercicioEditForm()"
-    [formFields]="getEjercicioFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeEjercicioModal()"
-    (save)="saveEjercicioChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
+  <app-modal-form [isOpen]="isEjercicioModalOpen()" [modalType]="'ejercicio'" [isCreating]="isEjercicioCreating()"
+    [form]="ejercicioEditForm()" [formFields]="getEjercicioFormFields()" [ejercicios]="[]" [selectedEjercicios]="[]"
+    [isLoading]="isLoading()" (close)="closeEjercicioModal()" (save)="saveEjercicioChanges()"
+    (toggleDiaSemana)="onToggleDiaSemana($event)" (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
 
   <!-- Modal de rutinas -->
-  <app-modal-form
-    [isOpen]="isRutinaModalOpen()"
-    [modalType]="'rutina'"
-    [isCreating]="isRutinaCreating()"
-    [form]="rutinaEditForm()"
-    [formFields]="getRutinaFormFields()"
-    [ejercicios]="ejerciciosFiltradosParaRutina()"
-    [selectedEjercicios]="ejerciciosSeleccionadosIds()"
-    [isLoading]="isLoading()"
-    (close)="closeRutinaModal()"
-    (save)="saveRutinaChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
+  <app-modal-form [isOpen]="isRutinaModalOpen()" [modalType]="'rutina'" [isCreating]="isRutinaCreating()"
+    [form]="rutinaEditForm()" [formFields]="getRutinaFormFields()" [ejercicios]="ejerciciosFiltradosParaRutina()"
+    [selectedEjercicios]="ejerciciosSeleccionadosIds()" [isLoading]="isLoading()" (close)="closeRutinaModal()"
+    (save)="saveRutinaChanges()" (toggleDiaSemana)="onToggleDiaSemana($event)"
     (toggleEjercicio)="toggleEjercicio($event)">
   </app-modal-form>
 
   <!-- Modal de mensajes -->
-  <app-modal-form
-    [isOpen]="mensajeManager.isModalOpen()"
-    [modalType]="'mensaje'"
-    [isCreating]="mensajeManager.isCreating()"
-    [form]="mensajeManager.editForm()"
-    [formFields]="getMensajeFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="mensajeManager.closeModal()"
-    (save)="saveMensaje()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)"
+  <app-modal-form [isOpen]="mensajeManager.isModalOpen()" [modalType]="'mensaje'"
+    [isCreating]="mensajeManager.isCreating()" [form]="mensajeManager.editForm()" [formFields]="getMensajeFormFields()"
+    [ejercicios]="[]" [selectedEjercicios]="[]" [isLoading]="isLoading()" (close)="mensajeManager.closeModal()"
+    (save)="saveMensaje()" (toggleDiaSemana)="onToggleDiaSemana($event)" (toggleEjercicio)="toggleEjercicio($event)"
     (responderMensaje)="responderMensaje($event)">
   </app-modal-form>
 
   <!-- Modal de invitaciones -->
   @if (isModalOpen() && modalData()?.mode === 'invitacion') {
-    <app-modal-form
-      [isOpen]="isModalOpen()"
-      [modalType]="'invitacion'"
-      [isCreating]="true"
-      [form]="invitacionForm()"
-      [formFields]="getInvitacionFormFields()"
-      [ejercicios]="[]"
-      [selectedEjercicios]="[]"
-      [isLoading]="isLoading()"
-      (close)="isModalOpen.set(false)"
-      (save)="saveInvitacionDirectly(modalData())"
-      (toggleDiaSemana)="onToggleDiaSemana($event)"
-      (toggleEjercicio)="toggleEjercicio($event)">
-    </app-modal-form>
+  <app-modal-form [isOpen]="isModalOpen()" [modalType]="'invitacion'" [isCreating]="true" [form]="invitacionForm()"
+    [formFields]="getInvitacionFormFields()" [ejercicios]="[]" [selectedEjercicios]="[]" [isLoading]="isLoading()"
+    (close)="isModalOpen.set(false)" (save)="saveInvitacionDirectly(modalData())"
+    (toggleDiaSemana)="onToggleDiaSemana($event)" (toggleEjercicio)="toggleEjercicio($event)">
+  </app-modal-form>
   }
 
   <!-- Modal de selección de contenido -->
   @if (isContentModalOpen()) {
-    <div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" (click)="isContentModalOpen.set(false)">
-      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 scale-100" (click)="$event.stopPropagation()">
-        <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
-          <h2 class="text-xl font-bold text-gray-800">¿Qué deseas crear?</h2>
-          <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110" (click)="isContentModalOpen.set(false)"
-            title="Cerrar">
-            ✕
-          </button>
-        </div>
-        <div class="p-6 space-y-4">
-          <button 
-            class="w-full p-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 flex items-center gap-3"
-            (click)="selectContentType('rutina')">
-            📋 <span class="font-medium">Crear Rutina</span>
-          </button>
-          <button 
-            class="w-full p-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors duration-200 flex items-center gap-3"
-            (click)="selectContentType('ejercicio')">
-            🏋️ <span class="font-medium">Crear Ejercicio</span>
-          </button>
-          <button 
-            class="w-full p-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors duration-200 flex items-center gap-3"
-            (click)="selectContentType('invitacion')">
-            📨 <span class="font-medium">Crear Invitación</span>
-          </button>
-        </div>
+  <div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+    (click)="isContentModalOpen.set(false)">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl transform transition-all duration-300 scale-100"
+      (click)="$event.stopPropagation()">
+      <div
+        class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+        <h2 class="text-xl font-bold text-gray-800">¿Qué deseas crear?</h2>
+        <button
+          class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110"
+          (click)="isContentModalOpen.set(false)" title="Cerrar">
+          ✕
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <button
+          class="w-full p-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 flex items-center gap-3"
+          (click)="selectContentType('rutina')">
+          <span class="font-medium">Crear Rutina</span>
+        </button>
+        <button
+          class="w-full p-4 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors duration-200 flex items-center gap-3"
+          (click)="selectContentType('ejercicio')">
+          <span class="font-medium">Crear Ejercicio</span>
+        </button>
+        <button
+          class="w-full p-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors duration-200 flex items-center gap-3"
+          (click)="selectContentType('invitacion')">
+          <span class="font-medium">Crear Invitación</span>
+        </button>
       </div>
     </div>
+  </div>
   }
 </div>

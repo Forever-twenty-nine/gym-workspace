@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Ejercicio } from 'gym-library';
@@ -68,6 +68,8 @@ export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
   @Output() rechazarInvitacion = new EventEmitter<string>();
   @Output() editarRutina = new EventEmitter<string>();
   @Output() clearField = new EventEmitter<string>();
+  @Output() editEjercicio = new EventEmitter<string>();
+  @Output() deleteEjercicio = new EventEmitter<string>();
 
   diasSemanaOptions = [
     { value: 'L', label: 'Lunes' },
@@ -78,6 +80,8 @@ export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
     { value: 'S', label: 'Sábado' },
     { value: 'D', label: 'Domingo' }
   ];
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     if (this.isOpen) {
@@ -110,6 +114,24 @@ export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onToggleDiaSemana(event: Event, value: string) {
+    if (!this.form) return;
+    
+    const checkbox = event.target as HTMLInputElement;
+    const currentValues = this.form.get('diasSemana')?.value || [];
+    
+    let newValues: string[];
+    if (checkbox.checked) {
+      // Agregar valor si no está presente
+      newValues = currentValues.includes(value) 
+        ? currentValues 
+        : [...currentValues, value];
+    } else {
+      // Remover valor si está presente
+      newValues = currentValues.filter((v: string) => v !== value);
+    }
+    
+    this.form.patchValue({ diasSemana: newValues });
+    this.cdr.detectChanges(); // Forzar detección de cambios para actualizar la vista
     this.toggleDiaSemana.emit({ event, value });
   }
 
@@ -165,6 +187,7 @@ export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
     }
     
     this.form.patchValue({ [fieldName]: newValues });
+    this.cdr.detectChanges(); // Forzar detección de cambios para actualizar la vista
   }
 
   getSelectedCount(fieldName: string): number {
@@ -195,6 +218,14 @@ export class ModalFormComponent implements OnInit, OnDestroy, OnChanges {
 
   onEditarRutina(rutinaId: string) {
     this.editarRutina.emit(rutinaId);
+  }
+
+  onEditEjercicio(ejercicioId: string) {
+    this.editEjercicio.emit(ejercicioId);
+  }
+
+  onDeleteEjercicio(ejercicioId: string) {
+    this.deleteEjercicio.emit(ejercicioId);
   }
 
   onAceptarInvitacion(entrenadorId: string) {

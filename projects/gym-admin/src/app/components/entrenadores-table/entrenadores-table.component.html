@@ -3,6 +3,9 @@
     <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
       <tr>
         <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
+        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">Email</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Plan</th>
+        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Estado</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Ejercicios</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Usuarios</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Rutinas</th>
@@ -22,6 +25,21 @@
               <div class="text-sm font-medium text-gray-900">{{ item.displayName }}</div>
             </div>
           </div>
+        </td>
+        <td class="px-6 py-5 whitespace-nowrap">
+          <div class="text-sm text-gray-900">{{ item.email }}</div>
+        </td>
+        <td class="px-6 py-5 whitespace-nowrap text-center">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                [class]="(item.plan || 'free') === 'premium' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'">
+            {{ (item.plan || 'free') === 'premium' ? 'Premium' : 'Free' }}
+          </span>
+        </td>
+        <td class="px-6 py-5 whitespace-nowrap text-center">
+          <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                [class]="item.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+            {{ item.activo ? 'Activo' : 'Inactivo' }}
+          </span>
         </td>
         <td class="px-6 py-5 whitespace-nowrap text-center">
           <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">

@@ -107,12 +107,15 @@ export class EntrenadoresPage {
 
   readonly entrenadores = computed(() => {
     return this.entrenadoresBase().map(entrenador => {
+      const usuario = this.usuarios().find(u => u.uid === entrenador.id);
       const ejerciciosCount = this.ejercicios().filter(e => e.creadorId === entrenador.id).length;
       const rutinasCount = this.rutinas().filter(r => r.creadorId === entrenador.id).length;
       const clientesCount = this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenador.id).length;
       
       return {
         ...entrenador,
+        email: usuario?.email || '',
+        plan: usuario?.plan || 'free',
         ejerciciosCount,
         rutinasCount,
         clientesCount
@@ -294,10 +297,6 @@ export class EntrenadoresPage {
 
   private createEditForm(item: any) {
     const formConfig: any = {
-      nombre: [{ value: '', disabled: true }],
-      email: [{ value: '', disabled: true }],
-      planInfo: [{ value: '', disabled: true }],
-      gimnasioInfo: [{ value: '', disabled: true }],
       activo: [item.activo || false],
       rutinasAsociadas: [item.rutinas || []],
       clientesAsignados: [{ value: '', disabled: true }],
@@ -423,38 +422,6 @@ export class EntrenadoresPage {
     
     return [
       {
-        name: 'nombre',
-        type: 'text',
-        label: 'Nombre del Entrenador',
-        placeholder: usuarioEntrenador?.nombre || usuarioEntrenador?.email || 'Nombre del entrenador',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'email',
-        type: 'text',
-        label: 'Email',
-        placeholder: usuarioEntrenador?.email || 'Email del entrenador',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'planInfo',
-        type: 'text',
-        label: 'Plan de Suscripción',
-        placeholder: usuarioEntrenador?.plan ? (usuarioEntrenador.plan === 'premium' ? 'Premium' : 'Gratuito') : 'Sin plan',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'gimnasioInfo',
-        type: 'text',
-        label: 'Gimnasio Asociado',
-        placeholder: gimnasioInfo?.nombre || 'Sin gimnasio asignado',
-        readonly: true,
-        colSpan: 1
-      },
-      {
         name: 'activo',
         type: 'checkbox',
         label: 'Estado',
@@ -517,15 +484,17 @@ export class EntrenadoresPage {
   }
 
   // Métodos requeridos por el modal pero no usados en esta página
-  onToggleDiaSemana(eventData: { event: Event; value: string }) {
-    // No se usa en entrenadores
+  onToggleDiaSemana(event: any) {
+    // Este método maneja el toggle de días de la semana desde el modal-form
+    // No necesitamos hacer nada específico aquí ya que el modal-form actualiza el form directamente
+    // console.log('Toggle día semana:', event);
   }
 
   toggleEjercicio(ejercicioId: string) {
-    // No se usa en entrenadores
+    // Este método maneja el toggle de ejercicios desde el modal-form
+    // El modal-form actualiza el formulario directamente, no necesitamos hacer nada aquí
+    console.log('Toggle ejercicio:', ejercicioId);
   }
-
- 
 
   openEjercicioModal(item: any) {
     this.ejercicioModalData.set(item);
@@ -640,7 +609,22 @@ export class EntrenadoresPage {
   }
 
   getEjercicioFormFields(): FormFieldConfig[] {
-    return [
+    // Verificar si estamos en el contexto de un entrenador (modal abierto)
+    const entrenadorActual = this.modalData();
+    const estaEnContextoEntrenador = entrenadorActual && entrenadorActual.id && !entrenadorActual.mode;
+    
+    // Obtener el plan del entrenador si estamos en contexto de entrenador
+    const usuarioEntrenador = estaEnContextoEntrenador 
+      ? this.usuarios().find(u => u.uid === entrenadorActual.id)
+      : null;
+    const planEntrenador = usuarioEntrenador?.plan || 'free';
+    const esPlanPremium = planEntrenador === 'premium';
+    
+    // Verificar si estamos editando un ejercicio existente
+    const ejercicioActual = this.ejercicioModalData();
+    const estaEditando = ejercicioActual && !this.isEjercicioCreating();
+    
+    const camposBase = [
       {
         name: 'nombre',
         type: 'text',
@@ -683,7 +667,11 @@ export class EntrenadoresPage {
         min: 0,
         step: 0.5,
         colSpan: 1
-      },
+      }
+    ];
+    
+    // Campos premium (solo para plan premium, o readonly para plan free si ya existen valores)
+    const camposPremium = esPlanPremium ? [
       {
         name: 'serieSegundos',
         type: 'text',
@@ -701,29 +689,71 @@ export class EntrenadoresPage {
         placeholder: 'Tiempo de descanso entre series',
         min: 0,
         colSpan: 2
+      }
+    ] : (estaEditando && (ejercicioActual.serieSegundos || ejercicioActual.descansoSegundos) ? [
+      {
+        name: 'serieSegundos',
+        type: 'text',
+        inputType: 'number',
+        label: 'Duración de Serie (seg) - Solo lectura',
+        placeholder: 'Duración por serie',
+        min: 0,
+        readonly: true,
+        colSpan: 1
       },
       {
-        name: 'creadorId',
-        type: 'select',
-        label: 'Entrenador Creador',
-        placeholder: 'Seleccionar entrenador',
-        options: [
-          { value: '', label: '-- Seleccionar entrenador --' },
-          ...this.usuarios()
-            .filter(user => user.role === Rol.ENTRENADOR)
-            .map(user => ({
-              value: user.uid,
-              label: `${user.nombre || user.email || user.uid}`
-            }))
-        ],
+        name: 'descansoSegundos',
+        type: 'text',
+        inputType: 'number',
+        label: 'Descanso (seg) - Solo lectura',
+        placeholder: 'Tiempo de descanso entre series',
+        min: 0,
+        readonly: true,
         colSpan: 2
       }
-    ];
+    ] : []);
+    
+    // Campo creador (solo si NO estamos en contexto de entrenador)
+    const campoCreador = estaEnContextoEntrenador ? [] : [{
+      name: 'creadorId',
+      type: 'select',
+      label: 'Entrenador Creador',
+      placeholder: 'Seleccionar entrenador',
+      options: [
+        { value: '', label: '-- Seleccionar entrenador --' },
+        ...this.usuarios()
+          .filter(user => user.role === Rol.ENTRENADOR)
+          .map(user => ({
+            value: user.uid,
+            label: `${user.nombre || user.email || user.uid}`
+          }))
+      ],
+      colSpan: 2
+    }];
+    
+    return [...camposBase, ...camposPremium, ...campoCreador];
   }
   
-  // ========================================
-  // MÉTODOS PARA RUTINAS
-  // ========================================
+  editEjercicio(ejercicioId: string) {
+    const ejercicio = this.ejercicios().find(e => e.id === ejercicioId);
+    if (ejercicio) {
+      this.openEjercicioModal(ejercicio);
+    } else {
+      this.toastService.log('ERROR: Ejercicio no encontrado');
+    }
+  }
+
+  async deleteEjercicio(ejercicioId: string) {
+    if (confirm('¿Estás seguro de que quieres eliminar este ejercicio? Esta acción no se puede deshacer.')) {
+      try {
+        await this.ejercicioService.delete(ejercicioId);
+        this.toastService.log('Ejercicio eliminado correctamente');
+      } catch (error) {
+        console.error('Error al eliminar ejercicio:', error);
+        this.toastService.log('ERROR: No se pudo eliminar el ejercicio');
+      }
+    }
+  }
   
   addRutinaParaEntrenador() {
     const entrenadorActual = this.modalData();
@@ -852,15 +882,24 @@ export class EntrenadoresPage {
   }
 
   private createRutinaEditForm(item: any) {
+    // Verificar si estamos creando desde el contexto de un entrenador
+    const entrenadorEnContexto = this.modalData() && this.modalData().id && !this.modalData().mode;
+    const estaCreandoDesdeEntrenador = this.isRutinaCreating() && entrenadorEnContexto;
+    
     const formConfig: any = {
       nombre: [item.nombre || ''],
       descripcion: [item.descripcion || ''],
       diasSemana: [item.diasSemana || []],
-      ejercicios: [item.ejercicios || []],
-      creadorId: [item.creadorId || ''],
-      asignadoId: [item.asignadoId || '']
+      ejercicios: [item.ejercicios || []]
     };
-
+    
+    // Solo incluir campos adicionales si NO estamos creando desde el contexto del entrenador
+    // Y tampoco cuando estamos editando desde el contexto del entrenador
+    if (!estaCreandoDesdeEntrenador && this.isRutinaCreating()) {
+      formConfig.creadorId = [item.creadorId || ''];
+      formConfig.asignadoId = [item.asignadoId || ''];
+    }
+    
     this.rutinaEditForm.set(this.fb.group(formConfig));
   }
 
@@ -877,6 +916,24 @@ export class EntrenadoresPage {
 
     if (!form.valid) {
       this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
+      // Mostrar errores específicos del formulario
+      const errors: string[] = [];
+      Object.keys(form.controls).forEach(key => {
+        const control = form.get(key);
+        if (control && control.errors) {
+          errors.push(`${key}: ${JSON.stringify(control.errors)}`);
+        }
+      });
+      if (errors.length > 0) {
+        this.toastService.log(`Errores de validación: ${errors.join(', ')}`);
+      }
+      return;
+    }
+
+    // Verificar que los campos requeridos tengan valores
+    const formValue = form.value;
+    if (!formValue.nombre || formValue.nombre.trim() === '') {
+      this.toastService.log('Error: El nombre de la rutina es obligatorio');
       return;
     }
 
@@ -884,6 +941,25 @@ export class EntrenadoresPage {
 
     try {
       let updatedData = { ...originalData, ...form.value };
+      
+      console.log('Form value before save:', form.value);
+      console.log('💾 Guardando rutina:', { originalData, formValue: form.value, updatedData });
+      
+      // Asegurar que creadorId esté presente cuando se crea desde entrenador
+      // Para edición, mantener el creadorId original
+      if (!updatedData.creadorId) {
+        if (this.isRutinaCreating() && this.modalData()?.id) {
+          updatedData.creadorId = this.modalData().id;
+        } else if (!this.isRutinaCreating()) {
+          // Para edición, mantener el creadorId original
+          updatedData.creadorId = originalData.creadorId;
+        }
+      }
+      
+      // Para edición, mantener asignadoId original si no viene del formulario
+      if (!this.isRutinaCreating() && updatedData.asignadoId === undefined) {
+        updatedData.asignadoId = originalData.asignadoId;
+      }
       
       // Limpiar campos undefined para evitar errores de Firestore
       const rutinaToSave: any = {
@@ -893,15 +969,19 @@ export class EntrenadoresPage {
         diasSemana: updatedData.diasSemana || [],
         ejercicios: updatedData.ejercicios || [],
         creadorId: updatedData.creadorId || '',
-        asignadoId: updatedData.asignadoId || '',
+        entrenadoId: null, // Siempre incluir entrenadoId, inicialmente null
         activa: updatedData.activa ?? true,
         completado: updatedData.completado ?? false,
         fechaAsignacion: updatedData.fechaAsignacion || new Date()
       };
       
-      // Solo agregar entrenadoId si asignadoId existe y no está vacío
-      if (rutinaToSave.asignadoId) {
-        rutinaToSave.entrenadoId = rutinaToSave.asignadoId;
+      console.log('📤 Datos a guardar en Firestore:', rutinaToSave);
+      
+      // Solo agregar asignadoId y actualizar entrenadoId si existe un valor válido
+      const asignadoIdValue = updatedData.asignadoId;
+      if (asignadoIdValue && typeof asignadoIdValue === 'string' && asignadoIdValue.trim() !== '') {
+        rutinaToSave.asignadoId = asignadoIdValue;
+        rutinaToSave.entrenadoId = asignadoIdValue;
       }
       
       await this.rutinaService.save(rutinaToSave);
@@ -945,7 +1025,12 @@ export class EntrenadoresPage {
         'Entrenador'
       : '';
     
-    return [
+    // Verificar si estamos creando desde el contexto de un entrenador
+    const entrenadorEnContexto = this.modalData() && this.modalData().id && !this.modalData().mode;
+    const estaCreandoDesdeEntrenador = this.isRutinaCreating() && entrenadorEnContexto;
+    const estaEditandoDesdeEntrenador = !this.isRutinaCreating() && entrenadorEnContexto;
+    
+    const camposBase = [
       {
         name: 'nombre',
         type: 'text',
@@ -977,7 +1062,11 @@ export class EntrenadoresPage {
           label: ejercicio.nombre,
           extra: `${ejercicio.series}x${ejercicio.repeticiones}`
         }))
-      },
+      }
+    ];
+    
+    // Campos adicionales solo si NO estamos creando NI editando desde el contexto del entrenador
+    const camposAdicionales = (estaCreandoDesdeEntrenador || estaEditandoDesdeEntrenador) ? [] : [
       {
         name: 'creadorId',
         type: 'text',
@@ -1006,6 +1095,8 @@ export class EntrenadoresPage {
         colSpan: 1
       }
     ];
+    
+    return [...camposBase, ...camposAdicionales];
   }
 
 

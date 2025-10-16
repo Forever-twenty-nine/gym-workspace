@@ -8,9 +8,13 @@
     <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
       <h2 class="text-xl font-bold text-gray-800">
         @if (isCreating) {
-          ➕ Crear {{ modalType | titlecase }}
+          Crear {{ modalType | titlecase }}
         } @else {
-          ✏️ Editar {{ modalType | titlecase }}
+          @if (modalType === 'entrenador') {
+            Editar Entrenador
+          } @else {
+            Editar {{ modalType | titlecase }}
+          }
         }
       </h2>
       <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110" (click)="onClose()"
@@ -107,7 +111,7 @@
                 <div class="grid grid-cols-3 md:grid-cols-7 gap-2">
                   @for (dia of diasSemanaOptions; track dia.value) {
                     <label class="flex items-center text-sm">
-                      <input type="checkbox" [checked]="form.get('DiasSemana')?.value?.includes(dia.value)"
+                      <input type="checkbox" [checked]="form.get('diasSemana')?.value?.includes(dia.value)"
                         (change)="onToggleDiaSemana($event, dia.value)"
                         class="mr-1 h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                       <span class="text-xs">{{ dia.label.slice(0, 3) }}</span>
@@ -472,8 +476,45 @@
                   @if (field.ejercicios && field.ejercicios.length > 0) {
                     <div class="max-h-60 overflow-y-auto divide-y divide-gray-100">
                       @for (ejercicio of field.ejercicios; track ejercicio.id) {
-                        <div class="px-4 py-3 hover:bg-orange-50 transition-colors duration-150">
-                          <span class="text-sm font-medium text-gray-800">{{ ejercicio.nombre }}</span>
+                        <div class="px-4 py-3 hover:bg-orange-50 transition-colors duration-150 flex items-center justify-between">
+                          <div class="flex-1">
+                            <span class="text-sm font-medium text-gray-800">{{ ejercicio.nombre }}</span>
+                            @if (ejercicio.descripcion) {
+                              <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ ejercicio.descripcion }}</p>
+                            }
+                            <div class="flex gap-3 mt-1">
+                              <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                {{ ejercicio.series }}x{{ ejercicio.repeticiones }}
+                              </span>
+                              @if (ejercicio.peso && ejercicio.peso > 0) {
+                                <span class="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                                  {{ ejercicio.peso }}kg
+                                </span>
+                              }
+                              @if (ejercicio.serieSegundos && ejercicio.serieSegundos > 0) {
+                                <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded">
+                                  {{ ejercicio.serieSegundos }}s
+                                </span>
+                              }
+                              @if (ejercicio.descansoSegundos && ejercicio.descansoSegundos > 0) {
+                                <span class="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded">
+                                  Descanso: {{ ejercicio.descansoSegundos }}s
+                                </span>
+                              }
+                            </div>
+                          </div>
+                          <div class="flex gap-2 ml-4">
+                            <button type="button" (click)="onEditEjercicio(ejercicio.id)"
+                              class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                              title="Editar ejercicio">
+                              Editar
+                            </button>
+                            <button type="button" (click)="onDeleteEjercicio(ejercicio.id)"
+                              class="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                              title="Eliminar ejercicio">
+                              Eliminar
+                            </button>
+                          </div>
                         </div>
                       }
                     </div>
