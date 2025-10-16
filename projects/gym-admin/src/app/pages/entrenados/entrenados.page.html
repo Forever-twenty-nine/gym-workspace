@@ -10,18 +10,12 @@
   <!-- Modal de detalles del entrenado -->
   <app-modal-form
     [isOpen]="isModalOpen()"
-    [modalType]="'entrenado'"
+    [title]="'Entrenado'"
     [isCreating]="isCreating()"
     [form]="editForm()"
     [formFields]="getFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
     [isLoading]="isLoading()"
     (close)="closeModal()"
-    (save)="saveChanges()"
-    (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
-    (aceptarInvitacion)="aceptarInvitacion($event)"
-    (rechazarInvitacion)="rechazarInvitacion($event)"
-    (clearField)="onClearField($event)">
+    (save)="saveChanges()">
   </app-modal-form>
 </div>

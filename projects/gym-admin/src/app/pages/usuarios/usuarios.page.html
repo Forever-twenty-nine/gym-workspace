@@ -20,8 +20,8 @@
   <app-toast [toasts]="toastService.toasts()" (closeToast)="toastService.remove($event)">
   </app-toast>
 
-  <app-modal-form [isOpen]="isModalOpen()" [modalType]="'usuario'" [isCreating]="isCreating()" [form]="editForm()"
-    [formFields]="formFields()" [ejercicios]="[]" [selectedEjercicios]="[]" [isLoading]="isLoading()"
+  <app-modal-form [isOpen]="isModalOpen()" [title]="'Usuario'" [isCreating]="isCreating()" [form]="editForm()"
+    [formFields]="formFields()" [isLoading]="isLoading()"
     (close)="closeModal()" (save)="saveChanges()">
   </app-modal-form>
 </div>

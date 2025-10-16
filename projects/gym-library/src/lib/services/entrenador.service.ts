@@ -1,5 +1,10 @@
 import { Injectable, signal, computed, inject, InjectionToken } from '@angular/core';
 import { Entrenador } from '../models/entrenador.model';
+import { RutinaService } from './rutina.service';
+import { EjercicioService } from './ejercicio.service';
+import { EntrenadoService } from './entrenado.service';
+import { UserService } from './user.service';
+import { Ejercicio } from '../models/ejercicio.model';
 
 /**
  * 🏋️‍♂️ Interfaz del adaptador de Firestore para Entrenadores
@@ -54,6 +59,10 @@ export const ENTRENADOR_FIRESTORE_ADAPTER = new InjectionToken<IEntrenadorFirest
 })
 export class EntrenadorService {
   private adapter = inject(ENTRENADOR_FIRESTORE_ADAPTER);
+  private rutinaService = inject(RutinaService);
+  private ejercicioService = inject(EjercicioService);
+  private entrenadoService = inject(EntrenadoService);
+  private userService = inject(UserService);
   
   // 📊 Signals para el estado de los entrenadores
   private readonly _entrenadores = signal<Entrenador[]>([]);
@@ -64,15 +73,6 @@ export class EntrenadorService {
   readonly entrenadores = this._entrenadores.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
-  
-  // 📈 Signals computed para estadísticas
-  readonly totalEntrenadores = computed(() => this._entrenadores().length);
-  readonly entrenadoresActivos = computed(() => 
-    this._entrenadores().filter(e => e.activo).length
-  );
-  readonly entrenadoresInactivos = computed(() => 
-    this._entrenadores().filter(e => !e.activo).length
-  );
   
   private unsubscribe: (() => void) | null = null;
   private isListenerInitialized = false;
@@ -208,16 +208,66 @@ export class EntrenadorService {
   }
   
   /**
-   * 🏋️‍♂️ Busca entrenadores por gimnasio
-   * @param gimnasioId - ID del gimnasio
-   * @returns Signal con los entrenadores del gimnasio
+   * 📋 Obtiene las rutinas de un entrenador específico
+   * @param entrenadorId - ID del entrenador
+   * @returns Array de rutinas del entrenador
    */
-  getEntrenadoresByGimnasio(gimnasioId: string) {
-    return computed(() => 
-      this._entrenadores().filter(entrenador => 
-        entrenador.gimnasioId === gimnasioId
-      )
+  getRutinasByEntrenador(entrenadorId: string) {
+    return this.rutinaService.rutinas().filter(rutina => 
+      rutina.creadorId === entrenadorId
     );
+  }
+  
+  /**
+   * 📋 Obtiene los ejercicios de un entrenador específico con info de creador
+   * @param entrenadorId - ID del entrenador
+   * @returns Array de ejercicios con creadorName
+   */
+  getEjerciciosByEntrenadorWithCreator(entrenadorId: string) {
+    return computed(() => {
+      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => 
+        ejercicio.creadorId === entrenadorId
+      ).map((ejercicio: Ejercicio) => {
+        let creadorName = null;
+        
+        if (ejercicio.creadorId) {
+          const usuario = this.userService.users().find(u => u.uid === ejercicio.creadorId);
+          creadorName = usuario?.nombre || usuario?.email || `Usuario ${ejercicio.creadorId}`;
+        }
+        
+        return {
+          ...ejercicio,
+          creadorName
+        };
+      });
+    });
+  }
+  
+  /**
+   * 👥 Obtiene el conteo de clientes asignados a un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @returns Número de clientes asignados
+   */
+  getClientesCount(entrenadorId: string): number {
+    return this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId).length;
+  }
+  
+  /**
+   * 👤 Obtiene los entrenadores con información de usuario combinada
+   * @returns Array de entrenadores con displayName, email, plan, etc.
+   */
+  getEntrenadoresWithUserInfo() {
+    return computed(() => {
+      return this._entrenadores().map(entrenador => {
+        const usuario = this.userService.users().find(u => u.uid === entrenador.id);
+        return {
+          ...entrenador,
+          displayName: usuario?.nombre || usuario?.email || `Usuario ${entrenador.id}`,
+          email: usuario?.email || '',
+          plan: usuario?.plan || 'free'
+        };
+      });
+    });
   }
   
   /**

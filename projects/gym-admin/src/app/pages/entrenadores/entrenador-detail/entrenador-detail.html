@@ -1,0 +1,172 @@
+<div class="w-full p-4">
+  @if (entrenador(); as entrenador) {
+    <div class="space-y-6">
+      <div class="bg-white rounded-lg shadow-md p-6">
+        @if (editForm(); as form) {
+          <form [formGroup]="form" class="mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (field of getFormFields(); track field.name) {
+                <div [ngClass]="field.colSpan === 2 ? 'col-span-2' : 'col-span-1'">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ field.label }}
+                  </label>
+                  @switch (field.type) {
+                    @case ('checkbox') {
+                      <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 cursor-pointer">
+                        <input type="checkbox" [formControlName]="field.name"
+                          class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
+                        <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
+                      </label>
+                    }
+                  }
+                </div>
+              }
+            </div>
+            <div class="flex justify-between mt-4">
+              <button (click)="goBack()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                ← Volver a Entrenadores
+              </button>
+              <button type="button" (click)="saveChanges()" [disabled]="!form.valid || isLoading()"
+                class="px-6 py-3 text-sm font-semibold text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:hover:scale-100">
+                @if (isLoading()) {
+                  <span class="flex items-center">
+                    <svg class="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                      </path>
+                    </svg>
+                    Guardando...
+                  </span>
+                } @else {
+                  Guardar Cambios
+                }
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Secciones de acciones -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Sección de Mensajes/Conversaciones -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Mensajes</h3>
+            <button type="button" (click)="addMensaje()"
+              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+              <span>+</span>
+              <span>Enviar Mensaje</span>
+            </button>
+          </div>
+          <p class="text-sm text-gray-500">Funcionalidad de mensajes aquí</p>
+        </div>
+
+        <!-- Sección de Ejercicios -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Ejercicios</h3>
+            <button type="button" (click)="addEjercicioParaEntrenador()"
+              class="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center gap-2">
+              <span>+</span>
+              <span>Crear Ejercicio</span>
+            </button>
+          </div>
+          <div class="space-y-2 max-h-40 overflow-y-auto">
+            @if (ejercicios() && ejercicios().length > 0) {
+              @for (ejercicio of ejercicios(); track ejercicio.id) {
+                <div class="flex items-center justify-between p-2 bg-white rounded-lg">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">{{ ejercicio.nombre }}</p>
+                    <p class="text-xs text-gray-600">{{ ejercicio.series }} series x {{ ejercicio.repeticiones }} reps</p>
+                  </div>
+                </div>
+              }
+            } @else {
+              <p class="text-sm text-gray-500 text-center py-4">No hay ejercicios</p>
+            }
+          </div>
+        </div>
+
+        <!-- Sección de Rutinas -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Rutinas</h3>
+            <button type="button" (click)="addRutinaParaEntrenador()"
+              class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2">
+              <span>+</span>
+              <span>Crear Rutina</span>
+            </button>
+          </div>
+          <div class="space-y-2 max-h-40 overflow-y-auto">
+            @if (getRutinasByEntrenador(entrenador.id) && getRutinasByEntrenador(entrenador.id).length > 0) {
+              @for (rutina of getRutinasByEntrenador(entrenador.id); track rutina.id) {
+                <div class="flex items-center justify-between p-2 bg-white rounded-lg">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">{{ rutina.nombre }}</p>
+                    <p class="text-xs text-gray-600">{{ rutina.notas || 'Sin descripción' }}</p>
+                  </div>
+                </div>
+              }
+            } @else {
+              <p class="text-sm text-gray-500 text-center py-4">No hay rutinas</p>
+            }
+          </div>
+        </div>
+
+        <!-- Sección de Invitaciones -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Invitaciones</h3>
+            <button type="button" (click)="addInvitacion()"
+              class="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors duration-200 flex items-center gap-2">
+              <span>+</span>
+              <span>Crear Invitación</span>
+            </button>
+          </div>
+          <p class="text-sm text-gray-500">Funcionalidad de invitaciones aquí</p>
+        </div>
+
+        <!-- Sección de Clientes Asignados -->
+        <div class="bg-gray-50 rounded-xl p-4 col-span-2">
+          <h3 class="text-lg font-semibold text-gray-800 mb-3">Clientes Asignados</h3>
+          <div class="max-h-40 overflow-y-auto">
+            <pre class="text-sm text-gray-700 whitespace-pre-wrap">{{ entrenadorService.getClientesCount(entrenador.id) }} clientes asignados</pre>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <p>Cargando entrenador...</p>
+  }
+
+  <!-- Toasts -->
+  <app-toast [toasts]="toastService.toasts()" (closeToast)="toastService.remove($event)">
+  </app-toast>
+
+  <!-- Modal de ejercicios -->
+  <app-ejercicio-modal [isOpen]="isEjercicioModalOpen()" [isCreating]="isEjercicioCreating()"
+    [creadorId]="entrenadorId()"
+    (close)="closeEjercicioModal()">
+  </app-ejercicio-modal>
+
+  <!-- Modal de rutinas -->
+  <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()"
+    [ejercicios]="ejerciciosFiltradosParaRutina()" [creadorId]="entrenadorId()"
+    (close)="closeRutinaModal()">
+  </app-rutina-modal>
+
+  <!-- Modal de mensajes -->
+  <app-mensajes-modal [isOpen]="isMensajeModalOpen()" [isCreating]="isMensajeCreating()"
+    [remitenteId]="entrenadorId()"
+    (close)="closeMensajeModal()">
+  </app-mensajes-modal>
+
+  <!-- Modal de invitaciones -->
+  <app-invitaciones-modal [isOpen]="isInvitacionModalOpen()"
+    [entrenadorId]="entrenadorId()"
+    (close)="closeInvitacionModal()">
+  </app-invitaciones-modal>
+</div>

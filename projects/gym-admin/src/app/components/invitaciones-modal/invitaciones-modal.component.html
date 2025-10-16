@@ -1,0 +1,121 @@
+<div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+     *ngIf="isOpen()"
+     (click)="onClose()">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
+       (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+      <h2 class="text-2xl font-bold text-gray-800">Enviar Invitación</h2>
+      <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110"
+              (click)="onClose()"
+              title="Cerrar">
+        ✕
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+      <form [formGroup]="invitacionForm()" class="space-y-6">
+        <!-- Email del invitado -->
+        <div class="form-group">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            Email del Invitado *
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+            formControlName="email"
+            placeholder="Ingrese el email del usuario a invitar"
+            [class.border-red-500]="invitacionForm().get('email')?.invalid && invitacionForm().get('email')?.touched"
+          />
+          @if (invitacionForm().get('email')?.invalid && invitacionForm().get('email')?.touched) {
+            <p class="mt-1 text-sm text-red-600">
+              @if (invitacionForm().get('email')?.errors?.['required']) {
+                El email es obligatorio
+              } @else if (invitacionForm().get('email')?.errors?.['email']) {
+                Ingrese un email válido
+              }
+            </p>
+          }
+        </div>
+
+        <!-- Mensaje de invitación -->
+        <div class="form-group">
+          <label for="mensaje" class="block text-sm font-medium text-gray-700 mb-2">
+            Mensaje de Invitación
+          </label>
+          <textarea
+            id="mensaje"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none"
+            formControlName="mensaje"
+            placeholder="Escribe un mensaje personalizado para la invitación..."
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Franja horaria (opcional, por si se usa en el futuro) -->
+        <div class="form-group hidden">
+          <label for="franjaHoraria" class="block text-sm font-medium text-gray-700 mb-2">
+            Franja Horaria
+          </label>
+          <select
+            id="franjaHoraria"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+            formControlName="franjaHoraria"
+          >
+            <option value="mañana">Mañana</option>
+            <option value="tarde">Tarde</option>
+            <option value="noche">Noche</option>
+          </select>
+        </div>
+      </form>
+
+      <!-- Lista de invitaciones existentes -->
+      @if (invitacionesEntrenador().length > 0) {
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Invitaciones Enviadas</h3>
+          <div class="space-y-3 max-h-48 overflow-y-auto">
+            <div *ngFor="let invitacion of invitacionesEntrenador()"
+                 class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">{{ invitacion.titulo }}</p>
+                <p class="text-xs text-gray-600">
+                  Estado: <span class="capitalize">{{ invitacion.estado }}</span>
+                </p>
+              </div>
+              <div class="text-xs text-gray-500">
+                {{ invitacion.fechaCreacion | date:'short' }}
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50">
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
+        (click)="onClose()"
+        [disabled]="isLoading()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+        (click)="onEnviarInvitacion()"
+        [disabled]="isLoading() || invitacionForm().invalid"
+      >
+        @if (isLoading()) {
+          <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+          Enviando...
+        } @else {
+          Enviar Invitación
+        }
+      </button>
+    </div>
+  </div>
+</div>

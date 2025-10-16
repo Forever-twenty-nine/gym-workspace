@@ -3,6 +3,7 @@ import { EntrenadoresPage } from './pages/entrenadores/entrenadores.page';
 import { EntrenadosPage } from './pages/entrenados/entrenados.page';
 import { GimnasiosPage } from './pages/gimnasios/gimnasios.page';
 import { UsuariosPage } from './pages/usuarios/usuarios.page';
+import { EntrenadorDetail } from './pages/entrenadores/entrenador-detail/entrenador-detail';
 
 export const routes: Routes = [
   {
@@ -12,6 +13,10 @@ export const routes: Routes = [
   {
     path: 'entrenadores',
     component: EntrenadoresPage
+  },
+  {
+    path: 'entrenadores/:id',
+    component: EntrenadorDetail
   },
   {
     path: 'entrenados',

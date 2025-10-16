@@ -11,8 +11,7 @@ import {
   Notificacion,
   Entrenado, 
   Rol, 
-  Objetivo,
-  TipoNotificacion
+  Objetivo
 } from 'gym-library';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastService } from '../../services/toast.service';
@@ -264,8 +263,7 @@ export class EntrenadosPage {
         label: 'Entrenador Asociado',
         placeholder: entrenadorAsociado?.displayName || 'Sin entrenador asignado',
         readonly: true,
-        colSpan: 1,
-        showClearButton: !!entrenadorAsociado
+        colSpan: 1
       },
       {
         name: 'objetivo',
@@ -284,17 +282,19 @@ export class EntrenadosPage {
       },
       {
         name: 'rutinasAsignadas',
-        type: 'rutinas-simple',
+        type: 'text',
         label: 'Rutinas Asignadas',
-        colSpan: 2,
-        rutinas: rutinasAsignadas
+        placeholder: rutinasAsignadas.length > 0 ? `${rutinasAsignadas.length} rutina(s) asignada(s)` : 'Sin rutinas asignadas',
+        readonly: true,
+        colSpan: 2
       },
       {
         name: 'notificacionesMensajes',
-        type: 'notificaciones-mensajes',
+        type: 'text',
         label: 'Notificaciones Pendientes',
-        colSpan: 2,
-        notificaciones: notificacionesEntrenado
+        placeholder: notificacionesEntrenado.length > 0 ? `${notificacionesEntrenado.length} notificación(es) pendiente(s)` : 'Sin notificaciones pendientes',
+        readonly: true,
+        colSpan: 2
       },
       {
         name: 'fechaRegistro',
@@ -341,150 +341,5 @@ export class EntrenadosPage {
   getConversacionesEntrenado(entrenadoId: string): any[] {
     // Funcionalidad de conversaciones no disponible
     return [];
-  }
-
-  marcarNotificacionComoLeida(notifId: string) {
-    this.notificacionService.marcarComoLeida(notifId);
-    this.toastService.log('Notificación marcada como leída');
-  }
-
-  
-  // Métodos para manejar invitaciones
-  async aceptarInvitacion(entrenadorId: string) {
-    this.isLoading.set(true);
-    
-    try {
-      // Obtener el entrenado actual del modal
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
-        return;
-      }
-      
-      // Buscar la notificación de invitación pendiente
-      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
-        notif.usuarioId === entrenadoActual.id &&
-        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        notif.datos?.entrenadorId === entrenadorId
-      );
-      
-      if (!invitacionNotif) {
-        this.toastService.log('ERROR: Invitación no encontrada');
-        return;
-      }
-      
-      // Aceptar la invitación usando el nuevo método unificado
-      await this.notificacionService.aceptarInvitacion(invitacionNotif.id);
-      
-      // Crear la asociación entrenador-entrenado
-      const entrenadoActualizado = {
-        ...entrenadoActual,
-        entrenadorId: entrenadorId
-      };
-      
-      await this.entrenadoService.save(entrenadoActualizado);
-      
-      this.toastService.log('✓ Invitación aceptada. Ahora tienes un entrenador asignado');
-      this.closeModal();
-    } catch (error) {
-      console.error('Error al aceptar invitación:', error);
-      this.toastService.log('ERROR: No se pudo aceptar la invitación');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  /**
-   * Rechaza una invitación de entrenador para el entrenado actual.
-   * @param entrenadorId  - ID del entrenador que envió la invitación.
-   * @returns 
-   */
-  async rechazarInvitacion(entrenadorId: string) {
-    this.isLoading.set(true);
-    
-    try {
-
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
-        return;
-      }
-      
-      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
-        notif.usuarioId === entrenadoActual.id &&
-        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        notif.datos?.entrenadorId === entrenadorId
-      );
-      
-      if (!invitacionNotif) {
-        this.toastService.log('ERROR: Invitación no encontrada');
-        return;
-      }
-      
-      await this.notificacionService.rechazarInvitacion(invitacionNotif.id);
-      
-      this.toastService.log('Invitación rechazada');
-    } catch (error) {
-      console.error('Error al rechazar invitación:', error);
-      this.toastService.log('ERROR: No se pudo rechazar la invitación');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  // Método para manejar el evento clearField del modal
-  onClearField(fieldName: string) {
-    if (fieldName === 'entrenadorInfo') {
-      this.confirmarLimpiarAsociacion();
-    }
-  }
-
-  // Método para confirmar y limpiar la asociación entrenador-entrenado
-  confirmarLimpiarAsociacion() {
-    const entrenadoActual = this.modalData();
-    if (!entrenadoActual || !entrenadoActual.entrenadorId) {
-      this.toastService.log('ERROR: No hay entrenador asignado para limpiar');
-      return;
-    }
-
-    const entrenador = this.entrenadores().find(e => e.id === entrenadoActual.entrenadorId);
-    const entrenadorNombre = entrenador?.displayName || 'el entrenador';
-
-    const confirmacion = confirm(
-      `¿Estás seguro de que quieres limpiar la asociación entre "${entrenadoActual.displayName}" y ${entrenadorNombre}?\n\nEsta acción no se puede deshacer.`
-    );
-
-    if (confirmacion) {
-      this.limpiarAsociacionEntrenador();
-    }
-  }
-
-  // Método para limpiar la asociación entrenador-entrenado
-  async limpiarAsociacionEntrenador() {
-    this.isLoading.set(true);
-
-    try {
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado');
-        return;
-      }
-
-      // Limpiar el entrenadorId del entrenado
-      const entrenadoActualizado = {
-        ...entrenadoActual,
-        entrenadorId: null
-      };
-
-      await this.entrenadoService.save(entrenadoActualizado);
-
-      this.toastService.log('✓ Asociación con entrenador limpiada exitosamente');
-      this.closeModal();
-    } catch (error) {
-      console.error('Error al limpiar asociación:', error);
-      this.toastService.log('ERROR: No se pudo limpiar la asociación');
-    } finally {
-      this.isLoading.set(false);
-    }
   }
 }
