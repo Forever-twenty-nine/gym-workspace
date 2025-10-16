@@ -21,10 +21,8 @@ import {
   Ejercicio,
   Rol 
 } from 'gym-library';
-import { CardConfig } from '../../components/shared/generic-card/generic-card.types';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
-import { EntrenadorStatsComponent } from '../../components/entrenador-stats/entrenador-stats.component';
 import { EntrenadoresTableComponent } from '../../components/entrenadores-table/entrenadores-table.component';
 import { ToastService } from '../../services/toast.service';
 import { GenericModalManager } from '../../helpers/modal-manager.helper';
@@ -38,7 +36,6 @@ import { PageTitleService } from '../../services/page-title.service';
     ReactiveFormsModule,
     ModalFormComponent,
     ToastComponent,
-    EntrenadorStatsComponent,
     EntrenadoresTableComponent
   ],
   templateUrl: './entrenadores.page.html',
@@ -206,41 +203,6 @@ export class EntrenadoresPage {
         };
       });
   });
-
-  // Configuración de los cards
-  readonly entrenadoresCardConfig: CardConfig = {
-    title: 'Entrenadores',
-    createButtonText: 'Crear Entrenador',
-    createButtonColor: 'blue',
-    emptyStateTitle: 'No hay entrenadores',
-    displayField: 'displayName',
-    showCounter: true,
-    counterColor: 'blue',
-    showChips: ['ejerciciosCount', 'clientesCount', 'rutinasCount']
-  };
-
-  readonly ejerciciosCardConfig: CardConfig = {
-    title: 'Ejercicios',
-    createButtonText: 'Crear Ejercicio',
-    createButtonColor: 'green',
-    emptyStateTitle: 'No hay ejercicios creados',
-    displayField: 'nombre',
-    showCounter: true,
-    counterColor: 'green',
-    showChips: ['creadorName']
-  };
-
-  readonly mensajesCardConfig: CardConfig = {
-    title: 'Mensajes de Entrenadores',
-    createButtonText: 'N/A',
-    createButtonColor: 'purple',
-    emptyStateTitle: 'No hay mensajes de entrenadores',
-    displayField: 'titulo',
-    showCounter: true,
-    counterColor: 'purple',
-    showChips: ['remitenteChip', 'destinatarioChip'],
-    showArrowBetweenChips: true
-  };
 
   // Signals para el estado del componente
   readonly isModalOpen = signal(false);

@@ -1,5 +1,4 @@
 import { Objetivo } from '../enums/objetivo.enum';
-import { Rutina } from './rutina.model';
 
 export interface Entrenado {
     id: string;
