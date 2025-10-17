@@ -26,7 +26,7 @@ export class InvitacionesModalComponent {
   private readonly toastService = inject(ToastService);
 
   // Inputs
-  isOpen = input.required<boolean>();
+  isOpen = input<boolean>(false);
   entrenadorId = input<string>('');
 
   // Outputs

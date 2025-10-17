@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ejercicio, EjercicioService, UserService, Rol } from 'gym-library';
@@ -21,9 +21,10 @@ export class EjercicioModalComponent {
   private readonly toastService = inject(ToastService);
 
   // Inputs
-  isOpen = input.required<boolean>();
-  isCreating = input.required<boolean>();
+  isOpen = input<boolean>(false);
+  isCreating = input<boolean>(false);
   creadorId = input<string>('');
+  ejercicioToEdit = input<Ejercicio | null>(null);
 
   // Outputs
   close = output<void>();
@@ -47,6 +48,13 @@ export class EjercicioModalComponent {
     }));
   });
 
+  // Efecto para inicializar formulario cuando cambian los inputs
+  private readonly initializeFormEffect = effect(() => {
+    if (this.isOpen()) {
+      this.initializeForm(this.ejercicioToEdit() || undefined);
+    }
+  });
+
   // Crear formulario
   private createForm(): FormGroup {
     return this.fb.group({
@@ -55,7 +63,8 @@ export class EjercicioModalComponent {
       series: [3, [Validators.required, Validators.min(1)]],
       repeticiones: [10, [Validators.required, Validators.min(1)]],
       peso: [0, Validators.min(0)],
-      descansoSegundos: [60, [Validators.required, Validators.min(0)]]
+      descansoSegundos: [60, [Validators.required, Validators.min(0)]],
+      serieSegundos: [0, Validators.min(0)]
     });
   }
 
@@ -69,7 +78,8 @@ export class EjercicioModalComponent {
         series: ejercicio.series || 3,
         repeticiones: ejercicio.repeticiones || 10,
         peso: ejercicio.peso || 0,
-        descansoSegundos: ejercicio.descansoSegundos || 60
+        descansoSegundos: ejercicio.descansoSegundos || 60,
+        serieSegundos: ejercicio.serieSegundos || 0
       });
     } else {
       this.ejercicioData.set(null);
@@ -79,7 +89,8 @@ export class EjercicioModalComponent {
         series: 3,
         repeticiones: 10,
         peso: 0,
-        descansoSegundos: 60
+        descansoSegundos: 60,
+        serieSegundos: 0
       });
     }
   }
@@ -120,6 +131,7 @@ export class EjercicioModalComponent {
         repeticiones: updatedData.repeticiones || 10,
         peso: updatedData.peso || 0,
         descansoSegundos: updatedData.descansoSegundos || 60,
+        serieSegundos: updatedData.serieSegundos || 0,
         creadorId: updatedData.creadorId || '',
         creadorTipo: Rol.ENTRENADOR,
         fechaCreacion: updatedData.fechaCreacion || new Date()

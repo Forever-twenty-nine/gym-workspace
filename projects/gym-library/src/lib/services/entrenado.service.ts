@@ -157,7 +157,7 @@ export class EntrenadoService {
      */
     getEntrenadosActivos(): Signal<Entrenado[]> {
         return computed(() => 
-            this._entrenados().filter(entrenado => entrenado.activo)
+            this._entrenados()
         );
     }
 
@@ -172,6 +172,6 @@ export class EntrenadoService {
      * 📊 Obtiene el conteo de entrenados activos
      */
     get entrenadoActivoCount(): Signal<number> {
-        return computed(() => this._entrenados().filter(c => c.activo).length);
+        return computed(() => this._entrenados().length);
     }
 }

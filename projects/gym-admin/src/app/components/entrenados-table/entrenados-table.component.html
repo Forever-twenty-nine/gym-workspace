@@ -5,7 +5,6 @@
         <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Entrenador</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Gimnasio</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Estado</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Objetivo</th>
         <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Fecha Registro</th>
         <th class="px-8 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
@@ -34,12 +33,6 @@
           <td class="px-6 py-5 whitespace-nowrap text-center">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
               {{ entrenado.gimnasioName || 'Sin asignar' }}
-            </span>
-          </td>
-          <td class="px-6 py-5 whitespace-nowrap text-center">
-            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                  [class]="entrenado.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-              {{ entrenado.activo ? 'Activo' : 'Inactivo' }}
             </span>
           </td>
           <td class="px-6 py-5 whitespace-nowrap text-center">

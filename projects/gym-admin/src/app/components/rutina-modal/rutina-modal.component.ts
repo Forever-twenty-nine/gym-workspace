@@ -22,10 +22,11 @@ export class RutinaModalComponent implements OnInit {
   private readonly toastService = inject(ToastService);
 
   // Inputs
-  isOpen = input.required<boolean>();
-  isCreating = input.required<boolean>();
-  ejercicios = input.required<Ejercicio[]>();
+  isOpen = input<boolean>(false);
+  isCreating = input<boolean>(false);
+  ejercicios = input<Ejercicio[]>([]);
   creadorId = input<string>('');
+  rutinaToEdit = input<any>(null);
 
   // Outputs
   close = output<void>();
@@ -82,14 +83,14 @@ export class RutinaModalComponent implements OnInit {
   ngOnInit() {
     // Inicializar formulario
     this.rutinaForm = this.createForm();
-    
-    // Efecto para inicializar formulario cuando se abre el modal
-    effect(() => {
-      if (this.isOpen()) {
-        this.initializeForm();
-      }
-    });
   }
+
+  // Efecto para inicializar formulario cuando se abre el modal
+  private readonly initializeFormEffect = effect(() => {
+    if (this.isOpen()) {
+      this.initializeForm(this.rutinaToEdit() || undefined);
+    }
+  });
 
   // Crear formulario
   private createForm(): FormGroup {
@@ -108,7 +109,7 @@ export class RutinaModalComponent implements OnInit {
       this.rutinaForm.patchValue({
         nombre: rutina.nombre || '',
         descripcion: rutina.descripcion || '',
-        diasSemana: rutina.diasSemana || [],
+        diasSemana: rutina.DiasSemana || rutina.diasSemana || [],
         ejercicios: rutina.ejercicios || []
       });
     } else {
@@ -194,7 +195,7 @@ export class RutinaModalComponent implements OnInit {
         id: updatedData.id || `r${Date.now()}`,
         nombre: updatedData.nombre || '',
         descripcion: updatedData.descripcion || '',
-        diasSemana: updatedData.diasSemana || [],
+        DiasSemana: updatedData.diasSemana || [],
         ejercicios: updatedData.ejercicios || [],
         creadorId: updatedData.creadorId || '',
         entrenadoId: null,

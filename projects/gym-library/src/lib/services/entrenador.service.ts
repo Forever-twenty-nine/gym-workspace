@@ -225,9 +225,7 @@ export class EntrenadorService {
    */
   getRutinasByEntrenador(entrenadorId: string) {
     return computed(() => {
-      const entrenador = this.getEntrenadorById(entrenadorId)();
-      if (!entrenador) return [];
-      return this.rutinaService.rutinas().filter(rutina => entrenador.rutinasCreadasIds.includes(rutina.id));
+      return this.rutinaService.rutinas().filter(rutina => rutina.creadorId === entrenadorId);
     });
   }
   
@@ -238,9 +236,7 @@ export class EntrenadorService {
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
-      const entrenador = this.getEntrenadorById(entrenadorId)();
-      if (!entrenador) return [];
-      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => entrenador.ejerciciosCreadasIds.includes(ejercicio.id));
+      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => ejercicio.creadorId === entrenadorId);
     });
   }
   

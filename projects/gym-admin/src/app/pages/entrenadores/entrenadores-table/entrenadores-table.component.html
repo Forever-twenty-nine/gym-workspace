@@ -29,7 +29,7 @@
               </div>
             }
             @case ('text') {
-              <div class="text-sm text-gray-900">{{ item[column.key] }}</div>
+              <div class="text-sm text-gray-900">{{ getDisplayValue(item, column.key) }}</div>
             }
             @case ('boolean') {
               <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
@@ -42,6 +42,9 @@
                     [class]="(item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass">
                 {{ (item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
               </span>
+            }
+            @case ('date') {
+              <div class="text-sm text-gray-900">{{ item.fechaRegistro | date:'short' }}</div>
             }
           }
         </td>

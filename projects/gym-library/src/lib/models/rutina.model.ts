@@ -15,6 +15,6 @@ export interface Rutina {
     fechaCreacion?: Date;
     fechaModificacion?: Date;
     // Plan Premium
-    DiasSemana?: number[];
+    DiasSemana?: string[];
     duracion?: number;
 }

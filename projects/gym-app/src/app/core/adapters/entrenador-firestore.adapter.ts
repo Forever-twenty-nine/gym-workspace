@@ -102,10 +102,6 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
   private mapPartialToFirestore(entrenador: Partial<Entrenador>): any {
     const data: any = {};
 
-    if (entrenador.activo !== undefined) {
-      data.activo = entrenador.activo;
-    }
-
     if (entrenador.fechaRegistro !== undefined) {
       data.fechaRegistro = entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : null;
     }

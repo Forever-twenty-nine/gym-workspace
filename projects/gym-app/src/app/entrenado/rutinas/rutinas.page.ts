@@ -134,13 +134,39 @@ export class RutinasPage implements OnInit, OnDestroy {
   }
 
   /**
-   * Formatea los días de la semana de números a nombres
+   * Formatea los días de la semana de strings a nombres cortos
    */
-  formatearDiasSemana(dias?: number[]): string {
+  formatearDiasSemana(dias?: string[]): string {
     if (!dias || dias.length === 0) return 'Sin días asignados';
     
-    const diasNombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    return dias.map(dia => diasNombres[dia] || 'N/A').join(', ');
+    const diasMapeo: { [key: string]: string } = {
+      'Lunes': 'Lun',
+      'Martes': 'Mar', 
+      'Miércoles': 'Mié',
+      'Jueves': 'Jue',
+      'Viernes': 'Vie',
+      'Sábado': 'Sáb',
+      'Domingo': 'Dom'
+    };
+    
+    return dias.map(dia => diasMapeo[dia] || dia).join(', ');
+  }
+
+  /**
+   * Mapea un día de la semana a su abreviatura
+   */
+  mapearDia(dia: string): string {
+    const diasMapeo: { [key: string]: string } = {
+      'Lunes': 'Lun',
+      'Martes': 'Mar', 
+      'Miércoles': 'Mié',
+      'Jueves': 'Jue',
+      'Viernes': 'Vie',
+      'Sábado': 'Sáb',
+      'Domingo': 'Dom'
+    };
+    
+    return diasMapeo[dia] || dia;
   }
 
   /**

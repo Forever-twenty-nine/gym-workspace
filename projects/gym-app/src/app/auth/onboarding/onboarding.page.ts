@@ -286,7 +286,6 @@ export class OnboardingPage {
       case 'entrenado':
         const clienteData: Entrenado = {
           id: uid,
-          activo: true,
           fechaRegistro: new Date(),
           objetivo: this.mapObjetivoToEnum(formData.objetivo)
         };
@@ -296,7 +295,6 @@ export class OnboardingPage {
 
       case 'entrenador':
         const entrenadorData: Omit<Entrenador, 'id'> = {
-          activo: true,
           fechaRegistro: new Date(),
           ejerciciosCreadasIds: [],
           entrenadosAsignadosIds: [],

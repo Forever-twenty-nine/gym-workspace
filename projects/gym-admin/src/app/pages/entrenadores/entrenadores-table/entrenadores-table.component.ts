@@ -11,7 +11,7 @@ interface EntrenadorTableItem extends Entrenador {
 interface ColumnConfig {
   key: keyof EntrenadorTableItem;
   label: string;
-  type: 'text' | 'boolean' | 'badge' | 'avatar';
+  type: 'text' | 'boolean' | 'badge' | 'avatar' | 'date';
   class?: string;
   badgeConfig?: {
     trueLabel: string;
@@ -55,21 +55,41 @@ export class EntrenadoresTableComponent {
       }
     },
     {
-      key: 'activo',
-      label: 'Estado',
-      type: 'boolean',
-      class: 'px-6 py-4 text-center',
-      badgeConfig: {
-        trueLabel: 'Activo',
-        falseLabel: 'Inactivo',
-        trueClass: 'bg-green-100 text-green-800',
-        falseClass: 'bg-red-100 text-red-800'
-      }
+      key: 'fechaRegistro',
+      label: 'Fecha Registro',
+      type: 'date',
+      class: 'px-6 py-4 text-center'
+    },
+    {
+      key: 'ejerciciosCreadasIds',
+      label: 'Ejercicios Creados',
+      type: 'text',
+      class: 'px-6 py-4 text-center'
+    },
+    {
+      key: 'entrenadosAsignadosIds',
+      label: 'Entrenados Asignados',
+      type: 'text',
+      class: 'px-6 py-4 text-center'
+    },
+    {
+      key: 'rutinasCreadasIds',
+      label: 'Rutinas Creadas',
+      type: 'text',
+      class: 'px-6 py-4 text-center'
     }
   ]);
   edit = output<EntrenadorTableItem>();
 
   onEdit(item: EntrenadorTableItem) {
     this.edit.emit(item);
+  }
+
+  getDisplayValue(item: EntrenadorTableItem, key: keyof EntrenadorTableItem): string {
+    const value = item[key];
+    if (Array.isArray(value)) {
+      return value.length.toString();
+    }
+    return value?.toString() || '';
   }
 }

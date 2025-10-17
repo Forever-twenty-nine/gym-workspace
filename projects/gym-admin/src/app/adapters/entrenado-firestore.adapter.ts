@@ -83,7 +83,6 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       entrenadoresId: data.entrenadoresId || [],
       rutinasAsignadas: data.rutinasAsignadas || [],
       rutinasCreadas: data.rutinasCreadas || [],
-      activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
     };
@@ -94,7 +93,6 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
    */
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
-      activo: entrenado.activo
     };
 
     // Incluir campos, usando delete si son null

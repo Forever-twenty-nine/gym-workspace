@@ -128,7 +128,6 @@ export class EntrenadosPage {
       email: [{ value: '', disabled: true }],
       planInfo: [{ value: '', disabled: true }],
       entrenadorInfo: [{ value: '', disabled: true }],
-      activo: [item.activo || false],
       objetivo: [item.objetivo || ''],
       fechaRegistro: [item.fechaRegistro ? new Date(item.fechaRegistro).toISOString().slice(0, 16) : '']
     };
@@ -255,13 +254,6 @@ export class EntrenadosPage {
         label: 'Objetivo',
         placeholder: 'Seleccionar objetivo',
         options: this.getObjetivosDisponibles(),
-        colSpan: 1
-      },
-      {
-        name: 'activo',
-        type: 'checkbox',
-        label: 'Estado',
-        checkboxLabel: 'Cliente Activo',
         colSpan: 1
       },
       {

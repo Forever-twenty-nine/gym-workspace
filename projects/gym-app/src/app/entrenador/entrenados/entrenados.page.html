@@ -79,14 +79,6 @@
                 </ion-item>
               }
 
-              <ion-item>
-                <ion-icon name="checkmark-circle" slot="start" [color]="selectedEntrenado()!.activo ? 'success' : 'danger'"></ion-icon>
-                <ion-label>
-                  <h3>Estado</h3>
-                  <p>{{ selectedEntrenado()!.activo ? 'Activo' : 'Inactivo' }}</p>
-                </ion-label>
-              </ion-item>
-
               @if (selectedEntrenado()!.fechaRegistro) {
                 <ion-item>
                   <ion-icon name="calendar" slot="start" color="secondary"></ion-icon>

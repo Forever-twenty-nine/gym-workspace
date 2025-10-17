@@ -33,8 +33,8 @@ export class MensajesModalComponent {
   private readonly toastService = inject(ToastService);
 
   // Inputs
-  isOpen = input.required<boolean>();
-  isCreating = input.required<boolean>();
+  isOpen = input<boolean>(false);
+  isCreating = input<boolean>(false);
   remitenteId = input<string>('');
 
   // Outputs

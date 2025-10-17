@@ -2,53 +2,53 @@
   @if (entrenador(); as entrenador) {
     <div class="space-y-6">
       <div class="bg-white rounded-lg shadow-md p-6">
-        @if (editForm(); as form) {
-          <form [formGroup]="form" class="mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              @for (field of getFormFields(); track field.name) {
-                <div [ngClass]="field.colSpan === 2 ? 'col-span-2' : 'col-span-1'">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    {{ field.label }}
-                  </label>
-                  @switch (field.type) {
-                    @case ('checkbox') {
-                      <label class="flex items-center p-3 bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 cursor-pointer">
-                        <input type="checkbox" [formControlName]="field.name"
-                          class="mr-3 h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-md">
-                        <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
-                      </label>
-                    }
-                    @case ('text') {
-                      <input type="text" [formControlName]="field.name" [disabled]="field.disabled ?? false"
-                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed">
-                    }
-                  }
-                </div>
-              }
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Nombre</p>
+                <p class="text-lg font-semibold text-gray-900">{{ entrenador.displayName }}</p>
+              </div>
             </div>
-            <div class="flex justify-between mt-4">
-              <button (click)="goBack()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                ← Volver a Entrenadores
-              </button>
-              <button type="button" (click)="saveChanges()" [disabled]="!form.valid || isLoading()"
-                class="px-6 py-3 text-sm font-semibold text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:hover:scale-100">
-                @if (isLoading()) {
-                  <span class="flex items-center">
-                    <svg class="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                      </path>
-                    </svg>
-                    Guardando...
-                  </span>
-                } @else {
-                  Guardar Cambios
-                }
-              </button>
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Email</p>
+                <p class="text-lg font-semibold text-gray-900">{{ entrenador.email }}</p>
+              </div>
             </div>
-          </form>
-        }
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Plan</p>
+                <p class="text-lg font-semibold text-gray-900">{{ entrenador.plan }}</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-3">
+              <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Fecha de Registro</p>
+                <p class="text-lg font-semibold text-gray-900">{{ entrenador.fechaRegistro ? (entrenador.fechaRegistro | date:'dd/MM/yyyy') : 'No disponible' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-start mt-6">
+          <button (click)="goBack()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors duration-200">
+            ← Volver a Entrenadores
+          </button>
+        </div>
       </div>
 
       <div class="bg-white rounded-lg shadow-md p-6">
@@ -73,6 +73,22 @@
                   <div class="flex-1">
                     <p class="text-sm font-medium text-gray-800">{{ ejercicio.nombre }}</p>
                     <p class="text-xs text-gray-600">{{ ejercicio.series }} series x {{ ejercicio.repeticiones }} reps</p>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <button (click)="editEjercicio(ejercicio)"
+                      class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors duration-200"
+                      title="Editar ejercicio">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button (click)="deleteEjercicio(ejercicio)"
+                      class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors duration-200"
+                      title="Eliminar ejercicio">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               }
@@ -100,6 +116,22 @@
                     <p class="text-sm font-medium text-gray-800">{{ rutina.nombre }}</p>
                     <p class="text-xs text-gray-600">{{ rutina.descripcion || 'Sin descripción' }}</p>
                   </div>
+                  <div class="flex items-center space-x-2">
+                    <button (click)="editRutina(rutina)"
+                      class="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors duration-200"
+                      title="Editar rutina">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                      </svg>
+                    </button>
+                    <button (click)="deleteRutina(rutina)"
+                      class="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors duration-200"
+                      title="Eliminar rutina">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               }
             } @else {
@@ -118,7 +150,21 @@
               <span>Crear Invitación</span>
             </button>
           </div>
-          <p class="text-sm text-gray-500">Funcionalidad de invitaciones aquí</p>
+          <div class="space-y-2 max-h-40 overflow-y-auto">
+            @if (invitaciones() && invitaciones().length > 0) {
+              @for (invitacion of invitaciones(); track invitacion.id) {
+                <div class="flex items-center justify-between p-2 bg-white rounded-lg">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-800">{{ invitacion.titulo }}</p>
+                    <p class="text-xs text-gray-600">{{ invitacion.mensaje }}</p>
+                    <p class="text-xs text-gray-500">Estado: {{ invitacion.datos?.estadoInvitacion || 'pendiente' }}</p>
+                  </div>
+                </div>
+              }
+            } @else {
+              <p class="text-sm text-gray-500 text-center py-4">No hay invitaciones</p>
+            }
+          </div>
         </div>
 
         <!-- Sección de Mensajes/Conversaciones -->
@@ -154,13 +200,13 @@
 
   <!-- Modal de ejercicios -->
   <app-ejercicio-modal [isOpen]="isEjercicioModalOpen()" [isCreating]="isEjercicioCreating()"
-    [creadorId]="entrenadorId()"
+    [creadorId]="entrenadorId()" [ejercicioToEdit]="ejercicioToEdit()"
     (close)="toggleModalEjercicios()">
   </app-ejercicio-modal>
 
   <!-- Modal de rutinas -->
   <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()"
-    [ejercicios]="ejercicios()" [creadorId]="entrenadorId()"
+    [ejercicios]="ejercicios()" [creadorId]="entrenadorId()" [rutinaToEdit]="rutinaToEdit()"
     (close)="toggleModalRutinas()">
   </app-rutina-modal>
 

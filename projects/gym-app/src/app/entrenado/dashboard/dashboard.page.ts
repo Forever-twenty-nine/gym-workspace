@@ -231,7 +231,6 @@ export class DashboardPage implements OnInit {
           const nuevoEntrenado: Entrenado = {
             id: currentUser.uid,
             entrenadoresId: [notificacion.datos.entrenadorId],
-            activo: true,
             fechaRegistro: new Date(),
             objetivo: Objetivo.MANTENER_PESO
           };

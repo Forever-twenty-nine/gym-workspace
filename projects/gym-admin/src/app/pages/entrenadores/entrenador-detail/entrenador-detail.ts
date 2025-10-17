@@ -1,14 +1,12 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EntrenadorService} from 'gym-library';
+import { EntrenadorService, EjercicioService, RutinaService, NotificacionService } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { RutinaModalComponent } from '../../../components/rutina-modal/rutina-modal.component';
 import { EjercicioModalComponent } from '../../../components/ejercicio-modal/ejercicio-modal.component';
 import { MensajesModalComponent } from '../../../components/mensajes-modal/mensajes-modal.component';
 import { InvitacionesModalComponent } from '../../../components/invitaciones-modal/invitaciones-modal.component';
-import { FormFieldConfig } from '../../../components/modal-form/modal-form.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
 
@@ -16,7 +14,6 @@ import { PageTitleService } from '../../../services/page-title.service';
   selector: 'app-entrenador-detail',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     ToastComponent,
     RutinaModalComponent,
     EjercicioModalComponent,
@@ -33,6 +30,9 @@ export class EntrenadorDetail implements OnInit {
   readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
   readonly entrenadorService = inject(EntrenadorService);
+  private readonly ejercicioService = inject(EjercicioService);
+  private readonly rutinaService = inject(RutinaService);
+  private readonly notificacionService = inject(NotificacionService);
 
 
   entrenadorId = signal<string>('');
@@ -43,24 +43,17 @@ export class EntrenadorDetail implements OnInit {
   });
 
   // Signals para el estado del componente
-  readonly editForm = computed(() => {
-    const entrenador = this.entrenador();
-    if (!entrenador) return null;
-    const formConfig: any = {
-      id: new FormControl({value: entrenador.id, disabled: true}),
-      activo: new FormControl(entrenador.activo || false),
-    };
-    return new FormGroup(formConfig);
-  });
   readonly isLoading = signal(false);
 
   // Signals para rutinas
   readonly isRutinaModalOpen = signal(false);
   readonly isRutinaCreating = signal(false);
+  readonly rutinaToEdit = signal<any>(null);
 
   // Signals para ejercicios
   readonly isEjercicioModalOpen = signal(false);
   readonly isEjercicioCreating = signal(false);
+  readonly ejercicioToEdit = signal<any>(null);
 
   // Signals para mensajes
   readonly isMensajeModalOpen = signal(false);
@@ -71,6 +64,8 @@ export class EntrenadorDetail implements OnInit {
 
   ngOnInit() {
     this.entrenadorService.initializeListener();
+    // Inicializar listener de notificaciones para que se carguen las invitaciones
+    this.notificacionService.notificaciones();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);
@@ -87,81 +82,26 @@ export class EntrenadorDetail implements OnInit {
     }
   }
 
-  async saveChanges() {
-    const form = this.editForm();
-    const entrenador = this.entrenador();
-
-    if (!form || !entrenador) {
-      this.toastService.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
-    this.isLoading.set(true);
-
-    try {
-      let updatedData = { ...entrenador, ...form.value };
-
-      const entrenadorDataToSave = {
-        ...updatedData
-      };
-
-      delete entrenadorDataToSave.displayName;
-      delete entrenadorDataToSave.email;
-      delete entrenadorDataToSave.plan;
-
-      await this.entrenadorService.update(entrenadorDataToSave.id, entrenadorDataToSave);
-
-      const usuarioEntrenadorNombre = entrenador.displayName || entrenador.id;
-      const clientesCount = this.entrenadorService.getClientesCount(entrenador.id);
-      const rutinasCount = this.rutinas().length;
-
-      this.toastService.log(`Entrenador actualizado: ${usuarioEntrenadorNombre} - Entrenados: ${clientesCount} - Rutinas: ${rutinasCount}`);
-    } catch (error) {
-      console.error('Error al guardar:', error);
-      this.toastService.log(`Error al guardar los cambios: ${error}`);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  getFormFields(): FormFieldConfig[] {
-    return [
-      {
-        name: 'id',
-        type: 'text',
-        label: 'ID del Entrenador',
-        disabled: true,
-        colSpan: 2
-      },
-      {
-        name: 'activo',
-        type: 'checkbox',
-        label: 'Estado',
-        checkboxLabel: 'Entrenador Activo',
-        colSpan: 2
-      }
-    ];
-  }
   // --------------------------------------------
   // Rutinas
   // --------------------------------------------
 
   readonly rutinas = computed(() => this.entrenadorService.getRutinasByEntrenador(this.entrenadorId())());
 
-  toggleModalRutinas() {
+  toggleModalRutinas(rutina?: any) {
     if (this.isRutinaModalOpen()) {
       this.isRutinaModalOpen.set(false);
       this.isRutinaCreating.set(false);
+      this.rutinaToEdit.set(null);
     } else {
       this.isRutinaModalOpen.set(true);
-      this.isRutinaCreating.set(true);
+      if (rutina) {
+        this.isRutinaCreating.set(false);
+        this.rutinaToEdit.set(rutina);
+      } else {
+        this.isRutinaCreating.set(true);
+        this.rutinaToEdit.set(null);
+      }
     }
   }
 
@@ -171,13 +111,20 @@ export class EntrenadorDetail implements OnInit {
 
   readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenador(this.entrenadorId())());
 
-  toggleModalEjercicios() {
+  toggleModalEjercicios(ejercicio?: any) {
     if (this.isEjercicioModalOpen()) {
       this.isEjercicioModalOpen.set(false);
       this.isEjercicioCreating.set(false);
+      this.ejercicioToEdit.set(null);
     } else {
       this.isEjercicioModalOpen.set(true);
-      this.isEjercicioCreating.set(true);
+      if (ejercicio) {
+        this.isEjercicioCreating.set(false);
+        this.ejercicioToEdit.set(ejercicio);
+      } else {
+        this.isEjercicioCreating.set(true);
+        this.ejercicioToEdit.set(null);
+      }
     }
   }
 
@@ -214,5 +161,47 @@ export class EntrenadorDetail implements OnInit {
   // --------------------------------------------
   goBack() {
     this.router.navigate(['/entrenadores']);
+  }
+
+  // --------------------------------------------
+  // Edición y eliminación de ejercicios
+  // --------------------------------------------
+  editEjercicio(ejercicio: any) {
+    this.toggleModalEjercicios(ejercicio);
+  }
+
+  async deleteEjercicio(ejercicio: any) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar el ejercicio "${ejercicio.nombre}"?`)) {
+      return;
+    }
+
+    try {
+      await this.ejercicioService.delete(ejercicio.id);
+      this.toastService.log(`Ejercicio eliminado: ${ejercicio.nombre}`);
+    } catch (error: any) {
+      console.error('Error al eliminar ejercicio:', error);
+      this.toastService.log(`ERROR al eliminar ejercicio: ${error.message}`);
+    }
+  }
+
+  // --------------------------------------------
+  // Edición y eliminación de rutinas
+  // --------------------------------------------
+  editRutina(rutina: any) {
+    this.toggleModalRutinas(rutina);
+  }
+
+  async deleteRutina(rutina: any) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar la rutina "${rutina.nombre}"?`)) {
+      return;
+    }
+
+    try {
+      await this.rutinaService.delete(rutina.id);
+      this.toastService.log(`Rutina eliminada: ${rutina.nombre}`);
+    } catch (error: any) {
+      console.error('Error al eliminar rutina:', error);
+      this.toastService.log(`ERROR al eliminar rutina: ${error.message}`);
+    }
   }
 }

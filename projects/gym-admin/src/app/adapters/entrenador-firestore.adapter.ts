@@ -9,7 +9,8 @@ import {
   Firestore,
   query,
   orderBy,
-  setDoc
+  setDoc,
+  Timestamp
 } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
 import { IEntrenadorFirestoreAdapter } from 'gym-library';
@@ -33,7 +34,7 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
    */
   getEntrenadores(callback: (entrenadores: Entrenador[]) => void): () => void {
     const entrenadoresCollection = collection(this.firestore, this.collectionName);
-    const entrenadoresQuery = query(entrenadoresCollection, orderBy('activo', 'desc'));
+    const entrenadoresQuery = query(entrenadoresCollection, orderBy('fechaRegistro', 'desc'));
     
     const unsubscribe = onSnapshot(
       entrenadoresQuery,
@@ -41,10 +42,14 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
         const entrenadores: Entrenador[] = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
-          entrenadores.push({
+          const entrenador: Entrenador = {
             id: doc.id,
-            ...data
-          } as Entrenador);
+            fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
+            ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
+            entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
+            rutinasCreadasIds: data['rutinasCreadasIds'] || []
+          };
+          entrenadores.push(entrenador);
         });
         
         callback(entrenadores);
@@ -67,7 +72,7 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
     try {
       const entrenadoresCollection = collection(this.firestore, this.collectionName);
       const docRef = await addDoc(entrenadoresCollection, {
-        ...entrenador,
+        fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
         ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
         entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
         rutinasCreadasIds: entrenador.rutinasCreadasIds || []
@@ -89,7 +94,7 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
     try {
       const entrenadorDoc = doc(this.firestore, this.collectionName, id);
       await setDoc(entrenadorDoc, {
-        ...entrenador,
+        fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
         ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
         entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
         rutinasCreadasIds: entrenador.rutinasCreadasIds || []
@@ -108,7 +113,11 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
   async update(id: string, entrenador: Partial<Entrenador>): Promise<void> {
     try {
       const entrenadorDoc = doc(this.firestore, this.collectionName, id);
-      await updateDoc(entrenadorDoc, entrenador);
+      const data: any = { ...entrenador };
+      if (entrenador.fechaRegistro) {
+        data.fechaRegistro = Timestamp.fromDate(entrenador.fechaRegistro);
+      }
+      await updateDoc(entrenadorDoc, data);
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al actualizar entrenador:', error);
       throw error;
@@ -130,8 +139,11 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
           const data = docSnapshot.data();
           const entrenador: Entrenador = {
             id: docSnapshot.id,
-            ...data
-          } as Entrenador;
+            fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
+            ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
+            entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
+            rutinasCreadasIds: data['rutinasCreadasIds'] || []
+          };
           callback(entrenador);
         } else {
           callback(null);

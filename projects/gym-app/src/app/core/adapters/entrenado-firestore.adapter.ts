@@ -89,7 +89,6 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapFromFirestore(data: any): Entrenado {
     return {
       id: data.id,
-      activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || null,
       entrenadoresId: data.entrenadoresId || [],
@@ -100,7 +99,6 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
 
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
-      activo: entrenado.activo
     };
 
     if (entrenado.objetivo !== undefined) {

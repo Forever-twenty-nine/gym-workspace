@@ -80,7 +80,7 @@
                 <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                   @for (dia of rutina.DiasSemana; track $index) {
                     <ion-chip color="primary" style="margin: 0; font-size: 11px; height: 24px;">
-                      {{ ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][dia] }}
+                      {{ mapearDia(dia) }}
                     </ion-chip>
                   }
                 </div>
