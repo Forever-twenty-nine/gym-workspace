@@ -14,7 +14,8 @@ import {
   IonAvatar, IonHeader, IonToolbar, IonTitle,
   IonButton,
   IonBadge,
-  IonText
+  IonText,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -29,7 +30,7 @@ import {
   checkmarkCircle as checkmarkCircleIcon,
   closeCircleOutline
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -59,6 +60,8 @@ export class DashboardPage implements OnInit {
   private userService = inject(UserService);
   private authService = inject(AuthService);
   private notificacionService = inject(NotificacionService);
+  private entrenadorService = inject(EntrenadorService);
+  private toastController = inject(ToastController);
   private injector = inject(Injector);
   private auth = inject(Auth);
 
@@ -217,7 +220,7 @@ export class DashboardPage implements OnInit {
         // Obtener el entrenado actual directamente del servicio
         const entrenadoSignal = this.entrenadoService.getEntrenado(currentUser.uid);
         const entrenadoExistente = entrenadoSignal();
-        
+
         if (entrenadoExistente) {
           // Actualizar el entrenado existente con el entrenadorId
           const entrenadoActualizado = {
@@ -236,12 +239,37 @@ export class DashboardPage implements OnInit {
           };
           await this.entrenadoService.save(nuevoEntrenado);
         }
+
+        // 3. Actualizar el entrenador para agregar el entrenado a su lista
+        const entrenadorSignal = this.entrenadorService.getEntrenadorById(notificacion.datos.entrenadorId);
+        const entrenadorExistente = entrenadorSignal();
+
+        if (entrenadorExistente) {
+          const entrenadorActualizado = {
+            ...entrenadorExistente,
+            entrenadosAsignadosIds: [...(entrenadorExistente.entrenadosAsignadosIds || []), currentUser.uid]
+          };
+          await this.entrenadorService.update(entrenadorExistente.id, entrenadorActualizado);
+        }
+
+        const toast = await this.toastController.create({
+          message: 'Invitación aceptada exitosamente',
+          duration: 2000,
+          position: 'bottom',
+          color: 'success'
+        });
+        await toast.present();
+
       }
-
-      // Aquí puedes agregar lógica adicional como mostrar mensaje de éxito
-
     } catch (error) {
       console.error('Error al aceptar invitación:', error);
+      const toast = await this.toastController.create({
+        message: 'Error al aceptar la invitación',
+        duration: 2000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await toast.present();
     }
   }
 

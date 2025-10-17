@@ -1,21 +1,9 @@
 <div class="w-full p-4">
-  
+
 <section class="bg-white rounded-lg shadow-md">
     <app-entrenados-table
       [entrenados]="entrenados()"
-      (edit)="openDetailsModal($event)">
+      (edit)="viewDetails($event)">
     </app-entrenados-table>
   </section>
-
-  <!-- Modal de detalles del entrenado -->
-  <app-modal-form
-    [isOpen]="isModalOpen()"
-    [title]="'Entrenado'"
-    [isCreating]="isCreating()"
-    [form]="editForm()"
-    [formFields]="getFormFields()"
-    [isLoading]="isLoading()"
-    (close)="closeModal()"
-    (save)="saveChanges()">
-  </app-modal-form>
 </div>
