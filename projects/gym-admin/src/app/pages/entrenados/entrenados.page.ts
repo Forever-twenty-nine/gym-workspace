@@ -14,9 +14,8 @@ import {
 } from 'gym-library';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
-import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
-import { EntrenadosTableComponent } from '../../components/entrenados-table/entrenados-table.component';@Component({
+import { EntrenadosTableComponent } from './entrenados-table/entrenados-table.component';@Component({
   selector: 'app-entrenados-page',
   imports: [
     CommonModule,

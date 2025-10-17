@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EntrenadorService, EjercicioService, RutinaService, NotificacionService } from 'gym-library';
+import { EntrenadorService, EjercicioService, RutinaService, NotificacionService, InvitacionService } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { RutinaModalComponent } from '../../../components/rutina-modal/rutina-modal.component';
 import { EjercicioModalComponent } from '../../../components/ejercicio-modal/ejercicio-modal.component';
@@ -33,6 +33,7 @@ export class EntrenadorDetail implements OnInit {
   private readonly ejercicioService = inject(EjercicioService);
   private readonly rutinaService = inject(RutinaService);
   private readonly notificacionService = inject(NotificacionService);
+  private readonly invitacionService = inject(InvitacionService);
 
 
   entrenadorId = signal<string>('');
@@ -66,6 +67,8 @@ export class EntrenadorDetail implements OnInit {
     this.entrenadorService.initializeListener();
     // Inicializar listener de notificaciones para que se carguen las invitaciones
     this.notificacionService.notificaciones();
+    // Inicializar listener de invitaciones
+    this.invitacionService.invitaciones();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);
@@ -132,7 +135,7 @@ export class EntrenadorDetail implements OnInit {
   // Invitaciones 
   // --------------------------------------------
 
-  readonly invitaciones = computed(() => this.entrenadorService.getInvitacionesByEntrenador(this.entrenadorId())());
+  readonly invitaciones = computed(() => this.invitacionService.getInvitacionesPorEntrenador(this.entrenadorId())());
 
   toggleModalInvitaciones() {
     if (this.isInvitacionModalOpen()) {

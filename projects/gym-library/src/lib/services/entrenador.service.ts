@@ -6,6 +6,7 @@ import { EntrenadoService } from './entrenado.service';
 import { UserService } from './user.service';
 import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
+import { InvitacionService } from './invitacion.service';
 import { Ejercicio } from '../models/ejercicio.model';
 
 /**
@@ -74,6 +75,7 @@ export class EntrenadorService {
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
   private mensajeService = inject(MensajeService);
+  private invitacionService = inject(InvitacionService);
   
   // 📊 Signals para el estado de los entrenadores
   private readonly _entrenadores = signal<Entrenador[]>([]);
@@ -246,7 +248,7 @@ export class EntrenadorService {
    * @returns Array de invitaciones del entrenador
    */
   getInvitacionesByEntrenador(entrenadorId: string) {
-    return this.notificacionService.getInvitacionesPorEntrenador(entrenadorId);
+    return this.invitacionService.getInvitacionesPorEntrenador(entrenadorId);
   }
   
   /**

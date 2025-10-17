@@ -5,8 +5,8 @@ import {
   EntrenadoService,
   UserService,
   RutinaService,
-  NotificacionService,
-  EntrenadorService
+  EntrenadorService,
+  InvitacionService
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
@@ -30,8 +30,8 @@ export class EntrenadoDetail implements OnInit {
   readonly entrenadoService = inject(EntrenadoService);
   private readonly userService = inject(UserService);
   private readonly rutinaService = inject(RutinaService);
-  private readonly notificacionService = inject(NotificacionService);
   private readonly entrenadorService = inject(EntrenadorService);
+  private readonly invitacionService = inject(InvitacionService);
 
   entrenadoId = signal<string>('');
 
@@ -60,8 +60,8 @@ export class EntrenadoDetail implements OnInit {
   ngOnInit() {
     // Los listeners se inicializan automáticamente cuando se accede a las señales
     this.entrenadorService.initializeListener();
-    // Inicializar listener de notificaciones para que se carguen las invitaciones
-    this.notificacionService.notificaciones();
+    // Inicializar listeners de invitaciones
+    this.invitacionService.invitaciones();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -95,23 +95,22 @@ export class EntrenadoDetail implements OnInit {
       });
   });
 
-  // Notificaciones del entrenado
-  readonly notificaciones = computed(() => {
+  // Invitaciones pendientes del entrenado
+  readonly invitacionesPendientes = computed(() => {
     const id = this.entrenadoId();
     if (!id) return [];
 
-    return this.notificacionService.getNotificacionesByUsuario(id)();
+    return this.invitacionService.getInvitacionesPendientesPorEntrenado(id)();
   });
 
   // Estadísticas computadas
   readonly estadisticas = computed(() => {
     const rutinas = this.rutinasAsignadas() || [];
-    const notifs = this.notificaciones() || [];
     
     return {
       rutinasAsignadas: rutinas.length,
       rutinasCompletadas: rutinas.filter(r => r?.completado === true).length,
-      notificacionesPendientes: notifs.filter(n => n?.leida === false).length
+      notificacionesPendientes: 0
     };
   });
 
@@ -136,19 +135,6 @@ export class EntrenadoDetail implements OnInit {
   }
 
   // --------------------------------------------
-  // Marcar notificación como leída
-  // --------------------------------------------
-  async marcarComoLeida(notificacion: any) {
-    try {
-      await this.notificacionService.marcarComoLeida(notificacion.id);
-      this.toastService.log('Notificación marcada como leída');
-    } catch (error: any) {
-      console.error('Error al marcar notificación como leída:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
   // Marcar rutina como completada
   // --------------------------------------------
   async marcarRutinaCompletada(rutina: any) {
@@ -162,6 +148,32 @@ export class EntrenadoDetail implements OnInit {
       this.toastService.log(`Rutina ${rutina.completado ? 'desmarcada' : 'marcada'} como completada`);
     } catch (error: any) {
       console.error('Error al actualizar rutina:', error);
+      this.toastService.log(`ERROR: ${error.message}`);
+    }
+  }
+
+  // --------------------------------------------
+  // Aceptar invitación
+  // --------------------------------------------
+  async aceptarInvitacion(invitacion: any) {
+    try {
+      await this.invitacionService.aceptarInvitacion(invitacion.id);
+      this.toastService.log('Invitación aceptada exitosamente');
+    } catch (error: any) {
+      console.error('Error al aceptar invitación:', error);
+      this.toastService.log(`ERROR: ${error.message}`);
+    }
+  }
+
+  // --------------------------------------------
+  // Rechazar invitación
+  // --------------------------------------------
+  async rechazarInvitacion(invitacion: any) {
+    try {
+      await this.invitacionService.rechazarInvitacion(invitacion.id);
+      this.toastService.log('Invitación rechazada');
+    } catch (error: any) {
+      console.error('Error al rechazar invitación:', error);
       this.toastService.log(`ERROR: ${error.message}`);
     }
   }

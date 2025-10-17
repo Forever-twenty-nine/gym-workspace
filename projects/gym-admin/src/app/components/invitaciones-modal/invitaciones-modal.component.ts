@@ -4,7 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import {
   NotificacionService,
   UserService,
-  EntrenadoService
+  EntrenadoService,
+  InvitacionService
 } from 'gym-library';
 import { ToastService } from '../../services/toast.service';
 
@@ -22,6 +23,7 @@ export class InvitacionesModalComponent {
   private readonly notificacionService = inject(NotificacionService);
   private readonly userService = inject(UserService);
   private readonly entrenadoService = inject(EntrenadoService);
+  private readonly invitacionService = inject(InvitacionService);
   private readonly fb = inject(FormBuilder);
   private readonly toastService = inject(ToastService);
 
@@ -56,17 +58,17 @@ export class InvitacionesModalComponent {
     const entrenadorId = this.entrenadorId();
     if (!entrenadorId) return [];
 
-    return this.notificacionService.getInvitacionesPorEntrenador(entrenadorId)()
-      .map(notif => {
-        const entrenado = this.entrenadoService.entrenados().find(e => e.id === notif.usuarioId);
+    return this.invitacionService.getInvitacionesPorEntrenador(entrenadorId)()
+      .map(invitacion => {
+        const entrenado = this.entrenadoService.entrenados().find(e => e.id === invitacion.entrenadoId);
         const usuarioEntrenado = entrenado ? this.usuarios().find(u => u.uid === entrenado.id) : null;
 
         return {
-          ...notif,
+          ...invitacion,
           titulo: `Invitación a ${usuarioEntrenado?.nombre || usuarioEntrenado?.email || 'cliente'}`,
-          entrenadorNombre: 'Entrenador',
-          invitacionId: notif.id,
-          estado: notif.datos?.estadoInvitacion || 'pendiente'
+          entrenadorNombre: invitacion.entrenadorNombre,
+          invitacionId: invitacion.id,
+          estado: invitacion.estado
         };
       });
   });
@@ -105,14 +107,24 @@ export class InvitacionesModalComponent {
     this.isLoading.set(true);
 
     try {
-      await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje);
+      const entrenador = this.usuarios().find(u => u.uid === entrenadorId);
+      const entrenadorNombre = entrenador?.nombre || entrenador?.email || 'Entrenador';
+
+      await this.invitacionService.crearInvitacion(
+        entrenadorId,
+        usuarioId,
+        entrenadorNombre,
+        usuarioInvitado.nombre || usuarioInvitado.email || 'Cliente',
+        data.email,
+        data.mensaje
+      );
 
       this.toastService.log('Invitación enviada exitosamente');
       this.invitacionForm().reset();
       this.close.emit();
 
     } catch (error) {
-      console.error('❌ Error al guardar notificación:', error);
+      console.error('❌ Error al guardar invitación:', error);
       this.toastService.log('ERROR al enviar invitación');
     } finally {
       this.isLoading.set(false);

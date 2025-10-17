@@ -30,7 +30,7 @@ import {
   checkmarkCircle as checkmarkCircleIcon,
   closeCircleOutline
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -61,6 +61,7 @@ export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private notificacionService = inject(NotificacionService);
   private entrenadorService = inject(EntrenadorService);
+  private invitacionService = inject(InvitacionService);
   private toastController = inject(ToastController);
   private injector = inject(Injector);
   private auth = inject(Auth);
@@ -154,12 +155,12 @@ export class DashboardPage implements OnInit {
       return [];
     }
 
-    const allNotificaciones = this.notificacionService.notificaciones();
+    const allInvitaciones = this.invitacionService.invitaciones();
     
-    const filtered = allNotificaciones.filter(n => {
-      const matches = n.usuarioId === userId &&
-        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        n.datos?.estadoInvitacion === 'pendiente';
+    const filtered = allInvitaciones.filter(inv => {
+      const matches = inv.entrenadoId === userId &&
+        inv.estado === 'pendiente' &&
+        inv.activa;
       
       return matches;
     });
@@ -207,12 +208,12 @@ export class DashboardPage implements OnInit {
     });
   }
 
-  async aceptarInvitacion(notificacion: any) {
-    if (!notificacion.datos?.entrenadorId) return;
+  async aceptarInvitacion(invitacion: any) {
+    if (!invitacion.entrenadorId) return;
 
     try {
       // 1. Aceptar la invitación
-      await this.notificacionService.aceptarInvitacion(notificacion.id);
+      await this.invitacionService.aceptarInvitacion(invitacion.id);
 
       // 2. Crear/actualizar la relación entrenador-entrenado
       const currentUser = this.authService.currentUser();
@@ -225,7 +226,7 @@ export class DashboardPage implements OnInit {
           // Actualizar el entrenado existente con el entrenadorId
           const entrenadoActualizado = {
             ...entrenadoExistente,
-            entrenadoresId: [...(entrenadoExistente.entrenadoresId || []), notificacion.datos.entrenadorId],
+            entrenadoresId: [...(entrenadoExistente.entrenadoresId || []), invitacion.entrenadorId],
             activo: true
           };
           await this.entrenadoService.save(entrenadoActualizado);
@@ -233,7 +234,7 @@ export class DashboardPage implements OnInit {
           // Crear nuevo entrenado si no existe
           const nuevoEntrenado: Entrenado = {
             id: currentUser.uid,
-            entrenadoresId: [notificacion.datos.entrenadorId],
+            entrenadoresId: [invitacion.entrenadorId],
             fechaRegistro: new Date(),
             objetivo: Objetivo.MANTENER_PESO
           };
@@ -241,7 +242,7 @@ export class DashboardPage implements OnInit {
         }
 
         // 3. Actualizar el entrenador para agregar el entrenado a su lista
-        const entrenadorSignal = this.entrenadorService.getEntrenadorById(notificacion.datos.entrenadorId);
+        const entrenadorSignal = this.entrenadorService.getEntrenadorById(invitacion.entrenadorId);
         const entrenadorExistente = entrenadorSignal();
 
         if (entrenadorExistente) {
@@ -273,9 +274,9 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  async rechazarInvitacion(notificacion: any) {
+  async rechazarInvitacion(invitacion: any) {
     try {
-      await this.notificacionService.rechazarInvitacion(notificacion.id);
+      await this.invitacionService.rechazarInvitacion(invitacion.id);
     } catch (error) {
       console.error('Error al rechazar invitación:', error);
     }

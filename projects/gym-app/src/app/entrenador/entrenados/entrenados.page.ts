@@ -25,7 +25,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
-import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol } from 'gym-library';
+import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService } from 'gym-library';
 
 @Component({
   selector: 'app-entrenados',
@@ -114,6 +114,7 @@ export class EntrenadosPage implements OnInit {
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);
+  private invitacionService = inject(InvitacionService);
   private fb = inject(FormBuilder);
 
   isModalOpen = signal(false);
@@ -196,7 +197,7 @@ export class EntrenadosPage implements OnInit {
     const usuarioInvitado = this.userService.users().find(u => u.email === data.email);
     const usuarioId = usuarioInvitado?.uid;
 
-    if (!usuarioId) {
+    if (!usuarioId || !usuarioInvitado?.email) {
       this.isLoading.set(false);
       return;
     }
@@ -205,8 +206,19 @@ export class EntrenadosPage implements OnInit {
     const entrenadorActual = this.userService.users().find(u => u.uid === entrenadorId);
     const entrenadorNombre = entrenadorActual?.nombre || entrenadorActual?.email || 'Entrenador';
 
+    // Obtener el nombre y email del entrenado
+    const entrenadoNombre = usuarioInvitado.nombre || usuarioInvitado.email || 'Entrenado';
+    const emailEntrenado = usuarioInvitado.email;
+
     try {
-      await this.notificacionService.crearInvitacion(entrenadorId, usuarioId, data.mensaje, entrenadorNombre);
+      await this.invitacionService.crearInvitacion(
+        entrenadorId,
+        usuarioId,
+        entrenadorNombre,
+        entrenadoNombre,
+        emailEntrenado,
+        data.mensaje
+      );
       this.closeInvitacionModal();
     } catch (error) {
       console.error('❌ Error al enviar invitación:', error);
