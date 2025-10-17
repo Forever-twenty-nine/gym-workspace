@@ -4,6 +4,8 @@ import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { EntrenadoService } from './entrenado.service';
 import { UserService } from './user.service';
+import { NotificacionService } from './notificacion.service';
+import { MensajeService } from './mensaje.service';
 import { Ejercicio } from '../models/ejercicio.model';
 
 /**
@@ -63,6 +65,8 @@ export class EntrenadorService {
   private ejercicioService = inject(EjercicioService);
   private entrenadoService = inject(EntrenadoService);
   private userService = inject(UserService);
+  private notificacionService = inject(NotificacionService);
+  private mensajeService = inject(MensajeService);
   
   // 📊 Signals para el estado de los entrenadores
   private readonly _entrenadores = signal<Entrenador[]>([]);
@@ -213,34 +217,42 @@ export class EntrenadorService {
    * @returns Array de rutinas del entrenador
    */
   getRutinasByEntrenador(entrenadorId: string) {
-    return this.rutinaService.rutinas().filter(rutina => 
-      rutina.creadorId === entrenadorId
-    );
+    return computed(() => {
+      return this.rutinaService.rutinas().filter(rutina => 
+        rutina.creadorId === entrenadorId
+      );
+    });
   }
   
   /**
-   * 📋 Obtiene los ejercicios de un entrenador específico con info de creador
+   * 📋 Obtiene los ejercicios de un entrenador específico
    * @param entrenadorId - ID del entrenador
-   * @returns Array de ejercicios con creadorName
+   * @returns Array de ejercicios del entrenador
    */
-  getEjerciciosByEntrenadorWithCreator(entrenadorId: string) {
+  getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
       return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => 
         ejercicio.creadorId === entrenadorId
-      ).map((ejercicio: Ejercicio) => {
-        let creadorName = null;
-        
-        if (ejercicio.creadorId) {
-          const usuario = this.userService.users().find(u => u.uid === ejercicio.creadorId);
-          creadorName = usuario?.nombre || usuario?.email || `Usuario ${ejercicio.creadorId}`;
-        }
-        
-        return {
-          ...ejercicio,
-          creadorName
-        };
-      });
+      );
     });
+  }
+  
+  /**
+   * 📨 Obtiene las invitaciones de un entrenador específico
+   * @param entrenadorId - ID del entrenador
+   * @returns Array de invitaciones del entrenador
+   */
+  getInvitacionesByEntrenador(entrenadorId: string) {
+    return this.notificacionService.getInvitacionesPorEntrenador(entrenadorId);
+  }
+  
+  /**
+   * 💬 Obtiene los mensajes de un entrenador específico
+   * @param entrenadorId - ID del entrenador
+   * @returns Array de mensajes del entrenador
+   */
+  getMensajesByEntrenador(entrenadorId: string) {
+    return this.mensajeService.getMensajesByEntrenador(entrenadorId);
   }
   
   /**

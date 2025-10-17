@@ -2,9 +2,7 @@ import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } 
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  EntrenadorService
-} from 'gym-library';
+import { EntrenadorService} from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { RutinaModalComponent } from '../../../components/rutina-modal/rutina-modal.component';
 import { EjercicioModalComponent } from '../../../components/ejercicio-modal/ejercicio-modal.component';
@@ -38,12 +36,11 @@ export class EntrenadorDetail implements OnInit {
 
 
   entrenadorId = signal<string>('');
+
   entrenador = computed(() => {
     const id = this.entrenadorId();
     return this.entrenadorService.getEntrenadoresWithUserInfo()().find(e => e.id === id);
   });
-
-  readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenadorWithCreator(this.entrenadorId())());
 
   // Signals para el estado del componente
   readonly editForm = computed(() => {
@@ -58,7 +55,6 @@ export class EntrenadorDetail implements OnInit {
 
   // Signals para rutinas
   readonly isRutinaModalOpen = signal(false);
-  readonly rutinaModalData = signal<any>(null);
   readonly isRutinaCreating = signal(false);
 
   // Signals para ejercicios
@@ -123,7 +119,7 @@ export class EntrenadorDetail implements OnInit {
 
       const usuarioEntrenadorNombre = entrenador.displayName || entrenador.id;
       const clientesCount = this.entrenadorService.getClientesCount(entrenador.id);
-      const rutinasCount = this.entrenadorService.getRutinasByEntrenador(entrenador.id).length;
+      const rutinasCount = this.rutinas().length;
 
       this.toastService.log(`Entrenador actualizado: ${usuarioEntrenadorNombre} - Entrenados: ${clientesCount} - Rutinas: ${rutinasCount}`);
     } catch (error) {
@@ -132,10 +128,6 @@ export class EntrenadorDetail implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
-  }
-
-  getRutinasByEntrenador(entrenadorId: string) {
-    return this.entrenadorService.getRutinasByEntrenador(entrenadorId);
   }
 
   getFormFields(): FormFieldConfig[] {
@@ -149,51 +141,69 @@ export class EntrenadorDetail implements OnInit {
       }
     ];
   }
+  // --------------------------------------------
+  // Rutinas
+  // --------------------------------------------
 
-
+  readonly rutinas = computed(() => this.entrenadorService.getRutinasByEntrenador(this.entrenadorId())());
 
   toggleModalRutinas() {
     if (this.isRutinaModalOpen()) {
       this.isRutinaModalOpen.set(false);
       this.isRutinaCreating.set(false);
-      this.rutinaModalData.set(null);
     } else {
       this.isRutinaModalOpen.set(true);
       this.isRutinaCreating.set(true);
-      this.rutinaModalData.set(null);
     }
   }
 
-  addEjercicioParaEntrenador() {
-    this.isEjercicioModalOpen.set(true);
-    this.isEjercicioCreating.set(true);
+  // --------------------------------------------
+  // Ejercicios
+  // --------------------------------------------
+
+  readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenador(this.entrenadorId())());
+
+  toggleModalEjercicios() {
+    if (this.isEjercicioModalOpen()) {
+      this.isEjercicioModalOpen.set(false);
+      this.isEjercicioCreating.set(false);
+    } else {
+      this.isEjercicioModalOpen.set(true);
+      this.isEjercicioCreating.set(true);
+    }
   }
 
-  closeEjercicioModal() {
-    this.isEjercicioModalOpen.set(false);
-    this.isEjercicioCreating.set(false);
+  // --------------------------------------------
+  // Invitaciones 
+  // --------------------------------------------
+
+  readonly invitaciones = computed(() => this.entrenadorService.getInvitacionesByEntrenador(this.entrenadorId())());
+
+  toggleModalInvitaciones() {
+    if (this.isInvitacionModalOpen()) {
+      this.isInvitacionModalOpen.set(false);
+    } else {
+      this.isInvitacionModalOpen.set(true);
+    }
   }
+  // --------------------------------------------
+  // Mensajes
+  // --------------------------------------------
 
-  closeMensajeModal() {
-    this.isMensajeModalOpen.set(false);
-    this.isMensajeCreating.set(false);
+  readonly mensajes = computed(() => this.entrenadorService.getMensajesByEntrenador(this.entrenadorId())());
+
+  toggleModalMensajes() {
+    if (this.isMensajeModalOpen()) {
+      this.isMensajeModalOpen.set(false);
+      this.isMensajeCreating.set(false);
+    } else {
+      this.isMensajeModalOpen.set(true);
+      this.isMensajeCreating.set(true);
+    }
   }
-
-  closeInvitacionModal() {
-    this.isInvitacionModalOpen.set(false);
-  }
-
-  addMensaje(remitenteId?: string) {
-    const remitenteIdFinal = remitenteId || this.entrenadorId();
-
-    this.isMensajeModalOpen.set(true);
-    this.isMensajeCreating.set(true);
-  }
-
-  addInvitacion() {
-    this.isInvitacionModalOpen.set(true);
-  }
-
+  // --------------------------------------------
+  // Boton volver
+  // --------------------------------------------
   goBack() {
     this.router.navigate(['/entrenadores']);
   }

@@ -50,24 +50,13 @@
       <div class="bg-white rounded-lg shadow-md p-6">
         <!-- Secciones de acciones -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Sección de Mensajes/Conversaciones -->
-        <div class="bg-gray-50 rounded-xl p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-gray-800">Mensajes</h3>
-            <button type="button" (click)="addMensaje()"
-              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
-              <span>+</span>
-              <span>Enviar Mensaje</span>
-            </button>
-          </div>
-          <p class="text-sm text-gray-500">Funcionalidad de mensajes aquí</p>
-        </div>
+        
 
         <!-- Sección de Ejercicios -->
         <div class="bg-gray-50 rounded-xl p-4">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-gray-800">Ejercicios</h3>
-            <button type="button" (click)="addEjercicioParaEntrenador()"
+            <button type="button" (click)="toggleModalEjercicios()"
               class="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center gap-2">
               <span>+</span>
               <span>Crear Ejercicio</span>
@@ -100,8 +89,8 @@
             </button>
           </div>
           <div class="space-y-2 max-h-40 overflow-y-auto">
-            @if (getRutinasByEntrenador(entrenador.id) && getRutinasByEntrenador(entrenador.id).length > 0) {
-              @for (rutina of getRutinasByEntrenador(entrenador.id); track rutina.id) {
+            @if (rutinas() && rutinas().length > 0) {
+              @for (rutina of rutinas(); track rutina.id) {
                 <div class="flex items-center justify-between p-2 bg-white rounded-lg">
                   <div class="flex-1">
                     <p class="text-sm font-medium text-gray-800">{{ rutina.nombre }}</p>
@@ -119,13 +108,26 @@
         <div class="bg-gray-50 rounded-xl p-4">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-gray-800">Invitaciones</h3>
-            <button type="button" (click)="addInvitacion()"
+            <button type="button" (click)="toggleModalInvitaciones()"
               class="px-3 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors duration-200 flex items-center gap-2">
               <span>+</span>
               <span>Crear Invitación</span>
             </button>
           </div>
           <p class="text-sm text-gray-500">Funcionalidad de invitaciones aquí</p>
+        </div>
+
+        <!-- Sección de Mensajes/Conversaciones -->
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800">Mensajes</h3>
+            <button type="button" (click)="toggleModalMensajes()"
+              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
+              <span>+</span>
+              <span>Enviar Mensaje</span>
+            </button>
+          </div>
+          <p class="text-sm text-gray-500">Funcionalidad de mensajes aquí</p>
         </div>
 
         <!-- Sección de Clientes Asignados -->
@@ -149,7 +151,7 @@
   <!-- Modal de ejercicios -->
   <app-ejercicio-modal [isOpen]="isEjercicioModalOpen()" [isCreating]="isEjercicioCreating()"
     [creadorId]="entrenadorId()"
-    (close)="closeEjercicioModal()">
+    (close)="toggleModalEjercicios()">
   </app-ejercicio-modal>
 
   <!-- Modal de rutinas -->
@@ -161,12 +163,12 @@
   <!-- Modal de mensajes -->
   <app-mensajes-modal [isOpen]="isMensajeModalOpen()" [isCreating]="isMensajeCreating()"
     [remitenteId]="entrenadorId()"
-    (close)="closeMensajeModal()">
+    (close)="toggleModalMensajes()">
   </app-mensajes-modal>
 
   <!-- Modal de invitaciones -->
   <app-invitaciones-modal [isOpen]="isInvitacionModalOpen()"
     [entrenadorId]="entrenadorId()"
-    (close)="closeInvitacionModal()">
+    (close)="toggleModalInvitaciones()">
   </app-invitaciones-modal>
 </div>
