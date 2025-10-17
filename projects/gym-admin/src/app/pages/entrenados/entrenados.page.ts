@@ -76,16 +76,14 @@ export class EntrenadosPage {
   readonly entrenados = computed(() => {
     return this.entrenadoService.entrenados().map(entrenado => {
       const usuario = this.usuarios().find(u => u.uid === entrenado.id);
-      const entrenador = this.entrenadores().find(e => e.id === entrenado.entrenadorId);
-      const entrenadorName = entrenador?.displayName || (entrenado.entrenadorId ? `Entrenador ${entrenado.entrenadorId}` : 'Sin asignar');
-      const gimnasio = this.gimnasios().find(g => g.id === entrenado.gimnasioId);
-      const gimnasioName = gimnasio?.displayName || (entrenado.gimnasioId ? `Gimnasio ${entrenado.gimnasioId}` : null);
+      const entrenadorId = entrenado.entrenadoresId?.[0]; // Tomar el primer entrenador
+      const entrenador = entrenadorId ? this.entrenadores().find(e => e.id === entrenadorId) : null;
+      const entrenadorName = entrenador?.displayName || (entrenadorId ? `Entrenador ${entrenadorId}` : 'Sin asignar');
       
       return {
         ...entrenado,
         displayName: usuario?.nombre || usuario?.email || `Entrenado ${entrenado.id}`,
-        entrenadorName,
-        gimnasioName
+        entrenadorName
       };
     });
   });
@@ -129,7 +127,6 @@ export class EntrenadosPage {
       nombre: [{ value: '', disabled: true }],
       email: [{ value: '', disabled: true }],
       planInfo: [{ value: '', disabled: true }],
-      gimnasioInfo: [{ value: '', disabled: true }],
       entrenadorInfo: [{ value: '', disabled: true }],
       activo: [item.activo || false],
       objetivo: [item.objetivo || ''],
@@ -170,10 +167,10 @@ export class EntrenadosPage {
       await this.entrenadoService.save(clienteDataToSave);
       
       const usuarioNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
-      const gimnasioNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
-      const entrenadorClienteNombre = this.usuarios().find(u => u.uid === updatedData.entrenadorId)?.nombre || 'Entrenador desconocido';
+      const entrenadorId = updatedData.entrenadoresId?.[0];
+      const entrenadorClienteNombre = entrenadorId ? this.usuarios().find(u => u.uid === entrenadorId)?.nombre || 'Entrenador desconocido' : 'Sin entrenador';
       
-      this.toastService.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
+      this.toastService.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Entrenador: ${entrenadorClienteNombre}`);
       
       this.closeModal();
     } catch (error) {
@@ -200,21 +197,16 @@ export class EntrenadosPage {
     }
     
     const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
-    const gimnasioAsociado = clienteData?.gimnasioId ? this.gimnasios().find(g => g.id === clienteData.gimnasioId) : null;
-    const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
+    const entrenadorId = clienteData?.entrenadoresId?.[0];
+    const entrenadorAsociado = entrenadorId ? this.entrenadores().find(e => e.id === entrenadorId) : null;
     
     // Obtener notificaciones del entrenado (SOLO NO LEÍDAS)
     const notificacionesEntrenado = this.getNotificacionesEntrenado(clienteData.id).filter(n => !n.leida);
     
     // Obtener rutinas asignadas al entrenado
     const rutinasAsignadas = this.rutinas().filter(rutina => {
-      // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(clienteData.id)) ||
-        rutina.asignadoId === clienteData.id || 
-        rutina.entrenadoId === clienteData.id;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
+      // Verificar si la rutina está en la lista de rutinas asignadas del cliente
+      return clienteData.rutinasAsignadas && clienteData.rutinasAsignadas.includes(rutina.id);
     }).map(rutina => {
       const creador = this.usuarios().find(u => u.uid === rutina.creadorId);
       return {
@@ -248,14 +240,6 @@ export class EntrenadosPage {
         placeholder: usuarioAsociado?.plan ? (usuarioAsociado.plan === 'premium' ? 'Premium' : 'Gratuito') : 'Sin plan',
         readonly: true,
         colSpan: 2
-      },
-      {
-        name: 'gimnasioInfo',
-        type: 'text',
-        label: 'Gimnasio Asociado',
-        placeholder: gimnasioAsociado?.displayName || 'Sin gimnasio asignado',
-        readonly: true,
-        colSpan: 1
       },
       {
         name: 'entrenadorInfo',

@@ -6,7 +6,7 @@ export interface EntrenadoTableItem {
   id: string;
   displayName: string;
   entrenadorName: string;
-  gimnasioName: string | null;
+  gimnasioName?: string | null;
   activo: boolean;
   objetivo?: Objetivo;
   fechaRegistro?: Date;

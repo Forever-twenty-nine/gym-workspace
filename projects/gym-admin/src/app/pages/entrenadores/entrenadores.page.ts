@@ -33,20 +33,7 @@ export class EntrenadoresPage {
     this.entrenadorService.initializeListener();
   }
 
-  readonly entrenadoresBase = this.entrenadorService.getEntrenadoresWithUserInfo();
-
-  readonly entrenadores = computed(() => {
-    return this.entrenadoresBase().map(entrenador => {
-      const rutinasCount = this.entrenadorService.getRutinasByEntrenador(entrenador.id).length;
-      const clientesCount = this.entrenadorService.getClientesCount(entrenador.id);
-      
-      return {
-        ...entrenador,
-        rutinasCount,
-        clientesCount
-      };
-    });
-  });
+  readonly entrenadores = this.entrenadorService.getEntrenadoresWithUserInfo();
 
   goToDetail(item: any) {
     this.router.navigate(['/entrenadores', item.id]);

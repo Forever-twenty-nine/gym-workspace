@@ -120,12 +120,34 @@ export class EntrenadoService {
     }
 
     /**
-     * 🔍 Busca entrenados por gimnasio
+     * 🔍 Busca entrenados por entrenador
      */
-    getEntrenadosByGimnasio(gimnasioId: string): Signal<Entrenado[]> {
+    getEntrenadosByEntrenador(entrenadorId: string): Signal<Entrenado[]> {
         return computed(() => 
             this._entrenados().filter(entrenado => 
-                entrenado.gimnasioId === gimnasioId
+                entrenado.entrenadoresId?.includes(entrenadorId)
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca entrenados que tienen una rutina asignada específica
+     */
+    getEntrenadosByRutinaAsignada(rutinaId: string): Signal<Entrenado[]> {
+        return computed(() => 
+            this._entrenados().filter(entrenado => 
+                entrenado.rutinasAsignadas?.includes(rutinaId)
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca entrenados que han creado una rutina específica
+     */
+    getEntrenadosByRutinaCreada(rutinaId: string): Signal<Entrenado[]> {
+        return computed(() => 
+            this._entrenados().filter(entrenado => 
+                entrenado.rutinasCreadas?.includes(rutinaId)
             )
         );
     }

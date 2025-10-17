@@ -243,10 +243,11 @@ export class UsuariosPage {
         case Rol.ENTRENADOR:
         case Rol.PERSONAL_TRAINER:
           const entrenadorData: any = {
-            gimnasioId: '',
             activo: true,
-            clientes: [],
-            rutinas: []
+            fechaRegistro: new Date(),
+            ejerciciosCreadasIds: [],
+            entrenadosAsignadosIds: [],
+            rutinasCreadasIds: []
           };
           
           const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;

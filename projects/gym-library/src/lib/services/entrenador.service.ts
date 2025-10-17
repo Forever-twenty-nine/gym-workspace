@@ -20,6 +20,13 @@ export interface IEntrenadorFirestoreAdapter {
   getEntrenadores(callback: (entrenadores: Entrenador[]) => void): () => void;
   
   /**
+   * 👤 Suscribe a cambios en un entrenador específico
+   * @param id - ID del entrenador
+   * @param callback - Función que se ejecuta cuando el entrenador cambia
+   */
+  subscribeToEntrenador(id: string, callback: (entrenador: Entrenador | null) => void): void;
+  
+  /**
    * ➕ Crea un nuevo entrenador
    * @param entrenador - Datos del entrenador a crear
    * @returns Promise con el ID del entrenador creado
@@ -218,9 +225,9 @@ export class EntrenadorService {
    */
   getRutinasByEntrenador(entrenadorId: string) {
     return computed(() => {
-      return this.rutinaService.rutinas().filter(rutina => 
-        rutina.creadorId === entrenadorId
-      );
+      const entrenador = this.getEntrenadorById(entrenadorId)();
+      if (!entrenador) return [];
+      return this.rutinaService.rutinas().filter(rutina => entrenador.rutinasCreadasIds.includes(rutina.id));
     });
   }
   
@@ -231,9 +238,9 @@ export class EntrenadorService {
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
-      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => 
-        ejercicio.creadorId === entrenadorId
-      );
+      const entrenador = this.getEntrenadorById(entrenadorId)();
+      if (!entrenador) return [];
+      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => entrenador.ejerciciosCreadasIds.includes(ejercicio.id));
     });
   }
   
@@ -258,10 +265,13 @@ export class EntrenadorService {
   /**
    * 👥 Obtiene el conteo de clientes asignados a un entrenador
    * @param entrenadorId - ID del entrenador
-   * @returns Número de clientes asignados
+   * @returns Signal con el número de clientes asignados
    */
-  getClientesCount(entrenadorId: string): number {
-    return this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId).length;
+  getClientesCount(entrenadorId: string) {
+    return computed(() => {
+      const entrenador = this.getEntrenadorById(entrenadorId)();
+      return entrenador?.entrenadosAsignadosIds?.length || 0;
+    });
   }
   
   /**

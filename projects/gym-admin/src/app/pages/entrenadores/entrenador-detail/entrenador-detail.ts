@@ -47,6 +47,7 @@ export class EntrenadorDetail implements OnInit {
     const entrenador = this.entrenador();
     if (!entrenador) return null;
     const formConfig: any = {
+      id: new FormControl({value: entrenador.id, disabled: true}),
       activo: new FormControl(entrenador.activo || false),
     };
     return new FormGroup(formConfig);
@@ -132,6 +133,13 @@ export class EntrenadorDetail implements OnInit {
 
   getFormFields(): FormFieldConfig[] {
     return [
+      {
+        name: 'id',
+        type: 'text',
+        label: 'ID del Entrenador',
+        disabled: true,
+        colSpan: 2
+      },
       {
         name: 'activo',
         type: 'checkbox',

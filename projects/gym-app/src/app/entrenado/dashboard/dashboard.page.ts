@@ -119,15 +119,11 @@ export class DashboardPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas asignadas a este entrenado
-    // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
+    // Filtrar rutinas asignadas a este entrenado (creadas por sus entrenadores)
     const rutinasDelEntrenado = rutinas.filter(rutina => {
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
-        rutina.entrenadoId === userId;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
+      const entrenado = this.entrenadoService.getEntrenado(userId)();
+      const entrenadoresIds = entrenado?.entrenadoresId || [];
+      return entrenadoresIds.includes(rutina.creadorId || '');
     });
     
     return rutinasDelEntrenado.map(rutina => {
@@ -138,7 +134,7 @@ export class DashboardPage implements OnInit {
       
       return {
         nombre: rutina.nombre,
-        fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
+        fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
         completada: rutina.completado || false,
         asignadoPor: asignadoPor
       };
@@ -226,7 +222,7 @@ export class DashboardPage implements OnInit {
           // Actualizar el entrenado existente con el entrenadorId
           const entrenadoActualizado = {
             ...entrenadoExistente,
-            entrenadorId: notificacion.datos.entrenadorId,
+            entrenadoresId: [...(entrenadoExistente.entrenadoresId || []), notificacion.datos.entrenadorId],
             activo: true
           };
           await this.entrenadoService.save(entrenadoActualizado);
@@ -234,8 +230,7 @@ export class DashboardPage implements OnInit {
           // Crear nuevo entrenado si no existe
           const nuevoEntrenado: Entrenado = {
             id: currentUser.uid,
-            gimnasioId: '', // Dejar en blanco como pidió el usuario
-            entrenadorId: notificacion.datos.entrenadorId,
+            entrenadoresId: [notificacion.datos.entrenadorId],
             activo: true,
             fechaRegistro: new Date(),
             objetivo: Objetivo.MANTENER_PESO

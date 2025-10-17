@@ -68,8 +68,9 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
       const entrenadoresCollection = collection(this.firestore, this.collectionName);
       const docRef = await addDoc(entrenadoresCollection, {
         ...entrenador,
-        entrenados: entrenador.entrenados || [],
-        rutinas: entrenador.rutinas || []
+        ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
+        entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
+        rutinasCreadasIds: entrenador.rutinasCreadasIds || []
       });
       
       return docRef.id;
@@ -89,8 +90,9 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
       const entrenadorDoc = doc(this.firestore, this.collectionName, id);
       await setDoc(entrenadorDoc, {
         ...entrenador,
-        entrenados: entrenador.entrenados || [],
-        rutinas: entrenador.rutinas || []
+        ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
+        entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
+        rutinasCreadasIds: entrenador.rutinasCreadasIds || []
       });
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al crear entrenador con ID:', error);
@@ -111,6 +113,38 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
       console.error('❌ EntrenadorFirestoreAdapter: Error al actualizar entrenador:', error);
       throw error;
     }
+  }
+
+  /**
+   * � Suscribe a cambios en un entrenador específico
+   * @param id - ID del entrenador
+   * @param callback - Función que se ejecuta cuando el entrenador cambia
+   */
+  subscribeToEntrenador(id: string, callback: (entrenador: Entrenador | null) => void): void {
+    const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+    
+    const unsubscribe = onSnapshot(
+      entrenadorDoc,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          const data = docSnapshot.data();
+          const entrenador: Entrenador = {
+            id: docSnapshot.id,
+            ...data
+          } as Entrenador;
+          callback(entrenador);
+        } else {
+          callback(null);
+        }
+      },
+      (error) => {
+        console.error('❌ EntrenadorFirestoreAdapter: Error al suscribirse a entrenador:', error);
+        callback(null);
+      }
+    );
+
+    // Nota: En este caso, no retornamos unsubscribe porque el método no lo requiere,
+    // pero en una implementación completa, podrías almacenarlo para limpieza.
   }
 
   /**

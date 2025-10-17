@@ -137,7 +137,7 @@ export class EntrenadosPage implements OnInit {
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId) : [];
+    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
 
   constructor() {
@@ -159,12 +159,8 @@ export class EntrenadosPage implements OnInit {
   }
 
   getRutinasAsignadasCount(entrenadoId: string): number {
-    const rutinas = this.rutinaService.rutinas();
-    return rutinas.filter(rutina => 
-      (rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) ||
-      (rutina.asignadoId === entrenadoId) || // Compatibilidad con datos antiguos
-      rutina.entrenadoId === entrenadoId
-    ).length;
+    const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
+    return entrenado?.rutinasAsignadas?.length || 0;
   }
 
   getUserName(userId: string): string {
@@ -235,13 +231,10 @@ export class EntrenadosPage implements OnInit {
   }
 
   private cargarRutinasEntrenado(entrenadoId: string) {
-    const rutinas = this.rutinaService.rutinas();
-    const rutinasEntrenado = rutinas.filter(rutina => 
-      (rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) ||
-      (rutina.asignadoId === entrenadoId) || // Compatibilidad con datos antiguos
-      rutina.entrenadoId === entrenadoId
-    );
-    this.rutinasEntrenado.set(rutinasEntrenado);
+    const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
+    const rutinaIds = entrenado?.rutinasAsignadas || [];
+    const rutinas = this.rutinaService.rutinas().filter(r => rutinaIds.includes(r.id));
+    this.rutinasEntrenado.set(rutinas);
   }
 
   private cargarRutinasDisponibles() {
@@ -250,10 +243,11 @@ export class EntrenadosPage implements OnInit {
     if (!entrenadorId || !entrenadoId) return;
 
     const rutinas = this.rutinaService.rutinas();
+    const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
+    const rutinasAsignadas = entrenado?.rutinasAsignadas || [];
     const rutinasEntrenador = rutinas.filter(rutina => 
       rutina.creadorId === entrenadorId && 
-      !(rutina.asignadoIds && rutina.asignadoIds.includes(entrenadoId)) &&
-      rutina.asignadoId !== entrenadoId // Compatibilidad con datos antiguos
+      !rutinasAsignadas.includes(rutina.id)
     );
     this.rutinasDisponibles.set(rutinasEntrenador);
   }
@@ -261,26 +255,26 @@ export class EntrenadosPage implements OnInit {
   async asignarRutina(rutina: Rutina) {
     if (!this.selectedEntrenado()) return;
 
+    const entrenado = this.selectedEntrenado()!;
+    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+
+    // Si ya está asignada, no hacer nada
+    if (rutinasAsignadas.includes(rutina.id)) {
+      return;
+    }
+
+    const entrenadoActualizado: Entrenado = {
+      ...entrenado,
+      rutinasAsignadas: [...rutinasAsignadas, rutina.id]
+    };
+
     try {
-      // Si ya está asignada a este entrenado, no hacer nada
-      const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
-      if (asignadoIds.includes(this.selectedEntrenado()!.id)) {
-        return;
-      }
-
-      const rutinaActualizada: Rutina = {
-        ...rutina,
-        asignadoIds: [...asignadoIds, this.selectedEntrenado()!.id],
-        asignadoTipo: Rol.ENTRENADO,
-        fechaAsignacion: new Date()
-      };
-
-      await this.rutinaService.save(rutinaActualizada);
+      await this.entrenadoService.save(entrenadoActualizado);
 
       // Esperar un momento para que el listener se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
+      this.cargarRutinasEntrenado(entrenado.id);
       this.cargarRutinasDisponibles();
       
     } catch (error) {
@@ -289,26 +283,24 @@ export class EntrenadosPage implements OnInit {
   }
 
   async desasignarRutina(rutina: Rutina) {
+    if (!this.selectedEntrenado()) return;
+
+    const entrenado = this.selectedEntrenado()!;
+    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+    const nuevosAsignados = rutinasAsignadas.filter(id => id !== rutina.id);
+
+    const entrenadoActualizado: Entrenado = {
+      ...entrenado,
+      rutinasAsignadas: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
+    };
+
     try {
-      const asignadoIds = rutina.asignadoIds || (rutina.asignadoId ? [rutina.asignadoId] : []);
-      const nuevosAsignados = asignadoIds.filter(id => id !== this.selectedEntrenado()!.id);
-
-      const rutinaActualizada: Rutina = {
-        ...rutina,
-        asignadoIds: nuevosAsignados.length > 0 ? nuevosAsignados : undefined,
-        // Si no quedan asignados, limpiar también asignadoTipo y fechaAsignacion
-        ...(nuevosAsignados.length === 0 && {
-          asignadoTipo: undefined,
-          fechaAsignacion: undefined as any
-        })
-      };
-
-      await this.rutinaService.save(rutinaActualizada);
+      await this.entrenadoService.save(entrenadoActualizado);
 
       // Esperar un momento para que el listener se actualice
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      this.cargarRutinasEntrenado(this.selectedEntrenado()!.id);
+      this.cargarRutinasEntrenado(entrenado.id);
       this.cargarRutinasDisponibles();
       
     } catch (error) {

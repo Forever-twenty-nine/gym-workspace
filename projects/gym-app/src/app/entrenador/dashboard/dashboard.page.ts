@@ -71,7 +71,7 @@ export class DashboardPage implements OnInit {
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId) : [];
+    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
 
   rutinasCreadas: Signal<any[]> = computed(() => {

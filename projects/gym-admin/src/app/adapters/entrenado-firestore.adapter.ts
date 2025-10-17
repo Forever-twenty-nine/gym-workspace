@@ -80,8 +80,9 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapFromFirestore(data: any): Entrenado {
     return {
       id: data.id,
-      gimnasioId: data.gimnasioId || '',
-      entrenadorId: data.entrenadorId || '',
+      entrenadoresId: data.entrenadoresId || [],
+      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasCreadas: data.rutinasCreadas || [],
       activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
@@ -97,12 +98,8 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     };
 
     // Incluir campos, usando delete si son null
-    if (entrenado.gimnasioId !== undefined) {
-      data.gimnasioId = entrenado.gimnasioId !== null ? entrenado.gimnasioId : deleteField();
-    }
-    
-    if (entrenado.entrenadorId !== undefined) {
-      data.entrenadorId = entrenado.entrenadorId !== null ? entrenado.entrenadorId : deleteField();
+    if (entrenado.entrenadoresId !== undefined) {
+      data.entrenadoresId = entrenado.entrenadoresId !== null ? entrenado.entrenadoresId : deleteField();
     }
 
     // Solo incluir objetivo si no es undefined

@@ -18,6 +18,10 @@
                         <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
                       </label>
                     }
+                    @case ('text') {
+                      <input type="text" [formControlName]="field.name" [disabled]="field.disabled ?? false"
+                        class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed">
+                    }
                   }
                 </div>
               }
@@ -94,7 +98,7 @@
                 <div class="flex items-center justify-between p-2 bg-white rounded-lg">
                   <div class="flex-1">
                     <p class="text-sm font-medium text-gray-800">{{ rutina.nombre }}</p>
-                    <p class="text-xs text-gray-600">{{ rutina.notas || 'Sin descripción' }}</p>
+                    <p class="text-xs text-gray-600">{{ rutina.descripcion || 'Sin descripción' }}</p>
                   </div>
                 </div>
               }

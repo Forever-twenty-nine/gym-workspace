@@ -26,7 +26,7 @@
 
   <div class="entrenamientos-container">
     <ion-list>
-      @if (rutinas().length === 0) {
+      @if (rutinasAsignadas().length === 0) {
         <ion-card>
           <ion-card-content>
             <p style="text-align: center; padding: 20px; color: var(--ion-color-medium);">
@@ -36,7 +36,7 @@
         </ion-card>
       }
       
-      @for (rutina of rutinas(); track $index) {
+      @for (rutina of rutinasAsignadas(); track $index) {
         <ion-card class="rutina-card" (click)="abrirDetalles(rutina)">
           <ion-card-header>
             <div class="card-header-content">
@@ -66,7 +66,7 @@
             <div class="info-asignacion" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--ion-color-light);">
               <div style="display: flex; align-items: center; gap: 8px; color: var(--ion-color-medium); font-size: 13px;">
                 <ion-icon name="calendar-outline"></ion-icon>
-                <span>{{ formatearFecha(rutina.fechaAsignacion) }}</span>
+                <span>{{ formatearFecha(rutina.fechaCreacion) }}</span>
               </div>
             </div>
 
@@ -111,18 +111,6 @@
               }
             </div>
 
-            <!-- Notas/Descripción (preview) -->
-            @if (rutina.notas) {
-              <div class="notas-preview" style="margin-top: 12px; padding: 10px; background: var(--ion-color-light); border-radius: 8px;">
-                <div style="display: flex; align-items: start; gap: 8px;">
-                  <ion-icon name="document-text-outline" style="font-size: 16px; color: var(--ion-color-medium); margin-top: 2px;"></ion-icon>
-                  <p style="margin: 0; font-size: 13px; color: var(--ion-color-medium); line-height: 1.4;">
-                    {{ rutina.notas.length > 80 ? (rutina.notas.substring(0, 80) + '...') : rutina.notas }}
-                  </p>
-                </div>
-              </div>
-            }
-
             <div class="accion-rapida">
               <ion-button 
                 fill="clear" 
@@ -156,14 +144,6 @@
 
       <ion-content class="ion-padding">
         <div class="modal-content">
-          <!-- Notas / Descripción -->
-          @if (rutinaSeleccionada()!.notas) {
-            <div class="modal-section">
-              <h3>Descripción</h3>
-              <p class="notas-text">{{ rutinaSeleccionada()!.notas }}</p>
-            </div>
-          }
-
           <!-- Información general -->
           <div class="modal-section">
             <h3>Información general</h3>
@@ -201,8 +181,8 @@
               <ion-item>
                 <ion-icon name="calendar-outline" slot="start"></ion-icon>
                 <ion-label>
-                  <h4>Fecha de asignación</h4>
-                  <p>{{ formatearFecha(rutinaSeleccionada()!.fechaAsignacion) }}</p>
+                  <h4>Fecha de creación</h4>
+                  <p>{{ formatearFecha(rutinaSeleccionada()!.fechaCreacion) }}</p>
                 </ion-label>
               </ion-item>
 

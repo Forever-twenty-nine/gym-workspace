@@ -39,7 +39,7 @@ import {
   stopOutline,
   timerOutline
 } from 'ionicons/icons';
-import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } from 'gym-library';
+import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
 import { CronometroRutinaComponent } from '../components/cronometro-rutina/cronometro-rutina.component';
 
 @Component({
@@ -72,6 +72,7 @@ export class RutinasPage implements OnInit, OnDestroy {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
+  private entrenadoService = inject(EntrenadoService);
   private injector = inject(Injector);
 
   // Señal para todas las rutinas
@@ -90,23 +91,16 @@ export class RutinasPage implements OnInit, OnDestroy {
   private tiempoInicio: number = 0;
 
   // Computed para rutinas del entrenado actual
-  rutinas = computed(() => {
+  rutinasAsignadas = computed(() => {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
+    const entrenado = this.entrenadoService.entrenados().find((e: any) => e.id === userId);
     
-    if (!userId || !rutinas.length) return [];
+    if (!userId || !rutinas.length || !entrenado?.rutinasAsignadas) return [];
     
     // Filtrar rutinas asignadas a este entrenado
-    // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
-    return rutinas.filter(rutina => {
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
-        rutina.entrenadoId === userId;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
-    });
+    return rutinas.filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id));
   });
 
   constructor() {

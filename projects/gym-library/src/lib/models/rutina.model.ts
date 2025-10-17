@@ -3,24 +3,18 @@ import { Ejercicio } from "./ejercicio.model";
 
 export interface Rutina {
     id: string;
-    entrenadoId?: string;
     nombre: string;
-    fechaAsignacion: Date;
+    activa: boolean;   
+    descripcion?: string;
     ejercicios?: Ejercicio[];
-    activa: boolean;
-    duracion?: number;
-    DiasSemana?: number[];
     completado?: boolean;
-    notas?: string;
-    // Información del creador (opcional)
+    // Información del creador
     creadorId?: string; 
     creadorTipo?: Rol;
-    // Información del asignado (opcional) - puede ser uno o múltiples
-    asignadoId?: string;  // Mantener para compatibilidad
-    asignadoIds?: string[];  // Nuevo campo para múltiples asignados
-    asignadoTipo?: Rol;
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;
-
+    // Plan Premium
+    DiasSemana?: number[];
+    duracion?: number;
 }

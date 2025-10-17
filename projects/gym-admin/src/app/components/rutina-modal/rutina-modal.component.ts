@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ejercicio, RutinaService, UserService, EntrenadoService } from 'gym-library';
@@ -13,7 +13,7 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './rutina-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RutinaModalComponent {
+export class RutinaModalComponent implements OnInit {
   // Servicios inyectados
   private readonly rutinaService = inject(RutinaService);
   private readonly userService = inject(UserService);
@@ -35,8 +35,8 @@ export class RutinaModalComponent {
   readonly rutinaData = signal<any>(null);
   readonly isLoading = signal(false);
 
-  // Formulario reactivo
-  rutinaForm = signal<FormGroup>(this.createForm());
+  // Formulario reactivo (no necesita ser signal)
+  rutinaForm!: FormGroup;
 
   // Opciones para días de la semana
   readonly diasSemanaOptions = [
@@ -71,14 +71,25 @@ export class RutinaModalComponent {
   });
 
   readonly ejerciciosSeleccionados = computed(() => {
-    const form = this.rutinaForm();
-    if (!form) return [];
+    if (!this.rutinaForm) return [];
 
-    const ejerciciosIds = form.get('ejercicios')?.value || [];
+    const ejerciciosIds = this.rutinaForm.get('ejercicios')?.value || [];
     return ejerciciosIds.map((id: string) =>
       this.ejercicios().find(ej => ej.id === id)
     ).filter(Boolean);
   });
+
+  ngOnInit() {
+    // Inicializar formulario
+    this.rutinaForm = this.createForm();
+    
+    // Efecto para inicializar formulario cuando se abre el modal
+    effect(() => {
+      if (this.isOpen()) {
+        this.initializeForm();
+      }
+    });
+  }
 
   // Crear formulario
   private createForm(): FormGroup {
@@ -94,7 +105,7 @@ export class RutinaModalComponent {
   initializeForm(rutina?: any) {
     if (rutina) {
       this.rutinaData.set({ ...rutina });
-      this.rutinaForm().patchValue({
+      this.rutinaForm.patchValue({
         nombre: rutina.nombre || '',
         descripcion: rutina.descripcion || '',
         diasSemana: rutina.diasSemana || [],
@@ -102,7 +113,7 @@ export class RutinaModalComponent {
       });
     } else {
       this.rutinaData.set(null);
-      this.rutinaForm().reset({
+      this.rutinaForm.reset({
         nombre: '',
         descripcion: '',
         diasSemana: [],
@@ -113,15 +124,13 @@ export class RutinaModalComponent {
 
   // Verificar si un día está seleccionado
   isDiaSelected(dia: string): boolean {
-    const form = this.rutinaForm();
-    const diasSeleccionados = form.get('diasSemana')?.value || [];
+    const diasSeleccionados = this.rutinaForm.get('diasSemana')?.value || [];
     return diasSeleccionados.includes(dia);
   }
 
   // Toggle día de la semana
   onToggleDia(dia: string) {
-    const form = this.rutinaForm();
-    const diasActuales = form.get('diasSemana')?.value || [];
+    const diasActuales = this.rutinaForm.get('diasSemana')?.value || [];
 
     let nuevosDias;
     if (diasActuales.includes(dia)) {
@@ -130,20 +139,18 @@ export class RutinaModalComponent {
       nuevosDias = [...diasActuales, dia];
     }
 
-    form.get('diasSemana')?.setValue(nuevosDias);
+    this.rutinaForm.get('diasSemana')?.setValue(nuevosDias);
   }
 
   // Verificar si un ejercicio está seleccionado
   isEjercicioSelected(ejercicioId: string): boolean {
-    const form = this.rutinaForm();
-    const ejerciciosSeleccionados = form.get('ejercicios')?.value || [];
+    const ejerciciosSeleccionados = this.rutinaForm.get('ejercicios')?.value || [];
     return ejerciciosSeleccionados.includes(ejercicioId);
   }
 
   // Toggle ejercicio
   onToggleEjercicioSeleccion(ejercicioId: string) {
-    const form = this.rutinaForm();
-    const ejerciciosActuales = form.get('ejercicios')?.value || [];
+    const ejerciciosActuales = this.rutinaForm.get('ejercicios')?.value || [];
 
     let nuevosEjercicios;
     if (ejerciciosActuales.includes(ejercicioId)) {
@@ -152,12 +159,12 @@ export class RutinaModalComponent {
       nuevosEjercicios = [...ejerciciosActuales, ejercicioId];
     }
 
-    form.get('ejercicios')?.setValue(nuevosEjercicios);
+    this.rutinaForm.get('ejercicios')?.setValue(nuevosEjercicios);
   }
 
   // Guardar cambios
   async onSaveRutina() {
-    const form = this.rutinaForm();
+    const form = this.rutinaForm;
 
     if (!form.valid) {
       this.toastService.log('Error: Por favor, completa todos los campos obligatorios');

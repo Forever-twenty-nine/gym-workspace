@@ -144,7 +144,7 @@ export class RutinasPage implements OnInit {
       descripcion: '',
       ejercicios: [],
       creadorId: entrenadorId,
-      asignadoId: '',
+      asignadoIds: [],
       activa: true,
       completado: false
     };
@@ -160,7 +160,7 @@ export class RutinasPage implements OnInit {
       DiasSemana: [diasSemanaStrings],
       ejercicios: [item.ejercicios || []],
       creadorId: [item.creadorId || ''],
-      asignadoId: [item.asignadoId || '']
+      asignadoIds: [item.asignadoIds || []]
     };
 
     this.rutinaEditForm.set(this.fb.group(formConfig));

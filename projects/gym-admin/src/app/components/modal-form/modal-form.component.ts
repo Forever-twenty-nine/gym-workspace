@@ -16,6 +16,7 @@ export interface FormFieldConfig {
   rows?: number;
   checkboxLabel?: string;
   readonly?: boolean;
+  disabled?: boolean;
   // Propiedades personalizadas para campos complejos
   notificaciones?: any[];
   conversaciones?: any[];

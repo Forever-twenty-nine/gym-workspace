@@ -2,60 +2,50 @@
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
       <tr>
-        <th class="px-8 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
-        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">Email</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Plan</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Estado</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Ejercicios</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Usuarios</th>
-        <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide">Rutinas</th>
+        @for (column of columns(); track column.key) {
+        <th [class]="column.class + ' text-sm font-semibold text-gray-700 uppercase tracking-wide'">
+          {{ column.label }}
+        </th>
+        }
         <th class="px-8 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-100">
-      <tr *ngFor="let item of items" class="hover:bg-blue-50 transition-colors duration-200">
-        <td class="px-8 py-5 whitespace-nowrap">
-          <div class="flex items-center">
-            <div class="flex-shrink-0 h-10 w-10">
-              <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
-                <span class="text-white font-medium text-sm">{{ item.displayName?.charAt(0)?.toUpperCase() }}</span>
+      @for (item of items(); track item.id) {
+      <tr class="hover:bg-blue-50 transition-colors duration-200">
+        @for (column of columns(); track column.key) {
+        <td [class]="column.class + ' py-5 whitespace-nowrap' + (column.type === 'boolean' || column.type === 'badge' ? ' text-center' : '')">
+          @switch (column.type) {
+            @case ('avatar') {
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                    <span class="text-white font-medium text-sm">{{ item.displayName.charAt(0).toUpperCase() }}</span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">{{ item.displayName }}</div>
+                </div>
               </div>
-            </div>
-            <div class="ml-4">
-              <div class="text-sm font-medium text-gray-900">{{ item.displayName }}</div>
-            </div>
-          </div>
+            }
+            @case ('text') {
+              <div class="text-sm text-gray-900">{{ item[column.key] }}</div>
+            }
+            @case ('boolean') {
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    [class]="item[column.key] ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass">
+                {{ item[column.key] ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+              </span>
+            }
+            @case ('badge') {
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                    [class]="(item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass">
+                {{ (item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+              </span>
+            }
+          }
         </td>
-        <td class="px-6 py-5 whitespace-nowrap">
-          <div class="text-sm text-gray-900">{{ item.email }}</div>
-        </td>
-        <td class="px-6 py-5 whitespace-nowrap text-center">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                [class]="(item.plan || 'free') === 'premium' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'">
-            {{ (item.plan || 'free') === 'premium' ? 'Premium' : 'Free' }}
-          </span>
-        </td>
-        <td class="px-6 py-5 whitespace-nowrap text-center">
-          <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                [class]="item.activo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-            {{ item.activo ? 'Activo' : 'Inactivo' }}
-          </span>
-        </td>
-        <td class="px-6 py-5 whitespace-nowrap text-center">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-            {{ item.ejerciciosCount || 0 }}
-          </span>
-        </td>
-        <td class="px-6 py-5 whitespace-nowrap text-center">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-            {{ item.clientesCount || 0 }}
-          </span>
-        </td>
-        <td class="px-6 py-5 whitespace-nowrap text-center">
-          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-orange-100 text-orange-800">
-            {{ item.rutinasCount || 0 }}
-          </span>
-        </td>
+        }
         <td class="px-8 py-5 whitespace-nowrap text-right">
           <button
             (click)="onEdit(item)"
@@ -67,9 +57,10 @@
           </button>
         </td>
       </tr>
+      }
     </tbody>
   </table>
-  @if (items.length === 0) {
+  @if (items().length === 0) {
     <div class="text-center py-12">
       <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>

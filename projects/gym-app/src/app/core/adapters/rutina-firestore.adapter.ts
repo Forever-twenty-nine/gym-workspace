@@ -83,85 +83,43 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   private mapFromFirestore(data: any): Rutina {
     return {
       id: data.id,
-      entrenadoId: data.entrenadoId,
       nombre: data.nombre || '',
-      fechaAsignacion: data.fechaAsignacion?.toDate?.() || data.fechaAsignacion || new Date(),
-      ejercicios: data.ejercicios || [],
       activa: data.activa ?? true,
-      duracion: data.duracion,
-      DiasSemana: data.DiasSemana || [],
+      descripcion: data.descripcion,
+      ejercicios: data.ejercicios || [],
       completado: data.completado ?? false,
-      notas: data.notas || '',
-      // Nuevos campos
       creadorId: data.creadorId,
       creadorTipo: data.creadorTipo,
-      asignadoId: data.asignadoId,  // Mantener compatibilidad con datos existentes
-      asignadoIds: data.asignadoIds || (data.asignadoId ? [data.asignadoId] : []),
-      asignadoTipo: data.asignadoTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
-      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
+      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
+      DiasSemana: data.DiasSemana || [],
+      duracion: data.duracion
     };
   }
 
   private mapToFirestore(rutina: Rutina): any {
     const data: any = {
       nombre: rutina.nombre,
-      ejercicios: rutina.ejercicios || [],
       activa: rutina.activa ?? true,
       DiasSemana: rutina.DiasSemana || [],
       completado: rutina.completado ?? false
     };
 
     // Solo incluir campos opcionales si tienen valor válido
-    if (rutina.entrenadoId) {
-      data.entrenadoId = rutina.entrenadoId;
+    if (rutina.descripcion) {
+      data.descripcion = rutina.descripcion;
     }
     
-    if (rutina.duracion && rutina.duracion > 0) {
-      data.duracion = rutina.duracion;
+    if (rutina.ejercicios && rutina.ejercicios.length > 0) {
+      data.ejercicios = rutina.ejercicios;
     }
     
-    if (rutina.notas && rutina.notas.trim() !== '') {
-      data.notas = rutina.notas;
-    }
-
-    if (rutina.fechaAsignacion) {
-      data.fechaAsignacion = rutina.fechaAsignacion instanceof Date 
-        ? Timestamp.fromDate(rutina.fechaAsignacion)
-        : rutina.fechaAsignacion;
-    } else if (rutina.fechaAsignacion === undefined) {
-      data.fechaAsignacion = deleteField();
-    }
-
-    // Nuevos campos opcionales
     if (rutina.creadorId) {
       data.creadorId = rutina.creadorId;
-    } else if (rutina.creadorId === undefined) {
-      data.creadorId = deleteField();
     }
     
     if (rutina.creadorTipo) {
       data.creadorTipo = rutina.creadorTipo;
-    } else if (rutina.creadorTipo === undefined) {
-      data.creadorTipo = deleteField();
-    }
-    
-    if (rutina.asignadoId) {
-      data.asignadoId = rutina.asignadoId;
-    } else if (rutina.asignadoId === undefined) {
-      data.asignadoId = deleteField();
-    }
-    
-    if (rutina.asignadoIds && rutina.asignadoIds.length > 0) {
-      data.asignadoIds = rutina.asignadoIds;
-    } else if (rutina.asignadoIds !== undefined) {
-      data.asignadoIds = deleteField();
-    }
-    
-    if (rutina.asignadoTipo) {
-      data.asignadoTipo = rutina.asignadoTipo;
-    } else if (rutina.asignadoTipo === undefined) {
-      data.asignadoTipo = deleteField();
     }
     
     if (rutina.fechaCreacion) {
@@ -174,6 +132,10 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       data.fechaModificacion = rutina.fechaModificacion instanceof Date 
         ? Timestamp.fromDate(rutina.fechaModificacion)
         : rutina.fechaModificacion;
+    }
+    
+    if (rutina.duracion && rutina.duracion > 0) {
+      data.duracion = rutina.duracion;
     }
 
     return data;
