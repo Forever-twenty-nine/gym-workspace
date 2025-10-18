@@ -164,8 +164,6 @@ export class EntrenadorDetail implements OnInit {
       this.toastService.log(`ERROR al eliminar rutina: ${error.message}`);
     }
   }
-
-
   // --------------------------------------------
   // Invitaciones 
   // --------------------------------------------
