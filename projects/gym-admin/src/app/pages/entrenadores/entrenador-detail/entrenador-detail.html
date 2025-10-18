@@ -174,33 +174,49 @@
         </div>
 
         <!-- Sección de Entrenados Asignados (lista compacta, junto a Invitaciones) -->
-        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-gray-800">Entrenados Asignados</h3>
-            <span class="text-sm text-gray-600">{{ entrenadorService.getEntrenadosCount(entrenador.id)() }} entrenados</span>
+            <h3 class="text-lg font-semibold text-blue-900">Entrenados Asignados</h3>
+            <span class="text-sm text-blue-700 font-medium">{{ entrenadorService.getEntrenadosCount(entrenador.id)() }} entrenados</span>
           </div>
 
           <div class="space-y-2 max-h-40 overflow-y-auto">
             @if (entrenadosAsignadosWithInfo() && entrenadosAsignadosWithInfo().length > 0) {
               @for (entrenado of entrenadosAsignadosWithInfo(); track entrenado.id) {
-                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 shadow-sm hover:bg-gray-50 transition-colors duration-200">
+                <div class="flex items-center justify-between p-3 bg-blue-100 rounded-lg border border-blue-200 shadow-sm hover:bg-blue-200 transition-colors duration-200 cursor-pointer"
+                     (click)="viewEntrenado(entrenado.id)">
                   <div class="flex-1">
-                    <p class="text-sm font-semibold text-gray-800">{{ entrenado.displayName || entrenado.id }}</p>
-                    <p class="text-xs text-gray-600">{{ entrenado.email || 'Sin email' }}</p>
+                    <div class="flex items-center">
+                      <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                      <div>
+                        <p class="text-sm font-semibold text-blue-900">{{ entrenado.displayName || entrenado.id }}</p>
+                        <p class="text-xs text-blue-800">{{ entrenado.email || 'Sin email' }}</p>
+                      </div>
+                    </div>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <button (click)="desvincularEntrenado(entrenado)"
+                    <button (click)="viewEntrenado(entrenado.id); $event.stopPropagation()"
+                      class="p-2 text-blue-700 hover:text-blue-900 hover:bg-blue-300 rounded transition-colors duration-200"
+                      title="Ver detalles">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      </svg>
+                    </button>
+                    <button (click)="desvincularEntrenado(entrenado); $event.stopPropagation()"
                       class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors duration-200"
                       title="Desvincular entrenado">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                       </svg>
                     </button>
                   </div>
                 </div>
               }
             } @else {
-              <p class="text-sm text-gray-700 text-center py-4 font-medium">No hay entrenados asignados</p>
+              <p class="text-sm text-blue-700 text-center py-4 font-medium">No hay entrenados asignados</p>
             }
           </div>
         </div>
@@ -233,4 +249,11 @@
     [entrenadorId]="entrenadorId()"
     (close)="toggleModalInvitaciones()">
   </app-invitaciones-modal>
+
+  <!-- Modal de entrenado -->
+  <app-entrenado-modal [isOpen]="isEntrenadoModalOpen()"
+    [entrenadoId]="entrenadoToView()"
+    [entrenadorId]="entrenadorId()"
+    (close)="closeEntrenadoModal()">
+  </app-entrenado-modal>
 </div>

@@ -100,6 +100,14 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       data.entrenadoresId = entrenado.entrenadoresId !== null ? entrenado.entrenadoresId : deleteField();
     }
 
+    if (entrenado.rutinasAsignadas !== undefined) {
+      data.rutinasAsignadas = entrenado.rutinasAsignadas !== null ? entrenado.rutinasAsignadas : deleteField();
+    }
+
+    if (entrenado.rutinasCreadas !== undefined) {
+      data.rutinasCreadas = entrenado.rutinasCreadas !== null ? entrenado.rutinasCreadas : deleteField();
+    }
+
     // Solo incluir objetivo si no es undefined
     if (entrenado.objetivo !== undefined) {
       data.objetivo = entrenado.objetivo !== null ? entrenado.objetivo : deleteField();

@@ -7,6 +7,7 @@ import { RutinaModalComponent } from '../../../components/rutina-modal/rutina-mo
 import { EjercicioModalComponent } from '../../../components/ejercicio-modal/ejercicio-modal.component';
 // Mensajes component temporalmente excluido de este detalle
 import { InvitacionesModalComponent } from '../../../components/invitaciones-modal/invitaciones-modal.component';
+import { EntrenadoModalComponent } from '../../../components/entrenado-modal/entrenado-modal.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
 
@@ -17,7 +18,8 @@ import { PageTitleService } from '../../../services/page-title.service';
     ToastComponent,
     RutinaModalComponent,
     EjercicioModalComponent,
-    InvitacionesModalComponent
+    InvitacionesModalComponent,
+    EntrenadoModalComponent
   ],
   templateUrl: './entrenador-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -60,6 +62,10 @@ export class EntrenadorDetail implements OnInit {
 
   // Signals para invitaciones
   readonly isInvitacionModalOpen = signal(false);
+
+  // Signals para entrenado modal
+  readonly isEntrenadoModalOpen = signal(false);
+  readonly entrenadoToView = signal<string>('');
 
   ngOnInit() {
     this.entrenadorService.initializeListener();
@@ -176,6 +182,19 @@ export class EntrenadorDetail implements OnInit {
     } else {
       this.isInvitacionModalOpen.set(true);
     }
+  }
+
+  // --------------------------------------------
+  // Modal de Entrenado
+  // --------------------------------------------
+  viewEntrenado(entrenadoId: string) {
+    this.entrenadoToView.set(entrenadoId);
+    this.isEntrenadoModalOpen.set(true);
+  }
+
+  closeEntrenadoModal() {
+    this.isEntrenadoModalOpen.set(false);
+    this.entrenadoToView.set('');
   }
   // --------------------------------------------
   // Entrenados Asignados
