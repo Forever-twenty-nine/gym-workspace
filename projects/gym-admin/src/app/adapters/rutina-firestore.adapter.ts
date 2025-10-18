@@ -66,8 +66,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       nombre: data.nombre || '',
       activa: data.activa ?? true,
       descripcion: data.descripcion || '',
-      ejercicios: data.ejercicios || [],
-      completado: data.completado ?? false,
+      ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
       DiasSemana: data.DiasSemana || [],
@@ -80,8 +79,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       nombre: rutina.nombre,
       activa: rutina.activa,
       descripcion: rutina.descripcion || '',
-      ejercicios: rutina.ejercicios || [],
-      completado: rutina.completado,
+      ejerciciosIds: rutina.ejerciciosIds || [],
       DiasSemana: rutina.DiasSemana || []
     };
 

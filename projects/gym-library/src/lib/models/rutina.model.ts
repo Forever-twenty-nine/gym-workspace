@@ -6,8 +6,7 @@ export interface Rutina {
     nombre: string;
     activa: boolean;   
     descripcion?: string;
-    ejercicios?: Ejercicio[];
-    completado?: boolean;
+    ejerciciosIds?: string[]; // Array de IDs de ejercicios
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;

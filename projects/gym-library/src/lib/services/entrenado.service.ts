@@ -77,6 +77,20 @@ export class EntrenadoService {
         
         try {
             await this.firestoreAdapter.save(entrenado);
+            
+            // Actualizar el signal local inmediatamente para reactividad
+            const entrenadosActuales = this._entrenados();
+            const index = entrenadosActuales.findIndex(e => e.id === entrenado.id);
+            
+            if (index >= 0) {
+                // Actualizar existente
+                entrenadosActuales[index] = { ...entrenado };
+            } else {
+                // Agregar nuevo
+                entrenadosActuales.push(entrenado);
+            }
+            
+            this._entrenados.set([...entrenadosActuales]);
         } catch (error) {
             console.error('Error al guardar entrenado:', error);
             throw error;

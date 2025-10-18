@@ -22,6 +22,8 @@ export * from './lib/models/mensaje.model';
 export * from './lib/models/conversacion.model';
 export * from './lib/models/invitacion.model';
 export * from './lib/models/environment.model';
+export * from './lib/models/progreso-rutina.model';
+export * from './lib/models/estadisticas-entrenado.model';
 /*
  * environments
  */
@@ -42,6 +44,7 @@ export * from './lib/services/notificacion.service';
 export * from './lib/services/mensaje.service';
 export * from './lib/services/conversacion.service';
 export * from './lib/services/invitacion.service';
+export * from './lib/services/progreso.service';
 /*
  * interfaces para adaptadores
  */

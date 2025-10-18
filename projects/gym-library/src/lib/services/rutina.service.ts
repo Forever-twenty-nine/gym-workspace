@@ -149,12 +149,11 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas completadas
+     * 🔍 Busca rutinas completadas (DEPRECATED - usar ProgresoService)
+     * @deprecated El progreso ahora está en el modelo del entrenado
      */
     getRutinasCompletadas(): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => rutina.completado === true)
-        );
+        return computed(() => []);
     }
 
     /**

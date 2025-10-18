@@ -86,10 +86,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       nombre: data.nombre || '',
       activa: data.activa ?? true,
       descripcion: data.descripcion,
-      ejercicios: data.ejercicios || [],
-      completado: data.completado ?? false,
-      creadorId: data.creadorId,
-      creadorTipo: data.creadorTipo,
+      ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
       DiasSemana: data.DiasSemana || [],
@@ -101,8 +98,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
     const data: any = {
       nombre: rutina.nombre,
       activa: rutina.activa ?? true,
-      DiasSemana: rutina.DiasSemana || [],
-      completado: rutina.completado ?? false
+      DiasSemana: rutina.DiasSemana || []
     };
 
     // Solo incluir campos opcionales si tienen valor válido
@@ -110,16 +106,8 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       data.descripcion = rutina.descripcion;
     }
     
-    if (rutina.ejercicios && rutina.ejercicios.length > 0) {
-      data.ejercicios = rutina.ejercicios;
-    }
-    
-    if (rutina.creadorId) {
-      data.creadorId = rutina.creadorId;
-    }
-    
-    if (rutina.creadorTipo) {
-      data.creadorTipo = rutina.creadorTipo;
+    if (rutina.ejerciciosIds && rutina.ejerciciosIds.length > 0) {
+      data.ejerciciosIds = rutina.ejerciciosIds; // Cambiado a ejerciciosIds
     }
     
     if (rutina.fechaCreacion) {
