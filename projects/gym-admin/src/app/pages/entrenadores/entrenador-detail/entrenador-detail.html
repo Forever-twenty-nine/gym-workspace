@@ -163,7 +163,6 @@
                 <div class="flex items-center justify-between p-3 bg-orange-100 rounded-lg border border-orange-200 shadow-sm hover:bg-orange-200 transition-colors duration-200">
                   <div class="flex-1">
                     <p class="text-sm font-semibold text-orange-900">{{ invitacion.entrenadoNombre }}</p>
-                    <p class="text-xs text-orange-800">{{ invitacion.mensajePersonalizado || 'Sin mensaje personalizado' }}</p>
                     <p class="text-xs text-orange-700 font-medium">Estado: {{ invitacion.estado }}</p>
                   </div>
                 </div>
@@ -174,25 +173,34 @@
           </div>
         </div>
 
-        <!-- Sección de Clientes Asignados (lista compacta, junto a Invitaciones) -->
+        <!-- Sección de Entrenados Asignados (lista compacta, junto a Invitaciones) -->
         <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-gray-800">Clientes Asignados</h3>
-            <span class="text-sm text-gray-600">{{ entrenadorService.getClientesCount(entrenador.id) }} clientes</span>
+            <h3 class="text-lg font-semibold text-gray-800">Entrenados Asignados</h3>
+            <span class="text-sm text-gray-600">{{ entrenadorService.getEntrenadosCount(entrenador.id)() }} entrenados</span>
           </div>
 
           <div class="space-y-2 max-h-40 overflow-y-auto">
             @if (entrenadosAsignadosWithInfo() && entrenadosAsignadosWithInfo().length > 0) {
-              @for (cliente of entrenadosAsignadosWithInfo(); track cliente.id) {
+              @for (entrenado of entrenadosAsignadosWithInfo(); track entrenado.id) {
                 <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 shadow-sm hover:bg-gray-50 transition-colors duration-200">
                   <div class="flex-1">
-                    <p class="text-sm font-semibold text-gray-800">{{ cliente.displayName || cliente.id }}</p>
-                    <p class="text-xs text-gray-600">{{ cliente.email || 'Sin email' }}</p>
+                    <p class="text-sm font-semibold text-gray-800">{{ entrenado.displayName || entrenado.id }}</p>
+                    <p class="text-xs text-gray-600">{{ entrenado.email || 'Sin email' }}</p>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <button (click)="desvincularEntrenado(entrenado)"
+                      class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors duration-200"
+                      title="Desvincular entrenado">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               }
             } @else {
-              <p class="text-sm text-gray-700 text-center py-4 font-medium">No hay clientes asignados</p>
+              <p class="text-sm text-gray-700 text-center py-4 font-medium">No hay entrenados asignados</p>
             }
           </div>
         </div>

@@ -196,6 +196,27 @@ export class EntrenadorDetail implements OnInit {
   });
 
   // --------------------------------------------
+  // Desvincular entrenado
+  // --------------------------------------------
+  async desvincularEntrenado(entrenado: any) {
+    if (!confirm(`¿Estás seguro de que quieres desvincular a "${entrenado.displayName}" de este entrenador?`)) {
+      return;
+    }
+
+    try {
+      const entrenadorId = this.entrenadorId();
+      const entrenadoId = entrenado.id;
+
+      await this.entrenadorService.desvincularEntrenado(entrenadorId, entrenadoId);
+
+      this.toastService.log(`Entrenado desvinculado: ${entrenado.displayName}`);
+    } catch (error: any) {
+      console.error('Error al desvincular entrenado:', error);
+      this.toastService.log(`ERROR al desvincular: ${error.message}`);
+    }
+  }
+
+  // --------------------------------------------
   // Boton volver
   // --------------------------------------------
   goBack() {

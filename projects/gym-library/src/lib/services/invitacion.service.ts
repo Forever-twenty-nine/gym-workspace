@@ -1,4 +1,6 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
+import { EntrenadoService } from './entrenado.service';
+import { EntrenadorService } from './entrenador.service';
 import { Invitacion } from '../models/invitacion.model';
 
 export interface IInvitacionFirestoreAdapter {
@@ -15,6 +17,7 @@ export class InvitacionService {
     private readonly invitacionSignals = new Map<string, WritableSignal<Invitacion | null>>();
     private isListenerInitialized = false;
     private firestoreAdapter?: IInvitacionFirestoreAdapter;
+    private injector = inject(Injector);
 
     /**
      * Configura el adaptador de Firestore
@@ -127,7 +130,7 @@ export class InvitacionService {
     }
 
     /**
-     * ✅ Aceptar invitación
+     * ✅ Aceptar invitación y vincular entrenado <-> entrenador
      */
     async aceptarInvitacion(invitacionId: string): Promise<void> {
         if (!this.firestoreAdapter) {
@@ -135,12 +138,61 @@ export class InvitacionService {
         }
 
         try {
+            // Intentar obtener de la lista general primero
+            let invitacion: Invitacion | null = this._invitaciones().find(inv => inv.id === invitacionId) || null;
+            
+            // Si no está en la lista general, usar el signal específico
+            if (!invitacion) {
+                const invitacionSignal = this.getInvitacion(invitacionId);
+                invitacion = invitacionSignal();
+                
+                // Si aún no está cargado, esperar un poco
+                if (!invitacion) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    invitacion = invitacionSignal();
+                }
+            }
+
+            if (!invitacion) {
+                throw new Error(`Invitación ${invitacionId} no encontrada`);
+            }
+
+            const entrenadoId = invitacion.entrenadoId;
+            const entrenadorId = invitacion.entrenadorId;
+
+            // 1) Marcar invitación como aceptada
             await this.firestoreAdapter.updateEstado(invitacionId, 'aceptada');
+
+            // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
+            const entrenadoService = this.injector.get(EntrenadoService);
+            const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId)();
+            const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === entrenadoId) || null;
+            if (entrenado) {
+                const entrenadoresId = [...(entrenado.entrenadoresId || [])];
+                if (!entrenadoresId.includes(entrenadorId)) {
+                    entrenadoresId.push(entrenadorId);
+                    const entrenadoActualizado = { ...entrenado, entrenadoresId } as any;
+                    await entrenadoService.save(entrenadoActualizado);
+                }
+            }
+
+            // 3) Actualizar entrenador: agregar entrenadoId a entrenadosAsignadosIds
+            const entrenadorService = this.injector.get(EntrenadorService);
+            const entrenador = entrenadorService.getEntrenadorById(entrenadorId)();
+            if (entrenador) {
+                const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
+                if (!entrenadosAsignadosIds.includes(entrenadoId)) {
+                    entrenadosAsignadosIds.push(entrenadoId);
+                    await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
+                }
+            }
         } catch (error) {
             console.error('Error al aceptar invitación:', error);
             throw error;
         }
     }
+
+
 
     /**
      * ❌ Rechazar invitación

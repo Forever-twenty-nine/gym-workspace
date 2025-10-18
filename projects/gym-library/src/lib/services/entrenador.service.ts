@@ -272,15 +272,36 @@ export class EntrenadorService {
   }
   
   /**
-   * 👥 Obtiene el conteo de clientes asignados a un entrenador
+   * 👥 Obtiene el conteo de entrenados asignados a un entrenador
    * @param entrenadorId - ID del entrenador
-   * @returns Signal con el número de clientes asignados
+   * @returns Signal con el número de entrenados asignados
    */
-  getClientesCount(entrenadorId: string) {
+  getEntrenadosCount(entrenadorId: string) {
     return computed(() => {
       const entrenador = this.getEntrenadorById(entrenadorId)();
       return entrenador?.entrenadosAsignadosIds?.length || 0;
     });
+  }
+
+  /**
+   * 🔗 Desvincula un entrenado de un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @param entrenadoId - ID del entrenado
+   */
+  async desvincularEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
+    // 1. Quitar entrenadorId del array entrenadoresId del entrenado
+    const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
+    if (entrenado) {
+      const entrenadoresId = (entrenado.entrenadoresId || []).filter((id: string) => id !== entrenadorId);
+      await this.entrenadoService.save({ ...entrenado, entrenadoresId });
+    }
+
+    // 2. Quitar entrenadoId del array entrenadosAsignadosIds del entrenador
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (entrenador) {
+      const entrenadosAsignadosIds = (entrenador.entrenadosAsignadosIds || []).filter((id: string) => id !== entrenadoId);
+      await this.update(entrenadorId, { entrenadosAsignadosIds });
+    }
   }
   
   /**

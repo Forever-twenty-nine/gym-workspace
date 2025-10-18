@@ -32,6 +32,7 @@ export class EntrenadoDetail implements OnInit {
   private readonly rutinaService = inject(RutinaService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly invitacionService = inject(InvitacionService);
+  // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
   entrenadoId = signal<string>('');
 
@@ -100,15 +101,7 @@ export class EntrenadoDetail implements OnInit {
   });
 
   // Estadísticas computadas
-  readonly estadisticas = computed(() => {
-    const rutinas = this.rutinasAsignadas() || [];
-    
-    return {
-      rutinasAsignadas: rutinas.length,
-      rutinasCompletadas: rutinas.filter(r => r?.completado === true).length,
-      notificacionesPendientes: 0
-    };
-  });
+  // Estadísticas eliminadas: sección removida del template
 
   // --------------------------------------------
   // Boton volver
@@ -154,9 +147,9 @@ export class EntrenadoDetail implements OnInit {
   async aceptarInvitacion(invitacion: any) {
     try {
       await this.invitacionService.aceptarInvitacion(invitacion.id);
-      this.toastService.log('Invitación aceptada exitosamente');
+      this.toastService.log('Invitación aceptada y vinculada correctamente');
     } catch (error: any) {
-      console.error('Error al aceptar invitación:', error);
+      console.error('Error al aceptar y vincular invitación:', error);
       this.toastService.log(`ERROR: ${error.message}`);
     }
   }
