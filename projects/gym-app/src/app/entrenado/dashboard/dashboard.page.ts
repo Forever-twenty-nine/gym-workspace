@@ -11,12 +11,16 @@ import {
   IonLabel,
   IonList,
   IonChip,
-  IonAvatar, IonHeader, IonToolbar, IonTitle,
+  IonAvatar,
   IonButton,
   IonBadge,
-  IonText, IonCardSubtitle, IonCardHeader } from '@ionic/angular/standalone';
+  IonText,  IonCardHeader, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
+  barbellOutline,
+  bodyOutline,
+  todayOutline,
+  medalOutline,
   statsChartOutline,
   fitnessOutline,
   personOutline,
@@ -26,7 +30,9 @@ import {
   time,
   notificationsOutline,
   checkmarkCircle as checkmarkCircleIcon,
-  closeCircleOutline
+  closeCircleOutline,
+  chevronForwardOutline,
+  accessibilityOutline,
 } from 'ionicons/icons';
 import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
@@ -36,7 +42,7 @@ import { Entrenado, Rutina } from 'gym-library';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.css'],
   standalone: true,
-  imports: [IonCardHeader, IonCardSubtitle, IonToolbar, IonHeader,
+  imports: [
     CommonModule,
     IonContent,
     IonCard,
@@ -45,10 +51,10 @@ import { Entrenado, Rutina } from 'gym-library';
     IonItem,
     IonLabel,
     IonList,
-    IonChip,
+    // IonChip,
     IonAvatar,
     IonButton,
-    IonBadge]
+    IonBadge, IonChip]
 })
 export class DashboardPage implements OnInit {
 
@@ -168,6 +174,12 @@ export class DashboardPage implements OnInit {
 
   constructor() {
     addIcons({
+      accessibilityOutline,
+      barbellOutline,
+      bodyOutline,
+      todayOutline,
+      medalOutline,
+      chevronForwardOutline,
       statsChartOutline,
       fitnessOutline,
       personOutline,
@@ -177,7 +189,7 @@ export class DashboardPage implements OnInit {
       time,
       notificationsOutline,
       checkmarkCircleIcon,
-      closeCircleOutline
+      closeCircleOutline,
     });
   }
 

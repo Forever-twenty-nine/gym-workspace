@@ -1,25 +1,22 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
   IonButton,
   IonIcon,
-  IonBadge,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
+
   IonCardContent,
-  IonAvatar
-} from '@ionic/angular/standalone';
+  IonAvatar, IonButtons, IonBackButton, IonChip } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  logOutOutline, 
-  personOutline, 
-  mailOutline, 
+import {
+  logOutOutline,
+  personOutline,
+  mailOutline,
   shieldOutline,
   timeOutline,
   checkmarkCircleOutline,
@@ -34,18 +31,16 @@ import { UserService, AuthService, User, RutinaService, Rutina, Rol } from 'gym-
   templateUrl: 'perfil.page.html',
   styleUrls: ['perfil.page.css'],
   standalone: true,
-  imports: [
+  imports: [IonChip, IonBackButton, IonButtons,
     CommonModule,
-    IonHeader, 
-    IonToolbar, 
-    IonTitle, 
-    IonContent, 
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
     IonButton,
     IonIcon,
-    IonBadge,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
+
     IonCardContent,
     IonAvatar
   ],
@@ -62,17 +57,17 @@ export class PerfilPage implements OnInit {
   estadisticas = computed(() => {
     const user = this.currentUser();
     const todasRutinas = this.rutinas();
-    
+
     if (!user || !todasRutinas) return null;
 
     // Filtrar rutinas del usuario actual
-    const misRutinas = todasRutinas.filter(r => 
+    const misRutinas = todasRutinas.filter(r =>
       r.asignadoId === user.uid || r.entrenadoId === user.uid
     );
 
     const rutinasCompletadas = misRutinas.filter(r => r.completado).length;
     const rutinasActivas = misRutinas.filter(r => r.activa && !r.completado).length;
-    const totalEjercicios = misRutinas.reduce((total, r) => 
+    const totalEjercicios = misRutinas.reduce((total, r) =>
       total + (r.ejercicios?.length || 0), 0
     );
 
@@ -85,7 +80,7 @@ export class PerfilPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ 
+    addIcons({
       logOutOutline,
       personOutline,
       mailOutline,
