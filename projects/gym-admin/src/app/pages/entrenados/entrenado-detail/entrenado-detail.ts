@@ -7,7 +7,8 @@ import {
   RutinaService,
   EntrenadorService,
   InvitacionService,
-  ProgresoService
+  ProgresoService,
+  EjercicioService
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
@@ -34,6 +35,7 @@ export class EntrenadoDetail implements OnInit {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly invitacionService = inject(InvitacionService);
   private readonly progresoService = inject(ProgresoService);
+  private readonly ejercicioService = inject(EjercicioService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
   entrenadoId = signal<string>('');
@@ -59,6 +61,7 @@ export class EntrenadoDetail implements OnInit {
 
   // Signals para el estado del componente
   readonly isLoading = signal(false);
+  readonly mostrarInvitaciones = signal(false);
 
   ngOnInit() {
     // Los listeners se inicializan automáticamente cuando se accede a las señales
@@ -96,6 +99,56 @@ export class EntrenadoDetail implements OnInit {
           progreso: progreso || null
         };
       });
+  });
+
+  // Rutinas organizadas por días de la semana (solo semana actual)
+  readonly rutinasPorDia = computed(() => {
+    const rutinas = this.rutinasAsignadas();
+    const hoy = new Date();
+
+    // Calcular fechas para la próxima semana (7 días)
+    const fechas = [];
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      fechas.push(fecha);
+    }
+
+    // Organizar por día
+    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; diaCompleto: string; esHoy: boolean; } } = {};
+
+    fechas.forEach(fecha => {
+      // Usar los mismos valores que se guardan en el modal (sin tildes)
+      const diaSemanaIndex = fecha.getDay();
+      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+      const diasSemanaConTilde = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+      const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+      const diaSemana = diasSemanaSinTilde[diaSemanaIndex]; // Usar sin tilde para comparación
+      const diaCorto = diasSemanaCorto[diaSemanaIndex];
+      const diaCompleto = diasSemanaConTilde[diaSemanaIndex]; // Mostrar con tilde
+      const fechaKey = fecha.toISOString().split('T')[0];
+
+      if (!rutinasOrganizadas[fechaKey]) {
+        rutinasOrganizadas[fechaKey] = {
+          fecha: new Date(fecha),
+          rutinas: [],
+          diaCorto,
+          diaCompleto,
+          esHoy: fecha.toDateString() === hoy.toDateString()
+        };
+      }
+
+      // Agregar rutinas que corresponden a este día
+      rutinas.forEach(rutina => {
+        if (rutina.DiasSemana && rutina.DiasSemana.includes(diaSemana)) {
+          rutinasOrganizadas[fechaKey].rutinas.push(rutina);
+        }
+      });
+    });
+
+    // Convertir a array y ordenar por fecha
+    return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
   });
 
   // Estadísticas del entrenado

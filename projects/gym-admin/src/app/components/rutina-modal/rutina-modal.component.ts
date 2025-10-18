@@ -98,8 +98,18 @@ export class RutinaModalComponent implements OnInit {
       nombre: ['', Validators.required],
       descripcion: [''],
       diasSemana: [[]],
-      ejercicios: [[]]
+      ejercicios: [[], this.minLengthArrayValidator(1)] // Al menos 1 ejercicio requerido
     });
+  }
+
+  // Validador personalizado para arrays con longitud mínima
+  private minLengthArrayValidator(minLength: number) {
+    return (control: any) => {
+      if (!control.value || !Array.isArray(control.value) || control.value.length < minLength) {
+        return { minLengthArray: { requiredLength: minLength, actualLength: control.value?.length || 0 } };
+      }
+      return null;
+    };
   }
 
   // Inicializar formulario con datos
@@ -110,7 +120,7 @@ export class RutinaModalComponent implements OnInit {
         nombre: rutina.nombre || '',
         descripcion: rutina.descripcion || '',
         diasSemana: rutina.DiasSemana || rutina.diasSemana || [],
-        ejercicios: rutina.ejercicios || []
+        ejercicios: rutina.ejerciciosIds || rutina.ejercicios || [] // Usar ejerciciosIds con fallback
       });
     } else {
       this.rutinaData.set(null);
@@ -179,6 +189,12 @@ export class RutinaModalComponent implements OnInit {
       return;
     }
 
+    // Verificar que haya al menos un ejercicio seleccionado
+    if (!formValue.ejercicios || formValue.ejercicios.length === 0) {
+      this.toastService.log('Error: Debes seleccionar al menos un ejercicio para la rutina');
+      return;
+    }
+
     this.isLoading.set(true);
 
     try {
@@ -191,7 +207,7 @@ export class RutinaModalComponent implements OnInit {
         nombre: updatedData.nombre || '',
         descripcion: updatedData.descripcion || '',
         DiasSemana: updatedData.diasSemana || [],
-        ejercicios: updatedData.ejercicios || [],
+        ejerciciosIds: updatedData.ejercicios || [], // Mapear ejercicios a ejerciciosIds
         entrenadoId: null,
         activa: updatedData.activa ?? true,
         completado: updatedData.completado ?? false,
