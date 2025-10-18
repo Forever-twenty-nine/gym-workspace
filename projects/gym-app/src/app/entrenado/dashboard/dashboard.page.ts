@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, computed, effect, Injector, runInInj
 import { CommonModule } from '@angular/common';
 import { Auth, user, User as FirebaseUser } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { 
+import {
   IonContent,
   IonCard,
   IonCardContent,
@@ -14,13 +14,12 @@ import {
   IonAvatar, IonHeader, IonToolbar, IonTitle,
   IonButton,
   IonBadge,
-  IonText
-} from '@ionic/angular/standalone';
+  IonText, IonCardSubtitle, IonCardHeader } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
+import {
   statsChartOutline,
-  fitnessOutline, 
-  personOutline, 
+  fitnessOutline,
+  personOutline,
   checkmarkCircleOutline,
   checkmarkCircle,
   timeOutline,
@@ -37,7 +36,7 @@ import { Entrenado, Rutina } from 'gym-library';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.css'],
   standalone: true,
-  imports: [ IonToolbar, IonHeader, 
+  imports: [IonCardHeader, IonCardSubtitle, IonToolbar, IonHeader,
     CommonModule,
     IonContent,
     IonCard,
@@ -49,11 +48,10 @@ import { Entrenado, Rutina } from 'gym-library';
     IonChip,
     IonAvatar,
     IonButton,
-    IonBadge
-  ]
+    IonBadge]
 })
 export class DashboardPage implements OnInit {
-  
+
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
@@ -64,26 +62,26 @@ export class DashboardPage implements OnInit {
 
   // Signals para datos reactivos
   todasLasRutinas = signal<Rutina[]>([]);
-  
+
   // Signal para el UID de Firebase Auth
   firebaseUserSignal = toSignal(runInInjectionContext(this.injector, () => user(this.auth)), { initialValue: null as FirebaseUser | null });
-  
+
   // Signal para el usuario actual que se actualiza automáticamente
   currentUserSignal = computed(() => this.authService.currentUser());
-  
+
   // Signal computado para los datos del entrenado
   entrenadoDataSignal = computed(() => {
     const firebaseUser = this.firebaseUserSignal();
     const userId = firebaseUser?.uid;
-    
+
     if (userId) {
       const entrenadoSignal = this.entrenadoService.getEntrenado(userId);
       return entrenadoSignal(); // Llamar al signal para obtener el valor
     }
-    
+
     return null;
   });
-  
+
   // Computed signals para UI
   nombreEntrenado = computed(() => {
     const user = this.userService.user();
@@ -98,16 +96,16 @@ export class DashboardPage implements OnInit {
   objetivoActual = computed(() => {
     const entrenadoData = this.entrenadoDataSignal();
     const invitaciones = this.invitacionesPendientes();
-    
+
     if (entrenadoData?.objetivo) {
       return entrenadoData.objetivo;
     }
-    
+
     // Si no hay objetivo pero hay invitaciones pendientes
     if (invitaciones.length > 0) {
       return 'Acepta una invitación para definir tu objetivo';
     }
-    
+
     // Si no hay objetivo ni invitaciones
     return 'Busca un entrenador para definir tu objetivo';
   });
@@ -116,26 +114,26 @@ export class DashboardPage implements OnInit {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
-    
+
     if (!userId || !rutinas.length) return [];
-    
+
     // Filtrar rutinas asignadas a este entrenado
     // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
     const rutinasDelEntrenado = rutinas.filter(rutina => {
-      const coincideId = 
+      const coincideId =
         (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
+        rutina.asignadoId === userId ||
         rutina.entrenadoId === userId;
       const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
       return coincideId && coincideTipo;
     });
-    
+
     return rutinasDelEntrenado.map(rutina => {
       // Obtener el nombre del creador (entrenador que asignó la rutina)
       const allUsers = this.userService.users();
       const creador = allUsers.find(u => u.uid === rutina.creadorId);
       const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
-      
+
       return {
         nombre: rutina.nombre,
         fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
@@ -150,25 +148,25 @@ export class DashboardPage implements OnInit {
     // Obtener el uid directamente de Firebase Auth
     const firebaseUser = this.firebaseUserSignal();
     const userId = firebaseUser?.uid;
-    
+
     if (!userId) {
       return [];
     }
 
     const allNotificaciones = this.notificacionService.notificaciones();
-    
+
     const filtered = allNotificaciones.filter(n => {
       const matches = n.usuarioId === userId &&
         n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
         n.datos?.estadoInvitacion === 'pendiente';
-      
+
       return matches;
     });
 
     return filtered;
   });
 
-  constructor() { 
+  constructor() {
     addIcons({
       statsChartOutline,
       fitnessOutline,
@@ -186,13 +184,13 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
     // Obtener el usuario actual y suscribirse a sus datos
     const currentUser = this.authService.currentUser();
-    
+
     // Sincronizar rutinas
     effect(() => {
       const rutinas = this.rutinaService.rutinas();
       this.todasLasRutinas.set(rutinas);
     }, { injector: this.injector });
-    
+
     // Verificar notificaciones
     effect(() => {
       const notificaciones = this.notificacionService.notificaciones();
@@ -221,7 +219,7 @@ export class DashboardPage implements OnInit {
         // Obtener el entrenado actual directamente del servicio
         const entrenadoSignal = this.entrenadoService.getEntrenado(currentUser.uid);
         const entrenadoExistente = entrenadoSignal();
-        
+
         if (entrenadoExistente) {
           // Actualizar el entrenado existente con el entrenadorId
           const entrenadoActualizado = {

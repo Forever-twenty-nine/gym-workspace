@@ -39,8 +39,9 @@ ion-toobar.gym-bg-transparent{
 
 
  ion-card {
+  /* --box-shadow: none; */
    border-radius: var(--app-border-radius-md);
-   box-shadow: var(--app-shadow-light);
+   /* box-shadow: var(--app-shadow-light); */
    margin: var(--app-spacing-md);
  }
 
