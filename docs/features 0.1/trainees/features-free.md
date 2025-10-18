@@ -4,15 +4,15 @@
 - Ver rutinas asignadas por entrenador ✅ 
 - Iniciar y y completar rutinas con cronometro✅ 
 - Ver detalles simples de ejercicios (series, reps, peso) ✅ 
-- opcion visual de progreso (check list)
-- nivel de usuario por completar rutinas
+- opcion visual de progreso (check list) ✅ 
+- nivel de usuario por completar rutinas ✅ 
 
 ---
 
 ## Progreso
 - Contador de rutinas completadas✅ 
-- Racha de entrenamiento (días consecutivos) 
-- Progreso básico por rutina (% completado)
+- Racha de entrenamiento (días consecutivos) ✅ 
+- Progreso básico por rutina (% completado)✅ 
 ---
 
 ## Social
