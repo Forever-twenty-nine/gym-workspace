@@ -167,28 +167,29 @@
           </div>
         </div>
 
-        <!-- Sección de Mensajes/Conversaciones -->
-        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <!-- Sección de Clientes Asignados (lista compacta, junto a Invitaciones) -->
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-semibold text-blue-900">Mensajes</h3>
-            <button type="button" (click)="toggleModalMensajes()"
-              class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2">
-              <span>+</span>
-              <span>Enviar Mensaje</span>
-            </button>
+            <h3 class="text-lg font-semibold text-gray-800">Clientes Asignados</h3>
+            <span class="text-sm text-gray-600">{{ entrenadorService.getClientesCount(entrenador.id) }} clientes</span>
           </div>
-          <div class="space-y-2 max-h-40 overflow-y-auto">
-            <p class="text-sm text-blue-700 text-center py-4 font-medium">Funcionalidad de mensajes aquí</p>
-          </div>
-        </div>
 
-        <!-- Sección de Clientes Asignados -->
-        <div class="bg-gray-50 rounded-xl p-4 col-span-2">
-          <h3 class="text-lg font-semibold text-gray-800 mb-3">Clientes Asignados</h3>
-          <div class="max-h-40 overflow-y-auto">
-            <pre class="text-sm text-gray-700 whitespace-pre-wrap">{{ entrenadorService.getClientesCount(entrenador.id) }} clientes asignados</pre>
+          <div class="space-y-2 max-h-40 overflow-y-auto">
+            @if (entrenadosAsignadosWithInfo() && entrenadosAsignadosWithInfo().length > 0) {
+              @for (cliente of entrenadosAsignadosWithInfo(); track cliente.id) {
+                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-100 shadow-sm hover:bg-gray-50 transition-colors duration-200">
+                  <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-800">{{ cliente.displayName || cliente.id }}</p>
+                    <p class="text-xs text-gray-600">{{ cliente.email || 'Sin email' }}</p>
+                  </div>
+                </div>
+              }
+            } @else {
+              <p class="text-sm text-gray-700 text-center py-4 font-medium">No hay clientes asignados</p>
+            }
           </div>
         </div>
+        
         </div>
       </div>
     </div>
@@ -211,12 +212,6 @@
     [ejercicios]="ejercicios()" [creadorId]="entrenadorId()" [rutinaToEdit]="rutinaToEdit()"
     (close)="toggleModalRutinas()">
   </app-rutina-modal>
-
-  <!-- Modal de mensajes -->
-  <app-mensajes-modal [isOpen]="isMensajeModalOpen()" [isCreating]="isMensajeCreating()"
-    [remitenteId]="entrenadorId()"
-    (close)="toggleModalMensajes()">
-  </app-mensajes-modal>
 
   <!-- Modal de invitaciones -->
   <app-invitaciones-modal [isOpen]="isInvitacionModalOpen()"
