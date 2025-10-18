@@ -86,13 +86,9 @@ export class EntrenadoDetail implements OnInit {
 
     return this.rutinaService.rutinas()
       .filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id))
-      .map(rutina => {
-        const creador = this.userService.users().find(u => u.uid === rutina.creadorId);
-        return {
-          ...rutina,
-          creadorNombre: creador?.nombre || creador?.email || 'Desconocido'
-        };
-      });
+      .map(rutina => ({
+        ...rutina
+      }));
   });
 
   // Invitaciones pendientes del entrenado

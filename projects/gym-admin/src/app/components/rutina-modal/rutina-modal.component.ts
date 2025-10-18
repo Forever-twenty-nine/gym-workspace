@@ -1,7 +1,7 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Ejercicio, RutinaService, UserService, EntrenadoService } from 'gym-library';
+import { Ejercicio, RutinaService, UserService, EntrenadoService, EntrenadorService } from 'gym-library';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -18,6 +18,7 @@ export class RutinaModalComponent implements OnInit {
   private readonly rutinaService = inject(RutinaService);
   private readonly userService = inject(UserService);
   private readonly entrenadoService = inject(EntrenadoService);
+  private readonly entrenadorService = inject(EntrenadorService);
   private readonly fb = inject(FormBuilder);
   private readonly toastService = inject(ToastService);
 
@@ -66,9 +67,8 @@ export class RutinaModalComponent implements OnInit {
     const creadorId = this.creadorId();
     if (!creadorId) return this.ejercicios();
 
-    return this.ejercicios().filter((ej: Ejercicio) =>
-      ej.creadorId === creadorId && ej.creadorTipo === 'entrenador'
-    );
+    // Obtener ejercicios creados por el entrenador
+    return this.entrenadorService.getEjerciciosByEntrenador(creadorId)();
   });
 
   readonly ejerciciosSeleccionados = computed(() => {
@@ -185,11 +185,6 @@ export class RutinaModalComponent implements OnInit {
       const originalData = this.rutinaData();
       let updatedData = { ...originalData, ...formValue };
 
-      // Asegurar creadorId
-      if (!updatedData.creadorId) {
-        updatedData.creadorId = this.creadorId() || originalData?.creadorId;
-      }
-
       // Limpiar campos para Firestore
       const rutinaToSave: any = {
         id: updatedData.id || `r${Date.now()}`,
@@ -197,7 +192,6 @@ export class RutinaModalComponent implements OnInit {
         descripcion: updatedData.descripcion || '',
         DiasSemana: updatedData.diasSemana || [],
         ejercicios: updatedData.ejercicios || [],
-        creadorId: updatedData.creadorId || '',
         entrenadoId: null,
         activa: updatedData.activa ?? true,
         completado: updatedData.completado ?? false,
@@ -206,13 +200,12 @@ export class RutinaModalComponent implements OnInit {
 
       await this.rutinaService.save(rutinaToSave);
 
-      let logMessage = `${this.isCreating() ? 'Creada' : 'Actualizada'} rutina: ${updatedData.nombre}`;
-      if (updatedData.creadorId) {
-        const creador = this.usuarios().find(u => u.uid === updatedData.creadorId);
-        logMessage += ` - Creador: ${creador?.nombre || creador?.email || updatedData.creadorId}`;
+      // Si es creación, agregar a la lista del entrenador
+      if (this.isCreating() && this.creadorId()) {
+        await this.entrenadorService.addRutinaCreada(this.creadorId(), rutinaToSave.id);
       }
 
-      this.toastService.log(logMessage);
+      this.toastService.log(`${this.isCreating() ? 'Creada' : 'Actualizada'} rutina: ${updatedData.nombre}`);
       this.close.emit();
 
     } catch (error: any) {

@@ -86,15 +86,6 @@ export class EjercicioService {
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	validateEjercicio(ejercicio: Ejercicio): void {
-		// Validación 1: Solo ENTRENADO o ENTRENADOR pueden ser creadores
-		if (ejercicio.creadorTipo) {
-			if (ejercicio.creadorTipo !== Rol.ENTRENADO && ejercicio.creadorTipo !== Rol.ENTRENADOR) {
-				throw new EjercicioValidationError(
-					`Solo entrenados y entrenadores pueden crear ejercicios. Tipo recibido: ${ejercicio.creadorTipo}`
-				);
-			}
-		}
-
 		// Validación 2: Solo ENTRENADO puede ser asignado
 		if (ejercicio.asignadoATipo) {
 			if (ejercicio.asignadoATipo !== Rol.ENTRENADO) {
@@ -108,13 +99,6 @@ export class EjercicioService {
 		if (ejercicio.asignadoAId && !ejercicio.asignadoATipo) {
 			throw new EjercicioValidationError(
 				'Si se especifica un usuario asignado, debe especificarse el tipo de asignado'
-			);
-		}
-
-		// Validación 4: Si hay creadorId, debe haber creadorTipo
-		if (ejercicio.creadorId && !ejercicio.creadorTipo) {
-			throw new EjercicioValidationError(
-				'Si se especifica un creador, debe especificarse el tipo de creador'
 			);
 		}
 
@@ -137,12 +121,6 @@ export class EjercicioService {
 	 */
 	private normalizeEjercicio(ejercicio: Ejercicio): Ejercicio {
 		const normalized = { ...ejercicio };
-
-		// Limpiar campos vacíos de creador
-		if (!normalized.creadorId || normalized.creadorId === '') {
-			delete normalized.creadorId;
-			delete normalized.creadorTipo;
-		}
 
 		// Limpiar campos vacíos de asignado
 		if (!normalized.asignadoAId || normalized.asignadoAId === '') {
@@ -285,18 +263,16 @@ export class EjercicioService {
 	 * 🔍 Obtiene ejercicios creados por un usuario específico
 	 */
 	getEjerciciosByCreador(creadorId: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorId === creadorId)
-		);
+		// Esta funcionalidad ahora se maneja a través del servicio de entrenador
+		return computed(() => []);
 	}
 
 	/**
 	 * 🔍 Obtiene ejercicios creados por un tipo de rol específico
 	 */
 	getEjerciciosByCreadorTipo(creadorTipo: Rol): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === creadorTipo)
-		);
+		// Esta funcionalidad ahora se maneja a través del servicio de entrenador
+		return computed(() => []);
 	}
 
 	/**
@@ -332,18 +308,16 @@ export class EjercicioService {
 	 * 🔍 Obtiene ejercicios creados por entrenados
 	 */
 	getEjerciciosCreadosPorEntrenados(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADO)
-		);
+		// Esta funcionalidad ahora se maneja a través del servicio de entrenador
+		return computed(() => []);
 	}
 
 	/**
 	 * 🔍 Obtiene ejercicios creados por entrenadores
 	 */
 	getEjerciciosCreadosPorEntrenadores(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADOR)
-		);
+		// Esta funcionalidad ahora se maneja a través del servicio de entrenador
+		return computed(() => []);
 	}
 
 	/**

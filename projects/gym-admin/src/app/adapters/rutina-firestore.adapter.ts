@@ -68,8 +68,6 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       descripcion: data.descripcion || '',
       ejercicios: data.ejercicios || [],
       completado: data.completado ?? false,
-      creadorId: data.creadorId,
-      creadorTipo: data.creadorTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
       DiasSemana: data.DiasSemana || [],
@@ -90,14 +88,6 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
     // Solo incluir campos opcionales si tienen valor válido
     if (rutina.duracion && rutina.duracion > 0) {
       data.duracion = rutina.duracion;
-    }
-
-    if (rutina.creadorId) {
-      data.creadorId = rutina.creadorId;
-    }
-    
-    if (rutina.creadorTipo) {
-      data.creadorTipo = rutina.creadorTipo;
     }
     
     if (rutina.fechaCreacion) {

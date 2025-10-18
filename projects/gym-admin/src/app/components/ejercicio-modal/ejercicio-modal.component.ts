@@ -1,7 +1,7 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Ejercicio, EjercicioService, UserService, Rol } from 'gym-library';
+import { Ejercicio, EjercicioService, UserService, Rol, EntrenadorService } from 'gym-library';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class EjercicioModalComponent {
   // Servicios inyectados
   private readonly ejercicioService = inject(EjercicioService);
   private readonly userService = inject(UserService);
+  private readonly entrenadorService = inject(EntrenadorService);
   private readonly fb = inject(FormBuilder);
   private readonly toastService = inject(ToastService);
 
@@ -60,10 +61,10 @@ export class EjercicioModalComponent {
     return this.fb.group({
       nombre: ['', Validators.required],
       descripcion: [''],
-      series: [3, [Validators.required, Validators.min(1)]],
-      repeticiones: [10, [Validators.required, Validators.min(1)]],
+      series: [0, [Validators.required, Validators.min(1)]],
+      repeticiones: [0, [Validators.required, Validators.min(1)]],
       peso: [0, Validators.min(0)],
-      descansoSegundos: [60, [Validators.required, Validators.min(0)]],
+      descansoSegundos: [0, [Validators.required, Validators.min(0)]],
       serieSegundos: [0, Validators.min(0)]
     });
   }
@@ -75,10 +76,10 @@ export class EjercicioModalComponent {
       this.ejercicioForm().patchValue({
         nombre: ejercicio.nombre || '',
         descripcion: ejercicio.descripcion || '',
-        series: ejercicio.series || 3,
-        repeticiones: ejercicio.repeticiones || 10,
+        series: ejercicio.series || 0,
+        repeticiones: ejercicio.repeticiones || 0,
         peso: ejercicio.peso || 0,
-        descansoSegundos: ejercicio.descansoSegundos || 60,
+        descansoSegundos: ejercicio.descansoSegundos || 0,
         serieSegundos: ejercicio.serieSegundos || 0
       });
     } else {
@@ -86,10 +87,10 @@ export class EjercicioModalComponent {
       this.ejercicioForm().reset({
         nombre: '',
         descripcion: '',
-        series: 3,
-        repeticiones: 10,
+        series: 0,
+        repeticiones: 0,
         peso: 0,
-        descansoSegundos: 60,
+        descansoSegundos: 0,
         serieSegundos: 0
       });
     }
@@ -117,11 +118,6 @@ export class EjercicioModalComponent {
       const originalData = this.ejercicioData();
       let updatedData = { ...originalData, ...formValue };
 
-      // Asegurar creadorId
-      if (!updatedData.creadorId) {
-        updatedData.creadorId = this.creadorId() || originalData?.creadorId;
-      }
-
       // Limpiar campos para Firestore
       const ejercicioToSave: Ejercicio = {
         id: updatedData.id || `ej${Date.now()}`,
@@ -132,17 +128,20 @@ export class EjercicioModalComponent {
         peso: updatedData.peso || 0,
         descansoSegundos: updatedData.descansoSegundos || 60,
         serieSegundos: updatedData.serieSegundos || 0,
-        creadorId: updatedData.creadorId || '',
-        creadorTipo: Rol.ENTRENADOR,
         fechaCreacion: updatedData.fechaCreacion || new Date()
       };
 
       await this.ejercicioService.save(ejercicioToSave);
 
+      // Si es creación, agregar el ejercicio al entrenador
+      if (!originalData?.id && this.creadorId()) {
+        await this.entrenadorService.addEjercicioCreado(this.creadorId(), ejercicioToSave.id);
+      }
+
       let logMessage = `${this.isCreating() ? 'Creado' : 'Actualizado'} ejercicio: ${updatedData.nombre}`;
-      if (updatedData.creadorId) {
-        const creador = this.usuarios().find(u => u.uid === updatedData.creadorId);
-        logMessage += ` - Creador: ${creador?.nombre || creador?.email || updatedData.creadorId}`;
+      if (this.creadorId()) {
+        const creador = this.usuarios().find(u => u.uid === this.creadorId());
+        logMessage += ` - Creador: ${creador?.nombre || creador?.email || this.creadorId()}`;
       }
 
       this.toastService.log(logMessage);

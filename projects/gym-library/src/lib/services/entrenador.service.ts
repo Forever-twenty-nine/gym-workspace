@@ -179,7 +179,6 @@ export class EntrenadorService {
     
     try {
       await this.adapter.update(id, entrenadorData);
-      console.log('✅ Entrenador actualizado:', id);
     } catch (error) {
       console.error('❌ Error al actualizar entrenador:', error);
       this._error.set('Error al actualizar entrenador');
@@ -227,7 +226,13 @@ export class EntrenadorService {
    */
   getRutinasByEntrenador(entrenadorId: string) {
     return computed(() => {
-      return this.rutinaService.rutinas().filter(rutina => rutina.creadorId === entrenadorId);
+      const entrenador = this._entrenadores().find(e => e.id === entrenadorId);
+      if (!entrenador || !entrenador.rutinasCreadasIds) {
+        return [];
+      }
+      return this.rutinaService.rutinas().filter(rutina => 
+        entrenador.rutinasCreadasIds.includes(rutina.id)
+      );
     });
   }
   
@@ -238,7 +243,13 @@ export class EntrenadorService {
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
-      return this.ejercicioService.ejercicios().filter((ejercicio: Ejercicio) => ejercicio.creadorId === entrenadorId);
+      const entrenador = this._entrenadores().find(e => e.id === entrenadorId);
+      if (!entrenador || !entrenador.ejerciciosCreadasIds) {
+        return [];
+      }
+      return this.ejercicioService.ejercicios().filter(ejercicio => 
+        entrenador.ejerciciosCreadasIds.includes(ejercicio.id)
+      );
     });
   }
   
@@ -291,13 +302,60 @@ export class EntrenadorService {
   }
   
   /**
-   * 🧹 Limpia los recursos del servicio
+   * ➕ Agrega un ejercicio a la lista de ejercicios creados de un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @param ejercicioId - ID del ejercicio a agregar
    */
-  destroy(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = null;
-      this.isListenerInitialized = false;
+  async addEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (entrenador) {
+      const ejerciciosCreadasIds = [...(entrenador.ejerciciosCreadasIds || [])];
+      if (!ejerciciosCreadasIds.includes(ejercicioId)) {
+        ejerciciosCreadasIds.push(ejercicioId);
+        await this.update(entrenadorId, { ejerciciosCreadasIds });
+      }
+    }
+  }
+
+  /**
+   * ➖ Quita un ejercicio de la lista de ejercicios creados de un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @param ejercicioId - ID del ejercicio a quitar
+   */
+  async removeEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (entrenador) {
+      const ejerciciosCreadasIds = (entrenador.ejerciciosCreadasIds || []).filter((id: string) => id !== ejercicioId);
+      await this.update(entrenadorId, { ejerciciosCreadasIds });
+    }
+  }
+
+  /**
+   * ➕ Agrega una rutina a la lista de rutinas creadas de un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @param rutinaId - ID de la rutina a agregar
+   */
+  async addRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (entrenador) {
+      const rutinasCreadasIds = [...(entrenador.rutinasCreadasIds || [])];
+      if (!rutinasCreadasIds.includes(rutinaId)) {
+        rutinasCreadasIds.push(rutinaId);
+        await this.update(entrenadorId, { rutinasCreadasIds });
+      }
+    }
+  }
+
+  /**
+   * ➖ Quita una rutina de la lista de rutinas creadas de un entrenador
+   * @param entrenadorId - ID del entrenador
+   * @param rutinaId - ID de la rutina a quitar
+   */
+  async removeRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (entrenador) {
+      const rutinasCreadasIds = (entrenador.rutinasCreadasIds || []).filter((id: string) => id !== rutinaId);
+      await this.update(entrenadorId, { rutinasCreadasIds });
     }
   }
 }

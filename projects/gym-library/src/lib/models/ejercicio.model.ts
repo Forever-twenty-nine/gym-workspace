@@ -9,10 +9,7 @@ export interface Ejercicio {
     peso?: number;
     descansoSegundos?: number;
     serieSegundos?: number;
-    // Información del creador (opcional)
-    creadorId?: string; 
-    creadorTipo?: Rol; 
-    // informacion del asignado (opcional)
+    // Información del asignado (opcional)
     asignadoAId?: string;
     asignadoATipo?: Rol;
     // Metadatos

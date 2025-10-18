@@ -8,9 +8,6 @@ export interface Rutina {
     descripcion?: string;
     ejercicios?: Ejercicio[];
     completado?: boolean;
-    // Información del creador
-    creadorId?: string; 
-    creadorTipo?: Rol;
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;

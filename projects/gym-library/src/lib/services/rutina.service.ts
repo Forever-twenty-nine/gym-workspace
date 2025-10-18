@@ -149,28 +149,6 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por creador
-     */
-    getRutinasByCreador(creadorId: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.creadorId === creadorId
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas por tipo de creador (Rol)
-     */
-    getRutinasByCreadorTipo(tipo: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.creadorTipo === tipo
-            )
-        );
-    }
-
-    /**
      * 🔍 Busca rutinas completadas
      */
     getRutinasCompletadas(): Signal<Rutina[]> {
