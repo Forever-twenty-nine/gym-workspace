@@ -51,12 +51,6 @@
                     <ion-label>Activa</ion-label>
                   </ion-chip>
                 }
-                @if (rutina.completado) {
-                  <ion-chip color="primary" style="margin: 0;">
-                    <ion-icon name="trophy-outline"></ion-icon>
-                    <ion-label>Completada</ion-label>
-                  </ion-chip>
-                }
               </div>
             </div>
           </ion-card-header>
@@ -96,10 +90,10 @@
                 </div>
               }
               
-              @if (rutina.ejercicios && rutina.ejercicios.length > 0) {
+                @if (rutina.ejerciciosIds && rutina.ejerciciosIds.length > 0) {
                 <div class="info-item">
                   <ion-icon name="fitness-outline"></ion-icon>
-                  <span>{{ rutina.ejercicios.length }} ejercicios</span>
+                  <span>{{ rutina.ejerciciosIds.length }} ejercicios</span>
                 </div>
               }
 

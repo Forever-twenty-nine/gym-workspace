@@ -1,7 +1,7 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Ejercicio, EjercicioService, UserService, Rol, EntrenadorService } from 'gym-library';
+import { Ejercicio, EjercicioService, UserService, Rol, EntrenadorService, PlanLimitError } from 'gym-library';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -149,7 +149,11 @@ export class EjercicioModalComponent {
 
     } catch (error: any) {
       console.error('Error al guardar ejercicio:', error);
-      this.toastService.log(`ERROR al guardar ejercicio: ${error.message}`);
+      if (error instanceof PlanLimitError) {
+        this.toastService.log('Has alcanzado el límite de ejercicios para tu plan. Actualiza para crear más.');
+      } else {
+        this.toastService.log(`ERROR al guardar ejercicio: ${error.message}`);
+      }
     } finally {
       this.isLoading.set(false);
     }

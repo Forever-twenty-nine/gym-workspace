@@ -22,7 +22,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash ,barbell} from 'ionicons/icons';
-import { AuthService, EjercicioService } from 'gym-library';
+import { AuthService, EjercicioService, EntrenadorService } from 'gym-library';
 
 @Component({
   selector: 'app-ejercicios',
@@ -61,11 +61,12 @@ import { AuthService, EjercicioService } from 'gym-library';
 export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
+  private entrenadorService = inject(EntrenadorService);
   private fb = inject(FormBuilder);
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.ejercicioService.getEjerciciosByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
   // Signals para el modal de ejercicios

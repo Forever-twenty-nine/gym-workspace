@@ -203,12 +203,12 @@ export class RutinasPage implements OnInit, OnDestroy {
    */
   ejerciciosCompletos = computed(() => {
     const rutina = this.rutinaSeleccionada();
-    if (!rutina?.ejercicios) return [];
+    if (!rutina?.ejerciciosIds) return [];
     
     const todosEjercicios = this.ejercicioService.ejercicios();
     
     // Si los ejercicios son strings (IDs), buscar los objetos completos
-    return rutina.ejercicios
+    return rutina.ejerciciosIds
       .map((ej: any) => {
         if (typeof ej === 'string') {
           return todosEjercicios.find(ejercicio => ejercicio.id === ej);

@@ -30,7 +30,7 @@ import {
   checkmarkCircle as checkmarkCircleIcon,
   closeCircleOutline
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService, PlanLimitError } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -123,23 +123,23 @@ export class DashboardPage implements OnInit {
     
     if (!userId || !rutinas.length) return [];
     
-    // Filtrar rutinas asignadas a este entrenado (creadas por sus entrenadores)
+    // Filtrar rutinas asignadas a este entrenado
     const rutinasDelEntrenado = rutinas.filter(rutina => {
       const entrenado = this.entrenadoService.getEntrenado(userId)();
-      const entrenadoresIds = entrenado?.entrenadoresId || [];
-      return entrenadoresIds.includes(rutina.creadorId || '');
+      return entrenado?.rutinasAsignadas?.includes(rutina.id) || false;
     });
     
     return rutinasDelEntrenado.map(rutina => {
-      // Obtener el nombre del creador (entrenador que asignó la rutina)
-      const allUsers = this.userService.users();
-      const creador = allUsers.find(u => u.uid === rutina.creadorId);
-      const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
+      // Obtener el nombre del entrenador asignado
+      const entrenado = this.entrenadoService.getEntrenado(userId)();
+      const entrenadorId = entrenado?.entrenadoresId?.[0];
+      const entrenador = entrenadorId ? this.userService.users().find(u => u.uid === entrenadorId) : null;
+      const asignadoPor = entrenador?.nombre || entrenador?.email || 'Entrenador';
       
       return {
         nombre: rutina.nombre,
         fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
-        completada: rutina.completado || false,
+        completada: false, // No hay propiedad completado en el modelo
         asignadoPor: asignadoPor
       };
     });
@@ -165,7 +165,17 @@ export class DashboardPage implements OnInit {
       return matches;
     });
 
-    return filtered;
+    return filtered.map(invitacion => {
+      const entrenador = this.userService.users().find(u => u.uid === invitacion.entrenadorId);
+      return {
+        ...invitacion,
+        titulo: `Invitación de ${invitacion.entrenadorNombre}`,
+        mensaje: invitacion.mensajePersonalizado || 'Te invito a ser mi cliente.',
+        datos: {
+          entrenadorNombre: invitacion.entrenadorNombre
+        }
+      };
+    });
   });
 
   constructor() { 
@@ -264,8 +274,12 @@ export class DashboardPage implements OnInit {
       }
     } catch (error) {
       console.error('Error al aceptar invitación:', error);
+      let message = 'Error al aceptar la invitación';
+      if (error instanceof PlanLimitError) {
+        message = 'El entrenador ha alcanzado el límite de clientes para su plan. No se puede aceptar la invitación.';
+      }
       const toast = await this.toastController.create({
-        message: 'Error al aceptar la invitación',
+        message,
         duration: 2000,
         position: 'bottom',
         color: 'danger'

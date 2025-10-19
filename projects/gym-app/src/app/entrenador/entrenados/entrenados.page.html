@@ -180,7 +180,7 @@
                   <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
                   <ion-label>
                     <h3>{{ rutina.nombre }}</h3>
-                    <p>{{ rutina.ejercicios?.length || 0 }} ejercicios</p>
+                    <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
                   </ion-label>
                   <ion-button fill="outline" color="danger" slot="end" (click)="desasignarRutina(rutina)">
                     <ion-icon name="remove-circle-outline"></ion-icon>
@@ -210,7 +210,7 @@
                   <ion-icon name="fitness-outline" slot="start" color="secondary"></ion-icon>
                   <ion-label>
                     <h3>{{ rutina.nombre }}</h3>
-                    <p>{{ rutina.ejercicios?.length || 0 }} ejercicios</p>
+                    <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
                   </ion-label>
                   <ion-button fill="solid" color="primary" slot="end" (click)="asignarRutina(rutina)">
                     <ion-icon name="add-circle-outline"></ion-icon>

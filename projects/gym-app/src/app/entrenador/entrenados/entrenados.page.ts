@@ -258,7 +258,6 @@ export class EntrenadosPage implements OnInit {
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
     const rutinasAsignadas = entrenado?.rutinasAsignadas || [];
     const rutinasEntrenador = rutinas.filter(rutina => 
-      rutina.creadorId === entrenadorId && 
       !rutinasAsignadas.includes(rutina.id)
     );
     this.rutinasDisponibles.set(rutinasEntrenador);

@@ -66,17 +66,16 @@ export class PerfilPage implements OnInit {
     
     if (!user || !todasRutinas) return null;
 
-    // Filtrar rutinas del usuario actual (creadas por sus entrenadores)
+    // Filtrar rutinas asignadas al usuario actual
     const misRutinas = todasRutinas.filter(r => {
       const entrenado = this.entrenadoService.getEntrenado(user.uid)();
-      const entrenadoresIds = entrenado?.entrenadoresId || [];
-      return entrenadoresIds.includes(r.creadorId || '');
+      return entrenado?.rutinasAsignadas?.includes(r.id) || false;
     });
 
-    const rutinasCompletadas = misRutinas.filter(r => r.completado).length;
-    const rutinasActivas = misRutinas.filter(r => r.activa && !r.completado).length;
+    const rutinasCompletadas = 0; // No hay propiedad completado
+    const rutinasActivas = misRutinas.filter(r => r.activa).length;
     const totalEjercicios = misRutinas.reduce((total, r) => 
-      total + (r.ejercicios?.length || 0), 0
+      total + (r.ejerciciosIds?.length || 0), 0
     );
 
     return {

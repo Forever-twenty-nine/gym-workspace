@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
 import { EntrenadoService } from './entrenado.service';
-import { EntrenadorService } from './entrenador.service';
+import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { Invitacion } from '../models/invitacion.model';
 
 export interface IInvitacionFirestoreAdapter {
@@ -182,6 +182,11 @@ export class InvitacionService {
             if (entrenador) {
                 const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
                 if (!entrenadosAsignadosIds.includes(entrenadoId)) {
+                    // Check limit before adding
+                    const limits = entrenadorService.getLimits(entrenadorId);
+                    if (entrenadosAsignadosIds.length >= limits.maxClients) {
+                        throw new PlanLimitError('Has alcanzado el límite de clientes para tu plan. Actualiza para conectar más.');
+                    }
                     entrenadosAsignadosIds.push(entrenadoId);
                     await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
                 }

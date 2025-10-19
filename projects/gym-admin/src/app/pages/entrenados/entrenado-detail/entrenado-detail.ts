@@ -8,7 +8,8 @@ import {
   EntrenadorService,
   InvitacionService,
   ProgresoService,
-  EjercicioService
+  EjercicioService,
+  PlanLimitError
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
@@ -249,7 +250,11 @@ export class EntrenadoDetail implements OnInit {
       this.toastService.log('Invitación aceptada y vinculada correctamente');
     } catch (error: any) {
       console.error('Error al aceptar y vincular invitación:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
+      if (error instanceof PlanLimitError) {
+        this.toastService.log('El entrenador ha alcanzado el límite de clientes para su plan. No se puede aceptar la invitación.');
+      } else {
+        this.toastService.log(`ERROR: ${error.message}`);
+      }
     }
   }
 

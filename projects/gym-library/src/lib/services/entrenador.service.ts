@@ -102,7 +102,7 @@ export class EntrenadorService {
   private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
   
   // Métodos privados para límites de plan
-  private getLimits(entrenadorId: string) {
+  getLimits(entrenadorId: string) {
     if (this.limitsCache.has(entrenadorId)) {
       return this.limitsCache.get(entrenadorId)!;
     }
@@ -385,7 +385,27 @@ export class EntrenadorService {
    * @param ejercicioId - ID del ejercicio a agregar
    */
   async addEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
-    await this.addItemWithLimit(entrenadorId, ejercicioId, 'ejerciciosCreadasIds', 'maxExercises', 'ejercicios');
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (!entrenador) return;
+
+    // Validación de plan: free no puede crear ejercicios con campos premium
+    const limits = this.getLimits(entrenadorId);
+    if (limits.maxExercises === 3) { // Plan free
+      const ejercicio = this.ejercicioService.getEjercicio(ejercicioId)();
+      if (ejercicio && (ejercicio.descansoSegundos !== undefined || ejercicio.serieSegundos !== undefined)) {
+        throw new PlanLimitError('En el plan free no se pueden configurar tiempos de descanso o serie. Actualiza a premium.');
+      }
+    }
+
+    const limitsGeneral = this.getLimits(entrenadorId);
+    const currentCount = entrenador.ejerciciosCreadasIds?.length || 0;
+    this.validateLimit(entrenadorId, currentCount, limitsGeneral.maxExercises, 'ejercicios');
+
+    const ejerciciosCreadasIds = [...(entrenador.ejerciciosCreadasIds || [])];
+    if (!ejerciciosCreadasIds.includes(ejercicioId)) {
+      ejerciciosCreadasIds.push(ejercicioId);
+      await this.update(entrenadorId, { ejerciciosCreadasIds });
+    }
   }
 
   /**
@@ -407,6 +427,18 @@ export class EntrenadorService {
    * @param rutinaId - ID de la rutina a agregar
    */
   async addRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (!entrenador) return;
+
+    // Validación de plan: free no puede crear rutinas con campos premium
+    const limits = this.getLimits(entrenadorId);
+    if (limits.maxRoutines === 5) { // Plan free
+      const rutina = this.rutinaService.getRutina(rutinaId)();
+      if (rutina && (rutina.DiasSemana !== undefined || rutina.duracion !== undefined)) {
+        throw new PlanLimitError('En el plan free no se pueden configurar días de la semana o duración. Actualiza a premium.');
+      }
+    }
+
     await this.addItemWithLimit(entrenadorId, rutinaId, 'rutinasCreadasIds', 'maxRoutines', 'rutinas');
   }
 
