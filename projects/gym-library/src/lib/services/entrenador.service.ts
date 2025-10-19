@@ -9,6 +9,14 @@ import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
 import { Ejercicio } from '../models/ejercicio.model';
 
+// Clase de error personalizada para límites
+export class PlanLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PlanLimitError';
+  }
+}
+
 /**
  * 🏋️‍♂️ Interfaz del adaptador de Firestore para Entrenadores
  * Define los métodos que debe implementar cualquier adaptador de persistencia
@@ -90,9 +98,58 @@ export class EntrenadorService {
   private unsubscribe: (() => void) | null = null;
   private isListenerInitialized = false;
   
-  constructor() {
-    // No cargar automáticamente, se hará manualmente cuando sea necesario
+  // Cache para límites por entrenador (evita búsquedas repetidas)
+  private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
+  
+  // Métodos privados para límites de plan
+  private getLimits(entrenadorId: string) {
+    if (this.limitsCache.has(entrenadorId)) {
+      return this.limitsCache.get(entrenadorId)!;
+    }
+    const user = this.userService.users().find(u => u.uid === entrenadorId);
+    const isFree = user?.plan === 'free';
+    const limits = {
+      maxClients: isFree ? 3 : Infinity,
+      maxRoutines: isFree ? 5 : Infinity,
+      maxExercises: isFree ? 10 : Infinity,
+    };
+    this.limitsCache.set(entrenadorId, limits);
+    return limits;
   }
+
+  private validateLimit(entrenadorId: string, currentCount: number, max: number, item: string): void {
+    if (currentCount >= max) {
+      throw new PlanLimitError(`Límite alcanzado: ${currentCount}/${max} ${item} en plan free.`);
+    }
+  }
+
+  // Método genérico para agregar items con validación
+  private async addItemWithLimit(
+    entrenadorId: string,
+    itemId: string,
+    arrayKey: keyof Entrenador,
+    maxKey: keyof ReturnType<typeof this.getLimits>,
+    itemName: string
+  ): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (!entrenador) return;
+
+    const limits = this.getLimits(entrenadorId);
+    const currentArray = (entrenador[arrayKey] as string[]) || [];
+    this.validateLimit(entrenadorId, currentArray.length, limits[maxKey], itemName);
+
+    if (!currentArray.includes(itemId)) {
+      const updatedArray = [...currentArray, itemId];
+      await this.update(entrenadorId, { [arrayKey]: updatedArray });
+    }
+  }
+
+  // Método para invalidar cache de límites (llamar cuando cambie el plan)
+  invalidateLimitsCache(entrenadorId: string): void {
+    this.limitsCache.delete(entrenadorId);
+  }
+  
+  
   
   /**
    * 📥 Inicializa el listener de entrenadores (llamar manualmente cuando sea necesario)
@@ -328,14 +385,7 @@ export class EntrenadorService {
    * @param ejercicioId - ID del ejercicio a agregar
    */
   async addEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
-    const entrenador = this.getEntrenadorById(entrenadorId)();
-    if (entrenador) {
-      const ejerciciosCreadasIds = [...(entrenador.ejerciciosCreadasIds || [])];
-      if (!ejerciciosCreadasIds.includes(ejercicioId)) {
-        ejerciciosCreadasIds.push(ejercicioId);
-        await this.update(entrenadorId, { ejerciciosCreadasIds });
-      }
-    }
+    await this.addItemWithLimit(entrenadorId, ejercicioId, 'ejerciciosCreadasIds', 'maxExercises', 'ejercicios');
   }
 
   /**
@@ -357,14 +407,7 @@ export class EntrenadorService {
    * @param rutinaId - ID de la rutina a agregar
    */
   async addRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
-    const entrenador = this.getEntrenadorById(entrenadorId)();
-    if (entrenador) {
-      const rutinasCreadasIds = [...(entrenador.rutinasCreadasIds || [])];
-      if (!rutinasCreadasIds.includes(rutinaId)) {
-        rutinasCreadasIds.push(rutinaId);
-        await this.update(entrenadorId, { rutinasCreadasIds });
-      }
-    }
+    await this.addItemWithLimit(entrenadorId, rutinaId, 'rutinasCreadasIds', 'maxRoutines', 'rutinas');
   }
 
   /**
@@ -377,6 +420,22 @@ export class EntrenadorService {
     if (entrenador) {
       const rutinasCreadasIds = (entrenador.rutinasCreadasIds || []).filter((id: string) => id !== rutinaId);
       await this.update(entrenadorId, { rutinasCreadasIds });
+    }
+  }
+
+  /**
+   * ➕ Asigna un entrenado a un entrenador con validación de límites
+   * @param entrenadorId - ID del entrenador
+   * @param entrenadoId - ID del entrenado a asignar
+   */
+  async asignarEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
+    await this.addItemWithLimit(entrenadorId, entrenadoId, 'entrenadosAsignadosIds', 'maxClients', 'clientes activos');
+
+    // Actualizar entrenado (solo después de validar límite)
+    const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
+    if (entrenado) {
+      const entrenadoresId = [...(entrenado.entrenadoresId || []), entrenadorId];
+      await this.entrenadoService.save({ ...entrenado, entrenadoresId });
     }
   }
 }

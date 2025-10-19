@@ -2,15 +2,16 @@
 
 
 ## Gestión de Clientes
-- Invitar clientes por notificacion interna (máximo 3 activos)
+- Invitar clientes por notificacion interna 
+- maximo de 3 clientes activos 
 - Ver lista de clientes activos/inactivos
-- Ver perfil básico de cliente
+- Ver perfil básico de cliente 
 
 ---
 
 ## Rutinas
 
-- Crear rutinas personalizadas (máximo 5 activas)
+- Crear rutinas (máximo 5 activas)
 - Editor de rutinas con biblioteca de ejercicios
 - Asignar rutinas a clientes
 - Ver progreso básico de cliente por rutina
