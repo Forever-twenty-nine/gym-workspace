@@ -1,0 +1,277 @@
+<div class="w-full p-4">
+  @if (entrenado(); as entrenado) {
+    @if (rutina(); as rutina) {
+      <div class="space-y-6">
+
+        <!-- Header Principal -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex-1">
+              <div class="flex items-center space-x-4">
+                <button (click)="goBack()" title="Volver" aria-label="Volver"
+                  class="p-3 bg-blue-50 text-blue-700 rounded-md border-2 border-blue-300 hover:bg-blue-600 hover:text-white transition-colors duration-150 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <div>
+                  <h1 class="text-2xl font-bold text-gray-900">{{ rutina.nombre }}</h1>
+                  <p class="text-sm text-gray-600">{{ entrenado.displayName }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado y Cronómetro -->
+            <div class="flex items-center space-x-6">
+              <div class="text-right">
+                <div class="text-sm font-medium text-gray-900">{{ getEstadoRutina() }}</div>
+                <div class="text-xs {{ getColorEstado() }}">{{ ejerciciosCompletados() }}/{{ ejerciciosTotales() }} ejercicios</div>
+              </div>
+
+              @if (mostrarCronometro()) {
+                <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                  <div class="text-xs text-blue-600 font-medium uppercase tracking-wider">Tiempo</div>
+                  <div class="text-lg font-mono font-bold text-blue-800">{{ tiempoTranscurrido() }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        
+
+        <!-- Contenido Principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- Panel Principal: Progreso y Ejercicios -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- Barra de Progreso -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                  <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                  Progreso de la Rutina
+                </h2>
+                <span class="text-2xl font-bold {{ getColorEstado() }}">{{ porcentajeProgreso() }}%</span>
+              </div>
+
+              <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                <div
+                  class="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full transition-all duration-500 ease-out"
+                  [style.width.%]="porcentajeProgreso()">
+                </div>
+              </div>
+
+              <!-- Botones de acción -->
+              <div class="flex flex-wrap gap-3">
+                @if (!rutinaIniciada()) {
+                  <button (click)="iniciarRutina()"
+                    class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m-3 7.5A9.5 9.5 0 1121.5 12 9.5 9.5 0 0112 2.5z"></path>
+                    </svg>
+                    <span>Iniciar Rutina</span>
+                  </button>
+                }
+
+                @if (rutinaIniciada() && !rutinaCompletada()) {
+                  <button (click)="completarRutina()"
+                    [disabled]="ejerciciosCompletados() < ejerciciosTotales()"
+                    [class.opacity-50]="ejerciciosCompletados() < ejerciciosTotales()"
+                    title="Debes completar todos los ejercicios antes de finalizar la rutina"
+                    class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Completar Rutina</span>
+                  </button>
+                }
+
+                @if (rutinaCompletada()) {
+                  <button (click)="reiniciarRutina()"
+                    class="flex items-center space-x-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Reiniciar Rutina</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- Lista de Ejercicios -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                Ejercicios
+              </h3>
+
+              @if (ejercicios() && ejercicios().length > 0) {
+                <div class="space-y-3">
+                  @for (ejercicio of ejercicios(); track $index) {
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div class="flex items-center space-x-4 flex-1">
+                        <!-- Checkbox -->
+                        <input
+                          type="checkbox"
+                          [checked]="isEjercicioCompletado(ejercicio.id)"
+                          (change)="toggleEjercicio(ejercicio.id)"
+                          [disabled]="!rutinaIniciada() || rutinaCompletada()"
+                          class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+
+                        <!-- Información del ejercicio -->
+                        <div class="flex-1">
+                          <div class="flex items-center space-x-3">
+                            <h4 class="font-medium text-gray-900">{{ ejercicio.nombre }}</h4>
+                            @if (ejercicio.series) {
+                              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{{ ejercicio.series }} series</span>
+                            }
+                            @if (ejercicio.repeticiones) {
+                              <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">{{ ejercicio.repeticiones }} reps</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Estado -->
+                      <div class="flex items-center">
+                        @if (isEjercicioCompletado(ejercicio.id)) {
+                          <div class="flex items-center text-green-600">
+                            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Completado</span>
+                          </div>
+                        } @else {
+                          <span class="text-sm text-gray-400">Pendiente</span>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-8 text-gray-500">
+                  <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                  <p>No hay ejercicios en esta rutina</p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Panel Lateral -->
+          <div class="space-y-6">            <!-- Historial de Sesiones -->
+            @if (progreso()?.sesiones && progreso()!.sesiones!.length > 0) {
+              <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Historial de Sesiones
+                </h3>
+
+                <div class="space-y-3 max-h-64 overflow-y-auto">
+                  @for (sesion of progreso()!.sesiones; track $index) {
+                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-900">
+                          {{ formatearFecha(sesion.fecha) }}
+                        </span>
+                        @if (sesion.duracion) {
+                          <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded">{{ sesion.duracion }} min</span>
+                        }
+                      </div>
+
+                      @if (sesion.ejerciciosCompletados && sesion.ejerciciosTotales) {
+                        <div class="text-xs text-gray-600">
+                          {{ sesion.ejerciciosCompletados }}/{{ sesion.ejerciciosTotales }} ejercicios completados
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Información de la Rutina -->
+            <div class="bg-gray-50 rounded-lg shadow-md p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg class="w-5 h-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Información de la Rutina
+              </h3>
+
+              <div class="space-y-4">
+                @if (rutina.descripcion) {
+                  <div class="bg-white rounded-lg p-3">
+                    <span class="text-sm font-medium text-gray-700">Descripción:</span>
+                    <p class="text-sm text-gray-600 mt-1">{{ rutina.descripcion }}</p>
+                  </div>
+                }
+
+                @if (rutina.DiasSemana && rutina.DiasSemana.length > 0) {
+                  <div class="bg-white rounded-lg p-3">
+                    <span class="text-sm font-medium text-gray-700">Días de la semana:</span>
+                    <p class="text-sm text-gray-600 mt-1">{{ rutina.DiasSemana.join(', ') }}</p>
+                  </div>
+                }
+
+                @if (rutina.duracion) {
+                  <div class="bg-white rounded-lg p-3">
+                    <span class="text-sm font-medium text-gray-700">Duración estimada:</span>
+                    <p class="text-sm text-gray-600 mt-1">{{ rutina.duracion }} minutos</p>
+                  </div>
+                }
+
+                @if (progreso()?.vecesCompletada && progreso()!.vecesCompletada! > 0) {
+                  <div class="bg-white rounded-lg p-3">
+                    <span class="text-sm font-medium text-gray-700">Veces completada:</span>
+                    <p class="text-sm text-gray-600 mt-1">{{ progreso()!.vecesCompletada }}</p>
+                  </div>
+                }
+
+                @if (progreso()?.fechaUltimaCompletada) {
+                  <div class="bg-white rounded-lg p-3">
+                    <span class="text-sm font-medium text-gray-700">Última vez:</span>
+                    <p class="text-sm text-gray-600 mt-1">{{ formatearFecha(progreso()!.fechaUltimaCompletada!) }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    } @else {
+      <div class="bg-white rounded-lg shadow-md p-8 text-center">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Rutina no encontrada</h2>
+        <p class="text-gray-600 mb-4">La rutina que buscas no existe o ha sido eliminada.</p>
+        <button (click)="goBack()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Volver
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Cargando...</p>
+    </div>
+  }
+
+  <!-- Toasts -->
+  
+
+  <app-toast [toasts]="toastService.toasts()" (closeToast)="toastService.remove($event)">
+  </app-toast>
+</div>

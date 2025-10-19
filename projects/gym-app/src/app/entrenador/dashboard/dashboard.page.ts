@@ -27,6 +27,7 @@ import { EntrenadoService } from 'gym-library';
 import { RutinaService } from 'gym-library';
 import { EjercicioService } from 'gym-library';
 import { UserService } from 'gym-library';
+import { EntrenadorService } from 'gym-library';
 import { Entrenado } from 'gym-library';
 
 @Component({
@@ -56,6 +57,7 @@ export class DashboardPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
   private userService = inject(UserService);
+  private entrenadorService = inject(EntrenadorService);
 
   stats = {
     entrenadosActivos: 15,
@@ -71,17 +73,17 @@ export class DashboardPage implements OnInit {
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadorId === entrenadorId) : [];
+    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
 
   rutinasCreadas: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.rutinaService.getRutinasByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getRutinasByEntrenador(entrenadorId)() : [];
   });
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.ejercicioService.getEjerciciosByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
   constructor() {

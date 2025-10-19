@@ -1,36 +1,6 @@
 <div class="w-full px-4 py-8">
-  
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <!-- Card de Gimnasios -->
-    <app-generic-card
-      [config]="gimnasiosCardConfig"
-      [items]="gimnasios()"
-      [idField]="'id'"
-      [canCreate]="false"
-      (edit)="openDetailsModal($event)"
-      (delete)="deleteGimnasio($event)">
-    </app-generic-card>
-  </section>
-
-  <!-- Toasts -->
-  <app-toast 
-    [toasts]="toastService.toasts()" 
-    (closeToast)="toastService.remove($event)">
-  </app-toast>
-
-  <!-- Modal de edición -->
-  <app-modal-form
-    [isOpen]="isModalOpen()"
-    [modalType]="'gimnasio'"
-    [isCreating]="isCreating()"
-    [form]="editForm()"
-    [formFields]="getFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeModal()"
-    (save)="saveChanges()"
-    (toggleDiaSemana)="onToggleDiaSemana($event)"
-    (toggleEjercicio)="toggleEjercicio($event)">
-  </app-modal-form>
+  <div class="bg-white rounded-lg shadow-md p-6 text-center">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Funcionalidad Próxima</h2>
+    <p class="text-gray-600">Esta sección está en desarrollo y estará disponible próximamente.</p>
+  </div>
 </div>

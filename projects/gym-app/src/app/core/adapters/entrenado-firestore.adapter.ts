@@ -89,23 +89,17 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapFromFirestore(data: any): Entrenado {
     return {
       id: data.id,
-      gimnasioId: data.gimnasioId || '',
-      entrenadorId: data.entrenadorId || null,
-      activo: data.activo ?? true,
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-      objetivo: data.objetivo || null
+      objetivo: data.objetivo || null,
+      entrenadoresId: data.entrenadoresId || [],
+      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasCreadas: data.rutinasCreadas || []
     };
   }
 
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
-      gimnasioId: entrenado.gimnasioId,
-      activo: entrenado.activo
     };
-
-    if (entrenado.entrenadorId !== undefined) {
-      data.entrenadorId = entrenado.entrenadorId;
-    }
 
     if (entrenado.objetivo !== undefined) {
       data.objetivo = entrenado.objetivo;
@@ -115,6 +109,18 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       data.fechaRegistro = entrenado.fechaRegistro instanceof Date 
         ? Timestamp.fromDate(entrenado.fechaRegistro)
         : entrenado.fechaRegistro;
+    }
+
+    if (entrenado.entrenadoresId) {
+      data.entrenadoresId = entrenado.entrenadoresId;
+    }
+
+    if (entrenado.rutinasAsignadas) {
+      data.rutinasAsignadas = entrenado.rutinasAsignadas;
+    }
+
+    if (entrenado.rutinasCreadas) {
+      data.rutinasCreadas = entrenado.rutinasCreadas;
     }
 
     return data;

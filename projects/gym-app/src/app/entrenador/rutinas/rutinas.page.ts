@@ -26,7 +26,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { fitnessOutline, close, add, pencil, trash ,barbell} from 'ionicons/icons';
-import { AuthService, RutinaService, EjercicioService } from 'gym-library';
+import { AuthService, RutinaService, EjercicioService, EntrenadorService } from 'gym-library';
 
 @Component({
   selector: 'app-rutinas',
@@ -68,16 +68,17 @@ export class RutinasPage implements OnInit {
   private authService = inject(AuthService);
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
+  private entrenadorService = inject(EntrenadorService);
   private fb = inject(FormBuilder);
 
   rutinasCreadas: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.rutinaService.getRutinasByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getRutinasByEntrenador(entrenadorId)() : [];
   });
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.ejercicioService.getEjerciciosByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
   // Signals para el modal de rutinas
@@ -144,7 +145,7 @@ export class RutinasPage implements OnInit {
       descripcion: '',
       ejercicios: [],
       creadorId: entrenadorId,
-      asignadoId: '',
+      asignadoIds: [],
       activa: true,
       completado: false
     };
@@ -160,7 +161,7 @@ export class RutinasPage implements OnInit {
       DiasSemana: [diasSemanaStrings],
       ejercicios: [item.ejercicios || []],
       creadorId: [item.creadorId || ''],
-      asignadoId: [item.asignadoId || '']
+      asignadoIds: [item.asignadoIds || []]
     };
 
     this.rutinaEditForm.set(this.fb.group(formConfig));

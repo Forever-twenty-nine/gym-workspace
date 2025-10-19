@@ -39,7 +39,7 @@ import {
   stopOutline,
   timerOutline
 } from 'ionicons/icons';
-import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio } from 'gym-library';
+import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
 import { CronometroRutinaComponent } from '../components/cronometro-rutina/cronometro-rutina.component';
 
 @Component({
@@ -72,6 +72,7 @@ export class RutinasPage implements OnInit, OnDestroy {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
+  private entrenadoService = inject(EntrenadoService);
   private injector = inject(Injector);
 
   // Señal para todas las rutinas
@@ -90,23 +91,16 @@ export class RutinasPage implements OnInit, OnDestroy {
   private tiempoInicio: number = 0;
 
   // Computed para rutinas del entrenado actual
-  rutinas = computed(() => {
+  rutinasAsignadas = computed(() => {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
+    const entrenado = this.entrenadoService.entrenados().find((e: any) => e.id === userId);
     
-    if (!userId || !rutinas.length) return [];
+    if (!userId || !rutinas.length || !entrenado?.rutinasAsignadas) return [];
     
     // Filtrar rutinas asignadas a este entrenado
-    // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
-    return rutinas.filter(rutina => {
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
-        rutina.entrenadoId === userId;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
-    });
+    return rutinas.filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id));
   });
 
   constructor() {
@@ -140,13 +134,39 @@ export class RutinasPage implements OnInit, OnDestroy {
   }
 
   /**
-   * Formatea los días de la semana de números a nombres
+   * Formatea los días de la semana de strings a nombres cortos
    */
-  formatearDiasSemana(dias?: number[]): string {
+  formatearDiasSemana(dias?: string[]): string {
     if (!dias || dias.length === 0) return 'Sin días asignados';
     
-    const diasNombres = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-    return dias.map(dia => diasNombres[dia] || 'N/A').join(', ');
+    const diasMapeo: { [key: string]: string } = {
+      'Lunes': 'Lun',
+      'Martes': 'Mar', 
+      'Miércoles': 'Mié',
+      'Jueves': 'Jue',
+      'Viernes': 'Vie',
+      'Sábado': 'Sáb',
+      'Domingo': 'Dom'
+    };
+    
+    return dias.map(dia => diasMapeo[dia] || dia).join(', ');
+  }
+
+  /**
+   * Mapea un día de la semana a su abreviatura
+   */
+  mapearDia(dia: string): string {
+    const diasMapeo: { [key: string]: string } = {
+      'Lunes': 'Lun',
+      'Martes': 'Mar', 
+      'Miércoles': 'Mié',
+      'Jueves': 'Jue',
+      'Viernes': 'Vie',
+      'Sábado': 'Sáb',
+      'Domingo': 'Dom'
+    };
+    
+    return diasMapeo[dia] || dia;
   }
 
   /**
@@ -183,12 +203,12 @@ export class RutinasPage implements OnInit, OnDestroy {
    */
   ejerciciosCompletos = computed(() => {
     const rutina = this.rutinaSeleccionada();
-    if (!rutina?.ejercicios) return [];
+    if (!rutina?.ejerciciosIds) return [];
     
     const todosEjercicios = this.ejercicioService.ejercicios();
     
     // Si los ejercicios son strings (IDs), buscar los objetos completos
-    return rutina.ejercicios
+    return rutina.ejerciciosIds
       .map((ej: any) => {
         if (typeof ej === 'string') {
           return todosEjercicios.find(ejercicio => ejercicio.id === ej);

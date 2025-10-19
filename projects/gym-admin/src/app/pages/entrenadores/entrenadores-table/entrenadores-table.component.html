@@ -1,0 +1,75 @@
+<div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
+      <tr>
+        @for (column of columns(); track column.key) {
+        <th [class]="column.class + ' text-sm font-semibold text-gray-700 uppercase tracking-wide'">
+          {{ column.label }}
+        </th>
+        }
+        <th class="px-8 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wide"></th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-100">
+      @for (item of items(); track item.id) {
+      <tr class="hover:bg-blue-50 transition-colors duration-200">
+        @for (column of columns(); track column.key) {
+        <td [class]="column.class + ' py-5 whitespace-nowrap' + (column.type === 'boolean' || column.type === 'badge' ? ' text-center' : '')">
+          @switch (column.type) {
+            @case ('avatar') {
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-10 w-10">
+                  <div class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                    <span class="text-white font-medium text-sm">{{ item.displayName.charAt(0).toUpperCase() }}</span>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">{{ item.displayName }}</div>
+                </div>
+              </div>
+            }
+            @case ('text') {
+              <div class="text-sm text-gray-900">{{ getDisplayValue(item, column.key) }}</div>
+            }
+            @case ('boolean') {
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    [class]="item[column.key] ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass">
+                {{ item[column.key] ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+              </span>
+            }
+            @case ('badge') {
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                    [class]="(item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass">
+                {{ (item[column.key] || 'free') === 'premium' ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+              </span>
+            }
+            @case ('date') {
+              <div class="text-sm text-gray-900">{{ item.fechaRegistro | date:'short' }}</div>
+            }
+          }
+        </td>
+        }
+        <td class="px-8 py-5 whitespace-nowrap text-right">
+          <button
+            (click)="onEdit(item)"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 transform hover:scale-105">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Editar
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  @if (items().length === 0) {
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No hay entrenadores</h3>
+      <p class="mt-1 text-sm text-gray-500">Comienza agregando tu primer entrenador.</p>
+    </div>
+  }
+</div>

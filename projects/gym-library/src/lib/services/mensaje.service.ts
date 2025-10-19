@@ -196,9 +196,13 @@ export class MensajeService {
     }
 
     /**
-     * 📊 Obtiene el conteo total de mensajes
+     * � Obtiene mensajes por entrenador (enviados o recibidos)
      */
-    get mensajeCount(): Signal<number> {
-        return computed(() => this._mensajes().length);
+    getMensajesByEntrenador(entrenadorId: string): Signal<Mensaje[]> {
+        return computed(() => 
+            this._mensajes().filter(msg => 
+                msg.remitenteId === entrenadorId || msg.destinatarioId === entrenadorId
+            )
+        );
     }
 }

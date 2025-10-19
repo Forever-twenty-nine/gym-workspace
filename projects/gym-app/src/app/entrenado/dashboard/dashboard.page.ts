@@ -14,7 +14,8 @@ import {
   IonAvatar, IonHeader, IonToolbar, IonTitle,
   IonButton,
   IonBadge,
-  IonText
+  IonText,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -29,7 +30,7 @@ import {
   checkmarkCircle as checkmarkCircleIcon,
   closeCircleOutline
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo } from 'gym-library';
+import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService, PlanLimitError } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -59,6 +60,9 @@ export class DashboardPage implements OnInit {
   private userService = inject(UserService);
   private authService = inject(AuthService);
   private notificacionService = inject(NotificacionService);
+  private entrenadorService = inject(EntrenadorService);
+  private invitacionService = inject(InvitacionService);
+  private toastController = inject(ToastController);
   private injector = inject(Injector);
   private auth = inject(Auth);
 
@@ -120,26 +124,22 @@ export class DashboardPage implements OnInit {
     if (!userId || !rutinas.length) return [];
     
     // Filtrar rutinas asignadas a este entrenado
-    // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
     const rutinasDelEntrenado = rutinas.filter(rutina => {
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
-        rutina.entrenadoId === userId;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
+      const entrenado = this.entrenadoService.getEntrenado(userId)();
+      return entrenado?.rutinasAsignadas?.includes(rutina.id) || false;
     });
     
     return rutinasDelEntrenado.map(rutina => {
-      // Obtener el nombre del creador (entrenador que asignó la rutina)
-      const allUsers = this.userService.users();
-      const creador = allUsers.find(u => u.uid === rutina.creadorId);
-      const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
+      // Obtener el nombre del entrenador asignado
+      const entrenado = this.entrenadoService.getEntrenado(userId)();
+      const entrenadorId = entrenado?.entrenadoresId?.[0];
+      const entrenador = entrenadorId ? this.userService.users().find(u => u.uid === entrenadorId) : null;
+      const asignadoPor = entrenador?.nombre || entrenador?.email || 'Entrenador';
       
       return {
         nombre: rutina.nombre,
-        fechaAsignada: this.formatearFecha(rutina.fechaAsignacion),
-        completada: rutina.completado || false,
+        fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
+        completada: false, // No hay propiedad completado en el modelo
         asignadoPor: asignadoPor
       };
     });
@@ -155,17 +155,27 @@ export class DashboardPage implements OnInit {
       return [];
     }
 
-    const allNotificaciones = this.notificacionService.notificaciones();
+    const allInvitaciones = this.invitacionService.invitaciones();
     
-    const filtered = allNotificaciones.filter(n => {
-      const matches = n.usuarioId === userId &&
-        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        n.datos?.estadoInvitacion === 'pendiente';
+    const filtered = allInvitaciones.filter(inv => {
+      const matches = inv.entrenadoId === userId &&
+        inv.estado === 'pendiente' &&
+        inv.activa;
       
       return matches;
     });
 
-    return filtered;
+    return filtered.map(invitacion => {
+      const entrenador = this.userService.users().find(u => u.uid === invitacion.entrenadorId);
+      return {
+        ...invitacion,
+        titulo: `Invitación de ${invitacion.entrenadorNombre}`,
+        mensaje: invitacion.mensajePersonalizado || 'Te invito a ser mi cliente.',
+        datos: {
+          entrenadorNombre: invitacion.entrenadorNombre
+        }
+      };
+    });
   });
 
   constructor() { 
@@ -208,12 +218,12 @@ export class DashboardPage implements OnInit {
     });
   }
 
-  async aceptarInvitacion(notificacion: any) {
-    if (!notificacion.datos?.entrenadorId) return;
+  async aceptarInvitacion(invitacion: any) {
+    if (!invitacion.entrenadorId) return;
 
     try {
       // 1. Aceptar la invitación
-      await this.notificacionService.aceptarInvitacion(notificacion.id);
+      await this.invitacionService.aceptarInvitacion(invitacion.id);
 
       // 2. Crear/actualizar la relación entrenador-entrenado
       const currentUser = this.authService.currentUser();
@@ -221,12 +231,12 @@ export class DashboardPage implements OnInit {
         // Obtener el entrenado actual directamente del servicio
         const entrenadoSignal = this.entrenadoService.getEntrenado(currentUser.uid);
         const entrenadoExistente = entrenadoSignal();
-        
+
         if (entrenadoExistente) {
           // Actualizar el entrenado existente con el entrenadorId
           const entrenadoActualizado = {
             ...entrenadoExistente,
-            entrenadorId: notificacion.datos.entrenadorId,
+            entrenadoresId: [...(entrenadoExistente.entrenadoresId || []), invitacion.entrenadorId],
             activo: true
           };
           await this.entrenadoService.save(entrenadoActualizado);
@@ -234,26 +244,53 @@ export class DashboardPage implements OnInit {
           // Crear nuevo entrenado si no existe
           const nuevoEntrenado: Entrenado = {
             id: currentUser.uid,
-            gimnasioId: '', // Dejar en blanco como pidió el usuario
-            entrenadorId: notificacion.datos.entrenadorId,
-            activo: true,
+            entrenadoresId: [invitacion.entrenadorId],
             fechaRegistro: new Date(),
             objetivo: Objetivo.MANTENER_PESO
           };
           await this.entrenadoService.save(nuevoEntrenado);
         }
+
+        // 3. Actualizar el entrenador para agregar el entrenado a su lista
+        const entrenadorSignal = this.entrenadorService.getEntrenadorById(invitacion.entrenadorId);
+        const entrenadorExistente = entrenadorSignal();
+
+        if (entrenadorExistente) {
+          const entrenadorActualizado = {
+            ...entrenadorExistente,
+            entrenadosAsignadosIds: [...(entrenadorExistente.entrenadosAsignadosIds || []), currentUser.uid]
+          };
+          await this.entrenadorService.update(entrenadorExistente.id, entrenadorActualizado);
+        }
+
+        const toast = await this.toastController.create({
+          message: 'Invitación aceptada exitosamente',
+          duration: 2000,
+          position: 'bottom',
+          color: 'success'
+        });
+        await toast.present();
+
       }
-
-      // Aquí puedes agregar lógica adicional como mostrar mensaje de éxito
-
     } catch (error) {
       console.error('Error al aceptar invitación:', error);
+      let message = 'Error al aceptar la invitación';
+      if (error instanceof PlanLimitError) {
+        message = 'El entrenador ha alcanzado el límite de clientes para su plan. No se puede aceptar la invitación.';
+      }
+      const toast = await this.toastController.create({
+        message,
+        duration: 2000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await toast.present();
     }
   }
 
-  async rechazarInvitacion(notificacion: any) {
+  async rechazarInvitacion(invitacion: any) {
     try {
-      await this.notificacionService.rechazarInvitacion(notificacion.id);
+      await this.invitacionService.rechazarInvitacion(invitacion.id);
     } catch (error) {
       console.error('Error al rechazar invitación:', error);
     }

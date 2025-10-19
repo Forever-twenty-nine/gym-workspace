@@ -12,16 +12,7 @@ import {
   docData
 } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Entrenador } from 'gym-library';
-
-interface IEntrenadorFirestoreAdapter {
-  getEntrenadores(callback: (entrenadores: Entrenador[]) => void): () => void;
-  subscribeToEntrenador(id: string, callback: (entrenador: Entrenador | null) => void): void;
-  create(entrenador: Omit<Entrenador, 'id'>): Promise<string>;
-  createWithId?(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void>;
-  update(id: string, entrenador: Partial<Entrenador>): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { Entrenador, IEntrenadorFirestoreAdapter } from 'gym-library';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
@@ -93,34 +84,38 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
   }
 
   private mapToFirestore(entrenador: Omit<Entrenador, 'id'> | Entrenador): any {
-    const data = { ...entrenador };
-    // No hay fechas que convertir en este modelo
+    const data = { ...entrenador } as any;
+    if (entrenador.fechaRegistro) {
+      data.fechaRegistro = Timestamp.fromDate(entrenador.fechaRegistro);
+    }
     return data;
   }
 
   private mapFromFirestore(data: any): Entrenador {
     const entrenador = { ...data };
-    // No hay timestamps que convertir en este modelo
+    if (data.fechaRegistro && data.fechaRegistro instanceof Timestamp) {
+      entrenador.fechaRegistro = data.fechaRegistro.toDate();
+    }
     return entrenador as Entrenador;
   }
 
   private mapPartialToFirestore(entrenador: Partial<Entrenador>): any {
     const data: any = {};
 
-    if (entrenador.gimnasioId !== undefined) {
-      data.gimnasioId = entrenador.gimnasioId;
+    if (entrenador.fechaRegistro !== undefined) {
+      data.fechaRegistro = entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : null;
     }
 
-    if (entrenador.activo !== undefined) {
-      data.activo = entrenador.activo;
+    if (entrenador.ejerciciosCreadasIds !== undefined) {
+      data.ejerciciosCreadasIds = entrenador.ejerciciosCreadasIds;
     }
 
-    if (entrenador.entrenados !== undefined) {
-      data.entrenados = entrenador.entrenados;
+    if (entrenador.entrenadosAsignadosIds !== undefined) {
+      data.entrenadosAsignadosIds = entrenador.entrenadosAsignadosIds;
     }
 
-    if (entrenador.rutinas !== undefined) {
-      data.rutinas = entrenador.rutinas;
+    if (entrenador.rutinasCreadasIds !== undefined) {
+      data.rutinasCreadasIds = entrenador.rutinasCreadasIds;
     }
 
     return data;

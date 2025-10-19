@@ -1,32 +1,24 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { 
-  EntrenadoService, 
-  UserService, 
-  GimnasioService, 
+import { Router } from '@angular/router';
+import {
+  EntrenadoService,
+  UserService,
+  GimnasioService,
   EntrenadorService,
   NotificacionService,
   RutinaService,
-  Notificacion,
-  Entrenado, 
-  Rol, 
-  Objetivo,
-  TipoNotificacion
+  Entrenado,
+  Rol,
+  Objetivo
 } from 'gym-library';
-import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
-import { GenericModalManager } from '../../helpers/modal-manager.helper';
 import { DisplayHelperService } from '../../services/display-helper.service';
-import { EntrenadosTableComponent } from '../../components/entrenados-table/entrenados-table.component';
-
-@Component({
+import { EntrenadosTableComponent } from './entrenados-table/entrenados-table.component';@Component({
   selector: 'app-entrenados-page',
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    ModalFormComponent,
     EntrenadosTableComponent
   ],
   templateUrl: './entrenados.page.html',
@@ -40,10 +32,10 @@ export class EntrenadosPage {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly notificacionService = inject(NotificacionService);
   private readonly rutinaService = inject(RutinaService);
-  private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly displayHelper = inject(DisplayHelperService);
   private readonly pageTitleService = inject(PageTitleService);
+  private readonly router = inject(Router);
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
@@ -77,16 +69,14 @@ export class EntrenadosPage {
   readonly entrenados = computed(() => {
     return this.entrenadoService.entrenados().map(entrenado => {
       const usuario = this.usuarios().find(u => u.uid === entrenado.id);
-      const entrenador = this.entrenadores().find(e => e.id === entrenado.entrenadorId);
-      const entrenadorName = entrenador?.displayName || (entrenado.entrenadorId ? `Entrenador ${entrenado.entrenadorId}` : 'Sin asignar');
-      const gimnasio = this.gimnasios().find(g => g.id === entrenado.gimnasioId);
-      const gimnasioName = gimnasio?.displayName || (entrenado.gimnasioId ? `Gimnasio ${entrenado.gimnasioId}` : null);
+      const entrenadorId = entrenado.entrenadoresId?.[0]; // Tomar el primer entrenador
+      const entrenador = entrenadorId ? this.entrenadores().find(e => e.id === entrenadorId) : null;
+      const entrenadorName = entrenador?.displayName || (entrenadorId ? `Entrenador ${entrenadorId}` : 'Sin asignar');
       
       return {
         ...entrenado,
         displayName: usuario?.nombre || usuario?.email || `Entrenado ${entrenado.id}`,
-        entrenadorName,
-        gimnasioName
+        entrenadorName
       };
     });
   });
@@ -97,11 +87,7 @@ export class EntrenadosPage {
   });
 
   // Signals para el estado del componente
-  readonly isModalOpen = signal(false);
-  readonly modalData = signal<any>(null);
-  readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
-  readonly isCreating = signal(false);
 
   constructor() {
     this.pageTitleService.setTitle('Entrenados');
@@ -110,79 +96,9 @@ export class EntrenadosPage {
     this.entrenadorService.initializeListener();
   }
 
-  openDetailsModal(item: any) {
-    this.modalData.set(item);
-    this.isModalOpen.set(true);
-    this.isCreating.set(false);
-    this.createEditForm(item);
-  }
-
-  closeModal() {
-    this.isModalOpen.set(false);
-    this.modalData.set(null);
-    this.editForm.set(null);
-    this.isLoading.set(false);
-    this.isCreating.set(false);
-  }
-
-  private createEditForm(item: any) {
-    const formConfig: any = {
-      nombre: [{ value: '', disabled: true }],
-      email: [{ value: '', disabled: true }],
-      planInfo: [{ value: '', disabled: true }],
-      gimnasioInfo: [{ value: '', disabled: true }],
-      entrenadorInfo: [{ value: '', disabled: true }],
-      activo: [item.activo || false],
-      objetivo: [item.objetivo || ''],
-      fechaRegistro: [item.fechaRegistro ? new Date(item.fechaRegistro).toISOString().slice(0, 16) : '']
-    };
-
-    this.editForm.set(this.fb.group(formConfig));
-  }
-
-  async saveChanges() {
-    const form = this.editForm();
-    const originalData = this.modalData();
-
-    if (!form || !originalData) {
-      this.toastService.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
-    this.isLoading.set(true);
-
-    try {
-      let updatedData = { ...originalData, ...form.value };
-      
-      const clienteDataToSave = {
-        ...updatedData,
-        fechaRegistro: updatedData.fechaRegistro ? new Date(updatedData.fechaRegistro) : undefined
-      };
-      
-      delete clienteDataToSave.usuarioInfo;
-      
-      await this.entrenadoService.save(clienteDataToSave);
-      
-      const usuarioNombre = this.usuarios().find(u => u.uid === updatedData.id)?.nombre || updatedData.id;
-      const gimnasioNombre = this.usuarios().find(u => u.uid === updatedData.gimnasioId)?.nombre || 'Gimnasio desconocido';
-      const entrenadorClienteNombre = this.usuarios().find(u => u.uid === updatedData.entrenadorId)?.nombre || 'Entrenador desconocido';
-      
-      this.toastService.log(`Cliente ${this.isCreating() ? 'creado' : 'actualizado'}: ${usuarioNombre} - Gimnasio: ${gimnasioNombre} - Entrenador: ${entrenadorClienteNombre}`);
-      
-      this.closeModal();
-    } catch (error) {
-      console.error('Error al guardar:', error);
-      this.toastService.log(`Error al guardar los cambios: ${error}`);
-    } finally {
-      this.isLoading.set(false);
-    }
+  viewDetails(item: any) {
+    // Navegar a la página de detalle del entrenado
+    this.router.navigate(['/entrenados', item.id]);
   }
 
   getObjetivosDisponibles() {
@@ -190,301 +106,5 @@ export class EntrenadosPage {
       value: objetivo,
       label: objetivo
     }));
-  }
-
-  getFormFields(): FormFieldConfig[] {
-    const clienteData = this.modalData();
-    
-    // Si no hay datos, retornar array vacío
-    if (!clienteData || !clienteData.id) {
-      return [];
-    }
-    
-    const usuarioAsociado = this.usuarios().find(u => u.uid === clienteData?.id);
-    const gimnasioAsociado = clienteData?.gimnasioId ? this.gimnasios().find(g => g.id === clienteData.gimnasioId) : null;
-    const entrenadorAsociado = clienteData?.entrenadorId ? this.entrenadores().find(e => e.id === clienteData.entrenadorId) : null;
-    
-    // Obtener notificaciones del entrenado (SOLO NO LEÍDAS)
-    const notificacionesEntrenado = this.getNotificacionesEntrenado(clienteData.id).filter(n => !n.leida);
-    
-    // Obtener rutinas asignadas al entrenado
-    const rutinasAsignadas = this.rutinas().filter(rutina => {
-      // Buscar en asignadoIds (array), asignadoId (nuevo) y entrenadoId (legacy)
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(clienteData.id)) ||
-        rutina.asignadoId === clienteData.id || 
-        rutina.entrenadoId === clienteData.id;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
-    }).map(rutina => {
-      const creador = this.usuarios().find(u => u.uid === rutina.creadorId);
-      return {
-        ...rutina,
-        asignadoNombre: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Entrenado',
-        creadorNombre: creador?.nombre || creador?.email || 'Desconocido'
-      };
-    });
-    
-    return [
-      {
-        name: 'nombre',
-        type: 'text',
-        label: 'Nombre del Cliente',
-        placeholder: usuarioAsociado?.nombre || usuarioAsociado?.email || 'Nombre del entrenado',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'email',
-        type: 'text',
-        label: 'Email',
-        placeholder: usuarioAsociado?.email || 'Email del entrenado',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'planInfo',
-        type: 'text',
-        label: 'Plan de Suscripción',
-        placeholder: usuarioAsociado?.plan ? (usuarioAsociado.plan === 'premium' ? 'Premium' : 'Gratuito') : 'Sin plan',
-        readonly: true,
-        colSpan: 2
-      },
-      {
-        name: 'gimnasioInfo',
-        type: 'text',
-        label: 'Gimnasio Asociado',
-        placeholder: gimnasioAsociado?.displayName || 'Sin gimnasio asignado',
-        readonly: true,
-        colSpan: 1
-      },
-      {
-        name: 'entrenadorInfo',
-        type: 'text',
-        label: 'Entrenador Asociado',
-        placeholder: entrenadorAsociado?.displayName || 'Sin entrenador asignado',
-        readonly: true,
-        colSpan: 1,
-        showClearButton: !!entrenadorAsociado
-      },
-      {
-        name: 'objetivo',
-        type: 'select',
-        label: 'Objetivo',
-        placeholder: 'Seleccionar objetivo',
-        options: this.getObjetivosDisponibles(),
-        colSpan: 1
-      },
-      {
-        name: 'activo',
-        type: 'checkbox',
-        label: 'Estado',
-        checkboxLabel: 'Cliente Activo',
-        colSpan: 1
-      },
-      {
-        name: 'rutinasAsignadas',
-        type: 'rutinas-simple',
-        label: 'Rutinas Asignadas',
-        colSpan: 2,
-        rutinas: rutinasAsignadas
-      },
-      {
-        name: 'notificacionesMensajes',
-        type: 'notificaciones-mensajes',
-        label: 'Notificaciones Pendientes',
-        colSpan: 2,
-        notificaciones: notificacionesEntrenado
-      },
-      {
-        name: 'fechaRegistro',
-        type: 'text',
-        inputType: 'datetime-local',
-        label: 'Fecha de Registro',
-        placeholder: 'Fecha de registro',
-        colSpan: 2
-      }
-    ];
-  }
-
-  // ========================================
-  // MÉTODOS PARA NOTIFICACIONES EN MODAL
-  // ========================================
-
-  getNotificacionesEntrenado(entrenadoId: string): any[] {
-    if (!entrenadoId) return [];
-    
-    const todasNotificaciones = this.notificacionService.notificaciones();
-    
-    const notificacionesRelacionadas = todasNotificaciones.filter(notif => {
-      return notif.usuarioId === entrenadoId;
-    });
-    
-    return notificacionesRelacionadas.map(notif => {
-      const remitenteId = notif.datos?.['remitenteId'];
-      
-      if (remitenteId) {
-        const remitente = this.usuarios().find(u => u.uid === remitenteId);
-        return {
-          ...notif,
-          noLeidos: 0, // Sin mensajes, no hay no leídos
-          mensajeInfo: {
-            remitenteNombre: remitente?.nombre || remitente?.email || 'Usuario desconocido'
-          }
-        };
-      }
-      
-      return { ...notif, noLeidos: 0 };
-    });
-  }
-
-  getConversacionesEntrenado(entrenadoId: string): any[] {
-    // Funcionalidad de conversaciones no disponible
-    return [];
-  }
-
-  marcarNotificacionComoLeida(notifId: string) {
-    this.notificacionService.marcarComoLeida(notifId);
-    this.toastService.log('Notificación marcada como leída');
-  }
-
-  
-  // Métodos para manejar invitaciones
-  async aceptarInvitacion(entrenadorId: string) {
-    this.isLoading.set(true);
-    
-    try {
-      // Obtener el entrenado actual del modal
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
-        return;
-      }
-      
-      // Buscar la notificación de invitación pendiente
-      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
-        notif.usuarioId === entrenadoActual.id &&
-        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        notif.datos?.entrenadorId === entrenadorId
-      );
-      
-      if (!invitacionNotif) {
-        this.toastService.log('ERROR: Invitación no encontrada');
-        return;
-      }
-      
-      // Aceptar la invitación usando el nuevo método unificado
-      await this.notificacionService.aceptarInvitacion(invitacionNotif.id);
-      
-      // Crear la asociación entrenador-entrenado
-      const entrenadoActualizado = {
-        ...entrenadoActual,
-        entrenadorId: entrenadorId
-      };
-      
-      await this.entrenadoService.save(entrenadoActualizado);
-      
-      this.toastService.log('✓ Invitación aceptada. Ahora tienes un entrenador asignado');
-      this.closeModal();
-    } catch (error) {
-      console.error('Error al aceptar invitación:', error);
-      this.toastService.log('ERROR: No se pudo aceptar la invitación');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  /**
-   * Rechaza una invitación de entrenador para el entrenado actual.
-   * @param entrenadorId  - ID del entrenador que envió la invitación.
-   * @returns 
-   */
-  async rechazarInvitacion(entrenadorId: string) {
-    this.isLoading.set(true);
-    
-    try {
-
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado actual');
-        return;
-      }
-      
-      const invitacionNotif = this.notificacionService.notificaciones().find(notif => 
-        notif.usuarioId === entrenadoActual.id &&
-        notif.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        notif.datos?.entrenadorId === entrenadorId
-      );
-      
-      if (!invitacionNotif) {
-        this.toastService.log('ERROR: Invitación no encontrada');
-        return;
-      }
-      
-      await this.notificacionService.rechazarInvitacion(invitacionNotif.id);
-      
-      this.toastService.log('Invitación rechazada');
-    } catch (error) {
-      console.error('Error al rechazar invitación:', error);
-      this.toastService.log('ERROR: No se pudo rechazar la invitación');
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
-
-  // Método para manejar el evento clearField del modal
-  onClearField(fieldName: string) {
-    if (fieldName === 'entrenadorInfo') {
-      this.confirmarLimpiarAsociacion();
-    }
-  }
-
-  // Método para confirmar y limpiar la asociación entrenador-entrenado
-  confirmarLimpiarAsociacion() {
-    const entrenadoActual = this.modalData();
-    if (!entrenadoActual || !entrenadoActual.entrenadorId) {
-      this.toastService.log('ERROR: No hay entrenador asignado para limpiar');
-      return;
-    }
-
-    const entrenador = this.entrenadores().find(e => e.id === entrenadoActual.entrenadorId);
-    const entrenadorNombre = entrenador?.displayName || 'el entrenador';
-
-    const confirmacion = confirm(
-      `¿Estás seguro de que quieres limpiar la asociación entre "${entrenadoActual.displayName}" y ${entrenadorNombre}?\n\nEsta acción no se puede deshacer.`
-    );
-
-    if (confirmacion) {
-      this.limpiarAsociacionEntrenador();
-    }
-  }
-
-  // Método para limpiar la asociación entrenador-entrenado
-  async limpiarAsociacionEntrenador() {
-    this.isLoading.set(true);
-
-    try {
-      const entrenadoActual = this.modalData();
-      if (!entrenadoActual || !entrenadoActual.id) {
-        this.toastService.log('ERROR: No se pudo identificar el entrenado');
-        return;
-      }
-
-      // Limpiar el entrenadorId del entrenado
-      const entrenadoActualizado = {
-        ...entrenadoActual,
-        entrenadorId: null
-      };
-
-      await this.entrenadoService.save(entrenadoActualizado);
-
-      this.toastService.log('✓ Asociación con entrenador limpiada exitosamente');
-      this.closeModal();
-    } catch (error) {
-      console.error('Error al limpiar asociación:', error);
-      this.toastService.log('ERROR: No se pudo limpiar la asociación');
-    } finally {
-      this.isLoading.set(false);
-    }
   }
 }

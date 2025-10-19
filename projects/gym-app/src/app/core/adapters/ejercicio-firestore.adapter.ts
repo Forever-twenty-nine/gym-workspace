@@ -79,8 +79,6 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
       descansoSegundos: data.descansoSegundos,
       serieSegundos: data.serieSegundos,
       // Nuevos campos
-      creadorId: data.creadorId,
-      creadorTipo: data.creadorTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
     };
@@ -98,14 +96,6 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
     };
 
     // Incluir campos opcionales solo si tienen valor
-    if (ejercicio.creadorId) {
-      data.creadorId = ejercicio.creadorId;
-    }
-    
-    if (ejercicio.creadorTipo) {
-      data.creadorTipo = ejercicio.creadorTipo;
-    }
-    
     if (ejercicio.fechaCreacion) {
       data.fechaCreacion = ejercicio.fechaCreacion instanceof Date 
         ? ejercicio.fechaCreacion

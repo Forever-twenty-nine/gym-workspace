@@ -49,8 +49,8 @@
               <ion-label>
                 <h3 style="margin: 0; font-size: 15px; font-weight: 600;">{{ invitacion.titulo }}</h3>
                 <p style="margin: 4px 0 0 0; font-size: 14px; color: var(--ion-color-medium);">{{ invitacion.mensaje }}</p>
-                @if (invitacion.datos?.entrenadorNombre) {
-                  <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--ion-color-primary); font-weight: 500;">De: {{ invitacion.datos?.entrenadorNombre }}</p>
+                @if (invitacion.datos.entrenadorNombre) {
+                  <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--ion-color-primary); font-weight: 500;">De: {{ invitacion.datos.entrenadorNombre }}</p>
                 }
               </ion-label>
               <div slot="end" style="display: flex; flex-direction: column; gap: 8px;">

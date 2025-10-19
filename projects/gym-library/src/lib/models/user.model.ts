@@ -1,8 +1,5 @@
 import { Rol} from '../enums/rol.enum';
 import { Plan } from '../enums/plan.enum';
-/**
- * Usuario de firebase 
- */
 
 export interface User {
   uid: string;
@@ -15,4 +12,5 @@ export interface User {
   entrenadoId?: string;
   onboarded?: boolean;
   plan?: Plan;
+ 
 }

@@ -28,6 +28,7 @@
     "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
     "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -- --configuration=firebase",
+    "gym-admin:with-emulator": "npx concurrently \"npm run emulator:start\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {

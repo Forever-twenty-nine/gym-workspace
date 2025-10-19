@@ -26,8 +26,15 @@ export class EjercicioService {
 	private isListenerInitialized = false;
 	private firestoreAdapter?: IEjercicioFirestoreAdapter;
 
-	constructor() {
-		// La inicialización se hará cuando se configure el adaptador
+	// Función genérica para filtrar por rango numérico
+	private filterByRange<T>(items: T[], getValue: (item: T) => number, min: number, max?: number): T[] {
+		return items.filter(item => {
+			const value = getValue(item);
+			if (max !== undefined) {
+				return value >= min && value <= max;
+			}
+			return value >= min;
+		});
 	}
 
 	/**
@@ -86,39 +93,7 @@ export class EjercicioService {
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	validateEjercicio(ejercicio: Ejercicio): void {
-		// Validación 1: Solo ENTRENADO o ENTRENADOR pueden ser creadores
-		if (ejercicio.creadorTipo) {
-			if (ejercicio.creadorTipo !== Rol.ENTRENADO && ejercicio.creadorTipo !== Rol.ENTRENADOR) {
-				throw new EjercicioValidationError(
-					`Solo entrenados y entrenadores pueden crear ejercicios. Tipo recibido: ${ejercicio.creadorTipo}`
-				);
-			}
-		}
-
-		// Validación 2: Solo ENTRENADO puede ser asignado
-		if (ejercicio.asignadoATipo) {
-			if (ejercicio.asignadoATipo !== Rol.ENTRENADO) {
-				throw new EjercicioValidationError(
-					`Los ejercicios solo pueden ser asignados a entrenados. Tipo recibido: ${ejercicio.asignadoATipo}`
-				);
-			}
-		}
-
-		// Validación 3: Si hay asignadoAId, debe haber asignadoATipo
-		if (ejercicio.asignadoAId && !ejercicio.asignadoATipo) {
-			throw new EjercicioValidationError(
-				'Si se especifica un usuario asignado, debe especificarse el tipo de asignado'
-			);
-		}
-
-		// Validación 4: Si hay creadorId, debe haber creadorTipo
-		if (ejercicio.creadorId && !ejercicio.creadorTipo) {
-			throw new EjercicioValidationError(
-				'Si se especifica un creador, debe especificarse el tipo de creador'
-			);
-		}
-
-		// Validación 5: Valores numéricos positivos
+		// Validación 1: Valores numéricos positivos
 		if (ejercicio.series < 0) {
 			throw new EjercicioValidationError('Las series deben ser un valor positivo');
 		}
@@ -138,21 +113,16 @@ export class EjercicioService {
 	private normalizeEjercicio(ejercicio: Ejercicio): Ejercicio {
 		const normalized = { ...ejercicio };
 
-		// Limpiar campos vacíos de creador
-		if (!normalized.creadorId || normalized.creadorId === '') {
-			delete normalized.creadorId;
-			delete normalized.creadorTipo;
+		// Limpiar strings vacíos
+		if (!normalized.nombre || normalized.nombre.trim() === '') {
+			throw new EjercicioValidationError('El nombre del ejercicio es obligatorio');
 		}
-
-		// Limpiar campos vacíos de asignado
-		if (!normalized.asignadoAId || normalized.asignadoAId === '') {
-			delete normalized.asignadoAId;
-			delete normalized.asignadoATipo;
-		}
-
-		// Si hay asignadoAId, asegurarse que asignadoATipo sea ENTRENADO
-		if (normalized.asignadoAId) {
-			normalized.asignadoATipo = Rol.ENTRENADO;
+		normalized.nombre = normalized.nombre.trim();
+		if (normalized.descripcion) {
+			normalized.descripcion = normalized.descripcion.trim();
+			if (normalized.descripcion === '') {
+				delete normalized.descripcion;
+			}
 		}
 
 		// Agregar o actualizar metadatos de fecha
@@ -233,12 +203,7 @@ export class EjercicioService {
 	 */
 	getEjerciciosBySeries(minSeries: number, maxSeries?: number): Signal<Ejercicio[]> {
 		return computed(() => 
-			this._ejercicios().filter(ejercicio => {
-				if (maxSeries) {
-					return ejercicio.series >= minSeries && ejercicio.series <= maxSeries;
-				}
-				return ejercicio.series >= minSeries;
-			})
+			this.filterByRange(this._ejercicios(), e => e.series, minSeries, maxSeries)
 		);
 	}
 
@@ -254,12 +219,7 @@ export class EjercicioService {
 	 */
 	getEjerciciosByRepeticiones(minReps: number, maxReps?: number): Signal<Ejercicio[]> {
 		return computed(() => 
-			this._ejercicios().filter(ejercicio => {
-				if (maxReps) {
-					return ejercicio.repeticiones >= minReps && ejercicio.repeticiones <= maxReps;
-				}
-				return ejercicio.repeticiones >= minReps;
-			})
+			this.filterByRange(this._ejercicios(), e => e.repeticiones, minReps, maxReps)
 		);
 	}
 
@@ -282,71 +242,6 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios creados por un usuario específico
-	 */
-	getEjerciciosByCreador(creadorId: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorId === creadorId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por un tipo de rol específico
-	 */
-	getEjerciciosByCreadorTipo(creadorTipo: Rol): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === creadorTipo)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios asignados a un usuario específico
-	 */
-	getEjerciciosByAsignado(asignadoAId: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.asignadoAId === asignadoAId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios asignados a entrenados (todos)
-	 */
-	getEjerciciosAsignados(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => 
-				ejercicio.asignadoAId && ejercicio.asignadoATipo === Rol.ENTRENADO
-			)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios sin asignar
-	 */
-	getEjerciciosSinAsignar(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => !ejercicio.asignadoAId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por entrenados
-	 */
-	getEjerciciosCreadosPorEntrenados(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADO)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por entrenadores
-	 */
-	getEjerciciosCreadosPorEntrenadores(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADOR)
-		);
-	}
-
-	/**
 	 * ✅ Verifica si un rol puede crear ejercicios
 	 */
 	static canCreateEjercicio(rol: Rol): boolean {
@@ -354,23 +249,9 @@ export class EjercicioService {
 	}
 
 	/**
-	 * ✅ Verifica si un rol puede ser asignado a un ejercicio
-	 */
-	static canBeAssignedToEjercicio(rol: Rol): boolean {
-		return rol === Rol.ENTRENADO;
-	}
-
-	/**
 	 * 📋 Obtiene los roles que pueden crear ejercicios
 	 */
 	static getRolesCreadores(): Rol[] {
 		return [Rol.ENTRENADO, Rol.ENTRENADOR];
-	}
-
-	/**
-	 * 📋 Obtiene los roles que pueden ser asignados a ejercicios
-	 */
-	static getRolesAsignables(): Rol[] {
-		return [Rol.ENTRENADO];
 	}
 }
