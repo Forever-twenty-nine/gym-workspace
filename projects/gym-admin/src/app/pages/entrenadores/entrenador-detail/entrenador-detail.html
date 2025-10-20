@@ -68,9 +68,15 @@
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-purple-900">Ejercicios</h3>
             <button type="button" (click)="toggleModalEjercicios()"
-              class="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center gap-2">
+              [disabled]="isAtEjercicioLimit()"
+              class="px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              [class.bg-purple-600]="!isAtEjercicioLimit()"
+              [class.bg-gray-400]="isAtEjercicioLimit()"
+              [class.hover:bg-purple-700]="!isAtEjercicioLimit()"
+              [class.hover:bg-gray-400]="isAtEjercicioLimit()"
+              [class.cursor-not-allowed]="isAtEjercicioLimit()">
               <span>+</span>
-              <span>Crear Ejercicio</span>
+              <span>{{ isAtEjercicioLimit() ? 'Límite alcanzado' : 'Crear Ejercicio' }}</span>
             </button>
           </div>
           <div class="space-y-2 max-h-40 overflow-y-auto">

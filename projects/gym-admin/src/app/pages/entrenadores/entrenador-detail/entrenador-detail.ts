@@ -82,6 +82,8 @@ export class EntrenadorDetail implements OnInit {
           this.pageTitleService.setTitle(`Entrenador: ${entrenador.displayName || id}`);
           // Limpiar IDs huérfanos de rutinas
           this.entrenadorService.cleanRutinasCreadasIds(id);
+          // Limpiar IDs huérfanos de ejercicios
+          this.entrenadorService.cleanEjerciciosCreadosIds(id);
         } else {
           this.router.navigate(['/entrenadores']);
         }
@@ -97,6 +99,14 @@ export class EntrenadorDetail implements OnInit {
 
   readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenador(this.entrenadorId())());
 
+  readonly isAtEjercicioLimit = computed(() => {
+    const entrenadorId = this.entrenadorId();
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.ejercicios().length;
+    return currentCount >= limits.maxExercises;
+  });
+
   editEjercicio(ejercicio: any) {
     this.toggleModalEjercicios(ejercicio);
   }
@@ -107,7 +117,7 @@ export class EntrenadorDetail implements OnInit {
     }
 
     try {
-      await this.ejercicioService.delete(ejercicio.id);
+      await this.entrenadorService.deleteEjercicioCreado(this.entrenadorId(), ejercicio.id);
       this.toastService.log(`Ejercicio eliminado: ${ejercicio.nombre}`);
     } catch (error: any) {
       console.error('Error al eliminar ejercicio:', error);

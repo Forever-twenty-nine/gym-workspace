@@ -2,7 +2,7 @@
 @if (isOpen()) {
   <div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
        (click)="onClose()">
-    <div class="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[95vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
          (click)="$event.stopPropagation()">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
@@ -15,7 +15,7 @@
       </div>
 
       <!-- Content -->
-      <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+      <div class="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
         @if (entrenado(); as entrenado) {
           <div class="space-y-4">
             <!-- Información básica -->
