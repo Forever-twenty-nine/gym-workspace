@@ -101,7 +101,7 @@ export class EntrenadorService {
   // Cache para límites por entrenador (evita búsquedas repetidas)
   private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
   
-  // Métodos privados para límites de plan
+  // Métodos para límites de plan
   getLimits(entrenadorId: string) {
     if (this.limitsCache.has(entrenadorId)) {
       return this.limitsCache.get(entrenadorId)!;
@@ -110,7 +110,7 @@ export class EntrenadorService {
     const isFree = user?.plan === 'free';
     const limits = {
       maxClients: isFree ? 3 : Infinity,
-      maxRoutines: isFree ? 5 : Infinity,
+      maxRoutines: isFree ? 3 : Infinity,
       maxExercises: isFree ? 10 : Infinity,
     };
     this.limitsCache.set(entrenadorId, limits);
@@ -452,6 +452,23 @@ export class EntrenadorService {
     if (entrenador) {
       const rutinasCreadasIds = (entrenador.rutinasCreadasIds || []).filter((id: string) => id !== rutinaId);
       await this.update(entrenadorId, { rutinasCreadasIds });
+    }
+  }
+
+  /**
+   * 🧹 Limpiar IDs huérfanos de rutinas creadas (IDs que no tienen rutina correspondiente)
+   * @param entrenadorId - ID del entrenador
+   */
+  async cleanRutinasCreadasIds(entrenadorId: string): Promise<void> {
+    const entrenador = this.getEntrenadorById(entrenadorId)();
+    if (!entrenador || !entrenador.rutinasCreadasIds) return;
+
+    const existingRutinas = this.getRutinasByEntrenador(entrenadorId)();
+    const existingIds = existingRutinas.map(r => r.id);
+    const cleanedIds = entrenador.rutinasCreadasIds.filter(id => existingIds.includes(id));
+
+    if (cleanedIds.length !== entrenador.rutinasCreadasIds.length) {
+      await this.update(entrenadorId, { rutinasCreadasIds: cleanedIds });
     }
   }
 

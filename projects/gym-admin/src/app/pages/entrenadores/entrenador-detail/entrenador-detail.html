@@ -110,9 +110,15 @@
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-green-900">Rutinas</h3>
             <button type="button" (click)="toggleModalRutinas()"
-              class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2">
+              [disabled]="isAtRutinaLimit()"
+              class="px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              [class.bg-green-600]="!isAtRutinaLimit()"
+              [class.bg-gray-400]="isAtRutinaLimit()"
+              [class.hover:bg-green-700]="!isAtRutinaLimit()"
+              [class.hover:bg-gray-400]="isAtRutinaLimit()"
+              [class.cursor-not-allowed]="isAtRutinaLimit()">
               <span>+</span>
-              <span>Crear Rutina</span>
+              <span>{{ isAtRutinaLimit() ? 'Límite alcanzado' : 'Crear Rutina' }}</span>
             </button>
           </div>
           <div class="space-y-2 max-h-40 overflow-y-auto">

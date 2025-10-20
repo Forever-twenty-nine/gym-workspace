@@ -125,6 +125,13 @@ export class EjercicioService {
 			}
 		}
 
+		// Eliminar campos opcionales que sean undefined para evitar errores en Firestore
+		if (normalized.peso === undefined) delete normalized.peso;
+		if (normalized.descansoSegundos === undefined) delete normalized.descansoSegundos;
+		if (normalized.serieSegundos === undefined) delete normalized.serieSegundos;
+		if (normalized.fechaCreacion === undefined) delete normalized.fechaCreacion;
+		if (normalized.fechaModificacion === undefined) delete normalized.fechaModificacion;
+
 		// Agregar o actualizar metadatos de fecha
 		const now = new Date();
 		if (!normalized.id || normalized.id === '') {

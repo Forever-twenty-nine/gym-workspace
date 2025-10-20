@@ -195,6 +195,16 @@ export class RutinaModalComponent implements OnInit {
       return;
     }
 
+    // Validar límite de rutinas para creación
+    if (this.isCreating() && this.creadorId()) {
+      const limits = this.entrenadorService.getLimits(this.creadorId());
+      const currentCount = this.entrenadorService.getRutinasByEntrenador(this.creadorId())().length;
+      if (currentCount >= limits.maxRoutines) {
+        this.toastService.log('Has alcanzado el límite de rutinas para tu plan. Actualiza para crear más.');
+        return;
+      }
+    }
+
     this.isLoading.set(true);
 
     try {
@@ -214,7 +224,7 @@ export class RutinaModalComponent implements OnInit {
         fechaAsignacion: updatedData.fechaAsignacion || new Date()
       };
 
-      await this.rutinaService.save(rutinaToSave);
+      await this.rutinaService.save(this.cleanUndefinedFields(rutinaToSave));
 
       // Si es creación, agregar a la lista del entrenador
       if (this.isCreating() && this.creadorId()) {
@@ -234,6 +244,17 @@ export class RutinaModalComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  // Limpiar campos undefined del objeto
+  private cleanUndefinedFields(obj: any): any {
+    const cleaned: any = {};
+    for (const key in obj) {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key];
+      }
+    }
+    return cleaned;
   }
 
   // Cerrar modal
