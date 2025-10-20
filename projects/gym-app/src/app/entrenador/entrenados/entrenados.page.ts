@@ -138,6 +138,15 @@ export class EntrenadosPage implements OnInit {
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
 
+    /** Calcula la antigüedad en días desde la fecha de registro */
+    getAntiguedadDias(entrenado: Entrenado): number | null {
+      if (!entrenado.fechaRegistro) return null;
+      const fecha = new Date(entrenado.fechaRegistro);
+      const hoy = new Date();
+      const diffMs = hoy.getTime() - fecha.getTime();
+      return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    }
+
   constructor() {
     addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline });
   }

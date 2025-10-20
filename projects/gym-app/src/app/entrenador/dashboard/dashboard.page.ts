@@ -88,9 +88,11 @@ export class DashboardPage implements OnInit {
 
   constructor() {
     addIcons({ peopleOutline, fitnessOutline, statsChartOutline, calendarOutline });
+    // Inicializar listener de entrenadores para que se listen rutinas y ejercicios creados
+    this.entrenadorService.initializeListener();
   }
   ngOnInit(): void {
-   
+    // ...existing code...
   }
 
   getUserName(userId: string): string {

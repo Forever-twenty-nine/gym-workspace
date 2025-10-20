@@ -89,6 +89,37 @@
                 </ion-item>
               }
             </ion-list>
+
+            <!-- Progreso y estadísticas resumidas -->
+            <ion-card style="margin-top: 16px;">
+              <ion-card-header>
+                <ion-card-title>Progreso y Estadísticas</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list lines="none">
+                  <ion-item>
+                    <ion-icon name="stats-chart-outline" slot="start" color="success"></ion-icon>
+                    <ion-label>
+                      <h3>Rutinas asignadas</h3>
+                      <p>{{ selectedEntrenado()!.rutinasAsignadas?.length || 0 }} rutinas</p>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+                    <ion-label>
+                      <h3>Antigüedad</h3>
+                      <p>
+                        @if (getAntiguedadDias(selectedEntrenado()!) !== null) {
+                          {{ getAntiguedadDias(selectedEntrenado()!) }} días
+                        } @else {
+                          Sin registro
+                        }
+                      </p>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
           </div>
         }
       </ion-content>
