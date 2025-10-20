@@ -17,6 +17,7 @@ import {
   barbell,
   person,
   statsChartOutline,
+  statsChart,
   flameOutline,
   flame} from 'ionicons/icons';
 
@@ -36,6 +37,6 @@ import {
 export class EntrenadoTabsPage {
 
   constructor() {
-    addIcons({homeOutline, home, flameOutline, barbellOutline, barbell, flame, statsChartOutline,fitnessOutline,personOutline, person});
+    addIcons({homeOutline, home, flameOutline, barbellOutline, barbell, flame, statsChartOutline, statsChart, fitnessOutline, personOutline, person});
   }
 }

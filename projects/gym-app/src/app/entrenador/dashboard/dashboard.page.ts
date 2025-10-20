@@ -40,13 +40,8 @@ import { Entrenado } from 'gym-library';
     IonToolbar,
     IonContent,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
     IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
     IonAvatar,
     IonChip
   ],

@@ -1,0 +1,184 @@
+.progreso-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.stats-card {
+  margin-bottom: 16px;
+}
+
+.stats-card .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stats-card .stats-grid .stat-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+}
+
+.stats-card .stats-grid .stat-item .stat-number {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--ion-color-primary);
+  margin-bottom: 4px;
+}
+
+.stats-card .stats-grid .stat-item .stat-label {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stats-card .progreso-general .progreso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stats-card .progreso-general .progreso-detalle {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.rutinas-card {
+  margin-bottom: 16px;
+}
+
+.rutinas-card .rutina-item {
+  --border-radius: 12px;
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--ion-color-light-shade);
+}
+
+.rutinas-card .rutina-item ion-label h3 {
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.rutinas-card .rutina-item ion-label .rutina-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rutinas-card .rutina-item ion-label .rutina-info .fecha-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.rutinas-card .rutina-item ion-label .rutina-info .fecha-info ion-icon {
+  font-size: 14px;
+}
+
+.rutinas-card .rutina-item ion-label .rutina-progreso .progreso-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.rutinas-card .rutina-item ion-label .rutina-progreso .progreso-mini span {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 35px;
+}
+
+.rutinas-card .rutina-item ion-label .rutina-progreso .ejercicios-count {
+  font-size: 11px;
+  color: var(--ion-color-medium);
+}
+
+.logros-card .logros-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.logros-card .logros-grid .logro-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--ion-color-light);
+  border-radius: 12px;
+}
+
+.logros-card .logros-grid .logro-item ion-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.logros-card .logros-grid .logro-item .logro-text {
+  flex: 1;
+}
+
+.logros-card .logros-grid .logro-item .logro-text .logro-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.logros-card .logros-grid .logro-item .logro-text .logro-desc {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+}
+
+.logros-card .no-logros {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ion-color-medium);
+}
+
+.logros-card .no-logros ion-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.logros-card .no-logros p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.no-rutinas {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ion-color-medium);
+}
+
+.no-rutinas ion-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.no-rutinas p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.loading-container ion-text {
+  font-size: 16px;
+}

@@ -1,23 +1,14 @@
-import { Component, OnInit, signal, inject, computed, effect, Injector, OnDestroy } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonButton,
   IonButtons,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonModal,
-  IonChip, IonBackButton } from '@ionic/angular/standalone';
+  IonBackButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline,
@@ -34,60 +25,45 @@ import {
   closeCircleOutline,
   listOutline,
   documentTextOutline,
-  pauseOutline,
-  stopOutline,
-  timerOutline
+  timerOutline,
+  notificationsOutline,
+  arrowBackOutline,
+  todayOutline
 } from 'ionicons/icons';
 import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
-import { CronometroRutinaComponent } from '../components/cronometro-rutina/cronometro-rutina.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   styleUrls: ['./rutinas.page.css'],
   standalone: true,
-  imports: [IonBackButton,
+  imports: [
+    IonBackButton,
     CommonModule,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonButton,
     IonButtons,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonModal,
-    IonChip,
-    CronometroRutinaComponent
+    IonIcon
   ],
 })
-export class RutinasPage implements OnInit, OnDestroy {
+export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
   private entrenadoService = inject(EntrenadoService);
+  private router = inject(Router);
   private injector = inject(Injector);
 
   // Señal para todas las rutinas
   private todasLasRutinas = signal<Rutina[]>([]);
 
-  // Señales para el modal
-  rutinaSeleccionada = signal<any>(null);
-  modalAbierto = signal<boolean>(false);
-
-  // Señales para el cronómetro
-  cronometroActivo = signal<boolean>(false);
-  cronometroPausado = signal<boolean>(false);
-  tiempoTranscurrido = signal<number>(0); // en segundos
-  rutinaEnCurso = signal<any>(null);
-  private intervaloId: any = null;
-  private tiempoInicio: number = 0;
+    // Estado del modal (ya no se usa, pero mantenemos por compatibilidad)
+  readonly modalAbierto = signal(false);
+  readonly rutinaSeleccionada = signal<any>(null);
 
   // Computed para rutinas del entrenado actual
   rutinasAsignadas = computed(() => {
@@ -118,9 +94,10 @@ export class RutinasPage implements OnInit, OnDestroy {
       closeCircleOutline,
       listOutline,
       documentTextOutline,
-      pauseOutline,
-      stopOutline,
-      timerOutline
+      timerOutline,
+      notificationsOutline,
+      arrowBackOutline,
+      todayOutline
     });
   }
 
@@ -217,6 +194,53 @@ export class RutinasPage implements OnInit, OnDestroy {
       .filter((ej: any) => ej !== undefined); // Filtrar ejercicios no encontrados
   });
 
+  // Rutinas organizadas por días de la semana (solo semana actual)
+  readonly rutinasPorDia = computed(() => {
+    const rutinas = this.rutinasAsignadas();
+    const hoy = new Date();
+
+    // Calcular fechas para la próxima semana (7 días)
+    const fechas = [];
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      fechas.push(fecha);
+    }
+
+    // Organizar por día
+    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; esHoy: boolean; } } = {};
+
+    fechas.forEach(fecha => {
+      // Usar los mismos valores que se guardan en el modal (sin tildes)
+      const diaSemanaIndex = fecha.getDay();
+      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+      const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+      const diaSemana = diasSemanaSinTilde[diaSemanaIndex]; // Usar sin tilde para comparación
+      const diaCorto = diasSemanaCorto[diaSemanaIndex];
+      const fechaKey = fecha.toISOString().split('T')[0];
+
+      if (!rutinasOrganizadas[fechaKey]) {
+        rutinasOrganizadas[fechaKey] = {
+          fecha: new Date(fecha),
+          rutinas: [],
+          diaCorto,
+          esHoy: fecha.toDateString() === hoy.toDateString()
+        };
+      }
+
+      // Agregar rutinas que corresponden a este día
+      rutinas.forEach(rutina => {
+        if (rutina.DiasSemana && rutina.DiasSemana.includes(diaSemana)) {
+          rutinasOrganizadas[fechaKey].rutinas.push(rutina);
+        }
+      });
+    });
+
+    // Convertir a array y ordenar por fecha
+    return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+  });
+
   /**
    * Abre el modal con los detalles de la rutina
    */
@@ -245,20 +269,8 @@ export class RutinasPage implements OnInit, OnDestroy {
   }
 
   iniciarEntrenamiento(rutina: any) {
-    // Iniciar cronómetro
-    this.rutinaEnCurso.set(rutina);
-    this.cronometroActivo.set(true);
-    this.cronometroPausado.set(false);
-    this.tiempoTranscurrido.set(0);
-    this.tiempoInicio = Date.now();
-
-    // Iniciar el intervalo del cronómetro
-    this.intervaloId = setInterval(() => {
-      if (!this.cronometroPausado()) {
-        const tiempoActual = Math.floor((Date.now() - this.tiempoInicio) / 1000);
-        this.tiempoTranscurrido.set(tiempoActual);
-      }
-    }, 1000);
+    // Navegar a la página de progreso de rutina
+    this.router.navigate(['/entrenado-tabs/rutina-progreso', rutina.id]);
 
     // Cerrar modal si está abierto
     if (this.modalAbierto()) {
@@ -267,53 +279,15 @@ export class RutinasPage implements OnInit, OnDestroy {
   }
 
   pausarCronometro() {
-    this.cronometroPausado.set(!this.cronometroPausado());
-
-    if (!this.cronometroPausado()) {
-      // Al reanudar, ajustar el tiempo de inicio
-      const tiempoTranscurridoMs = this.tiempoTranscurrido() * 1000;
-      this.tiempoInicio = Date.now() - tiempoTranscurridoMs;
-    }
+    // Este método ya no se usa - la lógica se maneja en rutina-progreso
   }
 
   detenerCronometro() {
-    if (this.intervaloId) {
-      clearInterval(this.intervaloId);
-      this.intervaloId = null;
-    }
-
-    this.cronometroActivo.set(false);
-    this.cronometroPausado.set(false);
-    this.tiempoTranscurrido.set(0);
-    this.rutinaEnCurso.set(null);
+    // Este método ya no se usa - la lógica se maneja en rutina-progreso
   }
 
   finalizarEntrenamiento() {
-    const tiempoFinal = this.tiempoTranscurrido();
-    const rutina = this.rutinaEnCurso();
-
-    // Detener cronómetro
-    this.detenerCronometro();
-
-    // Marcar rutina como completada
-    if (rutina) {
-      this.marcarCompletado(rutina);
-    }
-  }
-
-  /**
-   * Formatea el tiempo del cronómetro en formato HH:MM:SS
-   */
-  formatearTiempoCronometro(segundos: number): string {
-    const horas = Math.floor(segundos / 3600);
-    const minutos = Math.floor((segundos % 3600) / 60);
-    const segs = segundos % 60;
-
-    const horasStr = horas.toString().padStart(2, '0');
-    const minutosStr = minutos.toString().padStart(2, '0');
-    const segsStr = segs.toString().padStart(2, '0');
-
-    return `${horasStr}:${minutosStr}:${segsStr}`;
+    // Este método ya no se usa - la lógica se maneja en rutina-progreso
   }
 
   async marcarCompletado(rutina: any) {
@@ -332,13 +306,6 @@ export class RutinasPage implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Error al marcar rutina como completada:', error);
-    }
-  }
-
-  ngOnDestroy() {
-    // Limpiar el intervalo del cronómetro al destruir el componente
-    if (this.intervaloId) {
-      clearInterval(this.intervaloId);
     }
   }
 }
