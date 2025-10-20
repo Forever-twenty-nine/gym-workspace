@@ -1,9 +1,9 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -17,15 +17,14 @@ import {
   IonLabel,
   IonList,
   IonModal,
-  IonChip
-} from '@ionic/angular/standalone';
+  IonChip, IonBackButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  fitnessOutline, 
-  playOutline, 
-  timeOutline, 
-  flameOutline, 
-  calendarOutline, 
+import {
+  fitnessOutline,
+  playOutline,
+  timeOutline,
+  flameOutline,
+  calendarOutline,
   bodyOutline,
   trophyOutline,
   checkmarkCircle,
@@ -47,7 +46,7 @@ import { CronometroRutinaComponent } from '../components/cronometro-rutina/crono
   templateUrl: './rutinas.page.html',
   styleUrls: ['./rutinas.page.css'],
   standalone: true,
-  imports: [
+  imports: [IonBackButton,
     CommonModule,
     IonHeader,
     IonToolbar,
@@ -104,12 +103,12 @@ export class RutinasPage implements OnInit, OnDestroy {
   });
 
   constructor() {
-    addIcons({ 
-      fitnessOutline, 
-      playOutline, 
-      timeOutline, 
-      flameOutline, 
-      calendarOutline, 
+    addIcons({
+      fitnessOutline,
+      playOutline,
+      timeOutline,
+      flameOutline,
+      calendarOutline,
       bodyOutline,
       trophyOutline,
       checkmarkCircle,
@@ -206,7 +205,7 @@ export class RutinasPage implements OnInit, OnDestroy {
     if (!rutina?.ejerciciosIds) return [];
     
     const todosEjercicios = this.ejercicioService.ejercicios();
-    
+
     // Si los ejercicios son strings (IDs), buscar los objetos completos
     return rutina.ejerciciosIds
       .map((ej: any) => {
@@ -252,7 +251,7 @@ export class RutinasPage implements OnInit, OnDestroy {
     this.cronometroPausado.set(false);
     this.tiempoTranscurrido.set(0);
     this.tiempoInicio = Date.now();
-    
+
     // Iniciar el intervalo del cronómetro
     this.intervaloId = setInterval(() => {
       if (!this.cronometroPausado()) {
@@ -260,7 +259,7 @@ export class RutinasPage implements OnInit, OnDestroy {
         this.tiempoTranscurrido.set(tiempoActual);
       }
     }, 1000);
-    
+
     // Cerrar modal si está abierto
     if (this.modalAbierto()) {
       this.cerrarModal();
@@ -269,7 +268,7 @@ export class RutinasPage implements OnInit, OnDestroy {
 
   pausarCronometro() {
     this.cronometroPausado.set(!this.cronometroPausado());
-    
+
     if (!this.cronometroPausado()) {
       // Al reanudar, ajustar el tiempo de inicio
       const tiempoTranscurridoMs = this.tiempoTranscurrido() * 1000;
@@ -282,7 +281,7 @@ export class RutinasPage implements OnInit, OnDestroy {
       clearInterval(this.intervaloId);
       this.intervaloId = null;
     }
-    
+
     this.cronometroActivo.set(false);
     this.cronometroPausado.set(false);
     this.tiempoTranscurrido.set(0);
@@ -292,10 +291,10 @@ export class RutinasPage implements OnInit, OnDestroy {
   finalizarEntrenamiento() {
     const tiempoFinal = this.tiempoTranscurrido();
     const rutina = this.rutinaEnCurso();
-    
+
     // Detener cronómetro
     this.detenerCronometro();
-    
+
     // Marcar rutina como completada
     if (rutina) {
       this.marcarCompletado(rutina);
@@ -309,11 +308,11 @@ export class RutinasPage implements OnInit, OnDestroy {
     const horas = Math.floor(segundos / 3600);
     const minutos = Math.floor((segundos % 3600) / 60);
     const segs = segundos % 60;
-    
+
     const horasStr = horas.toString().padStart(2, '0');
     const minutosStr = minutos.toString().padStart(2, '0');
     const segsStr = segs.toString().padStart(2, '0');
-    
+
     return `${horasStr}:${minutosStr}:${segsStr}`;
   }
 
@@ -324,9 +323,9 @@ export class RutinasPage implements OnInit, OnDestroy {
         ...rutina,
         completado: !rutina.completado
       };
-      
+
       await this.rutinaService.save(rutinaActualizada);
-      
+
       // Si el modal está abierto, actualizar la rutina seleccionada
       if (this.modalAbierto() && this.rutinaSeleccionada()?.id === rutina.id) {
         this.rutinaSeleccionada.set(rutinaActualizada);

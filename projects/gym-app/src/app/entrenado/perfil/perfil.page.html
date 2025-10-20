@@ -1,19 +1,123 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <!-- <ion-title>Mi Perfil</ion-title> -->
+<ion-header [translucent]="true" class="px-4">
+  <ion-toolbar class="">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/entrenado-tabs/dashboard" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-center flex-1 text-base">Perfil</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Mi Perfil</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="">
 
   @if (currentUser(); as user) {
     <!-- Tarjeta de información personal compacta -->
-    <ion-card class="profile-card">
+    <section class="gym-box-primary px-2 py-2">
+      <div class="flex items-center gap-2 ion-padding">
+        <!-- Foto -->
+        <ion-avatar class="!w-16 !h-16">
+          <img src="../../../assets/images/test-foto.png" alt="" class="">
+        </ion-avatar>
+        <!-- Datos -->
+        <div>
+          <p class="font-heading font-bold text-xl mb-1 ">
+            {{ user.nombre }}
+          </p>
+          <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
+            Plan {{ user.plan }}
+          </ion-chip>
+        </div>
+      </div>
+    </section>
+
+    <!--  -->
+    <section class="ion-padding">
+      <div class="p-2 border border-solid border-gray-400 rounded-xl m-2">
+
+        <!-- Usuario -->
+        <div class="flex items-start gap-2 p-2">
+            <div class="flex flex-col border-b border-solid border-gray-400 w-full pb-3">
+              <span class="text-gray-500 text-xs font-heading">
+                ID Usuario
+              </span>
+              <span class="">
+                {{ user.uid }}
+              </span>
+            </div>
+        </div>
+
+        <!-- Email -->
+        @if (user.email) {
+          <div class="flex items-start gap-2 p-2">
+            <div class="flex flex-col border-b border-solid border-gray-400 w-full pb-3">
+              <span class="text-gray-500 text-xs font-heading">
+                Email
+              </span>
+              <span class="">
+                {{ user.email }}
+              </span>
+            </div>
+          </div>
+        }
+
+        @if (user.gimnasioId) {
+          <div class="info-item">
+            <ion-icon name="fitness-outline" color="primary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Gimnasio</span>
+              <span class="info-value">{{ user.gimnasioId }}</span>
+            </div>
+          </div>
+        }
+
+        @if (user.entrenadorId) {
+          <div class="info-item">
+            <ion-icon name="person-outline" color="primary"></ion-icon>
+            <div class="info-text">
+              <span class="info-label">Entrenador</span>
+              <span class="info-value">{{ user.entrenadorId }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Plan -->
+        @if (user.plan) {
+          <div class="flex items-start gap-2 p-2">
+            <div class="flex flex-col w-full pb-3">
+              <span class="text-gray-500 text-xs font-heading">
+                Plan
+              </span>
+              <span class="">
+                {{ user.plan }}
+              </span>
+            </div>
+          </div>
+
+        }
+
+
+      </div>
+    </section>
+
+    <!-- Logout -->
+    <section class="px-4">
+      <div class="px-2">
+        <ion-button
+          expand="block"
+          color="danger"
+          fill="outline"
+          (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar Sesión
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- <ion-card class="profile-card">
       <ion-card-content class="profile-content">
         <div class="profile-header">
           <ion-avatar class="profile-avatar">
@@ -22,7 +126,7 @@
             </div>
           </ion-avatar>
           <div class="profile-info">
-            <h2>{{ user.nombre }}</h2>
+            <h2></h2>
             <ion-badge [color]="getBadgeColor(user.role)">
               <ion-icon name="shield-outline"></ion-icon>
               {{ getRoleDisplayName(user.role) }}
@@ -30,10 +134,10 @@
           </div>
         </div>
       </ion-card-content>
-    </ion-card>
+    </ion-card> -->
 
     <!-- Información de contacto en grid -->
-    <ion-card class="info-card">
+    <!-- <ion-card class="info-card">
       <ion-card-header class="card-header-compact">
         <ion-card-title>
           <ion-icon name="person-outline"></ion-icon>
@@ -89,21 +193,21 @@
           </div>
         </div>
       </ion-card-content>
-    </ion-card>
+    </ion-card> -->
 
     <!-- Acciones de la cuenta -->
-    <ion-card class="account-card">
+    <!-- <ion-card class="account-card">
       <ion-card-content class="account-content">
-        <ion-button 
-          expand="block" 
-          color="danger" 
+        <ion-button
+          expand="block"
+          color="danger"
           fill="outline"
           (click)="logout()">
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Cerrar Sesión
         </ion-button>
       </ion-card-content>
-    </ion-card>
+    </ion-card> -->
 
   } @else {
     <ion-card>

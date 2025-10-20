@@ -1,34 +1,49 @@
-<ion-header [translucent]="true">
+<!-- <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- <ion-title>Mi Dashboard</ion-title> -->
+    <ion-title>Mi Dashboard</ion-title>
   </ion-toolbar>
-</ion-header>
+</ion-header> -->
 
 <ion-content [fullscreen]="true" class="ion-padding">
-  
+
   <!-- <ion-header collapse="condense">
     <ion-toolbar>
       <ion-title size="large">Mi Dashboard</ion-title>
     </ion-toolbar>
   </ion-header> -->
 
-  <!-- Información del entrenado -->
-  <ion-card>
-    <ion-card-content class="ion-padding">
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <ion-avatar style="width: 48px; height: 48px;">
-            <ion-icon name="person-outline" style="font-size: 28px;"></ion-icon>
+  <!-- ENTRENADO -->
+  <section class="p-2 mb-4">
+    <div class="flex justify-between items-start">
+        <div class="flex items-center justify-center gap-2">
+          <!-- Foto -->
+          <ion-avatar class="!w-12 !h-12">
+            <img src="../../../assets/images/test-foto.png" alt="" class="">
           </ion-avatar>
-          <h2 style="margin: 0; font-size: 20px; font-weight: 600;">{{ nombreEntrenado() }}</h2>
-        </div>
-        <ion-chip [color]="tipoPlan().includes('Premium') ? 'primary' : 'medium'">
-          {{ tipoPlan().replace('Plan ', '') }}
-        </ion-chip>
-      </div>
-    </ion-card-content>
-  </ion-card>
+          <div>
+            <!-- Nombre -->
+            <p class="gym-title-color !text-base !font-bold !mb-0">
+              Hola, {{ nombreEntrenado() }}
+            </p>
+            <!-- Plan -->
+             <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
+            Plan {{ tipoPlan().replace('Plan ', '') }}
+          </ion-chip>
 
+          </div>
+        </div>
+
+        <ion-button fill="clear" shape="round" class="!p-0">
+          <ion-icon
+            name="notifications-outline"
+            class="!text-2xl gym-text-color"
+          ></ion-icon>
+        </ion-button>
+      </div>
+  </section>
+
+
+  <!-- PENDIENTE A MODIFICAR -->
   <!-- Notificaciones / Invitaciones -->
   @if (invitacionesPendientes().length > 0) {
     <ion-card style="border-left: 4px solid var(--ion-color-primary);">
@@ -70,27 +85,107 @@
     </ion-card>
   }
 
-  <!-- Objetivo actual -->
-  <ion-card>
-    <ion-card-content class="ion-padding">
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <ion-icon name="stats-chart-outline" color="primary" style="font-size: 32px;"></ion-icon>
+
+
+
+  <!-- Plan a medida -->
+  <section class="p-2">
+    <!-- titulo -->
+    <h2 class=" font-heading text-lg font-semibold flex justify-between items-center mb-3">
+      Mi Plan Personalizado
+    </h2>
+    <div class="flex flex-col gap-2 p-4 items-start bg-gray-500/40 rounded-2xl">
+      <!-- nivel -->
+      <div class="w-full flex flex-row items-center gap-3   ">
+        <ion-icon name="accessibility-outline"  class="!text-xl"></ion-icon>
+        <p class="text-base ">
+          Principiante
+        </p>
+      </div>
+      <!-- objetivo -->
+      <div class="w-full flex flex-row items-center gap-3   ">
+        <ion-icon name="medal-outline"  class="!text-xl"></ion-icon>
+        <p class="text-base ">
+          {{ objetivoActual() }}
+        </p>
+      </div>
+      <!-- frecuencia -->
+       <div class=" w-full min-w-28 flex flex-row items-center gap-3">
+        <ion-icon name="today-outline"  class="!text-xl"></ion-icon>
+        <p class="text-base ">
+          4 días por semana
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-2 mt-3 flex justify-between items-center">
+    <h2 class=" font-heading text-lg font-semibold flex justify-between items-center">
+      Rutinas asignadas
+    </h2>
+    <ion-button fill="clean" size="small"  class="">
+      Ver todas
+    </ion-button>
+    <!-- <ion-chip [color]="rutinasAsignadas().length > 0 ? 'primary' : 'medium'" class="!px-4">
+      {{ rutinasAsignadas().length }}
+    </ion-chip> -->
+  </section>
+
+  @if (rutinasAsignadas().length > 0) {
+    <!-- Rutina por día -->
+    <ion-card class="rutina-card !h-56">
+      <ion-card-content class="!flex !flex-col !justify-between !h-full">
+        <div class="">
+          <span class=" text-right text-white/80 uppercase tracking-widest font-bold mb-4 rounded-full !inline-block">
+            Lunes
+          </span>
+          <p class="font-heading text-white !font-bold !text-2xl">
+            Tren Inferior
+          </p>
+          <p class="text-white/80 !text-base">
+            Foco en Glúteos (SEBA este dato se borra cuando el entrenador lo crea, o sea no se guarda)
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <div class="flex gap-2">
+            <p class="text-white/70">6 Ejercicios</p>
+          </div>
           <div>
-            <p style="margin: 0; font-size: 12px; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;">Objetivo Actual</p>
-            <h3 style="margin: 4px 0 0 0; font-size: 18px; font-weight: 600;">{{ objetivoActual() }}</h3>
+            <p class="text-white/70">|</p>
+          </div>
+          <div class="flex gap-2">
+            <p class="text-white/70">44:20 min</p>
           </div>
         </div>
-        <ion-chip color="success">
-          <ion-icon name="checkmark-circle" style="margin-right: 4px;"></ion-icon>
-          Activo
-        </ion-chip>
-      </div>
-    </ion-card-content>
-  </ion-card>
+
+        <ion-icon
+          name="chevron-forward-outline"
+          class="absolute bottom-3 right-3 !text-white !text-xl"
+        ></ion-icon>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <!-- Rutina sin asignar -->
+    <ion-card class="gym-box-primary shadow-none text-black p-1">
+      <ion-card-content class="ion-padding text-center">
+        <ion-icon name="barbell-outline"></ion-icon>
+        <p class="font-heading !font-bold !text-xl !my-2">
+          No tienes rutinas asignadas
+        </p>
+        <p>Tu entrenador "Pepe Hongo" te asignará rutinas proximamente.</p>
+      </ion-card-content>
+    </ion-card>
+  }
+
+
+
+
+
+
+
 
   <!-- Rutinas asignadas -->
-  <ion-card>
+<!-- <ion-card>
     <ion-card-content class="ion-padding">
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
         <ion-icon name="fitness-outline" color="primary" style="font-size: 32px;"></ion-icon>
@@ -101,7 +196,7 @@
           {{ rutinasAsignadas().length }}
         </ion-chip>
       </div>
-      
+
       @if (rutinasAsignadas().length > 0) {
         <ion-list style="margin: 0; padding: 0; background: transparent;">
           @for (rutina of rutinasAsignadas(); track rutina.nombre) {
@@ -125,4 +220,4 @@
     </ion-card-content>
   </ion-card>
 
-</ion-content>
+</ion-content> -->

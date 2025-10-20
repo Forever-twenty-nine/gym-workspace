@@ -1,8 +1,17 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <!-- <ion-title>Rutinas</ion-title> -->
+<ion-header [translucent]="true" class="px-4">
+  <ion-toolbar class="">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/entrenado-tabs/dashboard" text="" icon="arrow-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="text-center flex-1 text-base">Rutinas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
@@ -54,7 +63,7 @@
               </div>
             </div>
           </ion-card-header>
-          
+
           <ion-card-content>
             <!-- Información de asignación -->
             <div class="info-asignacion" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--ion-color-light);">
@@ -106,8 +115,8 @@
             </div>
 
             <div class="accion-rapida">
-              <ion-button 
-                fill="clear" 
+              <ion-button
+                fill="clear"
                 size="small"
                 (click)="verDetalles($event, rutina)">
                 Ver detalles completos
@@ -267,8 +276,8 @@
           <!-- Botones de acción -->
           <div class="modal-actions">
             @if (!cronometroActivo()) {
-              <ion-button 
-                expand="block" 
+              <ion-button
+                expand="block"
                 color="primary"
                 (click)="iniciarEntrenamiento(rutinaSeleccionada()!)"
                 [disabled]="rutinaSeleccionada()!.completado">
@@ -279,25 +288,25 @@
                 Se iniciará el cronómetro al comenzar
               </p>
             } @else if (rutinaEnCurso()?.id === rutinaSeleccionada()!.id) {
-              <ion-button 
-                expand="block" 
+              <ion-button
+                expand="block"
                 color="warning"
                 disabled>
                 <ion-icon name="timer-outline" slot="start"></ion-icon>
                 Rutina en curso
               </ion-button>
             } @else {
-              <ion-button 
-                expand="block" 
+              <ion-button
+                expand="block"
                 color="medium"
                 disabled>
                 <ion-icon name="play-outline" slot="start"></ion-icon>
                 Ya hay una rutina activa
               </ion-button>
             }
-            
-            <ion-button 
-              expand="block" 
+
+            <ion-button
+              expand="block"
               fill="outline"
               [color]="rutinaSeleccionada()!.completado ? 'medium' : 'success'"
               (click)="marcarCompletado(rutinaSeleccionada()!)">

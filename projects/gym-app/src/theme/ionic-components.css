@@ -2,7 +2,24 @@
  * IONIC COMPONENTS - GLOBAL OVERRIDES
  * ============================================================================ */
 
+html.md ion-button[fill="clean"][color="primary"],
+html.ios ion-button[fill="clean"][color="primary"] {
+  --color: var(--ion-color-primary);
+  --background: transparent;
+  --padding-end: 8px;
+  --padding-start: 8px;
+}
 
+ion-header{
+  box-shadow: none !important;
+  background: transparent;
+
+
+}
+ion-header ion-toolbar{
+  --box-shadow: none !important;
+  --background: transparent;
+}
 
 /* Buttons Primary Outline */
 /* html.md ion-button[fill="outline"][color="primary"]{} */
@@ -18,36 +35,113 @@ ion-button.button-large{
   font-size: 1.1rem;
 }
 
-html.md ion-button[fill="clean"][color="primary"],
-html.ios ion-button[fill="clean"][color="primary"] {
-  --color: var(--ion-color-primary);
-  --background: transparent;
-  --padding-end: 8px;
-  --padding-start: 8px;
-}
 
-
+/* -- Spinner -- */
 ion-spinner {
   width: 18px;
   height: 18px;
 }
 
 
-ion-toobar.gym-bg-transparent{
-  --background: red !important;
+/* -- Card -- */
+ion-card {
+  /* --box-shadow: none; */
+   border-radius: var(--app-border-radius-lg);
+   /* box-shadow: var(--app-shadow-light); */
+   margin: var(--app-spacing-md);
+}
+
+ion-card-title {
+   color: var(--ion-color-primary);
+   font-weight: 600;
 }
 
 
- ion-card {
-   border-radius: var(--app-border-radius-md);
-   box-shadow: var(--app-shadow-light);
-   margin: var(--app-spacing-md);
+/* -- Tabs -- */
+ion-tab-bar{
+  height: 90px;
+  border-radius: 40px 40px 0 0;
+}
+ion-tab-button {
+   --color: rgb(212, 212, 212);
+   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+.gym-tab-entrenado ion-tab-button.tab-selected .icon-default {
+  display: none;
+}
+
+.gym-tab-entrenado ion-tab-button.tab-selected .icon-active {
+  display: inline-block;
+}
+
+ ion-tab-button.tab-selected {
+   --color: var(--ion-color-primary);
  }
 
- ion-card-title {
-   color: var(--ion-color-primary);
-   font-weight: 600;
+ /* Estados especiales de tabs */
+ ion-tab-button.tab-hidden {
+   opacity: 0;
+   transform: scale(0.8);
+   pointer-events: none;
  }
+
+ /* Colores específicos por tipo de tab */
+ ion-tab-button[tab="dashboard"] {
+   --color-selected: var(--ion-color-primary);
+ }
+
+ ion-tab-button[tab="entrenamientos"] {
+   --color-selected: var(--ion-color-success);
+ }
+
+ ion-tab-button[tab="progreso"] {
+   --color-selected: var(--ion-color-tertiary);
+ }
+
+ ion-tab-button[tab="nutricion"] {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ ion-tab-button[tab="comunidad"] {
+   --color-selected: var(--ion-color-secondary);
+ }
+
+ ion-tab-button[tab="clientes"] {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ ion-tab-button[tab="perfil"] {
+   --color-selected: var(--ion-color-primary);
+ }
+
+ /* Variantes de color para diferentes roles */
+ .tabs-entrenador ion-tab-bar {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ .tabs-entrenador ion-tab-button {
+   --color-selected: var(--ion-color-warning);
+ }
+
+ .tabs-entrenador ion-tab-button.tab-selected {
+   --color: var(--ion-color-warning);
+ }
+
+ .tabs-gimnasio ion-tab-button.tab-selected {
+   --color: var(--ion-color-primary);
+ }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
  /* Items - Configuración global */
@@ -143,70 +237,3 @@ ion-toobar.gym-bg-transparent{
 
 
 
- /* Estilos base comunes para todas las tabs */
- ion-tab-bar {
-   --background: var(--ion-color-light);
-   --color: var(--ion-color-medium);
- }
-
- ion-tab-button {
-   --color: var(--ion-color-medium);
-   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
- }
-
- ion-tab-button.tab-selected {
-   --color: var(--ion-color-primary);
- }
-
- /* Estados especiales de tabs */
- ion-tab-button.tab-hidden {
-   opacity: 0;
-   transform: scale(0.8);
-   pointer-events: none;
- }
-
- /* Colores específicos por tipo de tab */
- ion-tab-button[tab="dashboard"] {
-   --color-selected: var(--ion-color-primary);
- }
-
- ion-tab-button[tab="entrenamientos"] {
-   --color-selected: var(--ion-color-success);
- }
-
- ion-tab-button[tab="progreso"] {
-   --color-selected: var(--ion-color-tertiary);
- }
-
- ion-tab-button[tab="nutricion"] {
-   --color-selected: var(--ion-color-warning);
- }
-
- ion-tab-button[tab="comunidad"] {
-   --color-selected: var(--ion-color-secondary);
- }
-
- ion-tab-button[tab="clientes"] {
-   --color-selected: var(--ion-color-warning);
- }
-
- ion-tab-button[tab="perfil"] {
-   --color-selected: var(--ion-color-primary);
- }
-
- /* Variantes de color para diferentes roles */
- .tabs-entrenador ion-tab-bar {
-   --color-selected: var(--ion-color-warning);
- }
-
- .tabs-entrenador ion-tab-button {
-   --color-selected: var(--ion-color-warning);
- }
-
- .tabs-entrenador ion-tab-button.tab-selected {
-   --color: var(--ion-color-warning);
- }
-
- .tabs-gimnasio ion-tab-button.tab-selected {
-   --color: var(--ion-color-primary);
- }

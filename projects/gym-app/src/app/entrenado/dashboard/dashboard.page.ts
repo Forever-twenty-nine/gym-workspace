@@ -2,7 +2,7 @@ import { Component, OnInit, signal, inject, computed, effect, Injector, runInInj
 import { CommonModule } from '@angular/common';
 import { Auth, user, User as FirebaseUser } from '@angular/fire/auth';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { 
+import {
   IonContent,
   IonCard,
   IonCardContent,
@@ -11,24 +11,29 @@ import {
   IonLabel,
   IonList,
   IonChip,
-  IonAvatar, IonHeader, IonToolbar, IonTitle,
+  IonAvatar,
   IonButton,
   IonBadge,
-  IonText,
-  ToastController
+  IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
+import {
+  barbellOutline,
+  bodyOutline,
+  todayOutline,
+  medalOutline,
   statsChartOutline,
-  fitnessOutline, 
-  personOutline, 
+  fitnessOutline,
+  personOutline,
   checkmarkCircleOutline,
   checkmarkCircle,
   timeOutline,
   time,
   notificationsOutline,
   checkmarkCircle as checkmarkCircleIcon,
-  closeCircleOutline
+  closeCircleOutline,
+  chevronForwardOutline,
+  accessibilityOutline,
 } from 'ionicons/icons';
 import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService, PlanLimitError } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
@@ -38,7 +43,7 @@ import { Entrenado, Rutina } from 'gym-library';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.css'],
   standalone: true,
-  imports: [ IonToolbar, IonHeader, 
+  imports: [
     CommonModule,
     IonContent,
     IonCard,
@@ -47,14 +52,13 @@ import { Entrenado, Rutina } from 'gym-library';
     IonItem,
     IonLabel,
     IonList,
-    IonChip,
+    // IonChip,
     IonAvatar,
     IonButton,
-    IonBadge
-  ]
+    IonBadge, IonChip]
 })
 export class DashboardPage implements OnInit {
-  
+
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
@@ -68,26 +72,26 @@ export class DashboardPage implements OnInit {
 
   // Signals para datos reactivos
   todasLasRutinas = signal<Rutina[]>([]);
-  
+
   // Signal para el UID de Firebase Auth
   firebaseUserSignal = toSignal(runInInjectionContext(this.injector, () => user(this.auth)), { initialValue: null as FirebaseUser | null });
-  
+
   // Signal para el usuario actual que se actualiza automáticamente
   currentUserSignal = computed(() => this.authService.currentUser());
-  
+
   // Signal computado para los datos del entrenado
   entrenadoDataSignal = computed(() => {
     const firebaseUser = this.firebaseUserSignal();
     const userId = firebaseUser?.uid;
-    
+
     if (userId) {
       const entrenadoSignal = this.entrenadoService.getEntrenado(userId);
       return entrenadoSignal(); // Llamar al signal para obtener el valor
     }
-    
+
     return null;
   });
-  
+
   // Computed signals para UI
   nombreEntrenado = computed(() => {
     const user = this.userService.user();
@@ -102,16 +106,16 @@ export class DashboardPage implements OnInit {
   objetivoActual = computed(() => {
     const entrenadoData = this.entrenadoDataSignal();
     const invitaciones = this.invitacionesPendientes();
-    
+
     if (entrenadoData?.objetivo) {
       return entrenadoData.objetivo;
     }
-    
+
     // Si no hay objetivo pero hay invitaciones pendientes
     if (invitaciones.length > 0) {
       return 'Acepta una invitación para definir tu objetivo';
     }
-    
+
     // Si no hay objetivo ni invitaciones
     return 'Busca un entrenador para definir tu objetivo';
   });
@@ -120,21 +124,24 @@ export class DashboardPage implements OnInit {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
     const rutinas = this.todasLasRutinas();
-    
+
     if (!userId || !rutinas.length) return [];
-    
+
     // Filtrar rutinas asignadas a este entrenado
     const rutinasDelEntrenado = rutinas.filter(rutina => {
-      const entrenado = this.entrenadoService.getEntrenado(userId)();
-      return entrenado?.rutinasAsignadas?.includes(rutina.id) || false;
+      const coincideId = 
+        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
+        rutina.asignadoId === userId || 
+        rutina.entrenadoId === userId;
+      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
+      return coincideId && coincideTipo;
     });
-    
+
     return rutinasDelEntrenado.map(rutina => {
-      // Obtener el nombre del entrenador asignado
-      const entrenado = this.entrenadoService.getEntrenado(userId)();
-      const entrenadorId = entrenado?.entrenadoresId?.[0];
-      const entrenador = entrenadorId ? this.userService.users().find(u => u.uid === entrenadorId) : null;
-      const asignadoPor = entrenador?.nombre || entrenador?.email || 'Entrenador';
+      // Obtener el nombre del creador (entrenador que asignó la rutina)
+      const allUsers = this.userService.users();
+      const creador = allUsers.find(u => u.uid === rutina.creadorId);
+      const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
       
       return {
         nombre: rutina.nombre,
@@ -150,17 +157,17 @@ export class DashboardPage implements OnInit {
     // Obtener el uid directamente de Firebase Auth
     const firebaseUser = this.firebaseUserSignal();
     const userId = firebaseUser?.uid;
-    
+
     if (!userId) {
       return [];
     }
 
-    const allInvitaciones = this.invitacionService.invitaciones();
+    const allNotificaciones = this.notificacionService.notificaciones();
     
-    const filtered = allInvitaciones.filter(inv => {
-      const matches = inv.entrenadoId === userId &&
-        inv.estado === 'pendiente' &&
-        inv.activa;
+    const filtered = allNotificaciones.filter(n => {
+      const matches = n.usuarioId === userId &&
+        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
+        n.datos?.estadoInvitacion === 'pendiente';
       
       return matches;
     });
@@ -178,8 +185,14 @@ export class DashboardPage implements OnInit {
     });
   });
 
-  constructor() { 
+  constructor() {
     addIcons({
+      accessibilityOutline,
+      barbellOutline,
+      bodyOutline,
+      todayOutline,
+      medalOutline,
+      chevronForwardOutline,
       statsChartOutline,
       fitnessOutline,
       personOutline,
@@ -189,20 +202,20 @@ export class DashboardPage implements OnInit {
       time,
       notificationsOutline,
       checkmarkCircleIcon,
-      closeCircleOutline
+      closeCircleOutline,
     });
   }
 
   ngOnInit() {
     // Obtener el usuario actual y suscribirse a sus datos
     const currentUser = this.authService.currentUser();
-    
+
     // Sincronizar rutinas
     effect(() => {
       const rutinas = this.rutinaService.rutinas();
       this.todasLasRutinas.set(rutinas);
     }, { injector: this.injector });
-    
+
     // Verificar notificaciones
     effect(() => {
       const notificaciones = this.notificacionService.notificaciones();
