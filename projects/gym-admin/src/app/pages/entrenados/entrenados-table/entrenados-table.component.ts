@@ -11,9 +11,11 @@ export interface EntrenadoTableItem {
   fechaRegistro?: Date;
 }
 
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-entrenados-table',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, RouterModule],
   templateUrl: './entrenados-table.component.html'
 })
 export class EntrenadosTableComponent {

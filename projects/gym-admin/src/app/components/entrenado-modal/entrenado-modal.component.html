@@ -2,7 +2,7 @@
 @if (isOpen()) {
   <div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
        (click)="onClose()">
-    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[95vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
          (click)="$event.stopPropagation()">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
@@ -58,7 +58,7 @@
                       <div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
                       <p class="text-sm font-medium text-gray-700">Rutinas Asignadas ({{ rutinasAsignadas().length }})</p>
                     </div>
-                    <div class="space-y-2 max-h-32 overflow-y-auto">
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
                       @for (rutina of rutinasAsignadas(); track rutina.id) {
                         <div class="flex items-center justify-between p-3 bg-green-50 border-2 border-green-300 rounded-lg shadow-sm">
                           <div class="flex-1 min-w-0">
@@ -87,12 +87,12 @@
 
                 <!-- Rutinas Disponibles -->
                 @if (rutinasDisponibles().length > 0) {
-                  <div>
+                  <div class="mb-4">
                     <div class="flex items-center mb-2">
                       <div class="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                       <p class="text-sm font-medium text-gray-700">Rutinas Disponibles ({{ rutinasDisponibles().length }})</p>
                     </div>
-                    <div class="space-y-2 max-h-32 overflow-y-auto">
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
                       @for (rutina of rutinasDisponibles(); track rutina.id) {
                         <div class="flex items-center justify-between p-3 bg-blue-50 border-2 border-blue-300 rounded-lg shadow-sm">
                           <div class="flex-1 min-w-0">
@@ -116,6 +116,37 @@
                         </div>
                       }
                     </div>
+                  </div>
+                }
+
+                <!-- Rutinas Completadas -->
+                @if (rutinasAsignadas().length > 0) {
+                  <div>
+                    <div class="flex items-center mb-2">
+                      <div class="w-3 h-3 bg-green-600 rounded-full mr-2"></div>
+                      <p class="text-sm font-medium text-gray-700">Rutinas Completadas ({{ rutinasCompletadas().length }})</p>
+                    </div>
+                    @if (rutinasCompletadas().length > 0) {
+                      <div class="space-y-2 max-h-32 overflow-y-auto">
+                        @for (rutina of rutinasCompletadas(); track rutina.id) {
+                          <div class="flex items-center p-3 bg-green-100 border-2 border-green-400 rounded-lg shadow-sm">
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center">
+                                <svg class="w-4 h-4 text-green-700 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div>
+                                  <p class="text-sm font-medium text-gray-900 truncate">{{ rutina.nombre }}</p>
+                                  <p class="text-xs text-gray-700">Completada</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <p class="text-sm text-gray-500 italic">No hay rutinas completadas aún</p>
+                    }
                   </div>
                 }
 

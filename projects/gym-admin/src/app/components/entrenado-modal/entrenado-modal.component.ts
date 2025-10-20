@@ -1,6 +1,6 @@
 import { Component, input, output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EntrenadoService, UserService, EntrenadorService } from 'gym-library';
+import { EntrenadoService, UserService, EntrenadorService, Rutina, ProgresoRutina } from 'gym-library';
 
 @Component({
   selector: 'app-entrenado-modal',
@@ -70,6 +70,21 @@ export class EntrenadoModalComponent {
 
     const asignadasIds = [...new Set(entrenado?.rutinasAsignadas || [])]; // Eliminar duplicados
     return rutinasEntrenador.filter(rutina => !asignadasIds.includes(rutina.id));
+  });
+
+  // Computed para rutinas completadas (solo visualización)
+  readonly rutinasCompletadas = computed((): Rutina[] => {
+    const entrenado = this.entrenado();
+    const rutinasAsignadas = this.rutinasAsignadas();
+    if (!entrenado || !rutinasAsignadas.length || !entrenado.progresoRutinas) return [];
+
+    // Obtener IDs de rutinas completadas
+    const completadasIds = entrenado.progresoRutinas
+      .filter((p: ProgresoRutina) => p.completado)
+      .map((p: ProgresoRutina) => p.rutinaId);
+
+    // Filtrar rutinas asignadas que están completadas
+    return rutinasAsignadas.filter(rutina => completadasIds.includes(rutina.id));
   });
 
   // Método para verificar si una rutina está asignada al entrenado

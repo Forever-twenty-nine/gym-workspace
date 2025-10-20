@@ -98,7 +98,7 @@ export class EntrenadosPage {
 
   viewDetails(item: any) {
     // Navegar a la página de detalle del entrenado
-    this.router.navigate(['/entrenados', item.id]);
+    this.router.navigate(['/entrenados/detalle', item.id]);
   }
 
   getObjetivosDisponibles() {

@@ -352,7 +352,7 @@ export class RutinaProgresoComponent implements OnInit, OnDestroy {
   // --------------------------------------------
 
   goBack() {
-    this.router.navigate(['/entrenados', this.entrenadoId()]);
+    this.router.navigate(['/entrenados/detalle', this.entrenadoId()]);
   }
 
   // --------------------------------------------

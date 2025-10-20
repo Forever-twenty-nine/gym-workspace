@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   EntrenadoService,
   UserService,
@@ -18,8 +18,9 @@ import { PageTitleService } from '../../../services/page-title.service';
 @Component({
   selector: 'app-entrenado-detail',
   imports: [
-    CommonModule,
-    ToastComponent
+  CommonModule,
+  ToastComponent,
+  RouterModule
   ],
   templateUrl: './entrenado-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
