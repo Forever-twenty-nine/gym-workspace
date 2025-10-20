@@ -7,14 +7,12 @@ import {
   IonCard,
   IonCardContent,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
   IonChip,
   IonAvatar,
   IonButton,
   IonBadge,
-  IonText
+  IonText,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -34,6 +32,9 @@ import {
   closeCircleOutline,
   chevronForwardOutline,
   accessibilityOutline,
+  notificationsCircle,
+  chevronUp,
+  chevronDown,
 } from 'ionicons/icons';
 import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService, PlanLimitError } from 'gym-library';
 import { Entrenado, Rutina } from 'gym-library';
@@ -49,13 +50,11 @@ import { Entrenado, Rutina } from 'gym-library';
     IonCard,
     IonCardContent,
     IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    // IonChip,
+    IonChip,
     IonAvatar,
     IonButton,
-    IonBadge, IonChip]
+    IonBadge
+  ],
 })
 export class DashboardPage implements OnInit {
 
@@ -69,6 +68,9 @@ export class DashboardPage implements OnInit {
   private toastController = inject(ToastController);
   private injector = inject(Injector);
   private auth = inject(Auth);
+
+  // Signal para controlar la visibilidad de invitaciones
+  mostrarInvitaciones = signal(true);
 
   // Signals para datos reactivos
   todasLasRutinas = signal<Rutina[]>([]);
@@ -127,20 +129,19 @@ export class DashboardPage implements OnInit {
 
     if (!userId || !rutinas.length) return [];
 
+    // Obtener el entrenado
+    const entrenado = this.entrenadoService.getEntrenado(userId)();
+
     // Filtrar rutinas asignadas a este entrenado
-    const rutinasDelEntrenado = rutinas.filter(rutina => {
-      const coincideId = 
-        (rutina.asignadoIds && rutina.asignadoIds.includes(userId)) ||
-        rutina.asignadoId === userId || 
-        rutina.entrenadoId === userId;
-      const coincideTipo = !rutina.asignadoTipo || rutina.asignadoTipo === Rol.ENTRENADO;
-      return coincideId && coincideTipo;
-    });
+    const rutinasDelEntrenado = rutinas.filter(rutina => 
+      entrenado?.rutinasAsignadas?.includes(rutina.id)
+    );
 
     return rutinasDelEntrenado.map(rutina => {
       // Obtener el nombre del creador (entrenador que asignó la rutina)
       const allUsers = this.userService.users();
-      const creador = allUsers.find(u => u.uid === rutina.creadorId);
+      const entrenadorId = entrenado?.entrenadoresId?.[0];
+      const creador = allUsers.find(u => u.uid === entrenadorId);
       const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
       
       return {
@@ -150,6 +151,26 @@ export class DashboardPage implements OnInit {
         asignadoPor: asignadoPor
       };
     });
+  });
+
+  // Computed signal para obtener el entrenador asignado
+  entrenadorAsignado = computed(() => {
+    const currentUser = this.authService.currentUser();
+    const userId = currentUser?.uid;
+
+    if (!userId) return null;
+
+    // Obtener el entrenado
+    const entrenado = this.entrenadoService.getEntrenado(userId)();
+
+    if (!entrenado?.entrenadoresId?.length) return null;
+
+    // Obtener el primer entrenador asignado
+    const entrenadorId = entrenado.entrenadoresId[0];
+    const allUsers = this.userService.users();
+    const entrenador = allUsers.find(u => u.uid === entrenadorId);
+
+    return entrenador || null;
   });
 
       // Invitaciones pendientes del usuario actual
@@ -162,17 +183,44 @@ export class DashboardPage implements OnInit {
       return [];
     }
 
-    const allNotificaciones = this.notificacionService.notificaciones();
-    
-    const filtered = allNotificaciones.filter(n => {
-      const matches = n.usuarioId === userId &&
-        n.tipo === TipoNotificacion.INVITACION_PENDIENTE &&
-        n.datos?.estadoInvitacion === 'pendiente';
-      
-      return matches;
+    // Obtener invitaciones directamente del servicio de invitaciones
+    const allInvitaciones = this.invitacionService.invitaciones();
+    console.log('📊 Total invitaciones en BD:', allInvitaciones.length);
+
+    // Filtrar invitaciones pendientes para este usuario
+    const invitacionesUsuario = allInvitaciones.filter(inv =>
+      inv.entrenadoId === userId &&
+      inv.estado === 'pendiente'
+    );
+
+    console.log('🎯 Invitaciones para este usuario:', invitacionesUsuario.length);
+
+    // Crear un Map para eliminar duplicados por ID
+    const uniqueMap = new Map();
+    invitacionesUsuario.forEach(invitacion => {
+      if (!uniqueMap.has(invitacion.id)) {
+        uniqueMap.set(invitacion.id, invitacion);
+      }
     });
 
-    return filtered.map(invitacion => {
+    const uniqueInvitaciones = Array.from(uniqueMap.values());
+    console.log('✅ Invitaciones únicas por ID:', uniqueInvitaciones.length);
+
+    // También verificar duplicados por contenido (mismo entrenador)
+    const contentMap = new Map();
+    uniqueInvitaciones.forEach(invitacion => {
+      const key = `${invitacion.datos?.entrenadorId}-${invitacion.datos?.estadoInvitacion}`;
+      if (!contentMap.has(key)) {
+        contentMap.set(key, invitacion);
+      } else {
+        console.warn('⚠️ Duplicado por contenido encontrado:', key);
+      }
+    });
+
+    const finalInvitaciones = Array.from(contentMap.values());
+    console.log('🎉 Invitaciones finales:', finalInvitaciones.length);
+
+    return uniqueInvitaciones.map(invitacion => {
       const entrenador = this.userService.users().find(u => u.uid === invitacion.entrenadorId);
       return {
         ...invitacion,
@@ -183,9 +231,7 @@ export class DashboardPage implements OnInit {
         }
       };
     });
-  });
-
-  constructor() {
+  });  constructor() {
     addIcons({
       accessibilityOutline,
       barbellOutline,
@@ -203,6 +249,9 @@ export class DashboardPage implements OnInit {
       notificationsOutline,
       checkmarkCircleIcon,
       closeCircleOutline,
+      notificationsCircle,
+      chevronUp,
+      chevronDown,
     });
   }
 
@@ -229,6 +278,15 @@ export class DashboardPage implements OnInit {
       month: '2-digit',
       day: '2-digit'
     });
+  }
+
+  // Método público para usar en el template
+  formatearFechaPublico(fecha: Date): string {
+    return this.formatearFecha(fecha);
+  }
+
+  toggleInvitaciones() {
+    this.mostrarInvitaciones.update(current => !current);
   }
 
   async aceptarInvitacion(invitacion: any) {
@@ -264,7 +322,7 @@ export class DashboardPage implements OnInit {
           await this.entrenadoService.save(nuevoEntrenado);
         }
 
-        // 3. Actualizar el entrenador para agregar el entrenado a su lista
+        // 4. Actualizar el entrenador para agregar el entrenado a su lista
         const entrenadorSignal = this.entrenadorService.getEntrenadorById(invitacion.entrenadorId);
         const entrenadorExistente = entrenadorSignal();
 
@@ -303,9 +361,25 @@ export class DashboardPage implements OnInit {
 
   async rechazarInvitacion(invitacion: any) {
     try {
+      // 1. Rechazar la invitación
       await this.invitacionService.rechazarInvitacion(invitacion.id);
+
+      const toast = await this.toastController.create({
+        message: 'Invitación rechazada',
+        duration: 2000,
+        position: 'bottom',
+        color: 'medium'
+      });
+      await toast.present();
     } catch (error) {
       console.error('Error al rechazar invitación:', error);
+      const toast = await this.toastController.create({
+        message: 'Error al rechazar la invitación',
+        duration: 2000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await toast.present();
     }
   }
 

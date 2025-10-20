@@ -20,12 +20,11 @@ import {
   IonPopover,
   IonInput,
   IonTextarea,
-  IonSelect,
-  IonSelectOption
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
-import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService } from 'gym-library';
+import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService, TipoNotificacion } from 'gym-library';
 
 @Component({
   selector: 'app-entrenados',
@@ -52,9 +51,7 @@ import { AuthService, EntrenadoService, UserService, NotificacionService, Entren
     IonPopover,
     IonModal,
     IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption
+    IonTextarea
   ],
   styles: [`
     .entrenado-detail {
@@ -115,6 +112,7 @@ export class EntrenadosPage implements OnInit {
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);
   private invitacionService = inject(InvitacionService);
+  private toastController = inject(ToastController);
   private fb = inject(FormBuilder);
 
   isModalOpen = signal(false);
@@ -126,8 +124,7 @@ export class EntrenadosPage implements OnInit {
   invitacionForm = signal<FormGroup>(
     this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      mensaje: [''],
-      franjaHoraria: ['mañana']
+      mensaje: ['']
     })
   );
 
@@ -181,6 +178,14 @@ export class EntrenadosPage implements OnInit {
 
   async saveInvitacion() {
     if (this.invitacionForm().invalid) {
+      const toast = await this.toastController.create({
+        message: 'Por favor, completa todos los campos obligatorios',
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      await toast.present();
+      this.invitacionForm().markAllAsTouched();
       return;
     }
 
@@ -189,6 +194,13 @@ export class EntrenadosPage implements OnInit {
     const entrenadorId = this.authService.currentUser()?.uid;
 
     if (!entrenadorId) {
+      const toast = await this.toastController.create({
+        message: 'Error: No se pudo identificar al entrenador',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
       this.isLoading.set(false);
       return;
     }
@@ -198,6 +210,13 @@ export class EntrenadosPage implements OnInit {
     const usuarioId = usuarioInvitado?.uid;
 
     if (!usuarioId || !usuarioInvitado?.email) {
+      const toast = await this.toastController.create({
+        message: 'Error: No se encontró un usuario con ese email',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
       this.isLoading.set(false);
       return;
     }
@@ -219,9 +238,27 @@ export class EntrenadosPage implements OnInit {
         emailEntrenado,
         data.mensaje
       );
+
+      // Notificación de éxito
+      const successToast = await this.toastController.create({
+        message: 'Invitación enviada exitosamente',
+        duration: 3000,
+        color: 'success',
+        position: 'top'
+      });
+      await successToast.present();
+
+      this.invitacionForm().reset();
       this.closeInvitacionModal();
     } catch (error) {
       console.error('❌ Error al enviar invitación:', error);
+      const errorToast = await this.toastController.create({
+        message: 'Error al enviar la invitación. Inténtalo de nuevo.',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await errorToast.present();
     } finally {
       this.isLoading.set(false);
     }

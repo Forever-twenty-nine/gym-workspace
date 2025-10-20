@@ -35,6 +35,7 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
       onSnapshot(
         notificacionesQuery,
         (snapshot) => {
+          console.log('🔥 Firestore listener triggered, docs count:', snapshot.docs.length);
           const notificaciones: Notificacion[] = snapshot.docs.map(doc => {
             const data = doc.data();
             return {
@@ -48,7 +49,8 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
                 : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
             } as Notificacion;
           });
-
+          
+          console.log('📋 Notificaciones procesadas:', notificaciones.map(n => ({ id: n.id, tipo: n.tipo, usuarioId: n.usuarioId })));
           onUpdate(notificaciones);
         },
         (error) => {

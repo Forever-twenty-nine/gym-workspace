@@ -34,6 +34,7 @@ export class NotificacionService {
         
         try {
             this.firestoreAdapter.initializeListener((notificaciones: Notificacion[]) => {
+                console.log('📡 Servicio notificaciones - Actualizando signal con', notificaciones.length, 'notificaciones');
                 this._notificaciones.set(notificaciones);
             });
             this.isListenerInitialized = true;
