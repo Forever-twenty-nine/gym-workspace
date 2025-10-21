@@ -1,6 +1,6 @@
-import { Component, input, output, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, output, computed, inject, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { EntrenadoService, UserService, EntrenadorService, Rutina, ProgresoRutina } from 'gym-library';
+import { EntrenadoService, UserService, EntrenadorService, Rutina } from 'gym-library';
 
 @Component({
   selector: 'app-entrenado-modal',
@@ -10,7 +10,7 @@ import { EntrenadoService, UserService, EntrenadorService, Rutina, ProgresoRutin
   templateUrl: './entrenado-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EntrenadoModalComponent {
+export class EntrenadoModalComponent implements OnChanges {
   // Servicios inyectados
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly userService = inject(UserService);
@@ -41,9 +41,12 @@ export class EntrenadoModalComponent {
     };
   });
 
-  // Método para cerrar el modal
-  onClose() {
-    this.close.emit();
+  // Método del ciclo de vida para detectar cambios en inputs
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['entrenadoId'] && this.entrenadoId()) {
+      // Inicializar listener de progreso de rutinas para este entrenado
+      // Lógica de progreso eliminada. Si se requiere, usar SesionRutinaService o EstadisticasEntrenadoService.
+    }
   }
 
   // Computed para obtener las rutinas del entrenador
@@ -74,17 +77,16 @@ export class EntrenadoModalComponent {
 
   // Computed para rutinas completadas (solo visualización)
   readonly rutinasCompletadas = computed((): Rutina[] => {
-    const entrenado = this.entrenado();
+    const entrenadoId = this.entrenadoId();
     const rutinasAsignadas = this.rutinasAsignadas();
-    if (!entrenado || !rutinasAsignadas.length || !entrenado.progresoRutinas) return [];
+    if (!entrenadoId || !rutinasAsignadas.length) return [];
 
-    // Obtener IDs de rutinas completadas
-    const completadasIds = entrenado.progresoRutinas
-      .filter((p: ProgresoRutina) => p.completado)
-      .map((p: ProgresoRutina) => p.rutinaId);
+    // Obtener progresos completados usando el servicio
+    // Lógica de progreso eliminada. Si se requiere, usar SesionRutinaService o EstadisticasEntrenadoService.
+    const rutinasCompletadas: string[] = [];
 
-    // Filtrar rutinas asignadas que están completadas
-    return rutinasAsignadas.filter(rutina => completadasIds.includes(rutina.id));
+  // Filtrar rutinas asignadas que están completadas (lógica eliminada)
+  return [];
   });
 
   // Método para verificar si una rutina está asignada al entrenado

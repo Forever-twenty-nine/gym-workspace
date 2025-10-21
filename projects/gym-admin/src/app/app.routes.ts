@@ -7,7 +7,6 @@ import { UsuariosPage } from './pages/usuarios/usuarios.page';
 import { EntrenadorDetail } from './pages/entrenadores/entrenador-detail/entrenador-detail';
 import { EntrenadoDetail } from './pages/entrenados/entrenado-detail/entrenado-detail';
 import { EntrenadoProgreso } from './pages/entrenados/entrenado-progreso/entrenado-progreso';
-import { RutinaProgresoComponent } from './pages/entrenados/rutina-progreso/rutina-progreso';
 
 export const routes: Routes = [
   {
@@ -29,10 +28,6 @@ export const routes: Routes = [
   {
     path: 'entrenados/detalle/:id',
     component: EntrenadoDetail
-  },
-   {
-    path: 'entrenados/:entrenadoId/rutinas/:rutinaId',
-    component: RutinaProgresoComponent
   },
   {
     path: 'entrenados/progreso/:id',

@@ -84,9 +84,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       rutinasAsignadas: data.rutinasAsignadas || [],
       rutinasCreadas: data.rutinasCreadas || [],
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-      objetivo: data.objetivo || undefined, // Usar undefined en lugar de null para consistencia
-      progresoRutinas: data.progresoRutinas ? data.progresoRutinas.map((p: any) => this.convertirProgresoFromFirestore(p)) : [],
-      estadisticas: data.estadisticas || undefined
+      objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
     };
   }
 
@@ -144,18 +142,6 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       data.fechaRegistro = entrenado.fechaRegistro instanceof Date 
         ? Timestamp.fromDate(entrenado.fechaRegistro)
         : entrenado.fechaRegistro;
-    }
-
-    // Incluir progreso de rutinas con conversión de fechas
-    if (entrenado.progresoRutinas !== undefined) {
-      data.progresoRutinas = entrenado.progresoRutinas !== null 
-        ? entrenado.progresoRutinas.map(progreso => this.convertirProgresoToFirestore(progreso))
-        : deleteField();
-    }
-
-    // Incluir estadísticas
-    if (entrenado.estadisticas !== undefined) {
-      data.estadisticas = entrenado.estadisticas !== null ? entrenado.estadisticas : deleteField();
     }
 
     return data;

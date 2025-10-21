@@ -7,20 +7,23 @@ import {
   RutinaService,
   EntrenadorService,
   InvitacionService,
-  ProgresoService,
+  SesionRutinaService,
   EjercicioService,
+  EstadisticasEntrenadoService,
   PlanLimitError
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
+import { RutinaSesionModalComponent } from '../rutina-sesion.modal/rutina-sesion.modal';
 
 @Component({
   selector: 'app-entrenado-detail',
   imports: [
   CommonModule,
   ToastComponent,
-  RouterModule
+  RouterModule,
+  RutinaSesionModalComponent
   ],
   templateUrl: './entrenado-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -36,8 +39,9 @@ export class EntrenadoDetail implements OnInit {
   private readonly rutinaService = inject(RutinaService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly invitacionService = inject(InvitacionService);
-  private readonly progresoService = inject(ProgresoService);
+  private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly ejercicioService = inject(EjercicioService);
+  private readonly estadisticasService = inject(EstadisticasEntrenadoService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
   entrenadoId = signal<string>('');
@@ -64,6 +68,8 @@ export class EntrenadoDetail implements OnInit {
   // Signals para el estado del componente
   readonly isLoading = signal(false);
   readonly mostrarInvitaciones = signal(false);
+  readonly mostrarModalSesiones = signal(false);
+  readonly rutinaSeleccionada = signal<string>('');
 
   ngOnInit() {
     // Los listeners se inicializan automáticamente cuando se accede a las señales
@@ -74,6 +80,8 @@ export class EntrenadoDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadoId.set(id);
+      // Inicializar listener de estadísticas para este entrenado
+      this.estadisticasService.initializeListener(id);
       setTimeout(() => {
         const entrenado = this.entrenado();
         if (entrenado) {
@@ -87,7 +95,7 @@ export class EntrenadoDetail implements OnInit {
     }
   }
 
-  // Rutinas asignadas al entrenado con progreso
+  // Rutinas asignadas al entrenado con sesiones
   readonly rutinasAsignadas = computed(() => {
     const entrenado = this.entrenado();
     if (!entrenado?.rutinasAsignadas) return [];
@@ -95,10 +103,13 @@ export class EntrenadoDetail implements OnInit {
     return this.rutinaService.rutinas()
       .filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id))
       .map(rutina => {
-        const progreso = this.progresoService.getProgresoRutina(entrenado.id, rutina.id)();
+        // Buscar la última sesión de esta rutina para este entrenado
+  const sesiones = this.sesionRutinaService.getSesionesPorRutina(rutina.id)().filter(s => s.entrenadoId === entrenado.id);
+        // Derivar estado de progreso desde la última sesión
+        const ultimaSesion = sesiones && sesiones.length > 0 ? sesiones[sesiones.length - 1] : null;
         return {
           ...rutina,
-          progreso: progreso || null
+          sesion: ultimaSesion
         };
       });
   });
@@ -156,7 +167,7 @@ export class EntrenadoDetail implements OnInit {
   // Estadísticas del entrenado
   readonly estadisticas = computed(() => {
     const id = this.entrenadoId();
-    return this.progresoService.getEstadisticas(id)();
+    return this.estadisticasService.getEstadisticas(id)();
   });
 
   // Invitaciones pendientes del entrenado
@@ -188,59 +199,9 @@ export class EntrenadoDetail implements OnInit {
   }
 
   // --------------------------------------------
-  // Iniciar rutina para el entrenado
-  // --------------------------------------------
-  async iniciarRutina(rutinaId: string) {
-    try {
-      await this.progresoService.iniciarRutina(this.entrenadoId(), rutinaId);
-      this.toastService.log('Rutina iniciada correctamente');
-    } catch (error: any) {
-      console.error('Error al iniciar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
-  // Completar rutina para el entrenado
-  // --------------------------------------------
-  async completarRutina(rutinaId: string) {
-    try {
-      await this.progresoService.completarRutina(this.entrenadoId(), rutinaId);
-      this.toastService.log('Rutina completada correctamente');
-    } catch (error: any) {
-      console.error('Error al completar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
-  // Marcar rutina como completada (DEPRECATED - usar completarRutina)
-  // --------------------------------------------
-  async marcarRutinaCompletada(rutina: any) {
-    try {
-      const entrenadoId = this.entrenadoId();
-      const progreso = this.progresoService.getProgresoRutina(entrenadoId, rutina.id)();
-
-      if (progreso?.completado) {
-        // Si ya está completada, reiniciarla
-        await this.progresoService.reiniciarRutina(entrenadoId, rutina.id);
-        this.toastService.log('Rutina reiniciada');
-      } else {
-        // Si no está completada, completarla
-        await this.completarRutina(rutina.id);
-      }
-    } catch (error: any) {
-      console.error('Error al actualizar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
   // Ver progreso detallado de una rutina
   // --------------------------------------------
-  verProgresoRutina(rutinaId: string) {
-    this.router.navigate(['/entrenados', this.entrenadoId(), 'rutinas', rutinaId]);
-  }
+  // Método de progreso eliminado. Usar sesiones o estadísticas si es necesario.
 
   // --------------------------------------------
   // Aceptar invitación
@@ -270,5 +231,18 @@ export class EntrenadoDetail implements OnInit {
       console.error('Error al rechazar invitación:', error);
       this.toastService.log(`ERROR: ${error.message}`);
     }
+  }
+
+  // --------------------------------------------
+  // Abrir modal de sesiones de rutina
+  // --------------------------------------------
+  abrirModalSesiones(rutinaId: string) {
+    this.rutinaSeleccionada.set(rutinaId);
+    this.mostrarModalSesiones.set(true);
+  }
+
+  cerrarModalSesiones() {
+    this.mostrarModalSesiones.set(false);
+    this.rutinaSeleccionada.set('');
   }
 }
