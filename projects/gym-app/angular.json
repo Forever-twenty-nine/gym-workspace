@@ -40,7 +40,8 @@
             "browser": "src/main.ts",
             "allowedCommonJsDependencies": [
               "localforage"
-            ]
+            ],
+            "externalDependencies": ["@stencil/core"]
           },
           "configurations": {
             "production": {

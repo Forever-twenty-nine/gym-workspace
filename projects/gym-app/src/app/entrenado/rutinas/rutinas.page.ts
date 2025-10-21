@@ -8,27 +8,25 @@ import {
   IonButton,
   IonButtons,
   IonIcon,
-  IonBackButton } from '@ionic/angular/standalone';
+  IonBackButton,
+  IonCard,
+  IonCardContent,
+  IonBadge,
+  IonList,
+  IonItem,
+  IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline,
   playOutline,
   timeOutline,
-  flameOutline,
   calendarOutline,
-  bodyOutline,
-  trophyOutline,
   checkmarkCircle,
-  chevronForwardOutline,
-  close,
-  checkmarkCircleOutline,
-  closeCircleOutline,
-  listOutline,
-  documentTextOutline,
   timerOutline,
   notificationsOutline,
   arrowBackOutline,
-  todayOutline
+  todayOutline,
+  bedOutline
 } from 'ionicons/icons';
 import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
 import { Router } from '@angular/router';
@@ -47,7 +45,13 @@ import { Router } from '@angular/router';
     IonContent,
     IonButton,
     IonButtons,
-    IonIcon
+    IonIcon,
+    IonCard,
+    IonCardContent,
+    IonBadge,
+    IonList,
+    IonItem,
+    IonLabel
   ],
 })
 export class RutinasPage implements OnInit {
@@ -83,21 +87,13 @@ export class RutinasPage implements OnInit {
       fitnessOutline,
       playOutline,
       timeOutline,
-      flameOutline,
       calendarOutline,
-      bodyOutline,
-      trophyOutline,
       checkmarkCircle,
-      chevronForwardOutline,
-      close,
-      checkmarkCircleOutline,
-      closeCircleOutline,
-      listOutline,
-      documentTextOutline,
       timerOutline,
       notificationsOutline,
       arrowBackOutline,
-      todayOutline
+      todayOutline,
+      bedOutline
     });
   }
 
@@ -290,22 +286,16 @@ export class RutinasPage implements OnInit {
     // Este método ya no se usa - la lógica se maneja en rutina-progreso
   }
 
-  async marcarCompletado(rutina: any) {
-    try {
-      // Actualizar el estado de completado
-      const rutinaActualizada: Rutina = {
-        ...rutina,
-        completado: !rutina.completado
-      };
-
-      await this.rutinaService.save(rutinaActualizada);
-
-      // Si el modal está abierto, actualizar la rutina seleccionada
-      if (this.modalAbierto() && this.rutinaSeleccionada()?.id === rutina.id) {
-        this.rutinaSeleccionada.set(rutinaActualizada);
+  verRutinasDelDia(dia: any) {
+    if (dia.rutinas && dia.rutinas.length > 0) {
+      // Si hay una sola rutina, ir directamente a ella
+      if (dia.rutinas.length === 1) {
+        this.iniciarEntrenamiento(dia.rutinas[0]);
+      } else {
+        // Si hay múltiples rutinas, por ahora ir a la primera
+        // TODO: Implementar selector de rutina o vista detallada del día
+        this.iniciarEntrenamiento(dia.rutinas[0]);
       }
-    } catch (error) {
-      console.error('Error al marcar rutina como completada:', error);
     }
   }
 }
