@@ -185,15 +185,12 @@ export class DashboardPage implements OnInit {
 
     // Obtener invitaciones directamente del servicio de invitaciones
     const allInvitaciones = this.invitacionService.invitaciones();
-    console.log('📊 Total invitaciones en BD:', allInvitaciones.length);
 
     // Filtrar invitaciones pendientes para este usuario
     const invitacionesUsuario = allInvitaciones.filter(inv =>
       inv.entrenadoId === userId &&
       inv.estado === 'pendiente'
     );
-
-    console.log('🎯 Invitaciones para este usuario:', invitacionesUsuario.length);
 
     // Crear un Map para eliminar duplicados por ID
     const uniqueMap = new Map();
@@ -204,8 +201,7 @@ export class DashboardPage implements OnInit {
     });
 
     const uniqueInvitaciones = Array.from(uniqueMap.values());
-    console.log('✅ Invitaciones únicas por ID:', uniqueInvitaciones.length);
-
+   
     // También verificar duplicados por contenido (mismo entrenador)
     const contentMap = new Map();
     uniqueInvitaciones.forEach(invitacion => {
@@ -218,7 +214,6 @@ export class DashboardPage implements OnInit {
     });
 
     const finalInvitaciones = Array.from(contentMap.values());
-    console.log('🎉 Invitaciones finales:', finalInvitaciones.length);
 
     return uniqueInvitaciones.map(invitacion => {
       const entrenador = this.userService.users().find(u => u.uid === invitacion.entrenadorId);

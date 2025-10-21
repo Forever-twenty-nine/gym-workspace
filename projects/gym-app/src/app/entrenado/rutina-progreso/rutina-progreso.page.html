@@ -65,13 +65,35 @@
             }
 
             @if (rutinaIniciada() && !rutinaCompletada()) {
+              @if (!rutinaPausada()) {
+                <ion-button
+                  expand="block"
+                  color="warning"
+                  (click)="pausarReanudarRutina()">
+                  <ion-icon name="pause-circle-outline" slot="start"></ion-icon>
+                  Pausar Rutina
+                </ion-button>
+              } @else {
+                <ion-button
+                  expand="block"
+                  color="secondary"
+                  (click)="pausarReanudarRutina()">
+                  <ion-icon name="play-outline" slot="start"></ion-icon>
+                  Reanudar Rutina
+                </ion-button>
+              }
+
               <ion-button
                 expand="block"
                 color="success"
                 (click)="completarRutina()"
-                [disabled]="ejerciciosCompletados() < ejerciciosTotales()">
+                [disabled]="isCompleting() || ejerciciosCompletados() < ejerciciosTotales()">
                 <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-                Completar Rutina
+                @if (isCompleting()) {
+                  Completando...
+                } @else {
+                  Completar Rutina
+                }
               </ion-button>
             }
 
@@ -101,12 +123,14 @@
             <ion-list lines="none">
               @for (ejercicio of ejercicios(); track $index) {
                 <ion-item class="ejercicio-item">
-                  <ion-checkbox
+                  <input
+                    type="checkbox"
                     slot="start"
                     [checked]="isEjercicioCompletado(ejercicio.id)"
-                    (ionChange)="toggleEjercicio(ejercicio.id)"
-                    [disabled]="!rutinaIniciada() || rutinaCompletada()">
-                  </ion-checkbox>
+                    (change)="toggleEjercicio(ejercicio.id)"
+                    [disabled]="!(rutinaIniciada() || cronometroActivo()) || rutinaCompletada()"
+                    class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
 
                   <ion-label>
                     <h3>{{ ejercicio.nombre }}</h3>
@@ -150,7 +174,7 @@
     </div>
   } @else {
     <div class="loading-container">
-      <ion-text color="medium">Cargando rutina...</ion-text>
+      <ion-text color="medium">Cargando rutina... ID: {{ rutinaId() }}</ion-text>
     </div>
   }
 </ion-content>

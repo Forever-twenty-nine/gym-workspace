@@ -11,10 +11,7 @@
       <!-- Estadísticas Generales -->
       <ion-card class="stats-card">
         <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="stats-chart-outline"></ion-icon>
-            Estadísticas Generales
-          </ion-card-title>
+          
         </ion-card-header>
         <ion-card-content>
           <div class="stats-grid">
@@ -35,137 +32,10 @@
               <div class="stat-label">Tiempo total</div>
             </div>
           </div>
-
-          <!-- Barra de progreso general -->
-          <div class="progreso-general">
-            <div class="progreso-header">
-              <span>Progreso general</span>
-              <span>{{ stats.porcentajeGeneral }}%</span>
-            </div>
-            <ion-progress-bar
-              [value]="stats.porcentajeGeneral / 100"
-              color="primary">
-            </ion-progress-bar>
-            <div class="progreso-detalle">
-              {{ stats.ejerciciosCompletados }}/{{ stats.totalEjercicios }} ejercicios completados
-            </div>
-          </div>
+          
         </ion-card-content>
       </ion-card>
 
-      <!-- Lista de Rutinas -->
-      <ion-card class="rutinas-card">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="fitness-outline"></ion-icon>
-            Progreso por Rutina
-          </ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          @if (progresoRutinas().length > 0) {
-            <ion-list lines="none">
-              @for (item of progresoRutinas(); track $index) {
-                <ion-item class="rutina-item">
-                  <ion-label>
-                    <h3>{{ item.rutina.nombre }}</h3>
-                    <div class="rutina-info">
-                      <ion-chip [color]="getColorEstado(item.progreso())" size="small">
-                        <ion-label>{{ getEstadoRutina(item.progreso()) }}</ion-label>
-                      </ion-chip>
-                      @if (item.progreso()?.fechaInicio) {
-                        <span class="fecha-info">
-                          <ion-icon name="calendar-outline"></ion-icon>
-                          {{ formatearFecha(item.progreso()!.fechaInicio) }}
-                        </span>
-                      }
-                    </div>
-                    @if (item.progreso() && item.rutina.ejerciciosIds) {
-                      <div class="rutina-progreso">
-                        <div class="progreso-mini">
-                          <span>{{ getProgresoRutina(item.progreso(), item.rutina) }}%</span>
-                          <ion-progress-bar
-                            [value]="getProgresoRutina(item.progreso(), item.rutina) / 100"
-                            color="primary"
-                            size="small">
-                          </ion-progress-bar>
-                        </div>
-                        <div class="ejercicios-count">
-                          {{ (item.progreso()?.ejerciciosCompletados?.length || 0) }}/{{ item.rutina.ejerciciosIds.length }} ejercicios
-                        </div>
-                      </div>
-                    }
-                  </ion-label>
-                </ion-item>
-              }
-            </ion-list>
-          } @else {
-            <div class="no-rutinas">
-              <ion-icon name="fitness-outline" color="medium"></ion-icon>
-              <p>No tienes rutinas asignadas</p>
-            </div>
-          }
-        </ion-card-content>
-      </ion-card>
-
-      <!-- Logros -->
-      <ion-card class="logros-card">
-        <ion-card-header>
-          <ion-card-title>
-            <ion-icon name="trophy-outline"></ion-icon>
-            Logros
-          </ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="logros-grid">
-            @if (stats.rutinasCompletadas > 0) {
-              <div class="logro-item">
-                <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-                <div class="logro-text">
-                  <div class="logro-title">Primera rutina completada</div>
-                  <div class="logro-desc">¡Has completado tu primera rutina!</div>
-                </div>
-              </div>
-            }
-
-            @if (stats.tiempoTotal >= 60) {
-              <div class="logro-item">
-                <ion-icon name="time-outline" color="primary"></ion-icon>
-                <div class="logro-text">
-                  <div class="logro-title">Entrenador dedicado</div>
-                  <div class="logro-desc">Más de 1 hora de entrenamiento</div>
-                </div>
-              </div>
-            }
-
-            @if (stats.porcentajeGeneral >= 50) {
-              <div class="logro-item">
-                <ion-icon name="flame-outline" color="warning"></ion-icon>
-                <div class="logro-text">
-                  <div class="logro-title">Mitad del camino</div>
-                  <div class="logro-desc">Más del 50% de progreso general</div>
-                </div>
-              </div>
-            }
-
-            @if (stats.rutinasCompletadas >= 5) {
-              <div class="logro-item">
-                <ion-icon name="trophy-outline" color="tertiary"></ion-icon>
-                <div class="logro-text">
-                  <div class="logro-title">Campeón</div>
-                  <div class="logro-desc">5 rutinas completadas</div>
-                </div>
-              </div>
-            }
-          </div>
-
-          @if (stats.rutinasCompletadas === 0 && stats.tiempoTotal === 0) {
-            <div class="no-logros">
-              <ion-icon name="trophy-outline" color="medium"></ion-icon>
-              <p>Completa rutinas para desbloquear logros</p>
-            </div>
-          }
-        </ion-card-content>
-      </ion-card>
 
     </div>
   } @else {

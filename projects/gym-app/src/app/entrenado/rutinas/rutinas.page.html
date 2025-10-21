@@ -28,8 +28,6 @@
           <ion-list lines="none" class="m-0 p-0">
             @for (dia of rutinasPorDia(); track dia.fecha) {
               <ion-item 
-                button 
-                (click)="verRutinasDelDia(dia)" 
                 [class.ion-item--highlight]="dia.esHoy" 
                 lines="none"
                 style="height: 120px; --inner-padding-end: 16px; --inner-padding-start: 16px; --padding-start: 16px; --padding-end: 16px;">
@@ -50,10 +48,14 @@
                       @if (dia.rutinas.length > 0) {
                         <div class="space-y-1">
                           @for (rutina of dia.rutinas.slice(0, 2); track rutina.id) {
-                            <div class="flex items-center justify-between bg-light rounded-md p-2">
+                            <ion-item 
+                              lines="none"
+                              class="bg-light rounded-md"
+                              [routerLink]="['../rutina-progreso', rutina.id]"
+                              detail="false">
                               <div class="flex-1">
                                 <div class="flex items-center justify-between">
-                                  <p class="text-sm font-medium text-dark">{{ rutina.nombre }}</p>
+                                  <p class="text-sm font-medium text-dark">{{ rutina.nombre }} (ID: {{ rutina.id }})</p>
                                   @if (rutina.ejerciciosIds && rutina.ejerciciosIds.length > 0) {
                                     <ion-icon name="fitness-outline" color="primary"></ion-icon>
                                   }
@@ -65,12 +67,13 @@
                                   }
                                 </div>
                               </div>
-                              <ion-icon
+                              <ion-icon 
                                 [name]="rutina.completado ? 'checkmark-circle' : 'play-circle'"
                                 [color]="rutina.completado ? 'success' : 'primary'"
-                                size="large">
+                                size="large"
+                                slot="end">
                               </ion-icon>
-                            </div>
+                            </ion-item>
                           }
                           @if (dia.rutinas.length > 2) {
                             <p class="text-xs text-medium mt-1">

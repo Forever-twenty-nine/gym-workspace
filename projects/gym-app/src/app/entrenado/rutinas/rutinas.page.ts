@@ -26,10 +26,11 @@ import {
   notificationsOutline,
   arrowBackOutline,
   todayOutline,
-  bedOutline
+  bedOutline,
+  playCircle
 } from 'ionicons/icons';
 import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-rutinas',
@@ -51,7 +52,8 @@ import { Router } from '@angular/router';
     IonBadge,
     IonList,
     IonItem,
-    IonLabel
+    IonLabel,
+    RouterModule
   ],
 })
 export class RutinasPage implements OnInit {
@@ -93,7 +95,8 @@ export class RutinasPage implements OnInit {
       notificationsOutline,
       arrowBackOutline,
       todayOutline,
-      bedOutline
+      bedOutline,
+      playCircle
     });
   }
 
@@ -265,11 +268,14 @@ export class RutinasPage implements OnInit {
   }
 
   iniciarEntrenamiento(rutina: any) {
-    // Navegar a la página de progreso de rutina
+    console.log('iniciarEntrenamiento llamado con rutina:', rutina);
+    // Navegar a la página de progreso de rutina dentro del tab
+    console.log('Navegando a:', ['/entrenado-tabs/rutina-progreso', rutina.id]);
     this.router.navigate(['/entrenado-tabs/rutina-progreso', rutina.id]);
 
     // Cerrar modal si está abierto
     if (this.modalAbierto()) {
+      console.log('Cerrando modal');
       this.cerrarModal();
     }
   }

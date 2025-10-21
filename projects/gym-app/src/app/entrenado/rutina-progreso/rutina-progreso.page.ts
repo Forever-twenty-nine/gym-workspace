@@ -20,9 +20,9 @@ import {
   IonChip,
   IonProgressBar,
   IonText,
-  IonBackButton,
-  IonCheckbox
+  IonBackButton
 } from '@ionic/angular/standalone';
+import { ModalController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   arrowBack,
@@ -36,7 +36,8 @@ import {
   flameOutline,
   calendarOutline,
   checkmarkCircle,
-  close
+  close,
+  pauseCircleOutline
 } from 'ionicons/icons';
 import {
   ProgresoService,
@@ -71,8 +72,7 @@ import {
     IonChip,
     IonProgressBar,
     IonText,
-    IonBackButton,
-    IonCheckbox
+    IonBackButton
   ],
   templateUrl: './rutina-progreso.page.html',
   styleUrls: ['./rutina-progreso.page.css']
@@ -80,6 +80,7 @@ import {
 export class RutinaProgresoPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly modalController = inject(ModalController);
   private readonly progresoService = inject(ProgresoService);
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
@@ -92,7 +93,10 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   readonly isLoading = signal(false);
   readonly tiempoTranscurrido = signal('00:00');
   readonly cronometroActivo = signal(false);
+  readonly rutinaPausada = signal(false);
+  readonly rutinaLocalIniciada = signal(false);
   readonly ejerciciosCompletadosLocal = signal<string[]>([]);
+  readonly isCompleting = signal(false);
   private intervaloCronometro?: any;
   private segundosTranscurridos = 0;
 
@@ -119,7 +123,8 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
 
   // Estados computados
   readonly rutinaIniciada = computed(() => {
-    return !!this.progreso()?.fechaInicio;
+    // Considera inicio local inmediato (optimista) o el progreso persistido
+    return this.rutinaLocalIniciada() || !!this.progreso()?.fechaInicio;
   });
 
   readonly rutinaCompletada = computed(() => !!this.progreso()?.completado);
@@ -139,6 +144,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   });
 
   constructor() {
+    console.log('Constructor rutina-progreso');
     addIcons({
       arrowBack,
       timerOutline,
@@ -151,12 +157,14 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       flameOutline,
       calendarOutline,
       checkmarkCircle,
-      close
+      close,
+      pauseCircleOutline
     });
   }
 
   ngOnInit() {
     const rutinaId = this.route.snapshot.paramMap.get('rutinaId');
+    console.log('ngOnInit rutina-progreso, rutinaId:', rutinaId);
 
     if (rutinaId) {
       this.rutinaId.set(rutinaId);
@@ -169,11 +177,13 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
         this.iniciarCronometro();
       }
     } else {
+      console.log('No rutinaId, navegando a rutinas');
       this.router.navigate(['/entrenado-tabs/rutinas']);
     }
   }
 
   ngOnDestroy() {
+    console.log('ngOnDestroy rutina-progreso');
     if (this.intervaloCronometro) {
       clearInterval(this.intervaloCronometro);
     }
@@ -195,6 +205,11 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
         if (progresoActual.ejerciciosCompletados) {
           this.ejerciciosCompletadosLocal.set([...progresoActual.ejerciciosCompletados]);
         }
+
+        // Inicializar estado de rutina
+        if (progresoActual.fechaInicio && !progresoActual.completado) {
+          this.rutinaLocalIniciada.set(true);
+        }
         break;
       }
 
@@ -213,10 +228,25 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       if (!entrenadoId) throw new Error('Usuario no autenticado');
 
       await this.progresoService.iniciarRutina(entrenadoId, this.rutinaId());
+      // Marcar inicio localmente para que la UI reaccione inmediatamente
+      this.rutinaLocalIniciada.set(true);
       this.iniciarCronometro();
+      this.rutinaPausada.set(false);
     } catch (error: any) {
       console.error('Error al iniciar rutina:', error);
       // TODO: Mostrar toast de error
+    }
+  }
+
+  pausarReanudarRutina() {
+    if (this.rutinaPausada()) {
+      // Reanudar
+      this.iniciarCronometro();
+      this.rutinaPausada.set(false);
+    } else {
+      // Pausar
+      this.detenerCronometro();
+      this.rutinaPausada.set(true);
     }
   }
 
@@ -232,6 +262,8 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       return;
     }
 
+    this.isCompleting.set(true);
+
     try {
       const entrenadoId = this.authService.currentUser()?.uid;
       if (!entrenadoId) throw new Error('Usuario no autenticado');
@@ -244,11 +276,17 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       // Reset del estado del cronómetro al completar
       this.tiempoTranscurrido.set('00:00');
       this.segundosTranscurridos = 0;
+      // limpiar el inicio local
+      this.rutinaLocalIniciada.set(false);
       // Reset de ejercicios completados
       this.ejerciciosCompletadosLocal.set([]);
+      // Cerrar el modal
+      this.modalController.dismiss();
     } catch (error: any) {
       console.error('Error al completar rutina:', error);
       // TODO: Mostrar toast de error
+    } finally {
+      this.isCompleting.set(false);
     }
   }
 
@@ -262,8 +300,11 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       this.detenerCronometro();
       // Reset completo del estado del cronómetro
       this.cronometroActivo.set(false);
+      this.rutinaPausada.set(false);
       this.tiempoTranscurrido.set('00:00');
       this.segundosTranscurridos = 0;
+      // limpiar el inicio local
+      this.rutinaLocalIniciada.set(false);
       // Reset de ejercicios completados
       this.ejerciciosCompletadosLocal.set([]);
     } catch (error: any) {
@@ -297,20 +338,35 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       const entrenadoId = this.authService.currentUser()?.uid;
       if (!entrenadoId) throw new Error('Usuario no autenticado');
 
-      if (estaCompletado) {
-        await this.progresoService.descompletarEjercicio(
-          entrenadoId,
-          this.rutinaId(),
-          ejercicioId,
-          this.ejerciciosTotales()
-        );
+      // Asegurarnos de que el progreso existe antes de sincronizar
+      let progresoActual = this.progreso();
+      if (!progresoActual) {
+        console.log('Creando progreso automáticamente antes de sincronizar ejercicio...');
+        await this.progresoService.iniciarRutina(entrenadoId, this.rutinaId());
+        
+        // Esperar un poco a que se propague
+        await new Promise(resolve => setTimeout(resolve, 100));
+        progresoActual = this.progreso();
+      }
+
+      if (progresoActual) {
+        if (estaCompletado) {
+          await this.progresoService.descompletarEjercicio(
+            entrenadoId,
+            this.rutinaId(),
+            ejercicioId,
+            this.ejerciciosTotales()
+          );
+        } else {
+          await this.progresoService.completarEjercicio(
+            entrenadoId,
+            this.rutinaId(),
+            ejercicioId,
+            this.ejerciciosTotales()
+          );
+        }
       } else {
-        await this.progresoService.completarEjercicio(
-          entrenadoId,
-          this.rutinaId(),
-          ejercicioId,
-          this.ejerciciosTotales()
-        );
+        throw new Error('No se pudo crear el progreso automáticamente');
       }
     } catch (error: any) {
       console.error('Error al sincronizar ejercicio:', error, {
@@ -320,7 +376,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       });
       // Revertir cambio local si falla la sincronización
       this.ejerciciosCompletadosLocal.set(completadosActuales);
-      // TODO: Mostrar error más prominente
+      // TODO: Mostrar error más prominente o reintentar
     }
   }
 
@@ -376,12 +432,14 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
 
   getEstadoRutina(): string {
     if (this.rutinaCompletada()) return 'Completada';
+    if (this.rutinaPausada()) return 'Pausada';
     if (this.rutinaIniciada()) return 'En progreso';
     return 'No iniciada';
   }
 
   getColorEstado(): string {
     if (this.rutinaCompletada()) return 'success';
+    if (this.rutinaPausada()) return 'warning';
     if (this.rutinaIniciada()) return 'primary';
     return 'medium';
   }

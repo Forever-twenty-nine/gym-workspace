@@ -7,15 +7,9 @@ import {
   IonContent,
   IonCard,
   IonCardHeader,
-  IonCardTitle,
   IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonChip,
-  IonProgressBar,
   IonText,
-  IonIcon
+
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -45,18 +39,11 @@ import {
     IonContent,
     IonCard,
     IonCardHeader,
-    IonCardTitle,
     IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonChip,
-    IonProgressBar,
     IonText,
-    IonIcon
   ],
   templateUrl: './progreso.page.html',
-  styleUrls: ['./progreso.page.css']
+  
 })
 export class ProgresoPage implements OnInit {
   private readonly progresoService = inject(ProgresoService);
