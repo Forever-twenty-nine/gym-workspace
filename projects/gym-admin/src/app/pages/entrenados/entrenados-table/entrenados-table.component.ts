@@ -23,9 +23,15 @@ export class EntrenadosTableComponent {
   readonly edit = output<EntrenadoTableItem>();
 
   onEdit(id: string) {
+    if (!id) {
+      console.error('ID de entrenado no válido para editar');
+      return;
+    }
     const item = this.entrenados().find(e => e.id === id);
     if (item) {
       this.edit.emit(item);
+    } else {
+      console.error(`Entrenado con ID ${id} no encontrado`);
     }
   }
 }

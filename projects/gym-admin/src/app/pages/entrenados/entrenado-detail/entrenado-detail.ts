@@ -237,6 +237,11 @@ export class EntrenadoDetail implements OnInit {
   // Abrir modal de sesiones de rutina
   // --------------------------------------------
   abrirModalSesiones(rutinaId: string) {
+    if (!rutinaId || rutinaId.trim() === '') {
+      console.error('No se puede abrir el modal: rutinaId está vacío');
+      return;
+    }
+
     this.rutinaSeleccionada.set(rutinaId);
     this.mostrarModalSesiones.set(true);
   }

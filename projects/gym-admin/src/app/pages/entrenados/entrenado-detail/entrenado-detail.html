@@ -268,10 +268,12 @@
   </app-toast>
 
   <!-- Modal de sesiones de rutina -->
-  <app-rutina-sesion-modal
-    [rutinaId]="rutinaSeleccionada()"
-    [entrenadoId]="entrenadoId()"
-    [open]="mostrarModalSesiones()"
-    (openChange)="cerrarModalSesiones()">
-  </app-rutina-sesion-modal>
+  @if (mostrarModalSesiones()) {
+    <app-rutina-sesion-modal
+      [rutinaId]="rutinaSeleccionada()"
+      [entrenadoId]="entrenadoId()"
+      [open]="mostrarModalSesiones()"
+      (openChange)="cerrarModalSesiones()">
+    </app-rutina-sesion-modal>
+  }
 </div>
