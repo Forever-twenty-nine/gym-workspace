@@ -131,8 +131,9 @@
     </ion-chip> -->
   </section>
 
+
   @if (rutinasAsignadas().length > 0) {
-    <!-- Rutina por día -->
+    <!-- Rutina por día de semana -->
     <ion-card class="rutina-card !h-56">
       <ion-card-content class="!flex !flex-col !justify-between !h-full">
         <div class="">
@@ -176,6 +177,27 @@
       </ion-card-content>
     </ion-card>
   }
+
+  <!-- @if (rutinasAsignadas().length > 0) {
+        <ion-list style="margin: 0; padding: 0; background: transparent;">
+          @for (rutina of rutinasAsignadas(); track rutina.nombre) {
+            <ion-item button (click)="verRutina(rutina)" lines="none" style="--background: var(--ion-color-light); margin-bottom: 8px; border-radius: 12px; --padding-start: 12px; --padding-end: 12px;">
+              <ion-label>
+                <h3 style="margin: 0; font-size: 15px; font-weight: 600;">{{ rutina.nombre }}</h3>
+              </ion-label>
+              <ion-label slot="end" style="text-align: right; max-width: 150px;">
+                <p style="margin: 0; font-size: 12px;">{{ rutina.asignadoPor }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
+      } @else {
+        <div style="text-align: center; padding: 24px 16px; background: var(--ion-color-light); border-radius: 12px;">
+          <ion-icon name="fitness-outline" style="font-size: 48px; color: var(--ion-color-medium); margin-bottom: 12px;"></ion-icon>
+          <p style="margin: 0; font-size: 14px; color: var(--ion-color-medium); font-weight: 500;">No tienes rutinas asignadas</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--ion-color-medium);">Tu entrenador te asignará rutinas pronto</p>
+        </div>
+      } -->
 
 
 

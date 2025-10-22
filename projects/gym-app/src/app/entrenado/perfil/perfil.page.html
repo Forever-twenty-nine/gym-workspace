@@ -12,48 +12,56 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="">
+<ion-content [fullscreen]="true" class="ion-padding">
 
   @if (currentUser(); as user) {
     <!-- Tarjeta de información personal compacta -->
-    <section class="gym-box-primary px-2 py-2">
-      <div class="flex items-center gap-2 ion-padding">
-        <!-- Foto -->
-        <ion-avatar class="!w-16 !h-16">
-          <img src="../../../assets/images/test-foto.png" alt="" class="">
-        </ion-avatar>
-        <!-- Datos -->
-        <div>
-          <p class="font-heading font-bold text-xl mb-1 ">
-            {{ user.nombre }}
-          </p>
-          <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
-            Plan {{ user.plan }}
-          </ion-chip>
-        </div>
-      </div>
+    <section class="text-center mb-6">
+      <!-- Foto -->
+      <ion-avatar class="!w-24 !h-24 mx-auto mb-4">
+        <img src="../../../assets/images/test-foto.png" alt="" class="">
+      </ion-avatar>
+      <p class="font-heading font-bold text-2xl mb-1 ">
+        {{ user.nombre }}
+      </p>
+      <p class="text-gray-600 text-sm mb-1 ">
+        Miembro desde: 19/10/2025
+      </p>
     </section>
 
-    <!--  -->
-    <section class="ion-padding">
-      <div class="p-2 border border-solid border-gray-400 rounded-xl m-2">
-
-        <!-- Usuario -->
-        <div class="flex items-start gap-2 p-2">
-            <div class="flex flex-col border-b border-solid border-gray-400 w-full pb-3">
-              <span class="text-gray-500 text-xs font-heading">
-                ID Usuario
-              </span>
-              <span class="">
-                {{ user.uid }}
-              </span>
+    <ion-card class="">
+      <ion-card-content class="gym-box-secondary bg-[var(--brand-color-primary)] p-2">
+        <div class="flex flex-col gap-2 p-2 items-start">
+          <!-- Plan -->
+          @if (user.plan) {
+            <div class="flex justify-center items-center">
+              <div>
+                <span class="gym-box-primary px-2 py-0.5 mr-2 rounded-full text-xs">
+                  Pro
+                </span>
+                <span class="text-white font-heading font-bold text-lg">
+                  ¡Pásate a Premium y desbloquea más funciones!
+                </span>
+              </div>
             </div>
-        </div>
 
+
+          }
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Información personal -->
+    <section class="p-2 mt-6">
+      <!-- titulo -->
+      <h2 class=" font-heading text-lg font-semibold flex justify-between items-center mb-3">
+        Información de cuenta
+      </h2>
+      <div class="flex flex-col gap-2 p-4 items-start bg-gray-400/50 rounded-2xl">
         <!-- Email -->
         @if (user.email) {
-          <div class="flex items-start gap-2 p-2">
-            <div class="flex flex-col border-b border-solid border-gray-400 w-full pb-3">
+          <div class="flex items-start w-full gap-2 p-2">
+            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
               <span class="text-gray-500 text-xs font-heading">
                 Email
               </span>
@@ -84,14 +92,26 @@
           </div>
         }
 
+        <!-- Usuario -->
+        <div class="flex items-start gap-2 p-2 w-full">
+            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
+              <span class="text-gray-500 text-xs font-heading">
+                ID Usuario
+              </span>
+              <span class="text-sm mt-1">
+                {{ user.uid }}
+              </span>
+            </div>
+        </div>
+
         <!-- Plan -->
         @if (user.plan) {
-          <div class="flex items-start gap-2 p-2">
-            <div class="flex flex-col w-full pb-3">
+          <div class="flex items-start gap-2 p-2 w-full">
+            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
               <span class="text-gray-500 text-xs font-heading">
                 Plan
               </span>
-              <span class="">
+              <span class="text-sm mt-1">
                 {{ user.plan }}
               </span>
             </div>
@@ -99,17 +119,20 @@
 
         }
 
-
       </div>
     </section>
 
+
+
     <!-- Logout -->
-    <section class="px-4">
+    <section class="">
       <div class="px-2">
         <ion-button
           expand="block"
-          color="danger"
-          fill="outline"
+          fill="solid"
+          size="default"
+          shape="round"
+          color="medium"
           (click)="logout()">
           <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Cerrar Sesión
