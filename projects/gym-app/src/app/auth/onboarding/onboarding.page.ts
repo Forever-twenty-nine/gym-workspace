@@ -286,8 +286,6 @@ export class OnboardingPage {
       case 'entrenado':
         const clienteData: Entrenado = {
           id: uid,
-          gimnasioId: '', // Se asignará después cuando se una a un gimnasio
-          activo: true,
           fechaRegistro: new Date(),
           objetivo: this.mapObjetivoToEnum(formData.objetivo)
         };
@@ -297,10 +295,10 @@ export class OnboardingPage {
 
       case 'entrenador':
         const entrenadorData: Omit<Entrenador, 'id'> = {
-          gimnasioId: '', // Se asignará después
-          activo: true,
-          entrenados: [],
-          rutinas: []
+          fechaRegistro: new Date(),
+          ejerciciosCreadasIds: [],
+          entrenadosAsignadosIds: [],
+          rutinasCreadasIds: []
         };
         await this.entrenadorService.createWithId(uid, entrenadorData);
         break;

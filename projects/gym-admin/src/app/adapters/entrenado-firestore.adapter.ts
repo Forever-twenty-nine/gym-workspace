@@ -80,12 +80,37 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   private mapFromFirestore(data: any): Entrenado {
     return {
       id: data.id,
-      gimnasioId: data.gimnasioId || '',
-      entrenadorId: data.entrenadorId || '',
-      activo: data.activo ?? true,
+      entrenadoresId: data.entrenadoresId || [],
+      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasCreadas: data.rutinasCreadas || [],
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
     };
+  }
+
+  /**
+   * 🔄 Convierte un objeto ProgresoRutina desde Firestore
+   */
+  private convertirProgresoFromFirestore(progreso: any): any {
+    const convertido = { ...progreso };
+
+    // Convertir Timestamps a fechas
+    if (convertido.fechaInicio?.toDate) {
+      convertido.fechaInicio = convertido.fechaInicio.toDate();
+    }
+    if (convertido.fechaUltimaCompletada?.toDate) {
+      convertido.fechaUltimaCompletada = convertido.fechaUltimaCompletada.toDate();
+    }
+
+    // Convertir fechas en sesiones
+    if (convertido.sesiones) {
+      convertido.sesiones = convertido.sesiones.map((sesion: any) => ({
+        ...sesion,
+        fecha: sesion.fecha?.toDate ? sesion.fecha.toDate() : sesion.fecha
+      }));
+    }
+
+    return convertido;
   }
 
   /**
@@ -93,16 +118,19 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
    */
   private mapToFirestore(entrenado: Entrenado): any {
     const data: any = {
-      activo: entrenado.activo
     };
 
     // Incluir campos, usando delete si son null
-    if (entrenado.gimnasioId !== undefined) {
-      data.gimnasioId = entrenado.gimnasioId !== null ? entrenado.gimnasioId : deleteField();
+    if (entrenado.entrenadoresId !== undefined) {
+      data.entrenadoresId = entrenado.entrenadoresId !== null ? entrenado.entrenadoresId : deleteField();
     }
-    
-    if (entrenado.entrenadorId !== undefined) {
-      data.entrenadorId = entrenado.entrenadorId !== null ? entrenado.entrenadorId : deleteField();
+
+    if (entrenado.rutinasAsignadas !== undefined) {
+      data.rutinasAsignadas = entrenado.rutinasAsignadas !== null ? entrenado.rutinasAsignadas : deleteField();
+    }
+
+    if (entrenado.rutinasCreadas !== undefined) {
+      data.rutinasCreadas = entrenado.rutinasCreadas !== null ? entrenado.rutinasCreadas : deleteField();
     }
 
     // Solo incluir objetivo si no es undefined
@@ -117,5 +145,30 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     }
 
     return data;
+  }
+
+  /**
+   * 🔄 Convierte un objeto ProgresoRutina para guardar en Firestore
+   */
+  private convertirProgresoToFirestore(progreso: any): any {
+    const convertido = { ...progreso };
+
+    // Convertir fechas a Timestamps
+    if (convertido.fechaInicio instanceof Date) {
+      convertido.fechaInicio = Timestamp.fromDate(convertido.fechaInicio);
+    }
+    if (convertido.fechaUltimaCompletada instanceof Date) {
+      convertido.fechaUltimaCompletada = Timestamp.fromDate(convertido.fechaUltimaCompletada);
+    }
+
+    // Convertir fechas en sesiones
+    if (convertido.sesiones) {
+      convertido.sesiones = convertido.sesiones.map((sesion: any) => ({
+        ...sesion,
+        fecha: sesion.fecha instanceof Date ? Timestamp.fromDate(sesion.fecha) : sesion.fecha
+      }));
+    }
+
+    return convertido;
   }
 }

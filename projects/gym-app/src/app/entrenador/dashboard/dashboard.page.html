@@ -29,62 +29,30 @@
       </ion-card-content>
     </ion-card>
     
-    <!-- Entrenados -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mis Entrenados</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          @for (entrenado of entrenadosAsociados(); track entrenado.id) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ getUserName(entrenado.id) }}</h3>
-                <p>Objetivo: {{ entrenado.objetivo }}</p>
-              </ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Ejercicios Creados -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mis Ejercicios</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ ejercicio.nombre }}</h3>
-                <p>{{ ejercicio.descripcion }}</p>
-              </ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Rutinas Creadas -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mis Rutinas</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          @for (rutina of rutinasCreadas(); track rutina.id) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ rutina.nombre }}</h3>
-                <p>Duración: {{ rutina.duracion }} min</p>
-              </ion-label>
-            </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+    <!-- Estadísticas resumen -->
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px;">
+      <ion-card style="flex: 1 1 180px; min-width: 180px; max-width: 220px; text-align: center;">
+        <ion-card-content>
+          <ion-icon name="people-outline" color="primary" style="font-size: 32px;"></ion-icon>
+          <h3 style="margin: 8px 0 0 0; font-size: 1.1em; font-weight: 500;">Entrenados asignados</h3>
+          <div style="font-size: 2.2em; font-weight: bold; color: var(--ion-color-primary);">{{ entrenadosAsociados().length }}</div>
+        </ion-card-content>
+      </ion-card>
+      <ion-card style="flex: 1 1 180px; min-width: 180px; max-width: 220px; text-align: center;">
+        <ion-card-content>
+          <ion-icon name="barbell-outline" color="success" style="font-size: 32px;"></ion-icon>
+          <h3 style="margin: 8px 0 0 0; font-size: 1.1em; font-weight: 500;">Ejercicios creados</h3>
+          <div style="font-size: 2.2em; font-weight: bold; color: var(--ion-color-success);">{{ ejerciciosCreados().length }}</div>
+        </ion-card-content>
+      </ion-card>
+      <ion-card style="flex: 1 1 180px; min-width: 180px; max-width: 220px; text-align: center;">
+        <ion-card-content>
+          <ion-icon name="fitness-outline" color="tertiary" style="font-size: 32px;"></ion-icon>
+          <h3 style="margin: 8px 0 0 0; font-size: 1.1em; font-weight: 500;">Rutinas creadas</h3>
+          <div style="font-size: 2.2em; font-weight: bold; color: var(--ion-color-tertiary);">{{ rutinasCreadas().length }}</div>
+        </ion-card-content>
+      </ion-card>
+    </div>
 
     
   </div>

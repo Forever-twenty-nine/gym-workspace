@@ -115,17 +115,6 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por entrenado
-     */
-    getRutinasByEntrenado(entrenadoId: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.entrenadoId === entrenadoId
-            )
-        );
-    }
-
-    /**
      * 🔍 Busca rutinas activas
      */
     getRutinasActivas(): Signal<Rutina[]> {
@@ -160,74 +149,17 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por entrenador (usando creadorId)
-     * @deprecated Use getRutinasByCreador instead
-     */
-    getRutinasByEntrenador(entrenadorId: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.creadorId === entrenadorId
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas por creador
-     */
-    getRutinasByCreador(creadorId: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.creadorId === creadorId
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas por tipo de creador (Rol)
-     */
-    getRutinasByCreadorTipo(tipo: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.creadorTipo === tipo
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas por asignado
-     */
-    getRutinasByAsignado(asignadoId: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.asignadoId === asignadoId
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas por tipo de asignado (Rol)
-     */
-    getRutinasByAsignadoTipo(tipo: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.asignadoTipo === tipo
-            )
-        );
-    }
-
-    /**
-     * 🔍 Busca rutinas completadas
+     * 🔍 Busca rutinas completadas (DEPRECATED - usar ProgresoService)
+     * @deprecated El progreso ahora está en el modelo del entrenado
      */
     getRutinasCompletadas(): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => rutina.completado === true)
-        );
+        return computed(() => []);
     }
 
     /**
      * 🔍 Busca rutinas por día de la semana
      */
-    getRutinasByDiaSemana(dia: number): Signal<Rutina[]> {
+    getRutinasByDiaSemana(dia: string): Signal<Rutina[]> {
         return computed(() => 
             this._rutinas().filter(rutina => 
                 rutina.DiasSemana?.includes(dia) || false

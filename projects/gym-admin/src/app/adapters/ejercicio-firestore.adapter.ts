@@ -70,8 +70,6 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
       descansoSegundos: data.descansoSegundos,
       serieSegundos: data.serieSegundos,
       // Nuevos campos
-      creadorId: data.creadorId,
-      creadorTipo: data.creadorTipo,
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
     };
@@ -82,27 +80,24 @@ export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {
       nombre: ejercicio.nombre,
       descripcion: ejercicio.descripcion,
       series: ejercicio.series,
-      repeticiones: ejercicio.repeticiones,
-      peso: ejercicio.peso,
-      descansoSegundos: ejercicio.descansoSegundos,
-      serieSegundos: ejercicio.serieSegundos
+      repeticiones: ejercicio.repeticiones
     };
 
-    // Incluir campos opcionales solo si tienen valor
-    if (ejercicio.creadorId) {
-      data.creadorId = ejercicio.creadorId;
+    // Incluir campos opcionales solo si no son undefined
+    if (ejercicio.peso !== undefined) {
+      data.peso = ejercicio.peso;
     }
-    
-    if (ejercicio.creadorTipo) {
-      data.creadorTipo = ejercicio.creadorTipo;
+    if (ejercicio.descansoSegundos !== undefined) {
+      data.descansoSegundos = ejercicio.descansoSegundos;
     }
-    
+    if (ejercicio.serieSegundos !== undefined) {
+      data.serieSegundos = ejercicio.serieSegundos;
+    }
     if (ejercicio.fechaCreacion) {
       data.fechaCreacion = ejercicio.fechaCreacion instanceof Date 
         ? ejercicio.fechaCreacion
         : ejercicio.fechaCreacion;
     }
-    
     if (ejercicio.fechaModificacion) {
       data.fechaModificacion = ejercicio.fechaModificacion instanceof Date 
         ? ejercicio.fechaModificacion

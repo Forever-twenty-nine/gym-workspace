@@ -1,0 +1,19 @@
+@if (open) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+      <button type="button" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" (click)="closeModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h2 class="text-xl font-bold mb-4">Sesiones de Rutina</h2>
+      <ul>
+        @for (sesion of sesiones(); track sesion.id) {
+          <li class="mb-2 p-2 bg-slate-100 rounded">
+            <span class="font-semibold">{{ sesion.fechaInicio ? (sesion.fechaInicio | date:'dd/MM/yyyy HH:mm') : 'Sin fecha' }}</span>
+            <span class="ml-2">Completada: {{ sesion.completada ? 'Sí' : 'No' }}</span>
+            <span class="ml-2">Ejercicios: {{ sesion.ejerciciosCompletados }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}

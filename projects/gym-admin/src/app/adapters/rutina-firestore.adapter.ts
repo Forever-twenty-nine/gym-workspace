@@ -63,70 +63,29 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   private mapFromFirestore(data: any): Rutina {
     return {
       id: data.id,
-      entrenadoId: data.entrenadoId,
       nombre: data.nombre || '',
-      fechaAsignacion: data.fechaAsignacion?.toDate?.() || data.fechaAsignacion || new Date(),
-      ejercicios: data.ejercicios || [],
       activa: data.activa ?? true,
-      duracion: data.duracion,
-      DiasSemana: data.DiasSemana || [],
-      completado: data.completado ?? false,
-      notas: data.notas || '',
-      // Nuevos campos
-      creadorId: data.creadorId,
-      creadorTipo: data.creadorTipo,
-      asignadoId: data.asignadoId,
-      asignadoIds: data.asignadoIds || [],
-      asignadoTipo: data.asignadoTipo,
+      descripcion: data.descripcion || '',
+      ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
-      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
+      fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
+      DiasSemana: data.DiasSemana || [],
+      duracion: data.duracion
     };
   }
 
   private mapToFirestore(rutina: Rutina): any {
     const data: any = {
-      entrenadoId: rutina.entrenadoId,
       nombre: rutina.nombre,
-      ejercicios: rutina.ejercicios || [],
       activa: rutina.activa,
-      DiasSemana: rutina.DiasSemana || [],
-      completado: rutina.completado
+      descripcion: rutina.descripcion || '',
+      ejerciciosIds: rutina.ejerciciosIds || [],
+      DiasSemana: rutina.DiasSemana || []
     };
 
     // Solo incluir campos opcionales si tienen valor válido
     if (rutina.duracion && rutina.duracion > 0) {
       data.duracion = rutina.duracion;
-    }
-    
-    if (rutina.notas && rutina.notas.trim() !== '') {
-      data.notas = rutina.notas;
-    }
-
-    if (rutina.fechaAsignacion) {
-      data.fechaAsignacion = rutina.fechaAsignacion instanceof Date 
-        ? Timestamp.fromDate(rutina.fechaAsignacion)
-        : rutina.fechaAsignacion;
-    }
-
-    // Nuevos campos opcionales
-    if (rutina.creadorId) {
-      data.creadorId = rutina.creadorId;
-    }
-    
-    if (rutina.creadorTipo) {
-      data.creadorTipo = rutina.creadorTipo;
-    }
-    
-    if (rutina.asignadoId) {
-      data.asignadoId = rutina.asignadoId;
-    }
-    
-    if (rutina.asignadoIds && rutina.asignadoIds.length > 0) {
-      data.asignadoIds = rutina.asignadoIds;
-    }
-    
-    if (rutina.asignadoTipo) {
-      data.asignadoTipo = rutina.asignadoTipo;
     }
     
     if (rutina.fechaCreacion) {

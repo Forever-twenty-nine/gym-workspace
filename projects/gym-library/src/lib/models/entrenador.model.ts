@@ -1,11 +1,9 @@
-import { Entrenado} from './entrenado.model';
-import { Rutina } from './rutina.model';
-
 export interface Entrenador{
     id: string;          
-    gimnasioId: string;
-    activo: boolean;
-    entrenados: Entrenado[];
-    rutinas: Rutina[];
+    fechaRegistro?: Date;
+    //asociaciones
+    ejerciciosCreadasIds: string[];
+    entrenadosAsignadosIds: string[];
+    rutinasCreadasIds: string[];
 
 }

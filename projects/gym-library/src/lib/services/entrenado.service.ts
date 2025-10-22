@@ -77,6 +77,20 @@ export class EntrenadoService {
         
         try {
             await this.firestoreAdapter.save(entrenado);
+            
+            // Actualizar el signal local inmediatamente para reactividad
+            const entrenadosActuales = this._entrenados();
+            const index = entrenadosActuales.findIndex(e => e.id === entrenado.id);
+            
+            if (index >= 0) {
+                // Actualizar existente
+                entrenadosActuales[index] = { ...entrenado };
+            } else {
+                // Agregar nuevo
+                entrenadosActuales.push(entrenado);
+            }
+            
+            this._entrenados.set([...entrenadosActuales]);
         } catch (error) {
             console.error('Error al guardar entrenado:', error);
             throw error;
@@ -120,12 +134,34 @@ export class EntrenadoService {
     }
 
     /**
-     * 🔍 Busca entrenados por gimnasio
+     * 🔍 Busca entrenados por entrenador
      */
-    getEntrenadosByGimnasio(gimnasioId: string): Signal<Entrenado[]> {
+    getEntrenadosByEntrenador(entrenadorId: string): Signal<Entrenado[]> {
         return computed(() => 
             this._entrenados().filter(entrenado => 
-                entrenado.gimnasioId === gimnasioId
+                entrenado.entrenadoresId?.includes(entrenadorId)
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca entrenados que tienen una rutina asignada específica
+     */
+    getEntrenadosByRutinaAsignada(rutinaId: string): Signal<Entrenado[]> {
+        return computed(() => 
+            this._entrenados().filter(entrenado => 
+                entrenado.rutinasAsignadas?.includes(rutinaId)
+            )
+        );
+    }
+
+    /**
+     * 🔍 Busca entrenados que han creado una rutina específica
+     */
+    getEntrenadosByRutinaCreada(rutinaId: string): Signal<Entrenado[]> {
+        return computed(() => 
+            this._entrenados().filter(entrenado => 
+                entrenado.rutinasCreadas?.includes(rutinaId)
             )
         );
     }
@@ -135,7 +171,7 @@ export class EntrenadoService {
      */
     getEntrenadosActivos(): Signal<Entrenado[]> {
         return computed(() => 
-            this._entrenados().filter(entrenado => entrenado.activo)
+            this._entrenados()
         );
     }
 
@@ -150,6 +186,51 @@ export class EntrenadoService {
      * 📊 Obtiene el conteo de entrenados activos
      */
     get entrenadoActivoCount(): Signal<number> {
-        return computed(() => this._entrenados().filter(c => c.activo).length);
+        return computed(() => this._entrenados().length);
+    }
+
+    /**
+     * 🏋️ Asigna una rutina a un entrenado
+     */
+    async asignarRutina(entrenadoId: string, rutinaId: string): Promise<void> {
+        const entrenado = this._entrenados().find(e => e.id === entrenadoId);
+        if (!entrenado) {
+            throw new Error('Entrenado no encontrado');
+        }
+
+        const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+        
+        // Si ya está asignada, no hacer nada
+        if (rutinasAsignadas.includes(rutinaId)) {
+            return;
+        }
+
+        const entrenadoActualizado: Entrenado = {
+            ...entrenado,
+            rutinasAsignadas: [...rutinasAsignadas, rutinaId]
+        };
+
+        await this.save(entrenadoActualizado);
+    }
+
+    /**
+     * 🏋️ Desasigna una rutina de un entrenado
+     */
+    async desasignarRutina(entrenadoId: string, rutinaId: string): Promise<void> {
+        const entrenado = this._entrenados().find(e => e.id === entrenadoId);
+        if (!entrenado) {
+            throw new Error('Entrenado no encontrado');
+        }
+
+        const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+        // Eliminar todas las instancias del rutinaId (por si hay duplicados)
+        const nuevosAsignados = rutinasAsignadas.filter(id => id !== rutinaId);
+
+        const entrenadoActualizado: Entrenado = {
+            ...entrenado,
+            rutinasAsignadas: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
+        };
+
+        await this.save(entrenadoActualizado);
     }
 }

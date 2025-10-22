@@ -17,6 +17,16 @@ export const routes: Routes = [
           import('../rutinas/rutinas.page').then((m) => m.RutinasPage),
       },
       {
+        path: 'progreso',
+        loadComponent: () =>
+          import('../progreso/progreso.page').then((m) => m.ProgresoPage),
+      },
+      {
+        path: 'rutina-progreso/:rutinaId',
+        loadComponent: () =>
+          import('../rutina-progreso/rutina-progreso.page').then((m) => m.RutinaProgresoPage),
+      },
+      {
         path: 'perfil',
         loadComponent: () =>
           import('../perfil/perfil.page').then((m) => m.PerfilPage), 

@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="text-center">Mi Progreso</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (estadisticasGenerales(); as stats) {
+    <div class="progreso-container">
+
+      <!-- Estadísticas Generales -->
+      <ion-card class="stats-card">
+        <ion-card-header>
+          
+        </ion-card-header>
+        <ion-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">{{ stats.rutinasAsignadas }}</div>
+              <div class="stat-label">Rutinas asignadas</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ stats.rutinasCompletadas }}</div>
+              <div class="stat-label">Completadas</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ stats.rutinasEnProgreso }}</div>
+              <div class="stat-label">En progreso</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">{{ formatearTiempo(stats.tiempoTotal) }}</div>
+              <div class="stat-label">Tiempo total</div>
+            </div>
+          </div>
+          
+        </ion-card-content>
+      </ion-card>
+
+
+    </div>
+  } @else {
+    <div class="loading-container">
+      <ion-text color="medium">Cargando progreso...</ion-text>
+    </div>
+  }
+</ion-content>

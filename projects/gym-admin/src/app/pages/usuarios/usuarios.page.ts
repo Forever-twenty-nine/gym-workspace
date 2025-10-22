@@ -1,11 +1,10 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol } from 'gym-library';
+import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol, Objetivo } from 'gym-library';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
-import { FirebaseAuthAdapter } from '../../adapters/firebase-auth.adapter';
-import { DisplayHelperService } from '../../services/display-helper.service';
+import { UsuariosTable } from '../../components/usuarios-table/usuarios-table';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
 
@@ -15,7 +14,8 @@ import { PageTitleService } from '../../services/page-title.service';
     CommonModule,
     ReactiveFormsModule,
     ModalFormComponent,
-    ToastComponent
+    ToastComponent,
+    UsuariosTable
   ],
   templateUrl: './usuarios.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,8 +27,6 @@ export class UsuariosPage {
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
   private readonly fb = inject(FormBuilder);
-  private readonly firebaseAuthAdapter = inject(FirebaseAuthAdapter);
-  private readonly displayHelperService = inject(DisplayHelperService);
   readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
 
@@ -38,17 +36,12 @@ export class UsuariosPage {
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
-    return this.userService.users().map(user => {
-      const needsReview = !user.nombre || !user.role;
-      return {
-        ...user,
-        displayName: user.nombre || user.email || `Usuario ${user.uid}`,
-        needsReview
-      };
-    });
+    return this.userService.users().map(user => ({
+      ...user,
+      displayName: user.nombre || user.email || `Usuario ${user.uid}`,
+      needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
+    }));
   });
-
-
 
   // Signals para el estado del componente
   readonly isModalOpen = signal(false);
@@ -56,6 +49,7 @@ export class UsuariosPage {
   readonly editForm = signal<FormGroup | null>(null);
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
+  readonly formFields = signal<FormFieldConfig[]>([]);
 
   addSampleUsuario() {
     this.openCreateModal();
@@ -67,6 +61,14 @@ export class UsuariosPage {
   }
 
   openDetailsModal(item: any) {
+    // Si es entrenado, cargar el objetivo
+    if (item.role === Rol.ENTRENADO) {
+      const entrenado = this.entrenadoService.getEntrenado(item.uid)();
+      if (entrenado) {
+        item.objetivo = entrenado.objetivo;
+      }
+    }
+
     this.modalData.set(item);
     this.isModalOpen.set(true);
     this.isCreating.set(false);
@@ -115,9 +117,26 @@ export class UsuariosPage {
         onboarded: [item.onboarded || false],
         plan: [item.plan || '']
       };
+
+      // Agregar objetivo si es entrenado
+      if (item.role === Rol.ENTRENADO) {
+        formConfig.objetivo = [item.objetivo || ''];
+      }
     }
 
-    this.editForm.set(this.fb.group(formConfig));
+    const form = this.fb.group(formConfig);
+    this.editForm.set(form);
+
+    // Actualizar campos del formulario
+    this.updateFormFields();
+
+    // Suscribirse a cambios en el rol para actualizar campos dinámicamente
+    if (!this.isCreating()) {
+      form.get('role')?.valueChanges.subscribe((newRole: any) => {
+        this.handleRoleChangeInForm(newRole as Rol, item);
+        this.updateFormFields();
+      });
+    }
   }
 
   async saveChanges() {
@@ -161,6 +180,16 @@ export class UsuariosPage {
           await this.handleRoleChange(updatedData.uid, newRole, updatedData);
         }
         
+        // Si es entrenado y cambió el objetivo, actualizar el documento entrenado
+        if (originalData.role === Rol.ENTRENADO && updatedData.objetivo !== originalData.objetivo) {
+          const currentEntrenado = this.entrenadoService.getEntrenado(updatedData.uid)();
+          if (currentEntrenado) {
+            const updatedEntrenado = { ...currentEntrenado, objetivo: updatedData.objetivo };
+            await this.entrenadoService.save(updatedEntrenado);
+            this.toastService.log(`✅ Objetivo actualizado para entrenado: ${updatedData.nombre || updatedData.email}`);
+          }
+        }
+        
         await this.userService.updateUser(updatedData.uid, updatedData);
         this.toastService.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
       }
@@ -182,7 +211,7 @@ export class UsuariosPage {
             id: uid,
             activo: true,
             fechaRegistro: new Date(),
-            objetivo: 'MANTENER_PESO'
+            objetivo: userData.objetivo || Objetivo.MANTENER_PESO
           };
           
           if (userData.gimnasioId && userData.gimnasioId !== '') {
@@ -214,10 +243,11 @@ export class UsuariosPage {
         case Rol.ENTRENADOR:
         case Rol.PERSONAL_TRAINER:
           const entrenadorData: any = {
-            gimnasioId: '',
             activo: true,
-            clientes: [],
-            rutinas: []
+            fechaRegistro: new Date(),
+            ejerciciosCreadasIds: [],
+            entrenadosAsignadosIds: [],
+            rutinasCreadasIds: []
           };
           
           const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;
@@ -255,9 +285,41 @@ export class UsuariosPage {
     return Object.values(Rol);
   }
 
-  getFormFields(): FormFieldConfig[] {
-    if (this.isCreating()) {
-      return [
+  private handleRoleChangeInForm(newRole: Rol, originalItem: any) {
+    const form = this.editForm();
+    if (!form) return;
+
+    if (newRole === Rol.ENTRENADO) {
+      // Si cambia a ENTRENADO, agregar el control objetivo si no existe
+      if (!form.contains('objetivo')) {
+        // Intentar obtener el objetivo actual del entrenado si existe
+        let objetivoValue = '';
+        if (originalItem.role === Rol.ENTRENADO) {
+          objetivoValue = originalItem.objetivo || '';
+        } else {
+          // Si no era entrenado, intentar cargar de la DB si existe documento
+          const entrenado = this.entrenadoService.getEntrenado(originalItem.uid)();
+          objetivoValue = entrenado?.objetivo || Objetivo.MANTENER_PESO;
+        }
+        form.addControl('objetivo', this.fb.control(objetivoValue));
+      }
+    } else {
+      // Si cambia de ENTRENADO a otro rol, remover el control objetivo
+      if (form.contains('objetivo')) {
+        form.removeControl('objetivo');
+      }
+    }
+  }
+
+  private updateFormFields() {
+    const form = this.editForm();
+    if (!form) return;
+
+    const isCreating = this.isCreating();
+    const currentRole = form.get('role')?.value;
+
+    if (isCreating) {
+      this.formFields.set([
         {
           name: 'email',
           type: 'text',
@@ -276,9 +338,9 @@ export class UsuariosPage {
           colSpan: 2,
           required: true
         }
-      ];
+      ]);
     } else {
-      return [
+      const fields: FormFieldConfig[] = [
         {
           name: 'nombre',
           type: 'text',
@@ -329,16 +391,22 @@ export class UsuariosPage {
           colSpan: 2
         }
       ];
+
+      // Agregar campo objetivo si es entrenado
+      if (currentRole === Rol.ENTRENADO) {
+        fields.push({
+          name: 'objetivo',
+          type: 'select',
+          label: 'Objetivo',
+          placeholder: 'Seleccionar objetivo',
+          options: Object.values(Objetivo).map(obj => ({ value: obj, label: obj })),
+          colSpan: 2
+        });
+      }
+
+      this.formFields.set(fields);
     }
   }
 
-  // Métodos requeridos por el modal pero no usados en esta página
-  onToggleDiaSemana(eventData: { event: Event; value: string }) {
-    // No se usa en usuarios
-  }
-
-  toggleEjercicio(ejercicioId: string) {
-    // No se usa en usuarios
-  }
 }
 

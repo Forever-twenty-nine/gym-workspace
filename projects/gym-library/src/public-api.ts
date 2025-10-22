@@ -20,7 +20,10 @@ export * from './lib/models/rutina.model';
 export * from './lib/models/notificacion.model';
 export * from './lib/models/mensaje.model';
 export * from './lib/models/conversacion.model';
+export * from './lib/models/invitacion.model';
 export * from './lib/models/environment.model';
+export * from './lib/models/sesion-rutina.model';
+export * from './lib/models/estadisticas-entrenado.model';
 /*
  * environments
  */
@@ -40,6 +43,8 @@ export * from './lib/services/storage.service';
 export * from './lib/services/notificacion.service';
 export * from './lib/services/mensaje.service';
 export * from './lib/services/conversacion.service';
+export * from './lib/services/invitacion.service';
+export * from './lib/services/sesion-rutina.service';
 /*
  * interfaces para adaptadores
  */
@@ -56,5 +61,9 @@ export type { IStorageAdapter } from './lib/services/storage.service';
 export type { INotificacionFirestoreAdapter } from './lib/services/notificacion.service';
 export type { IMensajeFirestoreAdapter } from './lib/services/mensaje.service';
 export type { IConversacionFirestoreAdapter } from './lib/services/conversacion.service';
+export type { IInvitacionFirestoreAdapter } from './lib/services/invitacion.service';
+export type { IEstadisticasEntrenadoFirestoreAdapter } from './lib/services/estadisticas-entrenado.service';
+export { ESTADISTICAS_ENTRENADO_FIRESTORE_ADAPTER } from './lib/services/estadisticas-entrenado.service';
+export { EstadisticasEntrenadoService } from './lib/services/estadisticas-entrenado.service';
 
 export * from './lib/gym-library';

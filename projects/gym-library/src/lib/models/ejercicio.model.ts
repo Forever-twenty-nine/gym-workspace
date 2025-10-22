@@ -7,14 +7,9 @@ export interface Ejercicio {
     series: number;
     repeticiones: number;
     peso?: number;
+    // plan premium 
     descansoSegundos?: number;
     serieSegundos?: number;
-    // Información del creador (opcional)
-    creadorId?: string; 
-    creadorTipo?: Rol; 
-    // informacion del asignado (opcional)
-    asignadoAId?: string;
-    asignadoATipo?: Rol;
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;

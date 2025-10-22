@@ -1,29 +1,9 @@
-<div class="w-full px-4 py-8">
-  
-  <section class="grid grid-cols-1 gap-6">
-    <!-- Tabla de Entrenados -->
-        <!-- Tabla de Entrenados -->
+<div class="w-full p-4">
+
+<section class="bg-white rounded-lg shadow-md">
     <app-entrenados-table
       [entrenados]="entrenados()"
-      (edit)="openDetailsModal($event)">
+      (edit)="viewDetails($event)">
     </app-entrenados-table>
   </section>
-
-  <!-- Modal de detalles del entrenado -->
-  <app-modal-form
-    [isOpen]="isModalOpen()"
-    [modalType]="'entrenado'"
-    [isCreating]="isCreating()"
-    [form]="editForm()"
-    [formFields]="getFormFields()"
-    [ejercicios]="[]"
-    [selectedEjercicios]="[]"
-    [isLoading]="isLoading()"
-    (close)="closeModal()"
-    (save)="saveChanges()"
-    (marcarNotificacionLeida)="marcarNotificacionComoLeida($event)"
-    (aceptarInvitacion)="aceptarInvitacion($event)"
-    (rechazarInvitacion)="rechazarInvitacion($event)"
-    (clearField)="onClearField($event)">
-  </app-modal-form>
 </div>

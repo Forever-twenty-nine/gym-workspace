@@ -24,7 +24,7 @@ import {
   fitnessOutline,
   statsChartOutline
 } from 'ionicons/icons';
-import { UserService, AuthService, User, RutinaService, Rutina, Rol } from 'gym-library';
+import { UserService, AuthService, User, RutinaService, Rutina, Rol, EntrenadoService } from 'gym-library';
 
 @Component({
   selector: 'app-perfil',
@@ -48,6 +48,7 @@ import { UserService, AuthService, User, RutinaService, Rutina, Rol } from 'gym-
 export class PerfilPage implements OnInit {
   private authService = inject(AuthService);
   private rutinaService = inject(RutinaService);
+  private entrenadoService = inject(EntrenadoService);
   private router = inject(Router);
 
   currentUser = signal<User | null>(null);
@@ -60,15 +61,16 @@ export class PerfilPage implements OnInit {
 
     if (!user || !todasRutinas) return null;
 
-    // Filtrar rutinas del usuario actual
-    const misRutinas = todasRutinas.filter(r =>
-      r.asignadoId === user.uid || r.entrenadoId === user.uid
-    );
+    // Filtrar rutinas asignadas al usuario actual
+    const misRutinas = todasRutinas.filter(r => {
+      const entrenado = this.entrenadoService.getEntrenado(user.uid)();
+      return entrenado?.rutinasAsignadas?.includes(r.id) || false;
+    });
 
-    const rutinasCompletadas = misRutinas.filter(r => r.completado).length;
-    const rutinasActivas = misRutinas.filter(r => r.activa && !r.completado).length;
-    const totalEjercicios = misRutinas.reduce((total, r) =>
-      total + (r.ejercicios?.length || 0), 0
+    const rutinasCompletadas = 0; // No hay propiedad completado
+    const rutinasActivas = misRutinas.filter(r => r.activa).length;
+    const totalEjercicios = misRutinas.reduce((total, r) => 
+      total + (r.ejerciciosIds?.length || 0), 0
     );
 
     return {

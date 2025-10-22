@@ -1,12 +1,11 @@
 import { Objetivo } from '../enums/objetivo.enum';
-import { Rutina } from './rutina.model';
 
 export interface Entrenado {
     id: string;
-    gimnasioId: string;
-    entrenadorId?: string;
-    activo: boolean;
     fechaRegistro?: Date;
     objetivo?: Objetivo;
-   
+    entrenadoresId?: string[];
+    rutinasAsignadas?: string[];
+    // Plan Premium
+    rutinasCreadas?: string[];
 }

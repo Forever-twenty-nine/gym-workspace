@@ -79,14 +79,6 @@
                 </ion-item>
               }
 
-              <ion-item>
-                <ion-icon name="checkmark-circle" slot="start" [color]="selectedEntrenado()!.activo ? 'success' : 'danger'"></ion-icon>
-                <ion-label>
-                  <h3>Estado</h3>
-                  <p>{{ selectedEntrenado()!.activo ? 'Activo' : 'Inactivo' }}</p>
-                </ion-label>
-              </ion-item>
-
               @if (selectedEntrenado()!.fechaRegistro) {
                 <ion-item>
                   <ion-icon name="calendar" slot="start" color="secondary"></ion-icon>
@@ -96,15 +88,38 @@
                   </ion-label>
                 </ion-item>
               }
-
-              <ion-item>
-                <ion-icon name="business" slot="start" color="tertiary"></ion-icon>
-                <ion-label>
-                  <h3>Gimnasio</h3>
-                  <p>{{ selectedEntrenado()!.gimnasioId }}</p>
-                </ion-label>
-              </ion-item>
             </ion-list>
+
+            <!-- Progreso y estadísticas resumidas -->
+            <ion-card style="margin-top: 16px;">
+              <ion-card-header>
+                <ion-card-title>Progreso y Estadísticas</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-list lines="none">
+                  <ion-item>
+                    <ion-icon name="stats-chart-outline" slot="start" color="success"></ion-icon>
+                    <ion-label>
+                      <h3>Rutinas asignadas</h3>
+                      <p>{{ selectedEntrenado()!.rutinasAsignadas?.length || 0 }} rutinas</p>
+                    </ion-label>
+                  </ion-item>
+                  <ion-item>
+                    <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+                    <ion-label>
+                      <h3>Antigüedad</h3>
+                      <p>
+                        @if (getAntiguedadDias(selectedEntrenado()!) !== null) {
+                          {{ getAntiguedadDias(selectedEntrenado()!) }} días
+                        } @else {
+                          Sin registro
+                        }
+                      </p>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
+            </ion-card>
           </div>
         }
       </ion-content>
@@ -136,20 +151,8 @@
         </ion-item>
 
         <ion-item>
-          <ion-select
-            label="Franja Horaria Preferida"
-            labelPlacement="stacked"
-            formControlName="franjaHoraria"
-            placeholder="Seleccionar franja horaria">
-            <ion-select-option value="mañana">Mañana (6:00 - 12:00)</ion-select-option>
-            <ion-select-option value="tarde">Tarde (12:00 - 18:00)</ion-select-option>
-            <ion-select-option value="noche">Noche (18:00 - 23:00)</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <ion-item>
           <ion-textarea
-            label="Mensaje Personalizado"
+            label="Mensaje Personalizado (opcional)"
             labelPlacement="stacked"
             formControlName="mensaje"
             placeholder="¡Hola! Me gustaría ser tu entrenador..."
@@ -196,19 +199,12 @@
                   <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
                   <ion-label>
                     <h3>{{ rutina.nombre }}</h3>
-                    <p>Asignada: {{ rutina.fechaAsignacion | date:'dd/MM/yyyy' }}</p>
-                    @if (rutina.asignadoIds && rutina.asignadoIds.length > 1) {
-                      <p style="font-size: 0.9em; color: var(--ion-color-secondary);">
-                        Compartida con {{ rutina.asignadoIds.length - 1 }} entrenado(s) más
-                      </p>
-                    }
+                    <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
                   </ion-label>
-                  @if ((rutina.asignadoIds && rutina.asignadoIds.includes(selectedEntrenado()!.id)) || rutina.asignadoId === selectedEntrenado()!.id) {
-                    <ion-button fill="outline" color="danger" slot="end" (click)="desasignarRutina(rutina)">
-                      <ion-icon name="remove-circle-outline"></ion-icon>
-                      Quitar
-                    </ion-button>
-                  }
+                  <ion-button fill="outline" color="danger" slot="end" (click)="desasignarRutina(rutina)">
+                    <ion-icon name="remove-circle-outline"></ion-icon>
+                    Quitar
+                  </ion-button>
                 </ion-item>
               }
             </ion-list>
@@ -233,7 +229,7 @@
                   <ion-icon name="fitness-outline" slot="start" color="secondary"></ion-icon>
                   <ion-label>
                     <h3>{{ rutina.nombre }}</h3>
-                    <p>{{ rutina.ejercicios?.length || 0 }} ejercicios</p>
+                    <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
                   </ion-label>
                   <ion-button fill="solid" color="primary" slot="end" (click)="asignarRutina(rutina)">
                     <ion-icon name="add-circle-outline"></ion-icon>

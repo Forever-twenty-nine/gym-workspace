@@ -34,10 +34,32 @@
     <!-- Acciones -->
     <ion-card>
       <ion-card-content>
-        <ion-button expand="block" fill="solid" color="primary" (click)="crearEjercicio()">
+        <!-- Indicador de límite de plan -->
+        <div style="margin-bottom: 16px; text-align: center;">
+          <ion-text [color]="hasReachedEjercicioLimit() ? 'warning' : 'medium'" style="font-size: 0.9em;">
+            <ion-icon name="information-circle-outline" style="margin-right: 4px;"></ion-icon>
+            {{ ejercicioLimitMessage() }}
+          </ion-text>
+        </div>
+
+        <ion-button 
+          expand="block" 
+          fill="solid" 
+          color="primary" 
+          (click)="crearEjercicio()"
+          [disabled]="hasReachedEjercicioLimit()">
           <ion-icon name="barbell" slot="start"></ion-icon>
           Crear Nuevo Ejercicio
+          @if (hasReachedEjercicioLimit()) {
+            <ion-icon name="lock-closed" slot="end"></ion-icon>
+          }
         </ion-button>
+
+        @if (hasReachedEjercicioLimit()) {
+          <ion-text color="warning" style="display: block; text-align: center; margin-top: 8px; font-size: 0.85em;">
+            Has alcanzado el límite de tu plan. Actualiza para crear más ejercicios.
+          </ion-text>
+        }
       </ion-card-content>
     </ion-card>
   </div>
@@ -108,25 +130,35 @@
             ></ion-input>
           </ion-item>
 
-          <ion-item>
-            <ion-input
-              label="Duración de Serie (seg)"
-              labelPlacement="stacked"
-              type="number"
-              formControlName="serieSegundos"
-              placeholder="Duración por serie"
-            ></ion-input>
-          </ion-item>
+          <!-- Campos premium - solo visibles para planes pagos -->
+          @if (!isFreePlan()) {
+            <ion-item>
+              <ion-input
+                label="Duración de Serie (seg)"
+                labelPlacement="stacked"
+                type="number"
+                formControlName="serieSegundos"
+                placeholder="Duración por serie"
+              ></ion-input>
+            </ion-item>
 
-          <ion-item>
-            <ion-input
-              label="Descanso (seg)"
-              labelPlacement="stacked"
-              type="number"
-              formControlName="descansoSegundos"
-              placeholder="Tiempo de descanso entre series"
-            ></ion-input>
-          </ion-item>
+            <ion-item>
+              <ion-input
+                label="Descanso (seg)"
+                labelPlacement="stacked"
+                type="number"
+                formControlName="descansoSegundos"
+                placeholder="Tiempo de descanso entre series"
+              ></ion-input>
+            </ion-item>
+          } @else {
+            <ion-item>
+              <ion-text color="medium" style="font-size: 0.9em; padding: 8px 0;">
+                <ion-icon name="star" style="margin-right: 4px;"></ion-icon>
+                Los campos de duración y descanso están disponibles en planes premium.
+              </ion-text>
+            </ion-item>
+          }
 
           <ion-button expand="block" type="submit" [disabled]="!ejercicioEditForm()?.valid">
             {{ isEjercicioCreating() ? 'Crear' : 'Guardar' }}

@@ -7,6 +7,7 @@ import {
   NotificacionService,
   EntrenadorService,
   GimnasioService,
+  InvitacionService,
   ENTRENADOR_FIRESTORE_ADAPTER,
   GIMNASIO_FIRESTORE_ADAPTER
 } from 'gym-library';
@@ -17,6 +18,7 @@ import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapte
 import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.adapter';
 import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adapter';
 import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
+import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
 
 /**
  * Función para inicializar los adaptadores de servicios (llamar manualmente cuando sea necesario)
@@ -29,13 +31,15 @@ function initializeServiceAdapters(
   notificacionService: NotificacionService,
   entrenadorService: EntrenadorService,
   gimnasioService: GimnasioService,
+  invitacionService: InvitacionService,
   entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
   ejercicioAdapter: EjercicioFirestoreAdapter,
   notificacionAdapter: NotificacionFirestoreAdapter,
   entrenadorAdapter: EntrenadorFirestoreAdapter,
-  gimnasioAdapter: GimnasioFirestoreAdapter
+  gimnasioAdapter: GimnasioFirestoreAdapter,
+  invitacionAdapter: InvitacionFirestoreAdapter
 ) {
   return () => {
     // Configurar adaptadores
@@ -44,6 +48,7 @@ function initializeServiceAdapters(
     rutinaService.setFirestoreAdapter(rutinaAdapter);
     ejercicioService.setFirestoreAdapter(ejercicioAdapter);
     notificacionService.setFirestoreAdapter(notificacionAdapter);
+    invitacionService.setFirestoreAdapter(invitacionAdapter);
     // NOTA: entrenadorService y gimnasioService usan injection tokens, no necesitan setFirestoreAdapter
 
     return Promise.resolve();
@@ -76,13 +81,15 @@ export const appProviders = [
       NotificacionService,
       EntrenadorService,
       GimnasioService,
+      InvitacionService,
       EntrenadoFirestoreAdapter,
       UserFirestoreAdapter,
       RutinaFirestoreAdapter,
       EjercicioFirestoreAdapter,
       NotificacionFirestoreAdapter,
       EntrenadorFirestoreAdapter,
-      GimnasioFirestoreAdapter
+      GimnasioFirestoreAdapter,
+      InvitacionFirestoreAdapter
     ],
     multi: true
   }

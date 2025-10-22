@@ -22,11 +22,12 @@ import {
   IonSelect,
   IonSelectOption,
   IonCheckbox,
-  IonText
+  IonText,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { fitnessOutline, close, add, pencil, trash ,barbell} from 'ionicons/icons';
-import { AuthService, RutinaService, EjercicioService } from 'gym-library';
+import { fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed} from 'ionicons/icons';
+import { AuthService, RutinaService, EjercicioService, EntrenadorService } from 'gym-library';
 
 @Component({
   selector: 'app-rutinas',
@@ -53,7 +54,8 @@ import { AuthService, RutinaService, EjercicioService } from 'gym-library';
     IonInput,
     IonTextarea,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonText
   ],
   styles: [`
     .rutina-modal {
@@ -68,26 +70,43 @@ export class RutinasPage implements OnInit {
   private authService = inject(AuthService);
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
+  private entrenadorService = inject(EntrenadorService);
   private fb = inject(FormBuilder);
+  private toastController = inject(ToastController);
 
   rutinasCreadas: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.rutinaService.getRutinasByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getRutinasByEntrenador(entrenadorId)() : [];
   });
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.ejercicioService.getEjerciciosByCreador(entrenadorId)() : [];
+    return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
-  // Signals para el modal de rutinas
+  // Computed signals para límites de plan
+  readonly hasReachedRutinaLimit = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.rutinasCreadas().length;
+    return currentCount >= limits.maxRoutines;
+  });
+
+  readonly rutinaLimitMessage = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return '';
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.rutinasCreadas().length;
+    return `Rutinas creadas: ${currentCount}/${limits.maxRoutines}`;
+  });
   readonly isRutinaModalOpen = signal(false);
   readonly rutinaModalData = signal<any>(null);
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
 
   constructor() {
-    addIcons({ fitnessOutline, close, add, pencil, trash ,barbell});
+    addIcons({ fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed});
   }
 
   ngOnInit() {
@@ -144,7 +163,7 @@ export class RutinasPage implements OnInit {
       descripcion: '',
       ejercicios: [],
       creadorId: entrenadorId,
-      asignadoId: '',
+      asignadoIds: [],
       activa: true,
       completado: false
     };
@@ -160,7 +179,7 @@ export class RutinasPage implements OnInit {
       DiasSemana: [diasSemanaStrings],
       ejercicios: [item.ejercicios || []],
       creadorId: [item.creadorId || ''],
-      asignadoId: [item.asignadoId || '']
+      asignadoIds: [item.asignadoIds || []]
     };
 
     this.rutinaEditForm.set(this.fb.group(formConfig));
@@ -175,6 +194,25 @@ export class RutinasPage implements OnInit {
     form.markAllAsTouched();
 
     if (!form.valid) return;
+
+    // Validar límite de rutinas para creación
+    if (this.isRutinaCreating()) {
+      const entrenadorId = this.authService.currentUser()?.uid;
+      if (entrenadorId) {
+        const limits = this.entrenadorService.getLimits(entrenadorId);
+        const currentCount = this.entrenadorService.getRutinasByEntrenador(entrenadorId)().length;
+        if (currentCount >= limits.maxRoutines) {
+          const toast = await this.toastController.create({
+            message: 'Has alcanzado el límite de rutinas para tu plan. Actualiza para crear más.',
+            duration: 3000,
+            color: 'warning',
+            position: 'top'
+          });
+          await toast.present();
+          return;
+        }
+      }
+    }
 
     try {
       const formValue = form.value;
@@ -195,6 +233,14 @@ export class RutinasPage implements OnInit {
       }
 
       await this.rutinaService.save(rutinaData);
+
+      // Si es creación, agregar la rutina al entrenador
+      if (this.isRutinaCreating() && rutinaData.id) {
+        const entrenadorId = this.authService.currentUser()?.uid;
+        if (entrenadorId) {
+          await this.entrenadorService.addRutinaCreada(entrenadorId, rutinaData.id);
+        }
+      }
       
       this.closeRutinaModal();
       // Mostrar éxito

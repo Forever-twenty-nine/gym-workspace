@@ -10,7 +10,7 @@ export interface IEjercicioFirestoreAdapter {
 }
 
 /**
- * ❌ Errores de validación personalizados
+ * Errores de validación personalizados
  */
 export class EjercicioValidationError extends Error {
   constructor(message: string) {
@@ -23,11 +23,19 @@ export class EjercicioValidationError extends Error {
 export class EjercicioService {
 	private readonly _ejercicios: WritableSignal<Ejercicio[]> = signal<Ejercicio[]>([]);
 	private readonly ejercicioSignals = new Map<string, WritableSignal<Ejercicio | null>>();
+	private readonly isSubscribed = new Map<string, boolean>();
+	private readonly computedFilters = new Map<string, Signal<Ejercicio[]>>();
 	private isListenerInitialized = false;
 	private firestoreAdapter?: IEjercicioFirestoreAdapter;
 
-	constructor() {
-		// La inicialización se hará cuando se configure el adaptador
+	private filterByRange<T>(items: T[], getValue: (item: T) => number, min: number, max?: number): T[] {
+		return items.filter(item => {
+			const value = getValue(item);
+			if (max !== undefined) {
+				return value >= min && value <= max;
+			}
+			return value >= min;
+		});
 	}
 
 	/**
@@ -36,10 +44,19 @@ export class EjercicioService {
 	setFirestoreAdapter(adapter: IEjercicioFirestoreAdapter): void {
 		this.firestoreAdapter = adapter;
 		this.initializeListener();
+		// Suscribir signals existentes que no estén suscritos
+		for (const [id, signal] of this.ejercicioSignals) {
+			if (!this.isSubscribed.get(id)) {
+				this.firestoreAdapter.subscribeToEjercicio(id, (ejercicio) => {
+					signal.set(ejercicio);
+				});
+				this.isSubscribed.set(id, true);
+			}
+		}
 	}
 
 	/**
-	 * 🔄 Inicializa el listener de Firestore de forma segura
+	 * Inicializa el listener de Firestore de forma segura
 	 */
 	private initializeListener(): void {
 		if (this.isListenerInitialized || !this.firestoreAdapter) return;
@@ -55,7 +72,7 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 📊 Signal readonly con todos los ejercicios
+	 * Signal readonly con todos los ejercicios
 	 */
 	get ejercicios(): Signal<Ejercicio[]> {
 		if (!this.isListenerInitialized && this.firestoreAdapter) {
@@ -65,60 +82,29 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 📊 Obtiene un ejercicio específico por ID
+	 * Obtiene un ejercicio específico por ID
 	 */
 	getEjercicio(id: string): Signal<Ejercicio | null> {
 		if (!this.ejercicioSignals.has(id)) {
 			const ejercicioSignal = signal<Ejercicio | null>(null);
 			this.ejercicioSignals.set(id, ejercicioSignal);
+			this.isSubscribed.set(id, false);
 			
 			if (this.firestoreAdapter) {
 				this.firestoreAdapter.subscribeToEjercicio(id, (ejercicio) => {
 					ejercicioSignal.set(ejercicio);
 				});
+				this.isSubscribed.set(id, true);
 			}
 		}
 		return this.ejercicioSignals.get(id)!.asReadonly();
 	}
 
 	/**
-	 * ✅ Valida las reglas de negocio del ejercicio
+	 * Valida las reglas de negocio del ejercicio
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	validateEjercicio(ejercicio: Ejercicio): void {
-		// Validación 1: Solo ENTRENADO o ENTRENADOR pueden ser creadores
-		if (ejercicio.creadorTipo) {
-			if (ejercicio.creadorTipo !== Rol.ENTRENADO && ejercicio.creadorTipo !== Rol.ENTRENADOR) {
-				throw new EjercicioValidationError(
-					`Solo entrenados y entrenadores pueden crear ejercicios. Tipo recibido: ${ejercicio.creadorTipo}`
-				);
-			}
-		}
-
-		// Validación 2: Solo ENTRENADO puede ser asignado
-		if (ejercicio.asignadoATipo) {
-			if (ejercicio.asignadoATipo !== Rol.ENTRENADO) {
-				throw new EjercicioValidationError(
-					`Los ejercicios solo pueden ser asignados a entrenados. Tipo recibido: ${ejercicio.asignadoATipo}`
-				);
-			}
-		}
-
-		// Validación 3: Si hay asignadoAId, debe haber asignadoATipo
-		if (ejercicio.asignadoAId && !ejercicio.asignadoATipo) {
-			throw new EjercicioValidationError(
-				'Si se especifica un usuario asignado, debe especificarse el tipo de asignado'
-			);
-		}
-
-		// Validación 4: Si hay creadorId, debe haber creadorTipo
-		if (ejercicio.creadorId && !ejercicio.creadorTipo) {
-			throw new EjercicioValidationError(
-				'Si se especifica un creador, debe especificarse el tipo de creador'
-			);
-		}
-
-		// Validación 5: Valores numéricos positivos
 		if (ejercicio.series < 0) {
 			throw new EjercicioValidationError('Las series deben ser un valor positivo');
 		}
@@ -133,32 +119,31 @@ export class EjercicioService {
 	}
 
 	/**
-	 * � Normaliza y limpia el ejercicio antes de guardar
+	 * Normaliza y limpia el ejercicio antes de guardar
 	 */
 	private normalizeEjercicio(ejercicio: Ejercicio): Ejercicio {
-		const normalized = { ...ejercicio };
+		const normalized: any = { ...ejercicio };
 
-		// Limpiar campos vacíos de creador
-		if (!normalized.creadorId || normalized.creadorId === '') {
-			delete normalized.creadorId;
-			delete normalized.creadorTipo;
+		if (!normalized.nombre || normalized.nombre.trim() === '') {
+			throw new EjercicioValidationError('El nombre del ejercicio es obligatorio');
+		}
+		normalized.nombre = normalized.nombre.trim();
+		if (normalized.descripcion) {
+			normalized.descripcion = normalized.descripcion.trim();
+			if (normalized.descripcion === '') {
+				delete normalized.descripcion;
+			}
 		}
 
-		// Limpiar campos vacíos de asignado
-		if (!normalized.asignadoAId || normalized.asignadoAId === '') {
-			delete normalized.asignadoAId;
-			delete normalized.asignadoATipo;
-		}
+		// Eliminar cualquier campo undefined para evitar errores en Firestore
+		Object.keys(normalized).forEach(key => {
+			if (normalized[key] === undefined) {
+				delete normalized[key];
+			}
+		});
 
-		// Si hay asignadoAId, asegurarse que asignadoATipo sea ENTRENADO
-		if (normalized.asignadoAId) {
-			normalized.asignadoATipo = Rol.ENTRENADO;
-		}
-
-		// Agregar o actualizar metadatos de fecha
 		const now = new Date();
 		if (!normalized.id || normalized.id === '') {
-			// Es una creación
 			normalized.fechaCreacion = now;
 		}
 		normalized.fechaModificacion = now;
@@ -167,8 +152,7 @@ export class EjercicioService {
 	}
 
 	/**
-	 * �💾 Guarda o actualiza un ejercicio (upsert si tiene id).
-	 * Aplica validaciones y normalización automáticamente.
+	 * Guarda o actualiza un ejercicio (upsert si tiene id). Aplica validaciones y normalización automáticamente.
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	async save(ejercicio: Ejercicio): Promise<void> {
@@ -176,10 +160,8 @@ export class EjercicioService {
 			throw new Error('Firestore adapter no configurado');
 		}
 
-		// Normalizar el ejercicio
 		const normalizedEjercicio = this.normalizeEjercicio(ejercicio);
 
-		// Validar las reglas de negocio
 		this.validateEjercicio(normalizedEjercicio);
 		
 		try {
@@ -191,7 +173,7 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 🗑️ Elimina un ejercicio por ID
+	 * Elimina un ejercicio por ID
 	 */
 	async delete(id: string): Promise<void> {
 		if (!this.firestoreAdapter) {
@@ -207,170 +189,105 @@ export class EjercicioService {
 	}
 
 	/**
-	 * 🔍 Busca ejercicios por nombre
+	 * Busca ejercicios por nombre
 	 */
 	getEjerciciosByNombre(nombre: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => 
-				ejercicio.nombre.toLowerCase().includes(nombre.toLowerCase())
-			)
-		);
+		const key = `nombre-${nombre}`;
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this._ejercicios().filter(ejercicio => 
+					ejercicio.nombre.toLowerCase().includes(nombre.toLowerCase())
+				)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 🔍 Busca ejercicios por descripción
+	 * Busca ejercicios por descripción
 	 */
 	getEjerciciosByDescripcion(descripcion: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => 
-				ejercicio.descripcion?.toLowerCase().includes(descripcion.toLowerCase())
-			)
-		);
+		const key = `descripcion-${descripcion}`;
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this._ejercicios().filter(ejercicio => 
+					ejercicio.descripcion?.toLowerCase().includes(descripcion.toLowerCase())
+				)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 🔍 Busca ejercicios por rango de series
+	 * Busca ejercicios por rango de series
 	 */
 	getEjerciciosBySeries(minSeries: number, maxSeries?: number): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => {
-				if (maxSeries) {
-					return ejercicio.series >= minSeries && ejercicio.series <= maxSeries;
-				}
-				return ejercicio.series >= minSeries;
-			})
-		);
+		const key = `series-${minSeries}-${maxSeries || 'max'}`;
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this.filterByRange(this._ejercicios(), e => e.series, minSeries, maxSeries)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 📊 Obtiene el conteo total de ejercicios
+	 * Obtiene el conteo total de ejercicios
 	 */
 	get ejercicioCount(): Signal<number> {
 		return computed(() => this._ejercicios().length);
 	}
 
 	/**
-	 * 🔍 Busca ejercicios por rango de repeticiones
+	 * Busca ejercicios por rango de repeticiones
 	 */
 	getEjerciciosByRepeticiones(minReps: number, maxReps?: number): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => {
-				if (maxReps) {
-					return ejercicio.repeticiones >= minReps && ejercicio.repeticiones <= maxReps;
-				}
-				return ejercicio.repeticiones >= minReps;
-			})
-		);
+		const key = `repeticiones-${minReps}-${maxReps || 'max'}`;
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this.filterByRange(this._ejercicios(), e => e.repeticiones, minReps, maxReps)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios con peso específico
+	 * Obtiene ejercicios con peso específico
 	 */
 	getEjerciciosConPeso(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.peso && ejercicio.peso > 0)
-		);
+		const key = 'con-peso';
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this._ejercicios().filter(ejercicio => ejercicio.peso && ejercicio.peso > 0)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios sin peso (peso corporal)
+	 * Obtiene ejercicios sin peso (peso corporal)
 	 */
 	getEjerciciosSinPeso(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => !ejercicio.peso || ejercicio.peso === 0)
-		);
+		const key = 'sin-peso';
+		if (!this.computedFilters.has(key)) {
+			this.computedFilters.set(key, computed(() => 
+				this._ejercicios().filter(ejercicio => !ejercicio.peso || ejercicio.peso === 0)
+			));
+		}
+		return this.computedFilters.get(key)!;
 	}
 
 	/**
-	 * 🔍 Obtiene ejercicios creados por un usuario específico
-	 */
-	getEjerciciosByCreador(creadorId: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorId === creadorId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por un tipo de rol específico
-	 */
-	getEjerciciosByCreadorTipo(creadorTipo: Rol): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === creadorTipo)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios asignados a un usuario específico
-	 */
-	getEjerciciosByAsignado(asignadoAId: string): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.asignadoAId === asignadoAId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios asignados a entrenados (todos)
-	 */
-	getEjerciciosAsignados(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => 
-				ejercicio.asignadoAId && ejercicio.asignadoATipo === Rol.ENTRENADO
-			)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios sin asignar
-	 */
-	getEjerciciosSinAsignar(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => !ejercicio.asignadoAId)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por entrenados
-	 */
-	getEjerciciosCreadosPorEntrenados(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADO)
-		);
-	}
-
-	/**
-	 * 🔍 Obtiene ejercicios creados por entrenadores
-	 */
-	getEjerciciosCreadosPorEntrenadores(): Signal<Ejercicio[]> {
-		return computed(() => 
-			this._ejercicios().filter(ejercicio => ejercicio.creadorTipo === Rol.ENTRENADOR)
-		);
-	}
-
-	/**
-	 * ✅ Verifica si un rol puede crear ejercicios
+	 * Verifica si un rol puede crear ejercicios
 	 */
 	static canCreateEjercicio(rol: Rol): boolean {
 		return rol === Rol.ENTRENADO || rol === Rol.ENTRENADOR;
 	}
 
 	/**
-	 * ✅ Verifica si un rol puede ser asignado a un ejercicio
-	 */
-	static canBeAssignedToEjercicio(rol: Rol): boolean {
-		return rol === Rol.ENTRENADO;
-	}
-
-	/**
-	 * 📋 Obtiene los roles que pueden crear ejercicios
+	 * Obtiene los roles que pueden crear ejercicios
 	 */
 	static getRolesCreadores(): Rol[] {
 		return [Rol.ENTRENADO, Rol.ENTRENADOR];
-	}
-
-	/**
-	 * 📋 Obtiene los roles que pueden ser asignados a ejercicios
-	 */
-	static getRolesAsignables(): Rol[] {
-		return [Rol.ENTRENADO];
 	}
 }

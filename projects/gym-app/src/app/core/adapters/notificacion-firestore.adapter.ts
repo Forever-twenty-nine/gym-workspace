@@ -35,6 +35,7 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
       onSnapshot(
         notificacionesQuery,
         (snapshot) => {
+          
           const notificaciones: Notificacion[] = snapshot.docs.map(doc => {
             const data = doc.data();
             return {
@@ -48,7 +49,8 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
                 : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
             } as Notificacion;
           });
-
+          
+         
           onUpdate(notificaciones);
         },
         (error) => {
