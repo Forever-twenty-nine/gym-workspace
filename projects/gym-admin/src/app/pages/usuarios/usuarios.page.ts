@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol, Objetivo } from 'gym-library';
@@ -29,6 +29,7 @@ export class UsuariosPage {
   private readonly fb = inject(FormBuilder);
   readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
+  private readonly ngZone = inject(NgZone);
 
   constructor() {
     this.pageTitleService.setTitle('Usuarios');
@@ -36,11 +37,13 @@ export class UsuariosPage {
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
-    return this.userService.users().map(user => ({
-      ...user,
-      displayName: user.nombre || user.email || `Usuario ${user.uid}`,
-      needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
-    }));
+    return this.ngZone.run(() => {
+      return this.userService.users().map(user => ({
+        ...user,
+        displayName: user.nombre || user.email || `Usuario ${user.uid}`,
+        needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
+      }));
+    });
   });
 
   // Signals para el estado del componente
@@ -56,23 +59,33 @@ export class UsuariosPage {
   }
 
   async deleteUsuario(id: string) {
-    await this.userService.deleteUser(id);
-    this.toastService.log(`Usuario eliminado: ${id}`);
+    return this.ngZone.run(async () => {
+      await this.userService.deleteUser(id);
+      this.toastService.log(`Usuario eliminado: ${id}`);
+    });
   }
 
   openDetailsModal(item: any) {
-    // Si es entrenado, cargar el objetivo
-    if (item.role === Rol.ENTRENADO) {
-      const entrenado = this.entrenadoService.getEntrenado(item.uid)();
-      if (entrenado) {
-        item.objetivo = entrenado.objetivo;
+    this.ngZone.run(async () => {
+      // Si es entrenado, cargar el objetivo de forma asíncrona
+      if (item.role === Rol.ENTRENADO) {
+        try {
+          // Esperar un tick para asegurar que estamos en zona
+          await Promise.resolve();
+          const entrenado = this.entrenadoService.getEntrenado(item.uid)();
+          if (entrenado) {
+            item.objetivo = entrenado.objetivo;
+          }
+        } catch (error) {
+          console.warn('Error cargando objetivo del entrenado:', error);
+        }
       }
-    }
 
-    this.modalData.set(item);
-    this.isModalOpen.set(true);
-    this.isCreating.set(false);
-    this.createEditForm(item);
+      this.modalData.set(item);
+      this.isModalOpen.set(true);
+      this.isCreating.set(false);
+      this.createEditForm(item);
+    });
   }
 
   openCreateModal() {
@@ -168,7 +181,9 @@ export class UsuariosPage {
           email: updatedData.email,
         };
         
-        await (this.userService as any).addUser(userDataForCreation, password);
+        await this.ngZone.run(async () => {
+          await (this.userService as any).addUser(userDataForCreation, password);
+        });
         this.toastService.log(`✅ Usuario creado con Firebase Auth: ${updatedData.email}`);
       } else {
         delete updatedData.password;
@@ -177,20 +192,26 @@ export class UsuariosPage {
         const newRole = updatedData.role;
         
         if (originalRole !== newRole && newRole) {
-          await this.handleRoleChange(updatedData.uid, newRole, updatedData);
+          await this.ngZone.run(async () => {
+            await this.handleRoleChange(updatedData.uid, newRole, updatedData);
+          });
         }
         
         // Si es entrenado y cambió el objetivo, actualizar el documento entrenado
         if (originalData.role === Rol.ENTRENADO && updatedData.objetivo !== originalData.objetivo) {
-          const currentEntrenado = this.entrenadoService.getEntrenado(updatedData.uid)();
-          if (currentEntrenado) {
-            const updatedEntrenado = { ...currentEntrenado, objetivo: updatedData.objetivo };
-            await this.entrenadoService.save(updatedEntrenado);
-            this.toastService.log(`✅ Objetivo actualizado para entrenado: ${updatedData.nombre || updatedData.email}`);
-          }
+          await this.ngZone.run(async () => {
+            const currentEntrenado = this.entrenadoService.getEntrenado(updatedData.uid)();
+            if (currentEntrenado) {
+              const updatedEntrenado = { ...currentEntrenado, objetivo: updatedData.objetivo };
+              await this.entrenadoService.save(updatedEntrenado);
+              this.toastService.log(`✅ Objetivo actualizado para entrenado: ${updatedData.nombre || updatedData.email}`);
+            }
+          });
         }
         
-        await this.userService.updateUser(updatedData.uid, updatedData);
+        await this.ngZone.run(async () => {
+          await this.userService.updateUser(updatedData.uid, updatedData);
+        });
         this.toastService.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
       }
 
@@ -298,8 +319,10 @@ export class UsuariosPage {
           objetivoValue = originalItem.objetivo || '';
         } else {
           // Si no era entrenado, intentar cargar de la DB si existe documento
-          const entrenado = this.entrenadoService.getEntrenado(originalItem.uid)();
-          objetivoValue = entrenado?.objetivo || Objetivo.MANTENER_PESO;
+          this.ngZone.run(() => {
+            const entrenado = this.entrenadoService.getEntrenado(originalItem.uid)();
+            objetivoValue = entrenado?.objetivo || Objetivo.MANTENER_PESO;
+          });
         }
         form.addControl('objetivo', this.fb.control(objetivoValue));
       }

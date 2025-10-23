@@ -33,7 +33,7 @@ export class RutinaService {
      */
     setFirestoreAdapter(adapter: IRutinaFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
     }
 
     /**

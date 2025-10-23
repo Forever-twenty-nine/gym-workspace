@@ -11,17 +11,9 @@ export interface FormFieldConfig {
   options?: { value: any; label: string; extra?: string }[];
   colSpan?: number;
   inputType?: string;
-  min?: number;
-  step?: number;
-  rows?: number;
   checkboxLabel?: string;
   readonly?: boolean;
   disabled?: boolean;
-  // Propiedades personalizadas para campos complejos
-  notificaciones?: any[];
-  rutinas?: any[];
-  ejercicios?: any[];
-  invitaciones?: any[];
 }
 
 @Component({
@@ -37,15 +29,9 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup | null = null;
   @Input() formFields: FormFieldConfig[] = [];
   @Input() isLoading: boolean = false;
-  @Input() showCustomAction: boolean = false;
-  @Input() customActionLabel: string = 'Acción';
-  @Input() showCustomAction2: boolean = false;
-  @Input() customAction2Label: string = 'Acción 2';
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
-  @Output() customAction = new EventEmitter<void>();
-  @Output() customAction2 = new EventEmitter<void>();
 
   constructor() {}
 
@@ -70,14 +56,6 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   onSave(): void {
     this.save.emit();
-  }
-
-  onCustomAction(): void {
-    this.customAction.emit();
-  }
-
-  onCustomAction2(): void {
-    this.customAction2.emit();
   }
 
   // Métodos para manejar multiselects genéricos

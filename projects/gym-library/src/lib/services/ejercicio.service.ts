@@ -43,16 +43,8 @@ export class EjercicioService {
 	 */
 	setFirestoreAdapter(adapter: IEjercicioFirestoreAdapter): void {
 		this.firestoreAdapter = adapter;
-		this.initializeListener();
-		// Suscribir signals existentes que no estén suscritos
-		for (const [id, signal] of this.ejercicioSignals) {
-			if (!this.isSubscribed.get(id)) {
-				this.firestoreAdapter.subscribeToEjercicio(id, (ejercicio) => {
-					signal.set(ejercicio);
-				});
-				this.isSubscribed.set(id, true);
-			}
-		}
+		// No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+		// Los signals existentes se suscribirán cuando se acceda a ellos
 	}
 
 	/**
