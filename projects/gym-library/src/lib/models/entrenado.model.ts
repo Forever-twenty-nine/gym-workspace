@@ -5,7 +5,7 @@ export interface Entrenado {
     fechaRegistro?: Date;
     objetivo?: Objetivo;
     entrenadoresId?: string[];
-    rutinasAsignadas?: string[];
+    rutinasAsignadasIds?: string[]; // IDs de RutinaAsignada
     // Plan Premium
     rutinasCreadas?: string[];
 }

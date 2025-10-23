@@ -165,17 +165,6 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por día de la semana
-     */
-    getRutinasByDiaSemana(dia: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.DiasSemana?.includes(dia) || false
-            )
-        );
-    }
-
-    /**
      * 🎯 Obtiene una rutina con sus ejercicios ya resueltos (más eficiente que hacer llamadas separadas)
      */
     getRutinaConEjercicios(id: string): Signal<RutinaConEjercicios | null> {

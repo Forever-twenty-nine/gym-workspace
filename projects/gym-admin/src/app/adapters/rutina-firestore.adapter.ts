@@ -79,7 +79,6 @@ export class RutinaFirestoreAdapter extends FirebaseAdapterBase implements IRuti
       ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
-      DiasSemana: data.DiasSemana || [],
       duracion: data.duracion
     };
   }
@@ -89,8 +88,7 @@ export class RutinaFirestoreAdapter extends FirebaseAdapterBase implements IRuti
       nombre: rutina.nombre,
       activa: rutina.activa,
       descripcion: rutina.descripcion || '',
-      ejerciciosIds: rutina.ejerciciosIds || [],
-      DiasSemana: rutina.DiasSemana || []
+      ejerciciosIds: rutina.ejerciciosIds || []
     };
 
     // Solo incluir campos opcionales si tienen valor válido

@@ -450,8 +450,8 @@ export class EntrenadorService {
     const limits = this.getLimits(entrenadorId);
     if (limits.maxRoutines === 5) { // Plan free
       const rutina = this.rutinaService.getRutina(rutinaId)();
-      if (rutina && (rutina.DiasSemana !== undefined || rutina.duracion !== undefined)) {
-        throw new PlanLimitError('En el plan free no se pueden configurar días de la semana o duración. Actualiza a premium.');
+      if (rutina && rutina.duracion !== undefined) {
+        throw new PlanLimitError('En el plan free no se pueden configurar duración. Actualiza a premium.');
       }
     }
 

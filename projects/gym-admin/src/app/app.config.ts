@@ -17,6 +17,7 @@ import {
   MensajeService,
   InvitacionService,
   SesionRutinaService,
+  RutinaAsignadaService,
   ENTRENADOR_FIRESTORE_ADAPTER, 
   GIMNASIO_FIRESTORE_ADAPTER,
   ESTADISTICAS_ENTRENADO_FIRESTORE_ADAPTER
@@ -31,6 +32,7 @@ import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.
 import { MensajeFirestoreAdapter } from './adapters/mensaje-firestore.adapter';
 import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
 import { EstadisticasEntrenadoFirestoreAdapter } from './adapters/estadisticas-entrenado-firestore.adapter';
+import { RutinaAsignadaFirestoreAdapter } from './adapters/rutina-asignada-firestore.adapter';
 
 import { routes } from './app.routes';
 
@@ -46,6 +48,7 @@ function initializeServiceAdapters(
   mensajeService: MensajeService,
   invitacionService: InvitacionService,
   sesionRutinaService: SesionRutinaService,
+  rutinaAsignadaService: RutinaAsignadaService,
   entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
@@ -55,7 +58,8 @@ function initializeServiceAdapters(
   notificacionAdapter: NotificacionFirestoreAdapter,
   mensajeAdapter: MensajeFirestoreAdapter,
   invitacionAdapter: InvitacionFirestoreAdapter,
-  sesionRutinaAdapter: SesionRutinaFirestoreAdapter
+  sesionRutinaAdapter: SesionRutinaFirestoreAdapter,
+  rutinaAsignadaAdapter: RutinaAsignadaFirestoreAdapter
 ) {
   return () => {
     // Configurar adaptadores
@@ -69,6 +73,7 @@ function initializeServiceAdapters(
     mensajeService.setFirestoreAdapter(mensajeAdapter);
     invitacionService.setFirestoreAdapter(invitacionAdapter);
     sesionRutinaService.setFirestoreAdapter(sesionRutinaAdapter);
+    rutinaAsignadaService.setFirestoreAdapter(rutinaAsignadaAdapter);
     
     return Promise.resolve();
   };
@@ -127,6 +132,7 @@ export const appConfig: ApplicationConfig = {
         MensajeService,
         InvitacionService,
         SesionRutinaService,
+        RutinaAsignadaService,
         EntrenadoFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
@@ -136,7 +142,8 @@ export const appConfig: ApplicationConfig = {
         NotificacionFirestoreAdapter,
         MensajeFirestoreAdapter,
         InvitacionFirestoreAdapter,
-        SesionRutinaFirestoreAdapter
+        SesionRutinaFirestoreAdapter,
+        RutinaAsignadaFirestoreAdapter
       ],
       multi: true
     }

@@ -31,6 +31,17 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
   readonly tiempoTranscurrido = signal(0); // en segundos
   readonly intervaloCronometro: any = null;
 
+  // Estado de error
+  readonly errorSesion = signal<string | null>(null);
+
+  // Método para mostrar errores temporales
+  private mostrarErrorTemporal(mensaje: string, duracionMs: number = 5000) {
+    this.errorSesion.set(mensaje);
+    setTimeout(() => {
+      this.errorSesion.set(null);
+    }, duracionMs);
+  }
+
   // Sesión completa con rutina y ejercicios
   readonly sesionCompleta = computed(() => {
     const sesion = this.sesionActual();
@@ -129,9 +140,9 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges(changes: any) {
-    // Cuando se abre el modal, preparar la sesión pero no iniciarla automáticamente
-    if (changes.open && changes.open.currentValue === true && !this.sesionActual()) {
-      this.prepararSesion();
+    // Cuando se abre el modal, preparar la información de la rutina pero NO crear sesión aún
+    if (changes.open && changes.open.currentValue === true) {
+      this.prepararInformacionRutina();
     }
   }
 
@@ -159,6 +170,11 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     } catch (error) {
       console.error('Error en recargarEjercicios:', error);
     }
+  }
+
+  // Método público para recargar la información de la rutina
+  recargarRutina() {
+    this.prepararInformacionRutina();
   }
 
   private formatearTiempo(segundos: number): string {
@@ -197,6 +213,20 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     this.tiempoTranscurrido.set(0);
   }
 
+  private async prepararInformacionRutina() {
+    try {
+      this.errorSesion.set(null);
+      // Obtener los ejercicios de la rutina sin crear sesión
+      const ejercicios = await this.sesionRutinaService.getEjerciciosByRutinaId(this.rutinaId);
+      if (ejercicios && ejercicios.length > 0) {
+        this.cargarEjerciciosDesdeDatos(ejercicios);
+      }
+    } catch (error) {
+      console.error('Error al preparar información de rutina:', error);
+      this.errorSesion.set('Error al cargar la información de la rutina.');
+    }
+  }
+
   private async prepararSesion() {
     try {
       await this.ngZone.run(async () => {
@@ -212,7 +242,7 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
 
   async iniciarSesion() {
     try {
-      // Si no hay sesión preparada, crearla primero
+      // Si no hay sesión creada, crearla primero
       if (!this.sesionActual()) {
         await this.prepararSesion();
       }
@@ -263,6 +293,9 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     if (!this.sesionActual()) return;
 
     try {
+      // Limpiar cualquier error anterior
+      this.errorSesion.set(null);
+
       const fechaFin = new Date();
       const duracion = this.tiempoTranscurrido();
 
@@ -278,6 +311,8 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
       this.sesionActual.update(sesion => sesion ? { ...sesion, completada: true, fechaFin, duracion } : null);
     } catch (error) {
       console.error('Error al completar sesión:', error);
+      this.mostrarErrorTemporal('Error al completar la sesión. Verifica tu conexión e inténtalo de nuevo.');
+      // No detener el cronómetro ni cambiar el estado de la sesión en caso de error
     }
   }
 
@@ -287,6 +322,7 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     this.ejerciciosSesion.update(ejercicios =>
       ejercicios.map(e => ({ ...e, completado: false, seriesCompletadas: 0 }))
     );
+    this.errorSesion.set(null);
   }
 
   closeModal() {

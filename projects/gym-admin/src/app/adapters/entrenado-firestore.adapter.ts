@@ -84,7 +84,7 @@ export class EntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IE
     return {
       id: data.id,
       entrenadoresId: data.entrenadoresId || [],
-      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasAsignadasIds: data.rutinasAsignadasIds || [],
       rutinasCreadas: data.rutinasCreadas || [],
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
@@ -128,8 +128,8 @@ export class EntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IE
       data.entrenadoresId = entrenado.entrenadoresId !== null ? entrenado.entrenadoresId : deleteField();
     }
 
-    if (entrenado.rutinasAsignadas !== undefined) {
-      data.rutinasAsignadas = entrenado.rutinasAsignadas !== null ? entrenado.rutinasAsignadas : deleteField();
+    if (entrenado.rutinasAsignadasIds !== undefined) {
+      data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds !== null ? entrenado.rutinasAsignadasIds : deleteField();
     }
 
     if (entrenado.rutinasCreadas !== undefined) {

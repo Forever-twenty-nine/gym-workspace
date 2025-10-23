@@ -28,6 +28,18 @@
 
       <!-- Content -->
       <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <!-- Notificación de error temporal -->
+        @if (errorSesion()) {
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-red-600 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              <p class="text-red-800 text-sm">{{ errorSesion() }}</p>
+            </div>
+          </div>
+        }
+
         <!-- Cronómetro y Controles -->
         <div class="bg-gray-50 rounded-lg p-6 mb-6">
           <div class="flex items-center justify-between mb-4">
@@ -61,7 +73,8 @@
 
           <!-- Botones de control -->
           <div class="flex items-center space-x-3">
-            @if (!cronometroCorriendo()) {
+            @if (!sesionActual()) {
+              <!-- Estado: Rutina preparada, sesión no creada -->
               <button (click)="iniciarSesion()"
                       class="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -69,7 +82,17 @@
                 </svg>
                 <span>Iniciar Rutina</span>
               </button>
+            } @else if (!cronometroCorriendo()) {
+              <!-- Estado: Sesión creada pero pausada -->
+              <button (click)="iniciarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m-3-3h3m-6 0h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Reanudar Rutina</span>
+              </button>
             } @else if (!sesionCompletada()) {
+              <!-- Estado: Sesión corriendo -->
               <button (click)="completarSesion()"
                       class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,6 +109,7 @@
                 <span>Reiniciar</span>
               </button>
             } @else {
+              <!-- Estado: Sesión completada -->
               <div class="flex items-center space-x-2 px-6 py-3 bg-green-100 text-green-800 rounded-lg font-medium">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -124,21 +148,38 @@
             }
           </div>
 
-          @if (!sesionActual()) {
-            <!-- Error: rutina no encontrada -->
+          @if (errorSesion()) {
+            <!-- Error específico -->
             <div class="text-center py-8">
               <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                 </svg>
               </div>
-              <h4 class="text-lg font-medium text-gray-900 mb-2">Rutina no encontrada</h4>
-              <p class="text-gray-500 mb-4">La rutina que intentas ejecutar no existe o ha sido eliminada.</p>
-              <button type="button" 
-                      (click)="closeModal()"
-                      class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                Cerrar
-              </button>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">Error</h4>
+              <p class="text-gray-500 mb-4">{{ errorSesion() }}</p>
+              <div class="flex space-x-3 justify-center">
+                <button (click)="recargarRutina()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  Reintentar
+                </button>
+                <button type="button" 
+                        (click)="closeModal()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          } @else if (!sesionActual() && !hayEjercicios()) {
+            <!-- Estado inicial: rutina no encontrada o no cargada aún -->
+            <div class="text-center py-8">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">Cargando rutina...</h4>
+              <p class="text-gray-500 mb-4">Preparando la información de la rutina.</p>
             </div>
           } @else if (hayEjercicios()) {
             <div class="space-y-3">
