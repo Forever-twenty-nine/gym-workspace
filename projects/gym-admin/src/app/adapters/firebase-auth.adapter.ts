@@ -30,7 +30,7 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
   
   // Signal para el estado de autenticación (lazy initialization en contexto de inyección)
   private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = runInInjectionContext(
-    this.injector,
+    inject(Injector),
     () => toSignal(authState(this.auth))
   );
 
