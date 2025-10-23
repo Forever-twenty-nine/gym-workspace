@@ -39,51 +39,112 @@ export class EntrenadosPage {
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
-    return this.userService.users().map(user => {
-      const needsReview = !user.nombre || !user.role;
-      return {
-        ...user,
-        displayName: user.nombre || user.email || `Usuario ${user.uid}`,
-        needsReview
-      };
-    });
+    try {
+      const users = this.userService.users();
+      if (!Array.isArray(users)) return [];
+
+      return users.map(user => {
+        const needsReview = !user.nombre || !user.role;
+        return {
+          ...user,
+          displayName: user.nombre || user.email || `Usuario ${user.uid}`,
+          needsReview
+        };
+      });
+    } catch (error) {
+      console.error('Error en computed usuarios:', error);
+      return [];
+    }
   });
 
   readonly entrenadores = computed(() => {
-    return this.entrenadorService.entrenadores().map(entrenador => {
-      const usuario = this.usuarios().find(u => u.uid === entrenador.id);
-      return {
-        ...entrenador,
-        displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
-      };
-    });
+    try {
+      const entrenadoresList = this.entrenadorService.entrenadores();
+      const usuariosList = this.usuarios();
+
+      if (!Array.isArray(entrenadoresList)) return [];
+      if (!Array.isArray(usuariosList)) return [];
+
+      return entrenadoresList.map(entrenador => {
+        const usuario = usuariosList.find(u => u.uid === entrenador.id);
+        return {
+          ...entrenador,
+          displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
+        };
+      });
+    } catch (error) {
+      console.error('Error en computed entrenadores:', error);
+      return [];
+    }
   });
 
   readonly gimnasios = computed(() => {
-    return this.gimnasioService.gimnasios().map(gimnasio => ({
-      ...gimnasio,
-      displayName: gimnasio.nombre || `Gimnasio ${gimnasio.id}`
-    }));
+    try {
+      const gimnasiosList = this.gimnasioService.gimnasios();
+      if (!Array.isArray(gimnasiosList)) return [];
+
+      return gimnasiosList.map(gimnasio => ({
+        ...gimnasio,
+        displayName: gimnasio.nombre || `Gimnasio ${gimnasio.id}`
+      }));
+    } catch (error) {
+      console.error('Error en computed gimnasios:', error);
+      return [];
+    }
   });
 
   readonly entrenados = computed(() => {
-    return this.entrenadoService.entrenados().map(entrenado => {
-      const usuario = this.usuarios().find(u => u.uid === entrenado.id);
-      const entrenadorId = entrenado.entrenadoresId?.[0]; // Tomar el primer entrenador
-      const entrenador = entrenadorId ? this.entrenadores().find(e => e.id === entrenadorId) : null;
-      const entrenadorName = entrenador?.displayName || (entrenadorId ? `Entrenador ${entrenadorId}` : 'Sin asignar');
-      
-      return {
-        ...entrenado,
-        displayName: usuario?.nombre || usuario?.email || `Entrenado ${entrenado.id}`,
-        entrenadorName
-      };
-    });
+    try {
+      const entrenadosList = this.entrenadoService.entrenados();
+      const usuariosList = this.usuarios();
+      const entrenadoresList = this.entrenadores();
+      const gimnasiosList = this.gimnasios();
+
+      if (!Array.isArray(entrenadosList) || !Array.isArray(usuariosList) || !Array.isArray(entrenadoresList) || !Array.isArray(gimnasiosList)) {
+        return [];
+      }
+
+      return entrenadosList.map(entrenado => {
+        try {
+          const usuario = usuariosList.find(u => u.uid === entrenado.id);
+          const entrenadorId = entrenado.entrenadoresId?.[0]; // Tomar el primer entrenador
+          const entrenador = entrenadoresList.find(e => e.id === entrenadorId);
+          const gimnasio = gimnasiosList.find(g => g.id === usuario?.gimnasioId);
+
+          return {
+            id: entrenado.id,
+            displayName: usuario?.displayName || usuario?.nombre || 'Sin nombre',
+            entrenadorName: entrenador?.displayName || 'Sin entrenador',
+            gimnasioName: gimnasio?.displayName || 'Sin gimnasio',
+            objetivo: usuario?.role === 'entrenado' ? (usuario as any).objetivo : undefined,
+            fechaRegistro: entrenado.fechaRegistro
+          };
+        } catch (error) {
+          console.error(`Error procesando entrenado ${entrenado.id}:`, error);
+          return {
+            id: entrenado.id,
+            displayName: 'Error',
+            entrenadorName: 'Error',
+            gimnasioName: 'Error'
+          };
+        }
+      });
+    } catch (error) {
+      console.error('Error en computed entrenados:', error);
+      return [];
+    }
   });
 
   // Rutinas del sistema
   readonly rutinas = computed(() => {
-    return this.rutinaService.rutinas();
+    try {
+      const rutinasList = this.rutinaService.rutinas();
+      if (!Array.isArray(rutinasList)) return [];
+      return rutinasList;
+    } catch (error) {
+      console.error('Error en computed rutinas:', error);
+      return [];
+    }
   });
 
   // Signals para el estado del componente
@@ -92,8 +153,9 @@ export class EntrenadosPage {
   constructor() {
     this.pageTitleService.setTitle('Entrenados');
     
-    // Inicializar el listener de entrenadores (necesario para las listas desplegables)
+    // Inicializar los listeners para cargar datos al inicio
     this.entrenadorService.initializeListener();
+    this.entrenadoService.initializeListener();
   }
 
   viewDetails(item: any) {

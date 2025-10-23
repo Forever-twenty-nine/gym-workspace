@@ -10,6 +10,7 @@ import {
   SesionRutinaService,
   EjercicioService,
   EstadisticasEntrenadoService,
+  RutinaAsignadaService,
   PlanLimitError
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
@@ -42,9 +43,42 @@ export class EntrenadoDetail implements OnInit {
   private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly ejercicioService = inject(EjercicioService);
   private readonly estadisticasService = inject(EstadisticasEntrenadoService);
+  private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
+  // Día actual de la semana (0 = domingo, 1 = lunes, etc.)
+  readonly diaActual = new Date().getDay();
+
+  // Función para obtener los próximos 7 días
+  private getProximos7Dias(): { fecha: Date; diaNombre: string; diaNumero: number }[] {
+    const dias = [];
+    const hoy = new Date();
+
+    for (let i = 0; i < 7; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+
+      const diaNumero = fecha.getDay();
+      const nombresDias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+      const diaNombre = nombresDias[diaNumero];
+
+      dias.push({
+        fecha,
+        diaNombre,
+        diaNumero
+      });
+    }
+
+    return dias;
+  }
+
   entrenadoId = signal<string>('');
+
+  // Signals para el estado del componente
+  readonly isLoading = signal(false);
+  readonly mostrarInvitaciones = signal(false);
+  readonly mostrarModalSesiones = signal(false);
+  readonly rutinaSeleccionada = signal<string>('');
 
   entrenado = computed(() => {
     const id = this.entrenadoId();
@@ -65,17 +99,14 @@ export class EntrenadoDetail implements OnInit {
     };
   });
 
-  // Signals para el estado del componente
-  readonly isLoading = signal(false);
-  readonly mostrarInvitaciones = signal(false);
-  readonly mostrarModalSesiones = signal(false);
-  readonly rutinaSeleccionada = signal<string>('');
-
   ngOnInit() {
     // Los listeners se inicializan automáticamente cuando se accede a las señales
     this.entrenadorService.initializeListener();
+    this.rutinaService.rutinas(); // Forzar inicialización del listener de rutinas
     // Inicializar listeners de invitaciones
     this.invitacionService.invitaciones();
+    // Forzar inicialización del listener de rutinas asignadas
+    this.rutinaAsignadaService.getRutinasAsignadas();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -95,73 +126,77 @@ export class EntrenadoDetail implements OnInit {
     }
   }
 
-  // Rutinas asignadas al entrenado con sesiones
-  readonly rutinasAsignadas = computed(() => {
-    const entrenado = this.entrenado();
-    if (!entrenado?.rutinasAsignadas) return [];
+    // Rutinas asignadas al entrenado con información completa
+  readonly rutinasAsignadasConInfo = computed(() => {
+    const entrenadoId = this.entrenadoId();
+    if (!entrenadoId) return [];
 
-    return this.rutinaService.rutinas()
-      .filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id))
-      .map(rutina => {
-        // Buscar la última sesión de esta rutina para este entrenado
-  const sesiones = this.sesionRutinaService.getSesionesPorRutina(rutina.id)().filter(s => s.entrenadoId === entrenado.id);
-        // Derivar estado de progreso desde la última sesión
-        const ultimaSesion = sesiones && sesiones.length > 0 ? sesiones[sesiones.length - 1] : null;
+    const rutinasAsignadas = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(entrenadoId)();
+    const rutinas = this.rutinaService.rutinas();
+
+    return rutinasAsignadas
+      .filter(ra => ra.activa)
+      .map(ra => {
+        const rutina = rutinas.find(r => r.id === ra.rutinaId);
         return {
-          ...rutina,
-          sesion: ultimaSesion
+          ...ra,
+          rutina: rutina || null
         };
-      });
+      })
+      .filter(item => item.rutina !== null);
   });
 
-  // Rutinas organizadas por días de la semana (solo semana actual)
+  // Rutinas organizadas por días de la semana (vista semanal)
   readonly rutinasPorDia = computed(() => {
-    const rutinas = this.rutinasAsignadas();
-    const hoy = new Date();
+    const rutinasAsignadas = this.rutinasAsignadasConInfo();
+    const proximos7Dias = this.getProximos7Dias();
 
-    // Calcular fechas para la próxima semana (7 días)
-    const fechas = [];
-    for (let i = 0; i < 7; i++) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() + i);
-      fechas.push(fecha);
-    }
+    return proximos7Dias.map(diaInfo => {
+      const rutinasDelDia: any[] = [];
 
-    // Organizar por día
-    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; diaCompleto: string; esHoy: boolean; } } = {};
+      // Agregar rutinas asignadas por día de la semana
+      rutinasAsignadas.forEach(item => {
+        // Verificar si diaSemana es un array (múltiples días) o un string (día único)
+        const diasAsignados = Array.isArray(item.diaSemana) ? item.diaSemana : [item.diaSemana];
 
-    fechas.forEach(fecha => {
-      // Usar los mismos valores que se guardan en el modal (sin tildes)
-      const diaSemanaIndex = fecha.getDay();
-      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-      const diasSemanaConTilde = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-      const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-
-      const diaSemana = diasSemanaSinTilde[diaSemanaIndex]; // Usar sin tilde para comparación
-      const diaCorto = diasSemanaCorto[diaSemanaIndex];
-      const diaCompleto = diasSemanaConTilde[diaSemanaIndex]; // Mostrar con tilde
-      const fechaKey = fecha.toISOString().split('T')[0];
-
-      if (!rutinasOrganizadas[fechaKey]) {
-        rutinasOrganizadas[fechaKey] = {
-          fecha: new Date(fecha),
-          rutinas: [],
-          diaCorto,
-          diaCompleto,
-          esHoy: fecha.toDateString() === hoy.toDateString()
-        };
-      }
-
-      // Agregar rutinas que corresponden a este día
-      rutinas.forEach(rutina => {
-        if (rutina.DiasSemana && rutina.DiasSemana.includes(diaSemana)) {
-          rutinasOrganizadas[fechaKey].rutinas.push(rutina);
+        if (diasAsignados.includes(diaInfo.diaNombre)) {
+          rutinasDelDia.push({
+            ...item,
+            tipoAsignacion: 'dia_semana'
+          });
         }
       });
-    });
 
-    // Convertir a array y ordenar por fecha
-    return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+      // Agregar rutinas con fecha específica para este día
+      rutinasAsignadas.forEach(item => {
+        if (item.fechaEspecifica) {
+          const fechaRutina = item.fechaEspecifica.toISOString().split('T')[0];
+          const fechaDia = diaInfo.fecha.toISOString().split('T')[0];
+          if (fechaRutina === fechaDia) {
+            rutinasDelDia.push({
+              ...item,
+              tipoAsignacion: 'fecha_especifica'
+            });
+          }
+        }
+      });
+
+      return {
+        ...diaInfo,
+        rutinas: rutinasDelDia,
+        esHoy: diaInfo.fecha.toDateString() === new Date().toDateString(),
+        fechaFormateada: diaInfo.fecha.toLocaleDateString('es-ES', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'short'
+        })
+      };
+    });
+  });
+
+  // Verificar si no hay rutinas asignadas en toda la semana
+  readonly noHayRutinasAsignadas = computed(() => {
+    return this.rutinasPorDia().every(dia => dia.rutinas.length === 0);
   });
 
   // Estadísticas del entrenado
@@ -237,6 +272,11 @@ export class EntrenadoDetail implements OnInit {
   // Abrir modal de sesiones de rutina
   // --------------------------------------------
   abrirModalSesiones(rutinaId: string) {
+    if (!rutinaId || rutinaId.trim() === '') {
+      console.error('No se puede abrir el modal: rutinaId está vacío');
+      return;
+    }
+
     this.rutinaSeleccionada.set(rutinaId);
     this.mostrarModalSesiones.set(true);
   }

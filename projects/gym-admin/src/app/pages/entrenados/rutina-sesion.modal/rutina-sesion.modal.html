@@ -1,19 +1,296 @@
 @if (open) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-      <button type="button" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" (click)="closeModal()">
-        <span aria-hidden="true">&times;</span>
-      </button>
-      <h2 class="text-xl font-bold mb-4">Sesiones de Rutina</h2>
-      <ul>
-        @for (sesion of sesiones(); track sesion.id) {
-          <li class="mb-2 p-2 bg-slate-100 rounded">
-            <span class="font-semibold">{{ sesion.fechaInicio ? (sesion.fechaInicio | date:'dd/MM/yyyy HH:mm') : 'Sin fecha' }}</span>
-            <span class="ml-2">Completada: {{ sesion.completada ? 'Sí' : 'No' }}</span>
-            <span class="ml-2">Ejercicios: {{ sesion.ejerciciosCompletados }}</span>
-          </li>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <!-- Header -->
+      <div class="bg-linear-to-r from-blue-600 to-purple-600 text-white p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <div>
+              <h2 class="text-2xl font-bold">Ejecutar Rutina</h2>
+              @if (sesionActual(); as sesion) {
+                <p class="text-blue-100">Sesión de {{ sesion.entrenadoId }}</p>
+              } @else {
+                <p class="text-red-100">Cargando sesión...</p>
+              }
+            </div>
+          </div>
+          <button type="button" class="text-white hover:text-gray-200 transition-colors" (click)="closeModal()">
+            <span class="sr-only">Cerrar</span>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <!-- Notificación de error temporal -->
+        @if (errorSesion()) {
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-red-600 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              <p class="text-red-800 text-sm">{{ errorSesion() }}</p>
+            </div>
+          </div>
         }
-      </ul>
+
+        <!-- Cronómetro y Controles -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="text-3xl font-mono font-bold text-gray-800">
+                {{ tiempoFormateado() }}
+              </div>
+              <div class="flex items-center space-x-2">
+                @if (cronometroCorriendo()) {
+                  <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <span class="text-sm text-red-600 font-medium">En ejecución</span>
+                } @else {
+                  <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
+                  <span class="text-sm text-gray-600">Pausado</span>
+                }
+              </div>
+            </div>
+
+            <!-- Barra de progreso -->
+            <div class="flex-1 max-w-xs mx-6">
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="text-sm font-medium text-gray-700">Progreso</span>
+                <span class="text-sm text-gray-500">{{ progresoSesion() }}%</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-linear-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                     [style.width.%]="progresoSesion()"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de control -->
+          <div class="flex items-center space-x-3">
+            @if (!sesionActual()) {
+              <!-- Estado: Rutina preparada, sesión no creada -->
+              <button (click)="iniciarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m-3-3h3m-6 0h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Iniciar Rutina</span>
+              </button>
+            } @else if (!cronometroCorriendo()) {
+              <!-- Estado: Sesión creada pero pausada -->
+              <button (click)="iniciarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m-3-3h3m-6 0h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Reanudar Rutina</span>
+              </button>
+            } @else if (!sesionCompletada()) {
+              <!-- Estado: Sesión corriendo -->
+              <button (click)="completarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Completar Sesión</span>
+              </button>
+
+              <button (click)="reiniciarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Reiniciar</span>
+              </button>
+            } @else {
+              <!-- Estado: Sesión completada -->
+              <div class="flex items-center space-x-2 px-6 py-3 bg-green-100 text-green-800 rounded-lg font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Sesión Completada</span>
+              </div>
+
+              <button (click)="reiniciarSesion()"
+                      class="flex items-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Nueva Sesión</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Lista de Ejercicios -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-800 flex items-center">
+              <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Ejercicios ({{ ejerciciosSesion().length }})
+            </h3>
+            @if (!hayEjercicios() && sesionActual()) {
+              <button (click)="recargarEjercicios()"
+                      class="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                <span>Recargar</span>
+              </button>
+            }
+          </div>
+
+          @if (errorSesion()) {
+            <!-- Error específico -->
+            <div class="text-center py-8">
+              <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">Error</h4>
+              <p class="text-gray-500 mb-4">{{ errorSesion() }}</p>
+              <div class="flex space-x-3 justify-center">
+                <button (click)="recargarRutina()"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  Reintentar
+                </button>
+                <button type="button" 
+                        (click)="closeModal()"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          } @else if (!sesionActual() && !hayEjercicios()) {
+            <!-- Estado inicial: rutina no encontrada o no cargada aún -->
+            <div class="text-center py-8">
+              <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">Cargando rutina...</h4>
+              <p class="text-gray-500 mb-4">Preparando la información de la rutina.</p>
+            </div>
+          } @else if (hayEjercicios()) {
+            <div class="space-y-3">
+              @for (ejercicioSesion of ejerciciosSesion(); track ejercicioSesion.ejercicio.id; let i = $index) {
+                <div class="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+                     [class.bg-green-50]="ejercicioSesion.completado"
+                     [class.border-green-300]="ejercicioSesion.completado"
+                     [class.opacity-60]="sesionCompletada() && !ejercicioSesion.completado">
+
+                  <div class="flex items-center space-x-4">
+                    <!-- Checkbox -->
+                    <div class="shrink-0">
+                      <input type="checkbox"
+                             [checked]="ejercicioSesion.completado"
+                             [disabled]="!cronometroCorriendo() || sesionCompletada()"
+                             (change)="toggleEjercicioCompletado(i)"
+                             class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+                    </div>
+
+                    <!-- Información del ejercicio -->
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center space-x-3">
+                        <h4 class="text-lg font-semibold text-gray-900 truncate"
+                            [class.line-through]="ejercicioSesion.completado"
+                            [class.text-green-800]="ejercicioSesion.completado">
+                          {{ ejercicioSesion.ejercicio.nombre }}
+                        </h4>
+
+                        @if (ejercicioSesion.completado) {
+                          <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                        }
+                      </div>
+
+                      @if (ejercicioSesion.ejercicio.descripcion) {
+                        <p class="text-sm text-gray-600 mt-1">{{ ejercicioSesion.ejercicio.descripcion }}</p>
+                      }
+
+                      <!-- Detalles del ejercicio -->
+                      <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                        <div class="flex items-center space-x-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                          </svg>
+                          <span>{{ ejercicioSesion.ejercicio.series }} series</span>
+                        </div>
+
+                        <div class="flex items-center space-x-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                          </svg>
+                          <span>{{ ejercicioSesion.ejercicio.repeticiones }} reps</span>
+                        </div>
+
+                        @if (ejercicioSesion.ejercicio.peso) {
+                          <div class="flex items-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2"></path>
+                            </svg>
+                            <span>{{ ejercicioSesion.ejercicio.peso }}kg</span>
+                          </div>
+                        }
+
+                        @if (ejercicioSesion.ejercicio.descansoSegundos) {
+                          <div class="flex items-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>{{ ejercicioSesion.ejercicio.descansoSegundos }}s descanso</span>
+                          </div>
+                        }
+                      </div>
+
+                      <!-- Series completadas -->
+                      @if (ejercicioSesion.completado) {
+                        <div class="mt-2 flex items-center space-x-2">
+                          <div class="text-sm font-medium text-green-700">Completado</div>
+                          <div class="flex space-x-1">
+                            @for (serie of [].constructor(ejercicioSesion.ejercicio.series); track $index) {
+                              <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- Estado vacío mejorado -->
+            <div class="text-center py-8">
+              <div class="w-16 h-16 bg-linear-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+              </div>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">No hay ejercicios cargados</h4>
+              <p class="text-gray-500 mb-4">Los ejercicios de la rutina no se pudieron cargar.</p>
+              <button (click)="recargarEjercicios()"
+                      class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Intentar Recargar
+              </button>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   </div>
 }

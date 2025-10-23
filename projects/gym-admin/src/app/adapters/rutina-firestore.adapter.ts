@@ -1,17 +1,17 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  Firestore, 
-  collection, 
-  addDoc, 
-  doc, 
-  deleteDoc, 
+import {
+  Firestore,
+  collection,
+  addDoc,
+  doc,
+  deleteDoc,
   setDoc,
   onSnapshot,
   Timestamp,
   QuerySnapshot,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { Rutina } from 'gym-library';
+import { Rutina, FirebaseAdapterBase } from 'gym-library';
 
 interface IRutinaFirestoreAdapter {
   initializeListener(onUpdate: (rutinas: Rutina[]) => void): void;
@@ -20,44 +20,54 @@ interface IRutinaFirestoreAdapter {
   delete(id: string): Promise<void>;
 }
 
-@Injectable({ providedIn: 'root' })
-export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
+@Injectable({
+  providedIn: 'root'
+})
+export class RutinaFirestoreAdapter extends FirebaseAdapterBase implements IRutinaFirestoreAdapter {
   private readonly COLLECTION = 'rutinas';
   private firestore = inject(Firestore);
 
   initializeListener(onUpdate: (rutinas: Rutina[]) => void): void {
     const col = collection(this.firestore, this.COLLECTION);
     onSnapshot(col, (snap: QuerySnapshot) => {
-      const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-      onUpdate(list);
+      this.runInZone(() => {
+        const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        onUpdate(list);
+      });
     });
   }
 
   subscribeToRutina(id: string, onUpdate: (rutina: Rutina | null) => void): void {
     const rutinaRef = doc(this.firestore, this.COLLECTION, id);
     onSnapshot(rutinaRef, (doc: DocumentSnapshot) => {
-      if (doc.exists()) {
-        onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-      } else {
-        onUpdate(null);
-      }
+      this.runInZone(() => {
+        if (doc.exists()) {
+          onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
+        } else {
+          onUpdate(null);
+        }
+      });
     });
   }
 
   async save(rutina: Rutina): Promise<void> {
-    const dataToSave = this.mapToFirestore(rutina);
-    
-    if (rutina.id) {
-      const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
-      await setDoc(rutinaRef, dataToSave, { merge: true });
-    } else {
-      await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
-    }
+    return this.runInZone(async () => {
+      const dataToSave = this.mapToFirestore(rutina);
+      
+      if (rutina.id) {
+        const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
+        await setDoc(rutinaRef, dataToSave, { merge: true });
+      } else {
+        await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+      }
+    });
   }
 
   async delete(id: string): Promise<void> {
-    const rutinaRef = doc(this.firestore, this.COLLECTION, id);
-    await deleteDoc(rutinaRef);
+    return this.runInZone(async () => {
+      const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(rutinaRef);
+    });
   }
 
   private mapFromFirestore(data: any): Rutina {
@@ -69,7 +79,6 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
-      DiasSemana: data.DiasSemana || [],
       duracion: data.duracion
     };
   }
@@ -79,8 +88,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       nombre: rutina.nombre,
       activa: rutina.activa,
       descripcion: rutina.descripcion || '',
-      ejerciciosIds: rutina.ejerciciosIds || [],
-      DiasSemana: rutina.DiasSemana || []
+      ejerciciosIds: rutina.ejerciciosIds || []
     };
 
     // Solo incluir campos opcionales si tienen valor válido

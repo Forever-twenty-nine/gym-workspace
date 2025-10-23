@@ -1,11 +1,16 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import { Rutina } from '../models/rutina.model';
+import { EjercicioService } from './ejercicio.service';
 
 export interface IRutinaFirestoreAdapter {
   initializeListener(onUpdate: (rutinas: Rutina[]) => void): void;
   subscribeToRutina(id: string, onUpdate: (rutina: Rutina | null) => void): void;
   save(rutina: Rutina): Promise<void>;
   delete(id: string): Promise<void>;
+}
+
+export interface RutinaConEjercicios extends Rutina {
+  ejercicios: any[]; // Ejercicios ya resueltos
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +20,9 @@ export class RutinaService {
     private readonly rutinaSignals = new Map<string, WritableSignal<Rutina | null>>();
     private isListenerInitialized = false;
     private firestoreAdapter?: IRutinaFirestoreAdapter;
+    
+    // Inyectar EjercicioService para combinar datos
+    private readonly ejercicioService = inject(EjercicioService);
 
     constructor() {
         // La inicialización se hará cuando se configure el adaptador
@@ -25,7 +33,7 @@ export class RutinaService {
      */
     setFirestoreAdapter(adapter: IRutinaFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
     }
 
     /**
@@ -157,13 +165,31 @@ export class RutinaService {
     }
 
     /**
-     * 🔍 Busca rutinas por día de la semana
+     * 🎯 Obtiene una rutina con sus ejercicios ya resueltos (más eficiente que hacer llamadas separadas)
      */
-    getRutinasByDiaSemana(dia: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
-                rutina.DiasSemana?.includes(dia) || false
-            )
-        );
+    getRutinaConEjercicios(id: string): Signal<RutinaConEjercicios | null> {
+        return computed(() => {
+            // Obtener la rutina base
+            const rutinaSignal = this.getRutina(id);
+            const rutina = rutinaSignal();
+            
+            if (!rutina || !rutina.ejerciciosIds || !Array.isArray(rutina.ejerciciosIds)) {
+                return null;
+            }
+
+            // Obtener todos los ejercicios disponibles
+            const todosEjercicios = this.ejercicioService.ejercicios();
+            
+            // Resolver ejercicios por IDs
+            const ejerciciosResueltos = rutina.ejerciciosIds
+                .map(id => todosEjercicios.find(e => e && e.id === id))
+                .filter(e => e !== undefined); // Filtrar ejercicios no encontrados
+
+            // Retornar rutina con ejercicios incluidos
+            return {
+                ...rutina,
+                ejercicios: ejerciciosResueltos
+            };
+        });
     }
 }

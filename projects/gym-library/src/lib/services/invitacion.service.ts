@@ -24,7 +24,7 @@ export class InvitacionService {
      */
     setFirestoreAdapter(adapter: IInvitacionFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
     }
 
     /**

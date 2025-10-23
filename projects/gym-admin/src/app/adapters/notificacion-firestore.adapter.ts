@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { 
   Firestore,
   collection,
@@ -10,50 +10,54 @@ import {
   setDoc,
   query,
   orderBy,
+  getDocs,
   Timestamp
 } from '@angular/fire/firestore';
-import { INotificacionFirestoreAdapter, Notificacion } from 'gym-library';
+import { INotificacionFirestoreAdapter, Notificacion, FirebaseAdapterBase } from 'gym-library';
 
 /**
  * 🔔 Adaptador de Firestore para Notificaciones
  * Implementa la interfaz INotificacionFirestoreAdapter para gym-admin
  */
 @Injectable({ providedIn: 'root' })
-export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapter {
+export class NotificacionFirestoreAdapter extends FirebaseAdapterBase implements INotificacionFirestoreAdapter {
   private firestore = inject(Firestore);
-  private injector = inject(Injector);
   private readonly COLLECTION_NAME = 'notificaciones';
 
   /**
    * 🔄 Inicializa el listener en tiempo real
    */
   initializeListener(onUpdate: (notificaciones: Notificacion[]) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const notificacionesCol = collection(this.firestore, this.COLLECTION_NAME);
       const notificacionesQuery = query(notificacionesCol, orderBy('fechaCreacion', 'desc'));
       
       onSnapshot(
         notificacionesQuery,
         (snapshot) => {
-          const notificaciones: Notificacion[] = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              ...data,
-              id: doc.id,
-              fechaCreacion: data['fechaCreacion'] instanceof Timestamp 
-                ? data['fechaCreacion'].toDate() 
-                : new Date(data['fechaCreacion']),
-              fechaLeida: data['fechaLeida'] instanceof Timestamp
-                ? data['fechaLeida'].toDate()
-                : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
-            } as Notificacion;
+          this.runInZone(() => {
+            const notificaciones: Notificacion[] = snapshot.docs.map(doc => {
+              const data = doc.data();
+              return {
+                ...data,
+                id: doc.id,
+                fechaCreacion: data['fechaCreacion'] instanceof Timestamp 
+                  ? data['fechaCreacion'].toDate() 
+                  : new Date(data['fechaCreacion']),
+                fechaLeida: data['fechaLeida'] instanceof Timestamp
+                  ? data['fechaLeida'].toDate()
+                  : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
+              } as Notificacion;
+            });
+            
+            onUpdate(notificaciones);
           });
-          
-          onUpdate(notificaciones);
         },
         (error) => {
-          console.error('❌ NotificacionFirestoreAdapter: Error en listener:', error);
-          onUpdate([]);
+          this.runInZone(() => {
+            console.error('❌ NotificacionFirestoreAdapter: Error en listener:', error);
+            onUpdate([]);
+          });
         }
       );
     });
@@ -63,33 +67,37 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
    * 📊 Suscripción a una notificación específica
    */
   subscribeToNotificacion(id: string, onUpdate: (notificacion: Notificacion | null) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const notificacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
       
       onSnapshot(
         notificacionDoc,
         (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.data();
-            const notificacion: Notificacion = {
-              ...data,
-              id: snapshot.id,
-              fechaCreacion: data['fechaCreacion'] instanceof Timestamp 
-                ? data['fechaCreacion'].toDate() 
-                : new Date(data['fechaCreacion']),
-              fechaLeida: data['fechaLeida'] instanceof Timestamp
-                ? data['fechaLeida'].toDate()
-                : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
-            } as Notificacion;
-            
-            onUpdate(notificacion);
-          } else {
-            onUpdate(null);
-          }
+          this.runInZone(() => {
+            if (snapshot.exists()) {
+              const data = snapshot.data();
+              const notificacion: Notificacion = {
+                ...data,
+                id: snapshot.id,
+                fechaCreacion: data['fechaCreacion'] instanceof Timestamp 
+                  ? data['fechaCreacion'].toDate() 
+                  : new Date(data['fechaCreacion']),
+                fechaLeida: data['fechaLeida'] instanceof Timestamp
+                  ? data['fechaLeida'].toDate()
+                  : data['fechaLeida'] ? new Date(data['fechaLeida']) : undefined
+              } as Notificacion;
+              
+              onUpdate(notificacion);
+            } else {
+              onUpdate(null);
+            }
+          });
         },
         (error) => {
-          console.error('❌ NotificacionFirestoreAdapter: Error al suscribirse:', error);
-          onUpdate(null);
+          this.runInZone(() => {
+            console.error('❌ NotificacionFirestoreAdapter: Error al suscribirse:', error);
+            onUpdate(null);
+          });
         }
       );
     });
@@ -99,7 +107,7 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
    * 💾 Guarda o actualiza una notificación
    */
   async save(notificacion: Notificacion): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const notificacionData = {
           ...notificacion,
@@ -129,7 +137,7 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
    * 🗑️ Elimina una notificación
    */
   async delete(id: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const notificacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
         await deleteDoc(notificacionDoc);
@@ -144,7 +152,7 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
    * ✅ Marca una notificación como leída
    */
   async marcarComoLeida(id: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const notificacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
         await updateDoc(notificacionDoc, {
@@ -159,25 +167,22 @@ export class NotificacionFirestoreAdapter implements INotificacionFirestoreAdapt
   }
 
   /**
-   * ✅ Marca todas las notificaciones de un usuario como leídas
+   * ✅ Marca todas las notificaciones como leídas para un usuario
    */
   async marcarTodasComoLeidas(usuarioId: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const notificacionesCol = collection(this.firestore, this.COLLECTION_NAME);
-        const snapshot = await onSnapshot(
-          query(notificacionesCol),
-          async (querySnapshot) => {
-            const updates = querySnapshot.docs
-              .filter(doc => doc.data()['usuarioId'] === usuarioId && !doc.data()['leida'])
-              .map(doc => updateDoc(doc.ref, {
-                leida: true,
-                fechaLeida: Timestamp.now()
-              }));
-            
-            await Promise.all(updates);
-          }
-        );
+        const querySnapshot = await getDocs(query(notificacionesCol));
+        
+        const updates = querySnapshot.docs
+          .filter(doc => doc.data()['usuarioId'] === usuarioId && !doc.data()['leida'])
+          .map(doc => updateDoc(doc.ref, {
+            leida: true,
+            fechaLeida: Timestamp.now()
+          }));
+        
+        await Promise.all(updates);
       } catch (error) {
         console.error('❌ NotificacionFirestoreAdapter: Error al marcar todas como leídas:', error);
         throw error;

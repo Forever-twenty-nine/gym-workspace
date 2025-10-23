@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { 
   Firestore, 
   collection, 
@@ -13,7 +13,7 @@ import {
   DocumentSnapshot,
   deleteField
 } from '@angular/fire/firestore';
-import { Entrenado } from 'gym-library';
+import { Entrenado, FirebaseAdapterBase } from 'gym-library';
 
 interface IEntrenadoFirestoreAdapter {
   initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void;
@@ -23,37 +23,40 @@ interface IEntrenadoFirestoreAdapter {
 }
 
 @Injectable({ providedIn: 'root' })
-export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
+export class EntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IEntrenadoFirestoreAdapter {
   private readonly COLLECTION = 'entrenados';
   private firestore = inject(Firestore);
-  private injector = inject(Injector);
 
   initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const entrenadosCol = collection(this.firestore, this.COLLECTION);
       
       onSnapshot(entrenadosCol, (snapshot: QuerySnapshot) => {
-        const list = snapshot.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-        onUpdate(list);
+        this.runInZone(() => {
+          const list = snapshot.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+          onUpdate(list);
+        });
       });
     });
   }
 
   subscribeToEntrenado(id: string, onUpdate: (entrenado: Entrenado | null) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
       onSnapshot(entrenadoRef, (doc: DocumentSnapshot) => {
-        if (doc.exists()) {
-          onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-        } else {
-          onUpdate(null);
-        }
+        this.runInZone(() => {
+          if (doc.exists()) {
+            onUpdate(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
+          } else {
+            onUpdate(null);
+          }
+        });
       });
     });
   }
 
   async save(entrenado: Entrenado): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const dataToSave = this.mapToFirestore(entrenado);
       
       if (entrenado.id) {
@@ -68,7 +71,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
   }
 
   async delete(id: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
       await deleteDoc(entrenadoRef);
     });
@@ -81,7 +84,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
     return {
       id: data.id,
       entrenadoresId: data.entrenadoresId || [],
-      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasAsignadasIds: data.rutinasAsignadasIds || [],
       rutinasCreadas: data.rutinasCreadas || [],
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || undefined // Usar undefined en lugar de null para consistencia
@@ -125,8 +128,8 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       data.entrenadoresId = entrenado.entrenadoresId !== null ? entrenado.entrenadoresId : deleteField();
     }
 
-    if (entrenado.rutinasAsignadas !== undefined) {
-      data.rutinasAsignadas = entrenado.rutinasAsignadas !== null ? entrenado.rutinasAsignadas : deleteField();
+    if (entrenado.rutinasAsignadasIds !== undefined) {
+      data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds !== null ? entrenado.rutinasAsignadasIds : deleteField();
     }
 
     if (entrenado.rutinasCreadas !== undefined) {

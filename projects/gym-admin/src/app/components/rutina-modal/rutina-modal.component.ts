@@ -40,17 +40,6 @@ export class RutinaModalComponent implements OnInit {
   // Formulario reactivo (no necesita ser signal)
   rutinaForm!: FormGroup;
 
-  // Opciones para días de la semana
-  readonly diasSemanaOptions = [
-    { value: 'lunes', label: 'Lunes' },
-    { value: 'martes', label: 'Martes' },
-    { value: 'miercoles', label: 'Miércoles' },
-    { value: 'jueves', label: 'Jueves' },
-    { value: 'viernes', label: 'Viernes' },
-    { value: 'sabado', label: 'Sábado' },
-    { value: 'domingo', label: 'Domingo' }
-  ];
-
   // Computed
   readonly modalTitle = computed(() => {
     return this.isCreating() ? 'Crear Rutina' : 'Editar Rutina';
@@ -97,7 +86,6 @@ export class RutinaModalComponent implements OnInit {
     return this.fb.group({
       nombre: ['', Validators.required],
       descripcion: [''],
-      diasSemana: [[]],
       ejercicios: [[], this.minLengthArrayValidator(1)] // Al menos 1 ejercicio requerido
     });
   }
@@ -119,7 +107,6 @@ export class RutinaModalComponent implements OnInit {
       this.rutinaForm.patchValue({
         nombre: rutina.nombre || '',
         descripcion: rutina.descripcion || '',
-        diasSemana: rutina.DiasSemana || rutina.diasSemana || [],
         ejercicios: rutina.ejerciciosIds || rutina.ejercicios || [] // Usar ejerciciosIds con fallback
       });
     } else {
@@ -127,30 +114,9 @@ export class RutinaModalComponent implements OnInit {
       this.rutinaForm.reset({
         nombre: '',
         descripcion: '',
-        diasSemana: [],
         ejercicios: []
       });
     }
-  }
-
-  // Verificar si un día está seleccionado
-  isDiaSelected(dia: string): boolean {
-    const diasSeleccionados = this.rutinaForm.get('diasSemana')?.value || [];
-    return diasSeleccionados.includes(dia);
-  }
-
-  // Toggle día de la semana
-  onToggleDia(dia: string) {
-    const diasActuales = this.rutinaForm.get('diasSemana')?.value || [];
-
-    let nuevosDias;
-    if (diasActuales.includes(dia)) {
-      nuevosDias = diasActuales.filter((d: string) => d !== dia);
-    } else {
-      nuevosDias = [...diasActuales, dia];
-    }
-
-    this.rutinaForm.get('diasSemana')?.setValue(nuevosDias);
   }
 
   // Verificar si un ejercicio está seleccionado
@@ -216,7 +182,6 @@ export class RutinaModalComponent implements OnInit {
         id: updatedData.id || `r${Date.now()}`,
         nombre: updatedData.nombre || '',
         descripcion: updatedData.descripcion || '',
-        DiasSemana: updatedData.diasSemana || [],
         ejerciciosIds: updatedData.ejercicios || [], // Mapear ejercicios a ejerciciosIds
         entrenadoId: null,
         activa: updatedData.activa ?? true,

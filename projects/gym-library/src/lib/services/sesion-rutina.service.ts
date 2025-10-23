@@ -1,5 +1,10 @@
-import { Injectable, signal, WritableSignal, Signal } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
 import { SesionRutina } from '../models/sesion-rutina.model';
+import { SesionRutinaStatus } from '../enums/sesion-rutina-status.enum';
+import { Rutina } from '../models/rutina.model';
+import { RutinaService } from './rutina.service';
+import { Ejercicio } from '../models/ejercicio.model';
+import { EjercicioService } from './ejercicio.service';
 
 export interface ISesionRutinaFirestoreAdapter {
   getSesionesPorEntrenado(entrenadoId: string, callback: (sesiones: SesionRutina[]) => void): void;
@@ -14,65 +19,152 @@ export interface ISesionRutinaFirestoreAdapter {
  */
 @Injectable({ providedIn: 'root' })
 export class SesionRutinaService {
-  // Mapa de signals para sesiones por rutina
-  private readonly rutinaSesionesSignals = new Map<string, WritableSignal<SesionRutina[]>>();
-  // Mapa de signals para sesiones por entrenado
-  private readonly entrenadoSesionesSignals = new Map<string, WritableSignal<SesionRutina[]>>();
+
   private firestoreAdapter?: ISesionRutinaFirestoreAdapter;
+  private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
 
-  constructor() {
-    // La inicialización se hará cuando se configure el adaptador
-  }
+  // inyección del servicio de rutina
+  private readonly rutinaService: RutinaService = inject(RutinaService);
+  private readonly ejercicioService: EjercicioService = inject(EjercicioService);
 
-  /**
-   * Configura el adaptador de Firestore
-   */
   setFirestoreAdapter(adapter: ISesionRutinaFirestoreAdapter): void {
     this.firestoreAdapter = adapter;
   }
 
   /**
-   * Obtiene todas las sesiones de una rutina
+   * Normaliza y limpia la sesión antes de guardar
    */
-  getSesionesPorRutina(rutinaId: string): Signal<SesionRutina[]> {
-    if (!this.rutinaSesionesSignals.has(rutinaId)) {
-      const sesionesSignal = signal<SesionRutina[]>([]);
-      this.rutinaSesionesSignals.set(rutinaId, sesionesSignal);
-      
-      if (this.firestoreAdapter) {
-        this.firestoreAdapter.getSesionesPorRutina(rutinaId, (sesiones) => {
-          sesionesSignal.set(sesiones);
+  private normalizeSesionRutina(sesion: SesionRutina): any {
+    const normalized: any = { ...sesion };
+
+    // Eliminar cualquier campo undefined para evitar errores en Firestore
+    Object.keys(normalized).forEach(key => {
+      if (normalized[key] === undefined) {
+        delete normalized[key];
+      }
+    });
+
+    // Normalizar rutinaResumen si existe
+    if (normalized.rutinaResumen) {
+      normalized.rutinaResumen = { ...normalized.rutinaResumen };
+      Object.keys(normalized.rutinaResumen).forEach(key => {
+        if (normalized.rutinaResumen[key] === undefined) {
+          delete normalized.rutinaResumen[key];
+        }
+      });
+
+      // Normalizar ejercicios
+      if (normalized.rutinaResumen.ejercicios) {
+        normalized.rutinaResumen.ejercicios = normalized.rutinaResumen.ejercicios.map((ejercicio: any) => {
+          const ej: any = { ...ejercicio };
+          Object.keys(ej).forEach(key => {
+            if (ej[key] === undefined) {
+              delete ej[key];
+            }
+          });
+          return ej;
         });
       }
     }
-    return this.rutinaSesionesSignals.get(rutinaId)!.asReadonly();
+
+    return normalized;
   }
 
   /**
-   * Obtiene todas las sesiones de un entrenado
+   * Obtiene sesiones por entrenado
    */
   getSesionesPorEntrenado(entrenadoId: string): Signal<SesionRutina[]> {
-    if (!this.entrenadoSesionesSignals.has(entrenadoId)) {
+    if (!this._sesionesPorEntrenado.has(entrenadoId)) {
       const sesionesSignal = signal<SesionRutina[]>([]);
-      this.entrenadoSesionesSignals.set(entrenadoId, sesionesSignal);
-      
+      this._sesionesPorEntrenado.set(entrenadoId, sesionesSignal);
       if (this.firestoreAdapter) {
         this.firestoreAdapter.getSesionesPorEntrenado(entrenadoId, (sesiones) => {
           sesionesSignal.set(sesiones);
         });
       }
     }
-    return this.entrenadoSesionesSignals.get(entrenadoId)!.asReadonly();
+    return this._sesionesPorEntrenado.get(entrenadoId)!.asReadonly();
   }
 
   /**
-   * Crea una nueva sesión
+   * Inicializa sesión de rutina en base a un usuario y a una rutina asignada
+   */
+  async inicializarSesionRutina(entrenadoId: string, rutinaId: string): Promise<SesionRutina> {
+    const rutinaSesion = await this.getRutinaById(rutinaId);
+    
+    if (!rutinaSesion) {
+      throw new Error('Rutina no encontrada');
+    }
+
+    const nuevaSesion: SesionRutina = {
+      id: this.generarIdUnico(),
+      entrenadoId: entrenadoId,
+      fechaInicio: new Date(),
+      rutinaResumen: {
+        id: rutinaSesion.id,
+        nombre: rutinaSesion.nombre,
+        ejercicios: await this.getEjerciciosByRutinaId(rutinaId)
+      },
+      status: SesionRutinaStatus.EN_PROGRESO,
+      porcentajeCompletado: 0,
+      completada: false
+    };
+    return nuevaSesion;
+  }
+
+  /**
+   * Crea una nueva sesión de rutina
    */
   async crearSesion(sesion: SesionRutina): Promise<void> {
     if (!this.firestoreAdapter) {
       throw new Error('Firestore adapter no configurado');
     }
-    await this.firestoreAdapter.save(sesion);
+    const normalizedSesion = this.normalizeSesionRutina(sesion);
+    await this.firestoreAdapter.save(normalizedSesion);
+  }
+
+  /**
+   * Obtiene una rutina por su ID
+   * @param rutinaId - ID de la rutina
+   * @returns - La rutina correspondiente
+   */
+  async getRutinaById(rutinaId: string): Promise<Rutina> {
+    // Función auxiliar para esperar
+    const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Intentar obtener la rutina hasta 5 veces con delays crecientes
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      // Primero verificar si la rutina ya está en la lista general
+      const rutinasActuales = this.rutinaService.rutinas();
+      const rutinaExistente = rutinasActuales.find(r => r.id === rutinaId);
+
+      if (rutinaExistente) {
+        return rutinaExistente;
+      }
+
+      // Esperar con delay creciente (100ms, 200ms, 400ms, 800ms, 1000ms)
+      await wait(100 * Math.pow(2, attempt - 1));
+    }
+
+    // Si no se encontró después de todos los intentos, intentar obtenerla específicamente
+    const rutinaSignal = this.rutinaService.getRutina(rutinaId);
+
+    // Último intento esperando un poco más
+    await wait(1000);
+    const rutina = rutinaSignal();
+
+    if (!rutina) {
+      throw new Error(`Rutina no encontrada: ${rutinaId}`);
+    }
+
+    return rutina;
+  }
+
+  async getEjerciciosByRutinaId(rutinaId: string): Promise<Ejercicio[]> {
+    const rutina = await this.getRutinaById(rutinaId);
+    if (!rutina.ejerciciosIds) return [];
+    const allEjercicios = this.ejercicioService.ejercicios();
+    return allEjercicios.filter(e => rutina.ejerciciosIds!.includes(e.id));
   }
 
   /**
@@ -82,26 +174,19 @@ export class SesionRutinaService {
     if (!this.firestoreAdapter) {
       throw new Error('Firestore adapter no configurado');
     }
-    await this.firestoreAdapter.update(sesion);
+    const normalizedSesion = this.normalizeSesionRutina(sesion);
+    await this.firestoreAdapter.update(normalizedSesion);
   }
 
   /**
    * Marca una sesión como completada
    */
-  async completarSesion(id: string, fechaFin: Date, duracion: number): Promise<void> {
-    // Primero obtener la sesión actual
-    const sesionesSignal = Array.from(this.rutinaSesionesSignals.values())
-      .find(signal => signal().some(s => s.id === id));
-    
-    if (sesionesSignal) {
-      const sesion = sesionesSignal().find(s => s.id === id);
-      if (sesion) {
-        sesion.completada = true;
-        sesion.fechaFin = fechaFin;
-        sesion.duracion = duracion;
-        await this.actualizarSesion(sesion);
-      }
-    }
+  async completarSesion(sesion: SesionRutina, fechaFin: Date, duracion: number): Promise<void> {
+    sesion.fechaFin = fechaFin;
+    sesion.duracion = duracion;
+    sesion.completada = true;
+    sesion.status = SesionRutinaStatus.COMPLETADA;
+    await this.actualizarSesion(sesion);
   }
 
   /**
@@ -112,5 +197,9 @@ export class SesionRutinaService {
       throw new Error('Firestore adapter no configurado');
     }
     await this.firestoreAdapter.delete(id);
+  }
+
+  generarIdUnico(): string {
+    return crypto.randomUUID();
   }
 }

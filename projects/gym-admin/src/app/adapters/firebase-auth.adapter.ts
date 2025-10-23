@@ -13,7 +13,7 @@ import {
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { computed, Signal } from '@angular/core';
-import { User, Rol, Entrenado, Objetivo } from 'gym-library';
+import { User, Rol, Entrenado, Objetivo, FirebaseAdapterBase } from 'gym-library';
 
 interface IAuthAdapter {
   createUserWithEmailAndPassword(email: string, password: string, userData: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }>;
@@ -24,10 +24,9 @@ interface IAuthAdapter {
 }
 
 @Injectable({ providedIn: 'root' })
-export class FirebaseAuthAdapter implements IAuthAdapter {
+export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAdapter {
   private readonly auth = inject(Auth);
   private readonly firestore = inject(Firestore);
-  private readonly injector = inject(Injector);
   
   // Signal para el estado de autenticación (lazy initialization en contexto de inyección)
   private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = runInInjectionContext(
@@ -44,7 +43,7 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
     userData: Partial<User>
   ): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      return await runInInjectionContext(this.injector, async () => {
+      return await this.runInZone(async () => {
         // Crear usuario en Firebase Auth
         const userCredential: UserCredential = await createUserWithEmailAndPassword(
           this.auth, 
@@ -121,49 +120,99 @@ export class FirebaseAuthAdapter implements IAuthAdapter {
 
   async loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
-      return await runInInjectionContext(this.injector, async () => {
-        const cred = await signInWithEmailAndPassword(this.auth, email, password);
-        const firebaseUser = cred.user;
+      return await this.runInZone(async () => {
+        const userCredential: UserCredential = await signInWithEmailAndPassword(
+          this.auth, 
+          email, 
+          password
+        );
+        
+        const firebaseUser = userCredential.user;
         
         if (firebaseUser) {
-          const user = await this.getUserData(firebaseUser);
-          return { success: true, user };
+          // Obtener datos adicionales del usuario desde Firestore
+          const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          let userData: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || email,
+            emailVerified: firebaseUser.emailVerified
+          };
+          
+          if (userDocSnap.exists()) {
+            const firestoreData = userDocSnap.data() as Partial<User>;
+            userData = { ...userData, ...firestoreData };
+          }
+          
+          return { success: true, user: userData };
         }
         
-        return { success: false, error: 'No se pudo obtener información del usuario' };
+        return { success: false, error: 'No se pudo iniciar sesión' };
       });
     } catch (error: any) {
+      console.error('❌ FirebaseAuthAdapter: Error iniciando sesión:', error.code || error.message);
       return { success: false, error: this.getErrorMessage(error) };
     }
   }
 
   async logout(): Promise<void> {
-    await runInInjectionContext(this.injector, async () => {
-      await signOut(this.auth);
-    });
+    try {
+      await this.runInZone(async () => {
+        await signOut(this.auth);
+      });
+    } catch (error: any) {
+      console.error('❌ FirebaseAuthAdapter: Error cerrando sesión:', error.code || error.message);
+      throw new Error(this.getErrorMessage(error));
+    }
   }
 
   async getCurrentUser(): Promise<User | null> {
-    return runInInjectionContext(this.injector, async () => {
-      const firebaseUser = this.authStateSignal();
-      
-      if (!firebaseUser) {
+    try {
+      return await this.runInZone(async () => {
+        const firebaseUser = this.auth.currentUser;
+        
+        if (firebaseUser) {
+          // Obtener datos adicionales del usuario desde Firestore
+          const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+          
+          let userData: User = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || '',
+            emailVerified: firebaseUser.emailVerified
+          };
+          
+          if (userDocSnap.exists()) {
+            const firestoreData = userDocSnap.data() as Partial<User>;
+            userData = { ...userData, ...firestoreData };
+          }
+          
+          return userData;
+        }
+        
         return null;
-      }
-      
-      return await this.getUserData(firebaseUser);
-    });
+      });
+    } catch (error: any) {
+      console.error('❌ FirebaseAuthAdapter: Error obteniendo usuario actual:', error.code || error.message);
+      throw new Error(this.getErrorMessage(error));
+    }
   }
 
   async isAuthenticated(): Promise<boolean> {
-    return runInInjectionContext(this.injector, () => {
-      return this.isAuthenticatedSignal();
-    });
+    try {
+      return await this.runInZone(async () => {
+        return !!this.auth.currentUser;
+      });
+    } catch (error: any) {
+      console.error('❌ FirebaseAuthAdapter: Error verificando autenticación:', error.code || error.message);
+      return false;
+    }
   }
 
   // Método privado reutilizable para obtener datos del usuario
   private async getUserData(firebaseUser: FirebaseUser): Promise<User> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
       const userSnap = await getDoc(userDocRef);
       

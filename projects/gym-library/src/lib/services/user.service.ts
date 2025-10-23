@@ -29,7 +29,7 @@ export class UserService {
    */
   setFirestoreAdapter(adapter: IUserFirestoreAdapter): void {
     this.firestoreAdapter = adapter;
-    this.initializeListener();
+    // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
   }
 
   /**

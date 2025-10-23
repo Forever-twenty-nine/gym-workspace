@@ -15,9 +15,9 @@ import {
   GimnasioService,
   NotificacionService,
   MensajeService,
-  ConversacionService,
   InvitacionService,
   SesionRutinaService,
+  RutinaAsignadaService,
   ENTRENADOR_FIRESTORE_ADAPTER, 
   GIMNASIO_FIRESTORE_ADAPTER,
   ESTADISTICAS_ENTRENADO_FIRESTORE_ADAPTER
@@ -30,9 +30,9 @@ import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adap
 import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
 import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.adapter';
 import { MensajeFirestoreAdapter } from './adapters/mensaje-firestore.adapter';
-import { ConversacionFirestoreAdapter } from './adapters/conversacion-firestore.adapter';
 import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
 import { EstadisticasEntrenadoFirestoreAdapter } from './adapters/estadisticas-entrenado-firestore.adapter';
+import { RutinaAsignadaFirestoreAdapter } from './adapters/rutina-asignada-firestore.adapter';
 
 import { routes } from './app.routes';
 
@@ -46,9 +46,9 @@ function initializeServiceAdapters(
   gimnasioService: GimnasioService,
   notificacionService: NotificacionService,
   mensajeService: MensajeService,
-  conversacionService: ConversacionService,
   invitacionService: InvitacionService,
   sesionRutinaService: SesionRutinaService,
+  rutinaAsignadaService: RutinaAsignadaService,
   entrenadoAdapter: EntrenadoFirestoreAdapter,
   userAdapter: UserFirestoreAdapter,
   rutinaAdapter: RutinaFirestoreAdapter,
@@ -57,9 +57,9 @@ function initializeServiceAdapters(
   gimnasioAdapter: GimnasioFirestoreAdapter,
   notificacionAdapter: NotificacionFirestoreAdapter,
   mensajeAdapter: MensajeFirestoreAdapter,
-  conversacionAdapter: ConversacionFirestoreAdapter,
   invitacionAdapter: InvitacionFirestoreAdapter,
-  sesionRutinaAdapter: SesionRutinaFirestoreAdapter
+  sesionRutinaAdapter: SesionRutinaFirestoreAdapter,
+  rutinaAsignadaAdapter: RutinaAsignadaFirestoreAdapter
 ) {
   return () => {
     // Configurar adaptadores
@@ -71,9 +71,9 @@ function initializeServiceAdapters(
     gimnasioService.setFirestoreAdapter(gimnasioAdapter);
     notificacionService.setFirestoreAdapter(notificacionAdapter);
     mensajeService.setFirestoreAdapter(mensajeAdapter);
-    conversacionService.setFirestoreAdapter(conversacionAdapter);
     invitacionService.setFirestoreAdapter(invitacionAdapter);
     sesionRutinaService.setFirestoreAdapter(sesionRutinaAdapter);
+    rutinaAsignadaService.setFirestoreAdapter(rutinaAsignadaAdapter);
     
     return Promise.resolve();
   };
@@ -130,9 +130,9 @@ export const appConfig: ApplicationConfig = {
         GimnasioService,
         NotificacionService,
         MensajeService,
-        ConversacionService,
         InvitacionService,
         SesionRutinaService,
+        RutinaAsignadaService,
         EntrenadoFirestoreAdapter, 
         UserFirestoreAdapter,
         RutinaFirestoreAdapter,
@@ -141,9 +141,9 @@ export const appConfig: ApplicationConfig = {
         GimnasioFirestoreAdapter,
         NotificacionFirestoreAdapter,
         MensajeFirestoreAdapter,
-        ConversacionFirestoreAdapter,
         InvitacionFirestoreAdapter,
-        SesionRutinaFirestoreAdapter
+        SesionRutinaFirestoreAdapter,
+        RutinaAsignadaFirestoreAdapter
       ],
       multi: true
     }

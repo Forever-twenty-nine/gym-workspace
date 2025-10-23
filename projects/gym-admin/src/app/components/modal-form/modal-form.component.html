@@ -1,11 +1,11 @@
 @if (isOpen) {
 <!-- Overlay -->
-<div class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" (click)="onOverlayClick()">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md" (click)="onOverlayClick()">
   <!-- Modal Content -->
   <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
     (click)="$event.stopPropagation()">
     <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-linear-to-r from-blue-50 to-purple-50">
       <h2 class="text-xl font-bold text-gray-800">
         @if (isCreating) {
           Crear {{ title }}
@@ -37,8 +37,7 @@
               <!-- Input de texto -->
               @case ('text') {
                 <input [type]="field.inputType || 'text'" [formControlName]="field.name"
-                  [placeholder]="field.placeholder || ''" [min]="field.min || null" [step]="field.step || null"
-                  [readonly]="field.readonly || false"
+                  [placeholder]="field.placeholder || ''" [readonly]="field.readonly || false"
                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400"
                   [class.border-red-300]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
                   [class.focus:ring-red-500]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
@@ -57,7 +56,7 @@
 
               <!-- Textarea -->
               @case ('textarea') {
-                <textarea [formControlName]="field.name" [placeholder]="field.placeholder || ''" [rows]="field.rows || 3"
+                <textarea [formControlName]="field.name" [placeholder]="field.placeholder || ''" [rows]="3"
                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:border-gray-400 resize-none"></textarea>
               }
 
@@ -91,44 +90,6 @@
                   <span class="text-sm font-semibold text-gray-700">{{ field.checkboxLabel }}</span>
                 </label>
               }
-
-              <!-- Multiselect genérico -->
-              @case ('multiselect') {
-                <div class="border border-gray-300 rounded-xl bg-white shadow-inner max-h-60 overflow-y-auto">
-                  @if (field.options && field.options.length > 0) {
-                    @for (option of field.options; track option.value) {
-                      <label
-                        class="flex items-center p-3 hover:bg-blue-50 border-b border-gray-200 last:border-b-0 cursor-pointer transition-colors duration-150">
-                        <input type="checkbox" 
-                               [checked]="isOptionSelected(field.name, option.value)"
-                               (change)="onToggleMultiselect(field.name, option.value, $event)"
-                               class="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <div class="flex-1">
-                          <div class="flex justify-between items-center">
-                            <h4 class="font-medium text-gray-800">{{ option.label }}</h4>
-                            @if (option.extra) {
-                              <span class="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                                {{ option.extra }}
-                              </span>
-                            }
-                          </div>
-                        </div>
-                      </label>
-                    }
-                  } @else {
-                    <div class="p-4 text-center text-gray-500">
-                      <p class="text-sm">No hay opciones disponibles</p>
-                    </div>
-                  }
-                </div>
-
-                <!-- Contador de seleccionados -->
-                @if (getSelectedCount(field.name) > 0) {
-                  <div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded-lg">
-                    ✅ {{ getSelectedCount(field.name) }} elemento(s) seleccionado(s)
-                  </div>
-                }
-              }
             }
           </div>
           }
@@ -138,23 +99,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-between gap-4 p-6 border-t border-gray-200 bg-white">
-      <div class="flex-1 flex gap-3">
-        @if (showCustomAction) {
-          <button type="button" (click)="onCustomAction()"
-            class="px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
-            {{ customActionLabel }}
-          </button>
-        }
-        @if (showCustomAction2) {
-          <button type="button" (click)="onCustomAction2()"
-            class="px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 border border-transparent rounded-xl hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200 hover:scale-105 shadow-md hover:shadow-lg">
-            {{ customAction2Label }}
-          </button>
-        }
-      </div>
-
-      <div class="flex items-center gap-4">
+    <div class="flex items-center justify-end gap-4 p-6 border-t border-gray-200 bg-white">
         <button type="button" (click)="onClose()"
           class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 hover:scale-105">
           Cancelar
@@ -176,7 +121,6 @@
           Guardar Cambios
           }
         </button>
-      </div>
     </div>
   </div>
 </div>

@@ -15,6 +15,7 @@ import {
 import { inject } from '@angular/core';
 import { IEntrenadorFirestoreAdapter } from 'gym-library';
 import { Entrenador } from 'gym-library';
+import { FirebaseAdapterBase } from 'gym-library';
 
 /**
  * 🏋️‍♂️ Adaptador de Firestore para Entrenadores
@@ -23,7 +24,7 @@ import { Entrenador } from 'gym-library';
 @Injectable({
   providedIn: 'root'
 })
-export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
+export class EntrenadorFirestoreAdapter extends FirebaseAdapterBase implements IEntrenadorFirestoreAdapter {
   private firestore = inject(Firestore);
   private collectionName = 'entrenadores';
 
@@ -39,24 +40,28 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
     const unsubscribe = onSnapshot(
       entrenadoresQuery,
       (snapshot) => {
-        const entrenadores: Entrenador[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const entrenador: Entrenador = {
-            id: doc.id,
-            fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
-            ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
-            entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
-            rutinasCreadasIds: data['rutinasCreadasIds'] || []
-          };
-          entrenadores.push(entrenador);
+        this.runInZone(() => {
+          const entrenadores: Entrenador[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const entrenador: Entrenador = {
+              id: doc.id,
+              fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
+              ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
+              entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
+              rutinasCreadasIds: data['rutinasCreadasIds'] || []
+            };
+            entrenadores.push(entrenador);
+          });
+          
+          callback(entrenadores);
         });
-        
-        callback(entrenadores);
       },
       (error) => {
-        console.error('❌ EntrenadorFirestoreAdapter: Error al obtener entrenadores:', error);
-        callback([]);
+        this.runInZone(() => {
+          console.error('❌ EntrenadorFirestoreAdapter: Error al obtener entrenadores:', error);
+          callback([]);
+        });
       }
     );
 
@@ -70,15 +75,17 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
    */
   async create(entrenador: Omit<Entrenador, 'id'>): Promise<string> {
     try {
-      const entrenadoresCollection = collection(this.firestore, this.collectionName);
-      const docRef = await addDoc(entrenadoresCollection, {
-        fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
-        ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
-        entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
-        rutinasCreadasIds: entrenador.rutinasCreadasIds || []
+      return await this.runInZone(async () => {
+        const entrenadoresCollection = collection(this.firestore, this.collectionName);
+        const docRef = await addDoc(entrenadoresCollection, {
+          fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
+          ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
+          entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
+          rutinasCreadasIds: entrenador.rutinasCreadasIds || []
+        });
+        
+        return docRef.id;
       });
-      
-      return docRef.id;
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al crear entrenador:', error);
       throw error;
@@ -92,12 +99,14 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
    */
   async createWithId(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void> {
     try {
-      const entrenadorDoc = doc(this.firestore, this.collectionName, id);
-      await setDoc(entrenadorDoc, {
-        fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
-        ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
-        entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
-        rutinasCreadasIds: entrenador.rutinasCreadasIds || []
+      return await this.runInZone(async () => {
+        const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+        await setDoc(entrenadorDoc, {
+          fechaRegistro: entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : Timestamp.now(),
+          ejerciciosCreadasIds: entrenador.ejerciciosCreadasIds || [],
+          entrenadosAsignadosIds: entrenador.entrenadosAsignadosIds || [],
+          rutinasCreadasIds: entrenador.rutinasCreadasIds || []
+        });
       });
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al crear entrenador con ID:', error);
@@ -112,12 +121,14 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
    */
   async update(id: string, entrenador: Partial<Entrenador>): Promise<void> {
     try {
-      const entrenadorDoc = doc(this.firestore, this.collectionName, id);
-      const data: any = { ...entrenador };
-      if (entrenador.fechaRegistro) {
-        data.fechaRegistro = Timestamp.fromDate(entrenador.fechaRegistro);
-      }
-      await updateDoc(entrenadorDoc, data);
+      return await this.runInZone(async () => {
+        const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+        const data: any = { ...entrenador };
+        if (entrenador.fechaRegistro) {
+          data.fechaRegistro = Timestamp.fromDate(entrenador.fechaRegistro);
+        }
+        await updateDoc(entrenadorDoc, data);
+      });
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al actualizar entrenador:', error);
       throw error;
@@ -135,23 +146,27 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
     const unsubscribe = onSnapshot(
       entrenadorDoc,
       (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          const data = docSnapshot.data();
-          const entrenador: Entrenador = {
-            id: docSnapshot.id,
-            fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
-            ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
-            entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
-            rutinasCreadasIds: data['rutinasCreadasIds'] || []
-          };
-          callback(entrenador);
-        } else {
-          callback(null);
-        }
+        this.runInZone(() => {
+          if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            const entrenador: Entrenador = {
+              id: docSnapshot.id,
+              fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
+              ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
+              entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
+              rutinasCreadasIds: data['rutinasCreadasIds'] || []
+            };
+            callback(entrenador);
+          } else {
+            callback(null);
+          }
+        });
       },
       (error) => {
-        console.error('❌ EntrenadorFirestoreAdapter: Error al suscribirse a entrenador:', error);
-        callback(null);
+        this.runInZone(() => {
+          console.error('❌ EntrenadorFirestoreAdapter: Error al suscribirse a entrenador:', error);
+          callback(null);
+        });
       }
     );
 
@@ -165,8 +180,10 @@ export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {
    */
   async delete(id: string): Promise<void> {
     try {
-      const entrenadorDoc = doc(this.firestore, this.collectionName, id);
-      await deleteDoc(entrenadorDoc);
+      return await this.runInZone(async () => {
+        const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+        await deleteDoc(entrenadorDoc);
+      });
     } catch (error) {
       console.error('❌ EntrenadorFirestoreAdapter: Error al eliminar entrenador:', error);
       throw error;

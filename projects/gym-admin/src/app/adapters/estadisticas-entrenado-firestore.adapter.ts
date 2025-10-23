@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -10,31 +10,31 @@ import {
   Timestamp,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { EstadisticasEntrenado } from 'gym-library';
-import { IEstadisticasEntrenadoFirestoreAdapter } from 'gym-library';
+import { EstadisticasEntrenado, IEstadisticasEntrenadoFirestoreAdapter, FirebaseAdapterBase } from 'gym-library';
 
 @Injectable({ providedIn: 'root' })
-export class EstadisticasEntrenadoFirestoreAdapter implements IEstadisticasEntrenadoFirestoreAdapter {
+export class EstadisticasEntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IEstadisticasEntrenadoFirestoreAdapter {
   private readonly COLLECTION = 'estadisticas-entrenado';
   private firestore = inject(Firestore);
-  private injector = inject(Injector);
 
   getEstadisticas(entrenadoId: string, callback: (estadisticas: EstadisticasEntrenado | null) => void): () => void {
-    return runInInjectionContext(this.injector, () => {
+    return this.runInZone(() => {
       const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
 
       return onSnapshot(estadisticasRef, (doc: DocumentSnapshot) => {
-        if (doc.exists()) {
-          callback(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
-        } else {
-          callback(null);
-        }
+        this.runInZone(() => {
+          if (doc.exists()) {
+            callback(this.mapFromFirestore({ ...doc.data(), id: doc.id }));
+          } else {
+            callback(null);
+          }
+        });
       });
     });
   }
 
   async create(entrenadoId: string, estadisticas: EstadisticasEntrenado): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const dataToSave = this.mapToFirestore(estadisticas);
       const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
       await setDoc(estadisticasRef, dataToSave);
@@ -42,7 +42,7 @@ export class EstadisticasEntrenadoFirestoreAdapter implements IEstadisticasEntre
   }
 
   async update(entrenadoId: string, estadisticas: Partial<EstadisticasEntrenado>): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const dataToSave = this.mapToFirestore(estadisticas);
       const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
       await updateDoc(estadisticasRef, dataToSave);
@@ -50,7 +50,7 @@ export class EstadisticasEntrenadoFirestoreAdapter implements IEstadisticasEntre
   }
 
   async delete(entrenadoId: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
       await deleteDoc(estadisticasRef);
     });
