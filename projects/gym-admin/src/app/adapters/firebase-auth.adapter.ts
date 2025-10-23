@@ -27,7 +27,6 @@ interface IAuthAdapter {
 export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAdapter {
   private readonly auth = inject(Auth);
   private readonly firestore = inject(Firestore);
-  private readonly injector = inject(Injector);
   
   // Signal para el estado de autenticación (lazy initialization en contexto de inyección)
   private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = runInInjectionContext(

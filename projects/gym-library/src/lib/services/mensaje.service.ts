@@ -133,17 +133,6 @@ export class MensajeService {
     }
 
     /**
-     * 🔍 Obtiene mensajes por conversación
-     */
-    getMensajesByConversacion(conversacionId: string): Signal<Mensaje[]> {
-        return computed(() => 
-            this._mensajes()
-                .filter(msg => msg.conversacionId === conversacionId)
-                .sort((a, b) => a.fechaEnvio.getTime() - b.fechaEnvio.getTime())
-        );
-    }
-
-    /**
      * 🔍 Obtiene mensajes enviados por un usuario
      */
     getMensajesByRemitente(remitenteId: string): Signal<Mensaje[]> {
@@ -181,18 +170,6 @@ export class MensajeService {
                 msg.destinatarioId === destinatarioId && !msg.leido
             ).length
         );
-    }
-
-    /**
-     * 📊 Obtiene el último mensaje de una conversación
-     */
-    getUltimoMensaje(conversacionId: string): Signal<Mensaje | null> {
-        return computed(() => {
-            const mensajes = this._mensajes()
-                .filter(msg => msg.conversacionId === conversacionId)
-                .sort((a, b) => b.fechaEnvio.getTime() - a.fechaEnvio.getTime());
-            return mensajes.length > 0 ? mensajes[0] : null;
-        });
     }
 
     /**

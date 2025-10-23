@@ -19,11 +19,9 @@ export interface FormFieldConfig {
   disabled?: boolean;
   // Propiedades personalizadas para campos complejos
   notificaciones?: any[];
-  conversaciones?: any[];
   rutinas?: any[];
   ejercicios?: any[];
   invitaciones?: any[];
-  mensajesConversacion?: any[];
 }
 
 @Component({
