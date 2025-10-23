@@ -89,7 +89,6 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
       ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad
       fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
       fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
-      DiasSemana: data.DiasSemana || [],
       duracion: data.duracion
     };
   }
@@ -97,8 +96,7 @@ export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {
   private mapToFirestore(rutina: Rutina): any {
     const data: any = {
       nombre: rutina.nombre,
-      activa: rutina.activa ?? true,
-      DiasSemana: rutina.DiasSemana || []
+      activa: rutina.activa ?? true
     };
 
     // Solo incluir campos opcionales si tienen valor válido
