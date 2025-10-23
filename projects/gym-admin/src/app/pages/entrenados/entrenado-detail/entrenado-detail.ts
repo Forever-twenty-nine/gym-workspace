@@ -100,18 +100,9 @@ export class EntrenadoDetail implements OnInit {
   });
 
   ngOnInit() {
-    // Los listeners se inicializan automáticamente cuando se accede a las señales
-    this.entrenadorService.initializeListener();
-    this.rutinaService.rutinas(); // Forzar inicialización del listener de rutinas
-    // Inicializar listeners de invitaciones
-    this.invitacionService.invitaciones();
-    // Forzar inicialización del listener de rutinas asignadas
-    this.rutinaAsignadaService.getRutinasAsignadas();
-
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadoId.set(id);
-      // Inicializar listener de estadísticas para este entrenado
       this.estadisticasService.initializeListener(id);
       setTimeout(() => {
         const entrenado = this.entrenado();
@@ -124,6 +115,11 @@ export class EntrenadoDetail implements OnInit {
     } else {
       this.router.navigate(['/entrenados']);
     }
+
+    this.entrenadorService.initializeListener();
+    this.rutinaService.rutinas();
+    this.invitacionService.invitaciones();
+    this.rutinaAsignadaService.getRutinasAsignadas();
   }
 
     // Rutinas asignadas al entrenado con información completa

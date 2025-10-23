@@ -65,6 +65,7 @@ export class RutinaAsignadaService {
      * 🔍 Obtiene todas las rutinas asignadas
      */
     getRutinasAsignadas(): Signal<RutinaAsignada[]> {
+        this.initializeListener();
         return this._rutinasAsignadas;
     }
 
