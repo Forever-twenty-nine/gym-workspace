@@ -1,4 +1,4 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -12,23 +12,22 @@ import {
   orderBy,
   Timestamp
 } from '@angular/fire/firestore';
-import { IInvitacionFirestoreAdapter, Invitacion } from 'gym-library';
+import { IInvitacionFirestoreAdapter, Invitacion, FirebaseAdapterBase } from 'gym-library';
 
 /**
  * 📨 Adaptador de Firestore para Invitaciones
  * Implementa la interfaz IInvitacionFirestoreAdapter para gym-admin
  */
 @Injectable({ providedIn: 'root' })
-export class InvitacionFirestoreAdapter implements IInvitacionFirestoreAdapter {
+export class InvitacionFirestoreAdapter extends FirebaseAdapterBase implements IInvitacionFirestoreAdapter {
   private firestore = inject(Firestore);
-  private injector = inject(Injector);
   private readonly COLLECTION_NAME = 'invitaciones';
 
   /**
    * 🔄 Inicializa el listener en tiempo real
    */
   initializeListener(onUpdate: (invitaciones: Invitacion[]) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const invitacionesCol = collection(this.firestore, this.COLLECTION_NAME);
       const invitacionesQuery = query(invitacionesCol, orderBy('fechaCreacion', 'desc'));
 
@@ -63,7 +62,7 @@ export class InvitacionFirestoreAdapter implements IInvitacionFirestoreAdapter {
    * 📊 Suscripción a una invitación específica
    */
   subscribeToInvitacion(id: string, onUpdate: (invitacion: Invitacion | null) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const invitacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
 
       onSnapshot(
@@ -99,7 +98,7 @@ export class InvitacionFirestoreAdapter implements IInvitacionFirestoreAdapter {
    * 💾 Guarda o actualiza una invitación
    */
   async save(invitacion: Invitacion): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const invitacionData = {
           ...invitacion,
@@ -129,7 +128,7 @@ export class InvitacionFirestoreAdapter implements IInvitacionFirestoreAdapter {
    * 🗑️ Elimina una invitación
    */
   async delete(id: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const invitacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
         await deleteDoc(invitacionDoc);
@@ -144,7 +143,7 @@ export class InvitacionFirestoreAdapter implements IInvitacionFirestoreAdapter {
    * 🔄 Actualiza el estado de una invitación
    */
   async updateEstado(id: string, estado: 'pendiente' | 'aceptada' | 'rechazada'): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       try {
         const invitacionDoc = doc(this.firestore, this.COLLECTION_NAME, id);
         const updateData: any = {

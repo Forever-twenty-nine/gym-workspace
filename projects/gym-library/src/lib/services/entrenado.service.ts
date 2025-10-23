@@ -27,7 +27,7 @@ export class EntrenadoService {
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
-    private initializeListener(): void {
+    initializeListener(): void {
         if (this.isListenerInitialized || !this.firestoreAdapter) return;
         
         try {

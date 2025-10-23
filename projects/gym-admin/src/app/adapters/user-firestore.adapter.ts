@@ -1,5 +1,5 @@
-import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { 
+import { Injectable, inject } from '@angular/core';
+import {
   Firestore,
   collection,
   getDocs,
@@ -11,7 +11,7 @@ import {
   QuerySnapshot
 } from '@angular/fire/firestore';
 import { Auth, deleteUser as deleteAuthUser } from '@angular/fire/auth';
-import { User } from 'gym-library';
+import { User, FirebaseAdapterBase } from 'gym-library';
 import { FirebaseAuthAdapter } from './firebase-auth.adapter';
 
 interface IUserFirestoreAdapter {
@@ -23,32 +23,35 @@ interface IUserFirestoreAdapter {
 }
 
 @Injectable({ providedIn: 'root' })
-export class UserFirestoreAdapter implements IUserFirestoreAdapter {
+export class UserFirestoreAdapter extends FirebaseAdapterBase implements IUserFirestoreAdapter {
   private readonly COLLECTION_NAME = 'usuarios';
   private firestore = inject(Firestore);
   private auth = inject(Auth);
-  private injector = inject(Injector);
   private firebaseAuthAdapter = inject(FirebaseAuthAdapter);
 
   initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void {
-    runInInjectionContext(this.injector, () => {
+    this.runInZone(() => {
       const usersCol = collection(this.firestore, this.COLLECTION_NAME);
       
       onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
-        const usersList = snapshot.docs.map(doc => ({
-          ...doc.data(),
-          uid: doc.id
-        } as User));
-        
-        onUpdate(usersList);
+        this.runInZone(() => {
+          const usersList = snapshot.docs.map(doc => ({
+            ...doc.data(),
+            uid: doc.id
+          } as User));
+          
+          onUpdate(usersList);
+        });
       }, (error) => {
-        onError(error.message);
+        this.runInZone(() => {
+          onError(error.message);
+        });
       });
     });
   }
 
   async getUsers(): Promise<User[]> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const usersCol = collection(this.firestore, this.COLLECTION_NAME);
       const snapshot = await getDocs(usersCol);
       
@@ -86,14 +89,14 @@ export class UserFirestoreAdapter implements IUserFirestoreAdapter {
   }
 
   async updateUser(uid: string, userData: Partial<User>): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
       await setDoc(userDoc, userData, { merge: true });
     });
   }
 
   async deleteUser(uid: string): Promise<void> {
-    return runInInjectionContext(this.injector, async () => {
+    return this.runInZone(async () => {
       const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
       await deleteDoc(userDoc);
     });

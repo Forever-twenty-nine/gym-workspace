@@ -10,23 +10,23 @@
 												<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 												</svg>
-												Estadísticas de Progreso
+												Estadísticas del Entrenado
 											</h3>
 											<div class="flex flex-row flex-wrap gap-6 ml-6">
-												<div class="flex flex-col items-center min-w-[80px]">
-													<span class="text-3xl font-extrabold text-blue-600">{{ estadisticas()?.nivel }}</span>
+												<div class="flex flex-col items-center min-w-20">
+													<span class="text-3xl font-extrabold text-blue-600">{{ estadisticas().nivel }}</span>
 													<span class="text-sm text-slate-500 font-medium">Nivel</span>
 												</div>
-												<div class="flex flex-col items-center min-w-[80px]">
-													<span class="text-3xl font-extrabold text-green-600">{{ estadisticas()?.totalRutinasCompletadas }}</span>
+												<div class="flex flex-col items-center min-w-20">
+													<span class="text-3xl font-extrabold text-green-600">{{ estadisticas().totalRutinasCompletadas }}</span>
 													<span class="text-sm text-slate-500 font-medium">Completadas</span>
 												</div>
-												<div class="flex flex-col items-center min-w-[80px]">
-													<span class="text-3xl font-extrabold text-orange-600">{{ estadisticas()?.rachaActual }}</span>
+												<div class="flex flex-col items-center min-w-20">
+													<span class="text-3xl font-extrabold text-orange-600">{{ estadisticas().rachaActual }}</span>
 													<span class="text-sm text-slate-500 font-medium">Racha</span>
 												</div>
-												<div class="flex flex-col items-center min-w-[80px]">
-													<span class="text-3xl font-extrabold text-purple-600">{{ estadisticas()?.experiencia }}</span>
+												<div class="flex flex-col items-center min-w-20">
+													<span class="text-3xl font-extrabold text-purple-600">{{ estadisticas().experiencia }}</span>
 													<span class="text-sm text-slate-500 font-medium">XP</span>
 												</div>
 											</div>
@@ -56,12 +56,12 @@
 				</h4>
 				@if (rutinasCompletadasConNombre().length > 0) {
 					<ul class="divide-y divide-green-100">
-						@for (progreso of rutinasCompletadasConNombre(); track progreso.rutinaId) {
+						@for (progreso of rutinasCompletadasConNombre(); track progreso.id) {
 							<li class="flex items-center justify-between px-4 py-3">
 								<div class="flex flex-col">
 									<span class="font-medium text-green-900">{{ progreso.nombre }}</span>
-									<span class="text-xs text-green-700">Completada {{ progreso.vecesCompletada }} vez/veces</span>
-									<span class="text-xs text-green-500">Última vez: {{ progreso.fechaUltimaCompletada ? (progreso.fechaUltimaCompletada | date:'dd/MM/yyyy') : 'N/A' }}</span>
+									<span class="text-xs text-green-700">Completada el {{ progreso.fechaFin | date:'dd/MM/yyyy' }}</span>
+									<span class="text-xs text-green-500">Duración: {{ progreso.duracion }} segundos</span>
 									<span class="text-xs text-green-400">{{ progreso.descripcion }}</span>
 								</div>
 								<span class="inline-flex items-center px-2 py-1 text-xs font-semibold bg-green-200 text-green-800 rounded-full ml-2">100%</span>
@@ -82,10 +82,10 @@
 			¿Cómo se calculan estas estadísticas?
 		</h4>
 		<ul class="text-xs text-blue-900 list-disc pl-5 space-y-1">
-			<li><b>Completadas</b>: Cada vez que finalizas una rutina al 100% se suma aquí.</li>
-			<li><b>Racha</b>: Días consecutivos en los que completas al menos una rutina.</li>
-			<li><b>XP</b>: Ganas experiencia cada vez que completas una rutina. Más rutinas, más XP.</li>
-			<li><b>Nivel</b>: Sube según la experiencia total acumulada (XP).</li>
+			<li><b>Nivel</b>: Sube cada 100 XP acumulados.</li>
+			<li><b>Completadas</b>: Número total de sesiones de rutina finalizadas al 100%.</li>
+			<li><b>Racha</b>: Días consecutivos con al menos una sesión completada.</li>
+			<li><b>XP</b>: 10 puntos por cada sesión completada.</li>
 		</ul>
 	</div>
 </div>

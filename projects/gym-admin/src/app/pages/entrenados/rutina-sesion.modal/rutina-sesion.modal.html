@@ -2,7 +2,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
+      <div class="bg-linear-to-r from-blue-600 to-purple-600 text-white p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@
                 <span class="text-sm text-gray-500">{{ progresoSesion() }}%</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
+                <div class="bg-linear-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
                      [style.width.%]="progresoSesion()"></div>
               </div>
             </div>
@@ -61,7 +61,7 @@
 
           <!-- Botones de control -->
           <div class="flex items-center space-x-3">
-            @if (!sesionIniciada()) {
+            @if (!cronometroCorriendo()) {
               <button (click)="iniciarSesion()"
                       class="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,10 +150,10 @@
 
                   <div class="flex items-center space-x-4">
                     <!-- Checkbox -->
-                    <div class="flex-shrink-0">
+                    <div class="shrink-0">
                       <input type="checkbox"
                              [checked]="ejercicioSesion.completado"
-                             [disabled]="!sesionIniciada() || sesionCompletada()"
+                             [disabled]="!cronometroCorriendo() || sesionCompletada()"
                              (change)="toggleEjercicioCompletado(i)"
                              class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
                     </div>
@@ -168,7 +168,7 @@
                         </h4>
 
                         @if (ejercicioSesion.completado) {
-                          <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                           </svg>
                         }
@@ -232,7 +232,7 @@
           } @else {
             <!-- Estado vacío mejorado -->
             <div class="text-center py-8">
-              <div class="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div class="w-16 h-16 bg-linear-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>

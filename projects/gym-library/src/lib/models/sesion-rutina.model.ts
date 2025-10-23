@@ -13,7 +13,7 @@ export interface SesionRutina {
     rutinaResumen: { 
         id: string; 
         nombre: string; 
-        ejercicios?: Ejercicio[];
+        ejercicios: Ejercicio[];
     };
 }
 

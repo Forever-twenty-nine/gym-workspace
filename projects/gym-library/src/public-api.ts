@@ -45,6 +45,8 @@ export * from './lib/services/mensaje.service';
 export * from './lib/services/conversacion.service';
 export * from './lib/services/invitacion.service';
 export * from './lib/services/sesion-rutina.service';
+export * from './lib/services/zone-runner.service';
+export * from './lib/services/firebase-adapter-base';
 /*
  * interfaces para adaptadores
  */

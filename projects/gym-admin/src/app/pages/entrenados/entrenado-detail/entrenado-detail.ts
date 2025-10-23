@@ -74,6 +74,7 @@ export class EntrenadoDetail implements OnInit {
   ngOnInit() {
     // Los listeners se inicializan automáticamente cuando se accede a las señales
     this.entrenadorService.initializeListener();
+    this.rutinaService.rutinas(); // Forzar inicialización del listener de rutinas
     // Inicializar listeners de invitaciones
     this.invitacionService.invitaciones();
 
@@ -104,7 +105,7 @@ export class EntrenadoDetail implements OnInit {
       .filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id))
       .map(rutina => {
         // Buscar la última sesión de esta rutina para este entrenado
-  const sesiones = this.sesionRutinaService.getSesionesPorRutina(rutina.id)().filter(s => s.entrenadoId === entrenado.id);
+        const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(entrenado.id)().filter(s => s.rutinaResumen.id === rutina.id);
         // Derivar estado de progreso desde la última sesión
         const ultimaSesion = sesiones && sesiones.length > 0 ? sesiones[sesiones.length - 1] : null;
         return {

@@ -72,7 +72,7 @@
         <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="shrink-0 w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
               <div class="flex items-center space-x-2">
@@ -81,7 +81,7 @@
               </div>
             </div>
             <div class="flex items-center space-x-3">
-              <svg class="flex-shrink-0 w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="shrink-0 w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
               <div class="flex items-center space-x-2">
@@ -92,7 +92,7 @@
             @if (invitacionesPendientes() && invitacionesPendientes().length > 0) {
               <div class="flex items-center space-x-3">
                 <div class="relative">
-                  <svg class="flex-shrink-0 w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="shrink-0 w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                   </svg>
                   <span class="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-orange-500 rounded-full min-w-[18px] h-[18px]">
@@ -127,7 +127,7 @@
                     <div class="flex items-center justify-between p-3 bg-white rounded-md border border-orange-100 shadow-sm hover:shadow-md transition-shadow duration-200">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center space-x-2">
-                          <svg class="w-4 h-4 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg class="w-4 h-4 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                           </svg>
                           <div class="min-w-0 flex-1">
@@ -168,7 +168,7 @@
         </div>
 
         <!-- Sección de Rutinas Asignadas -->
-        <div class="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-6 shadow-lg border border-slate-200">
+        <div class="bg-linear-to-br from-slate-50 to-blue-50 rounded-xl p-6 shadow-lg border border-slate-200">
           <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
             <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -184,9 +184,9 @@
                     <!-- Tarjeta del día con gradiente dinámico -->
                     <div class="relative bg-white rounded-xl shadow-lg border-2 transition-all duration-300 hover:shadow-xl hover:scale-105 overflow-hidden
                                 {{ dia.esHoy ? 'border-blue-400 shadow-blue-200' : 'border-slate-200 hover:border-slate-300' }}
-                                {{ dia.rutinas.length > 0 ? 'bg-gradient-to-br from-white to-slate-50' : 'bg-gradient-to-br from-slate-50 to-slate-100' }}">
+                                {{ dia.rutinas.length > 0 ? 'bg-linear-to-br from-white to-slate-50' : 'bg-linear-to-br from-slate-50 to-slate-100' }}">
                       <!-- Encabezado del día con gradiente -->
-                      <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 text-center relative overflow-hidden">
+                      <div class="bg-linear-to-r from-blue-500 to-purple-600 text-white p-3 text-center relative overflow-hidden">
                         <div class="relative z-10">
                           <div class="text-sm font-bold mb-1">{{ dia.diaCorto }}</div>
                           <div class="text-xs opacity-90">{{ dia.fecha.getDate() }}</div>
@@ -207,7 +207,7 @@
                           <div class="space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-transparent">
                             @for (rutina of dia.rutinas; track rutina.id) {
                               <!-- Tarjeta de rutina mejorada -->
-                              <div class="group bg-gradient-to-r from-white to-slate-50 rounded-md p-2 cursor-pointer
+                              <div class="group bg-linear-to-r from-white to-slate-50 rounded-md p-2 cursor-pointer
                                           hover:from-blue-50 hover:to-indigo-50 transition-all duration-300
                                           border border-slate-200 hover:border-blue-300 hover:shadow-sm
                                           transform hover:scale-102"
@@ -246,7 +246,7 @@
           } @else {
             <!-- Estado vacío general mejorado -->
             <div class="text-center py-12">
-              <div class="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div class="w-16 h-16 bg-linear-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
