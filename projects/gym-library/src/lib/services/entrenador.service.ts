@@ -472,40 +472,6 @@ export class EntrenadorService {
   }
 
   /**
-   * 🧹 Limpia IDs huérfanos de rutinas creadas (rutinas que ya no existen)
-   * @param entrenadorId - ID del entrenador
-   */
-  async cleanRutinasCreadasIds(entrenadorId: string): Promise<void> {
-    const entrenador = this.getEntrenadorById(entrenadorId)();
-    if (!entrenador || !entrenador.rutinasCreadasIds) return;
-
-    const existingRutinas = this.getRutinasByEntrenador(entrenadorId)();
-    const existingIds = existingRutinas.map(r => r.id);
-    const cleanedIds = entrenador.rutinasCreadasIds.filter(id => existingIds.includes(id));
-
-    if (cleanedIds.length !== entrenador.rutinasCreadasIds.length) {
-      await this.update(entrenadorId, { rutinasCreadasIds: cleanedIds });
-    }
-  }
-
-  /**
-   * Limpia IDs huérfanos de ejercicios creados (ejercicios que ya no existen)
-   * @param entrenadorId - ID del entrenador
-   */
-  async cleanEjerciciosCreadosIds(entrenadorId: string): Promise<void> {
-    const entrenador = this.getEntrenadorById(entrenadorId)();
-    if (!entrenador || !entrenador.ejerciciosCreadasIds) return;
-
-    const existingEjercicios = this.getEjerciciosByEntrenador(entrenadorId)();
-    const existingIds = existingEjercicios.map(e => e.id);
-    const cleanedIds = entrenador.ejerciciosCreadasIds.filter(id => existingIds.includes(id));
-
-    if (cleanedIds.length !== entrenador.ejerciciosCreadasIds.length) {
-      await this.update(entrenadorId, { ejerciciosCreadasIds: cleanedIds });
-    }
-  }
-
-  /**
    * ➕ Asigna un entrenado a un entrenador con validación de límites
    * @param entrenadorId - ID del entrenador
    * @param entrenadoId - ID del entrenado a asignar

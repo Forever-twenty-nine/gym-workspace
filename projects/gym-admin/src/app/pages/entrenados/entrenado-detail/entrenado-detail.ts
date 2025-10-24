@@ -11,6 +11,7 @@ import {
   EjercicioService,
   EstadisticasEntrenadoService,
   RutinaAsignadaService,
+  NotificacionService,
   PlanLimitError,
   Invitacion,
   RutinaAsignada
@@ -65,6 +66,7 @@ export class EntrenadoDetail implements OnInit {
   private readonly ejercicioService = inject(EjercicioService);
   private readonly estadisticasService = inject(EstadisticasEntrenadoService);
   private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
+  private readonly notificacionService = inject(NotificacionService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
     // Día actual de la semana (0 = domingo, 1 = lunes, etc.)
@@ -123,6 +125,8 @@ export class EntrenadoDetail implements OnInit {
     this.rutinaService.rutinas();
     this.invitacionService.invitaciones();
     this.rutinaAsignadaService.getRutinasAsignadas();
+    // Inicializar listener de notificaciones para que se carguen las notificaciones del entrenado
+    this.notificacionService.notificaciones();
   }
 
     // Rutinas asignadas al entrenado con información completa
@@ -157,6 +161,22 @@ export class EntrenadoDetail implements OnInit {
     if (!id) return [];
 
     return this.invitacionService.getInvitacionesPendientesPorEntrenado(id)();
+  });
+
+  // Notificaciones del entrenado (solo no leídas)
+  readonly notificacionesEntrenado = computed(() => {
+    const id = this.entrenadoId();
+    if (!id) return [];
+
+    return this.notificacionService.getNotificacionesNoLeidas(id)();
+  });
+
+  // Notificaciones no leídas del entrenado
+  readonly notificacionesNoLeidas = computed(() => {
+    const id = this.entrenadoId();
+    if (!id) return 0;
+
+    return this.notificacionService.getContadorNoLeidas(id)();
   });
 
   // --------------------------------------------
@@ -232,5 +252,21 @@ export class EntrenadoDetail implements OnInit {
 
   onRechazarInvitacion(invitacionId: string) {
     this.rechazarInvitacion(invitacionId);
+  }
+
+  // --------------------------------------------
+  // Manejo de notificaciones
+  // --------------------------------------------
+  async marcarTodasNotificacionesComoLeidas() {
+    try {
+      const entrenadoId = this.entrenadoId();
+      if (entrenadoId) {
+        await this.notificacionService.marcarTodasComoLeidas(entrenadoId);
+        this.toastService.log('Todas las notificaciones marcadas como leídas');
+      }
+    } catch (error) {
+      console.error('Error al marcar todas las notificaciones como leídas:', error);
+      this.toastService.log('Error al marcar notificaciones como leídas');
+    }
   }
 }

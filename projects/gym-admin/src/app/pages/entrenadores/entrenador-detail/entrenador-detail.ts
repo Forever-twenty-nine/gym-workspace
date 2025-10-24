@@ -83,10 +83,7 @@ export class EntrenadorDetail implements OnInit {
         const entrenador = this.entrenador();
         if (entrenador) {
           this.pageTitleService.setTitle(`Entrenador: ${entrenador.displayName || id}`);
-          // Limpiar IDs huérfanos de rutinas
-          this.entrenadorService.cleanRutinasCreadasIds(id);
-          // Limpiar IDs huérfanos de ejercicios
-          this.entrenadorService.cleanEjerciciosCreadosIds(id);
+          // Limpieza automática removida - usar solo cuando el usuario lo solicite
         } else {
           this.router.navigate(['/entrenadores']);
         }

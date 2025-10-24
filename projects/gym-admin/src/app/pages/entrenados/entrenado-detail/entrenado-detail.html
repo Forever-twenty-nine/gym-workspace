@@ -99,6 +99,74 @@
           </div>
         </div>
 
+        <!-- Sección de Notificaciones -->
+        <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <svg class="shrink-0 w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.868 12.683A17.925 17.925 0 012 21.75V19a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966-.351 1.091-.852l1.106-4.423c.11-.44-.054-.902-.417-1.173l-1.293-.97a1.062 1.062 0 01-.38-1.21v-3.586c0-.567.32-1.009.808-1.009h1.6c.488 0 .808.442.808 1.009v2.022c0 .306.163.596.435.776l2.14 1.291c.379.228.626.623.626 1.05v1.363c0 .527-.207 1.04-.577 1.415l-.921.921A2.25 2.25 0 0113.75 21H12a2.25 2.25 0 01-2.25-2.25v-2.382c0-.597.237-1.17.659-1.591l2.432-2.432a.75.75 0 00-.182-1.232l-1.02-.614a.75.75 0 00-.814.12l-2.43 1.829a.75.75 0 01-.99.128L4.683 9.465a.75.75 0 01-.128-.99l1.829-2.43a.75.75 0 00-.12-.814L4.65 5.03a.75.75 0 00-1.232.182L2.431 7.64a.75.75 0 01-1.591.659L.868 6.683z"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900">Notificaciones Pendientes</h3>
+              @if (notificacionesNoLeidas() > 0) {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  {{ notificacionesNoLeidas() }} sin leer
+                </span>
+              }
+            </div>
+            @if (notificacionesEntrenado().length > 0) {
+              <button (click)="marcarTodasNotificacionesComoLeidas()"
+                class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                Marcar todas como leídas
+              </button>
+            }
+          </div>
+
+          <div class="space-y-3 max-h-60 overflow-y-auto">
+            @if (notificacionesEntrenado() && notificacionesEntrenado().length > 0) {
+              @for (notificacion of notificacionesEntrenado(); track notificacion.id) {
+                <div class="flex items-start space-x-3 p-4 rounded-lg border border-yellow-200 bg-yellow-50 transition-colors duration-200">
+
+                  <!-- Icono según tipo de notificación -->
+                  <div class="shrink-0">
+                    @if (notificacion.tipo === 'rutina_asignada') {
+                      <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    } @else if (notificacion.tipo === 'invitacion_pendiente') {
+                      <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                      </svg>
+                    } @else {
+                      <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                    }
+                  </div>
+
+                  <!-- Contenido de la notificación -->
+                  <div class="flex-1 min-w-0">
+                      <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-gray-900">{{ notificacion.titulo }}</p>
+                        <p class="text-xs text-gray-500">
+                          {{ notificacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+                        </p>
+                      </div>
+                    <p class="text-sm text-gray-700 mt-1">{{ notificacion.mensaje }}</p>
+                  </div>
+                </div>
+              }
+            } @else {
+              <div class="text-center py-8">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.868 12.683A17.925 17.925 0 012 21.75V19a2.25 2.25 0 012.25-2.25h1.372c.516 0 .966-.351 1.091-.852l1.106-4.423c.11-.44-.054-.902-.417-1.173l-1.293-.97a1.062 1.062 0 01-.38-1.21v-3.586c0-.567.32-1.009.808-1.009h1.6c.488 0 .808.442.808 1.009v2.022c0 .306.163.596.435.776l2.14 1.291c.379.228.626.623.626 1.05v1.363c0 .527-.207 1.04-.577 1.415l-.921.921A2.25 2.25 0 0113.75 21H12a2.25 2.25 0 01-2.25-2.25v-2.382c0-.597.237-1.17.659-1.591l2.432-2.432a.75.75 0 00-.182-1.232l-1.02-.614a.75.75 0 00-.814.12l-2.43 1.829a.75.75 0 01-.99.128L4.683 9.465a.75.75 0 01-.128-.99l1.829-2.43a.75.75 0 00-.12-.814L4.65 5.03a.75.75 0 00-1.232.182L2.431 7.64a.75.75 0 01-1.591.659L.868 6.683z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No hay notificaciones pendientes</h3>
+                <p class="mt-1 text-sm text-gray-500">Las nuevas notificaciones aparecerán aquí.</p>
+              </div>
+            }
+          </div>
+        </div>
+
         <!-- Sección de Rutinas Asignadas -->
         <app-rutinas-semanal
           [rutinasAsignadas]="rutinasAsignadasConInfo()"

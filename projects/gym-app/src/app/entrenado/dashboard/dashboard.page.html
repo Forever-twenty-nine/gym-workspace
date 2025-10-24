@@ -17,12 +17,12 @@
     <div class="flex justify-between items-start">
         <div class="flex items-center justify-center gap-2">
           <!-- Foto -->
-          <ion-avatar class="!w-12 !h-12">
+          <ion-avatar class="w-12! h-12!">
             <img src="../../../assets/images/test-foto.png" alt="" class="">
           </ion-avatar>
           <div>
             <!-- Nombre -->
-            <p class="gym-title-color !text-base !font-bold !mb-0">
+            <p class="gym-title-color text-base! font-bold! mb-0!">
               Hola, {{ nombreEntrenado() }}
             </p>
             <!-- Plan -->
@@ -33,10 +33,10 @@
           </div>
         </div>
 
-        <ion-button fill="clear" shape="round" class="!p-0">
+        <ion-button fill="clear" shape="round" class="p-0!">
           <ion-icon
             name="notifications-outline"
-            class="!text-2xl gym-text-color"
+            class="text-2xl gym-text-color"
           ></ion-icon>
           @if (invitacionesPendientes().length > 0) {
             <ion-badge color="danger" class="absolute -top-1 -right-1">{{ invitacionesPendientes().length }}</ion-badge>
