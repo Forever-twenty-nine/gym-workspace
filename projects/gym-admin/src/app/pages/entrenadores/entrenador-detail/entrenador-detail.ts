@@ -73,6 +73,9 @@ export class EntrenadorDetail implements OnInit {
     this.notificacionService.notificaciones();
     // Inicializar listener de invitaciones
     this.invitacionService.invitaciones();
+    // Inicializar listeners de ejercicios y rutinas para que estén disponibles antes de limpiar
+    this.ejercicioService.ejercicios();
+    this.rutinaService.rutinas();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);

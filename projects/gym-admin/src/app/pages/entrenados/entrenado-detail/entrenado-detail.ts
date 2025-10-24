@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
@@ -11,12 +11,31 @@ import {
   EjercicioService,
   EstadisticasEntrenadoService,
   RutinaAsignadaService,
-  PlanLimitError
+  PlanLimitError,
+  Invitacion,
+  RutinaAsignada
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
 import { RutinaSesionModalComponent } from '../rutina-sesion.modal/rutina-sesion.modal';
+import { RutinasSemanalComponent } from './rutinas-semanal/rutinas-semanal';
+import { InvitacionesComponent } from './invitaciones/invitaciones';
+
+// Tipos locales que extienden los de la librería
+type RutinaAsignadaConInfo = RutinaAsignada & {
+  rutina?: any;
+  tipoAsignacion?: string;
+};
+
+interface DiaInfo {
+  fecha: Date;
+  diaNombre: string;
+  diaNumero: number;
+  rutinas: RutinaAsignadaConInfo[];
+  esHoy: boolean;
+  fechaFormateada: string;
+}
 
 @Component({
   selector: 'app-entrenado-detail',
@@ -24,7 +43,9 @@ import { RutinaSesionModalComponent } from '../rutina-sesion.modal/rutina-sesion
   CommonModule,
   ToastComponent,
   RouterModule,
-  RutinaSesionModalComponent
+  RutinaSesionModalComponent,
+  RutinasSemanalComponent,
+  InvitacionesComponent
   ],
   templateUrl: './entrenado-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -46,31 +67,8 @@ export class EntrenadoDetail implements OnInit {
   private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
-  // Día actual de la semana (0 = domingo, 1 = lunes, etc.)
+    // Día actual de la semana (0 = domingo, 1 = lunes, etc.)
   readonly diaActual = new Date().getDay();
-
-  // Función para obtener los próximos 7 días
-  private getProximos7Dias(): { fecha: Date; diaNombre: string; diaNumero: number }[] {
-    const dias = [];
-    const hoy = new Date();
-
-    for (let i = 0; i < 7; i++) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() + i);
-
-      const diaNumero = fecha.getDay();
-      const nombresDias = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-      const diaNombre = nombresDias[diaNumero];
-
-      dias.push({
-        fecha,
-        diaNombre,
-        diaNumero
-      });
-    }
-
-    return dias;
-  }
 
   entrenadoId = signal<string>('');
 
@@ -79,6 +77,21 @@ export class EntrenadoDetail implements OnInit {
   readonly mostrarInvitaciones = signal(false);
   readonly mostrarModalSesiones = signal(false);
   readonly rutinaSeleccionada = signal<string>('');
+  readonly navigated = signal(false);
+
+  constructor() {
+    // Effect para actualizar el título y manejar navegación
+    effect(() => {
+      const entrenado = this.entrenado();
+      const id = this.entrenadoId();
+      if (entrenado) {
+        this.pageTitleService.setTitle(`Entrenado: ${entrenado.displayName || id}`);
+      } else if (!this.navigated()) {
+        this.navigated.set(true);
+        this.router.navigate(['/entrenados']);
+      }
+    });
+  }
 
   entrenado = computed(() => {
     const id = this.entrenadoId();
@@ -104,16 +117,6 @@ export class EntrenadoDetail implements OnInit {
     if (id) {
       this.entrenadoId.set(id);
       this.estadisticasService.initializeListener(id);
-      setTimeout(() => {
-        const entrenado = this.entrenado();
-        if (entrenado) {
-          this.pageTitleService.setTitle(`Entrenado: ${entrenado.displayName || id}`);
-        } else {
-          this.router.navigate(['/entrenados']);
-        }
-      }, 0);
-    } else {
-      this.router.navigate(['/entrenados']);
     }
 
     this.entrenadorService.initializeListener();
@@ -142,59 +145,6 @@ export class EntrenadoDetail implements OnInit {
       .filter(item => item.rutina !== null);
   });
 
-  // Rutinas organizadas por días de la semana (vista semanal)
-  readonly rutinasPorDia = computed(() => {
-    const rutinasAsignadas = this.rutinasAsignadasConInfo();
-    const proximos7Dias = this.getProximos7Dias();
-
-    return proximos7Dias.map(diaInfo => {
-      const rutinasDelDia: any[] = [];
-
-      // Agregar rutinas asignadas por día de la semana
-      rutinasAsignadas.forEach(item => {
-        // Verificar si diaSemana es un array (múltiples días) o un string (día único)
-        const diasAsignados = Array.isArray(item.diaSemana) ? item.diaSemana : [item.diaSemana];
-
-        if (diasAsignados.includes(diaInfo.diaNombre)) {
-          rutinasDelDia.push({
-            ...item,
-            tipoAsignacion: 'dia_semana'
-          });
-        }
-      });
-
-      // Agregar rutinas con fecha específica para este día
-      rutinasAsignadas.forEach(item => {
-        if (item.fechaEspecifica) {
-          const fechaRutina = item.fechaEspecifica.toISOString().split('T')[0];
-          const fechaDia = diaInfo.fecha.toISOString().split('T')[0];
-          if (fechaRutina === fechaDia) {
-            rutinasDelDia.push({
-              ...item,
-              tipoAsignacion: 'fecha_especifica'
-            });
-          }
-        }
-      });
-
-      return {
-        ...diaInfo,
-        rutinas: rutinasDelDia,
-        esHoy: diaInfo.fecha.toDateString() === new Date().toDateString(),
-        fechaFormateada: diaInfo.fecha.toLocaleDateString('es-ES', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'short'
-        })
-      };
-    });
-  });
-
-  // Verificar si no hay rutinas asignadas en toda la semana
-  readonly noHayRutinasAsignadas = computed(() => {
-    return this.rutinasPorDia().every(dia => dia.rutinas.length === 0);
-  });
-
   // Estadísticas del entrenado
   readonly estadisticas = computed(() => {
     const id = this.entrenadoId();
@@ -217,19 +167,6 @@ export class EntrenadoDetail implements OnInit {
   }
 
   // --------------------------------------------
-  // Formatear fecha
-  // --------------------------------------------
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return 'Sin fecha';
-    const date = fecha instanceof Date ? fecha : new Date(fecha);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-  // --------------------------------------------
   // Ver progreso detallado de una rutina
   // --------------------------------------------
   // Método de progreso eliminado. Usar sesiones o estadísticas si es necesario.
@@ -237,9 +174,9 @@ export class EntrenadoDetail implements OnInit {
   // --------------------------------------------
   // Aceptar invitación
   // --------------------------------------------
-  async aceptarInvitacion(invitacion: any) {
+  async aceptarInvitacion(invitacionId: string) {
     try {
-      await this.invitacionService.aceptarInvitacion(invitacion.id);
+      await this.invitacionService.aceptarInvitacion(invitacionId);
       this.toastService.log('Invitación aceptada y vinculada correctamente');
     } catch (error: any) {
       console.error('Error al aceptar y vincular invitación:', error);
@@ -254,9 +191,9 @@ export class EntrenadoDetail implements OnInit {
   // --------------------------------------------
   // Rechazar invitación
   // --------------------------------------------
-  async rechazarInvitacion(invitacion: any) {
+  async rechazarInvitacion(invitacionId: string) {
     try {
-      await this.invitacionService.rechazarInvitacion(invitacion.id);
+      await this.invitacionService.rechazarInvitacion(invitacionId);
       this.toastService.log('Invitación rechazada');
     } catch (error: any) {
       console.error('Error al rechazar invitación:', error);
@@ -280,5 +217,20 @@ export class EntrenadoDetail implements OnInit {
   cerrarModalSesiones() {
     this.mostrarModalSesiones.set(false);
     this.rutinaSeleccionada.set('');
+  }
+
+  // --------------------------------------------
+  // Handlers para subcomponente de invitaciones
+  // --------------------------------------------
+  toggleMostrarInvitaciones() {
+    this.mostrarInvitaciones.set(!this.mostrarInvitaciones());
+  }
+
+  onAceptarInvitacion(invitacionId: string) {
+    this.aceptarInvitacion(invitacionId);
+  }
+
+  onRechazarInvitacion(invitacionId: string) {
+    this.rechazarInvitacion(invitacionId);
   }
 }
