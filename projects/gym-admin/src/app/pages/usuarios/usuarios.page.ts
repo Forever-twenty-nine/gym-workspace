@@ -271,20 +271,8 @@ export class UsuariosPage {
             rutinasCreadasIds: []
           };
           
-          const entrenadorServiceAdapter = (this.entrenadorService as any).adapter;
-          if (entrenadorServiceAdapter && entrenadorServiceAdapter.createWithId) {
-            await entrenadorServiceAdapter.createWithId(uid, entrenadorData);
-          } else {
-            this.toastService.log(`⚠️ Usando método create normal para entrenador`);
-            const tempId = await this.entrenadorService.create(entrenadorData);
-            await this.entrenadorService.delete(tempId);
-            
-            if (entrenadorServiceAdapter) {
-              await entrenadorServiceAdapter.update(uid, entrenadorData);
-            } else {
-              throw new Error('No se puede acceder al adaptador de entrenador');
-            }
-          }
+          // Crear o sobrescribir el documento del entrenador con el UID del usuario (idempotente)
+          await this.entrenadorService.createWithId(uid, entrenadorData);
           
           userData.entrenadorId = uid;
           

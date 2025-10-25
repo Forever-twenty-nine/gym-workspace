@@ -7,6 +7,10 @@ import { SesionRutinaService, RutinaService, Rutina, SesionRutina, SocialShareSe
   selector: 'app-entrenado-estadisticas',
   imports: [DatePipe, RouterModule],
   templateUrl: './entrenado-estadisticas.html',
+  host: {
+    '(document:click)': 'onDocumentClick()',
+    '(keydown.escape)': 'cerrarMenuCompartir()'
+  }
 })
 export class EntrenadoEstadisticas {
   private readonly route = inject(ActivatedRoute);
@@ -16,6 +20,7 @@ export class EntrenadoEstadisticas {
 
   readonly entrenadoId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
   readonly compartiendoEstadisticas = signal(false);
+  readonly mostrarMenuCompartir = signal(false);
 
   // Estadísticas calculadas desde las sesiones de rutinas
   readonly estadisticas = computed(() => {
@@ -112,27 +117,49 @@ export class EntrenadoEstadisticas {
 
     const id = this.entrenadoId();
     if (!id) {
-      console.error('No hay entrenadoId disponible');
+      console.error('❌ No hay entrenadoId disponible');
+      alert('No se puede compartir: falta el ID del entrenado');
       return;
     }
 
+    console.log('🚀 Iniciando compartir estadísticas para entrenadoId:', id, 'en', platform);
+
+    // Ocultar menú al iniciar
+    this.mostrarMenuCompartir.set(false);
     this.compartiendoEstadisticas.set(true);
 
     try {
+      console.log('📊 Llamando a socialShareService.generateAndShare...');
       await this.socialShareService.generateAndShare(
         id,
         platform,
         {
           includeStats: true,
-          includeLevel: true,
-          includeStreak: true
+          includeLevel: false,
+          includeStreak: false,
+          includeLast7Days: true
         }
       );
-      console.log('Estadísticas compartidas exitosamente en', platform);
+      console.log('✅ Estadísticas compartidas exitosamente en', platform);
+      alert('¡Imagen generada y compartida/descargada!');
     } catch (error) {
-      console.error('Error al compartir estadísticas:', error);
+      console.error('❌ Error al compartir estadísticas:', error);
+      alert(`Error al compartir: ${error}`);
     } finally {
       this.compartiendoEstadisticas.set(false);
     }
+  }  // Control del menú de compartir
+  toggleMenuCompartir(event?: Event) {
+    if (event) event.stopPropagation();
+    if (this.compartiendoEstadisticas()) return;
+    this.mostrarMenuCompartir.update(v => !v);
+  }
+
+  cerrarMenuCompartir() {
+    this.mostrarMenuCompartir.set(false);
+  }
+
+  onDocumentClick() {
+    this.cerrarMenuCompartir();
   }
 }
