@@ -96,6 +96,16 @@ export class EntrenadoDetail implements OnInit {
         this.router.navigate(['/entrenados']);
       }
     });
+
+    // Effect para generar notificaciones de rutinas próximas cuando cambian las asignaciones activas
+    effect(() => {
+      const id = this.entrenadoId();
+      if (!id) return;
+      // Observa cambios en las rutinas asignadas activas del entrenado
+      const _ = this.rutinaAsignadaService.getRutinasAsignadasActivasByEntrenado(id)();
+      // Lanza chequeo (idempotente por ID determinista)
+      this.rutinaAsignadaService.checkAndNotifyRutinasProximas(id, 24);
+    });
   }
 
   entrenado = computed(() => {

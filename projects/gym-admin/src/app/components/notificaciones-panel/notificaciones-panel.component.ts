@@ -30,6 +30,9 @@ export class NotificacionesPanelComponent {
     switch (tipo) {
       case TipoNotificacion.RUTINA_ASIGNADA:
         return 'rutina';
+      case TipoNotificacion.RECORDATORIO:
+        // Usamos el estilo de 'mensaje' para recordatorios
+        return 'mensaje';
       case TipoNotificacion.INVITACION_PENDIENTE:
       case TipoNotificacion.INVITACION_ACEPTADA:
       case TipoNotificacion.INVITACION_RECHAZADA:

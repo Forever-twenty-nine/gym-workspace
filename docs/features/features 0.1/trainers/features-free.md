@@ -30,13 +30,3 @@
 - Rutinas asignadas ✅
 
 ---
-
-## Restricciones
-
-- Máximo 3 clientes activos simultáneos
-- Máximo 5 rutinas activas (borrador o publicadas)
-- Maximo 10 ejercicios simples  activos
-- Sin chat en tiempo real
-- Sin estadísticas avanzadas por cliente
-- Sin branding personalizado
-- Sin exportación de reportes

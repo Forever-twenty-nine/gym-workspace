@@ -23,7 +23,7 @@
 
 ## Notificaciones
 - invitacion a conectarse con el entrenador ✅ 
-- Push: Nueva rutina asignada 
-- Push: Recordatorio de entrenamiento (configurable) 
+- Push: Nueva rutina asignada ✅ 
+- Push: Recordatorio de entrenamiento (configurable) ✅ 
 
 ---

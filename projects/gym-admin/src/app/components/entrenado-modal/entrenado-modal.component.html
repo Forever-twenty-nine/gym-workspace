@@ -204,9 +204,18 @@
                               <svg class="w-4 h-4 text-blue-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                               </svg>
-                              <div>
+                              <div class="flex items-center gap-2 min-w-0">
                                 <p class="text-sm font-medium text-gray-900 truncate">{{ rutina.nombre }}</p>
-                                <p class="text-xs text-gray-600">{{ rutina.ejerciciosIds?.length || 0 }} ejercicio(s)</p>
+                                @if (isRutinaAsignada(rutina.id)) {
+                                  <span
+                                    class="shrink-0 px-2 py-0.5 text-[10px] font-semibold rounded-full border"
+                                    class:text-blue-800="true"
+                                    class:bg-blue-100="true"
+                                    class:border-blue-300="true"
+                                    title="Esta rutina ya tiene al menos una asignación para este entrenado"
+                                  >Asignada</span>
+                                }
+                                <p class="text-xs text-gray-600 truncate">{{ rutina.ejerciciosIds?.length || 0 }} ejercicio(s)</p>
                               </div>
                             </div>
                           </div>
@@ -215,7 +224,7 @@
                             class="ml-2 px-3 py-1 text-xs font-medium text-white bg-blue-600 border border-transparent rounded hover:bg-blue-700 transition-colors"
                             [disabled]="showAsignacionForm()"
                           >
-                            Asignar
+                            {{ isRutinaAsignada(rutina.id) ? 'Asignar otra programación' : 'Asignar' }}
                           </button>
                         </div>
                       }

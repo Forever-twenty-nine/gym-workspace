@@ -89,12 +89,10 @@ export class EntrenadoModalComponent implements OnChanges {
   });
 
   readonly rutinasDisponibles = computed(() => {
-    const entrenado = this.entrenado();
+    // La lista de disponibles debe ser independiente de las asignadas
+    // para permitir múltiples programaciones de la misma rutina (p.ej. varios días).
     const rutinasEntrenador = this.rutinasEntrenador();
-    if (!rutinasEntrenador) return [];
-
-    const asignadasIds = this.rutinasAsignadas().map(ra => ra.rutinaId);
-    return rutinasEntrenador.filter(rutina => !asignadasIds.includes(rutina.id));
+    return rutinasEntrenador ?? [];
   });
 
   // Computed para rutinas asignadas con información completa
