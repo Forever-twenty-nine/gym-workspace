@@ -16,8 +16,8 @@
 ---
 
 ## Social
-- Compartir progreso en RRSS (Instagram, Facebook, Twitter)
-- Incluye watermark “Exportá tu progreso completo en PDF watermark — desbloqueá con Premium ”
+- Compartir progreso en RRSS (Instagram, Facebook, Twitter)✅ 
+- Incluye watermark “Exportá tu progreso completo en PDF watermark — desbloqueá con Premium ”✅ 
 
 ---
 
