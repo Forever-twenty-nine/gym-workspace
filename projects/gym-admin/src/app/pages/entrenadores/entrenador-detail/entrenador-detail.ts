@@ -73,6 +73,9 @@ export class EntrenadorDetail implements OnInit {
     this.notificacionService.notificaciones();
     // Inicializar listener de invitaciones
     this.invitacionService.invitaciones();
+    // Inicializar listeners de ejercicios y rutinas para que estén disponibles antes de limpiar
+    this.ejercicioService.ejercicios();
+    this.rutinaService.rutinas();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);
@@ -80,10 +83,7 @@ export class EntrenadorDetail implements OnInit {
         const entrenador = this.entrenador();
         if (entrenador) {
           this.pageTitleService.setTitle(`Entrenador: ${entrenador.displayName || id}`);
-          // Limpiar IDs huérfanos de rutinas
-          this.entrenadorService.cleanRutinasCreadasIds(id);
-          // Limpiar IDs huérfanos de ejercicios
-          this.entrenadorService.cleanEjerciciosCreadosIds(id);
+          // Limpieza automática removida - usar solo cuando el usuario lo solicite
         } else {
           this.router.navigate(['/entrenadores']);
         }

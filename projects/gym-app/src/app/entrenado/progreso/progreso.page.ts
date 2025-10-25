@@ -22,7 +22,6 @@ import {
   trophyOutline
 } from 'ionicons/icons';
 import {
-  ProgresoService,
   RutinaService,
   AuthService,
   EntrenadoService
@@ -46,7 +45,6 @@ import {
   
 })
 export class ProgresoPage implements OnInit {
-  private readonly progresoService = inject(ProgresoService);
   private readonly rutinaService = inject(RutinaService);
   private readonly authService = inject(AuthService);
   private readonly entrenadoService = inject(EntrenadoService);
@@ -78,9 +76,9 @@ export class ProgresoPage implements OnInit {
     const entrenados = this.entrenadoService.entrenados;
     const entrenado = entrenados().find((e: any) => e.id === userId);
 
-    if (!userId || !rutinas().length || !entrenado?.rutinasAsignadas) return [];
+    if (!userId || !rutinas().length || !entrenado?.rutinasAsignadasIds) return [];
 
-    return rutinas().filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id));
+    return rutinas().filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
   });
 
   progresoRutinas = computed(() => {
@@ -88,7 +86,8 @@ export class ProgresoPage implements OnInit {
     if (!userId) return [];
 
     return this.rutinasAsignadas().map(rutina => {
-      const progreso = this.progresoService.getProgresoRutina(userId, rutina.id);
+      // TODO: Implementar servicio de progreso
+      const progreso = signal({ completado: false, sesiones: [], ejerciciosCompletados: [] });
       return {
         rutina,
         progreso

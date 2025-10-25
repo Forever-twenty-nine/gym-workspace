@@ -64,7 +64,7 @@ export class PerfilPage implements OnInit {
     // Filtrar rutinas asignadas al usuario actual
     const misRutinas = todasRutinas.filter(r => {
       const entrenado = this.entrenadoService.getEntrenado(user.uid)();
-      return entrenado?.rutinasAsignadas?.includes(r.id) || false;
+      return entrenado?.rutinasAsignadasIds?.includes(r.id) || false;
     });
 
     const rutinasCompletadas = 0; // No hay propiedad completado

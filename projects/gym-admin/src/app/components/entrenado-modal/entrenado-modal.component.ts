@@ -1,7 +1,7 @@
 import { Component, input, output, computed, inject, ChangeDetectionStrategy, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EntrenadoService, UserService, EntrenadorService, Rutina, RutinaAsignadaService, RutinaAsignada } from 'gym-library';
+import { EntrenadoService, UserService, EntrenadorService, Rutina, RutinaAsignadaService, RutinaAsignada, NotificacionService, TipoNotificacion } from 'gym-library';
 
 @Component({
   selector: 'app-entrenado-modal',
@@ -18,6 +18,7 @@ export class EntrenadoModalComponent implements OnChanges {
   private readonly userService = inject(UserService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
+  private readonly notificacionService = inject(NotificacionService);
   private readonly fb = inject(FormBuilder);
 
   // Inputs
@@ -193,6 +194,11 @@ export class EntrenadoModalComponent implements OnChanges {
     this.isAsignando.set(true);
 
     try {
+      // Obtener información del entrenador para la notificación
+      const entrenador = this.entrenadorService.entrenadores().find(e => e.id === entrenadorId);
+      const entrenadorUsuario = entrenador ? this.userService.users().find(u => u.uid === entrenador.id) : null;
+      const entrenadorNombre = entrenadorUsuario?.nombre || entrenadorUsuario?.email || `Entrenador ${entrenadorId}`;
+
       if (formValue.tipoAsignacion === 'dia') {
         // Si se seleccionaron múltiples días, crear una asignación para cada día
         const diasSeleccionados = Array.isArray(formValue.diaSemana) ? formValue.diaSemana : [formValue.diaSemana];
@@ -211,6 +217,9 @@ export class EntrenadoModalComponent implements OnChanges {
             };
 
             await this.rutinaAsignadaService.save(rutinaAsignada);
+
+            // Crear notificación para el entrenado
+            await this.crearNotificacionRutinaAsignada(entrenadoId, rutina.nombre, entrenadorNombre, dia);
           }
         }
       } else {
@@ -227,6 +236,10 @@ export class EntrenadoModalComponent implements OnChanges {
         };
 
         await this.rutinaAsignadaService.save(rutinaAsignada);
+
+        // Crear notificación para el entrenado
+        const fechaFormateada = formValue.fechaEspecifica ? new Date(formValue.fechaEspecifica).toLocaleDateString('es-ES') : 'fecha específica';
+        await this.crearNotificacionRutinaAsignada(entrenadoId, rutina.nombre, entrenadorNombre, fechaFormateada);
       }
 
       this.onCancelarAsignacion();
@@ -247,6 +260,30 @@ export class EntrenadoModalComponent implements OnChanges {
       await this.rutinaAsignadaService.delete(rutinaAsignada.id);
     } catch (error) {
       console.error('Error al desasignar rutina:', error);
+    }
+  }
+
+  // Crear notificación cuando se asigna una rutina
+  private async crearNotificacionRutinaAsignada(entrenadoId: string, rutinaNombre: string, entrenadorNombre: string, programacion: string) {
+    try {
+      const notificacion = {
+        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        usuarioId: entrenadoId,
+        tipo: TipoNotificacion.RUTINA_ASIGNADA,
+        titulo: 'Nueva rutina asignada',
+        mensaje: `${entrenadorNombre} te ha asignado la rutina "${rutinaNombre}" para ${programacion}`,
+        leida: false,
+        datos: {
+          rutinaNombre: rutinaNombre,
+          entrenadorNombre: entrenadorNombre,
+          programacion: programacion
+        },
+        fechaCreacion: new Date()
+      };
+
+      await this.notificacionService.save(notificacion);
+    } catch (error) {
+      console.error('Error al crear notificación de rutina asignada:', error);
     }
   }
 }

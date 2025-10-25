@@ -167,7 +167,7 @@ export class EntrenadosPage implements OnInit {
 
   getRutinasAsignadasCount(entrenadoId: string): number {
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    return entrenado?.rutinasAsignadas?.length || 0;
+    return entrenado?.rutinasAsignadasIds?.length || 0;
   }
 
   getUserName(userId: string): string {
@@ -290,7 +290,7 @@ export class EntrenadosPage implements OnInit {
 
   private cargarRutinasEntrenado(entrenadoId: string) {
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinaIds = entrenado?.rutinasAsignadas || [];
+    const rutinaIds = entrenado?.rutinasAsignadasIds || [];
     const rutinas = this.rutinaService.rutinas().filter(r => rutinaIds.includes(r.id));
     this.rutinasEntrenado.set(rutinas);
   }
@@ -302,7 +302,7 @@ export class EntrenadosPage implements OnInit {
 
     const rutinas = this.rutinaService.rutinas();
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinasAsignadas = entrenado?.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado?.rutinasAsignadasIds || [];
     const rutinasEntrenador = rutinas.filter(rutina => 
       !rutinasAsignadas.includes(rutina.id)
     );
@@ -313,7 +313,7 @@ export class EntrenadosPage implements OnInit {
     if (!this.selectedEntrenado()) return;
 
     const entrenado = this.selectedEntrenado()!;
-    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado.rutinasAsignadasIds || [];
 
     // Si ya está asignada, no hacer nada
     if (rutinasAsignadas.includes(rutina.id)) {
@@ -322,7 +322,7 @@ export class EntrenadosPage implements OnInit {
 
     const entrenadoActualizado: Entrenado = {
       ...entrenado,
-      rutinasAsignadas: [...rutinasAsignadas, rutina.id]
+      rutinasAsignadasIds: [...rutinasAsignadas, rutina.id]
     };
 
     try {
@@ -343,12 +343,12 @@ export class EntrenadosPage implements OnInit {
     if (!this.selectedEntrenado()) return;
 
     const entrenado = this.selectedEntrenado()!;
-    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado.rutinasAsignadasIds || [];
     const nuevosAsignados = rutinasAsignadas.filter(id => id !== rutina.id);
 
     const entrenadoActualizado: Entrenado = {
       ...entrenado,
-      rutinasAsignadas: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
+      rutinasAsignadasIds: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
     };
 
     try {

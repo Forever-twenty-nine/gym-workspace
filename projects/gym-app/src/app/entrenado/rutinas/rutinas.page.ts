@@ -78,10 +78,10 @@ export class RutinasPage implements OnInit {
     const rutinas = this.todasLasRutinas();
     const entrenado = this.entrenadoService.entrenados().find((e: any) => e.id === userId);
     
-    if (!userId || !rutinas.length || !entrenado?.rutinasAsignadas) return [];
+    if (!userId || !rutinas.length || !entrenado?.rutinasAsignadasIds) return [];
     
     // Filtrar rutinas asignadas a este entrenado
-    return rutinas.filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id));
+    return rutinas.filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
   });
 
   constructor() {
@@ -230,9 +230,8 @@ export class RutinasPage implements OnInit {
 
       // Agregar rutinas que corresponden a este día
       rutinas.forEach(rutina => {
-        if (rutina.DiasSemana && rutina.DiasSemana.includes(diaSemana)) {
-          rutinasOrganizadas[fechaKey].rutinas.push(rutina);
-        }
+        // TODO: Implementar filtro por días de la semana desde RutinaAsignada
+        rutinasOrganizadas[fechaKey].rutinas.push(rutina);
       });
     });
 

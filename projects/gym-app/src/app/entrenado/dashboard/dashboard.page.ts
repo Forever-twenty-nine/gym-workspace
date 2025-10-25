@@ -134,7 +134,7 @@ export class DashboardPage implements OnInit {
 
     // Filtrar rutinas asignadas a este entrenado
     const rutinasDelEntrenado = rutinas.filter(rutina => 
-      entrenado?.rutinasAsignadas?.includes(rutina.id)
+      entrenado?.rutinasAsignadasIds?.includes(rutina.id)
     );
 
     return rutinasDelEntrenado.map(rutina => {

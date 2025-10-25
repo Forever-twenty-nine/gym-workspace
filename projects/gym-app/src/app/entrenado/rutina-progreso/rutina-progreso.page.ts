@@ -40,13 +40,11 @@ import {
   pauseCircleOutline
 } from 'ionicons/icons';
 import {
-  ProgresoService,
   RutinaService,
   EjercicioService,
   AuthService,
   Rutina,
-  Ejercicio,
-  ProgresoRutina
+  Ejercicio
 } from 'gym-library';
 
 @Component({
@@ -81,7 +79,6 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly modalController = inject(ModalController);
-  private readonly progresoService = inject(ProgresoService);
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
   private readonly authService = inject(AuthService);
@@ -115,10 +112,8 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   });
 
   progreso = computed(() => {
-    const entrenadoId = this.authService.currentUser()?.uid;
-    const rutinaId = this.rutinaId();
-    if (!entrenadoId) return null;
-    return this.progresoService.getProgresoRutina(entrenadoId, rutinaId)();
+    // TODO: Implementar servicio de progreso
+    return { completado: false, fechaInicio: null, ejerciciosCompletados: [] };
   });
 
   // Estados computados
@@ -223,19 +218,10 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   // --------------------------------------------
 
   async iniciarRutina() {
-    try {
-      const entrenadoId = this.authService.currentUser()?.uid;
-      if (!entrenadoId) throw new Error('Usuario no autenticado');
-
-      await this.progresoService.iniciarRutina(entrenadoId, this.rutinaId());
-      // Marcar inicio localmente para que la UI reaccione inmediatamente
-      this.rutinaLocalIniciada.set(true);
-      this.iniciarCronometro();
-      this.rutinaPausada.set(false);
-    } catch (error: any) {
-      console.error('Error al iniciar rutina:', error);
-      // TODO: Mostrar toast de error
-    }
+    // TODO: Implementar servicio de progreso
+    this.rutinaLocalIniciada.set(true);
+    this.iniciarCronometro();
+    this.rutinaPausada.set(false);
   }
 
   pausarReanudarRutina() {
@@ -264,53 +250,33 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
 
     this.isCompleting.set(true);
 
-    try {
-      const entrenadoId = this.authService.currentUser()?.uid;
-      if (!entrenadoId) throw new Error('Usuario no autenticado');
+    // TODO: Implementar servicio de progreso
+    this.detenerCronometro();
+    // Reset del estado del cronómetro al completar
+    this.tiempoTranscurrido.set('00:00');
+    this.segundosTranscurridos = 0;
+    // limpiar el inicio local
+    this.rutinaLocalIniciada.set(false);
+    // Reset de ejercicios completados
+    this.ejerciciosCompletadosLocal.set([]);
+    // Cerrar el modal
+    this.modalController.dismiss();
 
-      // Calcular duración en minutos basados en el cronómetro local
-      const duracionMinutos = Math.round(this.segundosTranscurridos / 60);
-      await this.progresoService.completarRutina(entrenadoId, this.rutinaId(), duracionMinutos);
-
-      this.detenerCronometro();
-      // Reset del estado del cronómetro al completar
-      this.tiempoTranscurrido.set('00:00');
-      this.segundosTranscurridos = 0;
-      // limpiar el inicio local
-      this.rutinaLocalIniciada.set(false);
-      // Reset de ejercicios completados
-      this.ejerciciosCompletadosLocal.set([]);
-      // Cerrar el modal
-      this.modalController.dismiss();
-    } catch (error: any) {
-      console.error('Error al completar rutina:', error);
-      // TODO: Mostrar toast de error
-    } finally {
-      this.isCompleting.set(false);
-    }
+    this.isCompleting.set(false);
   }
 
   async reiniciarRutina() {
-    try {
-      const entrenadoId = this.authService.currentUser()?.uid;
-      if (!entrenadoId) throw new Error('Usuario no autenticado');
-
-      await this.progresoService.reiniciarRutina(entrenadoId, this.rutinaId());
-
-      this.detenerCronometro();
-      // Reset completo del estado del cronómetro
-      this.cronometroActivo.set(false);
-      this.rutinaPausada.set(false);
-      this.tiempoTranscurrido.set('00:00');
-      this.segundosTranscurridos = 0;
-      // limpiar el inicio local
-      this.rutinaLocalIniciada.set(false);
-      // Reset de ejercicios completados
-      this.ejerciciosCompletadosLocal.set([]);
-    } catch (error: any) {
-      console.error('Error al reiniciar rutina:', error);
-      // TODO: Mostrar toast de error
-    }
+    // TODO: Implementar servicio de progreso
+    this.detenerCronometro();
+    // Reset completo del estado del cronómetro
+    this.cronometroActivo.set(false);
+    this.rutinaPausada.set(false);
+    this.tiempoTranscurrido.set('00:00');
+    this.segundosTranscurridos = 0;
+    // limpiar el inicio local
+    this.rutinaLocalIniciada.set(false);
+    // Reset de ejercicios completados
+    this.ejerciciosCompletadosLocal.set([]);
   }
 
   // --------------------------------------------
@@ -333,51 +299,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     // Actualizar estado local inmediatamente para UI responsiva
     this.ejerciciosCompletadosLocal.set(nuevosCompletados);
 
-    // Sincronización en segundo plano con el servicio
-    try {
-      const entrenadoId = this.authService.currentUser()?.uid;
-      if (!entrenadoId) throw new Error('Usuario no autenticado');
-
-      // Asegurarnos de que el progreso existe antes de sincronizar
-      let progresoActual = this.progreso();
-      if (!progresoActual) {
-        console.log('Creando progreso automáticamente antes de sincronizar ejercicio...');
-        await this.progresoService.iniciarRutina(entrenadoId, this.rutinaId());
-        
-        // Esperar un poco a que se propague
-        await new Promise(resolve => setTimeout(resolve, 100));
-        progresoActual = this.progreso();
-      }
-
-      if (progresoActual) {
-        if (estaCompletado) {
-          await this.progresoService.descompletarEjercicio(
-            entrenadoId,
-            this.rutinaId(),
-            ejercicioId,
-            this.ejerciciosTotales()
-          );
-        } else {
-          await this.progresoService.completarEjercicio(
-            entrenadoId,
-            this.rutinaId(),
-            ejercicioId,
-            this.ejerciciosTotales()
-          );
-        }
-      } else {
-        throw new Error('No se pudo crear el progreso automáticamente');
-      }
-    } catch (error: any) {
-      console.error('Error al sincronizar ejercicio:', error, {
-        entrenadoId: this.authService.currentUser()?.uid,
-        rutinaId: this.rutinaId(),
-        ejercicioId
-      });
-      // Revertir cambio local si falla la sincronización
-      this.ejerciciosCompletadosLocal.set(completadosActuales);
-      // TODO: Mostrar error más prominente o reintentar
-    }
+    // TODO: Sincronización con servicio de progreso
   }
 
   isEjercicioCompletado(ejercicioId: string): boolean {
