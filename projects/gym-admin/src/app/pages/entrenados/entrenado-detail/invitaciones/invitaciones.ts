@@ -1,44 +1,57 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Invitacion } from 'gym-library';
 
 @Component({
-  selector: 'app-invitaciones',
+  selector: 'app-invitaciones-modal',
   imports: [CommonModule],
   templateUrl: './invitaciones.html',
 })
-export class InvitacionesComponent {
+export class InvitacionesModalComponent {
 
   // Inputs
-  invitacionesPendientes = input.required<Invitacion[]>();
-  mostrarInvitaciones = input.required<boolean>();
+  invitacion = input.required<Invitacion | null>();
+  open = input.required<boolean>();
 
   // Outputs
-  toggleMostrarInvitaciones = output<void>();
-  aceptarInvitacionEvent = output<string>(); // Emite el ID de la invitación
-  rechazarInvitacionEvent = output<string>(); // Emite el ID de la invitación
+  openChange = output<boolean>();
+  aceptarInvitacion = output<string>();
+  rechazarInvitacion = output<string>();
 
-  // Método para formatear fecha
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return 'Sin fecha';
-    const date = fecha instanceof Date ? fecha : new Date(fecha);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  // Computed para verificar si hay invitación válida
+  hasInvitacion = computed(() => !!this.invitacion());
+
+  cerrarModal() {
+    this.openChange.emit(false);
   }
 
-  // Handlers para emitir eventos
-  onToggleMostrarInvitaciones() {
-    this.toggleMostrarInvitaciones.emit();
+  onAceptar() {
+    const inv = this.invitacion();
+    if (inv?.id) {
+      this.aceptarInvitacion.emit(inv.id);
+      this.cerrarModal();
+    }
   }
 
-  onAceptarInvitacion(invitacionId: string) {
-    this.aceptarInvitacionEvent.emit(invitacionId);
+  onRechazar() {
+    const inv = this.invitacion();
+    if (inv?.id) {
+      this.rechazarInvitacion.emit(inv.id);
+      this.cerrarModal();
+    }
   }
 
-  onRechazarInvitacion(invitacionId: string) {
-    this.rechazarInvitacionEvent.emit(invitacionId);
+  formatearFecha(timestamp: any): string {
+    if (!timestamp) return 'Fecha no disponible';
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Fecha no disponible';
+    }
   }
 }

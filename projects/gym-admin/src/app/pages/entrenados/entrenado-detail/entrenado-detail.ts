@@ -21,7 +21,8 @@ import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
 import { RutinaSesionModalComponent } from '../rutina-sesion.modal/rutina-sesion.modal';
 import { RutinasSemanalComponent } from './rutinas-semanal/rutinas-semanal';
-import { InvitacionesComponent } from './invitaciones/invitaciones';
+import { NotificacionesPanelComponent } from '../../../components/notificaciones-panel/notificaciones-panel.component';
+import { InvitacionesModalComponent } from './invitaciones/invitaciones';
 
 // Tipos locales que extienden los de la librería
 type RutinaAsignadaConInfo = RutinaAsignada & {
@@ -46,7 +47,8 @@ interface DiaInfo {
   RouterModule,
   RutinaSesionModalComponent,
   RutinasSemanalComponent,
-  InvitacionesComponent
+  NotificacionesPanelComponent,
+  InvitacionesModalComponent
   ],
   templateUrl: './entrenado-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -76,9 +78,10 @@ export class EntrenadoDetail implements OnInit {
 
   // Signals para el estado del componente
   readonly isLoading = signal(false);
-  readonly mostrarInvitaciones = signal(false);
   readonly mostrarModalSesiones = signal(false);
+  readonly mostrarModalInvitacion = signal(false);
   readonly rutinaSeleccionada = signal<string>('');
+  readonly invitacionSeleccionada = signal<Invitacion | null>(null);
   readonly navigated = signal(false);
 
   constructor() {
@@ -240,18 +243,19 @@ export class EntrenadoDetail implements OnInit {
   }
 
   // --------------------------------------------
-  // Handlers para subcomponente de invitaciones
+  // Abrir/cerrar modal de invitación
   // --------------------------------------------
-  toggleMostrarInvitaciones() {
-    this.mostrarInvitaciones.set(!this.mostrarInvitaciones());
+  abrirModalInvitacion(invitacionId: string) {
+    const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+    if (invitacion) {
+      this.invitacionSeleccionada.set(invitacion);
+      this.mostrarModalInvitacion.set(true);
+    }
   }
 
-  onAceptarInvitacion(invitacionId: string) {
-    this.aceptarInvitacion(invitacionId);
-  }
-
-  onRechazarInvitacion(invitacionId: string) {
-    this.rechazarInvitacion(invitacionId);
+  cerrarModalInvitacion() {
+    this.mostrarModalInvitacion.set(false);
+    this.invitacionSeleccionada.set(null);
   }
 
   // --------------------------------------------

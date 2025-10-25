@@ -2,6 +2,9 @@ import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector 
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { Invitacion } from '../models/invitacion.model';
+import { Notificacion } from '../models/notificacion.model';
+import { NotificacionService } from './notificacion.service';
+import { TipoNotificacion } from '../enums/tipo-notificacion.enum';
 
 export interface IInvitacionFirestoreAdapter {
   initializeListener(onUpdate: (invitaciones: Invitacion[]) => void): void;
@@ -126,7 +129,34 @@ export class InvitacionService {
             activa: true
         };
 
+        // 1) Guardar invitación
         await this.save(invitacion);
+
+        // 2) Crear notificación ligada a la invitación para el entrenado
+        try {
+            const notificacionService = this.injector.get(NotificacionService);
+            const notificacion: Notificacion = {
+                id: `notif-${invitacion.id}`,
+                usuarioId: invitacion.entrenadoId, // La ve el entrenado
+                tipo: TipoNotificacion.INVITACION_PENDIENTE,
+                titulo: `Invitación de ${entrenadorNombre}`,
+                mensaje: mensajePersonalizado || `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`,
+                leida: false,
+                datos: {
+                        invitacionId: invitacion.id,
+                        entrenadorId,
+                        entrenadorNombre,
+                        emailInvitado: emailEntrenado,
+                        estadoInvitacion: 'pendiente'
+                },
+                fechaCreacion: new Date()
+            };
+
+            await notificacionService.save(notificacion);
+        } catch (e) {
+            // No bloquear el flujo si falla la notificación, pero dejar rastro
+            console.warn('No se pudo crear la notificación de invitación:', e);
+        }
     }
 
     /**
@@ -191,6 +221,48 @@ export class InvitacionService {
                     await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
                 }
             }
+
+            // 4) Actualizar la notificación asociada a la invitación
+            try {
+                const notificacionService = this.injector.get(NotificacionService);
+                await notificacionService.save({
+                    id: `notif-${invitacionId}`,
+                    usuarioId: entrenadoId,
+                    tipo: TipoNotificacion.INVITACION_ACEPTADA,
+                    titulo: 'Invitación aceptada',
+                    mensaje: 'Has aceptado la invitación del entrenador',
+                    leida: true, // Marcar como leída porque el usuario ejecutó la acción
+                    fechaLeida: new Date(),
+                    datos: {
+                            invitacionId: invitacionId,
+                            entrenadorId,
+                            estadoInvitacion: 'aceptada',
+                            fechaRespuesta: new Date()
+                    },
+                    fechaCreacion: new Date()
+                } as Notificacion);
+
+                // 5) Crear notificación para el entrenador informando aceptación
+                await notificacionService.save({
+                    id: `notif-${invitacionId}-entrenador`,
+                    usuarioId: entrenadorId,
+                    tipo: TipoNotificacion.INVITACION_ACEPTADA,
+                    titulo: 'Tu invitación fue aceptada',
+                    mensaje: `${invitacion.entrenadoNombre} aceptó tu invitación`,
+                    leida: false,
+                    datos: {
+                            invitacionId: invitacionId,
+                            entrenadorId,
+                            remitenteId: entrenadoId,
+                            remitenteNombre: invitacion.entrenadoNombre,
+                            estadoInvitacion: 'aceptada',
+                            fechaRespuesta: new Date()
+                    },
+                    fechaCreacion: new Date()
+                } as Notificacion);
+            } catch (e) {
+                console.warn('No se pudo actualizar la notificación de invitación (aceptada):', e);
+            }
         } catch (error) {
             console.error('Error al aceptar invitación:', error);
             throw error;
@@ -209,6 +281,59 @@ export class InvitacionService {
 
         try {
             await this.firestoreAdapter.updateEstado(invitacionId, 'rechazada');
+
+            // Actualizar notificación asociada a la invitación
+            try {
+                // Intentar obtener la invitación para conocer ids
+                let invitacion: Invitacion | null = this._invitaciones().find(inv => inv.id === invitacionId) || null;
+                if (!invitacion) {
+                    const invSignal = this.getInvitacion(invitacionId);
+                    invitacion = invSignal();
+                }
+                if (!invitacion) {
+                    // Si no pudimos determinar los datos, no bloqueamos
+                    return;
+                }
+
+                const notificacionService = this.injector.get(NotificacionService);
+                await notificacionService.save({
+                    id: `notif-${invitacionId}`,
+                    usuarioId: invitacion.entrenadoId,
+                    tipo: TipoNotificacion.INVITACION_RECHAZADA,
+                    titulo: 'Invitación rechazada',
+                    mensaje: 'Has rechazado la invitación del entrenador',
+                    leida: true, // Marcar como leída porque el usuario ejecutó la acción
+                    fechaLeida: new Date(),
+                    datos: {
+                        invitacionId: invitacionId,
+                        entrenadorId: invitacion.entrenadorId,
+                        estadoInvitacion: 'rechazada',
+                        fechaRespuesta: new Date()
+                    },
+                    fechaCreacion: new Date()
+                } as Notificacion);
+
+                // Crear notificación para el entrenador informando rechazo
+                await notificacionService.save({
+                    id: `notif-${invitacionId}-entrenador`,
+                    usuarioId: invitacion.entrenadorId,
+                    tipo: TipoNotificacion.INVITACION_RECHAZADA,
+                    titulo: 'Tu invitación fue rechazada',
+                    mensaje: `${invitacion.entrenadoNombre} rechazó tu invitación`,
+                    leida: false,
+                    datos: {
+                        invitacionId: invitacionId,
+                        entrenadorId: invitacion.entrenadorId,
+                        remitenteId: invitacion.entrenadoId,
+                        remitenteNombre: invitacion.entrenadoNombre,
+                        estadoInvitacion: 'rechazada',
+                        fechaRespuesta: new Date()
+                    },
+                    fechaCreacion: new Date()
+                } as Notificacion);
+            } catch (e) {
+                console.warn('No se pudo actualizar la notificación de invitación (rechazada):', e);
+            }
         } catch (error) {
             console.error('Error al rechazar invitación:', error);
             throw error;
