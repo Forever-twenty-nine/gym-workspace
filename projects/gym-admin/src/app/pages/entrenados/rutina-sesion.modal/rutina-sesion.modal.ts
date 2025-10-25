@@ -14,7 +14,11 @@ interface EjercicioSesion {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './rutina-sesion.modal.html',
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.Default,
+  host: {
+    '(document:click)': 'onDocumentClick()',
+    '(keydown.escape)': 'cerrarMenuCompartir()'
+  }
 })
 export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges {
   @Input({ required: true }) rutinaId!: string;
@@ -27,12 +31,20 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
 
   // Estado de la sesión
   readonly sesionActual = signal<SesionRutina | null>(null);
+  readonly compartiendoRutina = signal(false);
   readonly cronometroCorriendo = signal(false);
   readonly tiempoTranscurrido = signal(0); // en segundos
   readonly intervaloCronometro: any = null;
+  readonly cargandoEjercicios = signal(false);
+  readonly mostrarMenuCompartir = signal(false);
 
   // Estado de error
   readonly errorSesion = signal<string | null>(null);
+
+  // Reintentos de carga inicial
+  private intentosCarga = 0;
+  private readonly maxIntentosCarga = 6; // ~ varios segundos de espera total
+  private cargaTimeout: any = null;
 
   // Método para mostrar errores temporales
   private mostrarErrorTemporal(mensaje: string, duracionMs: number = 5000) {
@@ -137,12 +149,35 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
 
   ngOnDestroy() {
     this.detenerCronometro();
+    this.cancelarReintentos();
   }
 
   ngOnChanges(changes: any) {
     // Cuando se abre el modal, preparar la información de la rutina pero NO crear sesión aún
     if (changes.open && changes.open.currentValue === true) {
+      // Limpiar estado anterior
+      this.ejerciciosSesion.set([]);
+      this.sesionActual.set(null);
+      this.errorSesion.set(null);
+      this.cargandoEjercicios.set(true);
+      this.intentosCarga = 0;
+      this.cancelarReintentos();
+      
+      // Cargar ejercicios
       this.prepararInformacionRutina();
+    }
+    
+    // Cuando se cierra el modal, limpiar estado
+    if (changes.open && changes.open.currentValue === false) {
+      this.detenerCronometro();
+      this.reiniciarCronometro();
+      this.ejerciciosSesion.set([]);
+      this.sesionActual.set(null);
+      this.errorSesion.set(null);
+      this.cargandoEjercicios.set(false);
+      this.intentosCarga = 0;
+      this.cancelarReintentos();
+      this.mostrarMenuCompartir.set(false);
     }
   }
 
@@ -174,6 +209,8 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
 
   // Método público para recargar la información de la rutina
   recargarRutina() {
+    this.ejerciciosSesion.set([]);
+    this.errorSesion.set(null);
     this.prepararInformacionRutina();
   }
 
@@ -214,16 +251,56 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   private async prepararInformacionRutina() {
+    // Guardas básicas: requerimos IDs válidos
+    if (!this.rutinaId || !this.entrenadoId) {
+      return;
+    }
+
+    this.errorSesion.set(null);
+    this.cargandoEjercicios.set(true);
+    this.intentosCarga++;
+
     try {
-      this.errorSesion.set(null);
       // Obtener los ejercicios de la rutina sin crear sesión
       const ejercicios = await this.sesionRutinaService.getEjerciciosByRutinaId(this.rutinaId);
-      if (ejercicios && ejercicios.length > 0) {
+
+      if (Array.isArray(ejercicios) && ejercicios.length > 0) {
         this.cargarEjerciciosDesdeDatos(ejercicios);
+        this.cargandoEjercicios.set(false);
+        return;
       }
-    } catch (error) {
+
+      // Si no hay ejercicios, puede ser que la rutina aún no se haya cargado en memoria
+      throw new Error('NO_EJERCICIOS');
+    } catch (error: any) {
+      // Si aún está abierto el modal, reintentar con backoff antes de mostrar error
+      const puedeReintentar = this.open && this.intentosCarga < this.maxIntentosCarga;
+      if (puedeReintentar) {
+        const delay = 200 * Math.pow(2, this.intentosCarga - 1); // 200, 400, 800, 1600, ...
+        this.programarReintento(delay);
+        return;
+      }
+
       console.error('Error al preparar información de rutina:', error);
       this.errorSesion.set('Error al cargar la información de la rutina.');
+      this.cargandoEjercicios.set(false);
+    }
+  }
+
+  private programarReintento(delayMs: number) {
+    this.cancelarReintentos();
+    this.cargaTimeout = setTimeout(() => {
+      // Solo reintentar si el modal sigue abierto
+      if (this.open) {
+        this.prepararInformacionRutina();
+      }
+    }, Math.min(delayMs, 2000));
+  }
+
+  private cancelarReintentos() {
+    if (this.cargaTimeout) {
+      clearTimeout(this.cargaTimeout);
+      this.cargaTimeout = null;
     }
   }
 
@@ -323,6 +400,177 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
       ejercicios.map(e => ({ ...e, completado: false, seriesCompletadas: 0 }))
     );
     this.errorSesion.set(null);
+  }
+
+  async compartirRutina(platform: 'instagram' | 'facebook' | 'twitter' | 'whatsapp') {
+    if (this.compartiendoRutina()) return;
+
+    const sesion = this.sesionActual();
+    if (!sesion || !sesion.completada) {
+      this.mostrarErrorTemporal('Solo puedes compartir rutinas completadas.');
+      return;
+    }
+
+    // Ocultar menú al iniciar
+    this.mostrarMenuCompartir.set(false);
+
+    this.compartiendoRutina.set(true);
+
+    try {
+      // Generar imagen personalizada con datos de la sesión
+      const blob = await this.generarImagenSesion(sesion);
+      
+      // Compartir la imagen
+      if (navigator.share && navigator.canShare({ files: [new File([blob], 'sesion-rutina.png', { type: 'image/png' })] })) {
+        const file = new File([blob], 'sesion-rutina.png', { type: 'image/png' });
+        await navigator.share({
+          files: [file],
+          title: '¡Rutina completada!',
+          text: `¡Completé mi rutina "${sesion.rutinaResumen.nombre}"! 💪`,
+        });
+      } else {
+        // Descargar imagen
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `rutina-${sesion.rutinaResumen.nombre.replace(/\s+/g, '-')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+      
+      console.log('Rutina compartida exitosamente en', platform);
+    } catch (error) {
+      console.error('Error al compartir rutina:', error);
+      this.mostrarErrorTemporal('Error al compartir la rutina. Inténtalo de nuevo.');
+    } finally {
+      this.compartiendoRutina.set(false);
+    }
+  }
+
+  // Control del menú de compartir
+  toggleMenuCompartir(event?: Event) {
+    if (event) event.stopPropagation();
+    if (this.compartiendoRutina()) return;
+    this.mostrarMenuCompartir.update(v => !v);
+  }
+
+  cerrarMenuCompartir() {
+    this.mostrarMenuCompartir.set(false);
+  }
+
+  onDocumentClick() {
+    this.cerrarMenuCompartir();
+  }
+
+  private async generarImagenSesion(sesion: SesionRutina): Promise<Blob> {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      throw new Error('No se pudo obtener el contexto del canvas');
+    }
+
+    // Fondo con gradiente
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#1e3a8a'); // blue-900
+    gradient.addColorStop(1, '#7c3aed'); // purple-600
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Título
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 64px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('¡Rutina Completada! 🎉', canvas.width / 2, 120);
+
+    // Nombre de la rutina
+    ctx.font = 'bold 48px Arial';
+    ctx.fillText(sesion.rutinaResumen.nombre, canvas.width / 2, 200);
+
+    // Estadísticas de la sesión
+    const stats = [
+      { label: 'Tiempo', value: this.formatearTiempo(sesion.duracion || 0), icon: '⏱️' },
+      { label: 'Ejercicios', value: `${this.ejerciciosSesion().filter(e => e.completado).length}/${this.ejerciciosSesion().length}`, icon: '💪' },
+      { label: 'Completado', value: `${sesion.porcentajeCompletado || 100}%`, icon: '✅' },
+      { label: 'Fecha', value: new Date(sesion.fechaFin!).toLocaleDateString('es-AR'), icon: '📅' }
+    ];
+
+    let yPos = 320;
+    const boxWidth = 450;
+    const boxHeight = 100;
+    const spacing = 20;
+
+    stats.forEach((stat, index) => {
+      if (index % 2 === 0) {
+        // Columna izquierda
+        this.dibujarCajaStat(ctx, 100, yPos, boxWidth, boxHeight, stat);
+      } else {
+        // Columna derecha
+        this.dibujarCajaStat(ctx, 530, yPos, boxWidth, boxHeight, stat);
+        yPos += boxHeight + spacing;
+      }
+    });
+
+    // Mensaje motivacional
+    yPos += 60;
+    ctx.font = 'italic 28px Arial';
+    ctx.fillStyle = '#fbbf24'; // yellow-400
+    ctx.fillText('¡Sigue así! Cada día eres más fuerte 💯', canvas.width / 2, yPos);
+
+    // Watermark
+    yPos = canvas.height - 120;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, yPos, canvas.width, 120);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText('Exportá tu progreso completo en PDF', canvas.width / 2, yPos + 40);
+    ctx.fillText('— desbloqueá con Premium', canvas.width / 2, yPos + 75);
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Error al generar la imagen'));
+          }
+        },
+        'image/png',
+        0.95
+      );
+    });
+  }
+
+  private dibujarCajaStat(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, stat: { label: string, value: string, icon: string }) {
+    // Fondo de la caja
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.fillRect(x, y, width, height);
+
+    // Borde
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y, width, height);
+
+    // Icono
+    ctx.font = '32px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'left';
+    ctx.fillText(stat.icon, x + 20, y + 50);
+
+    // Label
+    ctx.font = '20px Arial';
+    ctx.fillStyle = '#e5e7eb'; // gray-200
+    ctx.fillText(stat.label, x + 70, y + 35);
+
+    // Value
+    ctx.font = 'bold 32px Arial';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(stat.value, x + 70, y + 70);
   }
 
   closeModal() {

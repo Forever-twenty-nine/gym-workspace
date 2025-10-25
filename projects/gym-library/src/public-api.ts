@@ -47,6 +47,13 @@ export * from './lib/services/invitacion.service';
 export * from './lib/services/sesion-rutina.service';
 export * from './lib/services/zone-runner.service';
 export * from './lib/services/firebase-adapter-base';
+export * from './lib/services/progreso.service';
+export * from './lib/services/social-share.service';
+/*
+ * componentes
+ */
+export * from './lib/components/social-share-button.component';
+export * from './lib/components/social-share-panel.component';
 /*
  * interfaces para adaptadores
  */

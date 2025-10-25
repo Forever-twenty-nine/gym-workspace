@@ -1,7 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { SesionRutinaService, RutinaService, Rutina, SesionRutina } from 'gym-library';
+import { SesionRutinaService, RutinaService, Rutina, SesionRutina, SocialShareService } from 'gym-library';
 
 @Component({
   selector: 'app-entrenado-estadisticas',
@@ -12,8 +12,10 @@ export class EntrenadoEstadisticas {
   private readonly route = inject(ActivatedRoute);
   private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly rutinaService = inject(RutinaService);
+  private readonly socialShareService = inject(SocialShareService);
 
   readonly entrenadoId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
+  readonly compartiendoEstadisticas = signal(false);
 
   // Estadísticas calculadas desde las sesiones de rutinas
   readonly estadisticas = computed(() => {
@@ -103,5 +105,34 @@ export class EntrenadoEstadisticas {
     }
 
     return racha;
+  }
+
+  async compartirEstadisticas(platform: 'instagram' | 'facebook' | 'twitter' | 'whatsapp') {
+    if (this.compartiendoEstadisticas()) return;
+
+    const id = this.entrenadoId();
+    if (!id) {
+      console.error('No hay entrenadoId disponible');
+      return;
+    }
+
+    this.compartiendoEstadisticas.set(true);
+
+    try {
+      await this.socialShareService.generateAndShare(
+        id,
+        platform,
+        {
+          includeStats: true,
+          includeLevel: true,
+          includeStreak: true
+        }
+      );
+      console.log('Estadísticas compartidas exitosamente en', platform);
+    } catch (error) {
+      console.error('Error al compartir estadísticas:', error);
+    } finally {
+      this.compartiendoEstadisticas.set(false);
+    }
   }
 }

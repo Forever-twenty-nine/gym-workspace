@@ -9,20 +9,88 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
             <div>
-              <h2 class="text-2xl font-bold">Ejecutar Rutina</h2>
-              @if (sesionActual(); as sesion) {
-                <p class="text-blue-100">Sesión de {{ sesion.entrenadoId }}</p>
+              <h2 class="text-2xl font-bold">
+                @if (sesionCompletada()) {
+                  ¡Rutina Completada! 🎉
+                } @else if (sesionIniciada()) {
+                  Ejecutar Rutina
+                } @else {
+                  Preparar Rutina
+                }
+              </h2>
+              @if (sesionCompleta(); as sesion) {
+                <p class="text-blue-100">{{ sesion.rutinaResumen.nombre || 'Rutina' }}</p>
+              } @else if (cargandoEjercicios()) {
+                <p class="text-blue-100">Cargando ejercicios...</p>
+              } @else if (hayEjercicios()) {
+                <p class="text-blue-100">Rutina lista para comenzar</p>
+              } @else if (errorSesion()) {
+                <p class="text-red-200">Error al cargar rutina</p>
               } @else {
-                <p class="text-red-100">Cargando sesión...</p>
+                <p class="text-blue-100">Preparando rutina...</p>
               }
             </div>
           </div>
-          <button type="button" class="text-white hover:text-gray-200 transition-colors" (click)="closeModal()">
-            <span class="sr-only">Cerrar</span>
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
+          <div class="flex items-center space-x-2">
+            <!-- Botón de compartir - SOLO visible cuando la sesión está completada -->
+            @if (sesionCompletada()) {
+              <div class="relative" (click)="$event.stopPropagation()">
+                <button type="button" 
+                        [disabled]="compartiendoRutina()"
+                        (click)="toggleMenuCompartir($event)"
+                        class="text-white hover:text-gray-200 transition-colors p-2 hover:bg-white/10 rounded-lg disabled:opacity-50"
+                        title="Compartir resultados">
+                  @if (compartiendoRutina()) {
+                    <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                  } @else {
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                    </svg>
+                  }
+                </button>
+                
+                <!-- Menú desplegable de compartir (toggle por click) -->
+                @if (!compartiendoRutina() && mostrarMenuCompartir()) {
+                  <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 z-50">
+                    <button type="button"
+                            (click)="compartirRutina('instagram')"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-600 flex items-center space-x-2">
+                      <span>📷</span>
+                      <span>Instagram</span>
+                    </button>
+                    <button type="button"
+                            (click)="compartirRutina('facebook')"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 flex items-center space-x-2">
+                      <span>👍</span>
+                      <span>Facebook</span>
+                    </button>
+                    <button type="button"
+                            (click)="compartirRutina('twitter')"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 hover:text-sky-600 flex items-center space-x-2">
+                      <span>🐦</span>
+                      <span>Twitter</span>
+                    </button>
+                    <button type="button"
+                            (click)="compartirRutina('whatsapp')"
+                            class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-600 flex items-center space-x-2">
+                      <span>💬</span>
+                      <span>WhatsApp</span>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            
+            <!-- Botón de cerrar -->
+            <button type="button" class="text-white hover:text-gray-200 transition-colors" (click)="closeModal()">
+              <span class="sr-only">Cerrar</span>
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -170,16 +238,16 @@
                 </button>
               </div>
             </div>
-          } @else if (!sesionActual() && !hayEjercicios()) {
-            <!-- Estado inicial: rutina no encontrada o no cargada aún -->
+          } @else if (cargandoEjercicios()) {
+            <!-- Estado de carga -->
             <div class="text-center py-8">
               <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                <svg class="w-6 h-6 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
               </div>
-              <h4 class="text-lg font-medium text-gray-900 mb-2">Cargando rutina...</h4>
-              <p class="text-gray-500 mb-4">Preparando la información de la rutina.</p>
+              <h4 class="text-lg font-medium text-gray-900 mb-2">Cargando ejercicios...</h4>
+              <p class="text-gray-500">Preparando tu rutina.</p>
             </div>
           } @else if (hayEjercicios()) {
             <div class="space-y-3">
