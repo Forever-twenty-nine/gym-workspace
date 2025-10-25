@@ -212,6 +212,7 @@ pids
 firebase-debug.log
 firestore-debug.log
 emulator-data/
+firebase-export-*/
 
 # Capacitor
 .capacitor/

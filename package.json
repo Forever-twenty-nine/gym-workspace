@@ -2,7 +2,8 @@
   "name": "gym-workspace",
   "version": "0.0.0",
   "scripts": {
-    "emulator:start": "npx firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
+    "emulator:start": "npx firebase emulators:start --project=default-project --import=./emulator-data",
+    "emulator:start:with-export": "npx firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
     "emulator:export": "npx firebase emulators:export ./emulator-data",
     "emulator:import": "npx firebase emulators:start --import=./emulator-data",
     "kill-emulator-8080": "pwsh -NoProfile -File scripts/kill-emulator.ps1",
