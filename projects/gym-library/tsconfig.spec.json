@@ -5,8 +5,16 @@
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
     "types": [
-      "jasmine"
-    ]
+      "jest"
+    ],
+    "module": "commonjs",
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@angular/core": ["../../node_modules/@angular/core"]
+    }
   },
   "include": [
     "src/**/*.ts"

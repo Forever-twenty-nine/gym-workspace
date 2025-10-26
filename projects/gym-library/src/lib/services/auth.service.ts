@@ -1,4 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal } from '@angular/core';
+// Standalone: no es necesario 'providedIn'
 import { User } from '../models/user.model';
 
 export interface IAuthAdapter {
@@ -10,7 +11,7 @@ export interface IAuthAdapter {
   isAuthenticated(): Promise<boolean>;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AuthService {
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isAuthenticated = signal<boolean>(false);
@@ -18,6 +19,36 @@ export class AuthService {
   private readonly _error = signal<string | null>(null);
   
   private authAdapter?: IAuthAdapter;
+  /**
+   * Método privado para manejar login/register con lógica DRY
+   */
+  private async handleAuth(
+    action: () => Promise<{ success: boolean; user?: User; error?: string }>,
+    errorMsg: string
+  ): Promise<boolean> {
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      const result = await action();
+      if (result.success && result.user) {
+        this._currentUser.set(result.user);
+        this._isAuthenticated.set(true);
+        return true;
+      } else {
+        this._error.set(result.error || errorMsg);
+        return false;
+      }
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        this._error.set((error as { message?: string }).message || errorMsg);
+      } else {
+        this._error.set(errorMsg);
+      }
+      return false;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
 
   constructor() {
     // La inicialización se hará cuando se configure el adaptador
@@ -67,27 +98,10 @@ export class AuthService {
     if (!this.authAdapter) {
       throw new Error('Auth adapter no configurado');
     }
-
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    try {
-      const result = await this.authAdapter.loginWithGoogle();
-      
-      if (result.success && result.user) {
-        this._currentUser.set(result.user);
-        this._isAuthenticated.set(true);
-        return true;
-      } else {
-        this._error.set(result.error || 'Error desconocido en login con Google');
-        return false;
-      }
-    } catch (error: any) {
-      this._error.set(error.message || 'Error desconocido');
-      return false;
-    } finally {
-      this._isLoading.set(false);
-    }
+    return this.handleAuth(
+      () => this.authAdapter!.loginWithGoogle(),
+      'Error desconocido en login con Google'
+    );
   }
 
   /**
@@ -97,27 +111,10 @@ export class AuthService {
     if (!this.authAdapter) {
       throw new Error('Auth adapter no configurado');
     }
-
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    try {
-      const result = await this.authAdapter.loginWithEmail(email, password);
-      
-      if (result.success && result.user) {
-        this._currentUser.set(result.user);
-        this._isAuthenticated.set(true);
-        return true;
-      } else {
-        this._error.set(result.error || 'Error desconocido en login con email');
-        return false;
-      }
-    } catch (error: any) {
-      this._error.set(error.message || 'Error desconocido');
-      return false;
-    } finally {
-      this._isLoading.set(false);
-    }
+    return this.handleAuth(
+      () => this.authAdapter!.loginWithEmail(email, password),
+      'Error desconocido en login con email'
+    );
   }
 
   /**
@@ -127,27 +124,10 @@ export class AuthService {
     if (!this.authAdapter) {
       throw new Error('Auth adapter no configurado');
     }
-
-    this._isLoading.set(true);
-    this._error.set(null);
-
-    try {
-      const result = await this.authAdapter.registerWithEmail(email, password);
-      
-      if (result.success && result.user) {
-        this._currentUser.set(result.user);
-        this._isAuthenticated.set(true);
-        return true;
-      } else {
-        this._error.set(result.error || 'Error desconocido en registro con email');
-        return false;
-      }
-    } catch (error: any) {
-      this._error.set(error.message || 'Error desconocido');
-      return false;
-    } finally {
-      this._isLoading.set(false);
-    }
+    return this.handleAuth(
+      () => this.authAdapter!.registerWithEmail(email, password),
+      'Error desconocido en registro con email'
+    );
   }
 
   /**
@@ -157,16 +137,18 @@ export class AuthService {
     if (!this.authAdapter) {
       throw new Error('Auth adapter no configurado');
     }
-
     this._isLoading.set(true);
     this._error.set(null);
-
     try {
       await this.authAdapter.logout();
       this._currentUser.set(null);
       this._isAuthenticated.set(false);
-    } catch (error: any) {
-      this._error.set(error.message || 'Error desconocido en logout');
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        this._error.set((error as { message?: string }).message || 'Error desconocido en logout');
+      } else {
+        this._error.set('Error desconocido en logout');
+      }
       throw error;
     } finally {
       this._isLoading.set(false);
@@ -178,16 +160,13 @@ export class AuthService {
    */
   private async checkCurrentUser(): Promise<void> {
     if (!this.authAdapter) return;
-
     this._isLoading.set(true);
-
     try {
       const user = await this.authAdapter.getCurrentUser();
       const isAuth = await this.authAdapter.isAuthenticated();
-      
       this._currentUser.set(user);
       this._isAuthenticated.set(isAuth);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.warn('Error verificando usuario actual:', error);
       this._currentUser.set(null);
       this._isAuthenticated.set(false);
@@ -215,5 +194,17 @@ export class AuthService {
    */
   async refreshAuth(): Promise<void> {
     await this.checkCurrentUser();
+  }
+
+  /**
+   * Para testing: expone los signals internos
+   */
+  get _signals() {
+    return {
+      _currentUser: this._currentUser,
+      _isAuthenticated: this._isAuthenticated,
+      _isLoading: this._isLoading,
+      _error: this._error,
+    };
   }
 }

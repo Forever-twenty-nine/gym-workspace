@@ -29,7 +29,7 @@ export class UserService {
    */
   setFirestoreAdapter(adapter: IUserFirestoreAdapter): void {
     this.firestoreAdapter = adapter;
-    this.initializeListener();
+    // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
   }
 
   /**
@@ -131,7 +131,6 @@ export class UserService {
     
     try {
       const docId = await this.firestoreAdapter.addUser(user, password);
-      console.log('🔄 UserService: Usuario agregado con ID:', docId);
       return docId;
     } catch (error: any) {
       console.error('🔄 UserService: Error al agregar usuario:', error);

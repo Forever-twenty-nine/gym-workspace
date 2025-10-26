@@ -23,7 +23,6 @@ export interface Notificacion {
 
         // Para mensajes
         mensajeId?: string;
-        conversacionId?: string;
         remitenteId?: string;
         remitenteNombre?: string;
 

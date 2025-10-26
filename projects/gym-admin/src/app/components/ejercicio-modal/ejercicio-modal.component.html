@@ -1,13 +1,13 @@
-<div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-     *ngIf="isOpen()"
-     (click)="onClose()">
-  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
-       (click)="$event.stopPropagation()">
+@if (isOpen()) {
+  <div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+       (click)="close.emit()">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all duration-300 scale-100"
+         (click)="$event.stopPropagation()">
     <!-- Header -->
     <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
       <h2 class="text-2xl font-bold text-gray-800">{{ modalTitle() }}</h2>
       <button class="p-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-full transition-all duration-200 hover:scale-110"
-              (click)="onClose()"
+              (click)="close.emit()"
               title="Cerrar">
         ✕
       </button>
@@ -92,55 +92,70 @@
         </div>
 
         <!-- Peso, Descanso y Serie -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="form-group">
-            <label for="peso" class="block text-sm font-medium text-gray-700 mb-2">
-              Peso (kg)
-            </label>
-            <input
-              id="peso"
-              type="number"
-              min="0"
-              step="0.5"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-              formControlName="peso"
-              placeholder="0"
-            />
+        @if (isFreePlan()) {
+          <div class="grid grid-cols-1 gap-4">
+            <div class="form-group">
+              <label for="peso" class="block text-sm font-medium text-gray-700 mb-2">
+                Peso (kg)
+              </label>
+              <input
+                id="peso"
+                type="number"
+                min="0"
+                step="0.5"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                formControlName="peso"
+                placeholder="0"
+              />
+            </div>
           </div>
+        }
 
-          <div class="form-group">
-            <label for="descansoSegundos" class="block text-sm font-medium text-gray-700 mb-2">
-              Descanso (segundos) *
-            </label>
-            <input
-              id="descansoSegundos"
-              type="number"
-              min="0"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-              formControlName="descansoSegundos"
-              [class.border-red-500]="ejercicioForm().get('descansoSegundos')?.invalid && ejercicioForm().get('descansoSegundos')?.touched"
-            />
-            @if (ejercicioForm().get('descansoSegundos')?.invalid && ejercicioForm().get('descansoSegundos')?.touched) {
-              <p class="mt-1 text-sm text-red-600">
-                Debe ser mayor o igual a 0
-              </p>
-            }
-          </div>
+        @if (!isFreePlan()) {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="form-group">
+              <label for="peso" class="block text-sm font-medium text-gray-700 mb-2">
+                Peso (kg)
+              </label>
+              <input
+                id="peso"
+                type="number"
+                min="0"
+                step="0.5"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                formControlName="peso"
+                placeholder="0"
+              />
+            </div>
 
-          <div class="form-group">
-            <label for="serieSegundos" class="block text-sm font-medium text-gray-700 mb-2">
-              Serie (segundos)
-            </label>
-            <input
-              id="serieSegundos"
-              type="number"
-              min="0"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
-              formControlName="serieSegundos"
-              placeholder="0"
-            />
+            <div class="form-group">
+              <label for="descansoSegundos" class="block text-sm font-medium text-gray-700 mb-2">
+                Descanso (segundos)
+              </label>
+              <input
+                id="descansoSegundos"
+                type="number"
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                formControlName="descansoSegundos"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="serieSegundos" class="block text-sm font-medium text-gray-700 mb-2">
+                Serie (segundos)
+              </label>
+              <input
+                id="serieSegundos"
+                type="number"
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+                formControlName="serieSegundos"
+                placeholder="0"
+              />
+            </div>
           </div>
-        </div>
+        }
       </form>
     </div>
 
@@ -149,7 +164,7 @@
       <button
         type="button"
         class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200"
-        (click)="onClose()"
+        (click)="close.emit()"
         [disabled]="isLoading()"
       >
         Cancelar
@@ -170,3 +185,4 @@
     </div>
   </div>
 </div>
+}

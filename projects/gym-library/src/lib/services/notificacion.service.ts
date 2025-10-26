@@ -23,7 +23,7 @@ export class NotificacionService {
      */
     setFirestoreAdapter(adapter: INotificacionFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
     }
 
     /**
@@ -34,6 +34,7 @@ export class NotificacionService {
         
         try {
             this.firestoreAdapter.initializeListener((notificaciones: Notificacion[]) => {
+                
                 this._notificaciones.set(notificaciones);
             });
             this.isListenerInitialized = true;

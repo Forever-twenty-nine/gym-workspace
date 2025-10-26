@@ -20,12 +20,11 @@ import {
   IonPopover,
   IonInput,
   IonTextarea,
-  IonSelect,
-  IonSelectOption
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
-import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService } from 'gym-library';
+import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService, TipoNotificacion } from 'gym-library';
 
 @Component({
   selector: 'app-entrenados',
@@ -52,9 +51,7 @@ import { AuthService, EntrenadoService, UserService, NotificacionService, Entren
     IonPopover,
     IonModal,
     IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption
+    IonTextarea
   ],
   styles: [`
     .entrenado-detail {
@@ -115,6 +112,7 @@ export class EntrenadosPage implements OnInit {
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);
   private invitacionService = inject(InvitacionService);
+  private toastController = inject(ToastController);
   private fb = inject(FormBuilder);
 
   isModalOpen = signal(false);
@@ -126,8 +124,7 @@ export class EntrenadosPage implements OnInit {
   invitacionForm = signal<FormGroup>(
     this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      mensaje: [''],
-      franjaHoraria: ['mañana']
+      mensaje: ['']
     })
   );
 
@@ -140,6 +137,15 @@ export class EntrenadosPage implements OnInit {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
+
+    /** Calcula la antigüedad en días desde la fecha de registro */
+    getAntiguedadDias(entrenado: Entrenado): number | null {
+      if (!entrenado.fechaRegistro) return null;
+      const fecha = new Date(entrenado.fechaRegistro);
+      const hoy = new Date();
+      const diffMs = hoy.getTime() - fecha.getTime();
+      return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    }
 
   constructor() {
     addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline });
@@ -161,7 +167,7 @@ export class EntrenadosPage implements OnInit {
 
   getRutinasAsignadasCount(entrenadoId: string): number {
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    return entrenado?.rutinasAsignadas?.length || 0;
+    return entrenado?.rutinasAsignadasIds?.length || 0;
   }
 
   getUserName(userId: string): string {
@@ -181,6 +187,14 @@ export class EntrenadosPage implements OnInit {
 
   async saveInvitacion() {
     if (this.invitacionForm().invalid) {
+      const toast = await this.toastController.create({
+        message: 'Por favor, completa todos los campos obligatorios',
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      await toast.present();
+      this.invitacionForm().markAllAsTouched();
       return;
     }
 
@@ -189,6 +203,13 @@ export class EntrenadosPage implements OnInit {
     const entrenadorId = this.authService.currentUser()?.uid;
 
     if (!entrenadorId) {
+      const toast = await this.toastController.create({
+        message: 'Error: No se pudo identificar al entrenador',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
       this.isLoading.set(false);
       return;
     }
@@ -198,6 +219,13 @@ export class EntrenadosPage implements OnInit {
     const usuarioId = usuarioInvitado?.uid;
 
     if (!usuarioId || !usuarioInvitado?.email) {
+      const toast = await this.toastController.create({
+        message: 'Error: No se encontró un usuario con ese email',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
       this.isLoading.set(false);
       return;
     }
@@ -219,9 +247,27 @@ export class EntrenadosPage implements OnInit {
         emailEntrenado,
         data.mensaje
       );
+
+      // Notificación de éxito
+      const successToast = await this.toastController.create({
+        message: 'Invitación enviada exitosamente',
+        duration: 3000,
+        color: 'success',
+        position: 'top'
+      });
+      await successToast.present();
+
+      this.invitacionForm().reset();
       this.closeInvitacionModal();
     } catch (error) {
       console.error('❌ Error al enviar invitación:', error);
+      const errorToast = await this.toastController.create({
+        message: 'Error al enviar la invitación. Inténtalo de nuevo.',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await errorToast.present();
     } finally {
       this.isLoading.set(false);
     }
@@ -244,7 +290,7 @@ export class EntrenadosPage implements OnInit {
 
   private cargarRutinasEntrenado(entrenadoId: string) {
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinaIds = entrenado?.rutinasAsignadas || [];
+    const rutinaIds = entrenado?.rutinasAsignadasIds || [];
     const rutinas = this.rutinaService.rutinas().filter(r => rutinaIds.includes(r.id));
     this.rutinasEntrenado.set(rutinas);
   }
@@ -256,7 +302,7 @@ export class EntrenadosPage implements OnInit {
 
     const rutinas = this.rutinaService.rutinas();
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinasAsignadas = entrenado?.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado?.rutinasAsignadasIds || [];
     const rutinasEntrenador = rutinas.filter(rutina => 
       !rutinasAsignadas.includes(rutina.id)
     );
@@ -267,7 +313,7 @@ export class EntrenadosPage implements OnInit {
     if (!this.selectedEntrenado()) return;
 
     const entrenado = this.selectedEntrenado()!;
-    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado.rutinasAsignadasIds || [];
 
     // Si ya está asignada, no hacer nada
     if (rutinasAsignadas.includes(rutina.id)) {
@@ -276,7 +322,7 @@ export class EntrenadosPage implements OnInit {
 
     const entrenadoActualizado: Entrenado = {
       ...entrenado,
-      rutinasAsignadas: [...rutinasAsignadas, rutina.id]
+      rutinasAsignadasIds: [...rutinasAsignadas, rutina.id]
     };
 
     try {
@@ -297,12 +343,12 @@ export class EntrenadosPage implements OnInit {
     if (!this.selectedEntrenado()) return;
 
     const entrenado = this.selectedEntrenado()!;
-    const rutinasAsignadas = entrenado.rutinasAsignadas || [];
+    const rutinasAsignadas = entrenado.rutinasAsignadasIds || [];
     const nuevosAsignados = rutinasAsignadas.filter(id => id !== rutina.id);
 
     const entrenadoActualizado: Entrenado = {
       ...entrenado,
-      rutinasAsignadas: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
+      rutinasAsignadasIds: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
     };
 
     try {

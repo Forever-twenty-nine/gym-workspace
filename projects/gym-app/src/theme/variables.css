@@ -4,19 +4,20 @@
 
 
 /* ============================================================================
- * 1) Light Theme - Brand : https: //ionicframework.com/docs/theming/color-generator
+ * 1) Light Theme Brand
+      - Generamos la paleta de colores light base de la marca
  * ============================================================================ */
---brand-primary-color: #7ebc08;
---brand-primary-shade: #6ca208;
---brand-primary-tint: #96cf2a;
---brand-secondary-color: #8e967b;
---brand-tertiary-color: #50e3c2;
---brand-success-color: #2dd36f;
+--brand-primary-color: #BBE40A; /*#d6fe51;*/ /*#D2F801*/
+/* --brand-primary-shade: #6ca208;
+--brand-primary-tint: #96cf2a; */
+--brand-secondary-color: #e45328;
+/* --brand-tertiary-color: #50e3c2; */
+/* --brand-success-color: #2dd36f;
 --brand-warning-color: #fecc28;
---brand-danger-color: #eb445a;
+--brand-danger-color: #eb445a; */
 --brand-light-color: #f4f5f8;
---brand-medium-color: #92949c;
---brand-dark-color: #222428;
+--brand-medium-color: #2f302e;
+--brand-dark-color: #171717;
 
 
 
@@ -24,7 +25,9 @@
 
 
 /* ============================================================================
- * 2) Light Theme - Ionic
+ * 2) Light Theme Ionic
+   - Ionic https: //ionicframework.com/docs/theming/color-generator
+   - Definimos las variables de Ionic usando los colores de la marca.
  * ============================================================================ */
 
   /* 2.a) - Ionic Color Variables */
@@ -62,6 +65,13 @@
     /* --ion-backdrop-opacity: green; */
     /* --ion-overlay-background-color: blue; ETC */
 
+
+
+    /* Variables de componentes propios */
+    --color-title: var(--brand-dark-color);
+    --color-text: var(--brand-medium-color);
+    --color-primary: var(--brand-primary-color);
+    --color-tab: var(--brand-medium-color);
 }
 
 
@@ -71,22 +81,24 @@
 .dark {
   /* ============================================================================
    * 3) - Dark Theme - Brand
+    - Generamos la paleta de colores dark base de la marca
    * ============================================================================ */
-  --brand-primary-color: #b3ed10;
-  --brand-primary-shade: #94c30d;
-  --brand-primary-tint: #cbf53c;
-  --brand-secondary-color: #8e967b;
-  --brand-tertiary-color: #61f2d0;
+  --brand-primary-color: #BBE40A;
+  /* --brand-primary-shade: #94c30d;
+  --brand-primary-tint: #cbf53c; */
+  --brand-secondary-color: #e45328;
+  /* --brand-tertiary-color: #61f2d0;
   --brand-success-color: #00ff9d;
   --brand-warning-color: #ffd860;
-  --brand-danger-color: #ff5a5f;
-  --brand-light-color: #1e1e1e;
-  --brand-medium-color: #3a3a3a;
-  --brand-dark-color: #000000;
+  --brand-danger-color: #ff5a5f; */
+  --brand-light-color: #f9f9f9;
+  --brand-medium-color: #2f302e;
+  --brand-dark-color: #171717;
 
 
   /* ============================================================================
    * 4) - Dark Theme - Ionic
+    - Definimos las variables de Ionic usando los colores de la marca.
    * ============================================================================ */
   --ion-color-primary: var(--brand-primary-color);
   --ion-color-primary-rgb: 126, 188, 8;
@@ -103,7 +115,45 @@
   --ion-color-light: var(--brand-light-color);
   --ion-color-medium: var(--brand-medium-color);
   --ion-color-dark: var(--brand-dark-color);
+
+
+
+  /* Variables de componentes propios */
+  --color-title: var(--brand-light-color);
+  --color-text: var(--brand-medium-color);
+  --color-primary: var(--brand-primary-color);
+  --color-tab: var(--brand-medium-color);
 }
 
+
+
+/* Clases componentes */
+
+.gym-title-color{
+  color: var(--color-title);
+}
+
+.gym-text-color{
+  color: var(--color-text)
+}
+
+.gym-text-highlight {
+  color: var(--color-primary)
+}
+
+.gym-box-primary{
+  background-color: var(--brand-primary-color);
+}
+.gym-box-secondary {
+  background-color: var(--brand-secondary-color);
+}
+.gym-box-neutro {
+  background-color: var(--brand-medium-color);
+}
+
+
+.gym-tab-entrenado ion-tab-bar {
+  --background: var(--color-tab)
+}
 
 

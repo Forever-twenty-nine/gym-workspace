@@ -1,25 +1,54 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   EntrenadoService,
   UserService,
   RutinaService,
   EntrenadorService,
   InvitacionService,
-  ProgresoService,
+  SesionRutinaService,
   EjercicioService,
-  PlanLimitError
+  EstadisticasEntrenadoService,
+  RutinaAsignadaService,
+  NotificacionService,
+  PlanLimitError,
+  Invitacion,
+  RutinaAsignada
 } from 'gym-library';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';
+import { RutinaSesionModalComponent } from '../rutina-sesion.modal/rutina-sesion.modal';
+import { RutinasSemanalComponent } from './rutinas-semanal/rutinas-semanal';
+import { NotificacionesPanelComponent } from '../../../components/notificaciones-panel/notificaciones-panel.component';
+import { InvitacionesModalComponent } from './invitaciones/invitaciones';
+
+// Tipos locales que extienden los de la librería
+type RutinaAsignadaConInfo = RutinaAsignada & {
+  rutina?: any;
+  tipoAsignacion?: string;
+};
+
+interface DiaInfo {
+  fecha: Date;
+  diaNombre: string;
+  diaNumero: number;
+  rutinas: RutinaAsignadaConInfo[];
+  esHoy: boolean;
+  fechaFormateada: string;
+}
 
 @Component({
   selector: 'app-entrenado-detail',
   imports: [
-    CommonModule,
-    ToastComponent
+  CommonModule,
+  ToastComponent,
+  RouterModule,
+  RutinaSesionModalComponent,
+  RutinasSemanalComponent,
+  NotificacionesPanelComponent,
+  InvitacionesModalComponent
   ],
   templateUrl: './entrenado-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,11 +64,49 @@ export class EntrenadoDetail implements OnInit {
   private readonly rutinaService = inject(RutinaService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly invitacionService = inject(InvitacionService);
-  private readonly progresoService = inject(ProgresoService);
+  private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly ejercicioService = inject(EjercicioService);
+  private readonly estadisticasService = inject(EstadisticasEntrenadoService);
+  private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
+  private readonly notificacionService = inject(NotificacionService);
   // Usaremos el InvitacionService.aceptarInvitacion implementado en la librería
 
+    // Día actual de la semana (0 = domingo, 1 = lunes, etc.)
+  readonly diaActual = new Date().getDay();
+
   entrenadoId = signal<string>('');
+
+  // Signals para el estado del componente
+  readonly isLoading = signal(false);
+  readonly mostrarModalSesiones = signal(false);
+  readonly mostrarModalInvitacion = signal(false);
+  readonly rutinaSeleccionada = signal<string>('');
+  readonly invitacionSeleccionada = signal<Invitacion | null>(null);
+  readonly navigated = signal(false);
+
+  constructor() {
+    // Effect para actualizar el título y manejar navegación
+    effect(() => {
+      const entrenado = this.entrenado();
+      const id = this.entrenadoId();
+      if (entrenado) {
+        this.pageTitleService.setTitle(`Entrenado: ${entrenado.displayName || id}`);
+      } else if (!this.navigated()) {
+        this.navigated.set(true);
+        this.router.navigate(['/entrenados']);
+      }
+    });
+
+    // Effect para generar notificaciones de rutinas próximas cuando cambian las asignaciones activas
+    effect(() => {
+      const id = this.entrenadoId();
+      if (!id) return;
+      // Observa cambios en las rutinas asignadas activas del entrenado
+      const _ = this.rutinaAsignadaService.getRutinasAsignadasActivasByEntrenado(id)();
+      // Lanza chequeo (idempotente por ID determinista)
+      this.rutinaAsignadaService.checkAndNotifyRutinasProximas(id, 24);
+    });
+  }
 
   entrenado = computed(() => {
     const id = this.entrenadoId();
@@ -60,102 +127,45 @@ export class EntrenadoDetail implements OnInit {
     };
   });
 
-  // Signals para el estado del componente
-  readonly isLoading = signal(false);
-  readonly mostrarInvitaciones = signal(false);
-
   ngOnInit() {
-    // Los listeners se inicializan automáticamente cuando se accede a las señales
-    this.entrenadorService.initializeListener();
-    // Inicializar listeners de invitaciones
-    this.invitacionService.invitaciones();
-
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadoId.set(id);
-      setTimeout(() => {
-        const entrenado = this.entrenado();
-        if (entrenado) {
-          this.pageTitleService.setTitle(`Entrenado: ${entrenado.displayName || id}`);
-        } else {
-          this.router.navigate(['/entrenados']);
-        }
-      }, 0);
-    } else {
-      this.router.navigate(['/entrenados']);
+      this.estadisticasService.initializeListener(id);
     }
+
+    this.entrenadorService.initializeListener();
+    this.rutinaService.rutinas();
+    this.invitacionService.invitaciones();
+    this.rutinaAsignadaService.getRutinasAsignadas();
+    // Inicializar listener de notificaciones para que se carguen las notificaciones del entrenado
+    this.notificacionService.notificaciones();
   }
 
-  // Rutinas asignadas al entrenado con progreso
-  readonly rutinasAsignadas = computed(() => {
-    const entrenado = this.entrenado();
-    if (!entrenado?.rutinasAsignadas) return [];
+    // Rutinas asignadas al entrenado con información completa
+  readonly rutinasAsignadasConInfo = computed(() => {
+    const entrenadoId = this.entrenadoId();
+    if (!entrenadoId) return [];
 
-    return this.rutinaService.rutinas()
-      .filter(rutina => entrenado.rutinasAsignadas!.includes(rutina.id))
-      .map(rutina => {
-        const progreso = this.progresoService.getProgresoRutina(entrenado.id, rutina.id)();
+    const rutinasAsignadas = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(entrenadoId)();
+    const rutinas = this.rutinaService.rutinas();
+
+    return rutinasAsignadas
+      .filter(ra => ra.activa)
+      .map(ra => {
+        const rutina = rutinas.find(r => r.id === ra.rutinaId);
         return {
-          ...rutina,
-          progreso: progreso || null
+          ...ra,
+          rutina: rutina || null
         };
-      });
-  });
-
-  // Rutinas organizadas por días de la semana (solo semana actual)
-  readonly rutinasPorDia = computed(() => {
-    const rutinas = this.rutinasAsignadas();
-    const hoy = new Date();
-
-    // Calcular fechas para la próxima semana (7 días)
-    const fechas = [];
-    for (let i = 0; i < 7; i++) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() + i);
-      fechas.push(fecha);
-    }
-
-    // Organizar por día
-    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; diaCompleto: string; esHoy: boolean; } } = {};
-
-    fechas.forEach(fecha => {
-      // Usar los mismos valores que se guardan en el modal (sin tildes)
-      const diaSemanaIndex = fecha.getDay();
-      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-      const diasSemanaConTilde = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
-      const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-
-      const diaSemana = diasSemanaSinTilde[diaSemanaIndex]; // Usar sin tilde para comparación
-      const diaCorto = diasSemanaCorto[diaSemanaIndex];
-      const diaCompleto = diasSemanaConTilde[diaSemanaIndex]; // Mostrar con tilde
-      const fechaKey = fecha.toISOString().split('T')[0];
-
-      if (!rutinasOrganizadas[fechaKey]) {
-        rutinasOrganizadas[fechaKey] = {
-          fecha: new Date(fecha),
-          rutinas: [],
-          diaCorto,
-          diaCompleto,
-          esHoy: fecha.toDateString() === hoy.toDateString()
-        };
-      }
-
-      // Agregar rutinas que corresponden a este día
-      rutinas.forEach(rutina => {
-        if (rutina.DiasSemana && rutina.DiasSemana.includes(diaSemana)) {
-          rutinasOrganizadas[fechaKey].rutinas.push(rutina);
-        }
-      });
-    });
-
-    // Convertir a array y ordenar por fecha
-    return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+      })
+      .filter(item => item.rutina !== null);
   });
 
   // Estadísticas del entrenado
   readonly estadisticas = computed(() => {
     const id = this.entrenadoId();
-    return this.progresoService.getEstadisticas(id)();
+    return this.estadisticasService.getEstadisticas(id)();
   });
 
   // Invitaciones pendientes del entrenado
@@ -166,6 +176,22 @@ export class EntrenadoDetail implements OnInit {
     return this.invitacionService.getInvitacionesPendientesPorEntrenado(id)();
   });
 
+  // Notificaciones del entrenado (solo no leídas)
+  readonly notificacionesEntrenado = computed(() => {
+    const id = this.entrenadoId();
+    if (!id) return [];
+
+    return this.notificacionService.getNotificacionesNoLeidas(id)();
+  });
+
+  // Notificaciones no leídas del entrenado
+  readonly notificacionesNoLeidas = computed(() => {
+    const id = this.entrenadoId();
+    if (!id) return 0;
+
+    return this.notificacionService.getContadorNoLeidas(id)();
+  });
+
   // --------------------------------------------
   // Boton volver
   // --------------------------------------------
@@ -174,79 +200,16 @@ export class EntrenadoDetail implements OnInit {
   }
 
   // --------------------------------------------
-  // Formatear fecha
-  // --------------------------------------------
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return 'Sin fecha';
-    const date = fecha instanceof Date ? fecha : new Date(fecha);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-  // --------------------------------------------
-  // Iniciar rutina para el entrenado
-  // --------------------------------------------
-  async iniciarRutina(rutinaId: string) {
-    try {
-      await this.progresoService.iniciarRutina(this.entrenadoId(), rutinaId);
-      this.toastService.log('Rutina iniciada correctamente');
-    } catch (error: any) {
-      console.error('Error al iniciar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
-  // Completar rutina para el entrenado
-  // --------------------------------------------
-  async completarRutina(rutinaId: string) {
-    try {
-      await this.progresoService.completarRutina(this.entrenadoId(), rutinaId);
-      this.toastService.log('Rutina completada correctamente');
-    } catch (error: any) {
-      console.error('Error al completar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
-  // Marcar rutina como completada (DEPRECATED - usar completarRutina)
-  // --------------------------------------------
-  async marcarRutinaCompletada(rutina: any) {
-    try {
-      const entrenadoId = this.entrenadoId();
-      const progreso = this.progresoService.getProgresoRutina(entrenadoId, rutina.id)();
-
-      if (progreso?.completado) {
-        // Si ya está completada, reiniciarla
-        await this.progresoService.reiniciarRutina(entrenadoId, rutina.id);
-        this.toastService.log('Rutina reiniciada');
-      } else {
-        // Si no está completada, completarla
-        await this.completarRutina(rutina.id);
-      }
-    } catch (error: any) {
-      console.error('Error al actualizar rutina:', error);
-      this.toastService.log(`ERROR: ${error.message}`);
-    }
-  }
-
-  // --------------------------------------------
   // Ver progreso detallado de una rutina
   // --------------------------------------------
-  verProgresoRutina(rutinaId: string) {
-    this.router.navigate(['/entrenados', this.entrenadoId(), 'rutinas', rutinaId]);
-  }
+  // Método de progreso eliminado. Usar sesiones o estadísticas si es necesario.
 
   // --------------------------------------------
   // Aceptar invitación
   // --------------------------------------------
-  async aceptarInvitacion(invitacion: any) {
+  async aceptarInvitacion(invitacionId: string) {
     try {
-      await this.invitacionService.aceptarInvitacion(invitacion.id);
+      await this.invitacionService.aceptarInvitacion(invitacionId);
       this.toastService.log('Invitación aceptada y vinculada correctamente');
     } catch (error: any) {
       console.error('Error al aceptar y vincular invitación:', error);
@@ -261,13 +224,63 @@ export class EntrenadoDetail implements OnInit {
   // --------------------------------------------
   // Rechazar invitación
   // --------------------------------------------
-  async rechazarInvitacion(invitacion: any) {
+  async rechazarInvitacion(invitacionId: string) {
     try {
-      await this.invitacionService.rechazarInvitacion(invitacion.id);
+      await this.invitacionService.rechazarInvitacion(invitacionId);
       this.toastService.log('Invitación rechazada');
     } catch (error: any) {
       console.error('Error al rechazar invitación:', error);
       this.toastService.log(`ERROR: ${error.message}`);
+    }
+  }
+
+  // --------------------------------------------
+  // Abrir modal de sesiones de rutina
+  // --------------------------------------------
+  abrirModalSesiones(rutinaId: string) {
+    if (!rutinaId || rutinaId.trim() === '') {
+      console.error('No se puede abrir el modal: rutinaId está vacío');
+      return;
+    }
+
+    this.rutinaSeleccionada.set(rutinaId);
+    this.mostrarModalSesiones.set(true);
+  }
+
+  cerrarModalSesiones() {
+    this.mostrarModalSesiones.set(false);
+    this.rutinaSeleccionada.set('');
+  }
+
+  // --------------------------------------------
+  // Abrir/cerrar modal de invitación
+  // --------------------------------------------
+  abrirModalInvitacion(invitacionId: string) {
+    const invitacion = this.invitacionService.invitaciones().find(i => i.id === invitacionId);
+    if (invitacion) {
+      this.invitacionSeleccionada.set(invitacion);
+      this.mostrarModalInvitacion.set(true);
+    }
+  }
+
+  cerrarModalInvitacion() {
+    this.mostrarModalInvitacion.set(false);
+    this.invitacionSeleccionada.set(null);
+  }
+
+  // --------------------------------------------
+  // Manejo de notificaciones
+  // --------------------------------------------
+  async marcarTodasNotificacionesComoLeidas() {
+    try {
+      const entrenadoId = this.entrenadoId();
+      if (entrenadoId) {
+        await this.notificacionService.marcarTodasComoLeidas(entrenadoId);
+        this.toastService.log('Todas las notificaciones marcadas como leídas');
+      }
+    } catch (error) {
+      console.error('Error al marcar todas las notificaciones como leídas:', error);
+      this.toastService.log('Error al marcar notificaciones como leídas');
     }
   }
 }

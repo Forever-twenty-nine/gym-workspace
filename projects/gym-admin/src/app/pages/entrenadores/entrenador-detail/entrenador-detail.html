@@ -68,9 +68,15 @@
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-purple-900">Ejercicios</h3>
             <button type="button" (click)="toggleModalEjercicios()"
-              class="px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center gap-2">
+              [disabled]="isAtEjercicioLimit()"
+              class="px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              [class.bg-purple-600]="!isAtEjercicioLimit()"
+              [class.bg-gray-400]="isAtEjercicioLimit()"
+              [class.hover:bg-purple-700]="!isAtEjercicioLimit()"
+              [class.hover:bg-gray-400]="isAtEjercicioLimit()"
+              [class.cursor-not-allowed]="isAtEjercicioLimit()">
               <span>+</span>
-              <span>Crear Ejercicio</span>
+              <span>{{ isAtEjercicioLimit() ? 'Límite alcanzado' : 'Crear Ejercicio' }}</span>
             </button>
           </div>
           <div class="space-y-2 max-h-40 overflow-y-auto">
@@ -110,9 +116,15 @@
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-green-900">Rutinas</h3>
             <button type="button" (click)="toggleModalRutinas()"
-              class="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center gap-2">
+              [disabled]="isAtRutinaLimit()"
+              class="px-3 py-2 text-sm font-medium text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+              [class.bg-green-600]="!isAtRutinaLimit()"
+              [class.bg-gray-400]="isAtRutinaLimit()"
+              [class.hover:bg-green-700]="!isAtRutinaLimit()"
+              [class.hover:bg-gray-400]="isAtRutinaLimit()"
+              [class.cursor-not-allowed]="isAtRutinaLimit()">
               <span>+</span>
-              <span>Crear Rutina</span>
+              <span>{{ isAtRutinaLimit() ? 'Límite alcanzado' : 'Crear Rutina' }}</span>
             </button>
           </div>
           <div class="space-y-2 max-h-40 overflow-y-auto">
@@ -187,7 +199,7 @@
                      (click)="viewEntrenado(entrenado.id)">
                   <div class="flex-1">
                     <div class="flex items-center">
-                      <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-5 h-5 text-blue-600 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                       <div>

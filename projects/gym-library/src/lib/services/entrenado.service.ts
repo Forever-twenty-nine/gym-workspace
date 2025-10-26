@@ -21,13 +21,13 @@ export class EntrenadoService {
      */
     setFirestoreAdapter(adapter: IEntrenadoFirestoreAdapter): void {
         this.firestoreAdapter = adapter;
-        this.initializeListener();
+        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
-    private initializeListener(): void {
+    initializeListener(): void {
         if (this.isListenerInitialized || !this.firestoreAdapter) return;
         
         try {
@@ -146,16 +146,12 @@ export class EntrenadoService {
 
     /**
      * 🔍 Busca entrenados que tienen una rutina asignada específica
+     * NOTA: Este método ahora usa RutinaAsignadaService. Implementar cuando esté disponible.
      */
     getEntrenadosByRutinaAsignada(rutinaId: string): Signal<Entrenado[]> {
-        return computed(() => 
-            this._entrenados().filter(entrenado => 
-                entrenado.rutinasAsignadas?.includes(rutinaId)
-            )
-        );
-    }
-
-    /**
+        // TODO: Implementar usando RutinaAsignadaService
+        return computed(() => []);
+    }    /**
      * 🔍 Busca entrenados que han creado una rutina específica
      */
     getEntrenadosByRutinaCreada(rutinaId: string): Signal<Entrenado[]> {
@@ -187,50 +183,5 @@ export class EntrenadoService {
      */
     get entrenadoActivoCount(): Signal<number> {
         return computed(() => this._entrenados().length);
-    }
-
-    /**
-     * 🏋️ Asigna una rutina a un entrenado
-     */
-    async asignarRutina(entrenadoId: string, rutinaId: string): Promise<void> {
-        const entrenado = this._entrenados().find(e => e.id === entrenadoId);
-        if (!entrenado) {
-            throw new Error('Entrenado no encontrado');
-        }
-
-        const rutinasAsignadas = entrenado.rutinasAsignadas || [];
-        
-        // Si ya está asignada, no hacer nada
-        if (rutinasAsignadas.includes(rutinaId)) {
-            return;
-        }
-
-        const entrenadoActualizado: Entrenado = {
-            ...entrenado,
-            rutinasAsignadas: [...rutinasAsignadas, rutinaId]
-        };
-
-        await this.save(entrenadoActualizado);
-    }
-
-    /**
-     * 🏋️ Desasigna una rutina de un entrenado
-     */
-    async desasignarRutina(entrenadoId: string, rutinaId: string): Promise<void> {
-        const entrenado = this._entrenados().find(e => e.id === entrenadoId);
-        if (!entrenado) {
-            throw new Error('Entrenado no encontrado');
-        }
-
-        const rutinasAsignadas = entrenado.rutinasAsignadas || [];
-        // Eliminar todas las instancias del rutinaId (por si hay duplicados)
-        const nuevosAsignados = rutinasAsignadas.filter(id => id !== rutinaId);
-
-        const entrenadoActualizado: Entrenado = {
-            ...entrenado,
-            rutinasAsignadas: nuevosAsignados.length > 0 ? nuevosAsignados : undefined
-        };
-
-        await this.save(entrenadoActualizado);
     }
 }

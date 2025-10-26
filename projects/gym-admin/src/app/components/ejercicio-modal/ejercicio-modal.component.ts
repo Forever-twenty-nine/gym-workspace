@@ -49,6 +49,13 @@ export class EjercicioModalComponent {
     }));
   });
 
+  readonly isFreePlan = computed(() => {
+    const creadorId = this.creadorId();
+    if (!creadorId) return false;
+    const user = this.userService.users().find(u => u.uid === creadorId);
+    return user?.plan === 'free';
+  });
+
   // Efecto para inicializar formulario cuando cambian los inputs
   private readonly initializeFormEffect = effect(() => {
     if (this.isOpen()) {
@@ -64,7 +71,7 @@ export class EjercicioModalComponent {
       series: [0, [Validators.required, Validators.min(1)]],
       repeticiones: [0, [Validators.required, Validators.min(1)]],
       peso: [0, Validators.min(0)],
-      descansoSegundos: [0, [Validators.required, Validators.min(0)]],
+      descansoSegundos: [0, Validators.min(0)],
       serieSegundos: [0, Validators.min(0)]
     });
   }
@@ -73,26 +80,32 @@ export class EjercicioModalComponent {
   initializeForm(ejercicio?: Ejercicio) {
     if (ejercicio) {
       this.ejercicioData.set({ ...ejercicio });
-      this.ejercicioForm().patchValue({
+      const patchValue: any = {
         nombre: ejercicio.nombre || '',
         descripcion: ejercicio.descripcion || '',
         series: ejercicio.series || 0,
         repeticiones: ejercicio.repeticiones || 0,
         peso: ejercicio.peso || 0,
-        descansoSegundos: ejercicio.descansoSegundos || 0,
-        serieSegundos: ejercicio.serieSegundos || 0
-      });
+      };
+      if (!this.isFreePlan()) {
+        patchValue.descansoSegundos = ejercicio.descansoSegundos || 0;
+        patchValue.serieSegundos = ejercicio.serieSegundos || 0;
+      }
+      this.ejercicioForm().patchValue(patchValue);
     } else {
       this.ejercicioData.set(null);
-      this.ejercicioForm().reset({
+      const resetValue: any = {
         nombre: '',
         descripcion: '',
         series: 0,
         repeticiones: 0,
         peso: 0,
-        descansoSegundos: 0,
-        serieSegundos: 0
-      });
+      };
+      if (!this.isFreePlan()) {
+        resetValue.descansoSegundos = 0;
+        resetValue.serieSegundos = 0;
+      }
+      this.ejercicioForm().reset(resetValue);
     }
   }
 
@@ -126,12 +139,16 @@ export class EjercicioModalComponent {
         series: updatedData.series || 3,
         repeticiones: updatedData.repeticiones || 10,
         peso: updatedData.peso || 0,
-        descansoSegundos: updatedData.descansoSegundos || 60,
-        serieSegundos: updatedData.serieSegundos || 0,
         fechaCreacion: updatedData.fechaCreacion || new Date()
       };
 
-      await this.ejercicioService.save(ejercicioToSave);
+      // Solo incluir campos premium si no es plan free
+      if (!this.isFreePlan()) {
+        ejercicioToSave.descansoSegundos = updatedData.descansoSegundos ?? 60;
+        ejercicioToSave.serieSegundos = updatedData.serieSegundos ?? 0;
+      }
+
+      await this.ejercicioService.save(this.cleanUndefinedFields(ejercicioToSave));
 
       // Si es creación, agregar el ejercicio al entrenador
       if (!originalData?.id && this.creadorId()) {
@@ -159,8 +176,14 @@ export class EjercicioModalComponent {
     }
   }
 
-  // Cerrar modal
-  onClose() {
-    this.close.emit();
+  // Limpiar campos undefined del objeto
+  private cleanUndefinedFields(obj: any): any {
+    const cleaned: any = {};
+    for (const key in obj) {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key];
+      }
+    }
+    return cleaned;
   }
 }

@@ -92,7 +92,7 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
       objetivo: data.objetivo || null,
       entrenadoresId: data.entrenadoresId || [],
-      rutinasAsignadas: data.rutinasAsignadas || [],
+      rutinasAsignadasIds: data.rutinasAsignadasIds || [],
       rutinasCreadas: data.rutinasCreadas || []
     };
   }
@@ -115,8 +115,8 @@ export class EntrenadoFirestoreAdapter implements IEntrenadoFirestoreAdapter {
       data.entrenadoresId = entrenado.entrenadoresId;
     }
 
-    if (entrenado.rutinasAsignadas) {
-      data.rutinasAsignadas = entrenado.rutinasAsignadas;
+    if (entrenado.rutinasAsignadasIds) {
+      data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds;
     }
 
     if (entrenado.rutinasCreadas) {

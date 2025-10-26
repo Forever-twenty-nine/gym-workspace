@@ -73,6 +73,9 @@ export class EntrenadorDetail implements OnInit {
     this.notificacionService.notificaciones();
     // Inicializar listener de invitaciones
     this.invitacionService.invitaciones();
+    // Inicializar listeners de ejercicios y rutinas para que estén disponibles antes de limpiar
+    this.ejercicioService.ejercicios();
+    this.rutinaService.rutinas();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.entrenadorId.set(id);
@@ -80,6 +83,7 @@ export class EntrenadorDetail implements OnInit {
         const entrenador = this.entrenador();
         if (entrenador) {
           this.pageTitleService.setTitle(`Entrenador: ${entrenador.displayName || id}`);
+          // Limpieza automática removida - usar solo cuando el usuario lo solicite
         } else {
           this.router.navigate(['/entrenadores']);
         }
@@ -95,6 +99,14 @@ export class EntrenadorDetail implements OnInit {
 
   readonly ejercicios = computed(() => this.entrenadorService.getEjerciciosByEntrenador(this.entrenadorId())());
 
+  readonly isAtEjercicioLimit = computed(() => {
+    const entrenadorId = this.entrenadorId();
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.ejercicios().length;
+    return currentCount >= limits.maxExercises;
+  });
+
   editEjercicio(ejercicio: any) {
     this.toggleModalEjercicios(ejercicio);
   }
@@ -105,7 +117,7 @@ export class EntrenadorDetail implements OnInit {
     }
 
     try {
-      await this.ejercicioService.delete(ejercicio.id);
+      await this.entrenadorService.deleteEjercicioCreado(this.entrenadorId(), ejercicio.id);
       this.toastService.log(`Ejercicio eliminado: ${ejercicio.nombre}`);
     } catch (error: any) {
       console.error('Error al eliminar ejercicio:', error);
@@ -137,6 +149,14 @@ export class EntrenadorDetail implements OnInit {
 
   readonly rutinas = computed(() => this.entrenadorService.getRutinasByEntrenador(this.entrenadorId())());
 
+  readonly isAtRutinaLimit = computed(() => {
+    const entrenadorId = this.entrenadorId();
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.rutinas().length;
+    return currentCount >= limits.maxRoutines;
+  });
+
   toggleModalRutinas(rutina?: any) {
     if (this.isRutinaModalOpen()) {
       this.isRutinaModalOpen.set(false);
@@ -164,6 +184,7 @@ export class EntrenadorDetail implements OnInit {
 
     try {
       await this.rutinaService.delete(rutina.id);
+      await this.entrenadorService.removeRutinaCreada(this.entrenadorId(), rutina.id);
       this.toastService.log(`Rutina eliminada: ${rutina.nombre}`);
     } catch (error: any) {
       console.error('Error al eliminar rutina:', error);

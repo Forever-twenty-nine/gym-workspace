@@ -5,7 +5,7 @@
 - Iniciar y y completar rutinas con cronometro✅ 
 - Ver detalles simples de ejercicios (series, reps, peso) ✅ 
 - opcion visual de progreso (check list) ✅ 
-- nivel de usuario por completar rutinas ✅ 
+- Estadísticas por completar rutinas ✅ 
 
 ---
 
@@ -16,19 +16,14 @@
 ---
 
 ## Social
-- Compartir progreso en RRSS (Instagram, Facebook, Twitter)
-- Incluye watermark “Exportá tu progreso completo en PDF watermark — desbloqueá con Premium ”
+- Compartir progreso en RRSS (Instagram, Facebook, Twitter)✅ 
+- Incluye watermark “Exportá tu progreso completo en PDF watermark — desbloqueá con Premium ”✅ 
 
 ---
 
 ## Notificaciones
-- invitacion a conectarse con el entrenador
-- Push: Nueva rutina asignada
-- Push: Recordatorio de entrenamiento (configurable)
-
----
-
-## Comunicación
-- Chat unidirecional con limites
+- invitacion a conectarse con el entrenador ✅ 
+- Push: Nueva rutina asignada ✅ 
+- Push: Recordatorio de entrenamiento (configurable) ✅ 
 
 ---

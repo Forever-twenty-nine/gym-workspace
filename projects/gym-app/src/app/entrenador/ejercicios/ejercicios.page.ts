@@ -18,11 +18,13 @@ import {
   IonModal,
   IonButtons,
   IonInput,
-  IonTextarea
+  IonTextarea,
+  IonText,
+  ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barbellOutline, close, add, pencil, trash ,barbell} from 'ionicons/icons';
-import { AuthService, EjercicioService, EntrenadorService } from 'gym-library';
+import { barbellOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed, star} from 'ionicons/icons';
+import { AuthService, EjercicioService, EntrenadorService, UserService } from 'gym-library';
 
 @Component({
   selector: 'app-ejercicios',
@@ -47,7 +49,8 @@ import { AuthService, EjercicioService, EntrenadorService } from 'gym-library';
     IonModal,
     IonButtons,
     IonInput,
-    IonTextarea
+    IonTextarea,
+    IonText
   ],
   styles: [`
     .ejercicio-modal {
@@ -62,21 +65,45 @@ export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
   private entrenadorService = inject(EntrenadorService);
+  private userService = inject(UserService);
   private fb = inject(FormBuilder);
+  private toastController = inject(ToastController);
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
-  // Signals para el modal de ejercicios
+  // Computed signals para límites de plan
+  readonly hasReachedEjercicioLimit = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.ejerciciosCreados().length;
+    return currentCount >= limits.maxExercises;
+  });
+
+  readonly ejercicioLimitMessage = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return '';
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.ejerciciosCreados().length;
+    return `Ejercicios creados: ${currentCount}/${limits.maxExercises}`;
+  });
+
+  readonly isFreePlan = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return false;
+    const user = this.userService.users().find(u => u.uid === entrenadorId);
+    return user?.plan === 'free';
+  });
   readonly isEjercicioModalOpen = signal(false);
   readonly ejercicioModalData = signal<any>(null);
   readonly ejercicioEditForm = signal<FormGroup | null>(null);
   readonly isEjercicioCreating = signal(false);
 
   constructor() {
-    addIcons({ barbellOutline, close, add, pencil, trash, barbell });
+    addIcons({ barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star });
   }
 
   ngOnInit() {
@@ -147,11 +174,15 @@ export class EjerciciosPage implements OnInit {
       series: [item.series || 1],
       repeticiones: [item.repeticiones || 1],
       peso: [item.peso || 0],
-      serieSegundos: [item.serieSegundos || 0],
-      descansoSegundos: [item.descansoSegundos || 0],
       creadorId: [item.creadorId || ''],
       creadorTipo: [item.creadorTipo || 'entrenador']
     };
+
+    // Solo incluir campos premium si no es plan free
+    if (!this.isFreePlan()) {
+      formConfig.serieSegundos = [item.serieSegundos || 0];
+      formConfig.descansoSegundos = [item.descansoSegundos || 60];
+    }
 
     this.ejercicioEditForm.set(this.fb.group(formConfig));
   }
@@ -166,20 +197,57 @@ export class EjerciciosPage implements OnInit {
 
     if (!form.valid) return;
 
+    // Validar límite de ejercicios para creación
+    if (this.isEjercicioCreating()) {
+      const entrenadorId = this.authService.currentUser()?.uid;
+      if (entrenadorId) {
+        const limits = this.entrenadorService.getLimits(entrenadorId);
+        const currentCount = this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)().length;
+        if (currentCount >= limits.maxExercises) {
+          const toast = await this.toastController.create({
+            message: 'Has alcanzado el límite de ejercicios para tu plan. Actualiza para crear más.',
+            duration: 3000,
+            color: 'warning',
+            position: 'top'
+          });
+          await toast.present();
+          return;
+        }
+      }
+    }
+
     try {
       const formValue = form.value;
       
-      const ejercicioData = {
+      const ejercicioData: any = {
         ...originalData,
-        ...formValue,
+        nombre: formValue.nombre,
+        descripcion: formValue.descripcion,
+        series: formValue.series,
+        repeticiones: formValue.repeticiones,
+        peso: formValue.peso,
         fechaModificacion: new Date()
       };
+
+      // Solo incluir campos premium si no es plan free
+      if (!this.isFreePlan()) {
+        ejercicioData.descansoSegundos = formValue.descansoSegundos ?? 60;
+        ejercicioData.serieSegundos = formValue.serieSegundos ?? 0;
+      }
 
       if (this.isEjercicioCreating()) {
         ejercicioData.fechaCreacion = new Date();
       }
 
       await this.ejercicioService.save(ejercicioData);
+
+      // Si es creación, agregar el ejercicio al entrenador
+      if (this.isEjercicioCreating() && ejercicioData.id) {
+        const entrenadorId = this.authService.currentUser()?.uid;
+        if (entrenadorId) {
+          await this.entrenadorService.addEjercicioCreado(entrenadorId, ejercicioData.id);
+        }
+      }
       
       this.closeEjercicioModal();
       // Mostrar éxito

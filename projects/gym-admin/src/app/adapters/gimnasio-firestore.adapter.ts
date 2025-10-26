@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
-import { 
-    collection, 
-    doc, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
+import {
+    collection,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
     setDoc,
-    onSnapshot, 
-    query, 
+    onSnapshot,
+    query,
     orderBy,
     Firestore
 } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
-import { Gimnasio, IGimnasioFirestoreAdapter } from 'gym-library';
+import { Gimnasio, IGimnasioFirestoreAdapter, FirebaseAdapterBase } from 'gym-library';
 
 @Injectable({
     providedIn: 'root'
 })
-export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
+export class GimnasioFirestoreAdapter extends FirebaseAdapterBase implements IGimnasioFirestoreAdapter {
     private firestore = inject(Firestore);
     private readonly collectionName = 'gimnasios';
 
@@ -29,21 +29,23 @@ export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
         const gimnasiosQuery = query(gimnasiosCollection, orderBy('nombre', 'asc'));
         
         onSnapshot(gimnasiosQuery, (snapshot) => {
-            const gimnasios: Gimnasio[] = [];
-            
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                if (data) {
-                    gimnasios.push({
-                        id: doc.id,
-                        nombre: data['nombre'] || '',
-                        direccion: data['direccion'] || '',
-                        activo: data['activo'] || false
-                    });
-                }
+            this.runInZone(() => {
+                const gimnasios: Gimnasio[] = [];
+                
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data) {
+                        gimnasios.push({
+                            id: doc.id,
+                            nombre: data['nombre'] || '',
+                            direccion: data['direccion'] || '',
+                            activo: data['activo'] || false
+                        });
+                    }
+                });
+                
+                callback(gimnasios);
             });
-            
-            callback(gimnasios);
         });
     }
 
@@ -54,17 +56,19 @@ export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
         const gimnasioRef = doc(this.firestore, this.collectionName, id);
         
         onSnapshot(gimnasioRef, (doc) => {
-            if (doc.exists()) {
-                const data = doc.data();
-                callback({
-                    id: doc.id,
-                    nombre: data['nombre'] || '',
-                    direccion: data['direccion'] || '',
-                    activo: data['activo'] || false
-                });
-            } else {
-                callback(null);
-            }
+            this.runInZone(() => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    callback({
+                        id: doc.id,
+                        nombre: data['nombre'] || '',
+                        direccion: data['direccion'] || '',
+                        activo: data['activo'] || false
+                    });
+                } else {
+                    callback(null);
+                }
+            });
         });
     }
 
@@ -72,45 +76,49 @@ export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {
      * 💾 Guarda o actualiza un gimnasio
      */
     async save(gimnasio: Gimnasio): Promise<void> {
-        try {
-            const gimnasioData: any = {
-                activo: gimnasio.activo
-            };
-            
-            // Solo agregar campos si no son undefined
-            if (gimnasio.nombre !== undefined && gimnasio.nombre !== null) {
-                gimnasioData.nombre = gimnasio.nombre;
-            }
-            
-            if (gimnasio.direccion !== undefined && gimnasio.direccion !== null) {
-                gimnasioData.direccion = gimnasio.direccion;
-            }
+        return this.runInZone(async () => {
+            try {
+                const gimnasioData: any = {
+                    activo: gimnasio.activo
+                };
+                
+                // Solo agregar campos si no son undefined
+                if (gimnasio.nombre !== undefined && gimnasio.nombre !== null) {
+                    gimnasioData.nombre = gimnasio.nombre;
+                }
+                
+                if (gimnasio.direccion !== undefined && gimnasio.direccion !== null) {
+                    gimnasioData.direccion = gimnasio.direccion;
+                }
 
-            if (gimnasio.id) {
-                // Crear o actualizar gimnasio con ID específico usando setDoc
-                const gimnasioRef = doc(this.firestore, this.collectionName, gimnasio.id);
-                await setDoc(gimnasioRef, gimnasioData);
-            } else {
-                // Crear nuevo gimnasio con ID automático
-                const gimnasiosCollection = collection(this.firestore, this.collectionName);
-                await addDoc(gimnasiosCollection, gimnasioData);
+                if (gimnasio.id) {
+                    // Crear o actualizar gimnasio con ID específico usando setDoc
+                    const gimnasioRef = doc(this.firestore, this.collectionName, gimnasio.id);
+                    await setDoc(gimnasioRef, gimnasioData);
+                } else {
+                    // Crear nuevo gimnasio con ID automático
+                    const gimnasiosCollection = collection(this.firestore, this.collectionName);
+                    await addDoc(gimnasiosCollection, gimnasioData);
+                }
+            } catch (error) {
+                console.error('Error al guardar gimnasio:', error);
+                throw error;
             }
-        } catch (error) {
-            console.error('Error al guardar gimnasio:', error);
-            throw error;
-        }
+        });
     }
 
     /**
      * 🗑️ Elimina un gimnasio
      */
     async delete(id: string): Promise<void> {
-        try {
-            const gimnasioRef = doc(this.firestore, this.collectionName, id);
-            await deleteDoc(gimnasioRef);
-        } catch (error) {
-            console.error('Error al eliminar gimnasio:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            try {
+                const gimnasioRef = doc(this.firestore, this.collectionName, id);
+                await deleteDoc(gimnasioRef);
+            } catch (error) {
+                console.error('Error al eliminar gimnasio:', error);
+                throw error;
+            }
+        });
     }
 }

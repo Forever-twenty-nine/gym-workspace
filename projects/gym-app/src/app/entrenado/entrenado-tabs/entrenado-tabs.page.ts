@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
+import {
   IonTabs,
   IonTabBar,
   IonTabButton,
@@ -8,10 +8,18 @@ import {
   IonLabel
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  fitnessOutline, 
-  personOutline, 
-  statsChartOutline } from 'ionicons/icons';
+import {
+  homeOutline,
+  home,
+  fitnessOutline,
+  personOutline,
+  barbellOutline,
+  barbell,
+  person,
+  statsChartOutline,
+  statsChart,
+  calendarOutline,
+  calendar} from 'ionicons/icons';
 
 @Component({
   selector: 'app-entrenado-tabs',
@@ -28,7 +36,7 @@ import {
 })
 export class EntrenadoTabsPage {
 
-  constructor() { 
-    addIcons({statsChartOutline,fitnessOutline,personOutline});
+  constructor() {
+    addIcons({homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, statsChartOutline, statsChart, fitnessOutline, personOutline, person});
   }
 }

@@ -101,7 +101,7 @@ export class EntrenadorService {
   // Cache para límites por entrenador (evita búsquedas repetidas)
   private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
   
-  // Métodos privados para límites de plan
+  // Métodos para límites de plan
   getLimits(entrenadorId: string) {
     if (this.limitsCache.has(entrenadorId)) {
       return this.limitsCache.get(entrenadorId)!;
@@ -110,7 +110,7 @@ export class EntrenadorService {
     const isFree = user?.plan === 'free';
     const limits = {
       maxClients: isFree ? 3 : Infinity,
-      maxRoutines: isFree ? 5 : Infinity,
+      maxRoutines: isFree ? 3 : Infinity,
       maxExercises: isFree ? 10 : Infinity,
     };
     this.limitsCache.set(entrenadorId, limits);
@@ -123,7 +123,15 @@ export class EntrenadorService {
     }
   }
 
-  // Método genérico para agregar items con validación
+  /**
+   * 
+   * @param entrenadorId - 
+   * @param itemId 
+   * @param arrayKey 
+   * @param maxKey 
+   * @param itemName 
+   * @returns 
+   */
   private async addItemWithLimit(
     entrenadorId: string,
     itemId: string,
@@ -144,7 +152,6 @@ export class EntrenadorService {
     }
   }
 
-  // Método para invalidar cache de límites (llamar cuando cambie el plan)
   invalidateLimitsCache(entrenadorId: string): void {
     this.limitsCache.delete(entrenadorId);
   }
@@ -152,7 +159,7 @@ export class EntrenadorService {
   
   
   /**
-   * 📥 Inicializa el listener de entrenadores (llamar manualmente cuando sea necesario)
+   * Inicializa el listener de entrenadores (llamar manualmente cuando sea necesario)
    */
   initializeListener(): void {
     if (!this.isListenerInitialized) {
@@ -162,7 +169,7 @@ export class EntrenadorService {
   }
 
   /**
-   * 📥 Carga inicial de entrenadores con listener en tiempo real
+   * Carga inicial de entrenadores con listener en tiempo real
    */
   private loadEntrenadores(): void {
     this._loading.set(true);
@@ -182,7 +189,7 @@ export class EntrenadorService {
   }
   
   /**
-   * ➕ Crea un nuevo entrenador
+   * Crea un nuevo entrenador
    * @param entrenadorData - Datos del entrenador a crear
    * @returns Promise con el ID del entrenador creado
    */
@@ -203,7 +210,7 @@ export class EntrenadorService {
   }
 
   /**
-   * 📄 Crea un nuevo entrenador con ID específico
+   * Crea un nuevo entrenador con ID específico
    * @param id - ID específico del entrenador (igual al uid del usuario)
    * @param entrenadorData - Datos del entrenador a crear
    */
@@ -226,7 +233,7 @@ export class EntrenadorService {
   }
   
   /**
-   * ✏️ Actualiza un entrenador existente
+   * Actualiza un entrenador existente
    * @param id - ID del entrenador
    * @param entrenadorData - Datos actualizados del entrenador
    */
@@ -246,7 +253,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 🗑️ Elimina un entrenador
+   * Elimina un entrenador
    * @param id - ID del entrenador a eliminar
    */
   async delete(id: string): Promise<void> {
@@ -266,7 +273,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 🔍 Busca un entrenador por ID
+   * Busca un entrenador por ID
    * @param id - ID del entrenador
    * @returns Signal con el entrenador encontrado o undefined
    */
@@ -277,7 +284,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 📋 Obtiene las rutinas de un entrenador específico
+   * Obtiene las rutinas de un entrenador específico
    * @param entrenadorId - ID del entrenador
    * @returns Array de rutinas del entrenador
    */
@@ -294,7 +301,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 📋 Obtiene los ejercicios de un entrenador específico
+   * Obtiene los ejercicios de un entrenador específico
    * @param entrenadorId - ID del entrenador
    * @returns Array de ejercicios del entrenador
    */
@@ -311,7 +318,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 📨 Obtiene las invitaciones de un entrenador específico
+   * Obtiene las invitaciones de un entrenador específico
    * @param entrenadorId - ID del entrenador
    * @returns Array de invitaciones del entrenador
    */
@@ -320,7 +327,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 💬 Obtiene los mensajes de un entrenador específico
+   * Obtiene los mensajes de un entrenador específico
    * @param entrenadorId - ID del entrenador
    * @returns Array de mensajes del entrenador
    */
@@ -329,7 +336,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 👥 Obtiene el conteo de entrenados asignados a un entrenador
+   * Obtiene el conteo de entrenados asignados a un entrenador
    * @param entrenadorId - ID del entrenador
    * @returns Signal con el número de entrenados asignados
    */
@@ -341,19 +348,18 @@ export class EntrenadorService {
   }
 
   /**
-   * 🔗 Desvincula un entrenado de un entrenador
+   * Desvincula un entrenado de un entrenador
    * @param entrenadorId - ID del entrenador
    * @param entrenadoId - ID del entrenado
    */
   async desvincularEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
-    // 1. Quitar entrenadorId del array entrenadoresId del entrenado
+
     const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
     if (entrenado) {
       const entrenadoresId = (entrenado.entrenadoresId || []).filter((id: string) => id !== entrenadorId);
       await this.entrenadoService.save({ ...entrenado, entrenadoresId });
     }
 
-    // 2. Quitar entrenadoId del array entrenadosAsignadosIds del entrenador
     const entrenador = this.getEntrenadorById(entrenadorId)();
     if (entrenador) {
       const entrenadosAsignadosIds = (entrenador.entrenadosAsignadosIds || []).filter((id: string) => id !== entrenadoId);
@@ -362,7 +368,7 @@ export class EntrenadorService {
   }
   
   /**
-   * 👤 Obtiene los entrenadores con información de usuario combinada
+   * Obtiene los entrenadores con información de usuario combinada
    * @returns Array de entrenadores con displayName, email, plan, etc.
    */
   getEntrenadoresWithUserInfo() {
@@ -422,7 +428,17 @@ export class EntrenadorService {
   }
 
   /**
-   * ➕ Agrega una rutina a la lista de rutinas creadas de un entrenador
+   * Elimina un ejercicio creado por un entrenador y actualiza su lista
+   * @param entrenadorId - ID del entrenador
+   * @param ejercicioId - ID del ejercicio a eliminar
+   */
+  async deleteEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
+    await this.ejercicioService.delete(ejercicioId);
+    await this.removeEjercicioCreado(entrenadorId, ejercicioId);
+  }
+
+  /**
+   * Agrega una rutina a la lista de rutinas creadas de un entrenador
    * @param entrenadorId - ID del entrenador
    * @param rutinaId - ID de la rutina a agregar
    */
@@ -434,8 +450,8 @@ export class EntrenadorService {
     const limits = this.getLimits(entrenadorId);
     if (limits.maxRoutines === 5) { // Plan free
       const rutina = this.rutinaService.getRutina(rutinaId)();
-      if (rutina && (rutina.DiasSemana !== undefined || rutina.duracion !== undefined)) {
-        throw new PlanLimitError('En el plan free no se pueden configurar días de la semana o duración. Actualiza a premium.');
+      if (rutina && rutina.duracion !== undefined) {
+        throw new PlanLimitError('En el plan free no se pueden configurar duración. Actualiza a premium.');
       }
     }
 

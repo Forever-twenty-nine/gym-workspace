@@ -1,3 +1,4 @@
+ 
 import { Routes } from '@angular/router';
 import { EntrenadoresPage } from './pages/entrenadores/entrenadores.page';
 import { EntrenadosPage } from './pages/entrenados/entrenados.page';
@@ -5,7 +6,7 @@ import { GimnasiosPage } from './pages/gimnasios/gimnasios.page';
 import { UsuariosPage } from './pages/usuarios/usuarios.page';
 import { EntrenadorDetail } from './pages/entrenadores/entrenador-detail/entrenador-detail';
 import { EntrenadoDetail } from './pages/entrenados/entrenado-detail/entrenado-detail';
-import { RutinaProgresoComponent } from './pages/entrenados/rutina-progreso/rutina-progreso';
+import { EntrenadoEstadisticas } from './pages/entrenados/entrenado-estadisticas/entrenado-estadisticas';
 
 export const routes: Routes = [
   {
@@ -25,12 +26,12 @@ export const routes: Routes = [
     component: EntrenadosPage
   },
   {
-    path: 'entrenados/:id',
+    path: 'entrenados/detalle/:id',
     component: EntrenadoDetail
   },
   {
-    path: 'entrenados/:entrenadoId/rutinas/:rutinaId',
-    component: RutinaProgresoComponent
+    path: 'entrenados/estadisticas/:id',
+    component: EntrenadoEstadisticas
   },
   {
     path: 'gimnasios',
