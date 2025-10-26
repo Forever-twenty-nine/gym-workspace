@@ -1,7 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
 import { User } from '../models/user.model';
 import { Rol } from '../enums/rol.enum';
-import { ZoneRunnerService } from './zone-runner.service';
 
 export interface IUserFirestoreAdapter {
   initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void;

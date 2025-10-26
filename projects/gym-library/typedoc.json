@@ -1,0 +1,19 @@
+{
+  "entryPoints": ["src/lib"],
+  "entryPointStrategy": "expand",
+  "out": "docs/api",
+  "name": "Gym Library API",
+  "readme": "none",
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__mocks__/**",
+    "**/node_modules/**"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "includeVersion": true,
+  "gitRevision": "main",
+  "theme": "default"
+}

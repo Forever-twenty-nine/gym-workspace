@@ -130,12 +130,11 @@ export class SocialShareService {
       if (!displayName) {
         // Polling corto por si el listener de usuarios aún no actualizó
         const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-        const byUid = this.userService.getUserByUid(entrenadoId);
         for (let i = 0; i < 5 && !displayName; i++) {
           await wait(200);
-          const u = byUid();
-          if (u) {
-            displayName = u.nombre || u.email || undefined;
+          const user = this.userService.getUserByUid(entrenadoId);
+          if (user) {
+            displayName = user.nombre || user.email || undefined;
             break;
           }
         }
