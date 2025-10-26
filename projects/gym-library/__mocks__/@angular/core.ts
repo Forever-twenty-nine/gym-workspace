@@ -11,5 +11,9 @@ const createSignal = (initial: any) => {
 };
 
 export const signal = createSignal;
+export const computed = (fn: any) => {
+  const sig = createSignal(fn());
+  return sig.asReadonly();
+};
 export type Signal = any;
 export type WritableSignal = any;

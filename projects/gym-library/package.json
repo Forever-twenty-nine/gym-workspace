@@ -2,7 +2,9 @@
   "name": "gym-library",
   "version": "0.0.1",
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose --expand",
+    "test:watch": "jest --watch --verbose",
+    "test:coverage": "jest --coverage --verbose"
   },
   "peerDependencies": {
     "@angular/common": "^20.3.7",

@@ -7,6 +7,9 @@ describe('AuthService', () => {
   const mockUser: User = { uid: '123', nombre: 'Test', email: 'test@example.com' };
 
   beforeEach(() => {
+    // Silenciar console.warn durante tests
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+
     service = new AuthService();
     mockAdapter = {
       loginWithGoogle: jest.fn(),
@@ -23,6 +26,11 @@ describe('AuthService', () => {
     mockAdapter.getCurrentUser.mockResolvedValue(mockUser);
     mockAdapter.isAuthenticated.mockResolvedValue(true);
     service.setAuthAdapter(mockAdapter);
+  });
+
+  afterEach(() => {
+    // Restaurar console después de cada test
+    jest.restoreAllMocks();
   });
 
   it('debe iniciar sesión con Google correctamente', async () => {
