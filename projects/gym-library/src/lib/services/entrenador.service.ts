@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, InjectionToken } from '@angular/core';
+import { Injectable, signal, computed, inject, InjectionToken, DestroyRef } from '@angular/core';
 import { Entrenador } from '../models/entrenador.model';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
@@ -9,7 +9,13 @@ import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
 import { Ejercicio } from '../models/ejercicio.model';
 
-// Clase de error personalizada para límites
+/**
+ * Clase de error personalizada para límites de plan
+ * Se lanza cuando se intenta exceder los límites del plan free
+ * 
+ * @class PlanLimitError
+ * @extends Error
+ */
 export class PlanLimitError extends Error {
   constructor(message: string) {
     super(message);
@@ -18,64 +24,91 @@ export class PlanLimitError extends Error {
 }
 
 /**
- * 🏋️‍♂️ Interfaz del adaptador de Firestore para Entrenadores
+ * Interfaz del adaptador de Firestore para Entrenadores
  * Define los métodos que debe implementar cualquier adaptador de persistencia
+ * 
+ * @interface IEntrenadorFirestoreAdapter
  */
 export interface IEntrenadorFirestoreAdapter {
   /**
-   * 📥 Obtiene todos los entrenadores y configura listeners en tiempo real
-   * @param callback - Función que se ejecuta cuando los datos cambian
+   * Obtiene todos los entrenadores y configura listeners en tiempo real
+   * 
+   * @param {Function} callback - Función que se ejecuta cuando los datos cambian
+   * @returns {Function} Función de cleanup para detener el listener
    */
   getEntrenadores(callback: (entrenadores: Entrenador[]) => void): () => void;
   
   /**
-   * 👤 Suscribe a cambios en un entrenador específico
-   * @param id - ID del entrenador
-   * @param callback - Función que se ejecuta cuando el entrenador cambia
+   * Suscribe a cambios en un entrenador específico
+   * 
+   * @param {string} id - ID del entrenador
+   * @param {Function} callback - Función que se ejecuta cuando el entrenador cambia
+   * @returns {void}
    */
   subscribeToEntrenador(id: string, callback: (entrenador: Entrenador | null) => void): void;
   
   /**
-   * ➕ Crea un nuevo entrenador
-   * @param entrenador - Datos del entrenador a crear
-   * @returns Promise con el ID del entrenador creado
+   * Crea un nuevo entrenador
+   * 
+   * @param {Omit<Entrenador, 'id'>} entrenador - Datos del entrenador a crear
+   * @returns {Promise<string>} Promise con el ID del entrenador creado
    */
   create(entrenador: Omit<Entrenador, 'id'>): Promise<string>;
   
   /**
-   * 📄 Crea un nuevo entrenador con ID específico
-   * @param id - ID específico del entrenador
-   * @param entrenador - Datos del entrenador a crear
+   * Crea un nuevo entrenador con ID específico
+   * 
+   * @param {string} id - ID específico del entrenador
+   * @param {Omit<Entrenador, 'id'>} entrenador - Datos del entrenador a crear
+   * @returns {Promise<void>}
    */
   createWithId?(id: string, entrenador: Omit<Entrenador, 'id'>): Promise<void>;
   
   /**
-   * ✏️ Actualiza un entrenador existente
-   * @param id - ID del entrenador
-   * @param entrenador - Datos actualizados del entrenador
+   * Actualiza un entrenador existente
+   * 
+   * @param {string} id - ID del entrenador
+   * @param {Partial<Entrenador>} entrenador - Datos actualizados del entrenador
+   * @returns {Promise<void>}
    */
   update(id: string, entrenador: Partial<Entrenador>): Promise<void>;
   
   /**
-   * 🗑️ Elimina un entrenador
-   * @param id - ID del entrenador a eliminar
+   * Elimina un entrenador
+   * 
+   * @param {string} id - ID del entrenador a eliminar
+   * @returns {Promise<void>}
    */
   delete(id: string): Promise<void>;
 }
 
 /**
- * 🔑 Token de inyección para el adaptador de Entrenadores
+ * Token de inyección para el adaptador de Entrenadores
+ * Permite la inyección de dependencias del adaptador de Firestore
+ * 
+ * @constant
+ * @type {InjectionToken<IEntrenadorFirestoreAdapter>}
  */
 export const ENTRENADOR_FIRESTORE_ADAPTER = new InjectionToken<IEntrenadorFirestoreAdapter>('EntrenadorFirestoreAdapter');
 
 /**
- * 🏋️‍♂️ Servicio de gestión de Entrenadores
- * Maneja la lógica de negocio y el estado de los entrenadores usando signals de Angular
+ * Servicio de gestión de Entrenadores (trainers)
+ * Maneja la lógica de negocio y el estado reactivo de los entrenadores usando Angular Signals
+ * Compatible con aplicaciones zoneless de Angular 16+
+ * Incluye validación de límites de plan (free vs premium)
+ * 
+ * @example
+ * ```typescript
+ * constructor(private entrenadorService: EntrenadorService) {
+ *   const entrenadores = this.entrenadorService.entrenadores();
+ * }
+ * ```
  */
 @Injectable({
   providedIn: 'root'
 })
 export class EntrenadorService {
+  private readonly destroyRef = inject(DestroyRef);
   private adapter = inject(ENTRENADOR_FIRESTORE_ADAPTER);
   private rutinaService = inject(RutinaService);
   private ejercicioService = inject(EjercicioService);
@@ -85,23 +118,47 @@ export class EntrenadorService {
   private mensajeService = inject(MensajeService);
   private invitacionService = inject(InvitacionService);
   
-  // 📊 Signals para el estado de los entrenadores
   private readonly _entrenadores = signal<Entrenador[]>([]);
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
-  
-  // 🔍 Signals públicos de solo lectura
-  readonly entrenadores = this._entrenadores.asReadonly();
-  readonly loading = this._loading.asReadonly();
-  readonly error = this._error.asReadonly();
-  
   private unsubscribe: (() => void) | null = null;
   private isListenerInitialized = false;
-  
-  // Cache para límites por entrenador (evita búsquedas repetidas)
   private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
   
-  // Métodos para límites de plan
+  /**
+   * Signal de solo lectura con la lista de entrenadores
+   * @readonly
+   * @type {Signal<Entrenador[]>}
+   */
+  readonly entrenadores = this._entrenadores.asReadonly();
+  
+  /**
+   * Signal de solo lectura con el estado de carga
+   * @readonly
+   * @type {Signal<boolean>}
+   */
+  readonly loading = this._loading.asReadonly();
+  
+  /**
+   * Signal de solo lectura con el mensaje de error
+   * @readonly
+   * @type {Signal<string | null>}
+   */
+  readonly error = this._error.asReadonly();
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.cleanup();
+    });
+  }
+  
+  /**
+   * Obtiene los límites del plan para un entrenador específico
+   * Cachea los resultados para optimizar performance
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Object} Objeto con maxClients, maxRoutines y maxExercises
+   */
   getLimits(entrenadorId: string) {
     if (this.limitsCache.has(entrenadorId)) {
       return this.limitsCache.get(entrenadorId)!;
@@ -117,6 +174,17 @@ export class EntrenadorService {
     return limits;
   }
 
+  /**
+   * Valida que no se exceda el límite permitido para un tipo de item
+   * 
+   * @private
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {number} currentCount - Conteo actual de items
+   * @param {number} max - Límite máximo permitido
+   * @param {string} item - Nombre del tipo de item para el mensaje de error
+   * @throws {PlanLimitError} Si se excede el límite
+   * @returns {void}
+   */
   private validateLimit(entrenadorId: string, currentCount: number, max: number, item: string): void {
     if (currentCount >= max) {
       throw new PlanLimitError(`Límite alcanzado: ${currentCount}/${max} ${item} en plan free.`);
@@ -124,13 +192,16 @@ export class EntrenadorService {
   }
 
   /**
+   * Agrega un item a un array del entrenador validando límites del plan
+   * Método genérico para agregar clientes, rutinas o ejercicios
    * 
-   * @param entrenadorId - 
-   * @param itemId 
-   * @param arrayKey 
-   * @param maxKey 
-   * @param itemName 
-   * @returns 
+   * @private
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} itemId - ID del item a agregar
+   * @param {keyof Entrenador} arrayKey - Clave del array en el modelo Entrenador
+   * @param {keyof ReturnType<typeof this.getLimits>} maxKey - Clave del límite máximo
+   * @param {string} itemName - Nombre del item para mensajes de error
+   * @returns {Promise<void>}
    */
   private async addItemWithLimit(
     entrenadorId: string,
@@ -152,14 +223,22 @@ export class EntrenadorService {
     }
   }
 
+  /**
+   * Invalida el caché de límites para un entrenador específico
+   * Útil cuando cambia el plan del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {void}
+   */
   invalidateLimitsCache(entrenadorId: string): void {
     this.limitsCache.delete(entrenadorId);
   }
   
-  
-  
   /**
-   * Inicializa el listener de entrenadores (llamar manualmente cuando sea necesario)
+   * Inicializa el listener de entrenadores
+   * Solo se ejecuta una vez, debe llamarse manualmente cuando sea necesario
+   * 
+   * @returns {void}
    */
   initializeListener(): void {
     if (!this.isListenerInitialized) {
@@ -170,6 +249,10 @@ export class EntrenadorService {
 
   /**
    * Carga inicial de entrenadores con listener en tiempo real
+   * Configura la suscripción a cambios en la colección de entrenadores
+   * 
+   * @private
+   * @returns {void}
    */
   private loadEntrenadores(): void {
     this._loading.set(true);
@@ -190,8 +273,10 @@ export class EntrenadorService {
   
   /**
    * Crea un nuevo entrenador
-   * @param entrenadorData - Datos del entrenador a crear
-   * @returns Promise con el ID del entrenador creado
+   * 
+   * @param {Omit<Entrenador, 'id'>} entrenadorData - Datos del entrenador a crear
+   * @returns {Promise<string>} Promise con el ID del entrenador creado
+   * @throws {Error} Si ocurre un error durante la creación
    */
   async create(entrenadorData: Omit<Entrenador, 'id'>): Promise<string> {
     this._loading.set(true);
@@ -210,9 +295,12 @@ export class EntrenadorService {
   }
 
   /**
-   * Crea un nuevo entrenador con ID específico
-   * @param id - ID específico del entrenador (igual al uid del usuario)
-   * @param entrenadorData - Datos del entrenador a crear
+   * Crea un nuevo entrenador con ID específico (igual al uid del usuario)
+   * 
+   * @param {string} id - ID específico del entrenador
+   * @param {Omit<Entrenador, 'id'>} entrenadorData - Datos del entrenador a crear
+   * @returns {Promise<void>}
+   * @throws {Error} Si el adaptador no soporta createWithId o si ocurre un error
    */
   async createWithId(id: string, entrenadorData: Omit<Entrenador, 'id'>): Promise<void> {
     this._loading.set(true);
@@ -234,8 +322,11 @@ export class EntrenadorService {
   
   /**
    * Actualiza un entrenador existente
-   * @param id - ID del entrenador
-   * @param entrenadorData - Datos actualizados del entrenador
+   * 
+   * @param {string} id - ID del entrenador
+   * @param {Partial<Entrenador>} entrenadorData - Datos actualizados del entrenador
+   * @returns {Promise<void>}
+   * @throws {Error} Si ocurre un error durante la actualización
    */
   async update(id: string, entrenadorData: Partial<Entrenador>): Promise<void> {
     this._loading.set(true);
@@ -254,7 +345,10 @@ export class EntrenadorService {
   
   /**
    * Elimina un entrenador
-   * @param id - ID del entrenador a eliminar
+   * 
+   * @param {string} id - ID del entrenador a eliminar
+   * @returns {Promise<void>}
+   * @throws {Error} Si ocurre un error durante la eliminación
    */
   async delete(id: string): Promise<void> {
     this._loading.set(true);
@@ -273,9 +367,10 @@ export class EntrenadorService {
   }
   
   /**
-   * Busca un entrenador por ID
-   * @param id - ID del entrenador
-   * @returns Signal con el entrenador encontrado o undefined
+   * Busca un entrenador por ID usando computed signal
+   * 
+   * @param {string} id - ID del entrenador
+   * @returns {Signal<Entrenador | undefined>} Signal computada con el entrenador encontrado o undefined
    */
   getEntrenadorById(id: string) {
     return computed(() => 
@@ -285,8 +380,10 @@ export class EntrenadorService {
   
   /**
    * Obtiene las rutinas de un entrenador específico
-   * @param entrenadorId - ID del entrenador
-   * @returns Array de rutinas del entrenador
+   * Filtra las rutinas del RutinaService por los IDs del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Signal<Rutina[]>} Signal computada con las rutinas del entrenador
    */
   getRutinasByEntrenador(entrenadorId: string) {
     return computed(() => {
@@ -302,8 +399,10 @@ export class EntrenadorService {
   
   /**
    * Obtiene los ejercicios de un entrenador específico
-   * @param entrenadorId - ID del entrenador
-   * @returns Array de ejercicios del entrenador
+   * Filtra los ejercicios del EjercicioService por los IDs del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Signal<Ejercicio[]>} Signal computada con los ejercicios del entrenador
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
@@ -319,8 +418,9 @@ export class EntrenadorService {
   
   /**
    * Obtiene las invitaciones de un entrenador específico
-   * @param entrenadorId - ID del entrenador
-   * @returns Array de invitaciones del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Signal<Invitacion[]>} Signal con las invitaciones del entrenador
    */
   getInvitacionesByEntrenador(entrenadorId: string) {
     return this.invitacionService.getInvitacionesPorEntrenador(entrenadorId);
@@ -328,8 +428,9 @@ export class EntrenadorService {
   
   /**
    * Obtiene los mensajes de un entrenador específico
-   * @param entrenadorId - ID del entrenador
-   * @returns Array de mensajes del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Signal<Mensaje[]>} Signal con los mensajes del entrenador
    */
   getMensajesByEntrenador(entrenadorId: string) {
     return this.mensajeService.getMensajesByEntrenador(entrenadorId);
@@ -337,8 +438,9 @@ export class EntrenadorService {
   
   /**
    * Obtiene el conteo de entrenados asignados a un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @returns Signal con el número de entrenados asignados
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @returns {Signal<number>} Signal computada con el número de entrenados asignados
    */
   getEntrenadosCount(entrenadorId: string) {
     return computed(() => {
@@ -349,11 +451,13 @@ export class EntrenadorService {
 
   /**
    * Desvincula un entrenado de un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @param entrenadoId - ID del entrenado
+   * Actualiza ambos documentos para remover la asociación
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} entrenadoId - ID del entrenado
+   * @returns {Promise<void>}
    */
   async desvincularEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
-
     const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
     if (entrenado) {
       const entrenadoresId = (entrenado.entrenadoresId || []).filter((id: string) => id !== entrenadorId);
@@ -369,7 +473,9 @@ export class EntrenadorService {
   
   /**
    * Obtiene los entrenadores con información de usuario combinada
-   * @returns Array de entrenadores con displayName, email, plan, etc.
+   * Combina datos de entrenador con datos de usuario (displayName, email, plan)
+   * 
+   * @returns {Signal<Array>} Signal computada con entrenadores enriquecidos con info de usuario
    */
   getEntrenadoresWithUserInfo() {
     return computed(() => {
@@ -386,17 +492,21 @@ export class EntrenadorService {
   }
   
   /**
-   * ➕ Agrega un ejercicio a la lista de ejercicios creados de un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @param ejercicioId - ID del ejercicio a agregar
+   * Agrega un ejercicio a la lista de ejercicios creados de un entrenador
+   * Valida los límites del plan antes de agregar
+   * En plan free no permite configurar tiempos de descanso o serie
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} ejercicioId - ID del ejercicio a agregar
+   * @returns {Promise<void>}
+   * @throws {PlanLimitError} Si se excede el límite o si se usan campos premium en plan free
    */
   async addEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
     const entrenador = this.getEntrenadorById(entrenadorId)();
     if (!entrenador) return;
 
-    // Validación de plan: free no puede crear ejercicios con campos premium
     const limits = this.getLimits(entrenadorId);
-    if (limits.maxExercises === 3) { // Plan free
+    if (limits.maxExercises === 10) {
       const ejercicio = this.ejercicioService.getEjercicio(ejercicioId)();
       if (ejercicio && (ejercicio.descansoSegundos !== undefined || ejercicio.serieSegundos !== undefined)) {
         throw new PlanLimitError('En el plan free no se pueden configurar tiempos de descanso o serie. Actualiza a premium.');
@@ -415,9 +525,12 @@ export class EntrenadorService {
   }
 
   /**
-   * ➖ Quita un ejercicio de la lista de ejercicios creados de un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @param ejercicioId - ID del ejercicio a quitar
+   * Quita un ejercicio de la lista de ejercicios creados de un entrenador
+   * No elimina el ejercicio, solo lo desvincula del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} ejercicioId - ID del ejercicio a quitar
+   * @returns {Promise<void>}
    */
   async removeEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
     const entrenador = this.getEntrenadorById(entrenadorId)();
@@ -429,8 +542,11 @@ export class EntrenadorService {
 
   /**
    * Elimina un ejercicio creado por un entrenador y actualiza su lista
-   * @param entrenadorId - ID del entrenador
-   * @param ejercicioId - ID del ejercicio a eliminar
+   * Elimina el ejercicio del EjercicioService y lo desvincula del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} ejercicioId - ID del ejercicio a eliminar
+   * @returns {Promise<void>}
    */
   async deleteEjercicioCreado(entrenadorId: string, ejercicioId: string): Promise<void> {
     await this.ejercicioService.delete(ejercicioId);
@@ -439,16 +555,20 @@ export class EntrenadorService {
 
   /**
    * Agrega una rutina a la lista de rutinas creadas de un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @param rutinaId - ID de la rutina a agregar
+   * Valida los límites del plan antes de agregar
+   * En plan free no permite configurar duración
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} rutinaId - ID de la rutina a agregar
+   * @returns {Promise<void>}
+   * @throws {PlanLimitError} Si se excede el límite o si se usan campos premium en plan free
    */
   async addRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
     const entrenador = this.getEntrenadorById(entrenadorId)();
     if (!entrenador) return;
 
-    // Validación de plan: free no puede crear rutinas con campos premium
     const limits = this.getLimits(entrenadorId);
-    if (limits.maxRoutines === 5) { // Plan free
+    if (limits.maxRoutines === 3) {
       const rutina = this.rutinaService.getRutina(rutinaId)();
       if (rutina && rutina.duracion !== undefined) {
         throw new PlanLimitError('En el plan free no se pueden configurar duración. Actualiza a premium.');
@@ -459,9 +579,12 @@ export class EntrenadorService {
   }
 
   /**
-   * ➖ Quita una rutina de la lista de rutinas creadas de un entrenador
-   * @param entrenadorId - ID del entrenador
-   * @param rutinaId - ID de la rutina a quitar
+   * Quita una rutina de la lista de rutinas creadas de un entrenador
+   * No elimina la rutina, solo la desvincula del entrenador
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} rutinaId - ID de la rutina a quitar
+   * @returns {Promise<void>}
    */
   async removeRutinaCreada(entrenadorId: string, rutinaId: string): Promise<void> {
     const entrenador = this.getEntrenadorById(entrenadorId)();
@@ -472,18 +595,37 @@ export class EntrenadorService {
   }
 
   /**
-   * ➕ Asigna un entrenado a un entrenador con validación de límites
-   * @param entrenadorId - ID del entrenador
-   * @param entrenadoId - ID del entrenado a asignar
+   * Asigna un entrenado a un entrenador con validación de límites
+   * Actualiza ambos documentos para establecer la asociación
+   * 
+   * @param {string} entrenadorId - ID del entrenador
+   * @param {string} entrenadoId - ID del entrenado a asignar
+   * @returns {Promise<void>}
+   * @throws {PlanLimitError} Si se excede el límite de clientes en plan free
    */
   async asignarEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
     await this.addItemWithLimit(entrenadorId, entrenadoId, 'entrenadosAsignadosIds', 'maxClients', 'clientes activos');
 
-    // Actualizar entrenado (solo después de validar límite)
     const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
     if (entrenado) {
       const entrenadoresId = [...(entrenado.entrenadoresId || []), entrenadorId];
       await this.entrenadoService.save({ ...entrenado, entrenadoresId });
     }
+  }
+
+  /**
+   * Limpia todos los recursos y listeners del servicio
+   * Se ejecuta automáticamente cuando el servicio se destruye
+   * 
+   * @private
+   * @returns {void}
+   */
+  private cleanup(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
+    this.isListenerInitialized = false;
+    this.limitsCache.clear();
   }
 }

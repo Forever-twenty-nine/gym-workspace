@@ -2,6 +2,17 @@ import { EjercicioService, IEjercicioFirestoreAdapter } from './ejercicio.servic
 import { Ejercicio } from '../models/ejercicio.model';
 import { Rol } from '../enums/rol.enum';
 
+// Mock del módulo de Angular antes de importar el servicio
+jest.mock('@angular/core', () => {
+  const actual = jest.requireActual('@angular/core');
+  return {
+    ...actual,
+    inject: jest.fn(() => ({
+      onDestroy: jest.fn(),
+    })),
+  };
+});
+
 describe('EjercicioService', () => {
   let service: EjercicioService;
   let mockAdapter: jest.Mocked<IEjercicioFirestoreAdapter>;
@@ -82,6 +93,15 @@ describe('EjercicioService', () => {
       service.initializeEjerciciosListener();
       expect(mockAdapter.initializeListener).not.toHaveBeenCalled();
     });
+
+    it('no debe inicializar si no hay adaptador configurado', () => {
+      const newService = new EjercicioService();
+
+      newService.initializeEjerciciosListener();
+
+      // No debería hacer nada, no hay adaptador
+      expect(newService['_isListenerInitialized']()).toBe(false);
+    });
   });
 
   describe('findEjercicioById', () => {
@@ -109,6 +129,12 @@ describe('EjercicioService', () => {
       expect(calledWith.nombre).toBe(mockEjercicio.nombre);
       expect(calledWith.id).toBe(mockEjercicio.id);
       expect(calledWith.fechaModificacion).toBeDefined();
+    });
+
+    it('debe lanzar error si el adaptador no está configurado', async () => {
+      const newService = new EjercicioService();
+
+      await expect(newService.save(mockEjercicio)).rejects.toThrow('Firestore adapter no configurado');
     });
 
     it('debe validar entrada - nombre vacío', async () => {
@@ -156,6 +182,12 @@ describe('EjercicioService', () => {
       await service.delete('1');
 
       expect(service.ejercicios()).toEqual([]);
+    });
+
+    it('debe lanzar error si el adaptador no está configurado', async () => {
+      const newService = new EjercicioService();
+
+      await expect(newService.delete('1')).rejects.toThrow('Firestore adapter no configurado');
     });
 
     it('debe manejar ID vacío', async () => {
@@ -256,6 +288,239 @@ describe('EjercicioService', () => {
       expect(service.ejercicios()).toEqual([]);
       expect(service.error()).toBeNull();
       expect(service.isLoading()).toBe(false);
+    });
+
+    it('debe llamar unsubscribe si el listener está inicializado', () => {
+      service['_isListenerInitialized'].set(true);
+      mockAdapter.unsubscribe = jest.fn();
+
+      service.destroy();
+
+      expect(mockAdapter.unsubscribe).toHaveBeenCalled();
+    });
+
+    it('debe limpiar suscripciones individuales', () => {
+      const unsubscribeMock = jest.fn();
+      service['ejercicioUnsubscribers'].set('test-id', unsubscribeMock);
+
+      service.destroy();
+
+      expect(unsubscribeMock).toHaveBeenCalled();
+      expect(service['ejercicioUnsubscribers'].size).toBe(0);
+    });
+  });
+
+  describe('getEjercicio', () => {
+    it('debe retornar signal computado si el ejercicio existe en la lista', () => {
+      service['_ejercicios'].set([mockEjercicio]);
+      
+      const result = service.getEjercicio('1');
+      
+      expect(result()).toEqual(mockEjercicio);
+    });
+
+    it('debe reutilizar signal computado para el mismo ID', () => {
+      service['_ejercicios'].set([mockEjercicio]);
+      
+      const result1 = service.getEjercicio('1');
+      const result2 = service.getEjercicio('1');
+      
+      expect(result1).toBe(result2);
+    });
+
+    it('debe crear nueva suscripción si el ejercicio no existe en la lista', () => {
+      mockAdapter.subscribeToEjercicio.mockReturnValue(() => {});
+      
+      const result = service.getEjercicio('999');
+      
+      expect(mockAdapter.subscribeToEjercicio).toHaveBeenCalledWith('999', expect.any(Function));
+      expect(result()).toBeNull();
+    });
+
+    it('debe almacenar función de unsubscribe si se proporciona', () => {
+      const unsubscribeMock = jest.fn();
+      mockAdapter.subscribeToEjercicio.mockReturnValue(unsubscribeMock);
+      
+      service.getEjercicio('999');
+      
+      expect(service['ejercicioUnsubscribers'].has('999')).toBe(true);
+    });
+
+    it('debe reutilizar signal existente para suscripciones individuales', () => {
+      mockAdapter.subscribeToEjercicio.mockReturnValue(() => {});
+      
+      const result1 = service.getEjercicio('999');
+      const result2 = service.getEjercicio('999');
+      
+      expect(mockAdapter.subscribeToEjercicio).toHaveBeenCalledTimes(1);
+      expect(result1).toBe(result2);
+    });
+
+    it('debe actualizar el signal cuando el adaptador emite nuevos datos', () => {
+      let updateCallback: (ejercicio: Ejercicio | null) => void;
+      mockAdapter.subscribeToEjercicio.mockImplementation((id, callback) => {
+        updateCallback = callback;
+        return () => {};
+      });
+
+      const result = service.getEjercicio('999');
+      expect(result()).toBeNull();
+
+      const newEjercicio = { ...mockEjercicio, id: '999' };
+      updateCallback!(newEjercicio);
+
+      expect(result()).toEqual(newEjercicio);
+    });
+  });
+
+  describe('setFirestoreAdapter', () => {
+    it('debe desuscribirse del listener anterior si existe', () => {
+      const oldAdapter = {
+        ...mockAdapter,
+        unsubscribe: jest.fn(),
+      };
+
+      const newService = new EjercicioService();
+      newService.setFirestoreAdapter(oldAdapter);
+      newService['_isListenerInitialized'].set(true);
+
+      const newAdapter = { ...mockAdapter, unsubscribe: jest.fn() };
+      newService.setFirestoreAdapter(newAdapter);
+
+      expect(oldAdapter.unsubscribe).toHaveBeenCalled();
+    });
+  });
+
+  describe('normalizeEjercicio', () => {
+    it('debe normalizar nombre y descripción', () => {
+      const ejercicio = {
+        ...mockEjercicio,
+        nombre: '  Press de Banca  ',
+        descripcion: '  Ejercicio para pecho  ',
+      };
+
+      const normalized = service['normalizeEjercicio'](ejercicio);
+
+      expect(normalized.nombre).toBe('Press de Banca');
+      expect(normalized.descripcion).toBe('Ejercicio para pecho');
+    });
+
+    it('debe eliminar descripción vacía después de trim', () => {
+      const ejercicio = {
+        ...mockEjercicio,
+        descripcion: '   ',
+      };
+
+      const normalized = service['normalizeEjercicio'](ejercicio);
+
+      expect(normalized.descripcion).toBeUndefined();
+    });
+
+    it('debe eliminar campos undefined', () => {
+      const ejercicio: any = {
+        ...mockEjercicio,
+        campoUndefined: undefined,
+      };
+
+      const normalized = service['normalizeEjercicio'](ejercicio);
+
+      expect('campoUndefined' in normalized).toBe(false);
+    });
+
+    it('debe agregar fechaCreacion si el ejercicio es nuevo', () => {
+      const ejercicio = {
+        ...mockEjercicio,
+        id: '',
+      };
+
+      const normalized = service['normalizeEjercicio'](ejercicio);
+
+      expect(normalized.fechaCreacion).toBeDefined();
+      expect(normalized.fechaCreacion).toBeInstanceOf(Date);
+    });
+
+    it('debe actualizar fechaModificacion siempre', () => {
+      const oldDate = new Date('2020-01-01');
+      const ejercicio = {
+        ...mockEjercicio,
+        fechaModificacion: oldDate,
+      };
+
+      const normalized = service['normalizeEjercicio'](ejercicio);
+
+      expect(normalized.fechaModificacion).not.toEqual(oldDate);
+      expect(normalized.fechaModificacion).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('delete - casos adicionales', () => {
+    it('debe manejar ejercicio no encontrado', async () => {
+      service['_ejercicios'].set([]);
+
+      await expect(service.delete('999')).rejects.toThrow('Ejercicio no encontrado');
+      expect(service.error()).toBe('VALIDATION_ERROR');
+    });
+  });
+
+  describe('initializeListener - manejo de errores', () => {
+    it('debe capturar errores al inicializar el listener', () => {
+      const errorAdapter = {
+        ...mockAdapter,
+        initializeListener: jest.fn(() => {
+          throw new Error('Listener failed');
+        }),
+      };
+
+      const newService = new EjercicioService();
+      newService.setFirestoreAdapter(errorAdapter);
+
+      newService.initializeEjerciciosListener();
+
+      expect(newService.error()).toBe('NETWORK_ERROR');
+    });
+
+    it('debe llamar callback de error si el adaptador lo emite', () => {
+      let errorCallback: (error: string) => void;
+      mockAdapter.initializeListener.mockImplementation((onUpdate, onError) => {
+        errorCallback = onError!;
+      });
+
+      service.initializeEjerciciosListener();
+
+      errorCallback!('Test error');
+
+      expect(service.error()).toBe('NETWORK_ERROR');
+    });
+
+    it('debe actualizar ejercicios cuando el adaptador emite datos', () => {
+      let updateCallback: (ejercicios: Ejercicio[]) => void;
+      mockAdapter.initializeListener.mockImplementation((onUpdate, onError) => {
+        updateCallback = onUpdate;
+      });
+
+      service.initializeEjerciciosListener();
+
+      const ejercicios = [mockEjercicio];
+      updateCallback!(ejercicios);
+
+      expect(service.ejercicios()).toEqual(ejercicios);
+    });
+  });
+
+  describe('filterByRange', () => {
+    it('debe filtrar sin máximo cuando max no está definido', () => {
+      const ejercicios = [
+        { ...mockEjercicio, id: '1', series: 3 },
+        { ...mockEjercicio, id: '2', series: 5 },
+        { ...mockEjercicio, id: '3', series: 8 },
+      ];
+      service['_ejercicios'].set(ejercicios);
+
+      const result = service.getEjerciciosBySeries(5);
+
+      expect(result()).toHaveLength(2);
+      expect(result()[0].id).toBe('2');
+      expect(result()[1].id).toBe('3');
     });
   });
 });

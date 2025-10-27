@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, DestroyRef, inject } from '@angular/core';
 import { Ejercicio } from '../models/ejercicio.model';
 import { Rol } from '../enums/rol.enum';
 
@@ -28,6 +28,8 @@ export type EjercicioServiceError =
 
 @Injectable({ providedIn: 'root' })
 export class EjercicioService {
+  private readonly destroyRef = inject(DestroyRef);
+  
   // Signals privados
   private readonly _ejercicios = signal<Ejercicio[]>([]);
   private readonly _isLoading = signal<boolean>(false);
@@ -38,6 +40,13 @@ export class EjercicioService {
   private ejercicioUnsubscribers = new Map<string, () => void>();
   private computedFilters = new Map<string, Signal<any>>();
   private firestoreAdapter: IEjercicioFirestoreAdapter | null = null;
+
+  constructor() {
+    // ✅ Cleanup automático cuando el servicio se destruye (Angular 16+)
+    this.destroyRef.onDestroy(() => {
+      this.destroy();
+    });
+  }
   
   // Signals computadas públicas (creadas una vez)
   readonly ejercicioCount = computed(() => this._ejercicios().length);
