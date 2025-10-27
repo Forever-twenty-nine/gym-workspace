@@ -1,0 +1,94 @@
+.social-share-panel {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.preview-section {
+  margin: 1rem 0;
+}
+
+.preview-container {
+  margin-top: 1rem;
+  max-width: 400px;
+}
+
+.preview-container img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.options-section,
+.platforms-section {
+  margin: 1.5rem 0;
+}
+
+.options-section label {
+  display: block;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+
+.options-section input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.platform-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.platform-button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.platform-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.platform-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.platform-instagram {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.platform-facebook {
+  background: #1877f2;
+}
+
+.platform-twitter {
+  background: #1da1f2;
+}
+
+.platform-whatsapp {
+  background: #25d366;
+}
+
+.watermark-notice {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.watermark-notice p {
+  margin: 0.25rem 0;
+}
+
+h3, h4 {
+  margin: 0 0 1rem 0;
+}

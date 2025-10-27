@@ -1,0 +1,70 @@
+<div class="social-share-panel">
+  <h3>Compartir mi progreso</h3>
+  
+  @if (showPreview()) {
+    <div class="preview-section">
+      <button type="button" (click)="generatePreview()">
+        {{ previewUrl() ? 'Regenerar Preview' : 'Ver Preview' }}
+      </button>
+      
+      @if (previewUrl()) {
+        <div class="preview-container">
+          <img [src]="previewUrl()" alt="Preview del progreso" />
+        </div>
+      }
+    </div>
+  }
+
+  <div class="options-section">
+    <h4>Opciones de personalización</h4>
+    
+    <label>
+      <input
+        type="checkbox"
+        [checked]="includeStats()"
+        (change)="includeStats.set(!includeStats())"
+      />
+      Incluir estadísticas
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        [checked]="includeLevel()"
+        (change)="includeLevel.set(!includeLevel())"
+      />
+      Incluir nivel
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        [checked]="includeStreak()"
+        (change)="includeStreak.set(!includeStreak())"
+      />
+      Incluir racha
+    </label>
+  </div>
+
+  <div class="platforms-section">
+    <h4>Compartir en:</h4>
+    
+    <div class="platform-buttons">
+      @for (platform of platforms; track platform.name) {
+        <button
+          type="button"
+          class="platform-button"
+          [class]="'platform-' + platform.name"
+          [disabled]="isGenerating()"
+          (click)="shareOn(platform.name)">
+          {{ platform.label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="watermark-notice">
+    <p>ℹ️ Las imágenes compartidas incluyen un watermark.</p>
+    <p>Desbloqueá exportación en PDF sin watermark con <strong>Premium</strong>.</p>
+  </div>
+</div>

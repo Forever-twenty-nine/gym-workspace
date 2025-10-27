@@ -1,6 +1,13 @@
-// Archivo no versionado con claves reales de Firebase
-// Copia este archivo como environment.secrets.ts y agrega tus claves reales
-// Este archivo debe estar en .gitignore
+/**
+ * Archivo de ejemplo para configuración de Firebase
+ * 
+ * Para usar este archivo:
+ * 1. Copia este archivo como `environment.secrets.ts`
+ * 2. Reemplaza los valores de ejemplo con tus claves reales de Firebase
+ * 3. El archivo `environment.secrets.ts` está en .gitignore y no se subirá al repositorio
+ * 
+ * IMPORTANTE: Este archivo debe estar en .gitignore para no exponer las claves
+ */
 
 export const firebaseSecrets = {
   apiKey: 'TU_API_KEY_REAL',

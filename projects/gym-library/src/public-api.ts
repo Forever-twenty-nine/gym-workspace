@@ -28,7 +28,6 @@ export * from './lib/models/estadisticas-entrenado.model';
  * environments
  */
 export * from './lib/environments/environment';
-export * from './lib/environments/environment.prod';
 /*
  * servicios centralizados
  */
@@ -52,8 +51,8 @@ export * from './lib/services/social-share.service';
 /*
  * componentes
  */
-export * from './lib/components/social-share-button.component';
-export * from './lib/components/social-share-panel.component';
+export * from './lib/components/social-share-button/social-share-button.component';
+export * from './lib/components/social-share-panel/social-share-panel.component';
 /*
  * interfaces para adaptadores
  */

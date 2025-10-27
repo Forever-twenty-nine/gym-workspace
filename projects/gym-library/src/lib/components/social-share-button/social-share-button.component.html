@@ -1,0 +1,10 @@
+<button
+  type="button"
+  [disabled]="disabled() || isSharing()"
+  (click)="handleShare()">
+  @if (isSharing()) {
+    <span>Generando...</span>
+  } @else {
+    <ng-content></ng-content>
+  }
+</button>

@@ -1,162 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1761488822264" clover="3.2.0">
-  <project timestamp="1761488822264" name="All files">
-    <metrics statements="1533" coveredstatements="280" conditionals="629" coveredconditionals="124" methods="422" coveredmethods="99" elements="2584" coveredelements="503" complexity="0" loc="1533" ncloc="1533" packages="7" files="37" classes="37"/>
-    <package name="src">
-      <metrics statements="46" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
-      <file name="public-api.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/public-api.ts">
-        <metrics statements="46" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="66" count="0" type="stmt"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="75" count="0" type="stmt"/>
-        <line num="76" count="0" type="stmt"/>
-        <line num="78" count="0" type="stmt"/>
+<coverage generated="1761582273910" clover="3.2.0">
+  <project timestamp="1761582273910" name="All files">
+    <metrics statements="1485" coveredstatements="397" conditionals="629" coveredconditionals="144" methods="418" coveredmethods="110" elements="2532" coveredelements="651" complexity="0" loc="1485" ncloc="1485" packages="6" files="35" classes="35"/>
+    <package name="components.social-share-button">
+      <metrics statements="20" coveredstatements="20" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+      <file name="social-share-button.component.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/components/social-share-button/social-share-button.component.ts">
+        <metrics statements="20" coveredstatements="20" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="26" count="16" type="stmt"/>
+        <line num="29" count="16" type="stmt"/>
+        <line num="30" count="16" type="stmt"/>
+        <line num="31" count="16" type="stmt"/>
+        <line num="32" count="16" type="stmt"/>
+        <line num="35" count="16" type="stmt"/>
+        <line num="36" count="16" type="stmt"/>
+        <line num="39" count="16" type="stmt"/>
+        <line num="42" count="23" type="cond" truecount="4" falsecount="0"/>
+        <line num="43" count="6" type="stmt"/>
+        <line num="46" count="17" type="stmt"/>
+        <line num="48" count="17" type="stmt"/>
+        <line num="49" count="17" type="stmt"/>
+        <line num="54" count="14" type="stmt"/>
+        <line num="56" count="3" type="stmt"/>
+        <line num="57" count="3" type="stmt"/>
+        <line num="59" count="17" type="stmt"/>
       </file>
     </package>
-    <package name="src.lib">
-      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="gym-library.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/gym-library.ts">
-        <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
+    <package name="components.social-share-panel">
+      <metrics statements="34" coveredstatements="34" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
+      <file name="social-share-panel.component.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/components/social-share-panel/social-share-panel.component.ts">
+        <metrics statements="34" coveredstatements="34" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="20" type="stmt"/>
+        <line num="17" count="20" type="stmt"/>
+        <line num="18" count="20" type="stmt"/>
+        <line num="21" count="20" type="stmt"/>
+        <line num="22" count="20" type="stmt"/>
+        <line num="25" count="20" type="stmt"/>
+        <line num="26" count="20" type="stmt"/>
+        <line num="29" count="20" type="stmt"/>
+        <line num="30" count="20" type="stmt"/>
+        <line num="31" count="20" type="stmt"/>
+        <line num="33" count="20" type="stmt"/>
+        <line num="41" count="7" type="stmt"/>
+        <line num="43" count="7" type="stmt"/>
+        <line num="44" count="7" type="stmt"/>
+        <line num="45" count="7" type="stmt"/>
+        <line num="51" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="55" count="5" type="stmt"/>
+        <line num="56" count="5" type="stmt"/>
+        <line num="58" count="2" type="stmt"/>
+        <line num="59" count="2" type="stmt"/>
+        <line num="61" count="7" type="stmt"/>
+        <line num="66" count="10" type="stmt"/>
+        <line num="68" count="10" type="stmt"/>
+        <line num="69" count="10" type="stmt"/>
+        <line num="70" count="10" type="stmt"/>
+        <line num="75" count="8" type="stmt"/>
+        <line num="77" count="2" type="stmt"/>
+        <line num="78" count="2" type="stmt"/>
+        <line num="80" count="10" type="stmt"/>
+        <line num="85" count="18" type="stmt"/>
       </file>
     </package>
-    <package name="src.lib.components">
-      <metrics statements="54" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="4" coveredmethods="0"/>
-      <file name="social-share-button.component.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/components/social-share-button.component.ts">
-        <metrics statements="20" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="53" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
-        <line num="59" count="0" type="stmt"/>
-        <line num="60" count="0" type="stmt"/>
-        <line num="65" count="0" type="stmt"/>
-        <line num="67" count="0" type="stmt"/>
-        <line num="68" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-      </file>
-      <file name="social-share-panel.component.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/components/social-share-panel.component.ts">
-        <metrics statements="34" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="193" count="0" type="stmt"/>
-        <line num="194" count="0" type="stmt"/>
-        <line num="197" count="0" type="stmt"/>
-        <line num="198" count="0" type="stmt"/>
-        <line num="201" count="0" type="stmt"/>
-        <line num="202" count="0" type="stmt"/>
-        <line num="205" count="0" type="stmt"/>
-        <line num="206" count="0" type="stmt"/>
-        <line num="209" count="0" type="stmt"/>
-        <line num="210" count="0" type="stmt"/>
-        <line num="211" count="0" type="stmt"/>
-        <line num="213" count="0" type="stmt"/>
-        <line num="221" count="0" type="stmt"/>
-        <line num="223" count="0" type="stmt"/>
-        <line num="224" count="0" type="stmt"/>
-        <line num="225" count="0" type="stmt"/>
-        <line num="231" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="232" count="0" type="stmt"/>
-        <line num="235" count="0" type="stmt"/>
-        <line num="236" count="0" type="stmt"/>
-        <line num="238" count="0" type="stmt"/>
-        <line num="239" count="0" type="stmt"/>
-        <line num="241" count="0" type="stmt"/>
-        <line num="246" count="0" type="stmt"/>
-        <line num="248" count="0" type="stmt"/>
-        <line num="249" count="0" type="stmt"/>
-        <line num="250" count="0" type="stmt"/>
-        <line num="255" count="0" type="stmt"/>
-        <line num="257" count="0" type="stmt"/>
-        <line num="258" count="0" type="stmt"/>
-        <line num="260" count="0" type="stmt"/>
-        <line num="265" count="0" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.lib.enums">
-      <metrics statements="47" coveredstatements="8" conditionals="18" coveredconditionals="4" methods="9" coveredmethods="2"/>
+    <package name="enums">
+      <metrics statements="47" coveredstatements="47" conditionals="18" coveredconditionals="18" methods="9" coveredmethods="9"/>
       <file name="entrenado-tabs.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/entrenado-tabs.enum.ts">
-        <metrics statements="3" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="5" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="5" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
       </file>
       <file name="gimnasio-tabs.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/gimnasio-tabs.enum.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="5" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
+        <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="5" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
       </file>
       <file name="objetivo.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/objetivo.enum.ts">
-        <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
+        <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
       </file>
       <file name="permiso.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/permiso.enum.ts">
-        <metrics statements="7" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
+        <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
       </file>
       <file name="plan.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/plan.enum.ts">
         <metrics statements="3" coveredstatements="3" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
@@ -166,43 +109,43 @@
       </file>
       <file name="rol.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/rol.enum.ts">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="5" type="stmt"/>
+        <line num="3" count="5" type="stmt"/>
+        <line num="4" count="5" type="stmt"/>
+        <line num="5" count="5" type="stmt"/>
+      </file>
+      <file name="sesion-rutina-status.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/sesion-rutina-status.enum.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="1" count="3" type="cond" truecount="2" falsecount="0"/>
         <line num="2" count="3" type="stmt"/>
         <line num="3" count="3" type="stmt"/>
         <line num="4" count="3" type="stmt"/>
         <line num="5" count="3" type="stmt"/>
       </file>
-      <file name="sesion-rutina-status.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/sesion-rutina-status.enum.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-      </file>
       <file name="tipo-mensaje.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/tipo-mensaje.enum.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
+        <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
       </file>
       <file name="tipo-notificacion.enum.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/enums/tipo-notificacion.enum.ts">
-        <metrics statements="10" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
+        <metrics statements="10" coveredstatements="10" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="cond" truecount="2" falsecount="0"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
       </file>
     </package>
-    <package name="src.lib.environments">
+    <package name="environments">
       <metrics statements="8" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="environment.firebase.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/environments/environment.firebase.ts">
         <metrics statements="2" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -228,8 +171,8 @@
         <line num="6" count="0" type="stmt"/>
       </file>
     </package>
-    <package name="src.lib.services">
-      <metrics statements="1372" coveredstatements="272" conditionals="597" coveredconditionals="120" methods="403" coveredmethods="97"/>
+    <package name="services">
+      <metrics statements="1372" coveredstatements="296" conditionals="597" coveredconditionals="120" methods="403" coveredmethods="97"/>
       <file name="auth.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/auth.service.ts">
         <metrics statements="66" coveredstatements="64" conditionals="30" coveredconditionals="24" methods="19" coveredmethods="19"/>
         <line num="1" count="1" type="stmt"/>
@@ -301,9 +244,9 @@
       </file>
       <file name="ejercicio.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/ejercicio.service.ts">
         <metrics statements="135" coveredstatements="104" conditionals="78" coveredconditionals="52" methods="52" coveredmethods="44"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="30" count="1" type="stmt"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="3" count="3" type="stmt"/>
+        <line num="30" count="3" type="stmt"/>
         <line num="32" count="29" type="stmt"/>
         <line num="33" count="29" type="stmt"/>
         <line num="34" count="29" type="stmt"/>
@@ -438,9 +381,9 @@
         <line num="419" count="1" type="stmt"/>
       </file>
       <file name="entrenado.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/entrenado.service.ts">
-        <metrics statements="56" coveredstatements="0" conditionals="20" coveredconditionals="0" methods="29" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
+        <metrics statements="56" coveredstatements="2" conditionals="20" coveredconditionals="0" methods="29" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
         <line num="14" count="0" type="stmt"/>
         <line num="15" count="0" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
@@ -664,10 +607,10 @@
         <line num="486" count="0" type="stmt"/>
       </file>
       <file name="estadisticas-entrenado.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/estadisticas-entrenado.service.ts">
-        <metrics statements="64" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="11" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
+        <metrics statements="64" coveredstatements="3" conditionals="8" coveredconditionals="0" methods="11" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="49" count="2" type="stmt"/>
         <line num="50" count="0" type="stmt"/>
         <line num="53" count="0" type="stmt"/>
         <line num="54" count="0" type="stmt"/>
@@ -1021,11 +964,11 @@
         <line num="174" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
       <file name="progreso.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/progreso.service.ts">
-        <metrics statements="8" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
+        <metrics statements="8" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
         <line num="11" count="0" type="stmt"/>
         <line num="12" count="0" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
@@ -1120,10 +1063,10 @@
         <line num="248" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
       <file name="rutina.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/rutina.service.ts">
-        <metrics statements="57" coveredstatements="0" conditionals="23" coveredconditionals="0" methods="30" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
+        <metrics statements="57" coveredstatements="3" conditionals="23" coveredconditionals="0" methods="30" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="17" count="2" type="stmt"/>
         <line num="19" count="0" type="stmt"/>
         <line num="20" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
@@ -1180,12 +1123,12 @@
         <line num="189" count="0" type="stmt"/>
       </file>
       <file name="sesion-rutina.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/sesion-rutina.service.ts">
-        <metrics statements="72" coveredstatements="0" conditionals="28" coveredconditionals="0" methods="20" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
+        <metrics statements="72" coveredstatements="5" conditionals="28" coveredconditionals="0" methods="20" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="21" count="2" type="stmt"/>
         <line num="24" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
         <line num="28" count="0" type="stmt"/>
@@ -1255,14 +1198,14 @@
         <line num="203" count="0" type="stmt"/>
       </file>
       <file name="social-share.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/social-share.service.ts">
-        <metrics statements="227" coveredstatements="0" conditionals="93" coveredconditionals="0" methods="20" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
+        <metrics statements="227" coveredstatements="7" conditionals="93" coveredconditionals="0" methods="20" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
         <line num="31" count="0" type="stmt"/>
         <line num="32" count="0" type="stmt"/>
@@ -1518,9 +1461,9 @@
       </file>
       <file name="user.service.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/services/user.service.ts">
         <metrics statements="123" coveredstatements="104" conditionals="61" coveredconditionals="44" methods="37" coveredmethods="34"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="23" count="1" type="stmt"/>
+        <line num="1" count="3" type="stmt"/>
+        <line num="3" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
         <line num="25" count="29" type="stmt"/>
         <line num="26" count="29" type="stmt"/>
         <line num="27" count="29" type="stmt"/>
@@ -1657,7 +1600,7 @@
         <line num="41" count="0" type="stmt"/>
       </file>
     </package>
-    <package name="src.lib.utils">
+    <package name="utils">
       <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
       <file name="uuid.ts" path="/home/seba/repositorios/gym-workspace/projects/gym-library/src/lib/utils/uuid.ts">
         <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>

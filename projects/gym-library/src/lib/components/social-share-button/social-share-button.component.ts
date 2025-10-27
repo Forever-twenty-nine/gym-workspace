@@ -1,5 +1,5 @@
 import { Component, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-import { SocialShareService, ShareProgressOptions } from '../services/social-share.service';
+import { SocialShareService, ShareProgressOptions } from '../../services/social-share.service';
 
 /**
  * Componente de botón para compartir progreso en redes sociales
@@ -18,19 +18,8 @@ import { SocialShareService, ShareProgressOptions } from '../services/social-sha
  */
 @Component({
   selector: 'lib-social-share-button',
-  standalone: true,
-  template: `
-    <button
-      type="button"
-      [disabled]="disabled() || isSharing()"
-      (click)="handleShare()">
-      @if (isSharing()) {
-        <span>Generando...</span>
-      } @else {
-        <ng-content></ng-content>
-      }
-    </button>
-  `,
+  templateUrl: './social-share-button.component.html',
+  styleUrl: './social-share-button.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SocialShareButtonComponent {

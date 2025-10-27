@@ -19,6 +19,8 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.spec.ts',
-    '!src/**/*.d.ts'
+    '!src/**/*.d.ts',
+    '!src/public-api.ts',
+    '!src/lib/gym-library.ts'
   ],
 };
