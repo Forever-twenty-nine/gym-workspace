@@ -2,6 +2,9 @@
  * IONIC COMPONENTS - GLOBAL OVERRIDES
  * ============================================================================ */
 
+/* Se deben usar las variables del proyecto definidas en variables.css */
+
+
 html.md ion-button[fill="clean"][color="primary"],
 html.ios ion-button[fill="clean"][color="primary"] {
   --color: var(--ion-color-primary);
@@ -50,6 +53,7 @@ ion-card {
    /*box-shadow: var(--app-shadow-light); */
    margin: var(--app-spacing-md);
   animation: slideIn 0.3s ease-out;
+  background-color: var(--color-brand-primary);
 }
 
 @keyframes slideIn {
@@ -89,6 +93,10 @@ ion-tab-button {
 
  ion-tab-button.tab-selected {
    --color: var(--ion-color-primary);
+ }
+
+ ion-tab-button ion-icon{
+  font-size: 24px;
  }
 
  /* Estados especiales de tabs */

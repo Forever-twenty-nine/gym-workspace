@@ -22,13 +22,16 @@
           </ion-avatar>
           <div>
             <!-- Nombre -->
-            <p class="gym-title-color text-base! font-bold! mb-0!">
-              Hola, {{ nombreEntrenado() }}
+            <p class="text-xs text-brand-secondary ">
+              Bienvenido,
+            </p>
+            <p class="gym-title-color font-bold">
+              {{ nombreEntrenado() }}
             </p>
             <!-- Plan -->
-             <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
+             <!-- <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
             Plan {{ tipoPlan().replace('Plan ', '') }}
-          </ion-chip>
+          </ion-chip> -->
 
           </div>
         </div>
@@ -39,7 +42,9 @@
             class="text-2xl gym-text-color"
           ></ion-icon>
           @if (invitacionesPendientes().length > 0) {
-            <ion-badge color="danger" class="absolute -top-1 -right-1">{{ invitacionesPendientes().length }}</ion-badge>
+            <ion-badge color="primary" class="absolute -top-0.5 -right-0.5 min-w-4 min-h-4 rounded-full leading-4 text-xs ">
+              {{ invitacionesPendientes().length }}
+            </ion-badge>
           }
         </ion-button>
       </div>
@@ -60,14 +65,19 @@
       </div>
 
       @if (mostrarInvitaciones()) {
-        <div class="space-y-3">
+        <div class="">
           @for (invitacion of invitacionesPendientes(); track invitacion.id) {
-            <ion-card class="gym-box-primary shadow-md">
+            <ion-card class="gym-box-primary shadow-none m-0">
               <ion-card-content class="p-4">
-                <div class="flex items-start gap-3">
-                  <ion-avatar class="flex-shrink-0 !w-12 !h-12">
-                    <img src="../../../assets/images/test-foto.png" alt="Entrenador">
-                  </ion-avatar>
+                <div class="flex flex-col items-start gap-3 p-2">
+                  <div class="flex justify-center items-center gap-4">
+                    <ion-avatar class="flex-shrink-0 !w-12 !h-12">
+                      <img src="../../../assets/images/test-foto.png" alt="Entrenador">
+                    </ion-avatar>
+                    <p class="text-sm font-bold">{{ invitacion.datos.entrenadorNombre }}</p>
+                  </div>
+
+
                   <div class="flex-1 min-w-0">
                     <h3 class="font-heading font-semibold text-base mb-1 gym-title-color">{{ invitacion.titulo }}</h3>
                     <p class="text-sm text-gray-600 mb-2">{{ invitacion.mensaje }}</p>
@@ -76,13 +86,13 @@
                     }
                     <p class="text-xs text-gray-500 mt-1">{{ formatearFechaPublico(invitacion.fechaCreacion) }}</p>
                   </div>
-                  <div class="flex flex-col gap-2 flex-shrink-0">
-                    <ion-button fill="solid" color="success" size="small" (click)="aceptarInvitacion(invitacion)" class="min-w-[80px]">
-                      <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                  <div class="flex gap-2 flex-shrink-0">
+                    <ion-button fill="solid" color="success" size="small" (click)="aceptarInvitacion(invitacion)" class="p-2">
+                      <!-- <ion-icon name="checkmark-circle" slot="start"></ion-icon> -->
                       Aceptar
                     </ion-button>
-                    <ion-button fill="outline" color="danger" size="small" (click)="rechazarInvitacion(invitacion)" class="min-w-[80px]">
-                      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+                    <ion-button fill="outline" color="danger" size="small" (click)="rechazarInvitacion(invitacion)" class="p-2">
+                      <!-- <ion-icon name="close-circle-outline" slot="start"></ion-icon> -->
                       Rechazar
                     </ion-button>
                   </div>

@@ -215,9 +215,9 @@
 
 /* Tablet y pantallas medianas */
 @media (max-width: 768px) {
-  ion-card {
+  /* ion-card {
     margin: 10px;
-  }
+  } */
 
   .dashboard-container {
     padding: var(--app-spacing-sm);

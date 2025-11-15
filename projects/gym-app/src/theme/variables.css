@@ -1,3 +1,12 @@
+@theme{
+  --color-brand-primary: pink;
+  --color-brand-secondary: blue;
+}
+
+.dark{
+  --color-brand-primary: red;
+}
+
 
 :root{
 
@@ -7,7 +16,7 @@
  * 1) Light Theme Brand
       - Generamos la paleta de colores light base de la marca
  * ============================================================================ */
---brand-primary-color: #BBE40A; /*#d6fe51;*/ /*#D2F801*/
+--brand-primary-color: #BCFF31; /*#d6fe51;*/ /*#D2F801*/
 /* --brand-primary-shade: #6ca208;
 --brand-primary-tint: #96cf2a; */
 --brand-secondary-color: #e45328;
@@ -83,7 +92,7 @@
    * 3) - Dark Theme - Brand
     - Generamos la paleta de colores dark base de la marca
    * ============================================================================ */
-  --brand-primary-color: #BBE40A;
+  --brand-primary-color: #BCFF31;
   /* --brand-primary-shade: #94c30d;
   --brand-primary-tint: #cbf53c; */
   --brand-secondary-color: #e45328;
@@ -92,7 +101,7 @@
   --brand-warning-color: #ffd860;
   --brand-danger-color: #ff5a5f; */
   --brand-light-color: #f9f9f9;
-  --brand-medium-color: #2f302e;
+  --brand-medium-color: #202430;
   --brand-dark-color: #171717;
 
 
@@ -128,6 +137,10 @@
 
 
 /* Clases componentes */
+/*
+p{
+  color: var(--color-text);
+}
 
 .gym-title-color{
   color: var(--color-title);
@@ -154,6 +167,6 @@
 
 .gym-tab-entrenado ion-tab-bar {
   --background: var(--color-tab)
-}
+} */
 
 
