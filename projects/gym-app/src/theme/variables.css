@@ -1,14 +1,47 @@
-@theme{
-  --color-brand-primary: pink;
-  --color-brand-secondary: blue;
-}
-
-.dark{
-  --color-brand-primary: red;
-}
-
-
+/* 1. Defino mi paleta de colores */
 :root{
+  --brand-primary: #ddf44a;
+  --brand-secondary: #6ac33f;
+  --brand-dark: #161616;
+  --brand-gray: #9b9b9b;
+  --brand-gray-light: #f2f2f2;
+  --brand-light: #ffffff;
+  --brand-premium: #e45328;
+}
+
+/* 2. Para crear clases de Tailwind llamo a los colores brand */
+
+/* 3. Para el tema dark llamo a los colores brand */
+
+/* Se definen las variables que puede tomar Tailwind */
+@theme{
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-gray: var(--brand-gray);
+  --color-brand-gray-light: var(--brand-gray-light);
+  --color-brand-light: var(--brand-light);
+  --color-brand-premium: var(--brand-premium);
+
+  --font-head: 'Exo', sans-serif;
+  --font-body: 'Manrope', 'Helvetica Neue', sans-serif;
+
+
+}
+
+/* si no se definen las variables para el tema dark, tomará por defecto las de theme */
+.dark{
+  --color-brand-primary: #ddf44a;
+  --color-brand-secondary: #6ac33f;
+  --color-brand-dark: var(--brand-yoo);
+  --color-brand-gray: #9b9b9b;
+  --color-brand-gray-light: #f2f2f2;
+  --color-brand-light: var(--color-brand-dark);
+  --color-brand-premium: #e45328;
+}
+
+
+
 
 
 
@@ -16,17 +49,6 @@
  * 1) Light Theme Brand
       - Generamos la paleta de colores light base de la marca
  * ============================================================================ */
---brand-primary-color: #BCFF31; /*#d6fe51;*/ /*#D2F801*/
-/* --brand-primary-shade: #6ca208;
---brand-primary-tint: #96cf2a; */
---brand-secondary-color: #e45328;
-/* --brand-tertiary-color: #50e3c2; */
-/* --brand-success-color: #2dd36f;
---brand-warning-color: #fecc28;
---brand-danger-color: #eb445a; */
---brand-light-color: #f4f5f8;
---brand-medium-color: #2f302e;
---brand-dark-color: #171717;
 
 
 
@@ -40,7 +62,7 @@
  * ============================================================================ */
 
   /* 2.a) - Ionic Color Variables */
-  --ion-color-primary: var(--brand-primary-color);
+  /* --ion-color-primary: var(--brand-primary-color);
   --ion-color-primary-rgb: 126, 188, 8;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255,255,255;
@@ -54,12 +76,12 @@
   --ion-color-danger: var(--brand-danger-color);
   --ion-color-light: var(--brand-light-color);
   --ion-color-medium: var(--brand-medium-color);
-  --ion-color-dark: var(--brand-dark-color);
+  --ion-color-dark: var(--brand-dark-color); */
 
 
   /* 2.b) - Ionic Global Variables - solo se definen una vez porque en dark no es necesario cambiarlo */
-  --ion-font-family: 'Manrope', 'Helvetica Neue', sans-serif;
-  --ion-padding: 16px;
+  /* --ion-font-family: 'Manrope', 'Helvetica Neue', sans-serif;
+  --ion-padding: 16px; */
     /* ⚠️ Revisar estas variables https: //ionicframework.com/docs/theming/advanced */
     /* --ion-statusbar-padding: 50px;
     --ion-safe-area-top: 50px;
@@ -76,40 +98,19 @@
 
 
 
-    /* Variables de componentes propios */
-    --color-title: var(--brand-dark-color);
-    --color-text: var(--brand-medium-color);
-    --color-primary: var(--brand-primary-color);
-    --color-tab: var(--brand-medium-color);
-}
 
 
-
-
-
-.dark {
   /* ============================================================================
    * 3) - Dark Theme - Brand
     - Generamos la paleta de colores dark base de la marca
    * ============================================================================ */
-  --brand-primary-color: #BCFF31;
-  /* --brand-primary-shade: #94c30d;
-  --brand-primary-tint: #cbf53c; */
-  --brand-secondary-color: #e45328;
-  /* --brand-tertiary-color: #61f2d0;
-  --brand-success-color: #00ff9d;
-  --brand-warning-color: #ffd860;
-  --brand-danger-color: #ff5a5f; */
-  --brand-light-color: #f9f9f9;
-  --brand-medium-color: #202430;
-  --brand-dark-color: #171717;
 
 
   /* ============================================================================
    * 4) - Dark Theme - Ionic
     - Definimos las variables de Ionic usando los colores de la marca.
    * ============================================================================ */
-  --ion-color-primary: var(--brand-primary-color);
+  /* --ion-color-primary: var(--brand-primary-color);
   --ion-color-primary-rgb: 126, 188, 8;
   --ion-color-primary-contrast: #000000;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
@@ -123,50 +124,13 @@
   --ion-color-danger: var(--brand-danger-color);
   --ion-color-light: var(--brand-light-color);
   --ion-color-medium: var(--brand-medium-color);
-  --ion-color-dark: var(--brand-dark-color);
+  --ion-color-dark: var(--brand-dark-color); */
 
 
 
-  /* Variables de componentes propios */
-  --color-title: var(--brand-light-color);
-  --color-text: var(--brand-medium-color);
-  --color-primary: var(--brand-primary-color);
-  --color-tab: var(--brand-medium-color);
-}
-
-
-
-/* Clases componentes */
-/*
-p{
-  color: var(--color-text);
-}
-
-.gym-title-color{
-  color: var(--color-title);
-}
-
-.gym-text-color{
-  color: var(--color-text)
-}
-
-.gym-text-highlight {
-  color: var(--color-primary)
-}
-
-.gym-box-primary{
-  background-color: var(--brand-primary-color);
-}
-.gym-box-secondary {
-  background-color: var(--brand-secondary-color);
-}
-.gym-box-neutro {
-  background-color: var(--brand-medium-color);
-}
-
-
-.gym-tab-entrenado ion-tab-bar {
-  --background: var(--color-tab)
+/* Asegúrate de que Tailwind ya procesó y generó .font-body */
+/* @layer base {
+  body {
+    @apply font-head;
+  }
 } */
-
-

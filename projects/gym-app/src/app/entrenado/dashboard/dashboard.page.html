@@ -22,10 +22,10 @@
           </ion-avatar>
           <div>
             <!-- Nombre -->
-            <p class="text-xs text-brand-secondary ">
+            <p class="text-sm text-brand-gray">
               Bienvenido,
             </p>
-            <p class="gym-title-color font-bold">
+            <p class="text-xl font-bold font-head text-brand-dark">
               {{ nombreEntrenado() }}
             </p>
             <!-- Plan -->
@@ -54,7 +54,7 @@
   @if (invitacionesPendientes().length > 0) {
     <section class="p-2 mb-4">
       <div class="flex items-center justify-between mb-3">
-        <h2 class="font-heading text-lg font-semibold flex items-center gap-2 gym-title-color">
+        <h2 class="font-head text-lg font-semibold flex items-center gap-2 gym-title-color">
           <ion-icon name="notifications-circle" class="text-xl"></ion-icon>
           Invitaciones Pendientes
           <ion-badge color="primary" class="ml-2">{{ invitacionesPendientes().length }}</ion-badge>

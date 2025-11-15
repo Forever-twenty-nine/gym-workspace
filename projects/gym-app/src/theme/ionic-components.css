@@ -5,6 +5,13 @@
 /* Se deben usar las variables del proyecto definidas en variables.css */
 
 
+:root {
+  /* Definir las variables usadas en tailwind acá */
+  /* Es necesario definirlo acá porque se usan los componentes de ionic y tailwind no tiene peso con ellos */
+  --ion-font-family: var(--font-body);
+  --ion-background-color: var(--color-brand-light);
+}
+
 html.md ion-button[fill="clean"][color="primary"],
 html.ios ion-button[fill="clean"][color="primary"] {
   --color: var(--ion-color-primary);
