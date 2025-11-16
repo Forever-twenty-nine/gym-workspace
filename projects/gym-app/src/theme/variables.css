@@ -33,10 +33,10 @@
 .dark{
   --color-brand-primary: #ddf44a;
   --color-brand-secondary: #6ac33f;
-  --color-brand-dark: var(--brand-yoo);
+  --color-brand-dark: var(--brand-gray-light);
   --color-brand-gray: #9b9b9b;
-  --color-brand-gray-light: #f2f2f2;
-  --color-brand-light: var(--color-brand-dark);
+  --color-brand-gray-light: var(--brand-dark);
+  --color-brand-light: var(--brand-dark);
   --color-brand-premium: #e45328;
 }
 

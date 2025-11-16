@@ -6,10 +6,12 @@
 
 
 :root {
-  /* Definir las variables usadas en tailwind acá */
-  /* Es necesario definirlo acá porque se usan los componentes de ionic y tailwind no tiene peso con ellos */
+  /* Definir las variables usadas en tailwind acá
+     Usar siempre referencia tema light ya que el dark está definido en Tailwind */
   --ion-font-family: var(--font-body);
   --ion-background-color: var(--color-brand-light);
+
+  --ion-color-primary: var(--color-brand-primary);
 }
 
 html.md ion-button[fill="clean"][color="primary"],
@@ -39,12 +41,41 @@ ion-header ion-toolbar{
   background: blue !important;
 } */
 
-ion-button.button-large{
+
+/* ion-button.button-large{
   --padding-top: 20px;
   --padding-bottom: 20px;
   font-size: 1.1rem;
+} */
+
+ion-button{
+  text-transform: none;
+  font-family: 'Exo', sans-serif;
+  font-weight: bold;
+  min-height: 42px;
+  --box-shadow: none;
 }
 
+ion-button.gym-btn-icon{
+  --background: var(--color-brand-gray-light);
+  --color: var(--color-brand-dark);
+  --box-shadow: none;
+
+  --padding-top: 12px;
+  --padding-right: 12px;
+  --padding-left: 12px;
+  --padding-bottom: 12px
+}
+
+ion-button.gym-btn-outline{
+  --border-color: var(--color-brand-gray);
+  --color: var(--color-brand-light)
+}
+
+ion-button.gym-btn-accent{
+  --background: var(--brand-primary);
+  --color: var(--brand-dark)
+}
 
 /* -- Spinner -- */
 ion-spinner {
@@ -55,12 +86,10 @@ ion-spinner {
 
 /* -- Card -- */
 ion-card {
-  /* --box-shadow: none; */
-   border-radius: var(--app-border-radius-lg);
-   /*box-shadow: var(--app-shadow-light); */
-   margin: var(--app-spacing-md);
+  border-radius: 30px;
+  margin: var(--app-spacing-md);
   animation: slideIn 0.3s ease-out;
-  background-color: var(--color-brand-primary);
+  background-color: var(--color-brand-dark);
 }
 
 @keyframes slideIn {
@@ -79,6 +108,8 @@ ion-card-title {
    color: var(--ion-color-primary);
    font-weight: 600;
 }
+
+
 
 
 /* -- Tabs -- */
