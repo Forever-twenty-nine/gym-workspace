@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/entrenado-tabs/dashboard" text="" icon="arrow-back-outline"></ion-back-button>
     </ion-buttons>
-    <ion-title class="text-center flex-1 text-base">Perfil</ion-title>
+    <ion-title class="text-center flex-1 text-lg">Perfil</ion-title>
     <ion-buttons slot="end">
       <ion-button fill="clear">
         <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
@@ -21,25 +21,25 @@
       <ion-avatar class="!w-24 !h-24 mx-auto mb-4">
         <img src="../../../assets/images/test-foto.png" alt="" class="">
       </ion-avatar>
-      <p class="font-heading font-bold text-2xl mb-1 ">
+      <p class="font-head font-bold text-2xl mb-1 text-brand-dark ">
         {{ user.nombre }}
       </p>
-      <p class="text-gray-600 text-sm mb-1 ">
+      <p class="text-brand-gray text-sm mb-1 ">
         Miembro desde: 19/10/2025
       </p>
     </section>
 
-    <ion-card class="">
+    <ion-card class="bg-linear-65 from-brand-primary to-brand-secondary">
       <ion-card-content class="gym-box-secondary bg-[var(--brand-color-primary)] p-2">
         <div class="flex flex-col gap-2 p-2 items-start">
           <!-- Plan -->
           @if (user.plan) {
             <div class="flex justify-center items-center">
               <div>
-                <span class="gym-box-primary px-2 py-0.5 mr-2 rounded-full text-xs">
+                <span class="px-2 py-0.5 mr-2 rounded-full text-xs bg-brand-premium text-white">
                   Pro
                 </span>
-                <span class="text-white font-heading font-bold text-lg">
+                <span class="text-[var(--brand-dark)] font-heading font-bold text-lg">
                   ¡Pásate a Premium y desbloquea más funciones!
                 </span>
               </div>
@@ -54,18 +54,18 @@
     <!-- Información personal -->
     <section class="p-2 mt-6">
       <!-- titulo -->
-      <h2 class=" font-heading text-lg font-semibold flex justify-between items-center mb-3">
+      <h2 class=" font-head text-lg font-bold flex justify-between items-center mb-3 text-brand-dark">
         Información de cuenta
       </h2>
-      <div class="flex flex-col gap-2 p-4 items-start bg-gray-400/50 rounded-2xl">
+      <div class="flex flex-col gap-2 p-4 items-start rounded-2xl bg-brand-gray-light mb-4">
         <!-- Email -->
         @if (user.email) {
           <div class="flex items-start w-full gap-2 p-2">
-            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
-              <span class="text-gray-500 text-xs font-heading">
+            <div class="flex flex-col border-b border-solid border-brand-gray w-full pb-3">
+              <span class="text-brand-gray text-xs font-head">
                 Email
               </span>
-              <span class="">
+              <span class="text-brand-dark">
                 {{ user.email }}
               </span>
             </div>
@@ -76,8 +76,8 @@
           <div class="info-item">
             <ion-icon name="fitness-outline" color="primary"></ion-icon>
             <div class="info-text">
-              <span class="info-label">Gimnasio</span>
-              <span class="info-value">{{ user.gimnasioId }}</span>
+              <span class="text-brand-dark">Gimnasio</span>
+              <span class="text-brand-dark">{{ user.gimnasioId }}</span>
             </div>
           </div>
         }
@@ -86,19 +86,19 @@
           <div class="info-item">
             <ion-icon name="person-outline" color="primary"></ion-icon>
             <div class="info-text">
-              <span class="info-label">Entrenador</span>
-              <span class="info-value">{{ user.entrenadorId }}</span>
+              <span class="text-brand-dark">Entrenador</span>
+              <span class="text-brand-dark">{{ user.entrenadorId }}</span>
             </div>
           </div>
         }
 
         <!-- Usuario -->
         <div class="flex items-start gap-2 p-2 w-full">
-            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
-              <span class="text-gray-500 text-xs font-heading">
+            <div class="flex flex-col border-b border-solid border-brand-gray w-full pb-3">
+              <span class="text-brand-gray text-xs font-head">
                 ID Usuario
               </span>
-              <span class="text-sm mt-1">
+              <span class="text-brand-dark">
                 {{ user.uid }}
               </span>
             </div>
@@ -107,11 +107,11 @@
         <!-- Plan -->
         @if (user.plan) {
           <div class="flex items-start gap-2 p-2 w-full">
-            <div class="flex flex-col  border-b border-solid border-gray-400 w-full pb-3">
-              <span class="text-gray-500 text-xs font-heading">
+            <div class="flex flex-col border-b border-solid border-brand-gray w-full pb-3">
+              <span class="text-brand-gray text-xs font-head">
                 Plan
               </span>
-              <span class="text-sm mt-1">
+              <span class="text-brand-dark">
                 {{ user.plan }}
               </span>
             </div>
@@ -129,12 +129,10 @@
       <div class="px-2">
         <ion-button
           expand="block"
-          fill="solid"
+          fill="outline"
           size="default"
           shape="round"
-          color="medium"
           (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
           Cerrar Sesión
         </ion-button>
       </div>

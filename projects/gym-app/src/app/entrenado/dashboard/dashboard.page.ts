@@ -50,7 +50,6 @@ import { Entrenado, Rutina } from 'gym-library';
     IonCard,
     IonCardContent,
     IonIcon,
-    IonChip,
     IonAvatar,
     IonButton,
     IonBadge
@@ -133,7 +132,7 @@ export class DashboardPage implements OnInit {
     const entrenado = this.entrenadoService.getEntrenado(userId)();
 
     // Filtrar rutinas asignadas a este entrenado
-    const rutinasDelEntrenado = rutinas.filter(rutina => 
+    const rutinasDelEntrenado = rutinas.filter(rutina =>
       entrenado?.rutinasAsignadasIds?.includes(rutina.id)
     );
 
@@ -143,7 +142,7 @@ export class DashboardPage implements OnInit {
       const entrenadorId = entrenado?.entrenadoresId?.[0];
       const creador = allUsers.find(u => u.uid === entrenadorId);
       const asignadoPor = creador?.nombre || creador?.email || 'Entrenador';
-      
+
       return {
         nombre: rutina.nombre,
         fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
@@ -201,7 +200,7 @@ export class DashboardPage implements OnInit {
     });
 
     const uniqueInvitaciones = Array.from(uniqueMap.values());
-   
+
     // También verificar duplicados por contenido (mismo entrenador)
     const contentMap = new Map();
     uniqueInvitaciones.forEach(invitacion => {

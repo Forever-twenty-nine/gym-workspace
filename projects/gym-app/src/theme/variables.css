@@ -1,20 +1,8 @@
-/* 1. Defino mi paleta de colores */
-:root{
-  --brand-primary: #ddf44a;
-  --brand-secondary: #6ac33f;
-  --brand-dark: #161616;
-  --brand-gray: #9b9b9b;
-  --brand-gray-light: #f2f2f2;
-  --brand-light: #ffffff;
-  --brand-premium: #e45328;
-}
-
-/* 2. Para crear clases de Tailwind llamo a los colores brand */
-
-/* 3. Para el tema dark llamo a los colores brand */
-
-/* Se definen las variables que puede tomar Tailwind */
-@theme{
+/* ===============================
+   1. TAILWIND v4 THEME MAPPING
+================================= */
+@theme {
+  /* Colors accesibles desde Tailwind */
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
   --color-brand-dark: var(--brand-dark);
@@ -23,19 +11,45 @@
   --color-brand-light: var(--brand-light);
   --color-brand-premium: var(--brand-premium);
 
-  --font-head: 'Exo', sans-serif;
-  --font-body: 'Manrope', 'Helvetica Neue', sans-serif;
-
+  /* Fonts accesibles desde Tailwind */
+  --font-sans: var(--font-body);
+  --font-head: var(--font-head);
+  --font-body: var(--font-body);
 
 }
 
-/* si no se definen las variables para el tema dark, tomará por defecto las de theme */
+
+/* ===============================
+   2. PALETA BASE DEL PROYECTO
+================================= */
+:root{
+  --brand-primary: #ddf44a;
+  --brand-secondary: #6ac33f;
+  --brand-dark: #161616;
+  --brand-gray: #9b9b9b;
+  --brand-gray-light: #f2f2f2;
+  --brand-light: #ffffff;
+  --brand-premium: #e45328;
+
+  /* Tipografías */
+  --font-head: 'Exo', sans-serif;
+  --font-body: 'Manrope', 'Helvetica Neue', sans-serif;
+}
+
+
+
+
+
+
+/* ===============================
+   3. DARK MODE OVERRIDE
+================================= */
 .dark{
   --color-brand-primary: #ddf44a;
   --color-brand-secondary: #6ac33f;
   --color-brand-dark: var(--brand-gray-light);
   --color-brand-gray: #9b9b9b;
-  --color-brand-gray-light: var(--brand-dark);
+  --color-brand-gray-light: #292929;
   --color-brand-light: var(--brand-dark);
   --color-brand-premium: #e45328;
 }

@@ -31,7 +31,7 @@ import { UserService, AuthService, User, RutinaService, Rutina, Rol, EntrenadoSe
   templateUrl: 'perfil.page.html',
   styleUrls: ['perfil.page.css'],
   standalone: true,
-  imports: [IonChip, IonBackButton, IonButtons,
+  imports: [IonBackButton, IonButtons,
     CommonModule,
     IonHeader,
     IonToolbar,
@@ -69,7 +69,7 @@ export class PerfilPage implements OnInit {
 
     const rutinasCompletadas = 0; // No hay propiedad completado
     const rutinasActivas = misRutinas.filter(r => r.activa).length;
-    const totalEjercicios = misRutinas.reduce((total, r) => 
+    const totalEjercicios = misRutinas.reduce((total, r) =>
       total + (r.ejerciciosIds?.length || 0), 0
     );
 

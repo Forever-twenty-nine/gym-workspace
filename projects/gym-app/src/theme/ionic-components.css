@@ -1,28 +1,217 @@
-/* ============================================================================
- * IONIC COMPONENTS - GLOBAL OVERRIDES
- * ============================================================================ */
+/*
+las variables nativas creadas para el proyecto, se usan cuando no queremos cambiar de color en tema light y dark
+las variables de Tailwind se usan cuando si queremos que adopten otro color en light y dark especificado en el archivo variables.css
 
-/* Se deben usar las variables del proyecto definidas en variables.css */
+*/
+
+
+/* ===============================
+   BASE DE IONIC (ROOT)
+================================= */
 
 
 :root {
-  /* Definir las variables usadas en tailwind acá
-     Usar siempre referencia tema light ya que el dark está definido en Tailwind */
+  --brand-primary-rgb: 221, 244, 74;
+
   --ion-font-family: var(--font-body);
   --ion-background-color: var(--color-brand-light);
 
   --ion-color-primary: var(--color-brand-primary);
+  --ion-color-secondary: var(--color-brand-secondary);
 }
 
-html.md ion-button[fill="clean"][color="primary"],
+
+
+/* ===============================
+   HEADER / TOOLBAR
+================================= */
+ion-header,
+ion-toolbar {
+  --background: transparent;
+  --box-shadow: none;
+}
+
+ion-toolbar{
+  --color: var(--color-brand-dark)
+}
+
+ion-tab-bar {
+  height: 90px;
+  border-radius: 40px 40px 0 0;
+}
+ion-tab-button ion-icon {
+  font-size: 24px;
+}
+ion-tab-button {
+  --color: rgb(212, 212, 212);
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.gym-tab-entrenado ion-tab-bar{
+  --background: var(--color-brand-gray-light);
+}
+ion-tab-button.tab-selected {
+  color: var(--color-brand-secondary);
+}
+.dark ion-tab-button.tab-selected{
+  color: var(--color-brand-primary);
+}
+.gym-tab-entrenado ion-tab-button.tab-selected .icon-default {
+  display: none;
+}
+
+.gym-tab-entrenado ion-tab-button.tab-selected .icon-active {
+  display: inline-block;
+}
+
+
+
+
+
+/* Estados especiales de tabs */
+ion-tab-button.tab-hidden {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Colores específicos por tipo de tab */
+/* ion-tab-button[tab="dashboard"] {
+  --color-selected: var(--ion-color-primary);
+}
+
+ion-tab-button[tab="entrenamientos"] {
+  --color-selected: var(--ion-color-success);
+}
+
+ion-tab-button[tab="progreso"] {
+  --color-selected: var(--ion-color-tertiary);
+}
+
+ion-tab-button[tab="nutricion"] {
+  --color-selected: var(--ion-color-warning);
+}
+
+ion-tab-button[tab="comunidad"] {
+  --color-selected: var(--ion-color-secondary);
+}
+
+ion-tab-button[tab="clientes"] {
+  --color-selected: var(--ion-color-warning);
+}
+
+ion-tab-button[tab="perfil"] {
+  --color-selected: var(--ion-color-primary);
+} */
+
+
+
+
+/* ===============================
+   BOTONES IONIC POR DEFECTO
+================================= */
+ion-button{
+  text-transform: none;
+  font-family: var(--font-head);
+  font-weight: bold;
+
+  --min-height: 60px;
+  --padding-top: 18px;
+  --padding-bottom: 18px;
+}
+
+ion-button[fill="solid"] {
+  --background: var(--brand-primary);
+  --color: var(--brand-dark);
+
+  --box-shadow: none;
+  --min-height: 60px;
+}
+
+/* Estado disabled */
+ion-button[fill="solid"][disabled] {
+  opacity: 0.6;
+}
+
+
+ion-button[fill="outline"] {
+  --background: transparent;
+  --color: var(--color-brand-dark);
+  --border-color: var(--brand-gray);
+
+  --box-shadow: none;
+  --min-height: 60px;
+}
+
+ion-button[fill="clean"] {
+  --background: transparent;
+  --color: var(--color-brand-dark);
+}
+
+ion-button.gym-btn-icon {
+  --background: var(--color-brand-gray-light);
+  --color: var(--color-brand-dark);
+  --box-shadow: none;
+
+  --padding-top: 12px;
+  --padding-right: 12px;
+  --padding-left: 12px;
+  --padding-bottom: 12px
+}
+
+/* ===============================
+   BADGE BASE
+================================= */
+ion-badge {
+  font-family: var(--font-head);
+  padding: theme(padding.3);
+  border-radius: 20px;
+  line-height: 2px;
+  color: var(--brand-dark);
+}
+
+
+/* ===============================
+   CARD
+================================= */
+
+ion-card {
+  --ion-font-family: var(--font-body);
+  --background: var(--color-brand-dark);
+  --color: var(--color-brand-light);
+  padding: theme(padding.1);
+  box-shadow: none;
+  border-radius: 30px;
+
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+/* html.md ion-button[fill="clean"][color="primary"],
 html.ios ion-button[fill="clean"][color="primary"] {
   --color: var(--ion-color-primary);
   --background: transparent;
   --padding-end: 8px;
   --padding-start: 8px;
-}
+} */
 
-ion-header{
+/* ion-header{
   box-shadow: none !important;
   background: transparent;
 
@@ -31,7 +220,7 @@ ion-header{
 ion-header ion-toolbar{
   --box-shadow: none !important;
   --background: transparent;
-}
+} */
 
 /* Buttons Primary Outline */
 /* html.md ion-button[fill="outline"][color="primary"]{} */
@@ -48,156 +237,15 @@ ion-header ion-toolbar{
   font-size: 1.1rem;
 } */
 
-ion-button{
-  text-transform: none;
-  font-family: 'Exo', sans-serif;
-  font-weight: bold;
-  min-height: 42px;
-  --box-shadow: none;
-}
 
-ion-button.gym-btn-icon{
-  --background: var(--color-brand-gray-light);
-  --color: var(--color-brand-dark);
-  --box-shadow: none;
 
-  --padding-top: 12px;
-  --padding-right: 12px;
-  --padding-left: 12px;
-  --padding-bottom: 12px
-}
 
-ion-button.gym-btn-outline{
-  --border-color: var(--color-brand-gray);
-  --color: var(--color-brand-light)
-}
-
-ion-button.gym-btn-accent{
-  --background: var(--brand-primary);
-  --color: var(--brand-dark)
-}
 
 /* -- Spinner -- */
 ion-spinner {
   width: 18px;
   height: 18px;
 }
-
-
-/* -- Card -- */
-ion-card {
-  border-radius: 30px;
-  margin: var(--app-spacing-md);
-  animation: slideIn 0.3s ease-out;
-  background-color: var(--color-brand-dark);
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-ion-card-title {
-   color: var(--ion-color-primary);
-   font-weight: 600;
-}
-
-
-
-
-/* -- Tabs -- */
-ion-tab-bar{
-  height: 90px;
-  border-radius: 40px 40px 0 0;
-}
-ion-tab-button {
-   --color: rgb(212, 212, 212);
-   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-}
-.gym-tab-entrenado ion-tab-button.tab-selected .icon-default {
-  display: none;
-}
-
-.gym-tab-entrenado ion-tab-button.tab-selected .icon-active {
-  display: inline-block;
-}
-
- ion-tab-button.tab-selected {
-   --color: var(--ion-color-primary);
- }
-
- ion-tab-button ion-icon{
-  font-size: 24px;
- }
-
- /* Estados especiales de tabs */
- ion-tab-button.tab-hidden {
-   opacity: 0;
-   transform: scale(0.8);
-   pointer-events: none;
- }
-
- /* Colores específicos por tipo de tab */
- ion-tab-button[tab="dashboard"] {
-   --color-selected: var(--ion-color-primary);
- }
-
- ion-tab-button[tab="entrenamientos"] {
-   --color-selected: var(--ion-color-success);
- }
-
- ion-tab-button[tab="progreso"] {
-   --color-selected: var(--ion-color-tertiary);
- }
-
- ion-tab-button[tab="nutricion"] {
-   --color-selected: var(--ion-color-warning);
- }
-
- ion-tab-button[tab="comunidad"] {
-   --color-selected: var(--ion-color-secondary);
- }
-
- ion-tab-button[tab="clientes"] {
-   --color-selected: var(--ion-color-warning);
- }
-
- ion-tab-button[tab="perfil"] {
-   --color-selected: var(--ion-color-primary);
- }
-
- /* Variantes de color para diferentes roles */
- .tabs-entrenador ion-tab-bar {
-   --color-selected: var(--ion-color-warning);
- }
-
- .tabs-entrenador ion-tab-button {
-   --color-selected: var(--ion-color-warning);
- }
-
- .tabs-entrenador ion-tab-button.tab-selected {
-   --color: var(--ion-color-warning);
- }
-
- .tabs-gimnasio ion-tab-button.tab-selected {
-   --color: var(--ion-color-primary);
- }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -264,12 +312,7 @@ ion-tab-button {
    margin-right: var(--app-spacing-xs);
  }
 
- /* Toolbar - Configuración global */
- ion-toolbar.transparent {
-   --background: transparent;
-   --border-color: transparent;
-   --color: white;
- }
+
 
  /* Titles - Configuración global */
  ion-title.centered {

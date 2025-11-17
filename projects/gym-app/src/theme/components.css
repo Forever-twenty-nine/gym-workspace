@@ -1,0 +1,38 @@
+/* Button general */
+.g-btn-primary,
+.g-btn-outline{
+  --color: var(--color-brand-dark);
+  --padding-start: theme(spacing.4);
+  --padding-end: theme(spacing.4);
+  --padding-top: theme(spacing.4);
+  --padding-bottom: theme(spacing.4);
+  --border-radius: theme(borderRadius.full);
+}
+
+
+/* Button primary */
+/* .g-btn-primary {
+  --background: var(--color-brand-primary);
+  --color: var(--brand-dark);
+  --background-hover: color-mix(in srgb, var(--color-brand-primary), black 10%);
+
+
+} */
+
+/* Button outline */
+/* .g-btn-outline {
+  --background: transparent;
+  --border-color: var(--color-brand-gray)
+} */
+
+
+.g-card {
+  --background: var(--color-brand-light);
+  --color: var(--color-brand-dark);
+  --border-radius: theme(borderRadius.xl);
+  --padding: theme(spacing.8);
+}
+
+
+
+

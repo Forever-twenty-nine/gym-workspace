@@ -1,45 +1,19 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
-*/
-
-/* 1) Importing Fonts */
+/* 1. Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700&display=swap');
 
-
-/* 2) Ionic Styles (revisar si es necesario todos estos llamados o si faltan)*/
+/* 2. Ionic base */
 @import "@ionic/angular/css/core.css";
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
-/* @import "@ionic/angular/css/typography.css"; - Elegimos las de Tailwind */
 @import "@ionic/angular/css/display.css";
-/* Optional Ionic */
 @import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
-@import "@ionic/angular/css/flex-utils.css";
 
-
-/* 3) Ionic - Angular .dark class (será necesario?) */
-/* @import '@ionic/angular/css/palettes/dark.system.css'; */
-
-
-/* 4) Tailwind Styles */
+/* 3. Tailwind */
 @import "tailwindcss";
 
-
-/* 5) Se definen las variables del proyecto y las que tomará Tailwind para crear clases */
+/* 4. Custom theme (variables, Ionic overrides, my component styles) */
 @import "./theme/variables.css";
-
-
-/* 6) Ionic Components */
 @import "./theme/ionic-components.css";
-
-
-/* 7) Custom Styles - debe desaparecer */
- @import "./theme/custom.css";
-
+@import "./theme/components.css";
