@@ -6,13 +6,27 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { applyInitialTheme } from 'theme';
-//firebase
+import { InjectionToken } from '@angular/core';
 import { environment } from './environments/environment';
-import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import { Environment } from 'gym-library';
-//config
+import { initializeApp } from 'firebase/app';
+import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator, Auth } from 'firebase/auth';
+
+import { FIRESTORE, AUTH } from './app/core/firebase.tokens';
+
+// Inicializar Firebase nativo
+const firebaseApp = initializeApp(environment.firebase);
+const firestore = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+
+
+if ((environment as any).useEmulator) {
+  connectFirestoreEmulator(firestore, 'localhost', 8080);
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+}
+auth.useDeviceLanguage();
+
+// config
 import { appProviders } from './app/core/app.config';
 
 applyInitialTheme();
@@ -23,24 +37,11 @@ bootstrapApplication(AppComponent, {
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     importProvidersFrom(IonicStorageModule.forRoot()),
-    //firebase
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => {
-      const firestore = getFirestore();
-      if ((environment as any).useEmulator) {
-        connectFirestoreEmulator(firestore, 'localhost', 8080);
-      }
-      return firestore;
-    }),
-    provideAuth(() => {
-      const auth = getAuth();
-      auth.useDeviceLanguage();
-      if ((environment as any).useEmulator) {
-        connectAuthEmulator(auth, 'http://localhost:9099', {disableWarnings: true});
-      }
-      return auth;
-    }),
+    // Proveedores de Firebase nativo usando Tokens
+    { provide: FIRESTORE, useValue: firestore },
+    { provide: AUTH, useValue: auth },
     // app config
     ...appProviders
   ],
 });
+

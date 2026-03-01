@@ -6,19 +6,22 @@ import {
     doc,
     deleteDoc,
     setDoc,
+    updateDoc,
     onSnapshot,
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class RutinaAsignadaService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
+
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'rutinas-asignadas';

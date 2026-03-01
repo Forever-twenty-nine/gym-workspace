@@ -8,9 +8,10 @@ import {
   deleteDoc,
   Timestamp,
   DocumentSnapshot
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { EstadisticasEntrenado } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens';
 
 /**
  * 📊 Servicio de gestión de Estadísticas de Entrenados
@@ -20,7 +21,8 @@ import { ZoneRunnerService } from './zone-runner.service';
   providedIn: 'root'
 })
 export class EstadisticasEntrenadoService {
-  private readonly firestore = inject(Firestore);
+  private readonly firestore = inject(FIRESTORE);
+
   private readonly injector = inject(Injector);
   private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'estadisticas-entrenado';

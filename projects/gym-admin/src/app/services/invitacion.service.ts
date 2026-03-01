@@ -12,16 +12,18 @@ import {
     orderBy,
     Timestamp,
     DocumentSnapshot
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class InvitacionService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
+
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION_NAME = 'invitaciones';

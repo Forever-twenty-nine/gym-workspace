@@ -2,27 +2,29 @@ import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector,
 import {
     Firestore,
     collection,
-    doc,
     addDoc,
+    doc,
     updateDoc,
     deleteDoc,
     onSnapshot,
     setDoc,
     query,
+    where,
     orderBy,
     Timestamp,
     QuerySnapshot,
-    DocumentSnapshot
-} from '@angular/fire/firestore';
+    DocumentSnapshot,
+} from 'firebase/firestore';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class InvitacionService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'invitaciones';

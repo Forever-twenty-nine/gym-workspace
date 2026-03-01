@@ -6,18 +6,21 @@ import {
     doc,
     deleteDoc,
     setDoc,
+    updateDoc,
     onSnapshot,
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot,
     deleteField
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { Entrenado } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadoService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
+
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'entrenados';

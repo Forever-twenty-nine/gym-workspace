@@ -2,31 +2,32 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessC
 import { provideRouter } from '@angular/router';
 
 import { environment } from '../environments/environment';
-import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { routes } from './app.routes';
+import { initializeApp } from 'firebase/app';
+
+import { getFirestore, connectFirestoreEmulator, Firestore as FirebaseFirestore } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator, Auth as FirebaseAuth } from 'firebase/auth';
+import { FIRESTORE, AUTH } from './services/firebase.tokens';
+
+// Inicializar Firebase nativo
+const firebaseApp = initializeApp(environment.firebase);
+const firestore = getFirestore(firebaseApp);
+const auth = getAuth(firebaseApp);
+
+if ((environment as any).useEmulator) {
+  connectFirestoreEmulator(firestore, 'localhost', 8080);
+  connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+}
+auth.useDeviceLanguage();
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideFirestore(() => {
-      const firestore = getFirestore();
-      if ((environment as any).useEmulator) {
-        connectFirestoreEmulator(firestore, 'localhost', 8080);
-      }
-      return firestore;
-    }),
-    provideAuth(() => {
-      const auth = getAuth();
-      auth.useDeviceLanguage();
-      if ((environment as any).useEmulator) {
-        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-      }
-      return auth;
-    }),
+    // Proveedores de Firebase nativo usando Tokens
+    { provide: FIRESTORE, useValue: firestore },
+    { provide: AUTH, useValue: auth },
   ]
 };
+

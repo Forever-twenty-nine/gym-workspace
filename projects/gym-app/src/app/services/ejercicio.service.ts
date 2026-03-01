@@ -10,9 +10,10 @@ import {
 	QuerySnapshot,
 	DocumentSnapshot,
 	Timestamp
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { Ejercicio, Rol } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 /**
  * Errores de validación personalizados
@@ -26,7 +27,8 @@ export class EjercicioValidationError extends Error {
 
 @Injectable({ providedIn: 'root' })
 export class EjercicioService {
-	private readonly firestore = inject(Firestore);
+	private readonly firestore = inject(FIRESTORE);
+
 	private readonly injector = inject(Injector);
 	private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
 	private readonly COLLECTION = 'ejercicios';

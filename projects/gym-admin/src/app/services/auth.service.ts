@@ -7,21 +7,23 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
-  authState,
+  onAuthStateChanged,
   updateProfile,
   UserCredential,
   User as FirebaseUser
-} from '@angular/fire/auth';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
+} from 'firebase/auth';
+import { Firestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE, AUTH } from './firebase.tokens';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly auth = inject(Auth);
-  private readonly firestore = inject(Firestore);
+  private readonly auth = inject(AUTH);
+  private readonly firestore = inject(FIRESTORE);
   private readonly injector = inject(Injector);
   private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
 
@@ -30,8 +32,15 @@ export class AuthService {
   private readonly _isLoading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
-  // Signal para el estado de autenticación de Firebase
-  private readonly firebaseUser: Signal<FirebaseUser | null | undefined> = toSignal(authState(this.auth));
+  // Signal para el estado de autenticación de Firebase (usando nativo)
+  private readonly firebaseUser: Signal<FirebaseUser | null | undefined> = toSignal(
+    new Observable<FirebaseUser | null>(subscriber => {
+      return onAuthStateChanged(this.auth, (user) => {
+        subscriber.next(user);
+      });
+    })
+  );
+
 
   constructor() {
     // Inicializar el estado de autenticación basado en el usuario de Firebase

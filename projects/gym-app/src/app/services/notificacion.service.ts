@@ -2,26 +2,28 @@ import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector,
 import {
     Firestore,
     collection,
-    doc,
     addDoc,
-    updateDoc,
+    doc,
     deleteDoc,
-    onSnapshot,
     setDoc,
-    query,
-    orderBy,
-    Timestamp,
+    onSnapshot,
     QuerySnapshot,
     DocumentSnapshot,
+    Timestamp,
+    query,
     where,
+    orderBy,
+    limit,
+    updateDoc,
     getDocs
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { Notificacion, TipoNotificacion } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'notificaciones';

@@ -9,14 +9,17 @@ import {
     onSnapshot,
     QuerySnapshot,
     DocumentSnapshot,
-    Timestamp
-} from '@angular/fire/firestore';
+    Timestamp,
+    query,
+    where
+} from 'firebase/firestore';
 import { Gimnasio } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class GimnasioService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'gimnasios';

@@ -10,10 +10,11 @@ import {
     QuerySnapshot,
     DocumentSnapshot,
     Timestamp
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 export interface RutinaConEjercicios extends Rutina {
     ejercicios: any[]; // Ejercicios ya resueltos
@@ -21,7 +22,7 @@ export interface RutinaConEjercicios extends Rutina {
 
 @Injectable({ providedIn: 'root' })
 export class RutinaService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'rutinas';

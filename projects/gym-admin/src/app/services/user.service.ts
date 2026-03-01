@@ -10,14 +10,16 @@ import {
   onSnapshot,
   setDoc,
   QuerySnapshot
-} from '@angular/fire/firestore';
-import { Auth, createUserWithEmailAndPassword, updateProfile } from '@angular/fire/auth';
+} from 'firebase/firestore';
+import { Auth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE, AUTH } from './firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly firestore = inject(Firestore);
-  private readonly auth = inject(Auth);
+  private readonly firestore = inject(FIRESTORE);
+  private readonly auth = inject(AUTH);
+
   private readonly injector = inject(Injector);
   private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
 

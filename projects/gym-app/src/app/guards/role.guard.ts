@@ -2,45 +2,56 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Rol } from 'gym-library';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, map, take, switchMap } from 'rxjs';
 
-function getCurrentUserRole(): string | undefined {
+/**
+ * Función auxiliar para esperar a que el estado de autenticación termine de cargar.
+ * Devuelve un observable con el rol del usuario una vez que isLoading es false.
+ */
+function waitForInitialization() {
   const authService = inject(AuthService);
-  const user = authService.currentUser();
-  return user?.role;
+
+  return toObservable(authService.isLoading).pipe(
+    // Solo dejamos pasar cuando isLoading == false (Firebase terminó de chequear)
+    filter(loading => !loading),
+    take(1),
+    map(() => authService.currentUser()?.role)
+  );
 }
 
-export const gimnasioGuard = (): boolean => {
+export const gimnasioGuard = () => {
   const router = inject(Router);
-  const role = getCurrentUserRole();
-  
-  if (role === Rol.GIMNASIO) {
-    return true;
-  }
-  
-  router.navigate(['/login']);
-  return false;
+  return waitForInitialization().pipe(
+    map(role => {
+      if (role === Rol.GIMNASIO) return true;
+      console.warn('⚠️ RoleGuard: Usuario no es GIMNASIO, redirigiendo a login');
+      router.navigate(['/login']);
+      return false;
+    })
+  );
 };
 
-export const entrenadoGuard = (): boolean => {
+export const entrenadoGuard = () => {
   const router = inject(Router);
-  const role = getCurrentUserRole();
-  
-  if (role === Rol.ENTRENADO) {
-    return true;
-  }
-  
-  router.navigate(['/login']);
-  return false;
+  return waitForInitialization().pipe(
+    map(role => {
+      if (role === Rol.ENTRENADO) return true;
+      console.warn('⚠️ RoleGuard: Usuario no es ENTRENADO, redirigiendo a login');
+      router.navigate(['/login']);
+      return false;
+    })
+  );
 };
 
-export const entrenadorGuard = (): boolean => {
+export const entrenadorGuard = () => {
   const router = inject(Router);
-  const role = getCurrentUserRole();
-  
-  if (role === Rol.ENTRENADOR || role === Rol.PERSONAL_TRAINER) {
-    return true;
-  }
-  
-  router.navigate(['/login']);
-  return false;
+  return waitForInitialization().pipe(
+    map(role => {
+      if (role === Rol.ENTRENADOR || role === Rol.PERSONAL_TRAINER) return true;
+      console.warn('⚠️ RoleGuard: Usuario no es ENTRENADOR, redirigiendo a login');
+      router.navigate(['/login']);
+      return false;
+    })
+  );
 };

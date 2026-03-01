@@ -12,14 +12,17 @@ import {
     orderBy,
     Timestamp,
     QuerySnapshot,
-    DocumentSnapshot
-} from '@angular/fire/firestore';
+    DocumentSnapshot,
+    where,
+    limit
+} from 'firebase/firestore';
 import { Mensaje } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from '../core/firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class MensajeService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'mensajes';

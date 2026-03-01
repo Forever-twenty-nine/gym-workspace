@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,8 +7,7 @@ import {
   IonItem,
   IonInput,
   IonButton,
-  IonIcon,
-  AlertController
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
@@ -39,6 +38,7 @@ export class LoginPage {
     private authService: AuthService,
     private userService: UserService,
     private router: Router,
+    private ngZone: NgZone
   ) {
     addIcons({ arrowBackOutline, personOutline, lockClosedOutline });
   }
@@ -96,20 +96,23 @@ export class LoginPage {
    * Redirige al usuario según su rol
    */
   private redirectToRolePage(role?: string): void {
-    switch (role) {
-      case Rol.ENTRENADO:
-        this.router.navigate(['/entrenado-tabs']);
-        break;
-      case Rol.ENTRENADOR:
-      case Rol.PERSONAL_TRAINER:
-        this.router.navigate(['/entrenador-tabs']);
-        break;
-      case Rol.GIMNASIO:
-        this.router.navigate(['/gimnasio-tabs']);
-        break;
-      default:
-        // Si no tiene rol definido, enviar a onboarding
-        this.router.navigate(['/onboarding']);
-    }
+    // Aseguramos que la navegación ocurra en la zona de Angular
+    this.ngZone.run(() => {
+      switch (role) {
+        case Rol.ENTRENADO:
+          this.router.navigate(['/entrenado-tabs']);
+          break;
+        case Rol.ENTRENADOR:
+        case Rol.PERSONAL_TRAINER:
+          this.router.navigate(['/entrenador-tabs']);
+          break;
+        case Rol.GIMNASIO:
+          this.router.navigate(['/gimnasio-tabs']);
+          break;
+        default:
+          // Si no tiene rol definido, enviar a onboarding
+          this.router.navigate(['/onboarding']);
+      }
+    });
   }
 }

@@ -1,19 +1,21 @@
 import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
 import {
-    Firestore,
+    Firestore, // Keep Firestore type for type annotation
     collection,
     addDoc,
     doc,
     deleteDoc,
     setDoc,
+    updateDoc, // Added updateDoc
     onSnapshot,
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot
-} from '@angular/fire/firestore';
+} from 'firebase/firestore'; // Changed import path
 import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens'; // Added new import
 
 export interface RutinaConEjercicios extends Rutina {
     ejercicios: any[]; // Ejercicios ya resueltos
@@ -21,7 +23,7 @@ export interface RutinaConEjercicios extends Rutina {
 
 @Injectable({ providedIn: 'root' })
 export class RutinaService {
-    private readonly firestore = inject(Firestore);
+    private readonly firestore = inject(FIRESTORE); // Changed injection token
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'rutinas';

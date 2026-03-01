@@ -11,7 +11,7 @@ import {
   orderBy,
   setDoc,
   Timestamp
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import { Entrenador } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
@@ -21,6 +21,7 @@ import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
+import { FIRESTORE } from './firebase.tokens';
 
 // Clase de error personalizada para límites
 export class PlanLimitError extends Error {
@@ -38,7 +39,7 @@ export class PlanLimitError extends Error {
   providedIn: 'root'
 })
 export class EntrenadorService {
-  private readonly firestore = inject(Firestore);
+  private readonly firestore = inject(FIRESTORE);
   private readonly injector = inject(Injector);
   private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly collectionName = 'entrenadores';
