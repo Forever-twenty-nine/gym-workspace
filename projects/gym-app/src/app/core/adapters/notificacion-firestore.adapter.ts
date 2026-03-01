@@ -12,7 +12,8 @@ import {
   orderBy,
   Timestamp
 } from '@angular/fire/firestore';
-import { INotificacionFirestoreAdapter, Notificacion } from 'gym-library';
+import { Notificacion } from 'gym-library';
+import { INotificacionFirestoreAdapter } from '../../services/notificacion.service';
 
 /**
  * 🔔 Adaptador de Firestore para Notificaciones

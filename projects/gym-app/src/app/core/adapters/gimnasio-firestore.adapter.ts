@@ -1,3 +1,4 @@
+import { IGimnasioFirestoreAdapter } from '../../services/gimnasio.service';
 import { Injectable, inject, Injector, effect, runInInjectionContext } from '@angular/core';
 import {
   Firestore,
@@ -13,12 +14,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Gimnasio } from 'gym-library';
 
-interface IGimnasioFirestoreAdapter {
-  subscribeToGimnasios(callback: (gimnasios: Gimnasio[]) => void): void;
-  subscribeToGimnasio(id: string, callback: (gimnasio: Gimnasio | null) => void): void;
-  save(gimnasio: Gimnasio): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class GimnasioFirestoreAdapter implements IGimnasioFirestoreAdapter {

@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Mensaje } from '../models/mensaje.model';
+import { Mensaje } from 'gym-library';
 
 export interface IMensajeFirestoreAdapter {
   initializeListener(onUpdate: (mensajes: Mensaje[]) => void): void;

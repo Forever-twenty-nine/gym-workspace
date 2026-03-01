@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject, InjectionToken } from '@angular/core';
-import { EstadisticasEntrenado } from '../models/estadisticas-entrenado.model';
+import { EstadisticasEntrenado } from 'gym-library';
 
 /**
  * 📊 Interfaz del adaptador de Firestore para Estadísticas de Entrenados

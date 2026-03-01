@@ -1,3 +1,4 @@
+import { IEjercicioFirestoreAdapter } from '../../services/ejercicio.service';
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
@@ -12,12 +13,7 @@ import {
 } from '@angular/fire/firestore';
 import { Ejercicio } from 'gym-library';
 
-interface IEjercicioFirestoreAdapter {
-  initializeListener(onUpdate: (ejercicios: Ejercicio[]) => void): void;
-  subscribeToEjercicio(id: string, onUpdate: (ejercicio: Ejercicio | null) => void): void;
-  save(ejercicio: Ejercicio): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class EjercicioFirestoreAdapter implements IEjercicioFirestoreAdapter {

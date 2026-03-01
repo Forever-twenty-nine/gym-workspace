@@ -1,10 +1,10 @@
 import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
-import { Invitacion } from '../models/invitacion.model';
-import { Notificacion } from '../models/notificacion.model';
+import { Invitacion } from 'gym-library';
+import { Notificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
-import { TipoNotificacion } from '../enums/tipo-notificacion.enum';
+import { TipoNotificacion } from 'gym-library';
 
 export interface IInvitacionFirestoreAdapter {
   initializeListener(onUpdate: (invitaciones: Invitacion[]) => void): void;

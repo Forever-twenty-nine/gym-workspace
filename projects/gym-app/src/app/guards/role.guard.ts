@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from 'gym-library';
+import { AuthService } from '../services/auth.service';
 import { Rol } from 'gym-library';
 
 function getCurrentUserRole(): string | undefined {

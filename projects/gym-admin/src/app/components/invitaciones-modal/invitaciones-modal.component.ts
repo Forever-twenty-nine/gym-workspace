@@ -1,12 +1,10 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  NotificacionService,
-  UserService,
-  EntrenadoService,
-  InvitacionService
-} from 'gym-library';
+import { NotificacionService } from '../../services/notificacion.service';
+import { UserService } from '../../services/user.service';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { InvitacionService } from '../../services/invitacion.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({

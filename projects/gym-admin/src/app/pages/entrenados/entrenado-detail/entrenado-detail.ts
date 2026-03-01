@@ -1,21 +1,17 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import {
-  EntrenadoService,
-  UserService,
-  RutinaService,
-  EntrenadorService,
-  InvitacionService,
-  SesionRutinaService,
-  EjercicioService,
-  EstadisticasEntrenadoService,
-  RutinaAsignadaService,
-  NotificacionService,
-  PlanLimitError,
-  Invitacion,
-  RutinaAsignada
-} from 'gym-library';
+import { Invitacion, RutinaAsignada } from 'gym-library';
+import { EntrenadoService } from '../../../services/entrenado.service';
+import { UserService } from '../../../services/user.service';
+import { RutinaService } from '../../../services/rutina.service';
+import { EntrenadorService, PlanLimitError } from '../../../services/entrenador.service';
+import { InvitacionService } from '../../../services/invitacion.service';
+import { SesionRutinaService } from '../../../services/sesion-rutina.service';
+import { EjercicioService } from '../../../services/ejercicio.service';
+import { EstadisticasEntrenadoService } from '../../../services/estadisticas-entrenado.service';
+import { RutinaAsignadaService } from '../../../services/rutina-asignada.service';
+import { NotificacionService } from '../../../services/notificacion.service';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { ToastService } from '../../../services/toast.service';
 import { PageTitleService } from '../../../services/page-title.service';

@@ -1,17 +1,15 @@
 import { APP_INITIALIZER } from '@angular/core';
-import {
-  EntrenadoService,
-  UserService,
-  RutinaService,
-  EjercicioService,
-  NotificacionService,
-  EntrenadorService,
-  GimnasioService,
-  InvitacionService,
-  ENTRENADOR_FIRESTORE_ADAPTER,
-  GIMNASIO_FIRESTORE_ADAPTER
-} from 'gym-library';
+import { EntrenadoService } from '../services/entrenado.service';
+import { UserService } from '../services/user.service';
+import { RutinaService } from '../services/rutina.service';
+import { EjercicioService } from '../services/ejercicio.service';
+import { NotificacionService } from '../services/notificacion.service';
+import { EntrenadorService, ENTRENADOR_FIRESTORE_ADAPTER } from '../services/entrenador.service';
+import { GimnasioService, GIMNASIO_FIRESTORE_ADAPTER } from '../services/gimnasio.service';
+import { InvitacionService } from '../services/invitacion.service';
 import { EntrenadoFirestoreAdapter } from './adapters/entrenado-firestore.adapter';
+
+
 import { UserFirestoreAdapter } from './adapters/user-firestore.adapter';
 import { RutinaFirestoreAdapter } from './adapters/rutina-firestore.adapter';
 import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapter';

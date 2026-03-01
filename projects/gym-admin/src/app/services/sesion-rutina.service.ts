@@ -1,9 +1,9 @@
 import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
-import { SesionRutina } from '../models/sesion-rutina.model';
-import { SesionRutinaStatus } from '../enums/sesion-rutina-status.enum';
-import { Rutina } from '../models/rutina.model';
+import { SesionRutina } from 'gym-library';
+import { SesionRutinaStatus } from 'gym-library';
+import { Rutina } from 'gym-library';
 import { RutinaService } from './rutina.service';
-import { Ejercicio } from '../models/ejercicio.model';
+import { Ejercicio } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
 
 export interface ISesionRutinaFirestoreAdapter {

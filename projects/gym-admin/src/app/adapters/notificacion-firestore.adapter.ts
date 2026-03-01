@@ -13,7 +13,9 @@ import {
   getDocs,
   Timestamp
 } from '@angular/fire/firestore';
-import { INotificacionFirestoreAdapter, Notificacion, FirebaseAdapterBase } from 'gym-library';
+import { Notificacion } from 'gym-library';
+import { INotificacionFirestoreAdapter } from '../services/notificacion.service';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 /**
  * 🔔 Adaptador de Firestore para Notificaciones

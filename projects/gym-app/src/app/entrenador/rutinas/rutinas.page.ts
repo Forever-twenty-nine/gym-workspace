@@ -27,7 +27,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed} from 'ionicons/icons';
-import { AuthService, RutinaService, EjercicioService, EntrenadorService } from 'gym-library';
+import { AuthService } from '../../services/auth.service';
+import { RutinaService } from '../../services/rutina.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { EntrenadorService } from '../../services/entrenador.service';
 
 @Component({
   selector: 'app-rutinas',

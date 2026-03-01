@@ -12,7 +12,9 @@ import {
   orderBy,
   Timestamp
 } from '@angular/fire/firestore';
-import { IMensajeFirestoreAdapter, Mensaje, FirebaseAdapterBase } from 'gym-library';
+import { Mensaje } from 'gym-library';
+import { IMensajeFirestoreAdapter } from '../services/mensaje.service';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 /**
  * 💬 Adaptador de Firestore para Mensajes

@@ -1,7 +1,10 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { SesionRutinaService, RutinaService, Rutina, SesionRutina, SocialShareService } from 'gym-library';
+import { Rutina, SesionRutina } from 'gym-library';
+import { SesionRutinaService } from '../../../services/sesion-rutina.service';
+import { RutinaService } from '../../../services/rutina.service';
+import { SocialShareService } from '../../../services/social-share.service';
 
 @Component({
   selector: 'app-entrenado-estadisticas',

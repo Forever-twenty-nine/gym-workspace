@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject, InjectionToken } from '@angular/core';
-import { Entrenador } from '../models/entrenador.model';
+import { Entrenador } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { EntrenadoService } from './entrenado.service';
@@ -7,7 +7,7 @@ import { UserService } from './user.service';
 import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
-import { Ejercicio } from '../models/ejercicio.model';
+import { Ejercicio } from 'gym-library';
 
 // Clase de error personalizada para límites
 export class PlanLimitError extends Error {

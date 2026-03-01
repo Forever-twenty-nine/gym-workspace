@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Entrenado } from '../models/entrenado.model';
+import { Entrenado } from 'gym-library';
 
 export interface IEntrenadoFirestoreAdapter {
   initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void;

@@ -20,7 +20,8 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline } from 'ionicons/icons';
-import { AuthService, UserService } from 'gym-library';
+import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../services/user.service';
 import { Rol } from 'gym-library';
 
 @Component({

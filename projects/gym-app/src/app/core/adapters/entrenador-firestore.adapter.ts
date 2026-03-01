@@ -12,7 +12,8 @@ import {
   docData
 } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Entrenador, IEntrenadorFirestoreAdapter } from 'gym-library';
+import { Entrenador } from 'gym-library';
+import { IEntrenadorFirestoreAdapter } from '../../services/entrenador.service';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadorFirestoreAdapter implements IEntrenadorFirestoreAdapter {

@@ -1,5 +1,5 @@
 import { AuthService, IAuthAdapter } from './auth.service';
-import { User } from '../models/user.model';
+import { User } from 'gym-library';
 
 describe('AuthService', () => {
   let service: AuthService;

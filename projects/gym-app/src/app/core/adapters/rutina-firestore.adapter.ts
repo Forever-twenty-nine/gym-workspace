@@ -13,7 +13,8 @@ import {
   deleteField
 } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Rutina, IRutinaFirestoreAdapter } from 'gym-library';
+import { Rutina } from 'gym-library';
+import { IRutinaFirestoreAdapter } from '../../services/rutina.service';
 
 @Injectable({ providedIn: 'root' })
 export class RutinaFirestoreAdapter implements IRutinaFirestoreAdapter {

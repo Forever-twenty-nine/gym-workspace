@@ -1,9 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { 
-  EntrenadorService
-} from 'gym-library';
+import { EntrenadorService } from '../../services/entrenador.service';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { EntrenadoresTableComponent } from './entrenadores-table/entrenadores-table.component';
 import { ToastService } from '../../services/toast.service';

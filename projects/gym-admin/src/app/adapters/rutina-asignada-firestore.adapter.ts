@@ -1,3 +1,4 @@
+import { IRutinaAsignadaFirestoreAdapter } from '../services/rutina-asignada.service';
 import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
@@ -11,14 +12,10 @@ import {
   QuerySnapshot,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { RutinaAsignada, FirebaseAdapterBase } from 'gym-library';
+import { RutinaAsignada } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
-interface IRutinaAsignadaFirestoreAdapter {
-  initializeListener(onUpdate: (rutinasAsignadas: RutinaAsignada[]) => void): void;
-  subscribeToRutinaAsignada(id: string, onUpdate: (rutinaAsignada: RutinaAsignada | null) => void): void;
-  save(rutinaAsignada: RutinaAsignada): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+
 
 @Injectable({
   providedIn: 'root'

@@ -1,3 +1,4 @@
+import { IUserFirestoreAdapter } from '../../services/user.service';
 import { Injectable, inject, Injector, effect, runInInjectionContext } from '@angular/core';
 import { 
   Firestore, 
@@ -12,13 +13,7 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { User } from 'gym-library';
 
-interface IUserFirestoreAdapter {
-  initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void;
-  getUsers(): Promise<User[]>;
-  addUser(user: Omit<User, 'uid'>, password?: string): Promise<string>;
-  updateUser(uid: string, userData: Partial<User>): Promise<void>;
-  deleteUser(uid: string): Promise<void>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class UserFirestoreAdapter implements IUserFirestoreAdapter {

@@ -1,17 +1,13 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import {
-  EntrenadoService,
-  UserService,
-  GimnasioService,
-  EntrenadorService,
-  NotificacionService,
-  RutinaService,
-  Entrenado,
-  Rol,
-  Objetivo
-} from 'gym-library';
+import { Entrenado, Rol, Objetivo } from 'gym-library';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { UserService } from '../../services/user.service';
+import { GimnasioService } from '../../services/gimnasio.service';
+import { EntrenadorService } from '../../services/entrenador.service';
+import { NotificacionService } from '../../services/notificacion.service';
+import { RutinaService } from '../../services/rutina.service';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
 import { DisplayHelperService } from '../../services/display-helper.service';

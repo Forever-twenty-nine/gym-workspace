@@ -21,11 +21,9 @@ import {
   fitnessOutline,
   trophyOutline
 } from 'ionicons/icons';
-import {
-  RutinaService,
-  AuthService,
-  EntrenadoService
-} from 'gym-library';
+import { RutinaService } from '../../services/rutina.service';
+import { AuthService } from '../../services/auth.service';
+import { EntrenadoService } from '../../services/entrenado.service';
 
 @Component({
   selector: 'app-progreso',

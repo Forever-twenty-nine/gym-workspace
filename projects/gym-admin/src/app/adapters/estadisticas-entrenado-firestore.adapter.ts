@@ -1,3 +1,4 @@
+import { IEstadisticasEntrenadoFirestoreAdapter } from '../services/estadisticas-entrenado.service';
 import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
@@ -10,7 +11,8 @@ import {
   Timestamp,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { EstadisticasEntrenado, IEstadisticasEntrenadoFirestoreAdapter, FirebaseAdapterBase } from 'gym-library';
+import { EstadisticasEntrenado } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 @Injectable({ providedIn: 'root' })
 export class EstadisticasEntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IEstadisticasEntrenadoFirestoreAdapter {

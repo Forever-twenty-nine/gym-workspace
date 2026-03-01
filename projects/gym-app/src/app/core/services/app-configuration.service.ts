@@ -1,13 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  EntrenadoService, 
-  RutinaService,
-  EjercicioService,
-  AuthService, 
-  StorageService,
-  UserService,
-  NotificacionService
-} from 'gym-library';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { RutinaService } from '../../services/rutina.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { AuthService } from '../../services/auth.service';
+import { StorageService } from '../../services/storage.service';
+import { UserService } from '../../services/user.service';
+import { NotificacionService } from '../../services/notificacion.service';
 import { EntrenadoFirestoreAdapter } from '../adapters/entrenado-firestore.adapter';
 import { RutinaFirestoreAdapter } from '../adapters/rutina-firestore.adapter';
 import { EjercicioFirestoreAdapter } from '../adapters/ejercicio-firestore.adapter';
@@ -42,15 +40,15 @@ export class AppConfigurationService {
     try {
       // Solo configurar auth inicialmente para evitar conexiones a Firestore sin autenticación
       this.authService.setAuthAdapter(this.authAdapter);
-      
+
       // Verificar el usuario actual
       await this.authService.refreshAuth();
-      
+
       // Si hay usuario autenticado, configurar los servicios de datos
       if (this.authService.currentUser()) {
         await this.configureDataServices();
       }
-      
+
       this.storageService.setStorageAdapter(this.storageAdapter);
     } catch (error) {
       console.error('❌ Error configurando adaptadores:', error);
@@ -63,7 +61,7 @@ export class AppConfigurationService {
    */
   async configureDataServices(): Promise<void> {
     if (this.dataServicesConfigured) return;
-    
+
     try {
       this.entrenadoService.setFirestoreAdapter(this.entrenadoAdapter);
       this.rutinaService.setFirestoreAdapter(this.rutinaAdapter);

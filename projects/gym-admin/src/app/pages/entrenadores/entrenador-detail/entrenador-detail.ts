@@ -1,7 +1,13 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EntrenadorService, EjercicioService, RutinaService, NotificacionService, InvitacionService, EntrenadoService, UserService } from 'gym-library';
+import { EntrenadorService } from '../../../services/entrenador.service';
+import { EjercicioService } from '../../../services/ejercicio.service';
+import { RutinaService } from '../../../services/rutina.service';
+import { NotificacionService } from '../../../services/notificacion.service';
+import { InvitacionService } from '../../../services/invitacion.service';
+import { EntrenadoService } from '../../../services/entrenado.service';
+import { UserService } from '../../../services/user.service';
 import { ToastComponent } from '../../../components/shared/toast/toast.component';
 import { RutinaModalComponent } from '../../../components/rutina-modal/rutina-modal.component';
 import { EjercicioModalComponent } from '../../../components/ejercicio-modal/ejercicio-modal.component';

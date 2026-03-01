@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Notificacion } from '../models/notificacion.model';
-import { TipoNotificacion } from '../enums/tipo-notificacion.enum';
+import { Notificacion } from 'gym-library';
+import { TipoNotificacion } from 'gym-library';
 
 export interface INotificacionFirestoreAdapter {
   initializeListener(onUpdate: (notificaciones: Notificacion[]) => void): void;

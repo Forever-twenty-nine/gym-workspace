@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Ejercicio } from '../models/ejercicio.model';
-import { Rol } from '../enums/rol.enum';
+import { Ejercicio } from 'gym-library';
+import { Rol } from 'gym-library';
 
 export interface IEjercicioFirestoreAdapter {
   initializeListener(onUpdate: (ejercicios: Ejercicio[]) => void): void;

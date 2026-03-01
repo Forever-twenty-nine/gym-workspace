@@ -1,3 +1,4 @@
+import { IAuthAdapter } from '../../services/auth.service';
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { isDevMode } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup, signOut, authState, User as FirebaseUser, createUserWithEmailAndPassword } from '@angular/fire/auth';
@@ -7,14 +8,7 @@ import { User } from 'gym-library';
 import { Rol } from 'gym-library';
 import { computed, Signal } from '@angular/core';
 
-interface IAuthAdapter {
-  loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }>;
-  loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
-  registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
-  logout(): Promise<void>;
-  getCurrentUser(): Promise<User | null>;
-  isAuthenticated(): Promise<boolean>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseAuthAdapter implements IAuthAdapter {

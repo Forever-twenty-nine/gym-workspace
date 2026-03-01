@@ -1,15 +1,10 @@
+import { ISesionRutinaFirestoreAdapter } from '../services/sesion-rutina.service';
 import { inject } from '@angular/core';
 import { Firestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, query, where, QuerySnapshot, DocumentSnapshot } from '@angular/fire/firestore';
 import { SesionRutina } from 'gym-library';
-import { FirebaseAdapterBase } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
-export interface ISesionRutinaFirestoreAdapter {
-  getSesionesPorEntrenado(entrenadoId: string, callback: (sesiones: SesionRutina[]) => void): void;
-  getSesionesPorRutina(rutinaId: string, callback: (sesiones: SesionRutina[]) => void): void;
-  save(sesion: SesionRutina): Promise<void>;
-  update(sesion: SesionRutina): Promise<void>;
-  delete(sesionId: string): Promise<void>;
-}
+
 
 export class SesionRutinaFirestoreAdapter extends FirebaseAdapterBase implements ISesionRutinaFirestoreAdapter {
   private readonly COLLECTION = 'sesiones-rutina';

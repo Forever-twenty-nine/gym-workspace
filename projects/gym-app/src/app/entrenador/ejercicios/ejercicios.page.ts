@@ -24,7 +24,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed, star} from 'ionicons/icons';
-import { AuthService, EjercicioService, EntrenadorService, UserService } from 'gym-library';
+import { AuthService } from '../../services/auth.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { EntrenadorService } from '../../services/entrenador.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-ejercicios',

@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
-import { Rutina } from '../models/rutina.model';
+import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
 
 export interface IRutinaFirestoreAdapter {

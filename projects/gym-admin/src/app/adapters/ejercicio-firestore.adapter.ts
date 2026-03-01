@@ -1,3 +1,4 @@
+import { IEjercicioFirestoreAdapter } from '../services/ejercicio.service';
 import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
@@ -10,14 +11,10 @@ import {
   QuerySnapshot,
   DocumentSnapshot
 } from '@angular/fire/firestore';
-import { Ejercicio, FirebaseAdapterBase } from 'gym-library';
+import { Ejercicio } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
-interface IEjercicioFirestoreAdapter {
-  initializeListener(onUpdate: (ejercicios: Ejercicio[]) => void): void;
-  subscribeToEjercicio(id: string, onUpdate: (ejercicio: Ejercicio | null) => void): void;
-  save(ejercicio: Ejercicio): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+
 
 @Injectable({
   providedIn: 'root'

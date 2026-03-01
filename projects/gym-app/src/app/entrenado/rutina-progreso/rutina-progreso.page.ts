@@ -39,13 +39,10 @@ import {
   close,
   pauseCircleOutline
 } from 'ionicons/icons';
-import {
-  RutinaService,
-  EjercicioService,
-  AuthService,
-  Rutina,
-  Ejercicio
-} from 'gym-library';
+import { Rutina, Ejercicio } from 'gym-library';
+import { RutinaService } from '../../services/rutina.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-rutina-progreso',

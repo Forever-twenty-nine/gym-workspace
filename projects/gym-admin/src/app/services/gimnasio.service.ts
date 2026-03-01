@@ -1,5 +1,5 @@
 import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Gimnasio } from '../models/gimnasio.model';
+import { Gimnasio } from 'gym-library';
 
 export interface IGimnasioFirestoreAdapter {
     subscribeToGimnasios(callback: (gimnasios: Gimnasio[]) => void): void;

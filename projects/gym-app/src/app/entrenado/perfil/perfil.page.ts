@@ -24,7 +24,11 @@ import {
   fitnessOutline,
   statsChartOutline
 } from 'ionicons/icons';
-import { UserService, AuthService, User, RutinaService, Rutina, Rol, EntrenadoService } from 'gym-library';
+import { User, Rutina, Rol } from 'gym-library';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { RutinaService } from '../../services/rutina.service';
+import { EntrenadoService } from '../../services/entrenado.service';
 
 @Component({
   selector: 'app-perfil',

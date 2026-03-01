@@ -1,3 +1,4 @@
+import { IUserFirestoreAdapter } from '../services/user.service';
 import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
@@ -11,16 +12,11 @@ import {
   QuerySnapshot
 } from '@angular/fire/firestore';
 import { Auth, deleteUser as deleteAuthUser } from '@angular/fire/auth';
-import { User, FirebaseAdapterBase } from 'gym-library';
+import { User } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 import { FirebaseAuthAdapter } from './firebase-auth.adapter';
 
-interface IUserFirestoreAdapter {
-  initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void;
-  getUsers(): Promise<User[]>;
-  addUser(user: Omit<User, 'uid'>, password?: string): Promise<string>;
-  updateUser(uid: string, userData: Partial<User>): Promise<void>;
-  deleteUser(uid: string): Promise<void>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class UserFirestoreAdapter extends FirebaseAdapterBase implements IUserFirestoreAdapter {

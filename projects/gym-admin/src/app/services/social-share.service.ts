@@ -4,7 +4,7 @@ import { EstadisticasEntrenadoService } from './estadisticas-entrenado.service';
 import { EntrenadoService } from './entrenado.service';
 import { UserService } from './user.service';
 import { SesionRutinaService } from './sesion-rutina.service';
-import { SesionRutina } from '../models/sesion-rutina.model';
+import { SesionRutina } from 'gym-library';
 
 export interface ShareProgressOptions {
   includeStats?: boolean;

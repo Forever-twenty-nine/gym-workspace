@@ -1,3 +1,4 @@
+import { IEntrenadoFirestoreAdapter } from '../services/entrenado.service';
 import { Injectable, inject } from '@angular/core';
 import { 
   Firestore, 
@@ -13,14 +14,10 @@ import {
   DocumentSnapshot,
   deleteField
 } from '@angular/fire/firestore';
-import { Entrenado, FirebaseAdapterBase } from 'gym-library';
+import { Entrenado } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
-interface IEntrenadoFirestoreAdapter {
-  initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void;
-  subscribeToEntrenado(id: string, onUpdate: (entrenado: Entrenado | null) => void): void;
-  save(entrenado: Entrenado): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadoFirestoreAdapter extends FirebaseAdapterBase implements IEntrenadoFirestoreAdapter {

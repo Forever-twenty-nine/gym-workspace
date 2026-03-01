@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, effect, Injector } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AppConfigurationService } from './core/services/app-configuration.service';
-import { AuthService } from 'gym-library';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',

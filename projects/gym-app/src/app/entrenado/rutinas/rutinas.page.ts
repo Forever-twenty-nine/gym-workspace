@@ -29,7 +29,11 @@ import {
   bedOutline,
   playCircle
 } from 'ionicons/icons';
-import { RutinaService, AuthService, EjercicioService, Rol, Rutina, Ejercicio, EntrenadoService } from 'gym-library';
+import { Rol, Rutina, Ejercicio } from 'gym-library';
+import { RutinaService } from '../../services/rutina.service';
+import { AuthService } from '../../services/auth.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { EntrenadoService } from '../../services/entrenado.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({

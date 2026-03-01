@@ -12,7 +12,9 @@ import {
     Firestore
 } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
-import { Gimnasio, IGimnasioFirestoreAdapter, FirebaseAdapterBase } from 'gym-library';
+import { Gimnasio } from 'gym-library';
+import { IGimnasioFirestoreAdapter } from '../services/gimnasio.service';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 @Injectable({
     providedIn: 'root'

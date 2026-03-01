@@ -1,7 +1,11 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UserService, EntrenadoService, EntrenadorService, GimnasioService, Rol, Objetivo } from 'gym-library';
+import { Rol, Objetivo } from 'gym-library';
+import { UserService } from '../../services/user.service';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { EntrenadorService } from '../../services/entrenador.service';
+import { GimnasioService } from '../../services/gimnasio.service';
 import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
 import { UsuariosTable } from '../../components/usuarios-table/usuarios-table';

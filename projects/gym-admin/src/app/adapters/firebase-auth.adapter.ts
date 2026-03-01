@@ -1,9 +1,12 @@
+import { IAuthAdapter } from '../services/auth.service';
 import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
-import { 
-  Auth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  Auth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
   authState,
   onAuthStateChanged,
   updateProfile,
@@ -13,21 +16,14 @@ import {
 import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { computed, Signal } from '@angular/core';
-import { User, Rol, Entrenado, Objetivo, FirebaseAdapterBase } from 'gym-library';
-
-interface IAuthAdapter {
-  createUserWithEmailAndPassword(email: string, password: string, userData: Partial<User>): Promise<{ success: boolean; user?: User; error?: string }>;
-  loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
-  logout(): Promise<void>;
-  getCurrentUser(): Promise<User | null>;
-  isAuthenticated(): Promise<boolean>;
-}
+import { User, Rol, Entrenado, Objetivo } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 @Injectable({ providedIn: 'root' })
 export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAdapter {
   private readonly auth = inject(Auth);
   private readonly firestore = inject(Firestore);
-  
+
   // Signal para el estado de autenticación (lazy initialization en contexto de inyección)
   private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = runInInjectionContext(
     inject(Injector),
@@ -37,22 +33,46 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
   // Computed signal para verificar autenticación (más reactivo)
   readonly isAuthenticatedSignal = computed(() => !!this.authStateSignal());
 
+  async loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }> {
+    try {
+      return await this.runInZone(async () => {
+        const provider = new GoogleAuthProvider();
+        const cred = await signInWithPopup(this.auth, provider);
+        const firebaseUser = cred.user;
+
+        if (firebaseUser) {
+          const user = await this.getUserData(firebaseUser);
+          return { success: true, user };
+        }
+
+        return { success: false, error: 'No se pudo obtener información del usuario' };
+      });
+    } catch (error: any) {
+      console.error('❌ FirebaseAuthAdapter: Error en login con Google:', error.code || error.message);
+      return { success: false, error: this.getErrorMessage(error) };
+    }
+  }
+
+  async registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    return this.createUserWithEmailAndPassword(email, password, {});
+  }
+
   async createUserWithEmailAndPassword(
-    email: string, 
-    password: string, 
+    email: string,
+    password: string,
     userData: Partial<User>
   ): Promise<{ success: boolean; user?: User; error?: string }> {
     try {
       return await this.runInZone(async () => {
         // Crear usuario en Firebase Auth
         const userCredential: UserCredential = await createUserWithEmailAndPassword(
-          this.auth, 
-          email, 
+          this.auth,
+          email,
           password
         );
-        
+
         const firebaseUser = userCredential.user;
-        
+
         if (firebaseUser) {
           // Actualizar perfil de Firebase Auth con el nombre
           if (userData.nombre) {
@@ -100,20 +120,20 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
 
           return { success: true, user: newUser };
         }
-        
+
         return { success: false, error: 'No se pudo crear el usuario en Firebase Auth' };
       });
     } catch (error: any) {
       console.error('❌ FirebaseAuthAdapter: Error creando usuario:', error.code || error.message);
-      
+
       // Si el usuario ya existe, informar al administrador
       if (error.code === 'auth/email-already-in-use') {
-        return { 
-          success: false, 
-          error: 'Este email ya está registrado. El usuario debe iniciar sesión primero desde la app móvil antes de poder ser administrado desde aquí.' 
+        return {
+          success: false,
+          error: 'Este email ya está registrado. El usuario debe iniciar sesión primero desde la app móvil antes de poder ser administrado desde aquí.'
         };
       }
-      
+
       return { success: false, error: this.getErrorMessage(error) };
     }
   }
@@ -122,32 +142,32 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
     try {
       return await this.runInZone(async () => {
         const userCredential: UserCredential = await signInWithEmailAndPassword(
-          this.auth, 
-          email, 
+          this.auth,
+          email,
           password
         );
-        
+
         const firebaseUser = userCredential.user;
-        
+
         if (firebaseUser) {
           // Obtener datos adicionales del usuario desde Firestore
           const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
           const userDocSnap = await getDoc(userDocRef);
-          
+
           let userData: User = {
             uid: firebaseUser.uid,
             email: firebaseUser.email || email,
             emailVerified: firebaseUser.emailVerified
           };
-          
+
           if (userDocSnap.exists()) {
             const firestoreData = userDocSnap.data() as Partial<User>;
             userData = { ...userData, ...firestoreData };
           }
-          
+
           return { success: true, user: userData };
         }
-        
+
         return { success: false, error: 'No se pudo iniciar sesión' };
       });
     } catch (error: any) {
@@ -171,26 +191,26 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
     try {
       return await this.runInZone(async () => {
         const firebaseUser = this.auth.currentUser;
-        
+
         if (firebaseUser) {
           // Obtener datos adicionales del usuario desde Firestore
           const userDocRef = doc(this.firestore, 'usuarios', firebaseUser.uid);
           const userDocSnap = await getDoc(userDocRef);
-          
+
           let userData: User = {
             uid: firebaseUser.uid,
             email: firebaseUser.email || '',
             emailVerified: firebaseUser.emailVerified
           };
-          
+
           if (userDocSnap.exists()) {
             const firestoreData = userDocSnap.data() as Partial<User>;
             userData = { ...userData, ...firestoreData };
           }
-          
+
           return userData;
         }
-        
+
         return null;
       });
     } catch (error: any) {
@@ -215,9 +235,9 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
     return this.runInZone(async () => {
       const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
       const userSnap = await getDoc(userDocRef);
-      
+
       let userData: User;
-      
+
       if (userSnap.exists()) {
         userData = userSnap.data() as User;
       } else {
@@ -228,7 +248,7 @@ export class FirebaseAuthAdapter extends FirebaseAdapterBase implements IAuthAda
           emailVerified: firebaseUser.emailVerified
         };
       }
-      
+
       // Asegurar que el uid esté incluido
       return {
         ...userData,

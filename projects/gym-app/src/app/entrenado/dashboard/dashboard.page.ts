@@ -36,7 +36,14 @@ import {
   chevronUp,
   chevronDown,
 } from 'ionicons/icons';
-import { EntrenadoService, RutinaService, UserService, AuthService, NotificacionService, Rol, TipoNotificacion, Objetivo, EntrenadorService, InvitacionService, PlanLimitError } from 'gym-library';
+import { Rol, TipoNotificacion, Objetivo } from 'gym-library';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { RutinaService } from '../../services/rutina.service';
+import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
+import { NotificacionService } from '../../services/notificacion.service';
+import { EntrenadorService, PlanLimitError } from '../../services/entrenador.service';
+import { InvitacionService } from '../../services/invitacion.service';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({

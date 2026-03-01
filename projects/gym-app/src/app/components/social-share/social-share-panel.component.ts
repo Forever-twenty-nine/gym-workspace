@@ -1,5 +1,5 @@
 import { Component, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-import { SocialShareService, ShareProgressOptions } from '../services/social-share.service';
+import { SocialShareService, ShareProgressOptions } from '../../services/social-share.service';
 import { SocialShareButtonComponent } from './social-share-button.component';
 
 type Platform = 'instagram' | 'facebook' | 'twitter' | 'whatsapp';

@@ -1,7 +1,7 @@
 import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
-import { RutinaAsignada } from '../models/rutina-asignada.model';
-import { Notificacion } from '../models/notificacion.model';
-import { TipoNotificacion } from '../enums/tipo-notificacion.enum';
+import { RutinaAsignada } from 'gym-library';
+import { Notificacion } from 'gym-library';
+import { TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
 

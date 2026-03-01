@@ -12,7 +12,9 @@ import {
   orderBy,
   Timestamp
 } from '@angular/fire/firestore';
-import { IInvitacionFirestoreAdapter, Invitacion, FirebaseAdapterBase } from 'gym-library';
+import { Invitacion } from 'gym-library';
+import { IInvitacionFirestoreAdapter } from '../services/invitacion.service';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 /**
  * 📨 Adaptador de Firestore para Invitaciones

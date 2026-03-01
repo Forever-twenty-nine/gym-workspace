@@ -13,9 +13,9 @@ import {
   Timestamp
 } from '@angular/fire/firestore';
 import { inject } from '@angular/core';
-import { IEntrenadorFirestoreAdapter } from 'gym-library';
+import { IEntrenadorFirestoreAdapter } from '../services/entrenador.service';
 import { Entrenador } from 'gym-library';
-import { FirebaseAdapterBase } from 'gym-library';
+import { FirebaseAdapterBase } from '../services/firebase-adapter-base';
 
 /**
  * 🏋️‍♂️ Adaptador de Firestore para Entrenadores

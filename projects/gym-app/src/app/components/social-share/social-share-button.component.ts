@@ -1,5 +1,5 @@
 import { Component, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-import { SocialShareService, ShareProgressOptions } from '../services/social-share.service';
+import { SocialShareService, ShareProgressOptions } from '../../services/social-share.service';
 
 /**
  * Componente de botón para compartir progreso en redes sociales

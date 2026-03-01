@@ -1,15 +1,8 @@
+import { IStorageAdapter } from '../../services/storage.service';
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 
-interface IStorageAdapter {
-  init(): Promise<void>;
-  set(key: string, value: any): Promise<any>;
-  get(key: string): Promise<any>;
-  remove(key: string): Promise<any>;
-  clear(): Promise<void>;
-  keys(): Promise<string[]>;
-  length(): Promise<number>;
-}
+
 
 @Injectable({
   providedIn: 'root'

@@ -1,7 +1,12 @@
 import { Component, input, output, computed, inject, ChangeDetectionStrategy, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EntrenadoService, UserService, EntrenadorService, Rutina, RutinaAsignadaService, RutinaAsignada, NotificacionService, TipoNotificacion } from 'gym-library';
+import { Rutina, RutinaAsignada, TipoNotificacion } from 'gym-library';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { UserService } from '../../services/user.service';
+import { EntrenadorService } from '../../services/entrenador.service';
+import { RutinaAsignadaService } from '../../services/rutina-asignada.service';
+import { NotificacionService } from '../../services/notificacion.service';
 
 @Component({
   selector: 'app-entrenado-modal',

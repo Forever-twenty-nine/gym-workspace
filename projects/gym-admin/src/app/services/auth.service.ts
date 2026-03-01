@@ -1,6 +1,6 @@
 import { Injectable, signal, WritableSignal, Signal } from '@angular/core';
 // Standalone: no es necesario 'providedIn'
-import { User } from '../models/user.model';
+import { User } from 'gym-library';
 
 export interface IAuthAdapter {
   loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }>;

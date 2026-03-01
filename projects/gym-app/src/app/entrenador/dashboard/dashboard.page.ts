@@ -22,12 +22,12 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } from 'ionicons/icons';
-import { AuthService } from 'gym-library';
-import { EntrenadoService } from 'gym-library';
-import { RutinaService } from 'gym-library';
-import { EjercicioService } from 'gym-library';
-import { UserService } from 'gym-library';
-import { EntrenadorService } from 'gym-library';
+import { AuthService } from '../../services/auth.service';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { RutinaService } from '../../services/rutina.service';
+import { EjercicioService } from '../../services/ejercicio.service';
+import { UserService } from '../../services/user.service';
+import { EntrenadorService } from '../../services/entrenador.service';
 import { Entrenado } from 'gym-library';
 
 @Component({

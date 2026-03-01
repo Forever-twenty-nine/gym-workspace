@@ -1,7 +1,11 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Ejercicio, RutinaService, UserService, EntrenadoService, EntrenadorService, PlanLimitError } from 'gym-library';
+import { Ejercicio } from 'gym-library';
+import { RutinaService } from '../../services/rutina.service';
+import { UserService } from '../../services/user.service';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { EntrenadorService, PlanLimitError } from '../../services/entrenador.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({

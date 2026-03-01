@@ -24,7 +24,13 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
-import { AuthService, EntrenadoService, UserService, NotificacionService, Entrenado, RutinaService, Rutina, Rol, InvitacionService, TipoNotificacion } from 'gym-library';
+import { Entrenado, Rutina, Rol, TipoNotificacion } from 'gym-library';
+import { AuthService } from '../../services/auth.service';
+import { EntrenadoService } from '../../services/entrenado.service';
+import { UserService } from '../../services/user.service';
+import { NotificacionService } from '../../services/notificacion.service';
+import { RutinaService } from '../../services/rutina.service';
+import { InvitacionService } from '../../services/invitacion.service';
 
 @Component({
   selector: 'app-entrenados',

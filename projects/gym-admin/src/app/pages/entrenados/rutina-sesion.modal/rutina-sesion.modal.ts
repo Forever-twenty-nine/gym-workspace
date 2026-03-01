@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, computed, effect, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SesionRutinaService } from 'gym-library';
+import { SesionRutinaService } from '../../../services/sesion-rutina.service';
 import { SesionRutina, Ejercicio } from 'gym-library';
 
 interface EjercicioSesion {
