@@ -1,32 +1,40 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
-import { Ejercicio } from 'gym-library';
-import { Rol } from 'gym-library';
-
-export interface IEjercicioFirestoreAdapter {
-  initializeListener(onUpdate: (ejercicios: Ejercicio[]) => void): void;
-  subscribeToEjercicio(id: string, onUpdate: (ejercicio: Ejercicio | null) => void): void;
-  save(ejercicio: Ejercicio): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+	Firestore,
+	collection,
+	addDoc,
+	doc,
+	deleteDoc,
+	setDoc,
+	onSnapshot,
+	QuerySnapshot,
+	DocumentSnapshot
+} from '@angular/fire/firestore';
+import { Ejercicio, Rol } from 'gym-library';
+import { ZoneRunnerService } from './zone-runner.service';
 
 /**
  * Errores de validación personalizados
  */
 export class EjercicioValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'EjercicioValidationError';
-  }
+	constructor(message: string) {
+		super(message);
+		this.name = 'EjercicioValidationError';
+	}
 }
 
 @Injectable({ providedIn: 'root' })
 export class EjercicioService {
+	private readonly firestore = inject(Firestore);
+	private readonly injector = inject(Injector);
+	private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+	private readonly COLLECTION = 'ejercicios';
+
 	private readonly _ejercicios: WritableSignal<Ejercicio[]> = signal<Ejercicio[]>([]);
 	private readonly ejercicioSignals = new Map<string, WritableSignal<Ejercicio | null>>();
 	private readonly isSubscribed = new Map<string, boolean>();
 	private readonly computedFilters = new Map<string, Signal<Ejercicio[]>>();
 	private isListenerInitialized = false;
-	private firestoreAdapter?: IEjercicioFirestoreAdapter;
 
 	private filterByRange<T>(items: T[], getValue: (item: T) => number, min: number, max?: number): T[] {
 		return items.filter(item => {
@@ -38,24 +46,31 @@ export class EjercicioService {
 		});
 	}
 
+	constructor() { }
+
 	/**
-	 * Configura el adaptador de Firestore
+	 * Ejecuta el callback en el contexto correcto (zona o inyección)
 	 */
-	setFirestoreAdapter(adapter: IEjercicioFirestoreAdapter): void {
-		this.firestoreAdapter = adapter;
-		// No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
-		// Los signals existentes se suscribirán cuando se acceda a ellos
+	private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+		if (this.zoneRunner) {
+			return this.zoneRunner.run(callback);
+		}
+		return runInInjectionContext(this.injector, callback as any);
 	}
 
 	/**
 	 * Inicializa el listener de Firestore de forma segura
 	 */
 	private initializeListener(): void {
-		if (this.isListenerInitialized || !this.firestoreAdapter) return;
-		
+		if (this.isListenerInitialized) return;
+
 		try {
-			this.firestoreAdapter.initializeListener((ejercicios: Ejercicio[]) => {
-				this._ejercicios.set(ejercicios);
+			const col = collection(this.firestore, this.COLLECTION);
+			onSnapshot(col, (snap: QuerySnapshot) => {
+				this.runInZone(() => {
+					const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+					this._ejercicios.set(list);
+				});
 			});
 			this.isListenerInitialized = true;
 		} catch (e) {
@@ -67,7 +82,7 @@ export class EjercicioService {
 	 * Signal readonly con todos los ejercicios
 	 */
 	get ejercicios(): Signal<Ejercicio[]> {
-		if (!this.isListenerInitialized && this.firestoreAdapter) {
+		if (!this.isListenerInitialized) {
 			this.initializeListener();
 		}
 		return this._ejercicios.asReadonly();
@@ -81,13 +96,18 @@ export class EjercicioService {
 			const ejercicioSignal = signal<Ejercicio | null>(null);
 			this.ejercicioSignals.set(id, ejercicioSignal);
 			this.isSubscribed.set(id, false);
-			
-			if (this.firestoreAdapter) {
-				this.firestoreAdapter.subscribeToEjercicio(id, (ejercicio) => {
-					ejercicioSignal.set(ejercicio);
+
+			const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
+			onSnapshot(ejercicioRef, (snapshot: DocumentSnapshot) => {
+				this.runInZone(() => {
+					if (snapshot.exists()) {
+						ejercicioSignal.set(this.mapFromFirestore({ ...snapshot.data(), id: snapshot.id }));
+					} else {
+						ejercicioSignal.set(null);
+					}
 				});
-				this.isSubscribed.set(id, true);
-			}
+			});
+			this.isSubscribed.set(id, true);
 		}
 		return this.ejercicioSignals.get(id)!.asReadonly();
 	}
@@ -148,16 +168,21 @@ export class EjercicioService {
 	 * @throws {EjercicioValidationError} Si la validación falla
 	 */
 	async save(ejercicio: Ejercicio): Promise<void> {
-		if (!this.firestoreAdapter) {
-			throw new Error('Firestore adapter no configurado');
-		}
-
 		const normalizedEjercicio = this.normalizeEjercicio(ejercicio);
 
 		this.validateEjercicio(normalizedEjercicio);
-		
+
 		try {
-			await this.firestoreAdapter.save(normalizedEjercicio);
+			await this.runInZone(async () => {
+				const dataToSave = this.mapToFirestore(normalizedEjercicio);
+
+				if (normalizedEjercicio.id) {
+					const ejercicioRef = doc(this.firestore, this.COLLECTION, normalizedEjercicio.id);
+					await setDoc(ejercicioRef, dataToSave, { merge: true });
+				} else {
+					await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+				}
+			});
 		} catch (error) {
 			console.error('Error al guardar ejercicio:', error);
 			throw error;
@@ -168,12 +193,11 @@ export class EjercicioService {
 	 * Elimina un ejercicio por ID
 	 */
 	async delete(id: string): Promise<void> {
-		if (!this.firestoreAdapter) {
-			throw new Error('Firestore adapter no configurado');
-		}
-		
 		try {
-			await this.firestoreAdapter.delete(id);
+			await this.runInZone(async () => {
+				const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
+				await deleteDoc(ejercicioRef);
+			});
 		} catch (error) {
 			console.error('Error al eliminar ejercicio:', error);
 			throw error;
@@ -186,8 +210,8 @@ export class EjercicioService {
 	getEjerciciosByNombre(nombre: string): Signal<Ejercicio[]> {
 		const key = `nombre-${nombre}`;
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
-				this._ejercicios().filter(ejercicio => 
+			this.computedFilters.set(key, computed(() =>
+				this._ejercicios().filter(ejercicio =>
 					ejercicio.nombre.toLowerCase().includes(nombre.toLowerCase())
 				)
 			));
@@ -201,8 +225,8 @@ export class EjercicioService {
 	getEjerciciosByDescripcion(descripcion: string): Signal<Ejercicio[]> {
 		const key = `descripcion-${descripcion}`;
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
-				this._ejercicios().filter(ejercicio => 
+			this.computedFilters.set(key, computed(() =>
+				this._ejercicios().filter(ejercicio =>
 					ejercicio.descripcion?.toLowerCase().includes(descripcion.toLowerCase())
 				)
 			));
@@ -216,7 +240,7 @@ export class EjercicioService {
 	getEjerciciosBySeries(minSeries: number, maxSeries?: number): Signal<Ejercicio[]> {
 		const key = `series-${minSeries}-${maxSeries || 'max'}`;
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
+			this.computedFilters.set(key, computed(() =>
 				this.filterByRange(this._ejercicios(), e => e.series, minSeries, maxSeries)
 			));
 		}
@@ -236,7 +260,7 @@ export class EjercicioService {
 	getEjerciciosByRepeticiones(minReps: number, maxReps?: number): Signal<Ejercicio[]> {
 		const key = `repeticiones-${minReps}-${maxReps || 'max'}`;
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
+			this.computedFilters.set(key, computed(() =>
 				this.filterByRange(this._ejercicios(), e => e.repeticiones, minReps, maxReps)
 			));
 		}
@@ -249,7 +273,7 @@ export class EjercicioService {
 	getEjerciciosConPeso(): Signal<Ejercicio[]> {
 		const key = 'con-peso';
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
+			this.computedFilters.set(key, computed(() =>
 				this._ejercicios().filter(ejercicio => ejercicio.peso && ejercicio.peso > 0)
 			));
 		}
@@ -262,7 +286,7 @@ export class EjercicioService {
 	getEjerciciosSinPeso(): Signal<Ejercicio[]> {
 		const key = 'sin-peso';
 		if (!this.computedFilters.has(key)) {
-			this.computedFilters.set(key, computed(() => 
+			this.computedFilters.set(key, computed(() =>
 				this._ejercicios().filter(ejercicio => !ejercicio.peso || ejercicio.peso === 0)
 			));
 		}
@@ -282,4 +306,40 @@ export class EjercicioService {
 	static getRolesCreadores(): Rol[] {
 		return [Rol.ENTRENADO, Rol.ENTRENADOR];
 	}
+
+	private mapFromFirestore(data: any): Ejercicio {
+		return {
+			id: data.id,
+			nombre: data.nombre || '',
+			descripcion: data.descripcion,
+			series: data.series || 0,
+			repeticiones: data.repeticiones || 0,
+			peso: data.peso,
+			descansoSegundos: data.descansoSegundos,
+			serieSegundos: data.serieSegundos,
+			fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
+			fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
+		};
+	}
+
+	private mapToFirestore(ejercicio: Ejercicio): any {
+		const data: any = {
+			nombre: ejercicio.nombre,
+			descripcion: ejercicio.descripcion,
+			series: ejercicio.series,
+			repeticiones: ejercicio.repeticiones
+		};
+
+		if (ejercicio.peso !== undefined) {
+			data.peso = ejercicio.peso;
+		}
+		if (ejercicio.descansoSegundos !== undefined) {
+			data.descansoSegundos = ejercicio.descansoSegundos;
+		}
+		if (ejercicio.serieSegundos !== undefined) {
+			data.serieSegundos = ejercicio.serieSegundos;
+		}
+		return data;
+	}
 }
+

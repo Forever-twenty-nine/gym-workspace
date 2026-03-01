@@ -1,56 +1,68 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  doc,
+  deleteDoc,
+  setDoc,
+  onSnapshot,
+  QuerySnapshot,
+  getDocs
+} from '@angular/fire/firestore';
 import { User } from 'gym-library';
-
-export interface IUserFirestoreAdapter {
-  initializeListener(onUpdate: (users: User[]) => void, onError: (error: string) => void): void;
-  getUsers(): Promise<User[]>;
-  addUser(user: Omit<User, 'uid'>, password?: string): Promise<string>;
-  updateUser(uid: string, userData: Partial<User>): Promise<void>;
-  deleteUser(uid: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+  private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
+  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+  private readonly COLLECTION = 'usuarios';
+
   // 🔄 Signals privadas
   private readonly _user = signal<User | null>(null);
   private readonly _users: WritableSignal<User[]> = signal<User[]>([]);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
-  
-  private isListenerInitialized = false;
-  private firestoreAdapter?: IUserFirestoreAdapter;
 
-  constructor() {
-    // La inicialización se hará cuando se configure el adaptador
-  }
+  private isListenerInitialized = false;
+
+  constructor() { }
 
   /**
-   * Configura el adaptador de Firestore
+   * Ejecuta el callback en el contexto correcto (zona o inyección)
    */
-  setFirestoreAdapter(adapter: IUserFirestoreAdapter): void {
-    this.firestoreAdapter = adapter;
-    // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+    if (this.zoneRunner) {
+      return this.zoneRunner.run(callback);
+    }
+    return runInInjectionContext(this.injector, callback as any);
   }
 
   /**
    * Inicializa el listener de Firestore para usuarios
    */
   private initializeListener(): void {
-    if (this.isListenerInitialized || !this.firestoreAdapter) return;
-    
+    if (this.isListenerInitialized) return;
+
     try {
-      
-      
-      this.firestoreAdapter.initializeListener(
-        (users: User[]) => {
-          this._users.set(users);
-        },
-        (error: string) => {
+      const usersCol = collection(this.firestore, this.COLLECTION);
+      onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
+        this.runInZone(() => {
+          const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
+            ...docSnap.data(),
+            uid: docSnap.id
+          }));
+          this._users.set(usersList);
+        });
+      }, (error) => {
+        this.runInZone(() => {
           console.error('🔄 UserService: Error en listener:', error);
-          this._error.set(error);
-        }
-      );
-      
+          this._error.set(error.message);
+        });
+      });
+
       this.isListenerInitialized = true;
     } catch (e) {
       console.warn('Error inicializando listener de usuarios:', e);
@@ -59,7 +71,7 @@ export class UserService {
 
   /** Signal readonly para la lista de usuarios */
   get users(): Signal<User[]> {
-    if (!this.isListenerInitialized && this.firestoreAdapter) {
+    if (!this.isListenerInitialized) {
       this.initializeListener();
     }
     return this._users.asReadonly();
@@ -96,17 +108,20 @@ export class UserService {
    * Obtiene todos los usuarios desde Firestore
    */
   async getUsers(): Promise<User[]> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    
     this._isLoading.set(true);
     this._error.set(null);
-    
+
     try {
-      const usersList = await this.firestoreAdapter.getUsers();
-      this._users.set(usersList);
-      return usersList;
+      return await this.runInZone(async () => {
+        const usersCol = collection(this.firestore, this.COLLECTION);
+        const snapshot = await getDocs(usersCol);
+        const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
+          ...docSnap.data(),
+          uid: docSnap.id
+        }));
+        this._users.set(usersList);
+        return usersList;
+      });
     } catch (error: any) {
       console.error('🔄 UserService: Error al obtener usuarios:', error);
       this._error.set(error.message);
@@ -118,20 +133,17 @@ export class UserService {
 
   /**
    * Agrega un nuevo usuario
-   * @param user - Datos del usuario
-   * @param password - Contraseña opcional para crear cuenta de Firebase Auth
    */
-  async addUser(user: Omit<User, 'uid'>, password?: string): Promise<string> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    
+  async addUser(user: Omit<User, 'uid'>): Promise<string> {
     this._isLoading.set(true);
     this._error.set(null);
-    
+
     try {
-      const docId = await this.firestoreAdapter.addUser(user, password);
-      return docId;
+      return await this.runInZone(async () => {
+        const usersCol = collection(this.firestore, this.COLLECTION);
+        const docRef = await addDoc(usersCol, this.mapToFirestore(user as User));
+        return docRef.id;
+      });
     } catch (error: any) {
       console.error('🔄 UserService: Error al agregar usuario:', error);
       this._error.set(error.message);
@@ -145,16 +157,14 @@ export class UserService {
    * Actualiza un usuario existente
    */
   async updateUser(uid: string, userData: Partial<User>): Promise<void> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    
     this._isLoading.set(true);
     this._error.set(null);
-    
+
     try {
-      await this.firestoreAdapter.updateUser(uid, userData);
-     
+      await this.runInZone(async () => {
+        const userDoc = doc(this.firestore, this.COLLECTION, uid);
+        await setDoc(userDoc, userData, { merge: true });
+      });
     } catch (error: any) {
       console.error('🔄 UserService: Error al actualizar usuario:', error);
       this._error.set(error.message);
@@ -168,16 +178,14 @@ export class UserService {
    * Elimina un usuario
    */
   async deleteUser(uid: string): Promise<void> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    
     this._isLoading.set(true);
     this._error.set(null);
-    
+
     try {
-      await this.firestoreAdapter.deleteUser(uid);
-      console.log('🔄 UserService: Usuario eliminado:', uid);
+      await this.runInZone(async () => {
+        const userDoc = doc(this.firestore, this.COLLECTION, uid);
+        await deleteDoc(userDoc);
+      });
     } catch (error: any) {
       console.error('🔄 UserService: Error al eliminar usuario:', error);
       this._error.set(error.message);
@@ -222,5 +230,35 @@ export class UserService {
    */
   clearError(): void {
     this._error.set(null);
+  }
+
+  private mapFromFirestore(data: any): User {
+    return {
+      uid: data.uid,
+      nombre: data.nombre || null,
+      email: data.email || null,
+      emailVerified: data.emailVerified ?? false,
+      role: data.role || null,
+      entrenadorId: data.entrenadorId || null,
+      gimnasioId: data.gimnasioId || null,
+      entrenadoId: data.entrenadoId || null,
+      onboarded: data.onboarded ?? false,
+      plan: data.plan || null
+    };
+  }
+
+  private mapToFirestore(user: User): any {
+    const data: any = {
+      nombre: user.nombre || null,
+      email: user.email || null,
+      emailVerified: user.emailVerified ?? false,
+      role: user.role || null,
+      entrenadorId: user.entrenadorId || null,
+      gimnasioId: user.gimnasioId || null,
+      entrenadoId: user.entrenadoId || null,
+      onboarded: user.onboarded ?? false,
+      plan: user.plan || null
+    };
+    return data;
   }
 }

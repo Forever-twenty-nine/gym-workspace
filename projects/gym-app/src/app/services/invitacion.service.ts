@@ -1,44 +1,62 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    setDoc,
+    query,
+    orderBy,
+    Timestamp,
+    QuerySnapshot,
+    DocumentSnapshot
+} from '@angular/fire/firestore';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
-import { Invitacion } from 'gym-library';
-import { Notificacion } from 'gym-library';
+import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
-import { TipoNotificacion } from 'gym-library';
-
-export interface IInvitacionFirestoreAdapter {
-  initializeListener(onUpdate: (invitaciones: Invitacion[]) => void): void;
-  subscribeToInvitacion(id: string, onUpdate: (invitacion: Invitacion | null) => void): void;
-  save(invitacion: Invitacion): Promise<void>;
-  delete(id: string): Promise<void>;
-  updateEstado(id: string, estado: 'pendiente' | 'aceptada' | 'rechazada'): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvitacionService {
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly COLLECTION = 'invitaciones';
+
     private readonly _invitaciones: WritableSignal<Invitacion[]> = signal<Invitacion[]>([]);
     private readonly invitacionSignals = new Map<string, WritableSignal<Invitacion | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IInvitacionFirestoreAdapter;
-    private injector = inject(Injector);
+
+    constructor() { }
 
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IInvitacionFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
     private initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
+        if (this.isListenerInitialized) return;
 
         try {
-            this.firestoreAdapter.initializeListener((invitaciones: Invitacion[]) => {
-                this._invitaciones.set(invitaciones);
+            const col = collection(this.firestore, this.COLLECTION);
+            const q = query(col, orderBy('fechaCreacion', 'desc'));
+            onSnapshot(q, (snap: QuerySnapshot) => {
+                this.runInZone(() => {
+                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                    this._invitaciones.set(list);
+                });
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -50,7 +68,7 @@ export class InvitacionService {
      * 📊 Signal readonly con la lista de invitaciones
      */
     get invitaciones(): Signal<Invitacion[]> {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
+        if (!this.isListenerInitialized) {
             this.initializeListener();
         }
         return this._invitaciones.asReadonly();
@@ -64,11 +82,16 @@ export class InvitacionService {
             const invitacionSignal = signal<Invitacion | null>(null);
             this.invitacionSignals.set(id, invitacionSignal);
 
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToInvitacion(id, (invitacion) => {
-                    invitacionSignal.set(invitacion);
+            const invitacionRef = doc(this.firestore, this.COLLECTION, id);
+            onSnapshot(invitacionRef, (docSnap: DocumentSnapshot) => {
+                this.runInZone(() => {
+                    if (docSnap.exists()) {
+                        invitacionSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                    } else {
+                        invitacionSignal.set(null);
+                    }
                 });
-            }
+            });
         }
         return this.invitacionSignals.get(id)!.asReadonly();
     }
@@ -77,32 +100,39 @@ export class InvitacionService {
      * 💾 Guarda o actualiza una invitación
      */
     async save(invitacion: Invitacion): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-
-        try {
-            await this.firestoreAdapter.save(invitacion);
-        } catch (error) {
-            console.error('Error al guardar invitación:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const dataToSave = this.mapToFirestore(invitacion);
+            if (invitacion.id) {
+                const invitacionRef = doc(this.firestore, this.COLLECTION, invitacion.id);
+                await setDoc(invitacionRef, dataToSave, { merge: true });
+            } else {
+                const col = collection(this.firestore, this.COLLECTION);
+                await addDoc(col, dataToSave);
+            }
+        });
     }
 
     /**
      * 🗑️ Elimina una invitación por ID
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
+        return this.runInZone(async () => {
+            const invitacionRef = doc(this.firestore, this.COLLECTION, id);
+            await deleteDoc(invitacionRef);
+        });
+    }
 
-        try {
-            await this.firestoreAdapter.delete(id);
-        } catch (error) {
-            console.error('Error al eliminar invitación:', error);
-            throw error;
-        }
+    /**
+     * 🔄 Actualiza el estado de una invitación
+     */
+    async updateEstado(id: string, estado: 'pendiente' | 'aceptada' | 'rechazada'): Promise<void> {
+        return this.runInZone(async () => {
+            const invitacionRef = doc(this.firestore, this.COLLECTION, id);
+            await updateDoc(invitacionRef, {
+                estado,
+                fechaRespuesta: estado !== 'pendiente' ? Timestamp.now() : null
+            });
+        });
     }
 
     /**
@@ -143,11 +173,11 @@ export class InvitacionService {
                 mensaje: mensajePersonalizado || `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`,
                 leida: false,
                 datos: {
-                        invitacionId: invitacion.id,
-                        entrenadorId,
-                        entrenadorNombre,
-                        emailInvitado: emailEntrenado,
-                        estadoInvitacion: 'pendiente'
+                    invitacionId: invitacion.id,
+                    entrenadorId,
+                    entrenadorNombre,
+                    emailInvitado: emailEntrenado,
+                    estadoInvitacion: 'pendiente'
                 },
                 fechaCreacion: new Date()
             };
@@ -163,19 +193,15 @@ export class InvitacionService {
      * ✅ Aceptar invitación y vincular entrenado <-> entrenador
      */
     async aceptarInvitacion(invitacionId: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-
         try {
             // Intentar obtener de la lista general primero
             let invitacion: Invitacion | null = this._invitaciones().find(inv => inv.id === invitacionId) || null;
-            
+
             // Si no está en la lista general, usar el signal específico
             if (!invitacion) {
                 const invitacionSignal = this.getInvitacion(invitacionId);
                 invitacion = invitacionSignal();
-                
+
                 // Si aún no está cargado, esperar un poco
                 if (!invitacion) {
                     await new Promise(resolve => setTimeout(resolve, 200));
@@ -191,7 +217,7 @@ export class InvitacionService {
             const entrenadorId = invitacion.entrenadorId;
 
             // 1) Marcar invitación como aceptada
-            await this.firestoreAdapter.updateEstado(invitacionId, 'aceptada');
+            await this.updateEstado(invitacionId, 'aceptada');
 
             // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
             const entrenadoService = this.injector.get(EntrenadoService);
@@ -234,10 +260,10 @@ export class InvitacionService {
                     leida: true, // Marcar como leída porque el usuario ejecutó la acción
                     fechaLeida: new Date(),
                     datos: {
-                            invitacionId: invitacionId,
-                            entrenadorId,
-                            estadoInvitacion: 'aceptada',
-                            fechaRespuesta: new Date()
+                        invitacionId: invitacionId,
+                        entrenadorId,
+                        estadoInvitacion: 'aceptada',
+                        fechaRespuesta: new Date()
                     },
                     fechaCreacion: new Date()
                 } as Notificacion);
@@ -251,12 +277,12 @@ export class InvitacionService {
                     mensaje: `${invitacion.entrenadoNombre} aceptó tu invitación`,
                     leida: false,
                     datos: {
-                            invitacionId: invitacionId,
-                            entrenadorId,
-                            remitenteId: entrenadoId,
-                            remitenteNombre: invitacion.entrenadoNombre,
-                            estadoInvitacion: 'aceptada',
-                            fechaRespuesta: new Date()
+                        invitacionId: invitacionId,
+                        entrenadorId,
+                        remitenteId: entrenadoId,
+                        remitenteNombre: invitacion.entrenadoNombre,
+                        estadoInvitacion: 'aceptada',
+                        fechaRespuesta: new Date()
                     },
                     fechaCreacion: new Date()
                 } as Notificacion);
@@ -269,18 +295,12 @@ export class InvitacionService {
         }
     }
 
-
-
     /**
      * ❌ Rechazar invitación
      */
     async rechazarInvitacion(invitacionId: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-
         try {
-            await this.firestoreAdapter.updateEstado(invitacionId, 'rechazada');
+            await this.updateEstado(invitacionId, 'rechazada');
 
             // Actualizar notificación asociada a la invitación
             try {
@@ -345,7 +365,7 @@ export class InvitacionService {
      */
     getInvitacionesPorEntrenador(entrenadorId: string): Signal<Invitacion[]> {
         return computed(() =>
-            this._invitaciones().filter(inv =>
+            this.invitaciones().filter(inv =>
                 inv.entrenadorId === entrenadorId
             )
         );
@@ -356,7 +376,7 @@ export class InvitacionService {
      */
     getInvitacionesPorEntrenado(entrenadoId: string): Signal<Invitacion[]> {
         return computed(() =>
-            this._invitaciones().filter(inv =>
+            this.invitaciones().filter(inv =>
                 inv.entrenadoId === entrenadoId
             )
         );
@@ -367,7 +387,7 @@ export class InvitacionService {
      */
     getInvitacionesPendientesPorEntrenador(entrenadorId: string): Signal<Invitacion[]> {
         return computed(() =>
-            this._invitaciones().filter(inv =>
+            this.invitaciones().filter(inv =>
                 inv.entrenadorId === entrenadorId &&
                 inv.estado === 'pendiente' &&
                 inv.activa
@@ -380,11 +400,28 @@ export class InvitacionService {
      */
     getInvitacionesPendientesPorEntrenado(entrenadoId: string): Signal<Invitacion[]> {
         return computed(() =>
-            this._invitaciones().filter(inv =>
+            this.invitaciones().filter(inv =>
                 inv.entrenadoId === entrenadoId &&
                 inv.estado === 'pendiente' &&
                 inv.activa
             )
         );
+    }
+
+    private mapFromFirestore(data: any): Invitacion {
+        return {
+            ...data,
+            id: data.id,
+            fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date()),
+            fechaRespuesta: data.fechaRespuesta instanceof Timestamp ? data.fechaRespuesta.toDate() : (data.fechaRespuesta ? new Date(data.fechaRespuesta) : undefined)
+        } as Invitacion;
+    }
+
+    private mapToFirestore(invitacion: Invitacion): any {
+        return {
+            ...invitacion,
+            fechaCreacion: invitacion.fechaCreacion instanceof Date ? Timestamp.fromDate(invitacion.fechaCreacion) : (invitacion.fechaCreacion || Timestamp.now()),
+            fechaRespuesta: invitacion.fechaRespuesta instanceof Date ? Timestamp.fromDate(invitacion.fechaRespuesta) : (invitacion.fechaRespuesta || null)
+        };
     }
 }

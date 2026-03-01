@@ -1,34 +1,48 @@
-import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
-import { SesionRutina } from 'gym-library';
-import { SesionRutinaStatus } from 'gym-library';
-import { Rutina } from 'gym-library';
+import { Injectable, signal, WritableSignal, Signal, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+  Firestore,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  where,
+  QuerySnapshot,
+  Timestamp
+} from '@angular/fire/firestore';
+import { SesionRutina, SesionRutinaStatus, Rutina, Ejercicio } from 'gym-library';
 import { RutinaService } from './rutina.service';
-import { Ejercicio } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
-
-export interface ISesionRutinaFirestoreAdapter {
-  getSesionesPorEntrenado(entrenadoId: string, callback: (sesiones: SesionRutina[]) => void): void;
-  getSesionesPorRutina(rutinaId: string, callback: (sesiones: SesionRutina[]) => void): void;
-  save(sesion: SesionRutina): Promise<void>;
-  update(sesion: SesionRutina): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 /**
  * Servicio para gestionar sesiones de rutina como documentos independientes en Firestore
  */
 @Injectable({ providedIn: 'root' })
 export class SesionRutinaService {
+  private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
+  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+  private readonly COLLECTION = 'sesiones-rutina';
 
-  private firestoreAdapter?: ISesionRutinaFirestoreAdapter;
   private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
 
   // inyección del servicio de rutina
   private readonly rutinaService: RutinaService = inject(RutinaService);
   private readonly ejercicioService: EjercicioService = inject(EjercicioService);
 
-  setFirestoreAdapter(adapter: ISesionRutinaFirestoreAdapter): void {
-    this.firestoreAdapter = adapter;
+  constructor() { }
+
+  /**
+   * Ejecuta el callback en el contexto correcto (zona o inyección)
+   */
+  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+    if (this.zoneRunner) {
+      return this.zoneRunner.run(callback);
+    }
+    return runInInjectionContext(this.injector, callback as any);
   }
 
   /**
@@ -36,6 +50,17 @@ export class SesionRutinaService {
    */
   private normalizeSesionRutina(sesion: SesionRutina): any {
     const normalized: any = { ...sesion };
+
+    // Convertir fechas a Timestamp de Firestore
+    if (normalized.fechaInicio instanceof Date) {
+      normalized.fechaInicio = Timestamp.fromDate(normalized.fechaInicio);
+    }
+    if (normalized.fechaFin instanceof Date) {
+      normalized.fechaFin = Timestamp.fromDate(normalized.fechaFin);
+    }
+    if (normalized.fechaLeido instanceof Date) {
+      normalized.fechaLeido = Timestamp.fromDate(normalized.fechaLeido);
+    }
 
     // Eliminar cualquier campo undefined para evitar errores en Firestore
     Object.keys(normalized).forEach(key => {
@@ -71,17 +96,32 @@ export class SesionRutinaService {
   }
 
   /**
+   * Revierte la normalización al recibir datos de Firestore
+   */
+  private mapFromFirestore(data: any): SesionRutina {
+    return {
+      ...data,
+      fechaInicio: data.fechaInicio instanceof Timestamp ? data.fechaInicio.toDate() : data.fechaInicio,
+      fechaFin: data.fechaFin instanceof Timestamp ? data.fechaFin.toDate() : data.fechaFin,
+      fechaLeido: data.fechaLeido instanceof Timestamp ? data.fechaLeido.toDate() : data.fechaLeido
+    } as SesionRutina;
+  }
+
+  /**
    * Obtiene sesiones por entrenado
    */
   getSesionesPorEntrenado(entrenadoId: string): Signal<SesionRutina[]> {
     if (!this._sesionesPorEntrenado.has(entrenadoId)) {
       const sesionesSignal = signal<SesionRutina[]>([]);
       this._sesionesPorEntrenado.set(entrenadoId, sesionesSignal);
-      if (this.firestoreAdapter) {
-        this.firestoreAdapter.getSesionesPorEntrenado(entrenadoId, (sesiones) => {
+
+      const q = query(collection(this.firestore, this.COLLECTION), where('entrenadoId', '==', entrenadoId));
+      onSnapshot(q, (snapshot: QuerySnapshot) => {
+        this.runInZone(() => {
+          const sesiones = snapshot.docs.map(docSnap => this.mapFromFirestore({ id: docSnap.id, ...docSnap.data() }));
           sesionesSignal.set(sesiones);
         });
-      }
+      });
     }
     return this._sesionesPorEntrenado.get(entrenadoId)!.asReadonly();
   }
@@ -91,7 +131,7 @@ export class SesionRutinaService {
    */
   async inicializarSesionRutina(entrenadoId: string, rutinaId: string): Promise<SesionRutina> {
     const rutinaSesion = await this.getRutinaById(rutinaId);
-    
+
     if (!rutinaSesion) {
       throw new Error('Rutina no encontrada');
     }
@@ -116,11 +156,11 @@ export class SesionRutinaService {
    * Crea una nueva sesión de rutina
    */
   async crearSesion(sesion: SesionRutina): Promise<void> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    const normalizedSesion = this.normalizeSesionRutina(sesion);
-    await this.firestoreAdapter.save(normalizedSesion);
+    return this.runInZone(async () => {
+      const normalizedSesion = this.normalizeSesionRutina(sesion);
+      const ref = doc(this.firestore, this.COLLECTION, sesion.id);
+      await setDoc(ref, normalizedSesion);
+    });
   }
 
   /**
@@ -171,11 +211,11 @@ export class SesionRutinaService {
    * Actualiza una sesión existente
    */
   async actualizarSesion(sesion: SesionRutina): Promise<void> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    const normalizedSesion = this.normalizeSesionRutina(sesion);
-    await this.firestoreAdapter.update(normalizedSesion);
+    return this.runInZone(async () => {
+      const normalizedSesion = this.normalizeSesionRutina(sesion);
+      const ref = doc(this.firestore, this.COLLECTION, sesion.id);
+      await updateDoc(ref, { ...normalizedSesion });
+    });
   }
 
   /**
@@ -193,13 +233,14 @@ export class SesionRutinaService {
    * Elimina una sesión
    */
   async eliminarSesion(id: string): Promise<void> {
-    if (!this.firestoreAdapter) {
-      throw new Error('Firestore adapter no configurado');
-    }
-    await this.firestoreAdapter.delete(id);
+    return this.runInZone(async () => {
+      const ref = doc(this.firestore, this.COLLECTION, id);
+      await deleteDoc(ref);
+    });
   }
 
   generarIdUnico(): string {
     return crypto.randomUUID();
   }
 }
+

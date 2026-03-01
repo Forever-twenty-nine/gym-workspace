@@ -1,31 +1,15 @@
-import { Injectable, signal, WritableSignal, Signal } from '@angular/core';
-
-export interface IStorageAdapter {
-  init(): Promise<void>;
-  set(key: string, value: any): Promise<any>;
-  get(key: string): Promise<any>;
-  remove(key: string): Promise<any>;
-  clear(): Promise<void>;
-  keys(): Promise<string[]>;
-  length(): Promise<number>;
-}
+import { Injectable, signal, Signal, inject } from '@angular/core';
+import { Storage } from '@ionic/storage-angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
-  private storageAdapter?: IStorageAdapter;
+  private readonly storage = inject(Storage);
+  private _storage: Storage | null = null;
   private readonly _isReady = signal<boolean>(false);
 
   constructor() {
-    // La inicialización se hará cuando se configure el adaptador
-  }
-
-  /**
-   * Configura el adaptador de Storage
-   */
-  setStorageAdapter(adapter: IStorageAdapter): void {
-    this.storageAdapter = adapter;
     this.init();
   }
 
@@ -40,12 +24,11 @@ export class StorageService {
    * Inicializa el storage
    */
   async init(): Promise<void> {
-    if (!this.storageAdapter) {
-      throw new Error('Storage adapter no configurado');
-    }
+    if (this._isReady()) return;
 
     try {
-      await this.storageAdapter.init();
+      const storageInstance = await this.storage.create();
+      this._storage = storageInstance;
       this._isReady.set(true);
     } catch (error) {
       console.error('Error inicializando storage:', error);
@@ -58,7 +41,7 @@ export class StorageService {
    */
   public async set(key: string, value: any): Promise<any> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.set(key, value);
+    return this._storage?.set(key, value);
   }
 
   /**
@@ -66,7 +49,7 @@ export class StorageService {
    */
   public async get(key: string): Promise<any> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.get(key);
+    return this._storage?.get(key);
   }
 
   /**
@@ -74,7 +57,7 @@ export class StorageService {
    */
   public async remove(key: string): Promise<any> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.remove(key);
+    return this._storage?.remove(key);
   }
 
   /**
@@ -82,7 +65,7 @@ export class StorageService {
    */
   public async clear(): Promise<void> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.clear();
+    return this._storage?.clear();
   }
 
   /**
@@ -90,7 +73,7 @@ export class StorageService {
    */
   public async keys(): Promise<string[]> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.keys();
+    return this._storage?.keys() || [];
   }
 
   /**
@@ -98,17 +81,13 @@ export class StorageService {
    */
   public async length(): Promise<number> {
     await this.ensureStorageReady();
-    return this.storageAdapter!.length();
+    return this._storage?.length() || 0;
   }
 
   /**
    * Asegura que el storage esté listo para usar
    */
   private async ensureStorageReady(): Promise<void> {
-    if (!this.storageAdapter) {
-      throw new Error('Storage adapter no configurado');
-    }
-
     if (!this._isReady()) {
       await this.init();
     }

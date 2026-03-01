@@ -1,68 +1,68 @@
-import { Injectable, signal, WritableSignal, Signal } from '@angular/core';
-// Standalone: no es necesario 'providedIn'
-import { User } from 'gym-library';
-
-export interface IAuthAdapter {
-  loginWithGoogle(): Promise<{ success: boolean; user?: User; error?: string }>;
-  loginWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
-  registerWithEmail(email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }>;
-  logout(): Promise<void>;
-  getCurrentUser(): Promise<User | null>;
-  isAuthenticated(): Promise<boolean>;
-}
+import { Injectable, signal, WritableSignal, Signal, inject, Injector, runInInjectionContext, computed, isDevMode } from '@angular/core';
+import {
+  Auth,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  authState,
+  User as FirebaseUser,
+  createUserWithEmailAndPassword
+} from '@angular/fire/auth';
+import { Firestore, doc, getDoc } from '@angular/fire/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { User, Rol } from 'gym-library';
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly auth = inject(Auth);
+  private readonly firestore = inject(Firestore);
+  private readonly injector = inject(Injector);
+  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isAuthenticated = signal<boolean>(false);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
-  private authAdapter?: IAuthAdapter;
-  /**
-   * Método privado para manejar login/register con lógica DRY
-   */
-  private async handleAuth(
-    action: () => Promise<{ success: boolean; user?: User; error?: string }>,
-    errorMsg: string
-  ): Promise<boolean> {
-    this._isLoading.set(true);
-    this._error.set(null);
-    try {
-      const result = await action();
-      if (result.success && result.user) {
-        this._currentUser.set(result.user);
-        this._isAuthenticated.set(true);
-        return true;
-      } else {
-        this._error.set(result.error || errorMsg);
-        return false;
-      }
-    } catch (error: unknown) {
-      if (typeof error === 'object' && error !== null && 'message' in error) {
-        this._error.set((error as { message?: string }).message || errorMsg);
-      } else {
-        this._error.set(errorMsg);
-      }
-      return false;
-    } finally {
-      this._isLoading.set(false);
-    }
-  }
+  // Signal para el estado de autenticación de Firebase
+  private readonly authStateSignal: Signal<FirebaseUser | null | undefined> = toSignal(authState(this.auth));
 
   constructor() {
-    // La inicialización se hará cuando se configure el adaptador
+    // Monitorear cambios en el estado de autenticación
+    this.setupAuthSync();
   }
 
   /**
-   * Configura el adaptador de autenticación
+   * Ejecuta el callback en el contexto correcto (zona o inyección)
    */
-  setAuthAdapter(adapter: IAuthAdapter): void {
-    this.authAdapter = adapter;
-    // No llamar checkCurrentUser automáticamente para evitar problemas con contextos de inyección
-    // Debe ser llamado explícitamente con refreshAuth() cuando sea necesario
+  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+    if (this.zoneRunner) {
+      return this.zoneRunner.run(callback);
+    }
+    return runInInjectionContext(this.injector, callback as any);
+  }
+
+  private setupAuthSync() {
+    // Sincronizar el estado de auth de Firebase con nuestros signals internos
+    computed(() => {
+      const firebaseUser = this.authStateSignal();
+      if (firebaseUser === undefined) return; // Cargando inicial
+
+      this.runInZone(async () => {
+        if (firebaseUser) {
+          const user = await this.getUserData(firebaseUser);
+          this._currentUser.set(user);
+          this._isAuthenticated.set(true);
+        } else {
+          this._currentUser.set(null);
+          this._isAuthenticated.set(false);
+        }
+      });
+    });
   }
 
   /**
@@ -97,116 +97,195 @@ export class AuthService {
    * Inicia sesión con Google
    */
   async loginWithGoogle(): Promise<boolean> {
-    if (!this.authAdapter) {
-      throw new Error('Auth adapter no configurado');
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      return await this.runInZone(async () => {
+        const provider = new GoogleAuthProvider();
+        const cred = await signInWithPopup(this.auth, provider);
+        const firebaseUser = cred.user;
+
+        if (firebaseUser) {
+          const user = await this.getUserData(firebaseUser);
+          this._currentUser.set(user);
+          this._isAuthenticated.set(true);
+          return true;
+        }
+
+        this._error.set('No se pudo obtener información del usuario');
+        return false;
+      });
+    } catch (error: any) {
+      if (isDevMode()) console.error('Error en login con Google:', error);
+      this._error.set(this.getErrorMessage(error));
+      return false;
+    } finally {
+      this._isLoading.set(false);
     }
-    return this.handleAuth(
-      () => this.authAdapter!.loginWithGoogle(),
-      'Error desconocido en login con Google'
-    );
   }
 
   /**
    * Inicia sesión con email y contraseña
    */
   async loginWithEmail(email: string, password: string): Promise<boolean> {
-    if (!this.authAdapter) {
-      throw new Error('Auth adapter no configurado');
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      return await this.runInZone(async () => {
+        const cred = await signInWithEmailAndPassword(this.auth, email, password);
+        const firebaseUser = cred.user;
+
+        if (firebaseUser) {
+          const user = await this.getUserData(firebaseUser);
+          this._currentUser.set(user);
+          this._isAuthenticated.set(true);
+          return true;
+        }
+
+        this._error.set('No se pudo obtener información del usuario');
+        return false;
+      });
+    } catch (error: any) {
+      if (isDevMode()) console.error('Error en login con email:', error);
+      this._error.set(this.getErrorMessage(error));
+      return false;
+    } finally {
+      this._isLoading.set(false);
     }
-    return this.handleAuth(
-      () => this.authAdapter!.loginWithEmail(email, password),
-      'Error desconocido en login con email'
-    );
   }
 
   /**
    * Registra un nuevo usuario con email y contraseña
    */
   async registerWithEmail(email: string, password: string): Promise<boolean> {
-    if (!this.authAdapter) {
-      throw new Error('Auth adapter no configurado');
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      return await this.runInZone(async () => {
+        const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+        const firebaseUser = userCredential.user;
+
+        if (firebaseUser) {
+          const newUser: User = {
+            uid: firebaseUser.uid,
+            nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
+            email: firebaseUser.email || '',
+            role: this.inferRoleFromEmail(email),
+            onboarded: false
+          };
+          this._currentUser.set(newUser);
+          this._isAuthenticated.set(true);
+          return true;
+        }
+
+        this._error.set('No se pudo crear la cuenta');
+        return false;
+      });
+    } catch (error: any) {
+      if (isDevMode()) console.error('Error en registro:', error);
+      this._error.set(this.getRegistrationErrorMessage(error));
+      return false;
+    } finally {
+      this._isLoading.set(false);
     }
-    return this.handleAuth(
-      () => this.authAdapter!.registerWithEmail(email, password),
-      'Error desconocido en registro con email'
-    );
   }
 
   /**
    * Cierra sesión
    */
   async logout(): Promise<void> {
-    if (!this.authAdapter) {
-      throw new Error('Auth adapter no configurado');
-    }
     this._isLoading.set(true);
     this._error.set(null);
     try {
-      await this.authAdapter.logout();
-      this._currentUser.set(null);
-      this._isAuthenticated.set(false);
-    } catch (error: unknown) {
-      if (typeof error === 'object' && error !== null && 'message' in error) {
-        this._error.set((error as { message?: string }).message || 'Error desconocido en logout');
-      } else {
-        this._error.set('Error desconocido en logout');
-      }
+      await this.runInZone(async () => {
+        await signOut(this.auth);
+        this._currentUser.set(null);
+        this._isAuthenticated.set(false);
+      });
+    } catch (error: any) {
+      this._error.set('Error al cerrar sesión');
       throw error;
     } finally {
       this._isLoading.set(false);
     }
   }
 
-  /**
-   * Verifica el usuario actual
-   */
-  private async checkCurrentUser(): Promise<void> {
-    if (!this.authAdapter) return;
-    this._isLoading.set(true);
-    try {
-      const user = await this.authAdapter.getCurrentUser();
-      const isAuth = await this.authAdapter.isAuthenticated();
-      this._currentUser.set(user);
-      this._isAuthenticated.set(isAuth);
-    } catch (error: unknown) {
-      console.warn('Error verificando usuario actual:', error);
-      this._currentUser.set(null);
-      this._isAuthenticated.set(false);
-    } finally {
-      this._isLoading.set(false);
+  private async getUserData(firebaseUser: FirebaseUser): Promise<User> {
+    const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
+    const userSnap = await getDoc(userDocRef);
+
+    let userData: User;
+
+    if (userSnap.exists()) {
+      userData = userSnap.data() as User;
+    } else {
+      userData = {
+        uid: firebaseUser.uid,
+        nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
+        email: firebaseUser.email || '',
+        role: undefined,
+        onboarded: false
+      };
+    }
+
+    if (!userData.role) {
+      userData.role = this.inferRoleFromEmail(userData.email || '');
+    }
+
+    return { ...userData, uid: firebaseUser.uid };
+  }
+
+  private inferRoleFromEmail(email: string): Rol {
+    const emailLower = email.toLowerCase();
+    if (emailLower.includes('trainer') || emailLower.includes('entrenador')) return Rol.ENTRENADOR;
+    if (emailLower.includes('gimnasio') || emailLower.includes('gym')) return Rol.GIMNASIO;
+    if (emailLower.includes('personal')) return Rol.PERSONAL_TRAINER;
+    return Rol.ENTRENADO;
+  }
+
+  private getErrorMessage(error: any): string {
+    const errorCode = error.code || '';
+    switch (errorCode) {
+      case 'auth/invalid-credential':
+      case 'auth/user-not-found':
+      case 'auth/wrong-password': return 'Email o contraseña incorrectos';
+      case 'auth/user-disabled': return 'Esta cuenta ha sido deshabilitada';
+      case 'auth/too-many-requests': return 'Demasiados intentos fallidos. Intenta más tarde';
+      case 'auth/network-request-failed': return 'Error de conexión. Verifica tu internet';
+      case 'auth/popup-closed-by-user': return 'Inicio de sesión cancelado';
+      case 'auth/popup-blocked': return 'El navegador bloqueó la ventana emergente';
+      default: return error.message || 'Error al iniciar sesión';
     }
   }
 
-  /**
-   * Actualiza el usuario actual (útil para cambios de perfil)
-   */
+  private getRegistrationErrorMessage(error: any): string {
+    const errorCode = error.code || '';
+    switch (errorCode) {
+      case 'auth/email-already-in-use': return 'Este email ya está registrado';
+      case 'auth/weak-password': return 'La contraseña debe tener al menos 6 caracteres';
+      case 'auth/invalid-email': return 'El email no tiene un formato válido';
+      case 'auth/operation-not-allowed': return 'Método de registro no habilitado';
+      default: return error.message || 'Error al crear la cuenta';
+    }
+  }
+
   updateCurrentUser(user: User): void {
     this._currentUser.set(user);
   }
 
-  /**
-   * Limpia errores
-   */
   clearError(): void {
     this._error.set(null);
   }
 
-  /**
-   * Refresca el estado de autenticación
-   */
   async refreshAuth(): Promise<void> {
-    await this.checkCurrentUser();
-  }
-
-  /**
-   * Para testing: expone los signals internos
-   */
-  get _signals() {
-    return {
-      _currentUser: this._currentUser,
-      _isAuthenticated: this._isAuthenticated,
-      _isLoading: this._isLoading,
-      _error: this._error,
-    };
+    const firebaseUser = this.auth.currentUser;
+    if (firebaseUser) {
+      const user = await this.getUserData(firebaseUser);
+      this._currentUser.set(user);
+      this._isAuthenticated.set(true);
+    } else {
+      this._currentUser.set(null);
+      this._isAuthenticated.set(false);
+    }
   }
 }

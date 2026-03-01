@@ -1,50 +1,64 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    addDoc,
+    doc,
+    deleteDoc,
+    setDoc,
+    onSnapshot,
+    Timestamp,
+    QuerySnapshot,
+    DocumentSnapshot
+} from '@angular/fire/firestore';
 import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
-
-export interface IRutinaFirestoreAdapter {
-  initializeListener(onUpdate: (rutinas: Rutina[]) => void): void;
-  subscribeToRutina(id: string, onUpdate: (rutina: Rutina | null) => void): void;
-  save(rutina: Rutina): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 export interface RutinaConEjercicios extends Rutina {
-  ejercicios: any[]; // Ejercicios ya resueltos
+    ejercicios: any[]; // Ejercicios ya resueltos
 }
 
 @Injectable({ providedIn: 'root' })
 export class RutinaService {
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly COLLECTION = 'rutinas';
+
     // Señal interna con todas las rutinas
     private readonly _rutinas: WritableSignal<Rutina[]> = signal<Rutina[]>([]);
     private readonly rutinaSignals = new Map<string, WritableSignal<Rutina | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IRutinaFirestoreAdapter;
-    
+
     // Inyectar EjercicioService para combinar datos
     private readonly ejercicioService = inject(EjercicioService);
 
-    constructor() {
-        // La inicialización se hará cuando se configure el adaptador
-    }
+    constructor() { }
 
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IRutinaFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
     private initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
-        
+        if (this.isListenerInitialized) return;
+
         try {
-            this.firestoreAdapter.initializeListener((rutinas: Rutina[]) => {
-                this._rutinas.set(rutinas);
+            const col = collection(this.firestore, this.COLLECTION);
+            onSnapshot(col, (snap: QuerySnapshot) => {
+                this.runInZone(() => {
+                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                    this._rutinas.set(list);
+                });
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -56,7 +70,7 @@ export class RutinaService {
      * 📊 Signal readonly con todas las rutinas
      */
     get rutinas(): Signal<Rutina[]> {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
+        if (!this.isListenerInitialized) {
             this.initializeListener();
         }
         return this._rutinas.asReadonly();
@@ -69,12 +83,17 @@ export class RutinaService {
         if (!this.rutinaSignals.has(id)) {
             const rutinaSignal = signal<Rutina | null>(null);
             this.rutinaSignals.set(id, rutinaSignal);
-            
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToRutina(id, (rutina) => {
-                    rutinaSignal.set(rutina);
+
+            const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+            onSnapshot(rutinaRef, (snapshot: DocumentSnapshot) => {
+                this.runInZone(() => {
+                    if (snapshot.exists()) {
+                        rutinaSignal.set(this.mapFromFirestore({ ...snapshot.data(), id: snapshot.id }));
+                    } else {
+                        rutinaSignal.set(null);
+                    }
                 });
-            }
+            });
         }
         return this.rutinaSignals.get(id)!.asReadonly();
     }
@@ -83,12 +102,17 @@ export class RutinaService {
      * 💾 Guarda o actualiza una rutina (upsert si tiene id)
      */
     async save(rutina: Rutina): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
         try {
-            await this.firestoreAdapter.save(rutina);
+            await this.runInZone(async () => {
+                const dataToSave = this.mapToFirestore(rutina);
+
+                if (rutina.id) {
+                    const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
+                    await setDoc(rutinaRef, dataToSave, { merge: true });
+                } else {
+                    await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+                }
+            });
         } catch (error) {
             console.error('Error al guardar rutina:', error);
             throw error;
@@ -99,12 +123,11 @@ export class RutinaService {
      * 🗑️ Elimina una rutina por ID
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
         try {
-            await this.firestoreAdapter.delete(id);
+            await this.runInZone(async () => {
+                const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+                await deleteDoc(rutinaRef);
+            });
         } catch (error) {
             console.error('Error al eliminar rutina:', error);
             throw error;
@@ -115,8 +138,8 @@ export class RutinaService {
      * 🔍 Busca rutinas por nombre
      */
     getRutinasByNombre(nombre: string): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
+        return computed(() =>
+            this._rutinas().filter(rutina =>
                 rutina.nombre.toLowerCase().includes(nombre.toLowerCase())
             )
         );
@@ -126,7 +149,7 @@ export class RutinaService {
      * 🔍 Busca rutinas activas
      */
     getRutinasActivas(): Signal<Rutina[]> {
-        return computed(() => 
+        return computed(() =>
             this._rutinas().filter(rutina => rutina.activa)
         );
     }
@@ -149,8 +172,8 @@ export class RutinaService {
      * 🔍 Busca rutinas por duración
      */
     getRutinasByDuracion(duracion: number): Signal<Rutina[]> {
-        return computed(() => 
-            this._rutinas().filter(rutina => 
+        return computed(() =>
+            this._rutinas().filter(rutina =>
                 rutina.duracion === duracion
             )
         );
@@ -172,14 +195,14 @@ export class RutinaService {
             // Obtener la rutina base
             const rutinaSignal = this.getRutina(id);
             const rutina = rutinaSignal();
-            
+
             if (!rutina || !rutina.ejerciciosIds || !Array.isArray(rutina.ejerciciosIds)) {
                 return null;
             }
 
             // Obtener todos los ejercicios disponibles
             const todosEjercicios = this.ejercicioService.ejercicios();
-            
+
             // Resolver ejercicios por IDs
             const ejerciciosResueltos = rutina.ejerciciosIds
                 .map(id => todosEjercicios.find(e => e && e.id === id))
@@ -189,7 +212,47 @@ export class RutinaService {
             return {
                 ...rutina,
                 ejercicios: ejerciciosResueltos
-            };
+            } as RutinaConEjercicios;
         });
+    }
+
+    private mapFromFirestore(data: any): Rutina {
+        return {
+            id: data.id,
+            nombre: data.nombre || '',
+            activa: data.activa ?? true,
+            descripcion: data.descripcion || '',
+            ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
+            fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
+            fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
+            duracion: data.duracion
+        };
+    }
+
+    private mapToFirestore(rutina: Rutina): any {
+        const data: any = {
+            nombre: rutina.nombre,
+            activa: rutina.activa,
+            descripcion: rutina.descripcion || '',
+            ejerciciosIds: rutina.ejerciciosIds || []
+        };
+
+        if (rutina.duracion && rutina.duracion > 0) {
+            data.duracion = rutina.duracion;
+        }
+
+        if (rutina.fechaCreacion) {
+            data.fechaCreacion = rutina.fechaCreacion instanceof Date
+                ? Timestamp.fromDate(rutina.fechaCreacion)
+                : rutina.fechaCreacion;
+        }
+
+        if (rutina.fechaModificacion) {
+            data.fechaModificacion = rutina.fechaModificacion instanceof Date
+                ? Timestamp.fromDate(rutina.fechaModificacion)
+                : rutina.fechaModificacion;
+        }
+
+        return data;
     }
 }

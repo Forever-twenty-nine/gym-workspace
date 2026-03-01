@@ -1,80 +1,11 @@
-import { SesionRutinaFirestoreAdapter } from './adapters/sesion-rutina-firestore.adapter';
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, APP_INITIALIZER } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { environment } from '../environments/environment';
 import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import { EntrenadoService } from './services/entrenado.service';
-import { UserService } from './services/user.service';
-import { RutinaService } from './services/rutina.service';
-import { EjercicioService } from './services/ejercicio.service';
-import { EntrenadorService, ENTRENADOR_FIRESTORE_ADAPTER } from './services/entrenador.service';
-import { GimnasioService, GIMNASIO_FIRESTORE_ADAPTER } from './services/gimnasio.service';
-import { NotificacionService } from './services/notificacion.service';
-import { MensajeService } from './services/mensaje.service';
-import { InvitacionService } from './services/invitacion.service';
-import { SesionRutinaService } from './services/sesion-rutina.service';
-import { RutinaAsignadaService } from './services/rutina-asignada.service';
-import { ESTADISTICAS_ENTRENADO_FIRESTORE_ADAPTER } from './services/estadisticas-entrenado.service';
-
-import { EntrenadoFirestoreAdapter } from './adapters/entrenado-firestore.adapter';
-import { UserFirestoreAdapter } from './adapters/user-firestore.adapter';
-import { RutinaFirestoreAdapter } from './adapters/rutina-firestore.adapter';
-import { EjercicioFirestoreAdapter } from './adapters/ejercicio-firestore.adapter';
-import { EntrenadorFirestoreAdapter } from './adapters/entrenador-firestore.adapter';
-import { GimnasioFirestoreAdapter } from './adapters/gimnasio-firestore.adapter';
-import { NotificacionFirestoreAdapter } from './adapters/notificacion-firestore.adapter';
-import { MensajeFirestoreAdapter } from './adapters/mensaje-firestore.adapter';
-import { InvitacionFirestoreAdapter } from './adapters/invitacion-firestore.adapter';
-import { EstadisticasEntrenadoFirestoreAdapter } from './adapters/estadisticas-entrenado-firestore.adapter';
-import { RutinaAsignadaFirestoreAdapter } from './adapters/rutina-asignada-firestore.adapter';
-
 import { routes } from './app.routes';
-
-// Función para inicializar los adaptadores de servicios
-function initializeServiceAdapters(
-  entrenadoService: EntrenadoService,
-  userService: UserService,
-  rutinaService: RutinaService,
-  ejercicioService: EjercicioService,
-  entrenadorService: EntrenadorService,
-  gimnasioService: GimnasioService,
-  notificacionService: NotificacionService,
-  mensajeService: MensajeService,
-  invitacionService: InvitacionService,
-  sesionRutinaService: SesionRutinaService,
-  rutinaAsignadaService: RutinaAsignadaService,
-  entrenadoAdapter: EntrenadoFirestoreAdapter,
-  userAdapter: UserFirestoreAdapter,
-  rutinaAdapter: RutinaFirestoreAdapter,
-  ejercicioAdapter: EjercicioFirestoreAdapter,
-  entrenadorAdapter: EntrenadorFirestoreAdapter,
-  gimnasioAdapter: GimnasioFirestoreAdapter,
-  notificacionAdapter: NotificacionFirestoreAdapter,
-  mensajeAdapter: MensajeFirestoreAdapter,
-  invitacionAdapter: InvitacionFirestoreAdapter,
-  sesionRutinaAdapter: SesionRutinaFirestoreAdapter,
-  rutinaAsignadaAdapter: RutinaAsignadaFirestoreAdapter
-) {
-  return () => {
-    // Configurar adaptadores
-    entrenadoService.setFirestoreAdapter(entrenadoAdapter);
-    userService.setFirestoreAdapter(userAdapter);
-    rutinaService.setFirestoreAdapter(rutinaAdapter);
-    ejercicioService.setFirestoreAdapter(ejercicioAdapter);
-    // NOTA: entrenadorService usa injection token, no necesita setFirestoreAdapter
-    gimnasioService.setFirestoreAdapter(gimnasioAdapter);
-    notificacionService.setFirestoreAdapter(notificacionAdapter);
-    mensajeService.setFirestoreAdapter(mensajeAdapter);
-    invitacionService.setFirestoreAdapter(invitacionAdapter);
-    sesionRutinaService.setFirestoreAdapter(sesionRutinaAdapter);
-    rutinaAsignadaService.setFirestoreAdapter(rutinaAsignadaAdapter);
-
-    return Promise.resolve();
-  };
-}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -97,52 +28,5 @@ export const appConfig: ApplicationConfig = {
       }
       return auth;
     }),
-    // Proveer el adaptador de entrenadores
-    {
-      provide: ENTRENADOR_FIRESTORE_ADAPTER,
-      useClass: EntrenadorFirestoreAdapter
-    },
-    // Proveer el adaptador de gimnasios
-    {
-      provide: GIMNASIO_FIRESTORE_ADAPTER,
-      useClass: GimnasioFirestoreAdapter
-    },
-    // Proveer el adaptador de estadísticas de entrenados
-    {
-      provide: ESTADISTICAS_ENTRENADO_FIRESTORE_ADAPTER,
-      useClass: EstadisticasEntrenadoFirestoreAdapter
-    },
-    // Proveer el adaptador de sesiones de rutina
-    SesionRutinaFirestoreAdapter,
-    // Inicializar los adaptadores de servicios al arranque
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeServiceAdapters,
-      deps: [
-        EntrenadoService,
-        UserService,
-        RutinaService,
-        EjercicioService,
-        EntrenadorService,
-        GimnasioService,
-        NotificacionService,
-        MensajeService,
-        InvitacionService,
-        SesionRutinaService,
-        RutinaAsignadaService,
-        EntrenadoFirestoreAdapter,
-        UserFirestoreAdapter,
-        RutinaFirestoreAdapter,
-        EjercicioFirestoreAdapter,
-        EntrenadorFirestoreAdapter,
-        GimnasioFirestoreAdapter,
-        NotificacionFirestoreAdapter,
-        MensajeFirestoreAdapter,
-        InvitacionFirestoreAdapter,
-        SesionRutinaFirestoreAdapter,
-        RutinaAsignadaFirestoreAdapter
-      ],
-      multi: true
-    }
   ]
 };

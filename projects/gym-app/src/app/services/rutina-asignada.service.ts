@@ -1,50 +1,61 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
-import { RutinaAsignada } from 'gym-library';
-import { Notificacion } from 'gym-library';
-import { TipoNotificacion } from 'gym-library';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    doc,
+    addDoc,
+    setDoc,
+    deleteDoc,
+    onSnapshot,
+    Timestamp,
+    QuerySnapshot,
+    DocumentSnapshot
+} from '@angular/fire/firestore';
+import { RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
-
-export interface IRutinaAsignadaFirestoreAdapter {
-  initializeListener(onUpdate: (rutinasAsignadas: RutinaAsignada[]) => void): void;
-  subscribeToRutinaAsignada(id: string, onUpdate: (rutinaAsignada: RutinaAsignada | null) => void): void;
-  save(rutinaAsignada: RutinaAsignada): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class RutinaAsignadaService {
-    // Señal interna con todas las rutinas asignadas
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly COLLECTION = 'rutinas-asignadas';
+
     private readonly _rutinasAsignadas: WritableSignal<RutinaAsignada[]> = signal<RutinaAsignada[]>([]);
     private readonly rutinaAsignadaSignals = new Map<string, WritableSignal<RutinaAsignada | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IRutinaAsignadaFirestoreAdapter;
-
-    constructor() {
-        // La inicialización se hará cuando se configure el adaptador
-    }
 
     // Servicios auxiliares
     private readonly notificacionService: NotificacionService = inject(NotificacionService);
     private readonly rutinaService: RutinaService = inject(RutinaService);
 
+    constructor() { }
+
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IRutinaAsignadaFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
     private initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
+        if (this.isListenerInitialized) return;
 
         try {
-            this.firestoreAdapter.initializeListener((rutinasAsignadas: RutinaAsignada[]) => {
-                this._rutinasAsignadas.set(rutinasAsignadas);
+            const col = collection(this.firestore, this.COLLECTION);
+            onSnapshot(col, (snap: QuerySnapshot) => {
+                this.runInZone(() => {
+                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                    this._rutinasAsignadas.set(list);
+                });
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -57,31 +68,40 @@ export class RutinaAsignadaService {
      */
     subscribeToRutinaAsignada(id: string): Signal<RutinaAsignada | null> {
         if (!this.rutinaAsignadaSignals.has(id)) {
-            const rutinaSignal: WritableSignal<RutinaAsignada | null> = signal<RutinaAsignada | null>(null);
+            const rutinaSignal = signal<RutinaAsignada | null>(null);
             this.rutinaAsignadaSignals.set(id, rutinaSignal);
 
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToRutinaAsignada(id, (rutinaAsignada) => {
-                    rutinaSignal.set(rutinaAsignada);
+            const rutinaAsignadaRef = doc(this.firestore, this.COLLECTION, id);
+            onSnapshot(rutinaAsignadaRef, (docSnap: DocumentSnapshot) => {
+                this.runInZone(() => {
+                    if (docSnap.exists()) {
+                        rutinaSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                    } else {
+                        rutinaSignal.set(null);
+                    }
                 });
-            }
+            });
         }
-        return this.rutinaAsignadaSignals.get(id)!;
+        return this.rutinaAsignadaSignals.get(id)!.asReadonly();
     }
 
     /**
      * 🔍 Obtiene todas las rutinas asignadas
      */
     getRutinasAsignadas(): Signal<RutinaAsignada[]> {
-        this.initializeListener();
-        return this._rutinasAsignadas;
+        if (!this.isListenerInitialized) {
+            this.initializeListener();
+        }
+        return this._rutinasAsignadas.asReadonly();
     }
 
     /**
      * 🔍 Obtiene rutinas asignadas por entrenado
      */
     getRutinasAsignadasByEntrenado(entrenadoId: string): Signal<RutinaAsignada[]> {
-        this.initializeListener();
+        if (!this.isListenerInitialized) {
+            this.initializeListener();
+        }
         return computed(() =>
             this._rutinasAsignadas().filter(ra => ra.entrenadoId === entrenadoId)
         );
@@ -91,7 +111,9 @@ export class RutinaAsignadaService {
      * 🔍 Obtiene rutinas asignadas por entrenador
      */
     getRutinasAsignadasByEntrenador(entrenadorId: string): Signal<RutinaAsignada[]> {
-        this.initializeListener();
+        if (!this.isListenerInitialized) {
+            this.initializeListener();
+        }
         return computed(() =>
             this._rutinasAsignadas().filter(ra => ra.entrenadorId === entrenadorId)
         );
@@ -101,7 +123,9 @@ export class RutinaAsignadaService {
      * 🔍 Obtiene rutinas asignadas por rutina
      */
     getRutinasAsignadasByRutina(rutinaId: string): Signal<RutinaAsignada[]> {
-        this.initializeListener();
+        if (!this.isListenerInitialized) {
+            this.initializeListener();
+        }
         return computed(() =>
             this._rutinasAsignadas().filter(ra => ra.rutinaId === rutinaId)
         );
@@ -111,7 +135,9 @@ export class RutinaAsignadaService {
      * 🔍 Obtiene rutinas asignadas activas por entrenado
      */
     getRutinasAsignadasActivasByEntrenado(entrenadoId: string): Signal<RutinaAsignada[]> {
-        this.initializeListener();
+        if (!this.isListenerInitialized) {
+            this.initializeListener();
+        }
         return computed(() =>
             this._rutinasAsignadas().filter(ra =>
                 ra.entrenadoId === entrenadoId && ra.activa
@@ -123,27 +149,35 @@ export class RutinaAsignadaService {
      * 💾 Guarda una rutina asignada
      */
     async save(rutinaAsignada: RutinaAsignada): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter not configured');
-        }
-        await this.firestoreAdapter.save(rutinaAsignada);
+        return this.runInZone(async () => {
+            const dataToSave = this.mapToFirestore(rutinaAsignada);
+            if (rutinaAsignada.id) {
+                const rutinaAsignadaRef = doc(this.firestore, this.COLLECTION, rutinaAsignada.id);
+                await setDoc(rutinaAsignadaRef, dataToSave, { merge: true });
+            } else {
+                const col = collection(this.firestore, this.COLLECTION);
+                const docRef = await addDoc(col, dataToSave);
+                rutinaAsignada.id = docRef.id;
+            }
+        });
     }
 
     /**
      * 🗑️ Elimina una rutina asignada
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter not configured');
-        }
-        await this.firestoreAdapter.delete(id);
+        return this.runInZone(async () => {
+            const rutinaAsignadaRef = doc(this.firestore, this.COLLECTION, id);
+            await deleteDoc(rutinaAsignadaRef);
+        });
     }
 
     /**
      * 🔄 Actualiza el estado de una rutina asignada
      */
     async toggleActiva(id: string): Promise<void> {
-        const rutinaAsignada = this._rutinasAsignadas().find(ra => ra.id === id);
+        const rutinas = this.getRutinasAsignadas()();
+        const rutinaAsignada = rutinas.find(ra => ra.id === id);
         if (rutinaAsignada) {
             const updated = { ...rutinaAsignada, activa: !rutinaAsignada.activa };
             await this.save(updated);
@@ -152,28 +186,23 @@ export class RutinaAsignadaService {
 
     /**
      * Crea notificaciones de recordatorio para rutinas próximas de un entrenado en una ventana dada (por defecto 24h).
-     * Idempotente: usa un ID determinista por rutinaAsignada y día objetivo.
      */
     async checkAndNotifyRutinasProximas(entrenadoId: string, windowHours: number = 24): Promise<void> {
         const ahora = new Date();
         const ventanaMs = windowHours * 60 * 60 * 1000;
         const limite = new Date(ahora.getTime() + ventanaMs);
 
-        // Tomamos un snapshot de las rutinas asignadas activas del entrenado
         const asignadas = this.getRutinasAsignadasActivasByEntrenado(entrenadoId)();
         if (!asignadas || asignadas.length === 0) return;
 
         for (const ra of asignadas) {
-            // Determinar la fecha objetivo próxima
             const fechaObjetivo = this.calcularProximaFechaObjetivo(ra, ahora);
             if (!fechaObjetivo) continue;
 
-            // ¿Cae dentro de la ventana?
             if (fechaObjetivo.getTime() >= ahora.getTime() && fechaObjetivo.getTime() <= limite.getTime()) {
                 const yyyyMMdd = this.formatearYYYYMMDD(fechaObjetivo);
                 const notifId = `notif-rutina-proxima-${ra.id}-${yyyyMMdd}`;
 
-                // Componer título/mensaje (con nombre si está disponible)
                 const rutina = this.rutinaService.rutinas().find(r => r.id === ra.rutinaId);
                 const nombreRutina = rutina?.nombre || 'tu rutina asignada';
 
@@ -195,28 +224,22 @@ export class RutinaAsignadaService {
                 try {
                     await this.notificacionService.save(notificacion);
                 } catch (e) {
-                    // Si ya existe con el mismo ID, save podría sobrescribir; para Firestore adapters típicos, será upsert.
-                    // Si hay error, no bloqueamos el resto.
                     console.warn('No se pudo guardar notificación de rutina próxima:', e);
                 }
             }
         }
     }
 
-    /** Calcula la próxima fecha objetivo para una rutina asignada basada en fechaEspecifica o diaSemana */
     private calcularProximaFechaObjetivo(ra: RutinaAsignada, referencia: Date): Date | null {
-        // Caso 1: fecha específica
         if (ra.fechaEspecifica) {
             return new Date(ra.fechaEspecifica);
         }
 
-        // Caso 2: día de la semana
         if (ra.diaSemana) {
             const targetDow = this.mapDiaSemana(ra.diaSemana);
             if (targetDow === null) return null;
             const ref = new Date(referencia);
             const diff = (targetDow - ref.getDay() + 7) % 7;
-            // si es hoy, consideramos hoy como próxima ocurrencia
             const proxima = new Date(ref);
             proxima.setHours(23, 59, 59, 999);
             proxima.setDate(ref.getDate() + diff);
@@ -233,7 +256,6 @@ export class RutinaAsignadaService {
         return `${y}${m}${day}`;
     }
 
-    /** Mapea nombre de día (es/en, varias variantes) a número de getDay() (0=Domingo..6=Sábado) */
     private mapDiaSemana(dia: string): number | null {
         const v = dia.trim().toLowerCase();
         const map: Record<string, number> = {
@@ -246,5 +268,30 @@ export class RutinaAsignadaService {
             'sabado': 6, 'sábado': 6, 'sab': 6, 'sáb': 6, 'sat': 6, 'saturday': 6,
         };
         return map[v] ?? null;
+    }
+
+    private mapToFirestore(rutinaAsignada: RutinaAsignada): any {
+        return {
+            rutinaId: rutinaAsignada.rutinaId,
+            entrenadoId: rutinaAsignada.entrenadoId,
+            entrenadorId: rutinaAsignada.entrenadorId,
+            diaSemana: rutinaAsignada.diaSemana || null,
+            fechaEspecifica: rutinaAsignada.fechaEspecifica ? Timestamp.fromDate(rutinaAsignada.fechaEspecifica) : null,
+            fechaAsignacion: rutinaAsignada.fechaAsignacion ? Timestamp.fromDate(rutinaAsignada.fechaAsignacion) : Timestamp.now(),
+            activa: rutinaAsignada.activa
+        };
+    }
+
+    private mapFromFirestore(data: any): RutinaAsignada {
+        return {
+            id: data.id,
+            rutinaId: data.rutinaId,
+            entrenadoId: data.entrenadoId,
+            entrenadorId: data.entrenadorId,
+            diaSemana: data.diaSemana || undefined,
+            fechaEspecifica: data.fechaEspecifica instanceof Timestamp ? data.fechaEspecifica.toDate() : (data.fechaEspecifica ? new Date(data.fechaEspecifica) : undefined),
+            fechaAsignacion: data.fechaAsignacion instanceof Timestamp ? data.fechaAsignacion.toDate() : (data.fechaAsignacion ? new Date(data.fechaAsignacion) : new Date()),
+            activa: data.activa
+        } as RutinaAsignada;
     }
 }

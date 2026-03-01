@@ -1,51 +1,77 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    setDoc,
+    onSnapshot,
+    query,
+    orderBy
+} from '@angular/fire/firestore';
 import { Gimnasio } from 'gym-library';
-
-export interface IGimnasioFirestoreAdapter {
-    subscribeToGimnasios(callback: (gimnasios: Gimnasio[]) => void): void;
-    subscribeToGimnasio(id: string, callback: (gimnasio: Gimnasio | null) => void): void;
-    save(gimnasio: Gimnasio): Promise<void>;
-    delete(id: string): Promise<void>;
-}
-
-export const GIMNASIO_FIRESTORE_ADAPTER = Symbol('GIMNASIO_FIRESTORE_ADAPTER');
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class GimnasioService {
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly collectionName = 'gimnasios';
+
     private readonly _gimnasios: WritableSignal<Gimnasio[]> = signal<Gimnasio[]>([]);
     private readonly gimnasioSignals = new Map<string, WritableSignal<Gimnasio | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IGimnasioFirestoreAdapter;
 
-    constructor() {
-        // La inicialización se hará cuando se configure el adaptador
-    }
+    constructor() { }
 
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IGimnasioFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar automáticamente, se hará manualmente cuando sea necesario
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
-     * � Inicializa el listener de gimnasios (llamar manualmente cuando sea necesario)
+     * 📡 Inicializa el listener de gimnasios
      */
     initializeListener(): void {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
-            this.firestoreAdapter.subscribeToGimnasios((gimnasios) => {
+        if (this.isListenerInitialized) return;
+
+        const gimnasiosCollection = collection(this.firestore, this.collectionName);
+        const gimnasiosQuery = query(gimnasiosCollection, orderBy('nombre', 'asc'));
+
+        onSnapshot(gimnasiosQuery, (snapshot) => {
+            this.runInZone(() => {
+                const gimnasios: Gimnasio[] = [];
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (data) {
+                        gimnasios.push({
+                            id: doc.id,
+                            nombre: data['nombre'] || '',
+                            direccion: data['direccion'] || '',
+                            activo: data['activo'] || false
+                        });
+                    }
+                });
+
                 this._gimnasios.set(gimnasios);
             });
-            this.isListenerInitialized = true;
-        }
+        });
+        this.isListenerInitialized = true;
     }
 
     /**
      * 📊 Signal readonly con todos los gimnasios
      */
     get gimnasios(): Signal<Gimnasio[]> {
-        // No inicializar automáticamente, debe hacerse manualmente
         return this._gimnasios.asReadonly();
     }
 
@@ -56,12 +82,23 @@ export class GimnasioService {
         if (!this.gimnasioSignals.has(id)) {
             const gimnasioSignal = signal<Gimnasio | null>(null);
             this.gimnasioSignals.set(id, gimnasioSignal);
-            
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToGimnasio(id, (gimnasio) => {
-                    gimnasioSignal.set(gimnasio);
+
+            const gimnasioRef = doc(this.firestore, this.collectionName, id);
+            onSnapshot(gimnasioRef, (docSnap) => {
+                this.runInZone(() => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        gimnasioSignal.set({
+                            id: docSnap.id,
+                            nombre: data['nombre'] || '',
+                            direccion: data['direccion'] || '',
+                            activo: data['activo'] || false
+                        });
+                    } else {
+                        gimnasioSignal.set(null);
+                    }
                 });
-            }
+            });
         }
         return this.gimnasioSignals.get(id)!.asReadonly();
     }
@@ -70,27 +107,54 @@ export class GimnasioService {
      * 💾 Guarda o actualiza un gimnasio (upsert si tiene id)
      */
     async save(gimnasio: Gimnasio): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        await this.firestoreAdapter.save(gimnasio);
+        return this.runInZone(async () => {
+            try {
+                const gimnasioData: any = {
+                    activo: gimnasio.activo
+                };
+
+                if (gimnasio.nombre !== undefined && gimnasio.nombre !== null) {
+                    gimnasioData.nombre = gimnasio.nombre;
+                }
+
+                if (gimnasio.direccion !== undefined && gimnasio.direccion !== null) {
+                    gimnasioData.direccion = gimnasio.direccion;
+                }
+
+                if (gimnasio.id) {
+                    const gimnasioRef = doc(this.firestore, this.collectionName, gimnasio.id);
+                    await setDoc(gimnasioRef, gimnasioData);
+                } else {
+                    const gimnasiosCollection = collection(this.firestore, this.collectionName);
+                    await addDoc(gimnasiosCollection, gimnasioData);
+                }
+            } catch (error) {
+                console.error('Error al guardar gimnasio:', error);
+                throw error;
+            }
+        });
     }
 
     /**
      * 🗑️ Elimina un gimnasio por ID
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        await this.firestoreAdapter.delete(id);
+        return this.runInZone(async () => {
+            try {
+                const gimnasioRef = doc(this.firestore, this.collectionName, id);
+                await deleteDoc(gimnasioRef);
+            } catch (error) {
+                console.error('Error al eliminar gimnasio:', error);
+                throw error;
+            }
+        });
     }
 
     /**
      * 🔍 Obtiene un gimnasio específico por ID
      */
     getGimnasioById(id: string): Signal<Gimnasio | null> {
-        return computed(() => 
+        return computed(() =>
             this._gimnasios().find(gimnasio => gimnasio.id === id) || null
         );
     }
@@ -99,7 +163,7 @@ export class GimnasioService {
      * 🔍 Busca gimnasios activos
      */
     getGimnasiosActivos(): Signal<Gimnasio[]> {
-        return computed(() => 
+        return computed(() =>
             this._gimnasios().filter(gimnasio => gimnasio.activo)
         );
     }
@@ -108,8 +172,8 @@ export class GimnasioService {
      * 🔍 Busca gimnasios por dirección
      */
     getGimnasiosByDireccion(direccion: string): Signal<Gimnasio[]> {
-        return computed(() => 
-            this._gimnasios().filter(gimnasio => 
+        return computed(() =>
+            this._gimnasios().filter(gimnasio =>
                 gimnasio.direccion.toLowerCase().includes(direccion.toLowerCase())
             )
         );
@@ -126,7 +190,7 @@ export class GimnasioService {
      * 📊 Obtiene el conteo de gimnasios activos
      */
     get gimnasioActivoCount(): Signal<number> {
-        return computed(() => 
+        return computed(() =>
             this._gimnasios().filter(gimnasio => gimnasio.activo).length
         );
     }

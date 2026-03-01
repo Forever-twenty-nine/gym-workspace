@@ -1,38 +1,56 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    addDoc,
+    doc,
+    deleteDoc,
+    setDoc,
+    onSnapshot,
+    QuerySnapshot,
+    DocumentSnapshot,
+    Timestamp
+} from '@angular/fire/firestore';
 import { Entrenado } from 'gym-library';
-
-export interface IEntrenadoFirestoreAdapter {
-  initializeListener(onUpdate: (entrenados: Entrenado[]) => void): void;
-  subscribeToEntrenado(id: string, onUpdate: (entrenado: Entrenado | null) => void): void;
-  save(entrenado: Entrenado): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadoService {
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly COLLECTION = 'entrenados';
+
     // Señal que contiene la lista de entrenados (reactiva)
     private readonly _entrenados: WritableSignal<Entrenado[]> = signal<Entrenado[]>([]);
     private readonly entrenadoSignals = new Map<string, WritableSignal<Entrenado | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IEntrenadoFirestoreAdapter;
+
+    constructor() { }
 
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IEntrenadoFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
     initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
-        
+        if (this.isListenerInitialized) return;
+
         try {
-            this.firestoreAdapter.initializeListener((entrenados: Entrenado[]) => {
-                this._entrenados.set(entrenados);
+            const col = collection(this.firestore, this.COLLECTION);
+            onSnapshot(col, (snap: QuerySnapshot) => {
+                this.runInZone(() => {
+                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                    this._entrenados.set(list);
+                });
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -44,7 +62,7 @@ export class EntrenadoService {
      * 📊 Signal readonly con la lista de entrenados
      */
     get entrenados(): Signal<Entrenado[]> {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
+        if (!this.isListenerInitialized) {
             this.initializeListener();
         }
         return this._entrenados.asReadonly();
@@ -57,12 +75,17 @@ export class EntrenadoService {
         if (!this.entrenadoSignals.has(id)) {
             const entrenadoSignal = signal<Entrenado | null>(null);
             this.entrenadoSignals.set(id, entrenadoSignal);
-            
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToEntrenado(id, (entrenado) => {
-                    entrenadoSignal.set(entrenado);
+
+            const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+            onSnapshot(entrenadoRef, (docSnap: DocumentSnapshot) => {
+                this.runInZone(() => {
+                    if (docSnap.exists()) {
+                        entrenadoSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                    } else {
+                        entrenadoSignal.set(null);
+                    }
                 });
-            }
+            });
         }
         return this.entrenadoSignals.get(id)!.asReadonly();
     }
@@ -71,53 +94,34 @@ export class EntrenadoService {
      * 💾 Guarda o actualiza un entrenado (upsert si tiene id)
      */
     async save(entrenado: Entrenado): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.save(entrenado);
-            
-            // Actualizar el signal local inmediatamente para reactividad
-            const entrenadosActuales = this._entrenados();
-            const index = entrenadosActuales.findIndex(e => e.id === entrenado.id);
-            
-            if (index >= 0) {
-                // Actualizar existente
-                entrenadosActuales[index] = { ...entrenado };
+        return this.runInZone(async () => {
+            const dataToSave = this.mapToFirestore(entrenado);
+            if (entrenado.id) {
+                const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
+                await setDoc(entrenadoRef, dataToSave, { merge: true });
             } else {
-                // Agregar nuevo
-                entrenadosActuales.push(entrenado);
+                const col = collection(this.firestore, this.COLLECTION);
+                const docRef = await addDoc(col, dataToSave);
+                entrenado.id = docRef.id;
             }
-            
-            this._entrenados.set([...entrenadosActuales]);
-        } catch (error) {
-            console.error('Error al guardar entrenado:', error);
-            throw error;
-        }
+        });
     }
 
     /**
      * 🗑️ Elimina un entrenado por ID
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.delete(id);
-        } catch (error) {
-            console.error('Error al eliminar entrenado:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+            await deleteDoc(entrenadoRef);
+        });
     }
 
     /**
      * 🔍 Busca entrenados por ID
      */
     getEntrenadoById(id: string): Signal<Entrenado | null> {
-        return computed(() => 
+        return computed(() =>
             this._entrenados().find(entrenado => entrenado.id === id) || null
         );
     }
@@ -126,8 +130,8 @@ export class EntrenadoService {
      * 🔍 Busca entrenados por objetivo
      */
     getEntrenadosByObjetivo(objetivo: string): Signal<Entrenado[]> {
-        return computed(() => 
-            this._entrenados().filter(entrenado => 
+        return computed(() =>
+            this._entrenados().filter(entrenado =>
                 entrenado.objetivo === objetivo
             )
         );
@@ -137,8 +141,8 @@ export class EntrenadoService {
      * 🔍 Busca entrenados por entrenador
      */
     getEntrenadosByEntrenador(entrenadorId: string): Signal<Entrenado[]> {
-        return computed(() => 
-            this._entrenados().filter(entrenado => 
+        return computed(() =>
+            this._entrenados().filter(entrenado =>
                 entrenado.entrenadoresId?.includes(entrenadorId)
             )
         );
@@ -155,8 +159,8 @@ export class EntrenadoService {
      * 🔍 Busca entrenados que han creado una rutina específica
      */
     getEntrenadosByRutinaCreada(rutinaId: string): Signal<Entrenado[]> {
-        return computed(() => 
-            this._entrenados().filter(entrenado => 
+        return computed(() =>
+            this._entrenados().filter(entrenado =>
                 entrenado.rutinasCreadas?.includes(rutinaId)
             )
         );
@@ -166,7 +170,7 @@ export class EntrenadoService {
      * 📊 Obtiene entrenados activos
      */
     getEntrenadosActivos(): Signal<Entrenado[]> {
-        return computed(() => 
+        return computed(() =>
             this._entrenados()
         );
     }
@@ -184,4 +188,28 @@ export class EntrenadoService {
     get entrenadoActivoCount(): Signal<number> {
         return computed(() => this._entrenados().length);
     }
+
+    private mapFromFirestore(data: any): Entrenado {
+        return {
+            id: data.id,
+            fechaRegistro: data.fechaRegistro instanceof Timestamp ? data.fechaRegistro.toDate() : (data.fechaRegistro instanceof Date ? data.fechaRegistro : new Date()),
+            objetivo: data.objetivo || null,
+            entrenadoresId: data.entrenadoresId || [],
+            rutinasAsignadasIds: data.rutinasAsignadasIds || [],
+            rutinasCreadas: data.rutinasCreadas || []
+        };
+    }
+
+    private mapToFirestore(entrenado: Entrenado): any {
+        const data: any = {};
+        if (entrenado.objetivo !== undefined) data.objetivo = entrenado.objetivo;
+        if (entrenado.fechaRegistro) {
+            data.fechaRegistro = entrenado.fechaRegistro instanceof Date ? Timestamp.fromDate(entrenado.fechaRegistro) : entrenado.fechaRegistro;
+        }
+        if (entrenado.entrenadoresId) data.entrenadoresId = entrenado.entrenadoresId;
+        if (entrenado.rutinasAsignadasIds) data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds;
+        if (entrenado.rutinasCreadas) data.rutinasCreadas = entrenado.rutinasCreadas;
+        return data;
+    }
 }
+

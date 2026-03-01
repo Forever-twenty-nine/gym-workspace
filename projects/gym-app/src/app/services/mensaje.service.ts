@@ -1,39 +1,59 @@
-import { Injectable, signal, WritableSignal, Signal, computed } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    onSnapshot,
+    setDoc,
+    query,
+    orderBy,
+    Timestamp,
+    QuerySnapshot,
+    DocumentSnapshot
+} from '@angular/fire/firestore';
 import { Mensaje } from 'gym-library';
-
-export interface IMensajeFirestoreAdapter {
-  initializeListener(onUpdate: (mensajes: Mensaje[]) => void): void;
-  subscribeToMensaje(id: string, onUpdate: (mensaje: Mensaje | null) => void): void;
-  save(mensaje: Mensaje): Promise<void>;
-  delete(id: string): Promise<void>;
-  marcarComoLeido(id: string): Promise<void>;
-  marcarComoEntregado(id: string): Promise<void>;
-}
+import { ZoneRunnerService } from './zone-runner.service';
 
 @Injectable({ providedIn: 'root' })
 export class MensajeService {
+    private readonly firestore = inject(Firestore);
+    private readonly injector = inject(Injector);
+    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly COLLECTION = 'mensajes';
+
     private readonly _mensajes: WritableSignal<Mensaje[]> = signal<Mensaje[]>([]);
     private readonly mensajeSignals = new Map<string, WritableSignal<Mensaje | null>>();
     private isListenerInitialized = false;
-    private firestoreAdapter?: IMensajeFirestoreAdapter;
+
+    constructor() { }
 
     /**
-     * Configura el adaptador de Firestore
+     * Ejecuta el callback en el contexto correcto (zona o inyección)
      */
-    setFirestoreAdapter(adapter: IMensajeFirestoreAdapter): void {
-        this.firestoreAdapter = adapter;
-        // No inicializar listener aquí, se hará lazy cuando se acceda por primera vez
+    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
+        if (this.zoneRunner) {
+            return this.zoneRunner.run(callback);
+        }
+        return runInInjectionContext(this.injector, callback as any);
     }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
     private initializeListener(): void {
-        if (this.isListenerInitialized || !this.firestoreAdapter) return;
-        
+        if (this.isListenerInitialized) return;
+
         try {
-            this.firestoreAdapter.initializeListener((mensajes: Mensaje[]) => {
-                this._mensajes.set(mensajes);
+            const col = collection(this.firestore, this.COLLECTION);
+            const q = query(col, orderBy('fechaEnvio', 'desc'));
+            onSnapshot(q, (snap: QuerySnapshot) => {
+                this.runInZone(() => {
+                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                    this._mensajes.set(list);
+                });
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -45,7 +65,7 @@ export class MensajeService {
      * 📊 Signal readonly con la lista de mensajes
      */
     get mensajes(): Signal<Mensaje[]> {
-        if (!this.isListenerInitialized && this.firestoreAdapter) {
+        if (!this.isListenerInitialized) {
             this.initializeListener();
         }
         return this._mensajes.asReadonly();
@@ -58,12 +78,17 @@ export class MensajeService {
         if (!this.mensajeSignals.has(id)) {
             const mensajeSignal = signal<Mensaje | null>(null);
             this.mensajeSignals.set(id, mensajeSignal);
-            
-            if (this.firestoreAdapter) {
-                this.firestoreAdapter.subscribeToMensaje(id, (mensaje) => {
-                    mensajeSignal.set(mensaje);
+
+            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+            onSnapshot(mensajeRef, (docSnap: DocumentSnapshot) => {
+                this.runInZone(() => {
+                    if (docSnap.exists()) {
+                        mensajeSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                    } else {
+                        mensajeSignal.set(null);
+                    }
                 });
-            }
+            });
         }
         return this.mensajeSignals.get(id)!.asReadonly();
     }
@@ -72,72 +97,59 @@ export class MensajeService {
      * 💾 Guarda o actualiza un mensaje
      */
     async save(mensaje: Mensaje): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.save(mensaje);
-        } catch (error) {
-            console.error('Error al guardar mensaje:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const dataToSave = this.mapToFirestore(mensaje);
+            if (mensaje.id) {
+                const mensajeRef = doc(this.firestore, this.COLLECTION, mensaje.id);
+                await setDoc(mensajeRef, dataToSave, { merge: true });
+            } else {
+                const col = collection(this.firestore, this.COLLECTION);
+                await addDoc(col, dataToSave);
+            }
+        });
     }
 
     /**
      * 🗑️ Elimina un mensaje por ID
      */
     async delete(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.delete(id);
-        } catch (error) {
-            console.error('Error al eliminar mensaje:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+            await deleteDoc(mensajeRef);
+        });
     }
 
     /**
      * ✅ Marca un mensaje como leído
      */
     async marcarComoLeido(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.marcarComoLeido(id);
-        } catch (error) {
-            console.error('Error al marcar mensaje como leído:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+            await updateDoc(mensajeRef, {
+                leido: true,
+                fechaLeido: Timestamp.now()
+            });
+        });
     }
 
     /**
      * 📩 Marca un mensaje como entregado
      */
     async marcarComoEntregado(id: string): Promise<void> {
-        if (!this.firestoreAdapter) {
-            throw new Error('Firestore adapter no configurado');
-        }
-        
-        try {
-            await this.firestoreAdapter.marcarComoEntregado(id);
-        } catch (error) {
-            console.error('Error al marcar mensaje como entregado:', error);
-            throw error;
-        }
+        return this.runInZone(async () => {
+            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+            await updateDoc(mensajeRef, {
+                entregado: true
+            });
+        });
     }
 
     /**
      * 🔍 Obtiene mensajes enviados por un usuario
      */
     getMensajesByRemitente(remitenteId: string): Signal<Mensaje[]> {
-        return computed(() => 
-            this._mensajes().filter(msg => msg.remitenteId === remitenteId)
+        return computed(() =>
+            this.mensajes().filter(msg => msg.remitenteId === remitenteId)
         );
     }
 
@@ -145,8 +157,8 @@ export class MensajeService {
      * 🔍 Obtiene mensajes recibidos por un usuario
      */
     getMensajesByDestinatario(destinatarioId: string): Signal<Mensaje[]> {
-        return computed(() => 
-            this._mensajes().filter(msg => msg.destinatarioId === destinatarioId)
+        return computed(() =>
+            this.mensajes().filter(msg => msg.destinatarioId === destinatarioId)
         );
     }
 
@@ -154,8 +166,8 @@ export class MensajeService {
      * 📊 Obtiene mensajes no leídos para un usuario
      */
     getMensajesNoLeidos(destinatarioId: string): Signal<Mensaje[]> {
-        return computed(() => 
-            this._mensajes().filter(msg => 
+        return computed(() =>
+            this.mensajes().filter(msg =>
                 msg.destinatarioId === destinatarioId && !msg.leido
             )
         );
@@ -165,21 +177,41 @@ export class MensajeService {
      * 📊 Contador de mensajes no leídos
      */
     getContadorNoLeidos(destinatarioId: string): Signal<number> {
-        return computed(() => 
-            this._mensajes().filter(msg => 
+        return computed(() =>
+            this.mensajes().filter(msg =>
                 msg.destinatarioId === destinatarioId && !msg.leido
             ).length
         );
     }
 
     /**
-     * � Obtiene mensajes por entrenador (enviados o recibidos)
+     * 📋 Obtiene mensajes por entrenador (enviados o recibidos)
      */
     getMensajesByEntrenador(entrenadorId: string): Signal<Mensaje[]> {
-        return computed(() => 
-            this._mensajes().filter(msg => 
+        return computed(() =>
+            this.mensajes().filter(msg =>
                 msg.remitenteId === entrenadorId || msg.destinatarioId === entrenadorId
             )
         );
     }
+
+    private mapFromFirestore(data: any): Mensaje {
+        return {
+            ...data,
+            id: data.id,
+            fechaEnvio: data.fechaEnvio instanceof Timestamp ? data.fechaEnvio.toDate() : (data.fechaEnvio ? new Date(data.fechaEnvio) : new Date()),
+            fechaLeido: data.fechaLeido instanceof Timestamp ? data.fechaLeido.toDate() : (data.fechaLeido ? new Date(data.fechaLeido) : undefined),
+            fechaEditado: data.fechaEditado instanceof Timestamp ? data.fechaEditado.toDate() : (data.fechaEditado ? new Date(data.fechaEditado) : undefined)
+        } as Mensaje;
+    }
+
+    private mapToFirestore(mensaje: Mensaje): any {
+        return {
+            ...mensaje,
+            fechaEnvio: mensaje.fechaEnvio instanceof Date ? Timestamp.fromDate(mensaje.fechaEnvio) : (mensaje.fechaEnvio || Timestamp.now()),
+            fechaLeido: mensaje.fechaLeido instanceof Date ? Timestamp.fromDate(mensaje.fechaLeido) : (mensaje.fechaLeido || null),
+            fechaEditado: mensaje.fechaEditado instanceof Date ? Timestamp.fromDate(mensaje.fechaEditado) : (mensaje.fechaEditado || null)
+        };
+    }
 }
+
