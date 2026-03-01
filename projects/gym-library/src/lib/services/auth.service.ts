@@ -11,13 +11,15 @@ export interface IAuthAdapter {
   isAuthenticated(): Promise<boolean>;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isAuthenticated = signal<boolean>(false);
   private readonly _isLoading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
-  
+
   private authAdapter?: IAuthAdapter;
   /**
    * Método privado para manejar login/register con lógica DRY
