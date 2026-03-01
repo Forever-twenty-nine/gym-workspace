@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, computed, effect, NgZone } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { SesionRutinaService } from '../../../services/sesion-rutina.service';
 import { SesionRutina, Ejercicio } from 'gym-library';
 
@@ -12,7 +12,7 @@ interface EjercicioSesion {
 @Component({
   selector: 'app-rutina-sesion-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './rutina-sesion.modal.html',
   changeDetection: ChangeDetectionStrategy.Default,
   host: {

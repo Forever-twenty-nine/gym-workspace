@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { 
   IonHeader, 
@@ -24,17 +24,16 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed, star} from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
-import { EjercicioService } from '../../services/ejercicio.service';
-import { EntrenadorService } from '../../services/entrenador.service';
-import { UserService } from '../../services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-ejercicios',
   templateUrl: './ejercicios.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     IonHeader,
     IonToolbar,
@@ -54,7 +53,7 @@ import { UserService } from '../../services/user.service';
     IonInput,
     IonTextarea,
     IonText
-  ],
+],
   styles: [`
     .ejercicio-modal {
       --width: 95%;

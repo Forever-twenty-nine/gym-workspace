@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, NgZone } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rol, Objetivo } from 'gym-library';
 import { UserService } from '../../services/user.service';
@@ -15,12 +15,11 @@ import { PageTitleService } from '../../services/page-title.service';
 @Component({
   selector: 'app-usuarios-page',
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     ModalFormComponent,
     ToastComponent,
     UsuariosTable
-  ],
+],
   templateUrl: './usuarios.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

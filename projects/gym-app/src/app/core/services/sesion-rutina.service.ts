@@ -17,7 +17,7 @@ import { SesionRutina, SesionRutinaStatus, Rutina, Ejercicio } from 'gym-library
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 /**
  * Servicio para gestionar sesiones de rutina como documentos independientes en Firestore

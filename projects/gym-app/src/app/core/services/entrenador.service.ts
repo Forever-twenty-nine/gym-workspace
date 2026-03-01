@@ -23,7 +23,7 @@ import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 // Clase de error personalizada para límites
 export class PlanLimitError extends Error {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { 
   IonHeader, 
   IonToolbar, 
@@ -23,7 +23,6 @@ import { personOutline, createOutline, trashOutline } from 'ionicons/icons';
   styleUrls: ['gimnasio-users.page.css'],
   standalone: true,
   imports: [
-    CommonModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -36,7 +35,7 @@ import { personOutline, createOutline, trashOutline } from 'ionicons/icons';
     IonButton,
     IonIcon,
     IonSearchbar
-  ],
+],
 })
 export class GimnasioUsersPage {
   users = [

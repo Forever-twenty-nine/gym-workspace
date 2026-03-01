@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { EntrenadorService } from '../../services/entrenador.service';
 import { ToastComponent } from '../../components/shared/toast/toast.component';
@@ -10,10 +10,9 @@ import { PageTitleService } from '../../services/page-title.service';
 @Component({
   selector: 'app-entrenadores-page',
   imports: [
-    CommonModule,
     ToastComponent,
     EntrenadoresTableComponent
-  ],
+],
   templateUrl: './entrenadores.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

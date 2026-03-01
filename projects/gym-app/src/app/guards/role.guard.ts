@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../core/services/auth.service';
 import { Rol } from 'gym-library';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, take, switchMap } from 'rxjs';

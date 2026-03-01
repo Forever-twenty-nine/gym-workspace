@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface EntityCardConfig {
   title: string;
@@ -24,7 +24,7 @@ export interface EntityAction {
 @Component({
   selector: 'app-entity-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './entity-card.component.html'
 })
 export class EntityCardComponent<T = any> {

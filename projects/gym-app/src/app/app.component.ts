@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, effect, Injector } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AppConfigurationService } from './core/services/app-configuration.service';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -13,17 +13,17 @@ export class AppComponent implements OnInit {
   private authService = inject(AuthService);
   private injector = inject(Injector);
 
-  constructor() {}
+  constructor() { }
 
   async ngOnInit() {
     try {
       await this.appConfig.initialize();
-      
+
       // Si ya hay usuario autenticado, configurar servicios inmediatamente
       if (this.authService.currentUser()) {
         await this.appConfig.configureDataServices();
       }
-      
+
       // Configurar servicios de datos cuando el usuario se autentique
       effect(() => {
         const user = this.authService.currentUser();
@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
           this.appConfig.configureDataServices();
         }
       }, { injector: this.injector });
-      
+
     } catch (error) {
       console.error('❌ Error inicializando app:', error);
     }

@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   IonHeader,
   IonToolbar,
@@ -21,15 +21,14 @@ import {
   fitnessOutline,
   trophyOutline
 } from 'ionicons/icons';
-import { RutinaService } from '../../services/rutina.service';
-import { AuthService } from '../../services/auth.service';
-import { EntrenadoService } from '../../services/entrenado.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { AuthService } from '../../core/services/auth.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
 
 @Component({
   selector: 'app-progreso',
   standalone: true,
   imports: [
-    CommonModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -37,8 +36,8 @@ import { EntrenadoService } from '../../services/entrenado.service';
     IonCard,
     IonCardHeader,
     IonCardContent,
-    IonText,
-  ],
+    IonText
+],
   templateUrl: './progreso.page.html',
   
 })

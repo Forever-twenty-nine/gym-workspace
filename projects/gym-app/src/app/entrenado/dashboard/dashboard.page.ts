@@ -6,7 +6,7 @@ import {
   computed,
   signal
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import {
   IonContent,
@@ -41,13 +41,13 @@ import {
   notificationsCircle
 } from 'ionicons/icons';
 import { Rol, Objetivo } from 'gym-library';
-import { EntrenadoService } from '../../services/entrenado.service';
-import { RutinaService } from '../../services/rutina.service';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
-import { NotificacionService } from '../../services/notificacion.service';
-import { EntrenadorService, PlanLimitError } from '../../services/entrenador.service';
-import { InvitacionService } from '../../services/invitacion.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
+import { EntrenadorService, PlanLimitError } from '../../core/services/entrenador.service';
+import { InvitacionService } from '../../core/services/invitacion.service';
 import { Entrenado, Rutina } from 'gym-library';
 
 @Component({
@@ -56,7 +56,6 @@ import { Entrenado, Rutina } from 'gym-library';
   styleUrls: ['./dashboard.page.css'],
   standalone: true,
   imports: [
-    CommonModule,
     IonContent,
     IonCard,
     IonCardContent,
@@ -66,7 +65,7 @@ import { Entrenado, Rutina } from 'gym-library';
     IonButton,
     IonBadge,
     FormsModule
-  ],
+],
 })
 export class DashboardPage implements OnInit {
   private entrenadoService = inject(EntrenadoService);

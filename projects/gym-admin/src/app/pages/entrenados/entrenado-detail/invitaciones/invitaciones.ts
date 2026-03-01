@@ -1,10 +1,10 @@
 import { Component, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Invitacion } from 'gym-library';
 
 @Component({
   selector: 'app-invitaciones-modal',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './invitaciones.html',
 })
 export class InvitacionesModalComponent {

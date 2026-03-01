@@ -1,5 +1,5 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface Toast {
   id: string;
@@ -12,7 +12,7 @@ export interface Toast {
 @Component({
   selector: 'app-toast',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './toast.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

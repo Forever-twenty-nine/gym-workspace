@@ -11,7 +11,7 @@ import {
 } from 'firebase/auth';
 import { Firestore, doc, getDoc } from 'firebase/firestore';
 import { User, Rol } from 'gym-library';
-import { AUTH, FIRESTORE } from '../core/firebase.tokens';
+import { AUTH, FIRESTORE } from '../firebase.tokens';
 
 @Injectable({
   providedIn: 'root'

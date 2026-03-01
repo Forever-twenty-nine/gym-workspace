@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import {
   IonContent,
   IonButton,
@@ -18,10 +18,9 @@ import {
   templateUrl: 'welcome.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonContent,
-    IonButton,
-  ]
+    IonButton
+]
 })
 export class WelcomePage {
 

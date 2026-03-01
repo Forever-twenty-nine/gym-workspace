@@ -20,7 +20,7 @@ import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class InvitacionService {

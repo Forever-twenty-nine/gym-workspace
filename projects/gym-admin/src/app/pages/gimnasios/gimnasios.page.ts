@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { PageTitleService } from '../../services/page-title.service';
 
 @Component({
   selector: 'app-gimnasios-page',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './gimnasios.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

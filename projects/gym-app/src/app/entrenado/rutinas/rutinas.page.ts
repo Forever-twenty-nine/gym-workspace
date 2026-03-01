@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import {
   IonHeader,
   IonToolbar,
@@ -30,10 +30,10 @@ import {
   playCircle
 } from 'ionicons/icons';
 import { Rol, Rutina, Ejercicio } from 'gym-library';
-import { RutinaService } from '../../services/rutina.service';
-import { AuthService } from '../../services/auth.service';
-import { EjercicioService } from '../../services/ejercicio.service';
-import { EntrenadoService } from '../../services/entrenado.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { AuthService } from '../../core/services/auth.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -43,7 +43,6 @@ import { Router, RouterModule } from '@angular/router';
   standalone: true,
   imports: [
     IonBackButton,
-    CommonModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -58,7 +57,7 @@ import { Router, RouterModule } from '@angular/router';
     IonItem,
     IonLabel,
     RouterModule
-  ],
+],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);

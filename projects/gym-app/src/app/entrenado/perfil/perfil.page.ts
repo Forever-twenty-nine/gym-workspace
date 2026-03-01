@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import {
   IonHeader,
   IonToolbar,
@@ -25,29 +25,17 @@ import {
   statsChartOutline
 } from 'ionicons/icons';
 import { User, Rutina, Rol } from 'gym-library';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
-import { RutinaService } from '../../services/rutina.service';
-import { EntrenadoService } from '../../services/entrenado.service';
+import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
 
 @Component({
   selector: 'app-perfil',
   templateUrl: 'perfil.page.html',
   styleUrls: ['perfil.page.css'],
   standalone: true,
-  imports: [IonChip, IonBackButton, IonButtons,
-    CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonButton,
-    IonIcon,
-    IonCard,
-
-    IonCardContent,
-    IonAvatar
-  ],
+  imports: [IonChip, IonBackButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonCard, IonCardContent, IonAvatar],
 })
 export class PerfilPage implements OnInit {
   private authService = inject(AuthService);

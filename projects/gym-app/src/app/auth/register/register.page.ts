@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import {
   IonContent,
   IonItem,
@@ -18,15 +18,14 @@ import {
   arrowBackOutline
 } from 'ionicons/icons';
 import { Rol } from 'gym-library';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: 'register.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonContent,
     IonItem,
     IonInput,
@@ -34,7 +33,7 @@ import { UserService } from '../../services/user.service';
     IonText,
     IonIcon,
     ReactiveFormsModule
-  ]
+]
 })
 export class RegisterPage {
   registerForm: FormGroup;

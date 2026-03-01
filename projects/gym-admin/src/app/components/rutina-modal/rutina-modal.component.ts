@@ -1,5 +1,5 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ejercicio } from 'gym-library';
 import { RutinaService } from '../../services/rutina.service';
@@ -11,9 +11,8 @@ import { ToastService } from '../../services/toast.service';
 @Component({
   selector: 'app-rutina-modal',
   imports: [
-    CommonModule,
     ReactiveFormsModule
-  ],
+],
   templateUrl: './rutina-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

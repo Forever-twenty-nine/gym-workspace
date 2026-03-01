@@ -25,11 +25,11 @@ import {
   rocketOutline
 } from 'ionicons/icons';
 import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio } from 'gym-library';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
-import { EntrenadoService } from '../../services/entrenado.service';
-import { EntrenadorService } from '../../services/entrenador.service';
-import { GimnasioService } from '../../services/gimnasio.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
+import { GimnasioService } from '../../core/services/gimnasio.service';
 
 // Configuración del onboarding
 const ONBOARDING_CONFIG = {

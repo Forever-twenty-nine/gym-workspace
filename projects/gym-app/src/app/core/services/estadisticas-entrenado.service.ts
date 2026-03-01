@@ -17,7 +17,7 @@ import {
 } from 'firebase/firestore';
 import { EstadisticasEntrenado } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 /**
  * 📊 Servicio de gestión de Estadísticas de Entrenados

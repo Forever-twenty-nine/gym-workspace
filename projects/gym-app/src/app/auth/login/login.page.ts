@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import {
   IonContent,
   IonItem,
@@ -12,22 +12,21 @@ import {
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
 import { Rol } from 'gym-library';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: 'login.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonContent,
     IonItem,
     IonInput,
     IonButton,
     IonIcon,
     FormsModule
-  ]
+]
 })
 export class LoginPage {
   email: string = '';

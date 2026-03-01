@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import { Notificacion, TipoNotificacion } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import {
   IonContent,
   IonItem,
@@ -12,7 +12,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, arrowBackOutline } from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-forgot-password',
@@ -20,7 +20,6 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['forgot-password.page.css'],
   standalone: true,
   imports: [
-    CommonModule,
     IonContent,
     IonItem,
     IonInput,
@@ -28,7 +27,7 @@ import { AuthService } from '../../services/auth.service';
     IonIcon,
     IonSpinner,
     FormsModule
-  ]
+]
 })
 export class ForgotPasswordPage {
   email: string = '';

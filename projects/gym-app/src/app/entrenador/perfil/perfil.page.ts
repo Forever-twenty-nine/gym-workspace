@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import {
   IonHeader,
   IonToolbar,
@@ -20,8 +20,8 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline } from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
-import { UserService } from '../../services/user.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { Rol } from 'gym-library';
 
 @Component({
@@ -29,7 +29,6 @@ import { Rol } from 'gym-library';
   templateUrl: './perfil.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -42,7 +41,7 @@ import { Rol } from 'gym-library';
     IonIcon,
     IonAvatar,
     IonBadge
-  ],
+],
   styles: [`
     /* Estilos para el perfil unificado */
     .profile-card {

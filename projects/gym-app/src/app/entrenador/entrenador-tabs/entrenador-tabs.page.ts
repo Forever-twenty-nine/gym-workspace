@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { 
   IonTabs,
   IonTabBar,
@@ -21,13 +21,12 @@ import {
   templateUrl: './entrenador-tabs.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonTabs,
     IonTabBar,
     IonTabButton,
     IonIcon,
     IonLabel
-  ]
+]
 })
 export class EntrenadorTabsPage {
 

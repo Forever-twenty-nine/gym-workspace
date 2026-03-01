@@ -25,12 +25,12 @@ import {
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion } from 'gym-library';
-import { AuthService } from '../../services/auth.service';
-import { EntrenadoService } from '../../services/entrenado.service';
-import { UserService } from '../../services/user.service';
-import { NotificacionService } from '../../services/notificacion.service';
-import { RutinaService } from '../../services/rutina.service';
-import { InvitacionService } from '../../services/invitacion.service';
+import { AuthService } from '../../core/services/auth.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
+import { UserService } from '../../core/services/user.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { InvitacionService } from '../../core/services/invitacion.service';
 
 @Component({
   selector: 'app-entrenados',

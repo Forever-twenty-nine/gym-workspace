@@ -18,7 +18,7 @@ import { RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class RutinaAsignadaService {

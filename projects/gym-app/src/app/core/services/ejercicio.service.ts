@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { Ejercicio, Rol } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 /**
  * Errores de validación personalizados

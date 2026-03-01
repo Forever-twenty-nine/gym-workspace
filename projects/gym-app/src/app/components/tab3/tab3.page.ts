@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { 
   IonHeader, 
   IonToolbar, 
@@ -15,8 +15,8 @@ import {
 import { addIcons } from 'ionicons';
 import { logOutOutline } from 'ionicons/icons';
 import { User } from 'gym-library';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
+import { UserService } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-tab3',
@@ -24,17 +24,16 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['tab3.page.css'],
   standalone: true,
   imports: [
-    CommonModule,
-    IonHeader, 
-    IonToolbar, 
-    IonTitle, 
-    IonContent, 
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
     IonButton,
     IonIcon,
     IonItem,
     IonLabel,
     IonBadge
-  ],
+],
 })
 export class Tab3Page implements OnInit {
   currentUser: User | null = null;

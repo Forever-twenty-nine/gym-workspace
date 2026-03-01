@@ -14,7 +14,7 @@ import {
 import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
 import { ZoneRunnerService } from './zone-runner.service';
-import { FIRESTORE } from '../core/firebase.tokens';
+import { FIRESTORE } from '../firebase.tokens';
 
 export interface RutinaConEjercicios extends Rutina {
     ejercicios: any[]; // Ejercicios ya resueltos

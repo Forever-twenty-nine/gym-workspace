@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { Entrenado, Rol, Objetivo } from 'gym-library';
 import { EntrenadoService } from '../../services/entrenado.service';
@@ -14,9 +14,8 @@ import { DisplayHelperService } from '../../services/display-helper.service';
 import { EntrenadosTableComponent } from './entrenados-table/entrenados-table.component';@Component({
   selector: 'app-entrenados-page',
   imports: [
-    CommonModule,
     EntrenadosTableComponent
-  ],
+],
   templateUrl: './entrenados.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

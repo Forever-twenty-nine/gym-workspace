@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { 
   IonHeader, 
   IonToolbar, 
@@ -22,12 +22,12 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline } from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
-import { EntrenadoService } from '../../services/entrenado.service';
-import { RutinaService } from '../../services/rutina.service';
-import { EjercicioService } from '../../services/ejercicio.service';
-import { UserService } from '../../services/user.service';
-import { EntrenadorService } from '../../services/entrenador.service';
+import { AuthService } from '../../core/services/auth.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
+import { UserService } from '../../core/services/user.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
 
 @Component({
@@ -35,7 +35,6 @@ import { Entrenado } from 'gym-library';
   templateUrl: './dashboard.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonHeader,
     IonToolbar,
     IonContent,
@@ -44,7 +43,7 @@ import { Entrenado } from 'gym-library';
     IonIcon,
     IonAvatar,
     IonChip
-  ],
+],
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);

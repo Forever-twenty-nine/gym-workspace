@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 export interface Usuario {
   uid: string;
@@ -14,7 +14,7 @@ export interface Usuario {
 
 @Component({
   selector: 'app-usuarios-table',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './usuarios-table.html',
 })
 export class UsuariosTable {

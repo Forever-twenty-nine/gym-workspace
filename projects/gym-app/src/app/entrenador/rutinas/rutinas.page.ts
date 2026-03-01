@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { 
   IonHeader, 
@@ -27,17 +27,16 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed} from 'ionicons/icons';
-import { AuthService } from '../../services/auth.service';
-import { RutinaService } from '../../services/rutina.service';
-import { EjercicioService } from '../../services/ejercicio.service';
-import { EntrenadorService } from '../../services/entrenador.service';
+import { AuthService } from '../../core/services/auth.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     IonHeader,
     IonToolbar,
@@ -59,7 +58,7 @@ import { EntrenadorService } from '../../services/entrenador.service';
     IonSelect,
     IonSelectOption,
     IonText
-  ],
+],
   styles: [`
     .rutina-modal {
       --width: 95%;
