@@ -169,9 +169,8 @@ export class RutinasPage implements OnInit {
     return {
       id: 'r' + timestamp,
       nombre: '',
-      DiasSemana: [],
       descripcion: '',
-      ejercicios: [],
+      ejerciciosIds: [],
       creadorId: entrenadorId,
       asignadoIds: [],
       activa: true,
@@ -180,14 +179,10 @@ export class RutinasPage implements OnInit {
   }
 
   private createRutinaEditForm(item: any) {
-    // Convertir DiasSemana de números a strings para el select
-    const diasSemanaStrings = item.DiasSemana ? item.DiasSemana.map((dia: number) => dia.toString()) : [];
-
     const formConfig: any = {
       nombre: [item.nombre || ''],
       descripcion: [item.descripcion || ''],
-      DiasSemana: [diasSemanaStrings],
-      ejercicios: [item.ejercicios || []],
+      ejerciciosIds: [item.ejerciciosIds || []],
       creadorId: [item.creadorId || ''],
       asignadoIds: [item.asignadoIds || []]
     };
@@ -235,14 +230,10 @@ export class RutinasPage implements OnInit {
     try {
       const formValue = form.value;
 
-      // Convertir DiasSemana de strings a números
-      const diasSemanaNumeros = formValue.DiasSemana ? formValue.DiasSemana.map((dia: string) => parseInt(dia, 10)) : [];
-
       // Preparar datos para guardar
       const rutinaData = {
         ...originalData,
         ...formValue,
-        DiasSemana: diasSemanaNumeros,
         fechaModificacion: new Date()
       };
 
@@ -283,12 +274,7 @@ export class RutinasPage implements OnInit {
         placeholder: 'Descripción de la rutina...'
       },
       {
-        name: 'DiasSemana',
-        type: 'dias-semana',
-        label: 'Días de la Semana'
-      },
-      {
-        name: 'ejercicios',
+        name: 'ejerciciosIds',
         type: 'ejercicios-multiselect',
         label: 'Ejercicios Disponibles',
         options: this.ejerciciosCreados().map(ejercicio => ({

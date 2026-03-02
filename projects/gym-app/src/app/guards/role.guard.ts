@@ -4,6 +4,7 @@ import { AuthService } from '../core/services/auth.service';
 import { Rol } from 'gym-library';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, take, switchMap } from 'rxjs';
+import { of } from 'rxjs';
 
 /**
  * Función auxiliar para esperar a que el estado de autenticación termine de cargar.
@@ -12,8 +13,14 @@ import { filter, map, take, switchMap } from 'rxjs';
 function waitForInitialization() {
   const authService = inject(AuthService);
 
+  // Solución crítica: Si el estado de Firebase YA está cargado, no creamos
+  // un efecto de Signal, directamente devolvemos el rol. Si no, en una
+  // navegación interna al vuelo Angular choca y se bloquea silenciosamente.
+  if (!authService.isLoading()) {
+    return of(authService.currentUser()?.role);
+  }
+
   return toObservable(authService.isLoading).pipe(
-    // Solo dejamos pasar cuando isLoading == false (Firebase terminó de chequear)
     filter(loading => !loading),
     take(1),
     map(() => authService.currentUser()?.role)

@@ -11,7 +11,8 @@ import {
   IonCard,
 
   IonCardContent,
-  IonAvatar, IonButtons, IonBackButton, IonChip } from '@ionic/angular/standalone';
+  IonAvatar, IonButtons, IonBackButton, IonChip, IonList, IonItem, IonLabel
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   logOutOutline,
@@ -35,7 +36,7 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
   templateUrl: 'perfil.page.html',
   styleUrls: ['perfil.page.css'],
   standalone: true,
-  imports: [IonChip, IonBackButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonCard, IonCardContent, IonAvatar],
+  imports: [IonChip, IonBackButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonCard, IonCardContent, IonAvatar, IonList, IonItem, IonLabel],
 })
 export class PerfilPage implements OnInit {
   private authService = inject(AuthService);
@@ -61,7 +62,7 @@ export class PerfilPage implements OnInit {
 
     const rutinasCompletadas = 0; // No hay propiedad completado
     const rutinasActivas = misRutinas.filter(r => r.activa).length;
-    const totalEjercicios = misRutinas.reduce((total, r) => 
+    const totalEjercicios = misRutinas.reduce((total, r) =>
       total + (r.ejerciciosIds?.length || 0), 0
     );
 

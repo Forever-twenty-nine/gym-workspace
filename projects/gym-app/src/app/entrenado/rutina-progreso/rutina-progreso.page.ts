@@ -11,18 +11,11 @@ import {
   IonButtons,
   IonIcon,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonChip,
   IonProgressBar,
-  IonText,
   IonBackButton
 } from '@ionic/angular/standalone';
-import { ModalController } from '@ionic/angular';
+
 import { addIcons } from 'ionicons';
 import {
   arrowBack,
@@ -37,12 +30,16 @@ import {
   calendarOutline,
   checkmarkCircle,
   close,
-  pauseCircleOutline
+  pauseCircleOutline,
+  repeatOutline,
+  warningOutline
 } from 'ionicons/icons';
-import { Rutina, Ejercicio } from 'gym-library';
+import { Rutina, Ejercicio, SesionRutinaStatus } from 'gym-library';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { AuthService } from '../../core/services/auth.service';
+import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
+import { SesionRutina } from 'gym-library';
 
 @Component({
   selector: 'app-rutina-progreso',
@@ -58,15 +55,8 @@ import { AuthService } from '../../core/services/auth.service';
     IonButtons,
     IonIcon,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonChip,
     IonProgressBar,
-    IonText,
     IonBackButton
   ],
   templateUrl: './rutina-progreso.page.html',
@@ -75,10 +65,10 @@ import { AuthService } from '../../core/services/auth.service';
 export class RutinaProgresoPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly modalController = inject(ModalController);
   private readonly rutinaService = inject(RutinaService);
   private readonly ejercicioService = inject(EjercicioService);
   private readonly authService = inject(AuthService);
+  private readonly sesionRutinaService = inject(SesionRutinaService);
 
   // Parámetros de ruta
   rutinaId = signal<string>('');
@@ -109,8 +99,39 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   });
 
   progreso = computed(() => {
-    // TODO: Implementar servicio de progreso
-    return { completado: false, fechaInicio: null, ejerciciosCompletados: [] };
+    const entrenadoId = this.authService.currentUser()?.uid;
+    const rutinaId = this.rutinaId();
+    if (!entrenadoId || !rutinaId) return null;
+
+    const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(entrenadoId)();
+    // Buscar la sesión más reciente en progreso para esta rutina
+    return sesiones
+      .filter(s => s.rutinaResumen?.id === rutinaId && s.status === SesionRutinaStatus.EN_PROGRESO)
+      .sort((a, b) => {
+        const dateA = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
+        const dateB = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
+        return dateB.getTime() - dateA.getTime();
+      })[0] || null;
+  });
+
+  readonly yaRealizadaHoy = computed(() => {
+    const entrenadoId = this.authService.currentUser()?.uid;
+    const rutinaId = this.rutinaId();
+    if (!entrenadoId || !rutinaId) return false;
+
+    const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(entrenadoId)();
+
+    // Check si hay alguna completada hoy para esta rutina
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    return sesiones.some(s => {
+      if (s.rutinaResumen?.id !== rutinaId || !s.completada) return false;
+      const fechaSesion = s.fechaInicio instanceof Date ? s.fechaInicio : new Date(s.fechaInicio);
+      const sesionDia = new Date(fechaSesion);
+      sesionDia.setHours(0, 0, 0, 0);
+      return sesionDia.getTime() === hoy.getTime();
+    });
   });
 
   // Estados computados
@@ -119,7 +140,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     return this.rutinaLocalIniciada() || !!this.progreso()?.fechaInicio;
   });
 
-  readonly rutinaCompletada = computed(() => !!this.progreso()?.completado);
+  readonly rutinaCompletada = computed(() => !!this.progreso()?.completada);
 
   readonly ejerciciosTotales = computed(() => this.ejercicios().length);
 
@@ -150,7 +171,9 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       calendarOutline,
       checkmarkCircle,
       close,
-      pauseCircleOutline
+      pauseCircleOutline,
+      repeatOutline,
+      warningOutline
     });
   }
 
@@ -165,7 +188,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       this.inicializarEstadoLocal();
 
       // Iniciar cronómetro si la rutina está en progreso
-      if (this.progreso()?.fechaInicio && !this.progreso()?.completado) {
+      if (this.progreso()?.fechaInicio && !this.progreso()?.completada) {
         this.iniciarCronometro();
       }
     } else {
@@ -194,12 +217,11 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       const progresoActual = this.progreso();
       if (progresoActual) {
         // Inicializar estado local desde la base de datos
-        if (progresoActual.ejerciciosCompletados) {
-          this.ejerciciosCompletadosLocal.set([...progresoActual.ejerciciosCompletados]);
-        }
+        // Nota: En SesionRutina, la información de ejercicios completados puede estar en la sesión o en la rutinaResumen
+        // Por ahora usamos el estado local del componente
 
         // Inicializar estado de rutina
-        if (progresoActual.fechaInicio && !progresoActual.completado) {
+        if (progresoActual.fechaInicio && !progresoActual.completada) {
           this.rutinaLocalIniciada.set(true);
         }
         break;
@@ -215,10 +237,25 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   // --------------------------------------------
 
   async iniciarRutina() {
-    // TODO: Implementar servicio de progreso
-    this.rutinaLocalIniciada.set(true);
-    this.iniciarCronometro();
-    this.rutinaPausada.set(false);
+    const entrenadoId = this.authService.currentUser()?.uid;
+    const rutinaId = this.rutinaId();
+
+    if (!entrenadoId || !rutinaId) return;
+
+    try {
+      this.isLoading.set(true);
+      const nuevaSesion = await this.sesionRutinaService.inicializarSesionRutina(entrenadoId, rutinaId);
+      // nuevaSesion.ejerciciosCompletadosIds = []; // No existe en el modelo base
+      await this.sesionRutinaService.crearSesion(nuevaSesion);
+
+      this.rutinaLocalIniciada.set(true);
+      this.iniciarCronometro();
+      this.rutinaPausada.set(false);
+    } catch (error) {
+      console.error('Error al iniciar rutina:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   pausarReanudarRutina() {
@@ -247,7 +284,23 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
 
     this.isCompleting.set(true);
 
-    // TODO: Implementar servicio de progreso
+    const sesionActual = this.progreso();
+    if (sesionActual) {
+      try {
+        const sesionCompletada = {
+          ...sesionActual,
+          completada: true,
+          status: SesionRutinaStatus.COMPLETADA,
+          fechaFin: new Date(),
+          duracion: this.segundosTranscurridos,
+          porcentajeCompletado: 100
+        };
+        await this.sesionRutinaService.actualizarSesion(sesionCompletada);
+      } catch (error) {
+        console.error('Error completando rutina:', error);
+      }
+    }
+
     this.detenerCronometro();
     // Reset del estado del cronómetro al completar
     this.tiempoTranscurrido.set('00:00');
@@ -256,8 +309,9 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     this.rutinaLocalIniciada.set(false);
     // Reset de ejercicios completados
     this.ejerciciosCompletadosLocal.set([]);
-    // Cerrar el modal
-    this.modalController.dismiss();
+
+    // Navegar de vuelta en lugar de cerrar un modal
+    this.router.navigate(['/entrenado-tabs/rutinas']);
 
     this.isCompleting.set(false);
   }
@@ -296,7 +350,19 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     // Actualizar estado local inmediatamente para UI responsiva
     this.ejerciciosCompletadosLocal.set(nuevosCompletados);
 
-    // TODO: Sincronización con servicio de progreso
+    // Sincronización con servicio de progreso
+    const sesionActual = this.progreso();
+    if (sesionActual) {
+      try {
+        const sesionActualizada = {
+          ...sesionActual,
+          porcentajeCompletado: Math.round((nuevosCompletados.length / this.ejerciciosTotales()) * 100)
+        };
+        await this.sesionRutinaService.actualizarSesion(sesionActualizada);
+      } catch (error) {
+        console.error('Error al actualizar ejercicio:', error);
+      }
+    }
   }
 
   isEjercicioCompletado(ejercicioId: string): boolean {

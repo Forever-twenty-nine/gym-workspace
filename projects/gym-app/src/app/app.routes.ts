@@ -45,5 +45,10 @@ export const routes: Routes = [
     path: 'entrenador-tabs',
     loadChildren: () => import('./entrenador/entrenador-tabs/entrenador-tabs.routes').then((m) => m.routes),
     canActivate: [entrenadorGuard]
+  },
+  {
+    path: 'rutina-progreso/:rutinaId',
+    loadComponent: () => import('./entrenado/rutina-progreso/rutina-progreso.page').then((m) => m.RutinaProgresoPage),
+    canActivate: [entrenadoGuard]
   }
 ];

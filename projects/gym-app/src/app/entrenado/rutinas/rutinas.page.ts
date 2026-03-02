@@ -9,12 +9,9 @@ import {
   IonButtons,
   IonIcon,
   IonBackButton,
-  IonCard,
-  IonCardContent,
-  IonBadge,
-  IonList,
-  IonItem,
-  IonLabel } from '@ionic/angular/standalone';
+  IonModal,
+  IonFooter
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline,
@@ -27,14 +24,18 @@ import {
   arrowBackOutline,
   todayOutline,
   bedOutline,
-  playCircle
+  playCircle,
+  repeatOutline,
+  close
 } from 'ionicons/icons';
-import { Rol, Rutina, Ejercicio } from 'gym-library';
+import { Rol, Rutina, Ejercicio, RutinaAsignada } from 'gym-library';
+import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { Router, RouterModule } from '@angular/router';
+import { NavController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-rutinas',
@@ -50,14 +51,10 @@ import { Router, RouterModule } from '@angular/router';
     IonButton,
     IonButtons,
     IonIcon,
-    IonCard,
-    IonCardContent,
-    IonBadge,
-    IonList,
-    IonItem,
-    IonLabel,
+    IonModal,
+    IonFooter,
     RouterModule
-],
+  ],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
@@ -65,12 +62,14 @@ export class RutinasPage implements OnInit {
   private ejercicioService = inject(EjercicioService);
   private entrenadoService = inject(EntrenadoService);
   private router = inject(Router);
+  private navCtrl = inject(NavController);
   private injector = inject(Injector);
+  private rutinaAsignadaService = inject(RutinaAsignadaService);
 
   // Señal para todas las rutinas
   private todasLasRutinas = signal<Rutina[]>([]);
 
-    // Estado del modal (ya no se usa, pero mantenemos por compatibilidad)
+  // Estado del modal (ya no se usa, pero mantenemos por compatibilidad)
   readonly modalAbierto = signal(false);
   readonly rutinaSeleccionada = signal<any>(null);
 
@@ -78,12 +77,14 @@ export class RutinasPage implements OnInit {
   rutinasAsignadas = computed(() => {
     const currentUser = this.authService.currentUser();
     const userId = currentUser?.uid;
+    if (!userId) return [];
+
     const rutinas = this.todasLasRutinas();
-    const entrenado = this.entrenadoService.entrenados().find((e: any) => e.id === userId);
-    
-    if (!userId || !rutinas.length || !entrenado?.rutinasAsignadasIds) return [];
-    
-    // Filtrar rutinas asignadas a este entrenado
+    const entrenado = this.entrenadoService.getEntrenado(userId)();
+
+    if (!rutinas.length || !entrenado?.rutinasAsignadasIds) return [];
+
+    // Filtrar rutinas habilitadas para este entrenado
     return rutinas.filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
   });
 
@@ -116,17 +117,17 @@ export class RutinasPage implements OnInit {
    */
   formatearDiasSemana(dias?: string[]): string {
     if (!dias || dias.length === 0) return 'Sin días asignados';
-    
+
     const diasMapeo: { [key: string]: string } = {
       'Lunes': 'Lun',
-      'Martes': 'Mar', 
+      'Martes': 'Mar',
       'Miércoles': 'Mié',
       'Jueves': 'Jue',
       'Viernes': 'Vie',
       'Sábado': 'Sáb',
       'Domingo': 'Dom'
     };
-    
+
     return dias.map(dia => diasMapeo[dia] || dia).join(', ');
   }
 
@@ -136,14 +137,14 @@ export class RutinasPage implements OnInit {
   mapearDia(dia: string): string {
     const diasMapeo: { [key: string]: string } = {
       'Lunes': 'Lun',
-      'Martes': 'Mar', 
+      'Martes': 'Mar',
       'Miércoles': 'Mié',
       'Jueves': 'Jue',
       'Viernes': 'Vie',
       'Sábado': 'Sáb',
       'Domingo': 'Dom'
     };
-    
+
     return diasMapeo[dia] || dia;
   }
 
@@ -182,7 +183,7 @@ export class RutinasPage implements OnInit {
   ejerciciosCompletos = computed(() => {
     const rutina = this.rutinaSeleccionada();
     if (!rutina?.ejerciciosIds) return [];
-    
+
     const todosEjercicios = this.ejercicioService.ejercicios();
 
     // Si los ejercicios son strings (IDs), buscar los objetos completos
@@ -212,14 +213,22 @@ export class RutinasPage implements OnInit {
     // Organizar por día
     const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; esHoy: boolean; } } = {};
 
-    fechas.forEach(fecha => {
-      // Usar los mismos valores que se guardan en el modal (sin tildes)
-      const diaSemanaIndex = fecha.getDay();
-      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-      const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const rutinasAsignadas = this.rutinasAsignadas(); // Estas son las Rutinas completas
+    const currentUser = this.authService.currentUser();
+    const entrenadoId = currentUser?.uid;
+    const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(entrenadoId || '')();
 
-      const diaSemana = diasSemanaSinTilde[diaSemanaIndex]; // Usar sin tilde para comparación
-      const diaCorto = diasSemanaCorto[diaSemanaIndex];
+    fechas.forEach(fecha => {
+      // ... díaSemana, diaCorto, fechaKey ...
+      const diaSemanaIndex = fecha.getDay();
+      const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+
+      const diaSemanaLabel = diasSemana[diaSemanaIndex];
+      const diaSemanaNormalizado = diasSemanaSinTilde[diaSemanaIndex];
+
+      // ... inicializar rutinasOrganizadas ...
+      const diaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][diaSemanaIndex];
       const fechaKey = fecha.toISOString().split('T')[0];
 
       if (!rutinasOrganizadas[fechaKey]) {
@@ -231,10 +240,19 @@ export class RutinasPage implements OnInit {
         };
       }
 
-      // Agregar rutinas que corresponden a este día
-      rutinas.forEach(rutina => {
-        // TODO: Implementar filtro por días de la semana desde RutinaAsignada
-        rutinasOrganizadas[fechaKey].rutinas.push(rutina);
+      // Filtrar asignaciones para ESTE día específico
+      const asignacionesDelDia = asignaciones.filter((asig: RutinaAsignada) => {
+        if (!asig.diaSemana) return false;
+        const asigDiaNormalizado = asig.diaSemana.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return asigDiaNormalizado === diaSemanaNormalizado;
+      });
+
+      // Mapear las asignaciones a los objetos Rutina correspondientes
+      asignacionesDelDia.forEach((asig: RutinaAsignada) => {
+        const rutinaCompleta = rutinasAsignadas.find(r => r.id === asig.rutinaId);
+        if (rutinaCompleta) {
+          rutinasOrganizadas[fechaKey].rutinas.push(rutinaCompleta);
+        }
       });
     });
 
@@ -271,15 +289,29 @@ export class RutinasPage implements OnInit {
 
   iniciarEntrenamiento(rutina: any) {
     console.log('iniciarEntrenamiento llamado con rutina:', rutina);
-    // Navegar a la página de progreso de rutina dentro del tab
-    console.log('Navegando a:', ['/entrenado-tabs/rutina-progreso', rutina.id]);
-    this.router.navigate(['/entrenado-tabs/rutina-progreso', rutina.id]);
 
-    // Cerrar modal si está abierto
+    // Si el modal está abierto, lo cerramos
     if (this.modalAbierto()) {
-      console.log('Cerrando modal');
       this.cerrarModal();
+
+      setTimeout(() => {
+        this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
+          .then(success => console.log('Navegación al cronómetro (modal):', success))
+          .catch(err => console.error('Error ruteando:', err));
+      }, 350);
+    } else {
+      this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
+        .then(success => console.log('Navegación al cronómetro (directo):', success))
+        .catch(err => console.error('Error ruteando:', err));
     }
+  }
+
+  iniciarEntrenamientoDirecto(event: Event, rutina: any) {
+    event.stopPropagation();
+    console.log('iniciarEntrenamientoDirecto llamado con rutina:', rutina);
+    this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
+      .then(success => console.log('Navegación mini play:', success))
+      .catch(err => console.error('Error ruteando (mini play):', err));
   }
 
   pausarCronometro() {

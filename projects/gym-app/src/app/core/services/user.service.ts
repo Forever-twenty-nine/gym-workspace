@@ -8,7 +8,9 @@ import {
   setDoc,
   onSnapshot,
   QuerySnapshot,
-  getDocs
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore';
 import { User } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -203,8 +205,47 @@ export class UserService {
   getUserByEmail(email: string): Signal<User | null> {
     return computed(() => {
       const allUsers = this.users();
-      return allUsers.find(user => user.email === email) || null;
+      return allUsers.find(user => user.email?.toLowerCase() === email.toLowerCase()) || null;
     });
+  }
+
+  /**
+   * Busca un usuario por email de forma asíncrona usando una consulta a Firestore
+   */
+  async getUserByEmailAsync(email: string): Promise<User | null> {
+    try {
+      return await this.runInZone(async () => {
+        const usersCol = collection(this.firestore, this.COLLECTION);
+        // Intentamos búsqueda exacta
+        const q = query(usersCol, where('email', '==', email));
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          const docSnap = snapshot.docs[0];
+          return this.mapFromFirestore({
+            ...docSnap.data(),
+            uid: docSnap.id
+          });
+        }
+
+        // Si no se encuentra, intentamos con minúsculas (por si acaso)
+        const qLower = query(usersCol, where('email', '==', email.toLowerCase()));
+        const snapshotLower = await getDocs(qLower);
+
+        if (!snapshotLower.empty) {
+          const docSnap = snapshotLower.docs[0];
+          return this.mapFromFirestore({
+            ...docSnap.data(),
+            uid: docSnap.id
+          });
+        }
+
+        return null;
+      });
+    } catch (error) {
+      console.error('🔄 UserService: Error al buscar usuario por email:', error);
+      return null;
+    }
   }
 
   /**

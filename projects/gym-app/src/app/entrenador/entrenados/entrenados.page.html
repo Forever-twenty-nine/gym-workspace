@@ -15,7 +15,15 @@
           @for (entrenado of entrenadosAsociados(); track entrenado.id) {
           <ion-item button (click)="verCliente(entrenado)">
             <ion-label>
-              <h3>{{ getUserName(entrenado.id) }}</h3>
+              <h3>
+                {{ getUserName(entrenado.id) }}
+                @if (estaEntrenando(entrenado.id)) {
+                <ion-badge color="tertiary" class="ml-2 animate-pulse align-middle">
+                  <ion-icon name="flame" class="mr-1"></ion-icon>
+                  Entrenando
+                </ion-badge>
+                }
+              </h3>
               <p>Objetivo: {{ entrenado.objetivo }}</p>
               <p style="font-size: 0.9em; color: var(--ion-color-primary);">
                 <ion-icon name="fitness-outline" style="font-size: 14px;"></ion-icon>
@@ -42,6 +50,32 @@
         </ion-button>
       </ion-card-content>
     </ion-card>
+
+    @if (invitacionesPendientes().length > 0) {
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Invitaciones Pendientes</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          @for (invitacion of invitacionesPendientes(); track invitacion.id) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ invitacion.entrenadoNombre }}</h3>
+              <p>{{ invitacion.emailEntrenado }}</p>
+              <p style="font-size: 0.8em; color: var(--ion-color-medium);">
+                Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+              </p>
+            </ion-label>
+            <ion-button slot="end" fill="clear" color="danger" (click)="cancelarInvitacion(invitacion.id)">
+              <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+    }
   </div>
 
   <!-- Modal de detalles del entrenado -->
@@ -89,17 +123,39 @@
           </ion-list>
 
           <!-- Progreso y estadísticas resumidas -->
-          <ion-card style="margin-top: 16px;">
+          <ion-card style="margin-top: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
             <ion-card-header>
               <ion-card-title>Progreso y Estadísticas</ion-card-title>
             </ion-card-header>
             <ion-card-content>
-              <ion-list lines="none">
+              @if (estadisticasEntrenado(); as stats) {
+              <ion-list lines="none" class="detail-list">
                 <ion-item>
-                  <ion-icon name="stats-chart-outline" slot="start" color="success"></ion-icon>
+                  <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
                   <ion-label>
                     <h3>Rutinas asignadas</h3>
-                    <p>{{ selectedEntrenado()!.rutinasAsignadasIds?.length || 0 }} rutinas</p>
+                    <p>{{ stats.rutinasAsignadas }} rutinas activas</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon name="checkmark-circle" slot="start" color="success"></ion-icon>
+                  <ion-label>
+                    <h3>Entrenamientos finalizados</h3>
+                    <p>{{ stats.completadas }} sesiones</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon name="flame" slot="start" color="tertiary"></ion-icon>
+                  <ion-label>
+                    <h3>Sesiones puestas en progreso</h3>
+                    <p>{{ stats.enProgreso }} sesiones</p>
+                  </ion-label>
+                </ion-item>
+                <ion-item>
+                  <ion-icon name="time-outline" slot="start" color="warning"></ion-icon>
+                  <ion-label>
+                    <h3>Tiempo total entrenado</h3>
+                    <p>{{ formatearTiempo(stats.tiempoTotal) }}</p>
                   </ion-label>
                 </ion-item>
                 <ion-item>
@@ -116,6 +172,7 @@
                   </ion-label>
                 </ion-item>
               </ion-list>
+              }
             </ion-card-content>
           </ion-card>
         </div>
@@ -175,28 +232,58 @@
       <!-- Rutinas asignadas -->
       <ion-card>
         <ion-card-header>
-          <ion-card-title>Rutinas Asignadas</ion-card-title>
+          <ion-card-title>Rutinas del Entrenado</ion-card-title>
         </ion-card-header>
         <ion-card-content>
           @if (rutinasEntrenado().length > 0) {
           <ion-list>
             @for (rutina of rutinasEntrenado(); track rutina.id) {
-            <ion-item>
-              <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
-              <ion-label>
-                <h3>{{ rutina.nombre }}</h3>
-                <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
-              </ion-label>
-              <ion-button fill="outline" color="danger" slot="end" (click)="desasignarRutina(rutina)">
-                <ion-icon name="remove-circle-outline"></ion-icon>
-                Quitar
-              </ion-button>
-            </ion-item>
+            <ion-item-group>
+              <ion-item lines="none">
+                <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
+                <ion-label>
+                  <h3>{{ rutina.nombre }}</h3>
+                  <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
+                </ion-label>
+                <ion-button fill="clear" color="danger" slot="end" (click)="desasignarRutina(rutina)">
+                  <ion-icon name="close-circle-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+
+              <ion-item>
+                <div style="display: flex; flex-direction: column; width: 100%; gap: 8px; padding: 8px 0;">
+                  <ion-label color="medium" style="font-size: 0.8em; text-transform: uppercase; font-weight: bold;">
+                    Días de entrenamiento:
+                  </ion-label>
+
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                    @for (dia of getDiasAsignados(rutina.id); track dia) {
+                    <ion-badge color="secondary"
+                      style="display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 12px;">
+                      {{ dia }}
+                      <ion-icon name="close" style="font-size: 16px; cursor: pointer;"
+                        (click)="quitarDiaDeRutina(rutina.id, dia)"></ion-icon>
+                    </ion-badge>
+                    }
+
+                    <ion-item lines="none" style="--background: transparent; --padding-start: 0; min-height: 32px;">
+                      <ion-select label="" aria-label="Añadir día" interface="popover" placeholder="Añadir día"
+                        (ionChange)="asignarDiaARutina(rutina, $event)"
+                        style="--placeholder-color: var(--ion-color-primary); font-size: 0.9em;">
+                        @for (dia of diasSemana; track dia) {
+                        <ion-select-option [value]="dia">{{ dia }}</ion-select-option>
+                        }
+                      </ion-select>
+                    </ion-item>
+                  </div>
+                </div>
+              </ion-item>
+            </ion-item-group>
             }
           </ion-list>
           } @else {
           <p style="text-align: center; color: var(--ion-color-medium); padding: 20px;">
-            No hay rutinas asignadas
+            No hay rutinas habilitadas para este entrenado.
           </p>
           }
         </ion-card-content>
@@ -212,21 +299,21 @@
           <ion-list>
             @for (rutina of rutinasDisponibles(); track rutina.id) {
             <ion-item>
-              <ion-icon name="fitness-outline" slot="start" color="secondary"></ion-icon>
+              <ion-icon name="fitness-outline" slot="start" color="medium"></ion-icon>
               <ion-label>
                 <h3>{{ rutina.nombre }}</h3>
                 <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
               </ion-label>
-              <ion-button fill="solid" color="primary" slot="end" (click)="asignarRutina(rutina)">
-                <ion-icon name="add-circle-outline"></ion-icon>
-                Asignar
+              <ion-button fill="outline" color="primary" slot="end" (click)="asignarRutina(rutina)">
+                <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+                Habilitar
               </ion-button>
             </ion-item>
             }
           </ion-list>
           } @else {
           <p style="text-align: center; color: var(--ion-color-medium); padding: 20px;">
-            No hay rutinas disponibles para asignar
+            No hay más rutinas disponibles para habilitar.
           </p>
           }
         </ion-card-content>

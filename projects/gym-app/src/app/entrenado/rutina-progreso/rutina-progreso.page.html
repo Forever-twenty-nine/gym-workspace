@@ -1,0 +1,155 @@
+<ion-header [translucent]="true" class="ion-no-border">
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline"></ion-back-button>
+        </ion-buttons>
+        <ion-title class="text-center font-bold">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="pausarReanudarRutina()"
+                [disabled]="!rutinaIniciada() || rutinaCompletada()">
+                <ion-icon [name]="rutinaPausada() ? 'play-outline' : 'pause-circle-outline'"
+                    slot="icon-only"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+    <!-- Progress Header -->
+    <div class="progress-section p-4 shadow-sm mb-4">
+        <div class="flex items-center justify-between mb-2">
+            <div class="text-sm font-medium" style="color: var(--text-muted);">PROGRESO</div>
+            <div class="text-sm font-bold text-primary">{{ porcentajeProgreso() }}%</div>
+        </div>
+        <ion-progress-bar [value]="porcentajeProgreso() / 100" color="primary"
+            class="rounded-full h-2"></ion-progress-bar>
+
+        <div class="stats-grid grid grid-cols-2 gap-4 mt-6">
+            <div class="stat-card p-3 rounded-xl flex items-center gap-3" style="background: var(--bg-secondary);">
+                <div class="icon-bg w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                    <ion-icon name="timer-outline"></ion-icon>
+                </div>
+                <div>
+                    <div class="text-[10px] text-primary font-bold uppercase tracking-wider">Tiempo</div>
+                    <div class="text-lg font-black leading-none" style="color: var(--text-main);">{{
+                        tiempoTranscurrido() }}</div>
+                </div>
+            </div>
+
+            <div class="stat-card p-3 rounded-xl flex items-center gap-3" style="background: var(--bg-secondary);">
+                <div class="icon-bg w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white">
+                    <ion-icon name="flame-outline"></ion-icon>
+                </div>
+                <div>
+                    <div class="text-[10px] text-orange-500 font-bold uppercase tracking-wider">Estado</div>
+                    <div class="text-xs font-semibold" [class.text-orange-500]="rutinaIniciada()">{{ getEstadoRutina()
+                        }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Button (Overlay if not started) -->
+    @if (!rutinaIniciada() && !rutinaCompletada()) {
+    <div class="start-overlay p-6 text-center animate-fade-in">
+        <div class="mb-6">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+                style="background: rgba(var(--ion-color-primary-rgb), 0.1);">
+                <ion-icon name="play-outline" class="text-4xl text-primary"></ion-icon>
+            </div>
+            <h2 class="text-2xl font-black" style="color: var(--text-main);">¿Listo para empezar?</h2>
+
+            @if (yaRealizadaHoy()) {
+            <div
+                class="mt-4 mx-4 p-3 bg-orange-50 dark:bg-orange-500/10 rounded-xl border border-orange-200 dark:border-orange-500/30">
+                <p
+                    class="text-orange-600 dark:text-orange-400 font-bold m-0 flex items-center justify-center gap-1 text-sm">
+                    <ion-icon name="warning-outline" class="text-lg"></ion-icon>
+                    ¡Ya completaste esta rutina hoy!
+                </p>
+                <p class="text-xs text-orange-500/80 dark:text-orange-400/80 m-0 mt-1">Puedes volver a repetirla si lo
+                    deseas.</p>
+            </div>
+            } @else {
+            <p class="mt-2 px-8" style="color: var(--text-muted);">Prepárate para dar lo mejor de ti en esta rutina.</p>
+            }
+        </div>
+        <ion-button expand="block" (click)="iniciarRutina()" class="h-14 text-lg font-bold ion-margin-top shadow-md">
+            COMENZAR ENTRENAMIENTO
+        </ion-button>
+    </div>
+    }
+
+    <!-- Exercises List -->
+    @if (rutinaIniciada() || rutinaCompletada()) {
+    <div class="exercises-list px-4 pb-20">
+        <h3 class="text-lg font-bold mb-4 px-1" style="color: var(--text-main);">Ejercicios ({{ ejerciciosCompletados()
+            }}/{{
+            ejerciciosTotales() }})</h3>
+
+        @for (ejercicio of ejercicios(); track ejercicio.id) {
+        <ion-card (click)="toggleEjercicio(ejercicio.id)"
+            class="exercise-card mx-0 mb-4 rounded-2xl shadow-sm border-none transition-all active:scale-[0.98]"
+            [class.completed]="isEjercicioCompletado(ejercicio.id)">
+            <ion-card-content class="p-4 flex items-center gap-4">
+                <div class="exercise-indicator w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                    [class.bg-green-500]="isEjercicioCompletado(ejercicio.id)"
+                    [class.text-white]="isEjercicioCompletado(ejercicio.id)"
+                    [style.background]="!isEjercicioCompletado(ejercicio.id) ? 'var(--bg-secondary)' : ''"
+                    [style.color]="!isEjercicioCompletado(ejercicio.id) ? 'var(--text-muted)' : ''">
+                    <ion-icon
+                        [name]="isEjercicioCompletado(ejercicio.id) ? 'checkmark-circle' : 'fitness-outline'"></ion-icon>
+                </div>
+
+                <div class="flex-1">
+                    <h4 class="text-base font-bold m-0" style="color: var(--text-main);"
+                        [class.line-through]="isEjercicioCompletado(ejercicio.id)">
+                        {{ ejercicio.nombre }}
+                    </h4>
+                    <div class="flex items-center gap-3 mt-1 text-xs font-medium" style="color: var(--text-muted);">
+                        <span class="flex items-center gap-1">
+                            <ion-icon name="repeat-outline" class="text-primary"></ion-icon>
+                            {{ ejercicio.series }} x {{ ejercicio.repeticiones }}
+                        </span>
+                        @if (ejercicio.descansoSegundos) {
+                        <span class="flex items-center gap-1">
+                            <ion-icon name="time-outline" class="text-orange-500"></ion-icon>
+                            {{ ejercicio.descansoSegundos }}s
+                        </span>
+                        }
+                    </div>
+                </div>
+
+                <ion-icon [name]="isEjercicioCompletado(ejercicio.id) ? 'checkmark-circle' : 'play-outline'"
+                    [color]="isEjercicioCompletado(ejercicio.id) ? 'success' : 'medium'" class="text-2xl"></ion-icon>
+            </ion-card-content>
+        </ion-card>
+        }
+
+        <!-- Complete Button -->
+        @if (ejerciciosCompletados() === ejerciciosTotales() && !rutinaCompletada()) {
+        <div class="mt-8 animate-bounce-in">
+            <ion-button expand="block" color="success" (click)="completarRutina()"
+                class="h-16 text-lg font-black shadow-lg">
+                FINALIZAR ENTRENAMIENTO
+            </ion-button>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Success State -->
+    @if (rutinaCompletada()) {
+    <div class="success-overlay p-6 text-center animate-fade-in flex flex-col items-center justify-center min-h-[50vh]">
+        <div class="w-24 h-24 rounded-full flex items-center justify-center mb-6"
+            style="background: rgba(16, 185, 129, 0.1);">
+            <ion-icon name="checkmark-circle" class="text-6xl" style="color: var(--ion-color-success);"></ion-icon>
+        </div>
+        <h2 class="text-3xl font-black" style="color: var(--text-main);">¡Reto cumplido!</h2>
+        <p class="mt-2" style="color: var(--text-muted);">Has finalizado tu rutina con éxito. ¡Sigue así!</p>
+        <ion-button fill="clear" color="primary" class="mt-8 font-bold" (click)="goBack()">
+            VOLVER AL PANEL
+        </ion-button>
+    </div>
+    }
+</ion-content>

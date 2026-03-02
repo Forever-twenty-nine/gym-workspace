@@ -26,27 +26,53 @@ export class AuthService {
   private readonly _error = signal<string | null>(null);
 
   constructor() {
+    this.loadInitialSession();
     this.initializeAuthListener();
   }
 
+  private loadInitialSession() {
+    try {
+      const savedUser = localStorage.getItem('gym_auth_user');
+      if (savedUser) {
+        console.log('🛡️ Auth: Cargando sesión inicial de localStorage...');
+        const user = JSON.parse(savedUser) as User;
+        this._currentUser.set(user);
+        this._isAuthenticated.set(true);
+        // Dejamos _isLoading como true para que Firebase termine su proceso real
+      }
+    } catch (e) {
+      console.warn('🛡️ Auth: Error cargando sesión inicial:', e);
+    }
+  }
+
   private initializeAuthListener() {
+    console.log('🛡️ Auth: Inicializando listener de Firebase...');
     // Escuchamos cambios de auth de forma directa y sincronizada
     onAuthStateChanged(this.auth, async (firebaseUser) => {
+      console.log('🛡️ Auth: Cambio en Firebase User:', firebaseUser ? firebaseUser.email : 'NULL');
       if (firebaseUser) {
         try {
           // Cargamos los datos ANTES de emitir que no estamos cargando
           const userData = await this.getUserData(firebaseUser);
+          console.log('🛡️ Auth: Perfil cargado de Firestore para:', userData.email);
           this._currentUser.set(userData);
           this._isAuthenticated.set(true);
+
+          // Guardamos en local para restaurar rápido en recargas
+          localStorage.setItem('gym_auth_user', JSON.stringify(userData));
+
           this._isLoading.set(false);
         } catch (error) {
-          console.error('Error cargando perfil de usuario:', error);
+          console.error('🛡️ Auth: Error cargando perfil:', error);
           this._isLoading.set(false);
+          // Si hay error autenticado pero no hay perfil, bajamos el flag por ahora
         }
       } else {
+        console.warn('🛡️ Auth: Sesión de Firebase terminada (NULL)');
         this._currentUser.set(null);
         this._isAuthenticated.set(false);
         this._isLoading.set(false);
+        localStorage.removeItem('gym_auth_user');
       }
     });
   }

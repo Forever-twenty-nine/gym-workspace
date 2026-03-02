@@ -6,10 +6,11 @@ import {
   IonTitle,
   IonContent,
   IonCard,
-  IonCardHeader,
   IonCardContent,
   IonText,
-
+  IonIcon,
+  IonButton,
+  AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -19,11 +20,13 @@ import {
   calendarOutline,
   checkmarkCircleOutline,
   fitnessOutline,
-  trophyOutline
+  trophyOutline,
+  trashOutline
 } from 'ionicons/icons';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
+import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 
 @Component({
   selector: 'app-progreso',
@@ -34,17 +37,20 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
     IonTitle,
     IonContent,
     IonCard,
-    IonCardHeader,
     IonCardContent,
-    IonText
-],
+    IonText,
+    IonIcon,
+    IonButton
+  ],
   templateUrl: './progreso.page.html',
-  
+
 })
 export class ProgresoPage implements OnInit {
   private readonly rutinaService = inject(RutinaService);
   private readonly authService = inject(AuthService);
   private readonly entrenadoService = inject(EntrenadoService);
+  private readonly sesionRutinaService = inject(SesionRutinaService);
+  private readonly alertController = inject(AlertController);
 
   // Estado de carga
   readonly isLoading = signal(false);
@@ -57,7 +63,8 @@ export class ProgresoPage implements OnInit {
       calendarOutline,
       checkmarkCircleOutline,
       fitnessOutline,
-      trophyOutline
+      trophyOutline,
+      trashOutline
     });
   }
 
@@ -78,57 +85,44 @@ export class ProgresoPage implements OnInit {
     return rutinas().filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
   });
 
-  progresoRutinas = computed(() => {
+  historialSesiones = computed(() => {
     const userId = this.authService.currentUser()?.uid;
     if (!userId) return [];
 
-    return this.rutinasAsignadas().map(rutina => {
-      // TODO: Implementar servicio de progreso
-      const progreso = signal({ completado: false, sesiones: [], ejerciciosCompletados: [] });
-      return {
-        rutina,
-        progreso
-      };
+    const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(userId)();
+
+    // Ordenar de más reciente a más antigua
+    return sesiones.sort((a, b) => {
+      const dateA = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
+      const dateB = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
+      return dateB.getTime() - dateA.getTime();
     });
   });
 
   estadisticasGenerales = computed(() => {
-    const progresoData = this.progresoRutinas();
+    const sesiones = this.historialSesiones();
     const rutinasAsignadas = this.rutinasAsignadas();
 
-    const rutinasCompletadas = progresoData.filter(p => p.progreso()?.completado).length;
-    const rutinasEnProgreso = progresoData.filter(p => p.progreso() && !p.progreso()?.completado).length;
-    const rutinasNoIniciadas = rutinasAsignadas.length - rutinasCompletadas - rutinasEnProgreso;
+    const sesionesCompletadas = sesiones.filter(s => s.completada).length;
+    const sesionesEnProgreso = sesiones.filter(s => !s.completada).length;
 
-    // Calcular tiempo total entrenado
-    const tiempoTotal = progresoData.reduce((total: number, p) => {
-      const progresoValue = p.progreso();
-      if (progresoValue?.sesiones) {
-        return total + progresoValue.sesiones.reduce((sesionTotal: number, sesion: any) => sesionTotal + (sesion.duracion || 0), 0);
-      }
-      return total;
+    // Calcular tiempo total entrenado (asumiendo duracion en segundos en las sesiones completadas, pasar a minutos)
+    const tiempoTotalSegundos = sesiones.reduce((total: number, sesion) => {
+      return total + (sesion.duracion || 0);
     }, 0);
 
-    // Calcular porcentaje general de progreso
-    const totalEjercicios = rutinasAsignadas.reduce((total: number, rutina) => {
-      return total + (rutina.ejerciciosIds?.length || 0);
-    }, 0);
+    const tiempoTotal = Math.round(tiempoTotalSegundos / 60);
 
-    const ejerciciosCompletados = progresoData.reduce((total: number, p) => {
-      return total + (p.progreso()?.ejerciciosCompletados?.length || 0);
-    }, 0);
-
-    const porcentajeGeneral = totalEjercicios > 0 ? Math.round((ejerciciosCompletados / totalEjercicios) * 100) : 0;
+    // Consideramos una generalización para ejercicios totales basados en lo asignado,
+    // o simplemente las stats de las sesiones hechas.
+    const totalEntrenamientosRealizados = sesiones.length;
 
     return {
       rutinasAsignadas: rutinasAsignadas.length,
-      rutinasCompletadas,
-      rutinasEnProgreso,
-      rutinasNoIniciadas,
-      tiempoTotal,
-      porcentajeGeneral,
-      totalEjercicios,
-      ejerciciosCompletados
+      sesionesTotales: totalEntrenamientosRealizados,
+      completadas: sesionesCompletadas,
+      enProgreso: sesionesEnProgreso,
+      tiempoTotal
     };
   });
 
@@ -153,25 +147,47 @@ export class ProgresoPage implements OnInit {
     });
   }
 
-  getEstadoRutina(progreso: any): string {
-    const progresoValue = progreso?.();
-    if (progresoValue?.completado) return 'Completada';
-    if (progresoValue?.fechaInicio) return 'En progreso';
-    return 'No iniciada';
+  getEstadoSesion(sesion: any): string {
+    if (sesion.completada) return 'Completada';
+    if (sesion.fechaInicio) return 'En progreso';
+    return 'Pendiente';
   }
 
-  getColorEstado(progreso: any): string {
-    const progresoValue = progreso?.();
-    if (progresoValue?.completado) return 'success';
-    if (progresoValue?.fechaInicio) return 'primary';
+  getColorEstado(sesion: any): string {
+    if (sesion.completada) return 'success';
+    if (sesion.fechaInicio) return 'primary';
     return 'medium';
   }
 
-  getProgresoRutina(progreso: any, rutina: any): number {
-    const progresoValue = progreso?.();
-    if (!progresoValue?.ejerciciosCompletados || !rutina?.ejerciciosIds) return 0;
-    const total = rutina.ejerciciosIds.length;
-    const completados = progresoValue.ejerciciosCompletados.length;
-    return total > 0 ? Math.round((completados / total) * 100) : 0;
+  getProgresoSesion(sesion: any): number {
+    return sesion.porcentajeCompletado || 0;
+  }
+
+  redondearMinutos(segundos: number): number {
+    return Math.round((segundos || 0) / 60);
+  }
+
+  async confirmarEliminacion(sesionId: string) {
+    const alert = await this.alertController.create({
+      header: '¿Eliminar entrenamiento?',
+      message: 'Esta acción no se puede deshacer y los datos no sumarán a tu estadística.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'medium'
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          cssClass: 'text-red-500',
+          handler: async () => {
+            await this.sesionRutinaService.eliminarSesion(sesionId);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }
