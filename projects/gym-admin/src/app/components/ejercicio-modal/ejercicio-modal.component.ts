@@ -1,4 +1,5 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ejercicio, Rol } from 'gym-library';
@@ -11,7 +12,7 @@ import { ToastService } from '../../services/toast.service';
   selector: 'app-ejercicio-modal',
   imports: [
     ReactiveFormsModule
-],
+  ],
   templateUrl: './ejercicio-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -39,6 +40,13 @@ export class EjercicioModalComponent {
   // Formulario reactivo
   ejercicioForm = signal<FormGroup>(this.createForm());
 
+  // Señal para reactividad del estado del formulario
+  private readonly ejercicioStatus = signal<string>('INVALID');
+
+  readonly isSaveButtonDisabled = computed(() => {
+    return this.ejercicioStatus() === 'INVALID' || this.isLoading();
+  });
+
   // Computed
   readonly modalTitle = computed(() => {
     return this.isCreating() ? 'Crear Ejercicio' : 'Editar Ejercicio';
@@ -62,7 +70,19 @@ export class EjercicioModalComponent {
   private readonly initializeFormEffect = effect(() => {
     if (this.isOpen()) {
       this.initializeForm(this.ejercicioToEdit() || undefined);
+
+      // Sincronizar estado inicial
+      const form = this.ejercicioForm();
+      this.ejercicioStatus.set(form.status);
+
+      // Suscribirse a cambios futuros
+      const sub = form.statusChanges.subscribe(status => {
+        this.ejercicioStatus.set(status);
+      });
+
+      return () => sub.unsubscribe();
     }
+    return;
   });
 
   // Crear formulario

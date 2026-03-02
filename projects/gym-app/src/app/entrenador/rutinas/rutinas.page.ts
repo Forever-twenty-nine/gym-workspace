@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -26,7 +27,7 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed} from 'ionicons/icons';
+import { fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
@@ -58,7 +59,7 @@ import { EntrenadorService } from '../../core/services/entrenador.service';
     IonSelect,
     IonSelectOption,
     IonText
-],
+  ],
   styles: [`
     .rutina-modal {
       --width: 95%;
@@ -107,8 +108,15 @@ export class RutinasPage implements OnInit {
   readonly rutinaEditForm = signal<FormGroup | null>(null);
   readonly isRutinaCreating = signal(false);
 
+  // Señal para reactividad del estado del formulario rutinas
+  private readonly rutinaFormStatus = signal<string>('INVALID');
+
+  readonly isSaveDisabled = computed(() => {
+    return this.rutinaFormStatus() === 'INVALID';
+  });
+
   constructor() {
-    addIcons({ fitnessOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed});
+    addIcons({ fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed });
   }
 
   ngOnInit() {
@@ -127,7 +135,7 @@ export class RutinasPage implements OnInit {
   // ========================================
   // MÉTODOS PARA RUTINAS
   // ========================================
-  
+
   async deleteRutina(id: string) {
     await this.rutinaService.delete(id);
     // Mostrar toast o algo
@@ -174,7 +182,7 @@ export class RutinasPage implements OnInit {
   private createRutinaEditForm(item: any) {
     // Convertir DiasSemana de números a strings para el select
     const diasSemanaStrings = item.DiasSemana ? item.DiasSemana.map((dia: number) => dia.toString()) : [];
-    
+
     const formConfig: any = {
       nombre: [item.nombre || ''],
       descripcion: [item.descripcion || ''],
@@ -184,7 +192,15 @@ export class RutinasPage implements OnInit {
       asignadoIds: [item.asignadoIds || []]
     };
 
-    this.rutinaEditForm.set(this.fb.group(formConfig));
+    const form = this.fb.group(formConfig);
+    this.rutinaEditForm.set(form);
+
+    // Suscribirse a cambios de estado para actualizar la señal reactiva
+    form.statusChanges.subscribe(status => {
+      this.rutinaFormStatus.set(status);
+    });
+    // Establecer estado inicial
+    this.rutinaFormStatus.set(form.status);
   }
 
   async saveRutinaChanges() {
@@ -218,10 +234,10 @@ export class RutinasPage implements OnInit {
 
     try {
       const formValue = form.value;
-      
+
       // Convertir DiasSemana de strings a números
       const diasSemanaNumeros = formValue.DiasSemana ? formValue.DiasSemana.map((dia: string) => parseInt(dia, 10)) : [];
-      
+
       // Preparar datos para guardar
       const rutinaData = {
         ...originalData,
@@ -243,7 +259,7 @@ export class RutinasPage implements OnInit {
           await this.entrenadorService.addRutinaCreada(entrenadorId, rutinaData.id);
         }
       }
-      
+
       this.closeRutinaModal();
       // Mostrar éxito
     } catch (error) {

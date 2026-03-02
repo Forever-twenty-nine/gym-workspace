@@ -1,43 +1,25 @@
-import { Injectable, NgZone, inject, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 /**
- * Servicio opcional para ejecutar código en la zona correcta de Angular.
- * Este servicio es opcional y solo se registra cuando NgZone está disponible.
+ * Servicio adaptado para Angular 21 Zoneless.
+ * En modo zoneless, NgZone ya no es necesario, por lo que este servicio
+ * ahora simplemente ejecuta las funciones directamente.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class ZoneRunnerService {
-  private ngZone?: NgZone;
-
-  constructor(private injector: Injector) {
-    try {
-      // Intentar inyectar NgZone, pero no fallar si no está disponible
-      this.ngZone = injector.get(NgZone, undefined, { optional: true }) || undefined;
-    } catch {
-      // NgZone no disponible, continuar sin él
-    }
-  }
-
   /**
-   * Ejecuta el código proporcionado en la zona de Angular si NgZone está disponible.
-   * Si no está disponible, ejecuta el código normalmente.
+   * Ejecuta el código proporcionado directamente (ya no requiere NgZone).
    */
   run<T>(fn: () => T): T {
-    if (this.ngZone) {
-      return this.ngZone.run(fn);
-    }
     return fn();
   }
 
   /**
-   * Ejecuta el código proporcionado fuera de la zona de Angular si NgZone está disponible.
-   * Si no está disponible, ejecuta el código normalmente.
+   * Ejecuta el código proporcionado directamente (ya no requiere NgZone).
    */
   runOutside<T>(fn: () => T): T {
-    if (this.ngZone) {
-      return this.ngZone.runOutsideAngular(fn);
-    }
     return fn();
   }
 }

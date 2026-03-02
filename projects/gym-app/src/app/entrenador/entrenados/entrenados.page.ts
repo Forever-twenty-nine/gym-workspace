@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -134,6 +135,15 @@ export class EntrenadosPage implements OnInit {
     })
   );
 
+  // Señal para reactividad del estado del formulario invitacion
+  private readonly invitacionStatus = toSignal(this.invitacionForm().statusChanges, {
+    initialValue: this.invitacionForm().status
+  });
+
+  readonly isInvitacionSaveDisabled = computed(() => {
+    return this.invitacionStatus() === 'INVALID' || this.isLoading();
+  });
+
   // Señales para gestión de rutinas
   isRutinasModalOpen = signal(false);
   rutinasEntrenado = signal<Rutina[]>([]);
@@ -144,14 +154,14 @@ export class EntrenadosPage implements OnInit {
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
 
-    /** Calcula la antigüedad en días desde la fecha de registro */
-    getAntiguedadDias(entrenado: Entrenado): number | null {
-      if (!entrenado.fechaRegistro) return null;
-      const fecha = new Date(entrenado.fechaRegistro);
-      const hoy = new Date();
-      const diffMs = hoy.getTime() - fecha.getTime();
-      return Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    }
+  /** Calcula la antigüedad en días desde la fecha de registro */
+  getAntiguedadDias(entrenado: Entrenado): number | null {
+    if (!entrenado.fechaRegistro) return null;
+    const fecha = new Date(entrenado.fechaRegistro);
+    const hoy = new Date();
+    const diffMs = hoy.getTime() - fecha.getTime();
+    return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  }
 
   constructor() {
     addIcons({ peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline });
@@ -309,7 +319,7 @@ export class EntrenadosPage implements OnInit {
     const rutinas = this.rutinaService.rutinas();
     const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
     const rutinasAsignadas = entrenado?.rutinasAsignadasIds || [];
-    const rutinasEntrenador = rutinas.filter(rutina => 
+    const rutinasEntrenador = rutinas.filter(rutina =>
       !rutinasAsignadas.includes(rutina.id)
     );
     this.rutinasDisponibles.set(rutinasEntrenador);
@@ -339,7 +349,7 @@ export class EntrenadosPage implements OnInit {
 
       this.cargarRutinasEntrenado(entrenado.id);
       this.cargarRutinasDisponibles();
-      
+
     } catch (error) {
       console.error('Error al asignar rutina:', error);
     }
@@ -365,7 +375,7 @@ export class EntrenadosPage implements OnInit {
 
       this.cargarRutinasEntrenado(entrenado.id);
       this.cargarRutinasDisponibles();
-      
+
     } catch (error) {
       console.error('Error al desasignar rutina:', error);
     }

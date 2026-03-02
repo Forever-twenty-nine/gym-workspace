@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import { User } from 'gym-library';
 import {
   Firestore,
@@ -12,16 +12,13 @@ import {
   QuerySnapshot
 } from 'firebase/firestore';
 import { Auth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { ZoneRunnerService } from './zone-runner.service';
+
 import { FIRESTORE, AUTH } from './firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly firestore = inject(FIRESTORE);
   private readonly auth = inject(AUTH);
-
-  private readonly injector = inject(Injector);
-  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
 
   private readonly COLLECTION_NAME = 'usuarios';
 
@@ -35,15 +32,7 @@ export class UserService {
 
   constructor() { }
 
-  /**
-   * Ejecuta el callback en el contexto correcto (zona o inyección)
-   */
-  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-    if (this.zoneRunner) {
-      return this.zoneRunner.run(callback);
-    }
-    return runInInjectionContext(this.injector, callback as any);
-  }
+
 
   /**
    * Inicializa el listener de Firestore para usuarios
@@ -55,18 +44,14 @@ export class UserService {
       const usersCol = collection(this.firestore, this.COLLECTION_NAME);
 
       onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
-        this.runInZone(() => {
-          const usersList = snapshot.docs.map(doc => ({
-            ...doc.data(),
-            uid: doc.id
-          } as User));
-          this._users.set(usersList);
-        });
+        const usersList = snapshot.docs.map(doc => ({
+          ...doc.data(),
+          uid: doc.id
+        } as User));
+        this._users.set(usersList);
       }, (error) => {
-        this.runInZone(() => {
-          console.error('🔄 UserService: Error en listener:', error);
-          this._error.set(error.message);
-        });
+        console.error('🔄 UserService: Error en listener:', error);
+        this._error.set(error.message);
       });
 
       this.isListenerInitialized = true;
@@ -118,18 +103,16 @@ export class UserService {
     this._error.set(null);
 
     try {
-      return await this.runInZone(async () => {
-        const usersCol = collection(this.firestore, this.COLLECTION_NAME);
-        const snapshot = await getDocs(usersCol);
+      const usersCol = collection(this.firestore, this.COLLECTION_NAME);
+      const snapshot = await getDocs(usersCol);
 
-        const usersList = snapshot.docs.map(doc => ({
-          ...doc.data(),
-          uid: doc.id
-        } as User));
+      const usersList = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        uid: doc.id
+      } as User));
 
-        this._users.set(usersList);
-        return usersList;
-      }) as User[];
+      this._users.set(usersList);
+      return usersList;
     } catch (error: any) {
       console.error('🔄 UserService: Error al obtener usuarios:', error);
       this._error.set(error.message);
@@ -149,41 +132,39 @@ export class UserService {
     this._error.set(null);
 
     try {
-      return await this.runInZone(async () => {
-        if (user.email && password) {
-          // Crear usuario con Firebase Auth
-          const userCredential = await createUserWithEmailAndPassword(
-            this.auth,
-            user.email,
-            password
-          );
+      if (user.email && password) {
+        // Crear usuario con Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(
+          this.auth,
+          user.email,
+          password
+        );
 
-          const firebaseUser = userCredential.user;
-          if (firebaseUser) {
-            if (user.nombre) {
-              await updateProfile(firebaseUser, { displayName: user.nombre });
-            }
-
-            const newUser: User = {
-              ...user,
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || user.email,
-              emailVerified: firebaseUser.emailVerified
-            };
-
-            const userDocRef = doc(this.firestore, this.COLLECTION_NAME, firebaseUser.uid);
-            await setDoc(userDocRef, newUser);
-            return firebaseUser.uid;
-          } else {
-            throw new Error('No se pudo obtener información del usuario creado');
+        const firebaseUser = userCredential.user;
+        if (firebaseUser) {
+          if (user.nombre) {
+            await updateProfile(firebaseUser, { displayName: user.nombre });
           }
+
+          const newUser: User = {
+            ...user,
+            uid: firebaseUser.uid,
+            email: firebaseUser.email || user.email,
+            emailVerified: firebaseUser.emailVerified
+          };
+
+          const userDocRef = doc(this.firestore, this.COLLECTION_NAME, firebaseUser.uid);
+          await setDoc(userDocRef, newUser);
+          return firebaseUser.uid;
         } else {
-          // Crear usuario solo en Firestore
-          const usersCol = collection(this.firestore, this.COLLECTION_NAME);
-          const docRef = await addDoc(usersCol, user);
-          return docRef.id;
+          throw new Error('No se pudo obtener información del usuario creado');
         }
-      }) as string;
+      } else {
+        // Crear usuario solo en Firestore
+        const usersCol = collection(this.firestore, this.COLLECTION_NAME);
+        const docRef = await addDoc(usersCol, user);
+        return docRef.id;
+      }
     } catch (error: any) {
       console.error('🔄 UserService: Error al agregar usuario:', error);
       this._error.set(error.message);
@@ -201,10 +182,8 @@ export class UserService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
-        await setDoc(userDoc, userData, { merge: true });
-      });
+      const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
+      await setDoc(userDoc, userData, { merge: true });
     } catch (error: any) {
       console.error('🔄 UserService: Error al actualizar usuario:', error);
       this._error.set(error.message);
@@ -222,10 +201,8 @@ export class UserService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
-        await deleteDoc(userDoc);
-      });
+      const userDoc = doc(this.firestore, this.COLLECTION_NAME, uid);
+      await deleteDoc(userDoc);
       console.log('🔄 UserService: Usuario eliminado:', uid);
     } catch (error: any) {
       console.error('🔄 UserService: Error al eliminar usuario:', error);

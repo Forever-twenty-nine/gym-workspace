@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
+import { Component, OnInit, inject, computed, Signal, signal, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -23,7 +24,7 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barbellOutline, close, add, pencil, trash ,barbell, informationCircleOutline, lockClosed, star} from 'ionicons/icons';
+import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
@@ -53,7 +54,7 @@ import { UserService } from '../../core/services/user.service';
     IonInput,
     IonTextarea,
     IonText
-],
+  ],
   styles: [`
     .ejercicio-modal {
       --width: 95%;
@@ -104,6 +105,13 @@ export class EjerciciosPage implements OnInit {
   readonly ejercicioEditForm = signal<FormGroup | null>(null);
   readonly isEjercicioCreating = signal(false);
 
+  // Señal para rastrear el estado del formulario en modo zoneless
+  private readonly ejercicioFormStatus = signal<string>('INVALID');
+
+  readonly isSaveDisabled = computed(() => {
+    return this.ejercicioFormStatus() === 'INVALID';
+  });
+
   constructor() {
     addIcons({ barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star });
   }
@@ -123,7 +131,7 @@ export class EjerciciosPage implements OnInit {
   // ========================================
   // MÉTODOS PARA EJERCICIOS
   // ========================================
-  
+
   async deleteEjercicio(id: string) {
     await this.ejercicioService.delete(id);
     // Mostrar toast o algo
@@ -154,7 +162,7 @@ export class EjerciciosPage implements OnInit {
   private createEmptyEjercicio(): any {
     const timestamp = Date.now();
     const entrenadorId = this.authService.currentUser()?.uid;
-    
+
     return {
       id: 'e' + timestamp,
       nombre: '',
@@ -186,7 +194,15 @@ export class EjerciciosPage implements OnInit {
       formConfig.descansoSegundos = [item.descansoSegundos || 60];
     }
 
-    this.ejercicioEditForm.set(this.fb.group(formConfig));
+    const form = this.fb.group(formConfig);
+    this.ejercicioEditForm.set(form);
+
+    // Suscribirse a cambios de estado para actualizar la señal reactiva
+    form.statusChanges.subscribe(status => {
+      this.ejercicioFormStatus.set(status);
+    });
+    // Establecer estado inicial
+    this.ejercicioFormStatus.set(form.status);
   }
 
   async saveEjercicioChanges() {
@@ -220,7 +236,7 @@ export class EjerciciosPage implements OnInit {
 
     try {
       const formValue = form.value;
-      
+
       const ejercicioData: any = {
         ...originalData,
         nombre: formValue.nombre,
@@ -250,7 +266,7 @@ export class EjerciciosPage implements OnInit {
           await this.entrenadorService.addEjercicioCreado(entrenadorId, ejercicioData.id);
         }
       }
-      
+
       this.closeEjercicioModal();
       // Mostrar éxito
     } catch (error) {

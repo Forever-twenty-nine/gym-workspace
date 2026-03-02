@@ -1,10 +1,9 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import {
   IonContent,
-  IonItem,
   IonInput,
   IonButton,
   IonIcon
@@ -21,24 +20,22 @@ import { UserService } from '../../core/services/user.service';
   standalone: true,
   imports: [
     IonContent,
-    IonItem,
     IonInput,
     IonButton,
     IonIcon,
     FormsModule
-]
+  ]
 })
 export class LoginPage {
-  email: string = '';
-  password: string = '';
-  errorMessage: string = '';
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private userService: UserService,
-    private router: Router,
-    private ngZone: NgZone
-  ) {
+  readonly email = signal('');
+  readonly password = signal('');
+  readonly errorMessage = signal('');
+
+  constructor() {
     addIcons({ arrowBackOutline, personOutline, lockClosedOutline });
   }
 
@@ -54,23 +51,23 @@ export class LoginPage {
   }
 
   async login() {
-    this.errorMessage = '';
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Por favor, ingresa email y contraseña';
+    this.errorMessage.set('');
+    if (!this.email() || !this.password()) {
+      this.errorMessage.set('Por favor, ingresa email y contraseña');
       return;
     }
     try {
-      const success = await this.authService.loginWithEmail(this.email, this.password);
+      const success = await this.authService.loginWithEmail(this.email(), this.password());
       if (success) {
         const user = this.authService.currentUser();
         if (user) {
           this.redirectToRolePage(user.role);
         }
       } else {
-        this.errorMessage = 'Email o contraseña incorrectos';
+        this.errorMessage.set('Email o contraseña incorrectos');
       }
     } catch (error) {
-      this.errorMessage = 'Error al iniciar sesión';
+      this.errorMessage.set('Error al iniciar sesión');
     }
   }
 
@@ -83,10 +80,10 @@ export class LoginPage {
           this.redirectToRolePage(user.role);
         }
       } else {
-        this.errorMessage = 'Error al autenticar con Google';
+        this.errorMessage.set('Error al autenticar con Google');
       }
     } catch (error: any) {
-      this.errorMessage = error?.message || 'Ocurrió un error inesperado';
+      this.errorMessage.set(error?.message || 'Ocurrió un error inesperado');
       console.error('Google login error:', error);
     }
   }
@@ -95,23 +92,20 @@ export class LoginPage {
    * Redirige al usuario según su rol
    */
   private redirectToRolePage(role?: string): void {
-    // Aseguramos que la navegación ocurra en la zona de Angular
-    this.ngZone.run(() => {
-      switch (role) {
-        case Rol.ENTRENADO:
-          this.router.navigate(['/entrenado-tabs']);
-          break;
-        case Rol.ENTRENADOR:
-        case Rol.PERSONAL_TRAINER:
-          this.router.navigate(['/entrenador-tabs']);
-          break;
-        case Rol.GIMNASIO:
-          this.router.navigate(['/gimnasio-tabs']);
-          break;
-        default:
-          // Si no tiene rol definido, enviar a onboarding
-          this.router.navigate(['/onboarding']);
-      }
-    });
+    switch (role) {
+      case Rol.ENTRENADO:
+        this.router.navigate(['/entrenado-tabs']);
+        break;
+      case Rol.ENTRENADOR:
+      case Rol.PERSONAL_TRAINER:
+        this.router.navigate(['/entrenador-tabs']);
+        break;
+      case Rol.GIMNASIO:
+        this.router.navigate(['/gimnasio-tabs']);
+        break;
+      default:
+        // Si no tiene rol definido, enviar a onboarding
+        this.router.navigate(['/onboarding']);
+    }
   }
 }

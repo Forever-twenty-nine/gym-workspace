@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, computed, effect, NgZone } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, computed, effect } from '@angular/core';
 
 import { SesionRutinaService } from '../../../services/sesion-rutina.service';
 import { SesionRutina, Ejercicio } from 'gym-library';
@@ -27,7 +27,6 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
   @Output() openChange = new EventEmitter<boolean>();
 
   private readonly sesionRutinaService = inject(SesionRutinaService);
-  private readonly ngZone = inject(NgZone);
 
   // Estado de la sesión
   readonly sesionActual = signal<SesionRutina | null>(null);
@@ -162,11 +161,11 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
       this.cargandoEjercicios.set(true);
       this.intentosCarga = 0;
       this.cancelarReintentos();
-      
+
       // Cargar ejercicios
       this.prepararInformacionRutina();
     }
-    
+
     // Cuando se cierra el modal, limpiar estado
     if (changes.open && changes.open.currentValue === false) {
       this.detenerCronometro();
@@ -306,12 +305,10 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
 
   private async prepararSesion() {
     try {
-      await this.ngZone.run(async () => {
-        const nuevaSesion = await this.sesionRutinaService.inicializarSesionRutina(this.entrenadoId, this.rutinaId);
-        await this.sesionRutinaService.crearSesion(nuevaSesion);
-        this.sesionActual.set(nuevaSesion);
-        // NO iniciar cronómetro automáticamente
-      });
+      const nuevaSesion = await this.sesionRutinaService.inicializarSesionRutina(this.entrenadoId, this.rutinaId);
+      await this.sesionRutinaService.crearSesion(nuevaSesion);
+      this.sesionActual.set(nuevaSesion);
+      // NO iniciar cronómetro automáticamente
     } catch (error) {
       console.error('Error al preparar sesión:', error);
     }
@@ -360,9 +357,7 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     const sesion = this.sesionActual();
     if (sesion) {
       sesion.porcentajeCompletado = porcentaje;
-      this.ngZone.run(() => {
-        this.sesionRutinaService.actualizarSesion(sesion);
-      });
+      this.sesionRutinaService.actualizarSesion(sesion);
     }
   }
 
@@ -376,13 +371,11 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
       const fechaFin = new Date();
       const duracion = this.tiempoTranscurrido();
 
-      await this.ngZone.run(async () => {
-        await this.sesionRutinaService.completarSesion(
-          this.sesionActual()!,
-          fechaFin,
-          duracion
-        );
-      });
+      await this.sesionRutinaService.completarSesion(
+        this.sesionActual()!,
+        fechaFin,
+        duracion
+      );
 
       this.detenerCronometro();
       this.sesionActual.update(sesion => sesion ? { ...sesion, completada: true, fechaFin, duracion } : null);
@@ -419,7 +412,7 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
     try {
       // Generar imagen personalizada con datos de la sesión
       const blob = await this.generarImagenSesion(sesion);
-      
+
       // Compartir la imagen
       if (navigator.share && navigator.canShare({ files: [new File([blob], 'sesion-rutina.png', { type: 'image/png' })] })) {
         const file = new File([blob], 'sesion-rutina.png', { type: 'image/png' });
@@ -439,7 +432,7 @@ export class RutinaSesionModalComponent implements OnInit, OnDestroy, OnChanges 
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       }
-      
+
       console.log('Rutina compartida exitosamente en', platform);
     } catch (error) {
       console.error('Error al compartir rutina:', error);

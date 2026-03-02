@@ -1,4 +1,5 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificacionService } from '../../services/notificacion.service';
@@ -43,6 +44,14 @@ export class InvitacionesModalComponent {
       franjaHoraria: ['mañana']
     })
   );
+
+  private readonly invitacionStatus = toSignal(this.invitacionForm().statusChanges, {
+    initialValue: this.invitacionForm().status
+  });
+
+  readonly isEnviarDisabled = computed(() => {
+    return this.invitacionStatus() === 'INVALID' || this.isLoading();
+  });
 
   // Computed
   readonly usuarios = computed(() => {

@@ -1,13 +1,10 @@
 <!-- Button float -->
-<ion-button
-  slot="start"
-  fill="clear"
-  class="fixed top-4 left-2 z-10 text-white"
-  (click)="goToWelcome()">
+<ion-button slot="start" fill="clear" class="fixed top-4 left-2 z-10 text-white" (click)="goToWelcome()">
   <ion-icon name="arrow-back-outline"></ion-icon>
 </ion-button>
 
-<ion-content [fullscreen]="true" class="ion-padding" style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
+<ion-content [fullscreen]="true" class="ion-padding"
+  style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
 
   <!-- bg gradient & blur -->
   <div class="fixed inset-0 z-0">
@@ -25,16 +22,9 @@
       <p class="mb-2 text-white/80">
         Inicia sesión con:
       </p>
-      <ion-button
-        expand="block"
-        fill="outline"
-        size="large"
-        shape="round"
-        color="primary"
-        class="normal-case mb-6 !mt-0 "
-        (click)="loginWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google"
-          />
+      <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
+        class="normal-case mb-6 !mt-0 " (click)="loginWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google" />
         <span class="pl-3 text-base">Cuenta de Google</span>
       </ion-button>
       <p class="mb-2 text-white/80">
@@ -42,73 +32,38 @@
       </p>
 
 
-    <form >
-      <!-- email -->
-      <ion-item
-        class="mb-4">
-          <ion-icon
-            name="person-outline"
-            slot="start"
-            size="default"
-            aria-hidden="true"
-            class="mr-2 text-white/60">
+      <form>
+        <!-- email -->
+        <ion-input label="Email" label-placement="floating" type="email" name="email" [ngModel]="email()"
+          (ngModelChange)="email.set($event)" placeholder="Ingresa tu email" class="mb-4 text-white">
+          <ion-icon name="person-outline" slot="start" aria-hidden="true" class="mr-2 text-white/60">
           </ion-icon>
-          <ion-input
-            type="email"
-            name="email"
-            [(ngModel)]="email"
-            placeholder="Ingresa tu email"
-            class="bg-transparent !text-white">
-          </ion-input>
-      </ion-item>
-      <!-- password -->
-      <ion-item class="mb-4 rounded-lg ">
-        <ion-icon
-          name="lock-closed-outline"
-          slot="start"
-          size="default"
-          aria-hidden="true"
-          class="mr-2 text-white/60">
-        </ion-icon>
-        <ion-input
-          type="password"
-          name="password"
-          [(ngModel)]="password"
-          placeholder="Ingresa tu contraseña"
-          class="bg-transparent !text-white">
         </ion-input>
-      </ion-item>
-      <div class="flex gap-2 items-center justify-center mb-6">
-        <ion-button
-          expand="block"
-          fill="clean"
-          size="default"
-          shape="round"
-          color="primary"
-          (click)="goToForgotPassword()"
-          class="!mt-0">
-          ¿Olvidaste tu contraseña?
-        </ion-button>
-      </div>
-    </form>
-    
-    <!-- Error message -->
-    @if (errorMessage) {
+
+        <!-- password -->
+        <ion-input label="Contraseña" label-placement="floating" type="password" name="password" [ngModel]="password()"
+          (ngModelChange)="password.set($event)" placeholder="Ingresa tu contraseña" class="mb-4 text-white">
+          <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true" class="mr-2 text-white/60">
+          </ion-icon>
+        </ion-input>
+        <div class="flex gap-2 items-center justify-center mb-6">
+          <ion-button expand="block" fill="clean" size="default" shape="round" color="primary"
+            (click)="goToForgotPassword()" class="!mt-0">
+            ¿Olvidaste tu contraseña?
+          </ion-button>
+        </div>
+      </form>
+
+      <!-- Error message -->
+      @if (errorMessage()) {
       <div class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-        <p class="text-red-200 text-sm">{{ errorMessage }}</p>
+        <p class="text-red-200 text-sm">{{ errorMessage() }}</p>
       </div>
-    }
-    
-    <ion-button
-      expand="block"
-      fill="solid"
-      size="large"
-      shape="round"
-      color="primary"
-      (click)="login()"
-      class="">
-      Iniciar Sesión
-    </ion-button>
+      }
+
+      <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="login()" class="">
+        Iniciar Sesión
+      </ion-button>
 
 
 

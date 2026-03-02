@@ -1,4 +1,5 @@
 import { Component, input, output, signal, computed, inject, ChangeDetectionStrategy, OnInit, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ejercicio } from 'gym-library';
@@ -12,7 +13,7 @@ import { ToastService } from '../../services/toast.service';
   selector: 'app-rutina-modal',
   imports: [
     ReactiveFormsModule
-],
+  ],
   templateUrl: './rutina-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -40,8 +41,15 @@ export class RutinaModalComponent implements OnInit {
   readonly rutinaData = signal<any>(null);
   readonly isLoading = signal(false);
 
-  // Formulario reactivo (no necesita ser signal)
+  // Formulario reactivo
   rutinaForm!: FormGroup;
+
+  // Señal para reactividad del estado del formulario
+  private readonly rutinaStatus = signal<string>('INVALID');
+
+  readonly isSaveButtonDisabled = computed(() => {
+    return this.rutinaStatus() === 'INVALID' || this.isLoading();
+  });
 
   // Computed
   readonly modalTitle = computed(() => {
@@ -80,8 +88,20 @@ export class RutinaModalComponent implements OnInit {
   // Efecto para inicializar formulario cuando se abre el modal
   private readonly initializeFormEffect = effect(() => {
     if (this.isOpen()) {
-      this.initializeForm(this.rutinaToEdit() || undefined);
+      const rutina = this.rutinaToEdit() || undefined;
+      this.initializeForm(rutina);
+
+      // Sincronizar estado inicial
+      this.rutinaStatus.set(this.rutinaForm.status);
+
+      // Suscribirse a cambios futuros
+      const sub = this.rutinaForm.statusChanges.subscribe(status => {
+        this.rutinaStatus.set(status);
+      });
+
+      return () => sub.unsubscribe();
     }
+    return;
   });
 
   // Crear formulario

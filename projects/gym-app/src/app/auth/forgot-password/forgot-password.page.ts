@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import {
   IonContent,
-  IonItem,
   IonInput,
   IonButton,
   IonIcon,
@@ -21,24 +20,23 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [
     IonContent,
-    IonItem,
     IonInput,
     IonButton,
     IonIcon,
     IonSpinner,
     FormsModule
-]
+  ]
 })
 export class ForgotPasswordPage {
-  email: string = '';
-  emailError: string = '';
-  successMessage: string = '';
-  isLoading: boolean = false;
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {
+  readonly email = signal('');
+  readonly emailError = signal('');
+  readonly successMessage = signal('');
+  readonly isLoading = signal(false);
+
+  constructor() {
     addIcons({ arrowBackOutline, mailOutline });
   }
 
@@ -53,11 +51,11 @@ export class ForgotPasswordPage {
    * Valida el formato del email
    */
   validateEmail() {
-    this.emailError = '';
-    this.successMessage = '';
-    
-    if (this.email && !this.isValidEmail(this.email)) {
-      this.emailError = 'Por favor, ingresa un email válido';
+    this.emailError.set('');
+    this.successMessage.set('');
+
+    if (this.email() && !this.isValidEmail(this.email())) {
+      this.emailError.set('Por favor, ingresa un email válido');
     }
   }
 
@@ -73,14 +71,14 @@ export class ForgotPasswordPage {
    * Verifica si el email es válido y no está vacío
    */
   isEmailValid(): boolean {
-    return this.email.length > 0 && this.isValidEmail(this.email) && !this.emailError;
+    return this.email().length > 0 && this.isValidEmail(this.email()) && !this.emailError();
   }
 
   /**
    * Verifica si el email es inválido
    */
   isEmailInvalid(): boolean {
-    return this.email.length > 0 && (!this.isValidEmail(this.email) || !!this.emailError);
+    return this.email().length > 0 && (!this.isValidEmail(this.email()) || !!this.emailError());
   }
 
   /**
@@ -88,6 +86,6 @@ export class ForgotPasswordPage {
    */
   async resetPassword() {
     //solo de mock
-    this.successMessage = 'Se ha enviado un enlace de recuperación a tu email';
+    this.successMessage.set('Se ha enviado un enlace de recuperación a tu email');
   }
 }

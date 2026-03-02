@@ -1,4 +1,4 @@
-import { Injectable, signal, Signal, inject, Injector, runInInjectionContext, isDevMode, NgZone } from '@angular/core';
+import { Injectable, signal, Signal, inject, Injector, runInInjectionContext, isDevMode } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -19,7 +19,6 @@ import { AUTH, FIRESTORE } from '../firebase.tokens';
 export class AuthService {
   private readonly auth = inject(AUTH);
   private readonly firestore = inject(FIRESTORE);
-  private readonly zone = inject(NgZone);
 
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isAuthenticated = signal<boolean>(false);
@@ -37,23 +36,17 @@ export class AuthService {
         try {
           // Cargamos los datos ANTES de emitir que no estamos cargando
           const userData = await this.getUserData(firebaseUser);
-          this.zone.run(() => {
-            this._currentUser.set(userData);
-            this._isAuthenticated.set(true);
-            this._isLoading.set(false);
-          });
+          this._currentUser.set(userData);
+          this._isAuthenticated.set(true);
+          this._isLoading.set(false);
         } catch (error) {
           console.error('Error cargando perfil de usuario:', error);
-          this.zone.run(() => {
-            this._isLoading.set(false);
-          });
+          this._isLoading.set(false);
         }
       } else {
-        this.zone.run(() => {
-          this._currentUser.set(null);
-          this._isAuthenticated.set(false);
-          this._isLoading.set(false);
-        });
+        this._currentUser.set(null);
+        this._isAuthenticated.set(false);
+        this._isLoading.set(false);
       }
     });
   }
@@ -91,11 +84,9 @@ export class AuthService {
       if (cred.user) {
         // Forzamos carga inmediata para que el router.navigate siguiente funcione
         const user = await this.getUserData(cred.user);
-        this.zone.run(() => {
-          this._currentUser.set(user);
-          this._isAuthenticated.set(true);
-          this._isLoading.set(false);
-        });
+        this._currentUser.set(user);
+        this._isAuthenticated.set(true);
+        this._isLoading.set(false);
         return true;
       }
       this._isLoading.set(false);
@@ -116,11 +107,9 @@ export class AuthService {
       const cred = await signInWithPopup(this.auth, provider);
       if (cred.user) {
         const user = await this.getUserData(cred.user);
-        this.zone.run(() => {
-          this._currentUser.set(user);
-          this._isAuthenticated.set(true);
-          this._isLoading.set(false);
-        });
+        this._currentUser.set(user);
+        this._isAuthenticated.set(true);
+        this._isLoading.set(false);
         return true;
       }
       this._isLoading.set(false);
@@ -146,11 +135,9 @@ export class AuthService {
           role: this.inferRoleFromEmail(email),
           onboarded: false
         };
-        this.zone.run(() => {
-          this._currentUser.set(newUser);
-          this._isAuthenticated.set(true);
-          this._isLoading.set(false);
-        });
+        this._currentUser.set(newUser);
+        this._isAuthenticated.set(true);
+        this._isLoading.set(false);
         return true;
       }
       this._isLoading.set(false);

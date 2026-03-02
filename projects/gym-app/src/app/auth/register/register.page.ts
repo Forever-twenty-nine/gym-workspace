@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, signal, computed, inject, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import {
   IonContent,
-  IonItem,
   IonInput,
   IonButton,
   IonText,
@@ -27,26 +27,33 @@ import { UserService } from '../../core/services/user.service';
   standalone: true,
   imports: [
     IonContent,
-    IonItem,
     IonInput,
     IonButton,
     IonText,
     IonIcon,
     ReactiveFormsModule
-]
+  ]
 })
 export class RegisterPage {
-  registerForm: FormGroup;
-  errorMessage: string = '';
-  successMessage: string = '';
-  isSubmitDisabled: boolean = true;
+  private readonly router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
 
-  constructor(
-    private router: Router,
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private userService: UserService
-  ) {
+  readonly registerForm: FormGroup;
+  readonly errorMessage = signal('');
+  readonly successMessage = signal('');
+
+  // Señal que rastrea el estado del formulario para reactividad en modo zoneless
+  private formStatus!: Signal<string | undefined>;
+
+  readonly isSubmitDisabled = computed(() => {
+    // Al depender de formStatus(), este computed se reevaluará cuando el formulario cambie
+    const status = this.formStatus ? this.formStatus() : 'INVALID';
+    return status === 'INVALID' || !!this.successMessage();
+  });
+
+  constructor() {
     addIcons({
       lockClosedOutline,
       mailOutline,
@@ -54,7 +61,6 @@ export class RegisterPage {
       arrowBackOutline
     });
 
-    // Crear el formulario reactivo
     this.registerForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -63,25 +69,12 @@ export class RegisterPage {
       validators: this.passwordMatchValidator
     });
 
-    // Suscribirse a cambios del formulario para actualizar el estado del botón
-    this.registerForm.statusChanges.subscribe(() => {
-      this.updateSubmitButtonState();
+    // Inicializar la señal de estado después de crear el formulario
+    this.formStatus = toSignal(this.registerForm.statusChanges, {
+      initialValue: this.registerForm.status
     });
-
-    this.registerForm.valueChanges.subscribe(() => {
-      this.updateSubmitButtonState();
-    });
-
-    // Inicializar el estado del botón
-    this.updateSubmitButtonState();
   }
 
-  /**
-   * Actualiza el estado del botón de envío
-   */
-  private updateSubmitButtonState(): void {
-    this.isSubmitDisabled = !this.registerForm.valid || !!this.successMessage;
-  }
 
   /**
    * Validador personalizado para verificar que las contraseñas coincidan
@@ -126,26 +119,26 @@ export class RegisterPage {
    * Valida el formulario de registro
    */
   validateForm(): boolean {
-    this.errorMessage = '';
+    this.errorMessage.set('');
 
     if (this.registerForm.invalid) {
       if (this.f['email'].errors) {
         if (this.f['email'].errors['required']) {
-          this.errorMessage = 'El email es requerido';
+          this.errorMessage.set('El email es requerido');
         } else if (this.f['email'].errors['email']) {
-          this.errorMessage = 'Por favor, ingresa un email válido';
+          this.errorMessage.set('Por favor, ingresa un email válido');
         }
       } else if (this.f['password'].errors) {
         if (this.f['password'].errors['required']) {
-          this.errorMessage = 'La contraseña es requerida';
+          this.errorMessage.set('La contraseña es requerida');
         } else if (this.f['password'].errors['minlength']) {
-          this.errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+          this.errorMessage.set('La contraseña debe tener al menos 6 caracteres');
         }
       } else if (this.f['confirmPassword'].errors) {
         if (this.f['confirmPassword'].errors['required']) {
-          this.errorMessage = 'La confirmación de contraseña es requerida';
+          this.errorMessage.set('La confirmación de contraseña es requerida');
         } else if (this.f['confirmPassword'].errors['passwordMismatch']) {
-          this.errorMessage = 'Las contraseñas no coinciden';
+          this.errorMessage.set('Las contraseñas no coinciden');
         }
       }
       return false;
@@ -184,16 +177,15 @@ export class RegisterPage {
       return;
     }
 
-    this.errorMessage = '';
-    this.successMessage = '';
-    this.isSubmitDisabled = true;
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
     try {
       const { email, password } = this.registerForm.value;
 
       // Crear cuenta en Firebase Auth
       const result = await this.authService.registerWithEmail(email, password);
-      
+
       if (result) {
         // Registro exitoso
         // Crear perfil de usuario en Firestore
@@ -212,7 +204,7 @@ export class RegisterPage {
           await this.userService.updateUser(currentUser.uid, userData);
         }
 
-        this.successMessage = 'Cuenta creada exitosamente. Redirigiendo...';
+        this.successMessage.set('Cuenta creada exitosamente. Redirigiendo...');
 
         // Pequeño delay para mostrar el mensaje de éxito
         setTimeout(() => {
@@ -224,27 +216,24 @@ export class RegisterPage {
         if (authError) {
           // Mejorar el mensaje de error para email ya registrado
           if (authError.includes('email-already-in-use') || authError.includes('ya está registrado')) {
-            this.errorMessage = 'Este email ya está registrado. Intenta iniciar sesión en su lugar.';
+            this.errorMessage.set('Este email ya está registrado. Intenta iniciar sesión en su lugar.');
           } else if (authError.includes('weak-password')) {
-            this.errorMessage = 'La contraseña debe tener al menos 6 caracteres.';
+            this.errorMessage.set('La contraseña debe tener al menos 6 caracteres.');
           } else if (authError.includes('invalid-email')) {
-            this.errorMessage = 'El email no tiene un formato válido.';
+            this.errorMessage.set('El email no tiene un formato válido.');
           } else if (authError.includes('network-request-failed')) {
-            this.errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+            this.errorMessage.set('Error de conexión. Verifica tu conexión a internet.');
           } else {
-            this.errorMessage = authError;
+            this.errorMessage.set(authError);
           }
         } else {
-          this.errorMessage = 'Error al crear la cuenta. Inténtalo de nuevo.';
+          this.errorMessage.set('Error al crear la cuenta. Inténtalo de nuevo.');
         }
-        
-        this.isSubmitDisabled = false;
       }
 
     } catch (error: any) {
       console.error('Error inesperado al registrar usuario:', error);
-      this.errorMessage = 'Error inesperado. Inténtalo de nuevo.';
-      this.isSubmitDisabled = false;
+      this.errorMessage.set('Error inesperado. Inténtalo de nuevo.');
     }
   }
 

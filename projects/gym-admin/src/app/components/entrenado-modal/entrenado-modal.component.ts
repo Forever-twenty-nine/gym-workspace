@@ -1,4 +1,5 @@
-import { Component, input, output, computed, inject, ChangeDetectionStrategy, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, input, output, computed, inject, ChangeDetectionStrategy, OnChanges, SimpleChanges, signal, effect } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Rutina, RutinaAsignada, TipoNotificacion } from 'gym-library';
@@ -39,6 +40,28 @@ export class EntrenadoModalComponent implements OnChanges {
   readonly rutinaSeleccionada = signal<Rutina | null>(null);
   readonly asignacionForm = signal<FormGroup | null>(null);
   readonly isAsignando = signal(false);
+
+  // Señal para reactividad del estado del formulario
+  private readonly asignacionStatus = signal<string>('INVALID');
+
+  readonly isConfirmarDisabled = computed(() => {
+    return this.asignacionStatus() === 'INVALID' || this.isAsignando();
+  });
+
+  // Efecto para trackear el estado del formulario cuando se crea
+  private readonly trackAsignacionFormEffect = effect(() => {
+    const form = this.asignacionForm();
+    if (form) {
+      this.asignacionStatus.set(form.status);
+      const sub = form.statusChanges.subscribe(status => {
+        this.asignacionStatus.set(status);
+      });
+      return () => sub.unsubscribe();
+    } else {
+      this.asignacionStatus.set('INVALID');
+    }
+    return;
+  });
 
   // Opciones para días de la semana
   readonly diasSemanaOptions = [
@@ -131,7 +154,7 @@ export class EntrenadoModalComponent implements OnChanges {
       .filter(item => item.rutina !== null);
   });
 
-    // Método para verificar si una rutina está asignada al entrenado
+  // Método para verificar si una rutina está asignada al entrenado
   isRutinaAsignada(rutinaId: string): boolean {
     return this.rutinasAsignadas().some(ra => ra.rutinaId === rutinaId);
   }

@@ -31,9 +31,6 @@
   "references": [
     {
       "path": "./projects/gym-library/tsconfig.lib.json"
-    },
-    {
-      "path": "./projects/gym-library/tsconfig.spec.json"
     }
   ]
 }

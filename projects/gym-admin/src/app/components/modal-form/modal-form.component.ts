@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal, computed, inject } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -26,14 +26,44 @@ export class ModalFormComponent implements OnInit, OnDestroy {
   @Input() isOpen: boolean = false;
   @Input() title: string = '';
   @Input() isCreating: boolean = true;
-  @Input() form: FormGroup | null = null;
+
+  // Señal interna para reactividad del estado del formulario
+  private readonly internalFormStatus = signal<string>('INVALID');
+  private formSubscription?: any;
+  private _form: FormGroup | null = null;
+
+  @Input()
+  set form(value: FormGroup | null) {
+    this._form = value;
+    if (this.formSubscription) {
+      this.formSubscription.unsubscribe();
+    }
+
+    if (value) {
+      this.internalFormStatus.set(value.status);
+      this.formSubscription = value.statusChanges.subscribe(status => {
+        this.internalFormStatus.set(status);
+      });
+    } else {
+      this.internalFormStatus.set('INVALID');
+    }
+  }
+
+  get form(): FormGroup | null {
+    return this._form;
+  }
+
   @Input() formFields: FormFieldConfig[] = [];
   @Input() isLoading: boolean = false;
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<void>();
 
-  constructor() {}
+  readonly isSaveButtonDisabled = computed(() => {
+    return (this.internalFormStatus() === 'INVALID') || this.isLoading;
+  });
+
+  constructor() { }
 
   ngOnInit(): void {
     if (this.isOpen) {
@@ -43,6 +73,9 @@ export class ModalFormComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     document.body.style.overflow = 'auto';
+    if (this.formSubscription) {
+      this.formSubscription.unsubscribe();
+    }
   }
 
   onOverlayClick(): void {

@@ -2,10 +2,10 @@
   "name": "gym-workspace",
   "version": "0.0.0",
   "scripts": {
-    "emulator:start": "npx firebase emulators:start --project=default-project --import=./emulator-data",
-    "emulator:start:with-export": "npx firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
-    "emulator:export": "npx firebase emulators:export ./emulator-data",
-    "emulator:import": "npx firebase emulators:start --import=./emulator-data",
+    "emulator:start": "firebase emulators:start --project=default-project --import=./emulator-data",
+    "emulator:start:with-export": "firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
+    "emulator:export": "firebase emulators:export --project=default-project ./emulator-data",
+    "emulator:import": "firebase emulators:start --project=default-project --import=./emulator-data",
     "kill-emulator-8080": "pwsh -NoProfile -File scripts/kill-emulator.ps1",
     "gym-admin:serve": "cd projects/gym-admin && npm run start",
     "gym-admin:build": "cd projects/gym-admin && npm run build",
@@ -19,11 +19,11 @@
     "dev": "npm run library:build && npm run dev:parallel",
     "dev:parallel": "concurrently \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "dev:all": "concurrently \"npm run library:watch\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"lib,admin,app\" --prefix-colors \"yellow,cyan,magenta\"",
-    "dev:with-emulator": "npm run library:build && concurrently \"npm run emulator:start\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"emulator,admin,app\" --prefix-colors \"green,cyan,magenta\"",
+    "dev:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"emulator,admin,app\" --prefix-colors \"green,cyan,magenta\"",
     "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
     "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -- --configuration=firebase",
-    "gym-admin:with-emulator": "npx concurrently \"npm run emulator:start\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
+    "gym-admin:with-emulator": "concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {
