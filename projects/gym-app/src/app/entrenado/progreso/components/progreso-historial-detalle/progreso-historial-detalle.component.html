@@ -20,7 +20,7 @@
 
             <!-- Overlay oscuro usando fixed para cubrir el content area sin afectar el flujo de documento -->
             <div slot="fixed"
-                class="w-full h-full bg-gradient-to-br from-black/90 via-black/70 to-primary/80 pointer-events-none z-0">
+                class="w-full h-full bg-linear-to-br from-black/90 via-black/70 to-primary/80 pointer-events-none z-0">
             </div>
 
             <!-- Contenedor general en flujo normal (z-10 para estar sobre el overlay) -->
@@ -78,6 +78,18 @@
                             </ion-badge>
                         </div>
                     </div>
+                </div>
+
+                <!-- Compartir en Comunidad -->
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl shadow-sm border border-white/20 mx-2 mb-6 p-4">
+                    <ion-item lines="none" class="bg-transparent" style="--background: transparent; --color: white;">
+                        <ion-icon name="share-social-outline" slot="start" class="text-primary text-xl"></ion-icon>
+                        <ion-label>
+                            <h3 class="text-sm font-black text-white">Compartir en comunidad</h3>
+                            <p class="text-[10px] font-bold text-white/60 uppercase tracking-tighter">Hacer visible en el feed</p>
+                        </ion-label>
+                        <ion-toggle slot="end" [checked]="sesionSeleccionada.compartida" (ionChange)="toggleCompartir($event)" style="--handle-background-checked: var(--ion-color-primary);"></ion-toggle>
+                    </ion-item>
                 </div>
 
                 <!-- Lista de ejercicios de la sesión -->

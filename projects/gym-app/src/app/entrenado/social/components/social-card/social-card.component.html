@@ -1,0 +1,69 @@
+<ion-card class="m-0 mb-6 rounded-2xl border-none bg-white dark:bg-[#1c1c1e] shadow-sm overflow-hidden">
+  <!-- Header: Perfil de Usuario con ion-item -->
+  <ion-item lines="none" class="--background-transparent pt-2">
+    <ion-avatar slot="start" class="w-12 h-12">
+      <div class="w-full h-full bg-primary/10 flex items-center justify-center rounded-full">
+        <span class="text-primary font-bold text-base uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
+      </div>
+    </ion-avatar>
+    <ion-label class="ml-1">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ sesion.nombreUsuario || 'Usuario' }}</h3>
+      <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ formatearFecha(sesion.fechaInicio) }}</p>
+    </ion-label>
+    <ion-button slot="end" fill="clear" color="medium" class="m-0">
+      <ion-icon name="ellipsis-vertical" slot="icon-only"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <!-- Body: Contenido de la rutina -->
+  <ion-card-header class="pt-4 pb-0 px-5">
+    <ion-card-title class="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+      {{ sesion.rutinaResumen.nombre || 'Rutina' }}
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content class="pt-5 pb-6 px-5">
+    <!-- Grid de Stats usando ion-grid -->
+    <ion-grid class="p-0">
+      <ion-row class="gap-y-3">
+        <ion-col size="6" class="ion-no-padding pr-2">
+          <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl flex items-center gap-4">
+            <ion-icon name="time-outline" color="warning" class="text-2xl"></ion-icon>
+            <div class="flex flex-col">
+              <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Tiempo</span>
+              <span class="text-base font-black dark:text-white">{{ redondearMinutos(sesion.duracion || 0) }} min</span>
+            </div>
+          </div>
+        </ion-col>
+        <ion-col size="6" class="ion-no-padding pl-2">
+          <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl flex items-center gap-4">
+            <ion-icon name="barbell-outline" color="primary" class="text-2xl"></ion-icon>
+            <div class="flex flex-col">
+              <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Ejercicios</span>
+              <span class="text-base font-black dark:text-white">{{ sesion.rutinaResumen.ejercicios.length || 0 }}</span>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+
+  <!-- Interaction Area -->
+  <div class="px-5 py-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-black/10">
+    <ion-button fill="clear" size="default" (click)="toggleLike(); $event.stopPropagation()" 
+                [color]="hasLiked() ? 'danger' : 'medium'" class="font-black">
+      <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'" class="text-xl"></ion-icon>
+      {{ likesCount() || 0 }}
+    </ion-button>
+
+    <div class="flex -space-x-2 pr-1">
+      @for (likeUid of (sesion.likes || []).slice(-3).reverse(); track likeUid) {
+        <ion-avatar class="w-8 h-8 border-2 border-white dark:border-[#1c1c1e] shadow-sm">
+          <div class="w-full h-full flex items-center justify-center bg-primary/20">
+            <span class="text-[10px] font-black text-primary">U</span>
+          </div>
+        </ion-avatar>
+      }
+    </div>
+  </div>
+</ion-card>

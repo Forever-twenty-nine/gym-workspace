@@ -12,4 +12,9 @@ export interface Rutina {
     fechaModificacion?: Date;
     // Plan Premium
     duracion?: number;
+    // Social
+    compartida?: boolean;
+    usuarioId?: string;
+    nombreUsuario?: string;
+    fechaCompartida?: any;
 }

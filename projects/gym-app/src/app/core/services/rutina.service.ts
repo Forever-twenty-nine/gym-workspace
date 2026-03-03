@@ -100,6 +100,20 @@ export class RutinaService {
     }
 
     /**
+     * 🛰️ Actualiza el estado de compartir de una rutina
+     */
+    async setCompartida(id: string, compartida: boolean, userId: string, userName?: string): Promise<void> {
+        const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+        const data: Partial<Rutina> = {
+            compartida,
+            usuarioId: userId,
+            nombreUsuario: userName,
+            fechaCompartida: compartida ? Timestamp.now() : null
+        };
+        await setDoc(rutinaRef, data, { merge: true });
+    }
+
+    /**
      * 💾 Guarda o actualiza una rutina (upsert si tiene id)
      */
     async save(rutina: Rutina): Promise<void> {

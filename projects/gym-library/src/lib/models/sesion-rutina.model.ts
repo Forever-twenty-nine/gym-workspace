@@ -15,5 +15,10 @@ export interface SesionRutina {
         nombre: string; 
         ejercicios: Ejercicio[];
     };
+    // Social
+    compartida?: boolean;
+    nombreUsuario?: string;
+    fechaCompartida?: any;
+    likes?: string[]; // IDs de usuarios que dieron like
 }
 

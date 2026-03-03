@@ -10,6 +10,8 @@ import {
   query,
   where,
   Timestamp,
+  arrayUnion,
+  arrayRemove,
   QuerySnapshot,
   DocumentSnapshot
 } from 'firebase/firestore';
@@ -207,6 +209,68 @@ export class SesionRutinaService {
     return this.runInZone(async () => {
       const ref = doc(this.firestore, this.COLLECTION, id);
       await deleteDoc(ref);
+    });
+  }
+
+  /**
+   * Actualiza el estado de compartir de una sesión consumida
+   */
+  async setCompartida(id: string, compartida: boolean, userName?: string): Promise<void> {
+    return this.runInZone(async () => {
+      const ref = doc(this.firestore, this.COLLECTION, id);
+      const data: any = {
+        compartida,
+        nombreUsuario: userName,
+        fechaCompartida: compartida ? Timestamp.now() : null
+      };
+      await updateDoc(ref, data);
+    });
+  }
+
+  /**
+   * Obtiene todas las sesiones compartidas (Feed Social)
+   */
+  getSesionesCompartidas(): Signal<SesionRutina[]> {
+    const sesionesSignal = signal<SesionRutina[]>([]);
+    const q = query(collection(this.firestore, this.COLLECTION), where('compartida', '==', true));
+    
+    onSnapshot(q, (snapshot: QuerySnapshot) => {
+      this.runInZone(() => {
+        const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        // Ordenar por fecha de compartida descendente
+        sesiones.sort((a, b) => {
+          const dateA = (a as any).fechaCompartida?.toDate?.() || new Date((a as any).fechaCompartida);
+          const dateB = (b as any).fechaCompartida?.toDate?.() || new Date((b as any).fechaCompartida);
+          return dateB - dateA;
+        });
+        sesionesSignal.set(sesiones);
+      });
+    });
+    
+    return sesionesSignal.asReadonly();
+  }
+
+  /**
+   * Agrega un like a una sesión compartida
+   */
+  async addLike(sesionId: string, userId: string): Promise<void> {
+    const ref = doc(this.firestore, this.COLLECTION, sesionId);
+    return this.runInZone(async () => {
+      await updateDoc(ref, {
+        likes: arrayUnion(userId)
+      });
+    });
+  }
+
+  /**
+   * Elimina un like de una sesión compartida
+   */
+  async removeLike(sesionId: string, userId: string): Promise<void> {
+    const ref = doc(this.firestore, this.COLLECTION, sesionId);
+    return this.runInZone(async () => {
+      await updateDoc(ref, {
+        likes: arrayRemove(userId)
+      });
     });
   }
 

@@ -1,0 +1,29 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="pt-2">
+    <ion-title class="font-black text-2xl text-gray-900 dark:text-white">Comunidad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-gray-50 dark:bg-black">
+  <div class="max-w-md mx-auto pt-4 pb-20 px-4 animate-fade-in">
+    <!-- Subtítulo simple -->
+    <p class="text-[12px] font-bold text-gray-500 mb-6 uppercase tracking-widest text-center">Actividad Reciente</p>
+
+    <!-- Listado de Sesiones -->
+    @if (feedSocial().length === 0) {
+      <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
+          <ion-icon name="people-outline" class="text-4xl text-gray-300 dark:text-gray-600"></ion-icon>
+        </div>
+        <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Cero actividad aún</h3>
+        <p class="text-sm font-medium text-gray-500 px-10">¡Entrena hoy y comparte tu progreso con el resto!</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-5">
+        @for (sesion of feedSocial(); track sesion.id) {
+          <app-social-card [sesion]="sesion"></app-social-card>
+        }
+      </div>
+    }
+  </div>
+</ion-content>

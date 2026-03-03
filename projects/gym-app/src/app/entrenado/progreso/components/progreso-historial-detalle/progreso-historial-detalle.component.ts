@@ -16,7 +16,8 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonFooter
+    IonFooter,
+    IonToggle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -28,6 +29,9 @@ import {
     barbellOutline,
     logoWhatsapp
 } from 'ionicons/icons';
+import { inject } from '@angular/core';
+import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
     selector: 'app-progreso-historial-detalle',
@@ -46,11 +50,15 @@ import {
         IonText,
         IonList,
         IonItem,
-        IonLabel
+        IonLabel,
+        IonToggle
     ],
     templateUrl: './progreso-historial-detalle.component.html'
 })
 export class ProgresoHistorialDetalleComponent {
+    private sesionRutinaService = inject(SesionRutinaService);
+    private authService = inject(AuthService);
+
     @Input() isOpen = false;
     @Input() sesionSeleccionada: any = null;
     @Output() didDismiss = new EventEmitter<void>();
@@ -69,6 +77,15 @@ export class ProgresoHistorialDetalleComponent {
 
     cerrarDetalle() {
         this.didDismiss.emit();
+    }
+
+    async toggleCompartir(event: any) {
+        if (!this.sesionSeleccionada) return;
+        const compartida = event.detail.checked;
+        const user = this.authService.currentUser();
+        if (user) {
+            await this.sesionRutinaService.setCompartida(this.sesionSeleccionada.id, compartida, user.nombre || 'Usuario');
+        }
     }
 
     formatearFecha(fecha?: Date | string): string {

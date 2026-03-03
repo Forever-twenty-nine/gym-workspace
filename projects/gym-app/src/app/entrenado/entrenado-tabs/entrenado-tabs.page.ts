@@ -19,7 +19,9 @@ import {
   statsChartOutline,
   statsChart,
   calendarOutline,
-  calendar} from 'ionicons/icons';
+  calendar,
+  peopleOutline,
+  people} from 'ionicons/icons';
 
 @Component({
   selector: 'app-entrenado-tabs',
@@ -36,6 +38,6 @@ import {
 export class EntrenadoTabsPage {
 
   constructor() {
-    addIcons({homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, statsChartOutline, statsChart, fitnessOutline, personOutline, person});
+    addIcons({homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, statsChartOutline, statsChart, fitnessOutline, personOutline, person, peopleOutline, people});
   }
 }
