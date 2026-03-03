@@ -6,7 +6,7 @@
 
 <ion-content [fullscreen]="true">
   @if (estadisticasGenerales(); as stats) {
-  <div class="progreso-container w-full">
+  <div class="w-full p-4 mx-auto">
 
     <!-- Estadísticas Generales Premium -->
     <app-progreso-estadisticas [stats]="stats"></app-progreso-estadisticas>
@@ -17,7 +17,7 @@
 
   </div>
   } @else {
-  <div class="loading-container">
+  <div class="flex justify-center items-center">
     <ion-text color="medium">Cargando progreso...</ion-text>
   </div>
   }

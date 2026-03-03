@@ -36,16 +36,13 @@ export class ProgresoPage implements OnInit {
   private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly alertController = inject(AlertController);
 
-  // Estado de carga
   readonly isLoading = signal(false);
 
   constructor() { }
 
   ngOnInit() {
-    // Los datos se cargan automáticamente a través de los computed signals
   }
 
-  // Datos computados
   rutinasAsignadas = computed(() => {
     const currentUser = this.authService.currentUser;
     const userId = currentUser()?.uid;
@@ -64,7 +61,6 @@ export class ProgresoPage implements OnInit {
 
     const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(userId)();
 
-    // Ordenar de más reciente a más antigua
     return sesiones.sort((a, b) => {
       const dateA = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
       const dateB = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
@@ -79,15 +75,12 @@ export class ProgresoPage implements OnInit {
     const sesionesCompletadas = sesiones.filter(s => s.completada).length;
     const sesionesEnProgreso = sesiones.filter(s => !s.completada).length;
 
-    // Calcular tiempo total entrenado (asumiendo duracion en segundos en las sesiones completadas, pasar a minutos)
     const tiempoTotalSegundos = sesiones.reduce((total: number, sesion) => {
       return total + (sesion.duracion || 0);
     }, 0);
 
     const tiempoTotal = Math.round(tiempoTotalSegundos / 60);
 
-    // Consideramos una generalización para ejercicios totales basados en lo asignado,
-    // o simplemente las stats de las sesiones hechas.
     const totalEntrenamientosRealizados = sesiones.length;
 
     return {
