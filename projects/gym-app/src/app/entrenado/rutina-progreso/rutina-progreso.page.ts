@@ -10,11 +10,12 @@ import {
   IonButton,
   IonButtons,
   IonIcon,
-  IonCard,
-  IonCardContent,
-  IonProgressBar,
   IonBackButton
 } from '@ionic/angular/standalone';
+
+import { RutinaProgresoHeaderComponent } from './components/rutina-progreso-header/rutina-progreso-header.component';
+import { RutinaEjercicioItemComponent } from './components/rutina-ejercicio-item/rutina-ejercicio-item.component';
+import { RutinaOverlayComponent } from './components/rutina-overlay/rutina-overlay.component';
 
 import { addIcons } from 'ionicons';
 import {
@@ -54,13 +55,22 @@ import { SesionRutina } from 'gym-library';
     IonButton,
     IonButtons,
     IonIcon,
-    IonCard,
-    IonCardContent,
-    IonProgressBar,
-    IonBackButton
+    IonBackButton,
+    RutinaProgresoHeaderComponent,
+    RutinaEjercicioItemComponent,
+    RutinaOverlayComponent
   ],
   templateUrl: './rutina-progreso.page.html',
-  styleUrls: ['./rutina-progreso.page.css']
+  styles: [`
+    @keyframes bounceIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.05); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-bounce-in {
+      animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+  `]
 })
 export class RutinaProgresoPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);

@@ -1,0 +1,38 @@
+<div class="p-4 shadow-sm mb-4 rounded-b-[32px]"
+    style="background: var(--ion-card-background, var(--ion-background-color, #fff));">
+    <div class="flex items-center justify-between mb-2">
+        <div class="text-sm font-medium uppercase tracking-wider" style="color: var(--ion-color-medium);">PROGRESO</div>
+        <div class="text-sm font-bold" style="color: var(--ion-color-primary);">{{ porcentaje() }}%</div>
+    </div>
+    <ion-progress-bar [value]="porcentaje() / 100" color="primary" class="rounded-full h-2"></ion-progress-bar>
+
+    <div class="grid grid-cols-2 gap-4 mt-6">
+        <div class="p-3 rounded-xl flex items-center gap-3 shadow-sm border border-black/5 dark:border-white/5"
+            style="background: var(--ion-color-light);">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md"
+                style="background: var(--ion-color-primary);">
+                <ion-icon name="timer-outline"></ion-icon>
+            </div>
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--ion-color-primary);">
+                    Tiempo</div>
+                <div class="text-lg font-black leading-none" style="color: var(--color-title);">{{ tiempo() }}</div>
+            </div>
+        </div>
+
+        <div class="p-3 rounded-xl flex items-center gap-3 shadow-sm border border-black/5 dark:border-white/5"
+            style="background: var(--ion-color-light);">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md"
+                style="background: var(--ion-color-warning);">
+                <ion-icon name="flame-outline"></ion-icon>
+            </div>
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--ion-color-warning);">
+                    Estado</div>
+                <div class="text-xs font-semibold"
+                    [style.color]="iniciada() ? 'var(--ion-color-warning)' : 'var(--ion-color-medium)'">{{ estado() }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

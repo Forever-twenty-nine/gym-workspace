@@ -1,0 +1,91 @@
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Solicitudes de Plan</h1>
+
+        <div class="flex gap-2">
+            <button (click)="setFiltro('pendiente')"
+                [ngClass]="filtro() === 'pendiente' ? 'bg-yellow-500 text-white' : 'bg-gray-100 text-gray-600'"
+                class="px-4 py-2 rounded-md transition-colors">
+                Pendientes
+            </button>
+            <button (click)="setFiltro('aprobada')"
+                [ngClass]="filtro() === 'aprobada' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600'"
+                class="px-4 py-2 rounded-md transition-colors">
+                Aprobadas
+            </button>
+            <button (click)="setFiltro('rechazada')"
+                [ngClass]="filtro() === 'rechazada' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'"
+                class="px-4 py-2 rounded-md transition-colors">
+                Rechazadas
+            </button>
+            <button (click)="setFiltro('todas')"
+                [ngClass]="filtro() === 'todas' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'"
+                class="px-4 py-2 rounded-md transition-colors">
+                Todas
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan
+                        Solicitado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                    </th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let solicitud of solicitudesFiltradas()">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ solicitud.userName }}</div>
+                        <div class="text-sm text-gray-500">{{ solicitud.userEmail }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span class="capitalize">{{ solicitud.planActual }}</span> &rarr;
+                        <span class="font-bold text-indigo-600 capitalize">{{ solicitud.planSolicitado }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {{ solicitud.fechaCreacion?.toDate() | date:'medium' }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span [ngClass]="{
+              'bg-yellow-100 text-yellow-800': solicitud.estado === 'pendiente',
+              'bg-green-100 text-green-800': solicitud.estado === 'aprobada',
+              'bg-red-100 text-red-800': solicitud.estado === 'rechazada'
+            }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                            {{ solicitud.estado | titlecase }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end gap-2" *ngIf="solicitud.estado === 'pendiente'">
+                            <button (click)="aprobar(solicitud)"
+                                class="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded-md">
+                                Aprobar
+                            </button>
+                            <button (click)="rechazar(solicitud)"
+                                class="text-red-600 hover:text-red-900 bg-red-50 px-3 py-1 rounded-md">
+                                Rechazar
+                            </button>
+                        </div>
+                        <div *ngIf="solicitud.estado !== 'pendiente'" class="text-gray-400 italic">
+                            Respondida
+                        </div>
+                    </td>
+                </tr>
+                <tr *ngIf="solicitudesFiltradas().length === 0">
+                    <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                        No hay solicitudes que coincidan con el filtro.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

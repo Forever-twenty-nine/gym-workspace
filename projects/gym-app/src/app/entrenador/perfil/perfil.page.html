@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- <ion-title>Mi Perfil</ion-title> -->
+    <ion-title>Mi Perfil</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,107 +12,133 @@
   </ion-header>
 
   @if (currentUser(); as user) {
-    <!-- Tarjeta de información personal compacta -->
-    <ion-card class="profile-card">
-      <ion-card-content class="profile-content">
-        <div class="profile-header">
-          <ion-avatar class="profile-avatar">
-            <div class="avatar-placeholder">
-              {{ getIniciales(user.nombre) }}
-            </div>
-          </ion-avatar>
-          <div class="profile-info">
-            <h2>{{ user.nombre }}</h2>
-            <ion-badge [color]="getBadgeColor(user.role)">
-              <ion-icon name="shield-outline"></ion-icon>
-              {{ getRoleDisplayName(user.role) }}
-            </ion-badge>
+  <!-- Tarjeta de información personal compacta -->
+  <ion-card class="profile-card">
+    <ion-card-content class="profile-content">
+      <div class="profile-header">
+        <ion-avatar class="profile-avatar">
+          <div class="avatar-placeholder">
+            {{ getIniciales(user.nombre) }}
           </div>
+        </ion-avatar>
+        <div class="profile-info">
+          <h2>{{ user.nombre }}</h2>
+          <ion-badge [color]="getBadgeColor(user.role)">
+            <ion-icon name="shield-outline"></ion-icon>
+            {{ getRoleDisplayName(user.role) }}
+          </ion-badge>
         </div>
-      </ion-card-content>
-    </ion-card>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
-    <!-- Información de contacto en grid -->
-    <ion-card class="info-card">
-      <ion-card-header class="card-header-compact">
-        <ion-card-title>
-          <ion-icon name="person-outline"></ion-icon>
-          Información Personal
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="info-grid">
-        @if (user.email) {
-          <div class="info-item">
-            <ion-icon name="mail-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Email</span>
-              <span class="info-value">{{ user.email }}</span>
-            </div>
-          </div>
-        }
+  <!-- Gestión de Plan (NUEVA SECCIÓN MÁS VISIBLE) -->
+  <ion-card class="info-card !mb-4 border-2 border-primary/20">
+    <ion-card-header class="card-header-compact bg-primary/5">
+      <ion-card-title class="!text-primary">
+        <ion-icon name="trophy-outline"></ion-icon>
+        Suscripción y Plan
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="p-4">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-sm font-medium text-muted uppercase">Plan Actual</span>
+        <ion-badge color="tertiary" class="capitalize p-2 px-3 text-sm">{{ user.plan || 'free' }}</ion-badge>
+      </div>
 
-        @if (user.gimnasioId) {
-          <div class="info-item">
-            <ion-icon name="fitness-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Gimnasio</span>
-              <span class="info-value">{{ user.gimnasioId }}</span>
-            </div>
-          </div>
-        }
-
-        @if (user.entrenadorId) {
-          <div class="info-item">
-            <ion-icon name="person-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Entrenador</span>
-              <span class="info-value">{{ user.entrenadorId }}</span>
-            </div>
-          </div>
-        }
-
-        @if (user.plan) {
-          <div class="info-item">
-            <ion-icon name="trophy-outline" color="tertiary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Plan</span>
-              <span class="info-value">{{ user.plan }}</span>
-            </div>
-          </div>
-        }
-
-        <div class="info-item">
-          <ion-icon name="shield-outline" color="primary"></ion-icon>
-          <div class="info-text">
-            <span class="info-label">ID Usuario</span>
-            <span class="info-value user-id">{{ user.uid }}</span>
-          </div>
+      <div class="bg-light rounded-lg p-3 border border-border-color">
+        @if (!user.plan || user.plan === 'free') {
+        @if (ultimasolicitud()?.estado === 'pendiente') {
+        <div class="flex flex-col items-center gap-2 py-1 text-center">
+          <ion-spinner name="crescent" color="warning"></ion-spinner>
+          <p class="text-warning font-semibold">Solicitud Pendiente</p>
+          <p class="text-xs text-muted">Estamos revisando tu petición para habilitar las funciones Premium.</p>
         </div>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Acciones de la cuenta -->
-    <ion-card class="account-card">
-      <ion-card-content class="account-content">
-        <ion-button
-          expand="block"
-          color="danger"
-          fill="outline"
-          (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Cerrar Sesión
+        } @else if (ultimasolicitud()?.estado === 'rechazada') {
+        <div class="flex flex-col items-center gap-2 py-1 text-center">
+          <ion-icon name="alert-circle-outline" color="danger" class="text-2xl"></ion-icon>
+          <p class="text-danger font-semibold">Solicitud Rechazada</p>
+          <p class="text-xs text-muted mb-2">Motivo: {{ ultimasolicitud()?.motivoRechazo || 'No especificado' }}</p>
+          <ion-button size="small" fill="outline" (click)="solicitarPremium()">Intentar de nuevo</ion-button>
+        </div>
+        } @else {
+        <!-- No hay solicitud O la anterior fue aprobada pero el usuario es FREE (downgrade) -->
+        <p class="text-sm text-muted mb-3">
+          Como Entrenador FREE, tienes límites en la cantidad de entrenados y rutinas compartidas.
+        </p>
+        <ion-button expand="block" color="primary" (click)="solicitarPremium()">
+          <ion-icon name="star-outline" slot="start"></ion-icon>
+          Solicitar Acceso Premium
         </ion-button>
-      </ion-card-content>
-    </ion-card>
+        }
+        } @else {
+        <div class="flex items-center gap-3 text-success">
+          <ion-icon name="checkmark-circle" class="text-xl"></ion-icon>
+          <p class="font-semibold">Funciones Premium habilitadas</p>
+        </div>
+        }
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Información de contacto en grid -->
+  <ion-card class="info-card">
+    <ion-card-header class="card-header-compact">
+      <ion-card-title>
+        <ion-icon name="person-outline"></ion-icon>
+        Información Personal
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="info-grid">
+      @if (user.email) {
+      <div class="info-item">
+        <ion-icon name="mail-outline" color="primary"></ion-icon>
+        <div class="info-text">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ user.email }}</span>
+        </div>
+      </div>
+      }
+
+      @if (user.gimnasioId) {
+      <div class="info-item">
+        <ion-icon name="fitness-outline" color="primary"></ion-icon>
+        <div class="info-text">
+          <span class="info-label">Gimnasio</span>
+          <span class="info-value">{{ user.gimnasioId }}</span>
+        </div>
+      </div>
+      }
+
+      <div class="info-item">
+        <ion-icon name="shield-outline" color="primary"></ion-icon>
+        <div class="info-text">
+          <span class="info-label">ID Usuario</span>
+          <span class="info-value user-id">{{ user.uid }}</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Acciones de la cuenta -->
+  <ion-card class="account-card">
+    <ion-card-content class="account-content">
+      <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar Sesión
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 
   } @else {
-    <ion-card>
-      <ion-card-content>
-        <p>No se pudo cargar la información del usuario.</p>
-        <ion-button expand="block" (click)="logout()">
-          Volver al inicio
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
+  <ion-card>
+    <ion-card-content class="text-center py-8">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p class="mt-4 text-muted">Cargando perfil...</p>
+      <ion-button fill="clear" (click)="logout()">
+        Cerrar sesión
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
   }
 </ion-content>

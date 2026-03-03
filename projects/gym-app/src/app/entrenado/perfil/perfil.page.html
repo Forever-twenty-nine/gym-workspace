@@ -30,139 +30,203 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <form [formGroup]="editForm">
+    @if (currentUser(); as user) {
+    <!-- Tarjeta de información personal -->
+    <section class="gym-box-primary px-2 py-2">
+      <div class="flex items-center gap-4 ion-padding">
+        <!-- Foto con overlay de cámara -->
+        <div class="relative group cursor-pointer" (click)="triggerFileInput()">
+          <ion-avatar class="!w-20 !h-20 border-2 border-white/30 overflow-hidden relative">
+            <img [src]="user.photoURL || '../../../assets/images/test-foto.png'" alt="Foto de perfil"
+              class="object-cover w-full h-full">
 
-  @if (currentUser(); as user) {
-  <!-- Tarjeta de información personal -->
-  <section class="gym-box-primary px-2 py-2">
-    <div class="flex items-center gap-4 ion-padding">
-      <!-- Foto con overlay de cámara -->
-      <div class="relative group cursor-pointer" (click)="triggerFileInput()">
-        <ion-avatar class="!w-20 !h-20 border-2 border-white/30 overflow-hidden relative">
-          <img [src]="user.photoURL || '../../../assets/images/test-foto.png'" alt="Foto de perfil"
-            class="object-cover w-full h-full">
+            <div
+              class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <ion-icon name="camera-outline" class="text-white text-2xl"></ion-icon>
+            </div>
+
+            @if (isUploading()) {
+            <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <ion-spinner name="crescent" color="light"></ion-spinner>
+            </div>
+            }
+          </ion-avatar>
 
           <div
-            class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <ion-icon name="camera-outline" class="text-white text-2xl"></ion-icon>
+            class="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-full border-2 border-white shadow-lg">
+            <ion-icon name="camera-outline" class="text-xs block"></ion-icon>
           </div>
 
-          @if (isUploading()) {
-          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <ion-spinner name="crescent" color="light"></ion-spinner>
-          </div>
-          }
-        </ion-avatar>
-
-        <div class="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-full border-2 border-white shadow-lg">
-          <ion-icon name="camera-outline" class="text-xs block"></ion-icon>
+          <input type="file" id="photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
         </div>
 
-        <input type="file" id="photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
-      </div>
-
-      <!-- Datos -->
-      <div class="flex-1">
-        @if (!isEditing()) {
-        <h2 class="font-heading font-bold text-2xl text-white mb-1">
-          {{ user.nombre }}
-        </h2>
-        <ion-chip class="bg-white/20 text-white border-0 backdrop-blur-sm">
-          <ion-icon name="trophy-outline" class="mr-1"></ion-icon>
-          Plan {{ user.plan }}
-        </ion-chip>
-        } @else {
-        <form [formGroup]="editForm">
+        <!-- Datos -->
+        <div class="flex-1">
+          @if (!isEditing()) {
+          <h2 class="font-heading font-bold text-2xl text-white mb-1">
+            {{ user.nombre }}
+          </h2>
+          <ion-chip class="bg-white/20 text-white border-0 backdrop-blur-sm">
+            <ion-icon name="trophy-outline" class="mr-1"></ion-icon>
+            Plan {{ user.plan || 'free' }}
+          </ion-chip>
+          } @else {
           <ion-item class="--background-transparent !p-0" counter="true">
             <ion-label position="stacked" class="text-white/70">Nombre</ion-label>
             <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="text-white font-bold text-xl"
               maxlength="50">
             </ion-input>
           </ion-item>
-        </form>
-        }
+          }
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Información Detallada -->
-  <section class="ion-padding mt-2">
-    <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color">
-      <ion-list lines="inset" class="!bg-transparent !p-0">
+    <!-- Gestión de Plan -->
+    <section class="ion-padding mt-2">
+      <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color p-4">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-primary/10 p-2 rounded-lg text-primary">
+            <ion-icon name="trophy-outline" class="text-xl"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider mb-0 text-left">Tu Suscripción</h3>
+            <p class="text-foreground font-bold text-lg capitalize mb-0 text-left">{{ user.plan || 'free' }}</p>
+          </div>
+        </div>
 
-        <!-- Email (No editable) -->
-        <ion-item class="item-interactive">
-          <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="py-2">
-            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Email</h3>
-            <p class="text-foreground font-medium mt-1">{{ user.email }}</p>
-          </ion-label>
-          <ion-icon name="lock-closed-outline" slot="end" size="small" class="text-muted opacity-50"></ion-icon>
-        </ion-item>
+        <div class="bg-muted/5 rounded-xl p-3 border border-border-color/50">
+          @if (!user.plan || user.plan === 'free') {
+          @if (ultimasolicitud()?.estado === 'pendiente') {
+          <div class="flex flex-col items-center gap-2 py-2">
+            <ion-spinner name="dots" color="warning"></ion-spinner>
+            <p class="text-warning font-medium">Solicitud en revisión</p>
+            <p class="text-muted text-xs text-center">Nuestro equipo está validando tu suscripción. Pronto tendrás
+              noticias.</p>
+          </div>
+          } @else if (ultimasolicitud()?.estado === 'rechazada') {
+          <div class="flex flex-col items-center gap-2 py-2 text-center">
+            <ion-icon name="alert-circle-outline" color="danger" class="text-2xl"></ion-icon>
+            <p class="text-danger font-medium">Solicitud rechazada</p>
+            <p class="text-muted text-xs mb-2">Motivo: {{ ultimasolicitud()?.motivoRechazo || 'Sin especificar' }}</p>
+            <ion-button size="small" fill="outline" color="primary" (click)="solicitarPremium()">
+              Reintentar solicitud
+            </ion-button>
+          </div>
+          } @else {
+          <!-- No hay solicitud O la anterior fue aprobada pero el usuario es FREE (downgrade) -->
+          <p class="text-muted text-sm mb-3 text-left">
+            Accede a rutinas ilimitadas y seguimiento avanzado con el plan Premium.
+          </p>
+          <ion-button expand="block" color="primary" (click)="solicitarPremium()" class="ion-no-margin">
+            <ion-icon name="star-outline" slot="start"></ion-icon>
+            Solicitar Premium
+          </ion-button>
+          }
+          } @else {
+          <div class="flex items-center gap-2 text-success py-2">
+            <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+            <p class="font-medium">Ya tienes acceso total</p>
+          </div>
+          }
+        </div>
+      </div>
+    </section>
 
-        <!-- Gimnasio -->
-        @if (user.gimnasioId) {
-        <ion-item class="item-interactive">
-          <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="py-2">
-            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Gimnasio</h3>
-            <p class="text-foreground font-medium mt-1">{{ user.gimnasioId }}</p>
-          </ion-label>
-        </ion-item>
-        }
+    <!-- Información Detallada -->
+    <section class="ion-padding mt-0">
+      <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color">
+        <ion-list lines="inset" class="!bg-transparent !p-0">
 
-        <!-- Entrenador -->
-        @if (user.entrenadorId) {
-        <ion-item class="item-interactive">
-          <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="py-2">
-            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Entrenador</h3>
-            <p class="text-foreground font-medium mt-1">{{ user.entrenadorId }}</p>
-          </ion-label>
-        </ion-item>
-        }
+          <!-- Email -->
+          <ion-item class="item-interactive">
+            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-label class="py-2">
+              <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Email</h3>
+              <p class="text-foreground font-medium mt-1 text-left">{{ user.email }}</p>
+            </ion-label>
+            <ion-icon name="lock-closed-outline" slot="end" size="small" class="text-muted opacity-50"></ion-icon>
+          </ion-item>
 
-        <!-- Plan -->
-        <ion-item lines="none" class="item-interactive">
-          <ion-icon name="trophy-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="py-2">
-            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Plan Actual</h3>
-            <p class="text-foreground font-medium mt-1 capitalize">{{ user.plan }}</p>
-          </ion-label>
-          <ion-icon name="lock-closed-outline" slot="end" size="small" class="text-muted opacity-50"></ion-icon>
-        </ion-item>
+          <!-- Gimnasio -->
+          @if (user.gimnasioId) {
+          <ion-item class="item-interactive">
+            <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
+            <ion-label class="py-2">
+              <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Gimnasio</h3>
+              <p class="text-foreground font-medium mt-1 text-left">{{ user.gimnasioId }}</p>
+            </ion-label>
+          </ion-item>
+          }
 
-      </ion-list>
-    </div>
-  </section>
+          <!-- Entrenador -->
+          @if (user.entrenadorId) {
+          <ion-item class="item-interactive">
+            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
+            <ion-label class="py-2">
+              <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Entrenador</h3>
+              <p class="text-foreground font-medium mt-1 text-left">{{ user.entrenadorId }}</p>
+            </ion-label>
+          </ion-item>
+          }
 
-  <!-- Botones de Acción -->
-  <section class="ion-padding">
-    @if (!isEditing()) {
-    <div class="grid gap-3">
-      <ion-button expand="block" color="danger" fill="outline" (click)="logout()" class="ion-margin-top">
-        <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Cerrar Sesión
-      </ion-button>
-    </div>
+          <!-- Objetivo -->
+          @if (user.role === 'entrenado') {
+          <ion-item class="item-interactive">
+            <ion-icon name="trophy-outline" slot="start" color="primary"></ion-icon>
+            @if (!isEditing()) {
+            <ion-label class="py-2">
+              <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Objetivo</h3>
+              <p class="text-foreground font-medium mt-1 text-left">
+                {{ currentEntrenado()?.objetivo || 'Sin definir' }}
+              </p>
+            </ion-label>
+            } @else {
+            <ion-label position="stacked" color="primary">Objetivo</ion-label>
+            <ion-select formControlName="objetivo" placeholder="Selecciona tu objetivo" interface="popover"
+              class="w-full text-foreground">
+              @for (opcion of objetivoOptions; track opcion) {
+              <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+              }
+            </ion-select>
+            }
+          </ion-item>
+          }
+
+        </ion-list>
+      </div>
+    </section>
+
+    <!-- Botones de Acción -->
+    <section class="ion-padding">
+      @if (!isEditing()) {
+      <div class="grid gap-3">
+        <ion-button expand="block" color="danger" fill="outline" (click)="logout()" class="ion-margin-top">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar Sesión
+        </ion-button>
+      </div>
+      } @else {
+      <div class="grid grid-cols-2 gap-3">
+        <ion-button expand="block" color="medium" fill="outline" (click)="toggleEdit()">
+          Cancelar
+        </ion-button>
+        <ion-button expand="block" color="primary" (click)="saveProfile()" [disabled]="editForm.invalid">
+          Guardar
+        </ion-button>
+      </div>
+      }
+    </section>
+
     } @else {
-    <div class="grid grid-cols-2 gap-3">
-      <ion-button expand="block" color="medium" fill="outline" (click)="toggleEdit()">
-        Cancelar
-      </ion-button>
-      <ion-button expand="block" color="primary" (click)="saveProfile()" [disabled]="editForm.invalid">
-        Guardar
+    <div class="flex-col items-center justify-center h-full p-8 text-center">
+      <ion-icon name="person-outline" class="text-6xl text-muted opacity-20 mb-4"></ion-icon>
+      <p class="text-muted mb-6">No se pudo cargar la información del perfil.</p>
+      <ion-button (click)="logout()" fill="outline">
+        Volver al inicio
       </ion-button>
     </div>
     }
-  </section>
-
-  } @else {
-  <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-    <ion-icon name="person-outline" class="text-6xl text-muted opacity-20 mb-4"></ion-icon>
-    <p class="text-muted mb-6">No se pudo cargar la información del perfil.</p>
-    <ion-button (click)="logout()" fill="outline">
-      Volver al inicio
-    </ion-button>
-  </div>
-  }
+  </form>
 </ion-content>

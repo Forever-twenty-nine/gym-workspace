@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import {
@@ -11,8 +11,10 @@ import {
   IonCard,
 
   IonCardContent,
-  IonAvatar, IonButtons, IonBackButton, IonChip, IonList, IonItem, IonLabel, IonInput, IonProgressBar, IonSpinner
+  IonAvatar, IonButtons, IonBackButton, IonChip, IonList, IonItem, IonLabel, IonInput, IonProgressBar, IonSpinner, IonBadge,
+  IonSelect, IonSelectOption
 } from '@ionic/angular/standalone';
+import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -32,9 +34,11 @@ import {
   closeOutline,
   notificationsOutline,
   lockClosedOutline,
-  arrowBackOutline
+  arrowBackOutline,
+  starOutline,
+  alertCircleOutline
 } from 'ionicons/icons';
-import { User as LibraryUser, Rutina, Rol } from 'gym-library';
+import { User as LibraryUser, Rutina, Rol, Plan, SolicitudPlan, Objetivo } from 'gym-library';
 
 // Extendemos la interfaz User localmente para asegurar la existencia de photoURL
 // en caso de que la caché de la librería no se actualice inmediatamente.
@@ -46,6 +50,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { FirebaseStorageService } from '../../core/services/firebase-storage.service';
+import { PlanService } from '../../core/services/plan.service';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 
 @Component({
@@ -56,27 +61,35 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
   imports: [
     IonChip, IonBackButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonIcon, IonAvatar, IonList, IonItem,
-    IonLabel, IonInput, IonProgressBar, IonSpinner,
+    IonLabel, IonInput, IonProgressBar, IonSpinner, IonSelect, IonSelectOption,
     FormsModule, ReactiveFormsModule, CommonModule
   ],
 })
-export class PerfilPage implements OnInit {
+export class PerfilPage implements OnInit, OnDestroy {
   private authService = inject(AuthService); // Actualiza sesión local
   private userService = inject(UserService);
   private rutinaService = inject(RutinaService);
-  private entrenadoService = inject(EntrenadoService);
+  public entrenadoService = inject(EntrenadoService);
   private storageService = inject(FirebaseStorageService);
+  private planService = inject(PlanService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
 
-  currentUser = signal<User | null>(null);
+  currentUser = computed(() => this.authService.currentUser() as User);
+  currentEntrenado = computed(() => {
+    const user = this.currentUser();
+    return user ? this.entrenadoService.getEntrenado(user.uid)() : null;
+  });
   rutinas = signal<Rutina[]>([]);
+  ultimasolicitud = signal<SolicitudPlan | null>(null);
   isEditing = signal<boolean>(false);
   isUploading = signal<boolean>(false);
+  private solicitudesUnsubscribe?: Unsubscribe;
   editForm!: FormGroup;
+  objetivoOptions = Object.values(Objetivo);
 
   // Estadísticas computadas
   estadisticas = computed(() => {
@@ -122,30 +135,62 @@ export class PerfilPage implements OnInit {
       'close-outline': closeOutline,
       'notifications-outline': notificationsOutline,
       'lock-closed-outline': lockClosedOutline,
-      'arrow-back-outline': arrowBackOutline
+      'arrow-back-outline': arrowBackOutline,
+      'star-outline': starOutline,
+      'alert-circle-outline': alertCircleOutline
+    });
+
+    // Efecto para recargar la solicitud cuando cambia el usuario
+    effect(() => {
+      const user = this.currentUser();
+      if (user) {
+        this.iniciarListenerSolicitudes(user.uid);
+      }
     });
   }
 
   ngOnInit() {
-    this.currentUser.set(this.authService.currentUser() as User);
     this.rutinas.set(this.rutinaService.rutinas());
     this.initForm();
   }
 
+  ngOnDestroy() {
+    if (this.solicitudesUnsubscribe) {
+      this.solicitudesUnsubscribe();
+    }
+  }
+
+  private iniciarListenerSolicitudes(userId: string) {
+    if (this.solicitudesUnsubscribe) {
+      this.solicitudesUnsubscribe();
+    }
+
+    this.solicitudesUnsubscribe = this.planService.getSolicitudesUsuarioListener(userId, (solicitudes) => {
+      if (solicitudes && solicitudes.length > 0) {
+        this.ultimasolicitud.set(solicitudes[0]); // La más reciente por el orderBy en el service
+      } else {
+        this.ultimasolicitud.set(null);
+      }
+    });
+  }
+
   private initForm() {
     const user = this.currentUser();
+    const entrenado = user ? this.entrenadoService.getEntrenado(user.uid)() : null;
+
     this.editForm = this.fb.group({
       nombre: [user?.nombre || '', [Validators.required, Validators.minLength(3)]],
       email: [{ value: user?.email || '', disabled: true }],
-      plan: [{ value: user?.plan || '', disabled: true }]
+      plan: [{ value: user?.plan || '', disabled: true }],
+      objetivo: [entrenado?.objetivo || '']
     });
   }
 
   toggleEdit() {
-    if (this.isEditing()) {
-      this.initForm(); // Reset form when canceling
-    }
     this.isEditing.set(!this.isEditing());
+    if (this.isEditing()) {
+      this.initForm(); // Asegurar datos frescos al empezar a editar
+    }
   }
 
   async saveProfile() {
@@ -161,14 +206,24 @@ export class PerfilPage implements OnInit {
       const user = this.currentUser();
       if (!user) return;
 
-      const updatedData = {
+      const updatedUserData = {
         nombre: this.editForm.value.nombre
       };
 
-      await this.userService.updateUser(user.uid, updatedData);
+      // Guardar cambios del usuario
+      await this.userService.updateUser(user.uid, updatedUserData);
 
-      // Update local signal (usually UserService would trigger this, but we update locally for better UX)
-      this.currentUser.update(u => u ? { ...u, ...updatedData } : null);
+      // Guardar cambios del entrenado (objetivo)
+      if (user.role === 'entrenado') {
+        const entrenadoData = this.entrenadoService.getEntrenado(user.uid)();
+        if (entrenadoData) {
+          const updatedEntrenado = {
+            ...entrenadoData,
+            objetivo: this.editForm.value.objetivo
+          };
+          await this.entrenadoService.save(updatedEntrenado);
+        }
+      }
 
       this.isEditing.set(false);
       this.showToast('Perfil actualizado correctamente', 'success');
@@ -206,7 +261,6 @@ export class PerfilPage implements OnInit {
 
       await this.userService.updateUser(user.uid, { photoURL });
 
-      this.currentUser.update(u => u ? { ...u, photoURL } : null);
       this.showToast('Foto de perfil actualizada', 'success');
     } catch (error) {
       console.error('Error uploading photo:', error);
@@ -230,6 +284,38 @@ export class PerfilPage implements OnInit {
       position: 'bottom'
     });
     toast.present();
+  }
+
+  async solicitarPremium() {
+    const user = this.currentUser();
+    if (!user) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Solicitar Plan Premium',
+      message: '¿Estás seguro de que deseas solicitar el plan Premium? Un administrador revisará tu solicitud.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Solicitar',
+          handler: async () => {
+            const loading = await this.loadingCtrl.create({ message: 'Enviando solicitud...' });
+            await loading.present();
+            try {
+              await this.planService.solicitarPremium(user);
+              // La actualización de ultimasolicitud ocurrirá sola por el listener
+              this.showToast('Solicitud enviada correctamente', 'success');
+            } catch (error) {
+              console.error('Error al solicitar premium:', error);
+              this.showToast('Error al enviar la solicitud', 'danger');
+            } finally {
+              loading.dismiss();
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
   async logout() {

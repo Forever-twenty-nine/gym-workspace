@@ -1,0 +1,38 @@
+<div class="p-6 text-center animate-fade-in flex flex-col items-center justify-center"
+    [class.min-h-[50vh]]="type() === 'success'" [class.min-h-[60vh]]="type() === 'start'">
+
+    <div class="w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-sm"
+        [style.background]="type() === 'success' ? 'rgba(var(--ion-color-success-rgb, 16, 185, 129), 0.1)' : 'rgba(var(--ion-color-primary-rgb, 187, 228, 10), 0.1)'">
+        <ion-icon [name]="icon()" [class.text-6xl]="type() === 'success'" [class.text-4xl]="type() === 'start'"
+            [style.color]="type() === 'success' ? 'var(--ion-color-success)' : 'var(--ion-color-primary)'"></ion-icon>
+    </div>
+
+    <h2 class="text-2xl font-black" style="color: var(--color-title);" [class.text-3xl]="type() === 'success'">
+        {{ title() }}
+    </h2>
+
+    @if (type() === 'start' && yaRealizadaHoy()) {
+    <div class="mt-4 mx-4 p-3 rounded-xl border"
+        style="background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.1); border-color: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.3);">
+        <p class="font-bold m-0 flex items-center justify-center gap-1 text-sm"
+            style="color: var(--ion-color-warning);">
+            <ion-icon name="warning-outline" class="text-lg"></ion-icon>
+            ¡Ya completaste esta rutina hoy!
+        </p>
+        <p class="text-xs m-0 mt-1 opacity-80" style="color: var(--ion-color-warning);">Puedes volver a repetirla si lo
+            deseas.
+        </p>
+    </div>
+    } @else {
+    <p class="mt-2 px-8" style="color: var(--ion-color-medium);">
+        {{ subtitle() }}
+    </p>
+    }
+
+    <div class="w-full mt-8">
+        <ion-button [expand]="expand()" [fill]="buttonFill()" [color]="buttonColor()" (click)="action.emit()"
+            class="font-bold shadow-md" [class.h-14]="type() === 'start'" [class.text-lg]="type() === 'start'">
+            {{ buttonText() }}
+        </ion-button>
+    </div>
+</div>

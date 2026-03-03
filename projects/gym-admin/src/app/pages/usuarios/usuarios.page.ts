@@ -122,7 +122,7 @@ export class UsuariosPage {
         role: [item.role || ''],
         emailVerified: [item.emailVerified || false],
         onboarded: [item.onboarded || false],
-        plan: [item.plan || '']
+        plan: [item.plan || 'free']
       };
 
       // Agregar objetivo si es entrenado

@@ -9,7 +9,7 @@ import {
   User as FirebaseUser,
   createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { Firestore, doc, getDoc } from 'firebase/firestore';
+import { Firestore, doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe } from 'firebase/firestore';
 import { User, Rol } from 'gym-library';
 import { AUTH, FIRESTORE } from '../firebase.tokens';
 
@@ -24,6 +24,7 @@ export class AuthService {
   private readonly _isAuthenticated = signal<boolean>(false);
   private readonly _isLoading = signal<boolean>(true);
   private readonly _error = signal<string | null>(null);
+  private userSnapshotUnsubscribe?: Unsubscribe;
 
   constructor() {
     this.loadInitialSession();
@@ -50,22 +51,35 @@ export class AuthService {
     // Escuchamos cambios de auth de forma directa y sincronizada
     onAuthStateChanged(this.auth, async (firebaseUser) => {
       console.log('🛡️ Auth: Cambio en Firebase User:', firebaseUser ? firebaseUser.email : 'NULL');
+
+      // Limpiar listener previo si existe
+      if (this.userSnapshotUnsubscribe) {
+        this.userSnapshotUnsubscribe();
+      }
+
       if (firebaseUser) {
         try {
-          // Cargamos los datos ANTES de emitir que no estamos cargando
+          // Primero una carga inicial rápida
           const userData = await this.getUserData(firebaseUser);
-          console.log('🛡️ Auth: Perfil cargado de Firestore para:', userData.email);
           this._currentUser.set(userData);
           this._isAuthenticated.set(true);
-
-          // Guardamos en local para restaurar rápido en recargas
-          localStorage.setItem('gym_auth_user', JSON.stringify(userData));
-
           this._isLoading.set(false);
+
+          // Suscribirse a cambios en tiempo real del documento del usuario
+          const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
+          this.userSnapshotUnsubscribe = onFirestoreSnapshot(userDocRef, (snapshot) => {
+            if (snapshot.exists()) {
+              console.log('🛡️ Auth: Cambio detectado en documento de usuario (Real-time)');
+              const data = snapshot.data() as User;
+              const updatedUser = { ...data, uid: firebaseUser.uid };
+              this._currentUser.set(updatedUser);
+              localStorage.setItem('gym_auth_user', JSON.stringify(updatedUser));
+            }
+          });
+
         } catch (error) {
           console.error('🛡️ Auth: Error cargando perfil:', error);
           this._isLoading.set(false);
-          // Si hay error autenticado pero no hay perfil, bajamos el flag por ahora
         }
       } else {
         console.warn('🛡️ Auth: Sesión de Firebase terminada (NULL)');

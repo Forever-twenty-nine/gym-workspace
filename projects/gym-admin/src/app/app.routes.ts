@@ -1,4 +1,4 @@
- 
+
 import { Routes } from '@angular/router';
 import { EntrenadoresPage } from './pages/entrenadores/entrenadores.page';
 import { EntrenadosPage } from './pages/entrenados/entrenados.page';
@@ -7,6 +7,7 @@ import { UsuariosPage } from './pages/usuarios/usuarios.page';
 import { EntrenadorDetail } from './pages/entrenadores/entrenador-detail/entrenador-detail';
 import { EntrenadoDetail } from './pages/entrenados/entrenado-detail/entrenado-detail';
 import { EntrenadoEstadisticas } from './pages/entrenados/entrenado-estadisticas/entrenado-estadisticas';
+import { SolicitudesPlanPage } from './pages/solicitudes-plan/solicitudes-plan.page';
 
 export const routes: Routes = [
   {
@@ -36,6 +37,10 @@ export const routes: Routes = [
   {
     path: 'gimnasios',
     component: GimnasiosPage
+  },
+  {
+    path: 'solicitudes-plan',
+    component: SolicitudesPlanPage
   },
   {
     path: '',
