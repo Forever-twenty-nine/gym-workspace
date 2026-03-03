@@ -1,0 +1,72 @@
+<ion-card class="rounded-3xl shadow-xl text-white relative overflow-hidden bg-gray-900 m-4 mt-6 mb-8 border-none"
+    style="background-image: url('assets/images/gym_progress_bg.png'); background-size: cover; background-position: center;">
+
+    <!-- Overlay oscuro para garantizar contraste -->
+    <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-primary/60 pointer-events-none z-0">
+    </div>
+
+    <!-- Decoraciones de fondo absoluto -->
+    <div class="absolute top-0 right-0 -mr-8 -mt-8 opacity-20 pointer-events-none z-0">
+        <ion-icon name="trophy-outline" style="font-size: 140px;"></ion-icon>
+    </div>
+    <div class="absolute bottom-0 left-0 -ml-8 -mb-8 opacity-10 pointer-events-none z-0">
+        <ion-icon name="fitness-outline" style="font-size: 100px;"></ion-icon>
+    </div>
+
+    <ion-card-header class="relative z-10 pt-6 px-4">
+        <ion-card-title class="text-3xl font-black mb-3 text-white">¡Sigue Así!</ion-card-title>
+        <ion-card-subtitle class="text-white/80 font-medium text-sm normal-case">Tu esfuerzo está dando resultados
+            diarios</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content class="relative z-10 pb-6 px-4">
+        <ion-grid>
+            <ion-row>
+                <!-- Card: Completadas -->
+                <ion-col size="6" size-md="3" class="p-2">
+                    <div
+                        class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full">
+                        <ion-icon name="checkmark-circle-outline" class="text-3xl text-emerald-300 mb-1"></ion-icon>
+                        <ion-text class="text-3xl font-black">{{ stats.completadas }}</ion-text>
+                        <ion-text
+                            class="text-[10px] text-white/90 font-bold uppercase tracking-widest text-center mt-1">Completadas</ion-text>
+                    </div>
+                </ion-col>
+
+                <!-- Card: Tiempo Total -->
+                <ion-col size="6" size-md="3" class="p-2">
+                    <div
+                        class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full">
+                        <ion-icon name="time-outline" class="text-3xl text-orange-200 mb-1"></ion-icon>
+                        <ion-text class="text-2xl font-black mt-1">{{ formatearTiempo(stats.tiempoTotal) }}</ion-text>
+                        <ion-text
+                            class="text-[10px] text-white/90 font-bold uppercase tracking-widest text-center mt-1">Tiempo</ion-text>
+                    </div>
+                </ion-col>
+
+                <!-- Card: Asignadas -->
+                <ion-col size="6" size-md="3" class="p-2">
+                    <div
+                        class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full">
+                        <ion-icon name="fitness-outline" class="text-3xl text-sky-200 mb-1"></ion-icon>
+                        <ion-text class="text-2xl font-black mt-1">{{ stats.rutinasAsignadas }}</ion-text>
+                        <ion-text
+                            class="text-[10px] text-white/90 font-bold uppercase tracking-widest text-center mt-1">Asignadas</ion-text>
+                    </div>
+                </ion-col>
+
+                <!-- Card: En progreso -->
+                <ion-col size="6" size-md="3" class="p-2">
+                    <div
+                        class="bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full">
+                        <ion-icon name="flame-outline" class="text-3xl text-rose-300 mb-1"></ion-icon>
+                        <ion-text class="text-2xl font-black mt-1">{{ stats.enProgreso }}</ion-text>
+                        <ion-text
+                            class="text-[10px] text-white/90 font-bold uppercase tracking-widest text-center mt-1">En
+                            Progreso</ion-text>
+                    </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ion-card-content>
+</ion-card>

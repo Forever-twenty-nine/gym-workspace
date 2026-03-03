@@ -5,28 +5,15 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  IonCard,
-  IonCardContent,
   IonText,
-  IonIcon,
-  IonButton,
   AlertController
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import {
-  statsChartOutline,
-  timeOutline,
-  flameOutline,
-  calendarOutline,
-  checkmarkCircleOutline,
-  fitnessOutline,
-  trophyOutline,
-  trashOutline
-} from 'ionicons/icons';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
+import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
+import { ProgresoHistorialComponent } from './components/progreso-historial/progreso-historial.component';
 
 @Component({
   selector: 'app-progreso',
@@ -36,14 +23,11 @@ import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
     IonToolbar,
     IonTitle,
     IonContent,
-    IonCard,
-    IonCardContent,
     IonText,
-    IonIcon,
-    IonButton
+    ProgresoEstadisticasComponent,
+    ProgresoHistorialComponent
   ],
   templateUrl: './progreso.page.html',
-
 })
 export class ProgresoPage implements OnInit {
   private readonly rutinaService = inject(RutinaService);
@@ -55,18 +39,7 @@ export class ProgresoPage implements OnInit {
   // Estado de carga
   readonly isLoading = signal(false);
 
-  constructor() {
-    addIcons({
-      statsChartOutline,
-      timeOutline,
-      flameOutline,
-      calendarOutline,
-      checkmarkCircleOutline,
-      fitnessOutline,
-      trophyOutline,
-      trashOutline
-    });
-  }
+  constructor() { }
 
   ngOnInit() {
     // Los datos se cargan automáticamente a través de los computed signals
@@ -125,47 +98,6 @@ export class ProgresoPage implements OnInit {
       tiempoTotal
     };
   });
-
-  // Utilidades
-  formatearTiempo(minutos: number): string {
-    const horas = Math.floor(minutos / 60);
-    const mins = minutos % 60;
-
-    if (horas > 0) {
-      return `${horas}h ${mins}m`;
-    }
-    return `${mins}m`;
-  }
-
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return 'Sin fecha';
-    const date = fecha instanceof Date ? fecha : new Date(fecha);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  getEstadoSesion(sesion: any): string {
-    if (sesion.completada) return 'Completada';
-    if (sesion.fechaInicio) return 'En progreso';
-    return 'Pendiente';
-  }
-
-  getColorEstado(sesion: any): string {
-    if (sesion.completada) return 'success';
-    if (sesion.fechaInicio) return 'primary';
-    return 'medium';
-  }
-
-  getProgresoSesion(sesion: any): number {
-    return sesion.porcentajeCompletado || 0;
-  }
-
-  redondearMinutos(segundos: number): number {
-    return Math.round((segundos || 0) / 60);
-  }
 
   async confirmarEliminacion(sesionId: string) {
     const alert = await this.alertController.create({
