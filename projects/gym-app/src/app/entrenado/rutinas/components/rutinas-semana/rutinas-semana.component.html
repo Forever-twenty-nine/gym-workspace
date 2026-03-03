@@ -1,0 +1,112 @@
+<ion-card class="mx-0 mt-0 mb-6 bg-white dark:bg-gray-800 rounded-3xl shadow-sm relative overflow-hidden">
+
+    <!-- Image Background Overlay -->
+    <div class="absolute inset-0 z-0 bg-transparent rounded-3xl overflow-hidden">
+        <img src="assets/images/rutinas_card_bg.png" alt=""
+            class="w-full h-full object-cover opacity-70 dark:opacity-40" />
+        <div
+            class="absolute inset-0 bg-gradient-to-t from-gray-200/50 to-white/30 dark:from-gray-900/80 dark:to-gray-800/40">
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10">
+        <!-- Header with more padding -->
+        <ion-card-header class="p-6 pb-4">
+            <ion-card-title class="text-2xl font-black text-gray-900 dark:text-white m-0 tracking-tight">Esta
+                Semana</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content class="px-4 pb-6">
+            @if (rutinasPorDia && rutinasPorDia.length > 0) {
+            <ion-list lines="none" class="p-0 m-0"
+                style="background: transparent; --ion-background-color: transparent; --ion-item-background: transparent;">
+                @for (dia of rutinasPorDia; track dia.fecha) {
+
+                @if (dia.rutinas.length > 0) {
+                @for (rutina of dia.rutinas; track rutina.id) {
+                <!-- Floating Item Wrapper -->
+                <div class="mb-3 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-[#1a1c22] overflow-hidden"
+                    [class.border-l-4]="dia.esHoy" [class.border-l-primary]="dia.esHoy">
+
+                    <ion-item button detail="false" (click)="onVerDetalles(rutina, dia.esFuturo)" class="m-0"
+                        style="--background: transparent; --padding-start: 16px;">
+
+                        <div slot="start"
+                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 shadow-sm"
+                            [class.bg-primary]="dia.esHoy" [class.text-white]="dia.esHoy"
+                            [class.bg-gray-100]="!dia.esHoy" [class.dark:bg-gray-700]="!dia.esHoy"
+                            [class.text-gray-900]="!dia.esHoy" [class.dark:text-white]="!dia.esHoy">
+                            <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
+                            <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
+                        </div>
+
+                        <ion-label class="py-1">
+                            <div class="flex flex-row items-center gap-3">
+                                @if (dia.esHoy) {
+                                <ion-badge color="primary"
+                                    class="text-[9px] font-black rounded-full uppercase px-1.5 py-0.5 whitespace-nowrap">Hoy</ion-badge>
+                                }
+                                <h3 class="text-base font-bold text-gray-900 dark:text-white m-0 mr-auto truncate">{{
+                                    rutina.nombre }}</h3>
+
+                                <!-- Datos en una fila alineados a la derecha de la etiqueta -->
+                                <div
+                                    class="flex flex-row items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                    <span class="flex items-center gap-1">
+                                        <ion-icon name="fitness-outline" color="primary"></ion-icon>
+                                        {{ rutina.ejerciciosIds?.length || 0 }}
+                                    </span>
+                                    @if (rutina.duracion) {
+                                    <span class="flex items-center gap-1">
+                                        <ion-icon name="time-outline" color="warning"></ion-icon>
+                                        {{ rutina.duracion }}'
+                                    </span>
+                                    }
+                                </div>
+                            </div>
+                        </ion-label>
+
+                        @if (!dia.esFuturo) {
+                        <ion-button fill="clear" slot="end" class="m-0 pl-1"
+                            (click)="onIniciarEntrenamientoDirecto($event, rutina)">
+                            <ion-icon name="play-circle" slot="icon-only" class="text-3xl text-primary"></ion-icon>
+                        </ion-button>
+                        }
+                    </ion-item>
+                </div>
+                }
+                } @else {
+                <!-- Floating Item Wrapper for Rest -->
+                <div
+                    class="mb-3 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700/60 bg-white dark:bg-[#1a1c22] overflow-hidden">
+                    <ion-item lines="none" class="m-0" style="--background: transparent; --padding-start: 16px;">
+                        <div slot="start"
+                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 opacity-60 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
+                            <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
+                        </div>
+                        <ion-label class="opacity-60 py-1">
+                            <div class="flex flex-row items-center gap-3">
+                                <h3 class="text-sm font-bold text-gray-900 dark:text-white m-0">Descanso</h3>
+                                <p class="text-xs m-0 text-gray-500 dark:text-gray-400 ml-auto flex items-center gap-1">
+                                    <ion-icon name="bed-outline"></ion-icon> Libre
+                                </p>
+                            </div>
+                        </ion-label>
+                    </ion-item>
+                </div>
+                }
+
+                }
+            </ion-list>
+            } @else {
+            <div class="flex flex-col items-center justify-center py-16 text-center opacity-60">
+                <ion-icon name="calendar-outline" class="text-5xl mb-4 text-gray-400 dark:text-gray-500"></ion-icon>
+                <h4 class="text-base font-bold text-gray-700 dark:text-gray-300">Sin rutinas este periodo</h4>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Tu entrenador actualizará tu plan pronto.</p>
+            </div>
+            }
+        </ion-card-content>
+    </div>
+</ion-card>

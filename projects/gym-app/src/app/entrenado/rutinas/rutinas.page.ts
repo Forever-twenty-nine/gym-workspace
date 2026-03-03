@@ -36,11 +36,13 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { Router, RouterModule } from '@angular/router';
 import { NavController } from '@ionic/angular/standalone';
+import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
+import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
+
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
-  styleUrls: ['./rutinas.page.css'],
   standalone: true,
   imports: [
     IonBackButton,
@@ -51,9 +53,9 @@ import { NavController } from '@ionic/angular/standalone';
     IonButton,
     IonButtons,
     IonIcon,
-    IonModal,
-    IonFooter,
-    RouterModule
+    RouterModule,
+    RutinaDetalleModalComponent,
+    RutinasSemanaComponent
   ],
 })
 export class RutinasPage implements OnInit {
@@ -72,6 +74,7 @@ export class RutinasPage implements OnInit {
   // Estado del modal (ya no se usa, pero mantenemos por compatibilidad)
   readonly modalAbierto = signal(false);
   readonly rutinaSeleccionada = signal<any>(null);
+  readonly esFuturoSeleccionado = signal<boolean>(false);
 
   // Computed para rutinas del entrenado actual
   rutinasAsignadas = computed(() => {
@@ -112,70 +115,7 @@ export class RutinasPage implements OnInit {
     }, { injector: this.injector });
   }
 
-  /**
-   * Formatea los días de la semana de strings a nombres cortos
-   */
-  formatearDiasSemana(dias?: string[]): string {
-    if (!dias || dias.length === 0) return 'Sin días asignados';
 
-    const diasMapeo: { [key: string]: string } = {
-      'Lunes': 'Lun',
-      'Martes': 'Mar',
-      'Miércoles': 'Mié',
-      'Jueves': 'Jue',
-      'Viernes': 'Vie',
-      'Sábado': 'Sáb',
-      'Domingo': 'Dom'
-    };
-
-    return dias.map(dia => diasMapeo[dia] || dia).join(', ');
-  }
-
-  /**
-   * Mapea un día de la semana a su abreviatura
-   */
-  mapearDia(dia: string): string {
-    const diasMapeo: { [key: string]: string } = {
-      'Lunes': 'Lun',
-      'Martes': 'Mar',
-      'Miércoles': 'Mié',
-      'Jueves': 'Jue',
-      'Viernes': 'Vie',
-      'Sábado': 'Sáb',
-      'Domingo': 'Dom'
-    };
-
-    return diasMapeo[dia] || dia;
-  }
-
-  /**
-   * Formatea una fecha
-   */
-  formatearFecha(fecha?: Date): string {
-    if (!fecha) return 'Sin fecha';
-    const date = fecha instanceof Date ? fecha : new Date(fecha);
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-
-  /**
-   * Calcula las calorías estimadas basado en duración
-   */
-  calcularCaloriasEstimadas(duracion?: number): number {
-    if (!duracion) return 0;
-    // Estimación aproximada: 7-8 calorías por minuto de entrenamiento
-    return Math.round(duracion * 7.5);
-  }
-
-  /**
-   * Obtiene el objeto ejercicio completo a partir de su ID
-   */
-  getEjercicioById(ejercicioId: string): Ejercicio | undefined {
-    return this.ejercicioService.ejercicios().find(ej => ej.id === ejercicioId);
-  }
 
   /**
    * Computed que convierte los IDs de ejercicios de la rutina seleccionada a objetos completos
@@ -211,7 +151,7 @@ export class RutinasPage implements OnInit {
     }
 
     // Organizar por día
-    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; esHoy: boolean; } } = {};
+    const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; esHoy: boolean; esFuturo: boolean; } } = {};
 
     const rutinasAsignadas = this.rutinasAsignadas(); // Estas son las Rutinas completas
     const currentUser = this.authService.currentUser();
@@ -232,11 +172,13 @@ export class RutinasPage implements OnInit {
       const fechaKey = fecha.toISOString().split('T')[0];
 
       if (!rutinasOrganizadas[fechaKey]) {
+        const esHoyCheck = fecha.toDateString() === hoy.toDateString();
         rutinasOrganizadas[fechaKey] = {
           fecha: new Date(fecha),
           rutinas: [],
           diaCorto,
-          esHoy: fecha.toDateString() === hoy.toDateString()
+          esHoy: esHoyCheck,
+          esFuturo: !esHoyCheck && fecha.getTime() > hoy.getTime()
         };
       }
 
@@ -263,18 +205,13 @@ export class RutinasPage implements OnInit {
   /**
    * Abre el modal con los detalles de la rutina
    */
-  abrirDetalles(rutina: any): void {
-    this.rutinaSeleccionada.set(rutina);
+  abrirDetalles(eventData: { rutina: any, esFuturo: boolean }): void {
+    this.rutinaSeleccionada.set(eventData.rutina);
+    this.esFuturoSeleccionado.set(eventData.esFuturo);
     this.modalAbierto.set(true);
   }
 
-  /**
-   * Abre el modal desde el botón "Ver más" (previene propagación)
-   */
-  verDetalles(event: Event, rutina: any): void {
-    event.stopPropagation();
-    this.abrirDetalles(rutina);
-  }
+
 
   /**
    * Cierra el modal
@@ -314,28 +251,5 @@ export class RutinasPage implements OnInit {
       .catch(err => console.error('Error ruteando (mini play):', err));
   }
 
-  pausarCronometro() {
-    // Este método ya no se usa - la lógica se maneja en rutina-progreso
-  }
 
-  detenerCronometro() {
-    // Este método ya no se usa - la lógica se maneja en rutina-progreso
-  }
-
-  finalizarEntrenamiento() {
-    // Este método ya no se usa - la lógica se maneja en rutina-progreso
-  }
-
-  verRutinasDelDia(dia: any) {
-    if (dia.rutinas && dia.rutinas.length > 0) {
-      // Si hay una sola rutina, ir directamente a ella
-      if (dia.rutinas.length === 1) {
-        this.iniciarEntrenamiento(dia.rutinas[0]);
-      } else {
-        // Si hay múltiples rutinas, por ahora ir a la primera
-        // TODO: Implementar selector de rutina o vista detallada del día
-        this.iniciarEntrenamiento(dia.rutinas[0]);
-      }
-    }
-  }
 }

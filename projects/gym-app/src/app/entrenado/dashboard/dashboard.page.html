@@ -15,87 +15,84 @@
   <!-- ENTRENADO -->
   <section class="p-2 mb-4">
     <div class="flex justify-between items-start">
-        <div class="flex items-center justify-center gap-2">
-          <!-- Foto -->
-          <ion-avatar class="w-12! h-12!">
-            <img src="../../../assets/images/test-foto.png" alt="" class="">
-          </ion-avatar>
-          <div>
-            <!-- Nombre -->
-            <p class="gym-title-color text-base! font-bold! mb-0!">
-              Hola, {{ nombreEntrenado() }}
-            </p>
-            <!-- Plan -->
-             <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
+      <div class="flex items-center justify-center gap-2">
+        <!-- Foto -->
+        <ion-avatar class="w-12! h-12!">
+          <img src="../../../assets/images/test-foto.png" alt="" class="">
+        </ion-avatar>
+        <div>
+          <!-- Nombre -->
+          <p class="gym-title-color text-base! font-bold! mb-0!">
+            Hola, {{ nombreEntrenado() }}
+          </p>
+          <!-- Plan -->
+          <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
             Plan {{ tipoPlan().replace('Plan ', '') }}
           </ion-chip>
 
-          </div>
         </div>
-
-        <ion-button fill="clear" shape="round" class="p-0!">
-          <ion-icon
-            name="notifications-outline"
-            class="text-2xl gym-text-color"
-          ></ion-icon>
-          @if (invitacionesPendientes().length > 0) {
-            <ion-badge color="danger" class="absolute -top-1 -right-1">{{ invitacionesPendientes().length }}</ion-badge>
-          }
-        </ion-button>
       </div>
+
+      <ion-button fill="clear" shape="round" class="p-0!">
+        <ion-icon name="notifications-outline" class="text-2xl gym-text-color"></ion-icon>
+        @if (invitacionesPendientes().length > 0) {
+        <ion-badge color="danger" class="absolute -top-1 -right-1">{{ invitacionesPendientes().length }}</ion-badge>
+        }
+      </ion-button>
+    </div>
   </section>
 
   <!-- Invitaciones Pendientes - SIEMPRE VISIBLE EN LA PARTE SUPERIOR -->
   @if (invitacionesPendientes().length > 0) {
-    <section class="p-2 mb-4">
-      <div class="flex items-center justify-between mb-3">
-        <h2 class="font-heading text-lg font-semibold flex items-center gap-2 gym-title-color">
-          <ion-icon name="notifications-circle" class="text-xl"></ion-icon>
-          Invitaciones Pendientes
-          <ion-badge color="primary" class="ml-2">{{ invitacionesPendientes().length }}</ion-badge>
-        </h2>
-        <ion-button fill="clear" size="small" (click)="toggleInvitaciones()">
-          <ion-icon [name]="mostrarInvitaciones() ? 'chevron-up' : 'chevron-down'"></ion-icon>
-        </ion-button>
-      </div>
+  <section class="p-2 mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="font-heading text-lg font-semibold flex items-center gap-2 gym-title-color">
+        <ion-icon name="notifications-circle" class="text-xl"></ion-icon>
+        Invitaciones Pendientes
+        <ion-badge color="primary" class="ml-2">{{ invitacionesPendientes().length }}</ion-badge>
+      </h2>
+      <ion-button fill="clear" size="small" (click)="toggleInvitaciones()">
+        <ion-icon [name]="mostrarInvitaciones() ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </ion-button>
+    </div>
 
-      @if (mostrarInvitaciones()) {
-        <div class="space-y-3">
-          @for (invitacion of invitacionesPendientes(); track invitacion.id) {
-            <ion-card class="gym-box-primary shadow-md">
-              <ion-card-content class="p-4">
-                <div class="flex items-start gap-3">
-                  <ion-avatar class="flex-shrink-0 !w-12 !h-12">
-                    <img src="../../../assets/images/test-foto.png" alt="Entrenador">
-                  </ion-avatar>
-                  <div class="flex-1 min-w-0">
-                    <h3 class="font-heading font-semibold text-base mb-1 gym-title-color">{{ invitacion.titulo }}</h3>
-                    <p class="text-sm text-gray-600 mb-2">{{ invitacion.mensaje }}</p>
-                    @if (invitacion.datos.entrenadorNombre) {
-                      <p class="text-xs gym-text-color font-medium">De: {{ invitacion.datos.entrenadorNombre }}</p>
-                    }
-                    <p class="text-xs text-gray-500 mt-1">{{ formatearFechaPublico(invitacion.fechaCreacion) }}</p>
-                  </div>
-                  <div class="flex flex-col gap-2 flex-shrink-0">
-                    <ion-button fill="solid" color="success" size="small" (click)="aceptarInvitacion(invitacion)" class="min-w-[80px]">
-                      <ion-icon name="checkmark-circle" slot="start"></ion-icon>
-                      Aceptar
-                    </ion-button>
-                    <ion-button fill="outline" color="danger" size="small" (click)="rechazarInvitacion(invitacion)" class="min-w-[80px]">
-                      <ion-icon name="close-circle-outline" slot="start"></ion-icon>
-                      Rechazar
-                    </ion-button>
-                  </div>
-                </div>
-              </ion-card-content>
-            </ion-card>
-          }
-        </div>
+    @if (mostrarInvitaciones()) {
+    <div class="space-y-3">
+      @for (invitacion of invitacionesPendientes(); track invitacion.id) {
+      <ion-card class="gym-box-primary shadow-md">
+        <ion-card-content class="p-4">
+          <div class="flex items-start gap-3">
+            <ion-avatar class="flex-shrink-0 !w-12 !h-12">
+              <img src="../../../assets/images/test-foto.png" alt="Entrenador">
+            </ion-avatar>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-heading font-semibold text-base mb-1 gym-title-color">{{ invitacion.titulo }}</h3>
+              <p class="text-sm text-gray-600 mb-2">{{ invitacion.mensaje }}</p>
+              @if (invitacion.datos.entrenadorNombre) {
+              <p class="text-xs gym-text-color font-medium">De: {{ invitacion.datos.entrenadorNombre }}</p>
+              }
+              <p class="text-xs text-gray-500 mt-1">{{ formatearFechaPublico(invitacion.fechaCreacion) }}</p>
+            </div>
+            <div class="flex flex-col gap-2 flex-shrink-0">
+              <ion-button fill="solid" color="success" size="small" (click)="aceptarInvitacion(invitacion)"
+                class="min-w-[80px]">
+                <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+                Aceptar
+              </ion-button>
+              <ion-button fill="outline" color="danger" size="small" (click)="rechazarInvitacion(invitacion)"
+                class="min-w-[80px]">
+                <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+                Rechazar
+              </ion-button>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
       }
-    </section>
+    </div>
+    }
+  </section>
   }
-
-
 
 
   <!-- Plan a medida -->
@@ -107,21 +104,21 @@
     <div class="flex flex-col gap-2 p-4 items-start bg-gray-500/40 rounded-2xl">
       <!-- nivel -->
       <div class="w-full flex flex-row items-center gap-3   ">
-        <ion-icon name="accessibility-outline"  class="!text-xl"></ion-icon>
+        <ion-icon name="accessibility-outline" class="!text-xl"></ion-icon>
         <p class="text-base ">
           Principiante
         </p>
       </div>
       <!-- objetivo -->
       <div class="w-full flex flex-row items-center gap-3   ">
-        <ion-icon name="medal-outline"  class="!text-xl"></ion-icon>
+        <ion-icon name="medal-outline" class="!text-xl"></ion-icon>
         <p class="text-base ">
           {{ objetivoActual() }}
         </p>
       </div>
       <!-- frecuencia -->
-       <div class=" w-full min-w-28 flex flex-row items-center gap-3">
-        <ion-icon name="today-outline"  class="!text-xl"></ion-icon>
+      <div class=" w-full min-w-28 flex flex-row items-center gap-3">
+        <ion-icon name="today-outline" class="!text-xl"></ion-icon>
         <p class="text-base ">
           4 días por semana
         </p>
@@ -133,114 +130,79 @@
     <h2 class=" font-heading text-lg font-semibold flex justify-between items-center">
       Rutinas asignadas
     </h2>
-    <ion-button fill="clean" size="small"  class="">
+    <ion-button fill="clean" size="small" class="">
       Ver todas
     </ion-button>
-    <!-- <ion-chip [color]="rutinasAsignadas().length > 0 ? 'primary' : 'medium'" class="!px-4">
-      {{ rutinasAsignadas().length }}
-    </ion-chip> -->
   </section>
 
   @if (rutinasAsignadas().length > 0) {
-    <!-- Rutina por día -->
-    <ion-card class="rutina-card !h-56">
-      <ion-card-content class="!flex !flex-col !justify-between !h-full">
+  <!-- Vistazo de Rutinas -->
+  <div class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar ms-2 me-2 -mx-2 ps-2 pe-2">
+    @for (rutina of rutinasAsignadas(); track rutina.id || rutina.nombre) {
+    <ion-card class="rutina-card !h-56 w-[280px] snap-center shrink-0 !m-0 relative shadow-lg">
+      <ion-card-content class="!flex !flex-col !justify-between !h-full relative z-10 !p-5">
         <div class="">
-          <span class=" text-right text-white/80 uppercase tracking-widest font-bold mb-4 rounded-full !inline-block">
-            Lunes
+          @if (rutina.diaCorto) {
+          <span
+            class="bg-primary/90 text-white text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block shadow-sm">
+            {{ rutina.diaCorto }}
           </span>
-          <p class="font-heading text-white !font-bold !text-2xl">
-            Tren Inferior
-          </p>
-          <p class="text-white/80 !text-base">
-            Foco en Glúteos (SEBA este dato se borra cuando el entrenador lo crea, o sea no se guarda)
-          </p>
-        </div>
-        <div class="flex gap-2">
-          <div class="flex gap-2">
-            <p class="text-white/70">6 Ejercicios</p>
-          </div>
-          <div>
-            <p class="text-white/70">|</p>
-          </div>
-          <div class="flex gap-2">
-            <p class="text-white/70">44:20 min</p>
-          </div>
-        </div>
-
-        <ion-icon
-          name="chevron-forward-outline"
-          class="absolute bottom-3 right-3 !text-white !text-xl"
-        ></ion-icon>
-      </ion-card-content>
-    </ion-card>
-  } @else {
-    <!-- Rutina sin asignar -->
-    <ion-card class="gym-box-primary shadow-none text-black p-1">
-      <ion-card-content class="ion-padding text-center">
-        <ion-icon name="barbell-outline"></ion-icon>
-        <p class="font-heading !font-bold !text-xl !my-2">
-          No tienes rutinas asignadas
-        </p>
-        @if (entrenadorAsignado()) {
-          <p>Tu entrenador {{ entrenadorAsignado()?.nombre || entrenadorAsignado()?.email || 'Entrenador' }} te asignará rutinas próximamente.</p>
-          <div class="mt-3 flex items-center justify-center gap-2">
-            <ion-avatar class="!w-8 !h-8">
-              <img src="../../../assets/images/test-foto.png" alt="Entrenador">
-            </ion-avatar>
-            <div class="text-left">
-              <p class="text-sm font-medium gym-title-color">{{ entrenadorAsignado()?.nombre || 'Entrenador' }}</p>
-              <p class="text-xs text-gray-600">{{ entrenadorAsignado()?.email }}</p>
-            </div>
-          </div>
-        } @else {
-          <p>Busca un entrenador para que te asigne rutinas personalizadas.</p>
-        }
-      </ion-card-content>
-    </ion-card>
-  }
-
-
-
-
-
-
-
-
-  <!-- Rutinas asignadas -->
-<!-- <ion-card>
-    <ion-card-content class="ion-padding">
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <ion-icon name="fitness-outline" color="primary" style="font-size: 32px;"></ion-icon>
-        <div style="flex: 1;">
-          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Mis Rutinas</h3>
-        </div>
-        <ion-chip [color]="rutinasAsignadas().length > 0 ? 'primary' : 'medium'">
-          {{ rutinasAsignadas().length }}
-        </ion-chip>
-      </div>
-
-      @if (rutinasAsignadas().length > 0) {
-        <ion-list style="margin: 0; padding: 0; background: transparent;">
-          @for (rutina of rutinasAsignadas(); track rutina.nombre) {
-            <ion-item button (click)="verRutina(rutina)" lines="none" style="--background: var(--ion-color-light); margin-bottom: 8px; border-radius: 12px; --padding-start: 12px; --padding-end: 12px;">
-              <ion-label>
-                <h3 style="margin: 0; font-size: 15px; font-weight: 600;">{{ rutina.nombre }}</h3>
-              </ion-label>
-              <ion-label slot="end" style="text-align: right; max-width: 150px;">
-                <p style="margin: 0; font-size: 12px;">{{ rutina.asignadoPor }}</p>
-              </ion-label>
-            </ion-item>
+          } @else {
+          <span
+            class="bg-black/50 text-white/90 text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block border border-white/20">
+            {{ rutina.fechaAsignada }}
+          </span>
           }
-        </ion-list>
-      } @else {
-        <div style="text-align: center; padding: 24px 16px; background: var(--ion-color-light); border-radius: 12px;">
-          <ion-icon name="fitness-outline" style="font-size: 48px; color: var(--ion-color-medium); margin-bottom: 12px;"></ion-icon>
-          <p style="margin: 0; font-size: 14px; color: var(--ion-color-medium); font-weight: 500;">No tienes rutinas asignadas</p>
-          <p style="margin: 8px 0 0 0; font-size: 12px; color: var(--ion-color-medium);">Tu entrenador te asignará rutinas pronto</p>
+
+          <p class="font-heading text-white !font-bold !text-2xl line-clamp-2 leading-tight drop-shadow-md">
+            {{ rutina.nombre }}
+          </p>
+
+          @if (rutina.descripcion) {
+          <p class="text-white/80 !text-sm mt-2 line-clamp-2 leading-snug">
+            {{ rutina.descripcion }}
+          </p>
+          }
         </div>
+
+        <div class="flex gap-4 items-center mt-auto pt-3">
+          <div class="flex gap-1.5 items-center">
+            <ion-icon name="barbell-outline" class="text-white/90 text-lg"></ion-icon>
+            <p class="text-white/90 text-sm font-medium">{{ rutina.ejerciciosIds?.length || 0 }} Ejercicios</p>
+          </div>
+        </div>
+
+        <div
+          class="absolute bottom-4 right-4 bg-white/20 rounded-full p-2 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
+          <ion-icon name="chevron-forward-outline" class="!text-white !text-xl"></ion-icon>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    }
+  </div>
+  } @else {
+  <!-- Rutina sin asignar -->
+  <ion-card class="gym-box-primary shadow-none text-black p-1">
+    <ion-card-content class="ion-padding text-center">
+      <ion-icon name="barbell-outline"></ion-icon>
+      <p class="font-heading !font-bold !text-xl !my-2">
+        No tienes rutinas asignadas
+      </p>
+      @if (entrenadorAsignado()) {
+      <p>Tu entrenador {{ entrenadorAsignado()?.nombre || entrenadorAsignado()?.email || 'Entrenador' }} te asignará
+        rutinas próximamente.</p>
+      <div class="mt-3 flex items-center justify-center gap-2">
+        <ion-avatar class="!w-8 !h-8">
+          <img src="../../../assets/images/test-foto.png" alt="Entrenador">
+        </ion-avatar>
+        <div class="text-left">
+          <p class="text-sm font-medium gym-title-color">{{ entrenadorAsignado()?.nombre || 'Entrenador' }}</p>
+          <p class="text-xs text-gray-600">{{ entrenadorAsignado()?.email }}</p>
+        </div>
+      </div>
+      } @else {
+      <p>Busca un entrenador para que te asigne rutinas personalizadas.</p>
       }
     </ion-card-content>
   </ion-card>
-
-</ion-content> -->
+  }

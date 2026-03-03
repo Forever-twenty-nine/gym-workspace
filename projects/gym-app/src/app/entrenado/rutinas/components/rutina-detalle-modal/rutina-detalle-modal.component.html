@@ -1,0 +1,103 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="cerrarModal()">
+    <ng-template>
+        <ion-header class="ion-no-border">
+            <ion-toolbar class="pt-2">
+                <ion-buttons slot="start">
+                    <ion-button (click)="cerrarModal()"
+                        class="w-10 h-10 ml-2 rounded-full bg-gray-100 dark:bg-gray-800">
+                        <ion-icon name="close" slot="icon-only" class="text-gray-600 dark:text-gray-300"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+                <ion-title class="font-black text-center pr-12 text-gray-900 dark:text-white">Detalles</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="bg-gray-50 dark:bg-[#121212]">
+            @if (rutina) {
+            <div class="px-4 py-4 animate-fade-in">
+                <ion-card
+                    class="m-0 mb-6 bg-primary/10 dark:bg-primary/5 rounded-3xl border border-primary/20 shadow-none">
+                    <ion-card-header>
+                        <ion-card-title class="text-3xl font-black text-gray-900 dark:text-white mb-1">{{ rutina.nombre
+                            }}</ion-card-title>
+                    </ion-card-header>
+                    <ion-card-content class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
+                        {{ rutina.descripcion || 'Disfruta de tu entrenamiento. Sigue las instrucciones y mantén la
+                        consistencia para lograr tus objetivos.' }}
+                    </ion-card-content>
+                </ion-card>
+
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <ion-card
+                        class="m-0 p-4 rounded-3xl bg-white dark:bg-gray-800 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+                        <ion-icon name="fitness-outline" class="text-2xl text-primary mb-2"></ion-icon>
+                        <span
+                            class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Ejercicios</span>
+                        <span class="text-2xl font-black text-gray-800 dark:text-white leading-none">{{
+                            rutina.ejerciciosIds?.length || 0 }}</span>
+                    </ion-card>
+                    <ion-card
+                        class="m-0 p-4 rounded-3xl bg-white dark:bg-gray-800 flex flex-col items-center justify-center border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+                        <ion-icon name="time-outline" class="text-2xl text-orange-500 mb-2"></ion-icon>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-1">Duración
+                            Est.</span>
+                        <span class="text-2xl font-black text-gray-800 dark:text-white leading-none">{{ rutina.duracion
+                            || 45 }}<span class="text-sm font-bold text-gray-500 ml-1">min</span></span>
+                    </ion-card>
+                </div>
+
+                <div class="pb-10">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="text-lg font-black m-0 text-gray-900 dark:text-white">Contenido</h3>
+                        <ion-badge color="primary"
+                            class="px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide">Semana
+                            Actual</ion-badge>
+                    </div>
+
+                    <ion-list lines="none" class="bg-transparent p-0 m-0 space-y-3">
+                        @for (ej of ejercicios; track ej.id) {
+                        <ion-item
+                            class="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden m-0"
+                            style="--background: transparent; --padding-start: 16px;">
+                            <div slot="start"
+                                class="w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center my-3 shadow-inner">
+                                <ion-icon name="repeat-outline" class="text-xl text-primary"></ion-icon>
+                            </div>
+                            <ion-label class="py-2">
+                                <h5 class="text-base font-bold text-gray-900 dark:text-white m-0 tracking-tight">{{
+                                    ej.nombre }}</h5>
+                                <p
+                                    class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-semibold flex items-center gap-1">
+                                    <ion-icon name="sync-circle-outline" class="text-sm"></ion-icon>
+                                    {{ ej.series }} series x {{ ej.repeticiones }} reps
+                                </p>
+                            </ion-label>
+                        </ion-item>
+                        }
+                    </ion-list>
+                </div>
+            </div>
+            }
+        </ion-content>
+
+        <ion-footer
+            class="ion-no-border bg-white dark:bg-gray-900 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.5)]">
+            <div class="p-4 px-6 pb-8">
+                @if (!esFuturo) {
+                <ion-button expand="block" class="m-0 h-14"
+                    style="--border-radius: 16px; --box-shadow: 0 4px 6px -1px var(--ion-color-primary-tint), 0 2px 4px -1px var(--ion-color-primary-tint);"
+                    (click)="iniciar()">
+                    <span class="text-base font-black tracking-wide">COMENZAR AHORA</span>
+                    <ion-icon name="play-circle" slot="end" class="text-2xl"></ion-icon>
+                </ion-button>
+                } @else {
+                <ion-button expand="block" class="m-0 h-14 opacity-50" color="medium" disabled="true"
+                    style="--border-radius: 16px;">
+                    <span class="text-base font-black tracking-wide">AÚN NO DISPONIBLE</span>
+                    <ion-icon name="lock-closed" slot="end" class="text-2xl"></ion-icon>
+                </ion-button>
+                }
+            </div>
+        </ion-footer>
+    </ng-template>
+</ion-modal>

@@ -48,7 +48,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
 import { EntrenadorService, PlanLimitError } from '../../core/services/entrenador.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
-import { Entrenado, Rutina } from 'gym-library';
+import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
+import { Entrenado, Rutina, RutinaAsignada } from 'gym-library';
 
 @Component({
   selector: 'app-dashboard',
@@ -65,7 +66,7 @@ import { Entrenado, Rutina } from 'gym-library';
     IonButton,
     IonBadge,
     FormsModule
-],
+  ],
 })
 export class DashboardPage implements OnInit {
   private entrenadoService = inject(EntrenadoService);
@@ -75,6 +76,7 @@ export class DashboardPage implements OnInit {
   private notificacionService = inject(NotificacionService);
   private entrenadorService = inject(EntrenadorService);
   private invitacionService = inject(InvitacionService);
+  private rutinaAsignadaService = inject(RutinaAsignadaService);
   private toastController = inject(ToastController);
 
   // Signal para controlar la visibilidad de invitaciones
@@ -147,20 +149,74 @@ export class DashboardPage implements OnInit {
   rutinasAsignadas = computed(() => {
     const user = this.currentUserSignal();
     const userId = user?.uid;
-    const rutinas = this.todasLasRutinas();
+    const rutinas = this.rutinaService.rutinas();
 
     if (!userId || !rutinas.length) return [];
 
     const entrenado = this.entrenadoService.getEntrenado(userId)();
+    const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(userId)();
     const rutinasDelEntrenado = rutinas.filter(rutina =>
       entrenado?.rutinasAsignadasIds?.includes(rutina.id)
     );
 
-    return rutinasDelEntrenado.map(rutina => ({
-      nombre: rutina.nombre,
-      fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
-      asignadoPor: 'Entrenador' // Simplificado para este ejemplo
-    }));
+    if (asignaciones.length === 0) {
+      return rutinasDelEntrenado.map(rutina => ({
+        ...rutina,
+        nombre: rutina.nombre,
+        fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
+        asignadoPor: 'Entrenador',
+        diaCorto: ''
+      })).slice(0, 3);
+    }
+
+    const hoy = new Date();
+    const proximas: any[] = [];
+
+    for (let i = 0; i < 7 && proximas.length < 3; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + i);
+      const diaSemanaIndex = fecha.getDay();
+      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+      const diaCortoArr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+      const diaSemanaNormalizado = diasSemanaSinTilde[diaSemanaIndex];
+      const diaCorto = diaCortoArr[diaSemanaIndex];
+      const esHoyCheck = fecha.toDateString() === hoy.toDateString();
+
+      const asignacionesDelDia = asignaciones.filter((asig: RutinaAsignada) => {
+        if (!asig.diaSemana) return false;
+
+        // El diaSemana suele venir desde gym-library como "lunes", "martes", etc.
+        const asigDiaNormalizado = asig.diaSemana.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return asigDiaNormalizado === diaSemanaNormalizado;
+      });
+
+      asignacionesDelDia.forEach((asig: RutinaAsignada) => {
+        const rutinaOriginal = rutinas.find(r => r.id === asig.rutinaId);
+        // Si la rutina pertenece al entrenado, la agregamos
+        if (rutinaOriginal && rutinasDelEntrenado.some(r => r.id === rutinaOriginal.id) && proximas.length < 3) {
+          proximas.push({
+            ...rutinaOriginal,
+            nombre: rutinaOriginal.nombre,
+            fechaAsignada: this.formatearFecha(rutinaOriginal.fechaCreacion || new Date()),
+            asignadoPor: 'Entrenador',
+            diaCorto: esHoyCheck ? 'Hoy' : diaCorto
+          });
+        }
+      });
+    }
+
+    if (proximas.length === 0 && rutinasDelEntrenado.length > 0) {
+      return rutinasDelEntrenado.map(rutina => ({
+        ...rutina,
+        nombre: rutina.nombre,
+        fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
+        asignadoPor: 'Entrenador',
+        diaCorto: ''
+      })).slice(0, 3);
+    }
+
+    return proximas;
   });
 
   entrenadorAsignado = computed(() => {
@@ -195,8 +251,7 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    // Escuchar cambios en rutinas globales
-    this.todasLasRutinas.set(this.rutinaService.rutinas());
+    // Escuchar cambios en rutinas globales (ya se hace reactivamente vía computations)
   }
 
   private formatearFecha(fecha: any): string {
