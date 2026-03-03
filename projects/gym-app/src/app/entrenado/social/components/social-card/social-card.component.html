@@ -2,9 +2,13 @@
   <!-- Header: Perfil de Usuario con ion-item -->
   <ion-item lines="none" class="--background-transparent pt-2">
     <ion-avatar slot="start" class="w-12 h-12">
+      @if (userProfilePhoto()) {
+      <img [src]="userProfilePhoto()" alt="Foto de perfil" class="object-cover w-full h-full">
+      } @else {
       <div class="w-full h-full bg-primary/10 flex items-center justify-center rounded-full">
         <span class="text-primary font-bold text-base uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
       </div>
+      }
     </ion-avatar>
     <ion-label class="ml-1">
       <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ sesion.nombreUsuario || 'Usuario' }}</h3>
@@ -40,7 +44,8 @@
             <ion-icon name="barbell-outline" color="primary" class="text-2xl"></ion-icon>
             <div class="flex flex-col">
               <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Ejercicios</span>
-              <span class="text-base font-black dark:text-white">{{ sesion.rutinaResumen.ejercicios.length || 0 }}</span>
+              <span class="text-base font-black dark:text-white">{{ sesion.rutinaResumen.ejercicios.length || 0
+                }}</span>
             </div>
           </div>
         </ion-col>
@@ -49,20 +54,25 @@
   </ion-card-content>
 
   <!-- Interaction Area -->
-  <div class="px-5 py-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-black/10">
-    <ion-button fill="clear" size="default" (click)="toggleLike(); $event.stopPropagation()" 
-                [color]="hasLiked() ? 'danger' : 'medium'" class="font-black">
+  <div
+    class="px-5 py-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-black/10">
+    <ion-button fill="clear" size="default" (click)="toggleLike(); $event.stopPropagation()"
+      [color]="hasLiked() ? 'danger' : 'medium'" class="font-black">
       <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'" class="text-xl"></ion-icon>
       {{ likesCount() || 0 }}
     </ion-button>
 
     <div class="flex -space-x-2 pr-1">
       @for (likeUid of (sesion.likes || []).slice(-3).reverse(); track likeUid) {
-        <ion-avatar class="w-8 h-8 border-2 border-white dark:border-[#1c1c1e] shadow-sm">
-          <div class="w-full h-full flex items-center justify-center bg-primary/20">
-            <span class="text-[10px] font-black text-primary">U</span>
-          </div>
-        </ion-avatar>
+      <ion-avatar class="w-8 h-8 border-2 border-white dark:border-[#1c1c1e] shadow-sm overflow-hidden bg-gray-100">
+        @if (getLikeUserPhoto(likeUid)) {
+        <img [src]="getLikeUserPhoto(likeUid)" alt="Usuario que dio like" class="object-cover w-full h-full">
+        } @else {
+        <div class="w-full h-full flex items-center justify-center bg-primary/20">
+          <span class="text-[10px] font-black text-primary">U</span>
+        </div>
+        }
+      </ion-avatar>
       }
     </div>
   </div>

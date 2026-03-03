@@ -286,7 +286,8 @@ export class UserService {
       gimnasioId: data.gimnasioId || null,
       entrenadoId: data.entrenadoId || null,
       onboarded: data.onboarded ?? false,
-      plan: data.plan || null
+      plan: data.plan || null,
+      photoURL: data.photoURL || null
     };
   }
 
@@ -300,7 +301,8 @@ export class UserService {
       gimnasioId: user.gimnasioId || null,
       entrenadoId: user.entrenadoId || null,
       onboarded: user.onboarded ?? false,
-      plan: user.plan || null
+      plan: user.plan || null,
+      photoURL: user.photoURL || null
     };
     return data;
   }

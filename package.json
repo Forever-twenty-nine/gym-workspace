@@ -6,7 +6,7 @@
     "emulator:start:with-export": "firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
     "emulator:export": "firebase emulators:export --project=default-project ./emulator-data",
     "emulator:import": "firebase emulators:start --project=default-project --import=./emulator-data",
-    "kill-emulator-8080": "pwsh -NoProfile -File scripts/kill-emulator.ps1",
+    "kill-emulator-8080": "powershell -NoProfile -File scripts/kill-emulator.ps1",
     "gym-admin:serve": "cd projects/gym-admin && npm run start",
     "gym-admin:build": "cd projects/gym-admin && npm run build",
     "gym-admin:test": "cd projects/gym-admin && npm run test",

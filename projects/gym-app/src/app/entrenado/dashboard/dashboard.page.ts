@@ -49,7 +49,12 @@ import { NotificacionService } from '../../core/services/notificacion.service';
 import { EntrenadorService, PlanLimitError } from '../../core/services/entrenador.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
-import { Entrenado, Rutina, RutinaAsignada } from 'gym-library';
+import { Entrenado, Rutina, RutinaAsignada, User as LibraryUser } from 'gym-library';
+
+// Extendemos la interfaz User localmente para asegurar la existencia de photoURL
+export interface User extends LibraryUser {
+  photoURL?: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -86,7 +91,7 @@ export class DashboardPage implements OnInit {
   todasLasRutinas = signal<Rutina[]>([]);
 
   // Signal principal heredado del AUTH service
-  currentUserSignal = this.authService.currentUser;
+  currentUserSignal = this.authService.currentUser as Signal<User | null>;
 
   // Signal computado para los datos del entrenado
   entrenadoDataSignal = computed(() => {
@@ -225,7 +230,7 @@ export class DashboardPage implements OnInit {
 
     const entrenadorId = entrenado.entrenadoresId[0];
     const allUsers = this.userService.users();
-    return allUsers.find(u => u.uid === entrenadorId) || null;
+    return (allUsers.find(u => u.uid === entrenadorId) as User) || null;
   });
 
   constructor() {

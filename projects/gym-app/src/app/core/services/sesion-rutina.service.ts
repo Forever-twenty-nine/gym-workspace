@@ -32,6 +32,7 @@ export class SesionRutinaService {
   private readonly COLLECTION = 'sesiones-rutina';
 
   private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
+  private _sesionesCompartidasSignal?: Signal<SesionRutina[]>;
 
   // inyección de servicios
   private readonly rutinaService: RutinaService = inject(RutinaService);
@@ -215,12 +216,13 @@ export class SesionRutinaService {
   /**
    * Actualiza el estado de compartir de una sesión consumida
    */
-  async setCompartida(id: string, compartida: boolean, userName?: string): Promise<void> {
+  async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string): Promise<void> {
     return this.runInZone(async () => {
       const ref = doc(this.firestore, this.COLLECTION, id);
       const data: any = {
         compartida,
         nombreUsuario: userName,
+        fotoUsuario: userPhoto,
         fechaCompartida: compartida ? Timestamp.now() : null
       };
       await updateDoc(ref, data);
@@ -231,23 +233,42 @@ export class SesionRutinaService {
    * Obtiene todas las sesiones compartidas (Feed Social)
    */
   getSesionesCompartidas(): Signal<SesionRutina[]> {
+    if (this._sesionesCompartidasSignal) {
+      return this._sesionesCompartidasSignal;
+    }
+
     const sesionesSignal = signal<SesionRutina[]>([]);
-    const q = query(collection(this.firestore, this.COLLECTION), where('compartida', '==', true));
-    
+    const col = collection(this.firestore, this.COLLECTION);
+    const q = query(col, where('compartida', '==', true));
+
     onSnapshot(q, (snapshot: QuerySnapshot) => {
       this.runInZone(() => {
         const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
+
         // Ordenar por fecha de compartida descendente
         sesiones.sort((a, b) => {
-          const dateA = (a as any).fechaCompartida?.toDate?.() || new Date((a as any).fechaCompartida);
-          const dateB = (b as any).fechaCompartida?.toDate?.() || new Date((b as any).fechaCompartida);
-          return dateB - dateA;
+          const timeA = this.getSafeTime(a.fechaCompartida) || this.getSafeTime(a.fechaInicio) || 0;
+          const timeB = this.getSafeTime(b.fechaCompartida) || this.getSafeTime(b.fechaInicio) || 0;
+          return timeB - timeA;
         });
+
         sesionesSignal.set(sesiones);
       });
     });
-    
-    return sesionesSignal.asReadonly();
+
+    this._sesionesCompartidasSignal = sesionesSignal.asReadonly();
+    return this._sesionesCompartidasSignal;
+  }
+
+  private getSafeTime(date: any): number {
+    if (!date) return 0;
+    if (date instanceof Date) return date.getTime();
+    if (date.toDate && typeof date.toDate === 'function') return date.toDate().getTime();
+    if (typeof date === 'string' || typeof date === 'number') {
+      const d = new Date(date);
+      return isNaN(d.getTime()) ? 0 : d.getTime();
+    }
+    return 0;
   }
 
   /**
@@ -286,6 +307,9 @@ export class SesionRutinaService {
     if (data.fechaFin instanceof Date) {
       data.fechaFin = Timestamp.fromDate(data.fechaFin);
     }
+    if (data.fechaCompartida instanceof Date) {
+      data.fechaCompartida = Timestamp.fromDate(data.fechaCompartida);
+    }
     return data;
   }
 
@@ -293,7 +317,9 @@ export class SesionRutinaService {
     return {
       ...data,
       fechaInicio: data.fechaInicio instanceof Timestamp ? data.fechaInicio.toDate() : (data.fechaInicio ? new Date(data.fechaInicio) : new Date()),
-      fechaFin: data.fechaFin instanceof Timestamp ? data.fechaFin.toDate() : (data.fechaFin ? new Date(data.fechaFin) : undefined)
+      fechaFin: data.fechaFin instanceof Timestamp ? data.fechaFin.toDate() : (data.fechaFin ? new Date(data.fechaFin) : undefined),
+      fechaCompartida: data.fechaCompartida instanceof Timestamp ? data.fechaCompartida.toDate() : (data.fechaCompartida ? new Date(data.fechaCompartida) : undefined),
+      likes: data.likes || []
     } as SesionRutina;
   }
 }

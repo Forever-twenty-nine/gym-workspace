@@ -10,14 +10,15 @@ export interface SesionRutina {
     status?: SesionRutinaStatus;
     porcentajeCompletado?: number;
     completada?: boolean;
-    rutinaResumen: { 
-        id: string; 
-        nombre: string; 
+    rutinaResumen: {
+        id: string;
+        nombre: string;
         ejercicios: Ejercicio[];
     };
     // Social
     compartida?: boolean;
     nombreUsuario?: string;
+    fotoUsuario?: string;
     fechaCompartida?: any;
     likes?: string[]; // IDs de usuarios que dieron like
 }

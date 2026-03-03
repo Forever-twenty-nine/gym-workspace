@@ -1,31 +1,32 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonCard, 
-  IonCardContent, 
-  IonAvatar, 
+import {
+  IonCard,
+  IonCardContent,
+  IonAvatar,
   IonIcon,
-  IonButton, 
-  IonCardHeader, 
+  IonButton,
+  IonCardHeader,
   IonItem,
   IonLabel,
   IonCardTitle,
   IonGrid,
   IonRow,
-  IonCol 
+  IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { 
-  barbellOutline, 
-  timeOutline, 
-  calendarOutline, 
-  checkmark, 
-  heart, 
-  heartOutline, 
-  ellipsisVertical 
+import {
+  barbellOutline,
+  timeOutline,
+  calendarOutline,
+  checkmark,
+  heart,
+  heartOutline,
+  ellipsisVertical
 } from 'ionicons/icons';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
 
 @Component({
   selector: 'app-social-card',
@@ -49,7 +50,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class SocialCardComponent {
   private readonly _sesion = signal<any>(null);
-  
+
   @Input({ required: true }) set sesion(value: any) {
     this._sesion.set(value);
   }
@@ -60,6 +61,7 @@ export class SocialCardComponent {
 
   private readonly sesionService = inject(SesionRutinaService);
   private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
 
   // Perfil del usuario actual para los likes
   currentUser = this.authService.currentUser;
@@ -74,22 +76,39 @@ export class SocialCardComponent {
   // Computamos la cantidad de likes
   likesCount = computed(() => (this._sesion()?.likes || []).length);
 
+  // Computamos la foto de perfil con fallback a búsqueda dinámica
+  userProfilePhoto = computed(() => {
+    const sesion = this._sesion();
+    if (!sesion) return null;
+
+    // Si ya viene persistida en la sesión, la usamos (mejor performance)
+    if (sesion.fotoUsuario) return sesion.fotoUsuario;
+
+    // Fallback: Buscar en la lista de usuarios global por UID
+    if (sesion.entrenadoId) {
+      const user = this.userService.getUserByUid(sesion.entrenadoId)();
+      return user?.photoURL || null;
+    }
+
+    return null;
+  });
+
   constructor() {
-    addIcons({ 
-      barbellOutline, 
-      timeOutline, 
-      calendarOutline, 
-      checkmark, 
-      heart, 
-      heartOutline, 
-      ellipsisVertical 
+    addIcons({
+      barbellOutline,
+      timeOutline,
+      calendarOutline,
+      checkmark,
+      heart,
+      heartOutline,
+      ellipsisVertical
     });
   }
 
   toggleLike() {
     const user = this.currentUser();
     const currentSesion = this._sesion();
-    
+
     if (!user || !currentSesion?.id) return;
 
     const sessionCopy = { ...currentSesion, likes: [...(currentSesion.likes || [])] };
@@ -98,7 +117,7 @@ export class SocialCardComponent {
       // Optimistic UI: Quitar localmente
       sessionCopy.likes = sessionCopy.likes.filter((id: string) => id !== user.uid);
       this._sesion.set(sessionCopy);
-      
+
       this.sesionService.removeLike(currentSesion.id, user.uid)
         .catch(err => {
           console.error('❌ Error al quitar like:', err);
@@ -117,14 +136,20 @@ export class SocialCardComponent {
     }
   }
 
+  // Obtiene la foto de un usuario que dio like
+  getLikeUserPhoto(uid: string): string | null {
+    const user = this.userService.getUserByUid(uid)();
+    return user?.photoURL || null;
+  }
+
   formatearFecha(fecha?: Date | string): string {
     if (!fecha) return '';
     const date = fecha instanceof Date ? fecha : new Date(fecha);
     return date.toLocaleDateString('es-ES', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit'
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 

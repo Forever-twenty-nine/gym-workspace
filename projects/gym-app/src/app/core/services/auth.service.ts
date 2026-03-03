@@ -190,11 +190,16 @@ export class AuthService {
     let userData: User;
     if (userSnap.exists()) {
       userData = userSnap.data() as User;
+      // Si Firestore no tiene foto pero Firebase sí, la usamos
+      if (!userData.photoURL && firebaseUser.photoURL) {
+        userData.photoURL = firebaseUser.photoURL;
+      }
     } else {
       userData = {
         uid: firebaseUser.uid,
         nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
         email: firebaseUser.email || '',
+        photoURL: firebaseUser.photoURL || undefined,
         role: undefined,
         onboarded: false
       };

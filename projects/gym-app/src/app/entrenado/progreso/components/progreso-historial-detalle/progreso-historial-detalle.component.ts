@@ -83,8 +83,19 @@ export class ProgresoHistorialDetalleComponent {
         if (!this.sesionSeleccionada) return;
         const compartida = event.detail.checked;
         const user = this.authService.currentUser();
+
         if (user) {
-            await this.sesionRutinaService.setCompartida(this.sesionSeleccionada.id, compartida, user.nombre || 'Usuario');
+            // Optimistic update
+            this.sesionSeleccionada.compartida = compartida;
+            this.sesionSeleccionada.nombreUsuario = user.nombre || user.email || 'Usuario';
+            this.sesionSeleccionada.fotoUsuario = user.photoURL;
+
+            await this.sesionRutinaService.setCompartida(
+                this.sesionSeleccionada.id,
+                compartida,
+                this.sesionSeleccionada.nombreUsuario,
+                this.sesionSeleccionada.fotoUsuario
+            );
         }
     }
 

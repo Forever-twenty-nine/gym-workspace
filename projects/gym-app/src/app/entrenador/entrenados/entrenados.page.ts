@@ -138,7 +138,12 @@ export class EntrenadosPage implements OnInit {
   diaSeleccionado = signal<string>('Lunes');
 
   isModalOpen = signal(false);
-  selectedEntrenado = signal<Entrenado | null>(null);
+  selectedEntrenadoId = signal<string | null>(null);
+  selectedEntrenado = computed(() => {
+    const id = this.selectedEntrenadoId();
+    if (!id) return null;
+    return this.entrenadoService.entrenados().find(e => e.id === id) || null;
+  });
 
   // Señales para invitación
   isInvitacionModalOpen = signal(false);
@@ -170,12 +175,18 @@ export class EntrenadosPage implements OnInit {
   });
 
   rutinasEntrenado = computed(() => {
-    const entrenadoId = this.selectedEntrenado()?.id;
-    if (!entrenadoId) return [];
+    const entrenado = this.selectedEntrenado();
+    if (!entrenado) return [];
 
-    const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinaIds = entrenado?.rutinasAsignadasIds || [];
-    return this.rutinaService.rutinas().filter(r => rutinaIds.includes(r.id));
+    const rutinaIds = new Set(entrenado.rutinasAsignadasIds || []);
+
+    // También incluir rutinas que tengan asignaciones por día aunque no estén en el array principal
+    this.asignacionesEntrenado().forEach(a => {
+      if (a.rutinaId) rutinaIds.add(a.rutinaId);
+    });
+
+    const todasLasRutinas = this.rutinaService.rutinas();
+    return todasLasRutinas.filter(r => rutinaIds.has(r.id));
   });
 
   estadisticasEntrenado = computed(() => {
@@ -203,7 +214,13 @@ export class EntrenadosPage implements OnInit {
     };
   });
 
-  rutinasDisponibles = signal<Rutina[]>([]);
+  rutinasDisponibles = computed(() => {
+    const items = this.rutinasEntrenado();
+    const itemIds = items.map(r => r.id);
+    const todasLasRutinas = this.rutinaService.rutinas();
+
+    return todasLasRutinas.filter(r => !itemIds.includes(r.id));
+  });
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
@@ -233,13 +250,13 @@ export class EntrenadosPage implements OnInit {
   }
 
   verCliente(entrenado: Entrenado) {
-    this.selectedEntrenado.set(entrenado);
+    this.selectedEntrenadoId.set(entrenado.id);
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
-    this.selectedEntrenado.set(null);
+    this.selectedEntrenadoId.set(null);
   }
 
   getRutinasAsignadasCount(entrenadoId: string): number {
@@ -395,35 +412,20 @@ export class EntrenadosPage implements OnInit {
 
   closeRutinasModal() {
     this.isRutinasModalOpen.set(false);
-    this.selectedEntrenado.set(null);
-    this.rutinasDisponibles.set([]);
+    this.selectedEntrenadoId.set(null);
   }
 
   // Métodos para gestión de rutinas
   openRutinasModal(entrenado: Entrenado) {
-    this.selectedEntrenado.set(entrenado);
-    this.cargarRutinasDisponibles();
+    this.selectedEntrenadoId.set(entrenado.id);
     this.isRutinasModalOpen.set(true);
   }
 
-  private cargarRutinasDisponibles() {
-    const entrenadorId = this.authService.currentUser()?.uid;
-    const entrenadoId = this.selectedEntrenado()?.id;
-    if (!entrenadorId || !entrenadoId) return;
-
-    const rutinas = this.rutinaService.rutinas();
-    const entrenado = this.entrenadoService.entrenados().find(e => e.id === entrenadoId);
-    const rutinasAsignadas = entrenado?.rutinasAsignadasIds || [];
-    const rutinasEntrenador = rutinas.filter(rutina =>
-      !rutinasAsignadas.includes(rutina.id)
-    );
-    this.rutinasDisponibles.set(rutinasEntrenador);
-  }
 
   async asignarRutina(rutina: Rutina) {
-    if (!this.selectedEntrenado()) return;
+    const entrenado = this.selectedEntrenado();
+    if (!entrenado) return;
 
-    const entrenado = this.selectedEntrenado()!;
     const rutinasAsignadasIds = [...(entrenado.rutinasAsignadasIds || [])];
 
     if (rutinasAsignadasIds.includes(rutina.id)) return;
@@ -442,8 +444,6 @@ export class EntrenadosPage implements OnInit {
         position: 'bottom'
       });
       await toast.present();
-
-      this.cargarRutinasDisponibles();
     } catch (error) {
       console.error('Error al habilitar rutina:', error);
     }
@@ -452,6 +452,14 @@ export class EntrenadosPage implements OnInit {
   async asignarDiaARutina(rutina: Rutina, event: any) {
     const dia = event.detail.value;
     if (!dia || !this.selectedEntrenado()) return;
+
+    // Evitar duplicados para el mismo día
+    const diasActuales = this.getDiasAsignados(rutina.id);
+    if (diasActuales.includes(dia)) {
+      // Resetear el select
+      event.target.value = null;
+      return;
+    }
 
     const entrenadorId = this.authService.currentUser()?.uid;
     if (!entrenadorId) return;
@@ -470,6 +478,9 @@ export class EntrenadosPage implements OnInit {
 
     try {
       await this.rutinaAsignadaService.save(rutinaAsignada);
+
+      // Resetear el select para que muestre el placeholder de nuevo
+      event.target.value = null;
 
       const toast = await this.toastController.create({
         message: `Rutina asignada al ${dia}`,
@@ -501,13 +512,12 @@ export class EntrenadosPage implements OnInit {
   }
 
   async desasignarRutina(rutina: Rutina) {
-    if (!this.selectedEntrenado()) return;
-
-    const entrenado = this.selectedEntrenado()!;
+    const entrenado = this.selectedEntrenado();
+    if (!entrenado) return;
 
     try {
       // 1) Eliminar todas las asignaciones de esta rutina para este entrenado
-      const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(entrenado.id)()
+      const asignaciones = this.asignacionesEntrenado()
         .filter(a => a.rutinaId === rutina.id);
 
       for (const asignacion of asignaciones) {
@@ -518,7 +528,7 @@ export class EntrenadosPage implements OnInit {
       const rutinasAsignadasIds = (entrenado.rutinasAsignadasIds || []).filter(id => id !== rutina.id);
       const entrenadoActualizado: Entrenado = {
         ...entrenado,
-        rutinasAsignadasIds: rutinasAsignadasIds.length > 0 ? rutinasAsignadasIds : undefined
+        rutinasAsignadasIds: rutinasAsignadasIds.length > 0 ? rutinasAsignadasIds : []
       };
       await this.entrenadoService.save(entrenadoActualizado);
 
@@ -529,9 +539,6 @@ export class EntrenadosPage implements OnInit {
         position: 'bottom'
       });
       await toast.present();
-
-      // Recargar disponibles
-      this.cargarRutinasDisponibles();
 
     } catch (error) {
       console.error('Error al desasignar rutina:', error);

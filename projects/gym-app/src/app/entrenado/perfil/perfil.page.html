@@ -1,200 +1,168 @@
 <ion-header [translucent]="true" class="px-4">
-  <ion-toolbar class="">
+  <ion-toolbar>
     <ion-buttons slot="start">
+      @if (!isEditing()) {
       <ion-back-button defaultHref="/entrenado-tabs/dashboard" text="" icon="arrow-back-outline"></ion-back-button>
-    </ion-buttons>
-    <ion-title class="text-center flex-1 text-base">Perfil</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear">
-        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
+      } @else {
+      <ion-button (click)="toggleEdit()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
       </ion-button>
+      }
+    </ion-buttons>
+    <ion-title class="text-center flex-1 text-base">
+      {{ isEditing() ? 'Editar Perfil' : 'Perfil' }}
+    </ion-title>
+    <ion-buttons slot="end">
+      @if (!isEditing()) {
+      <ion-button (click)="toggleEdit()">
+        <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      } @else {
+      <ion-button (click)="saveProfile()" [disabled]="editForm.invalid">
+        <ion-icon name="save-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      }
     </ion-buttons>
   </ion-toolbar>
+  @if (isUploading()) {
+  <ion-progress-bar type="indeterminate"></ion-progress-bar>
+  }
 </ion-header>
 
-<ion-content [fullscreen]="true" class="">
+<ion-content [fullscreen]="true">
 
   @if (currentUser(); as user) {
-  <!-- Tarjeta de información personal compacta -->
+  <!-- Tarjeta de información personal -->
   <section class="gym-box-primary px-2 py-2">
-    <div class="flex items-center gap-2 ion-padding">
-      <!-- Foto -->
-      <ion-avatar class="!w-16 !h-16">
-        <img src="../../../assets/images/test-foto.png" alt="" class="">
-      </ion-avatar>
+    <div class="flex items-center gap-4 ion-padding">
+      <!-- Foto con overlay de cámara -->
+      <div class="relative group cursor-pointer" (click)="triggerFileInput()">
+        <ion-avatar class="!w-20 !h-20 border-2 border-white/30 overflow-hidden relative">
+          <img [src]="user.photoURL || '../../../assets/images/test-foto.png'" alt="Foto de perfil"
+            class="object-cover w-full h-full">
+
+          <div
+            class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <ion-icon name="camera-outline" class="text-white text-2xl"></ion-icon>
+          </div>
+
+          @if (isUploading()) {
+          <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+            <ion-spinner name="crescent" color="light"></ion-spinner>
+          </div>
+          }
+        </ion-avatar>
+
+        <div class="absolute -bottom-1 -right-1 bg-primary text-white p-1 rounded-full border-2 border-white shadow-lg">
+          <ion-icon name="camera-outline" class="text-xs block"></ion-icon>
+        </div>
+
+        <input type="file" id="photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+      </div>
+
       <!-- Datos -->
-      <div>
-        <p class="font-heading font-bold text-xl mb-1 ">
+      <div class="flex-1">
+        @if (!isEditing()) {
+        <h2 class="font-heading font-bold text-2xl text-white mb-1">
           {{ user.nombre }}
-        </p>
-        <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
+        </h2>
+        <ion-chip class="bg-white/20 text-white border-0 backdrop-blur-sm">
+          <ion-icon name="trophy-outline" class="mr-1"></ion-icon>
           Plan {{ user.plan }}
         </ion-chip>
+        } @else {
+        <form [formGroup]="editForm">
+          <ion-item class="--background-transparent !p-0" counter="true">
+            <ion-label position="stacked" class="text-white/70">Nombre</ion-label>
+            <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="text-white font-bold text-xl"
+              maxlength="50">
+            </ion-input>
+          </ion-item>
+        </form>
+        }
       </div>
     </div>
   </section>
 
-  <!--  -->
-  <section class="ion-padding">
-    <div class="border border-solid border-gray-400 rounded-xl m-2 overflow-hidden bg-white">
-      <ion-list lines="inset" style="background: transparent; margin: 0; padding: 0;">
+  <!-- Información Detallada -->
+  <section class="ion-padding mt-2">
+    <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color">
+      <ion-list lines="inset" class="!bg-transparent !p-0">
 
-        <!-- Email -->
-        @if (user.email) {
-        <ion-item style="--background: transparent;">
+        <!-- Email (No editable) -->
+        <ion-item class="item-interactive">
           <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap py-2">
-            <h3 class="text-gray-500 text-xs font-heading">Email</h3>
-            <p class="text-black text-base mt-1">{{ user.email }}</p>
+          <ion-label class="py-2">
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Email</h3>
+            <p class="text-foreground font-medium mt-1">{{ user.email }}</p>
           </ion-label>
+          <ion-icon name="lock-closed-outline" slot="end" size="small" class="text-muted opacity-50"></ion-icon>
         </ion-item>
-        }
 
+        <!-- Gimnasio -->
         @if (user.gimnasioId) {
-        <ion-item style="--background: transparent;">
+        <ion-item class="item-interactive">
           <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap py-2">
-            <h3 class="text-gray-500 text-xs font-heading">Gimnasio</h3>
-            <p class="text-black text-base mt-1">{{ user.gimnasioId }}</p>
+          <ion-label class="py-2">
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Gimnasio</h3>
+            <p class="text-foreground font-medium mt-1">{{ user.gimnasioId }}</p>
           </ion-label>
         </ion-item>
         }
 
+        <!-- Entrenador -->
         @if (user.entrenadorId) {
-        <ion-item style="--background: transparent;">
+        <ion-item class="item-interactive">
           <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap py-2">
-            <h3 class="text-gray-500 text-xs font-heading">Entrenador</h3>
-            <p class="text-black text-base mt-1">{{ user.entrenadorId }}</p>
+          <ion-label class="py-2">
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Entrenador</h3>
+            <p class="text-foreground font-medium mt-1">{{ user.entrenadorId }}</p>
           </ion-label>
         </ion-item>
         }
 
         <!-- Plan -->
-        @if (user.plan) {
-        <ion-item lines="none" style="--background: transparent;">
+        <ion-item lines="none" class="item-interactive">
           <ion-icon name="trophy-outline" slot="start" color="primary"></ion-icon>
-          <ion-label class="ion-text-wrap py-2">
-            <h3 class="text-gray-500 text-xs font-heading">Plan</h3>
-            <p class="text-black text-base mt-1">{{ user.plan }}</p>
+          <ion-label class="py-2">
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Plan Actual</h3>
+            <p class="text-foreground font-medium mt-1 capitalize">{{ user.plan }}</p>
           </ion-label>
+          <ion-icon name="lock-closed-outline" slot="end" size="small" class="text-muted opacity-50"></ion-icon>
         </ion-item>
-        }
 
       </ion-list>
     </div>
   </section>
 
-  <!-- Logout -->
-  <section class="px-4">
-    <div class="px-2">
-      <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
+  <!-- Botones de Acción -->
+  <section class="ion-padding">
+    @if (!isEditing()) {
+    <div class="grid gap-3">
+      <ion-button expand="block" color="danger" fill="outline" (click)="logout()" class="ion-margin-top">
         <ion-icon name="log-out-outline" slot="start"></ion-icon>
         Cerrar Sesión
       </ion-button>
     </div>
+    } @else {
+    <div class="grid grid-cols-2 gap-3">
+      <ion-button expand="block" color="medium" fill="outline" (click)="toggleEdit()">
+        Cancelar
+      </ion-button>
+      <ion-button expand="block" color="primary" (click)="saveProfile()" [disabled]="editForm.invalid">
+        Guardar
+      </ion-button>
+    </div>
+    }
   </section>
 
-  <!-- <ion-card class="profile-card">
-      <ion-card-content class="profile-content">
-        <div class="profile-header">
-          <ion-avatar class="profile-avatar">
-            <div class="avatar-placeholder">
-              {{ getIniciales(user.nombre) }}
-            </div>
-          </ion-avatar>
-          <div class="profile-info">
-            <h2></h2>
-            <ion-badge [color]="getBadgeColor(user.role)">
-              <ion-icon name="shield-outline"></ion-icon>
-              {{ getRoleDisplayName(user.role) }}
-            </ion-badge>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card> -->
-
-  <!-- Información de contacto en grid -->
-  <!-- <ion-card class="info-card">
-      <ion-card-header class="card-header-compact">
-        <ion-card-title>
-          <ion-icon name="person-outline"></ion-icon>
-          Información Personal
-        </ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="info-grid">
-        @if (user.email) {
-          <div class="info-item">
-            <ion-icon name="mail-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Email</span>
-              <span class="info-value">{{ user.email }}</span>
-            </div>
-          </div>
-        }
-
-        @if (user.gimnasioId) {
-          <div class="info-item">
-            <ion-icon name="fitness-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Gimnasio</span>
-              <span class="info-value">{{ user.gimnasioId }}</span>
-            </div>
-          </div>
-        }
-
-        @if (user.entrenadorId) {
-          <div class="info-item">
-            <ion-icon name="person-outline" color="primary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Entrenador</span>
-              <span class="info-value">{{ user.entrenadorId }}</span>
-            </div>
-          </div>
-        }
-
-        @if (user.plan) {
-          <div class="info-item">
-            <ion-icon name="trophy-outline" color="tertiary"></ion-icon>
-            <div class="info-text">
-              <span class="info-label">Plan</span>
-              <span class="info-value">{{ user.plan }}</span>
-            </div>
-          </div>
-        }
-
-        <div class="info-item">
-          <ion-icon name="shield-outline" color="primary"></ion-icon>
-          <div class="info-text">
-            <span class="info-label">ID Usuario</span>
-            <span class="info-value user-id">{{ user.uid }}</span>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card> -->
-
-  <!-- Acciones de la cuenta -->
-  <!-- <ion-card class="account-card">
-      <ion-card-content class="account-content">
-        <ion-button
-          expand="block"
-          color="danger"
-          fill="outline"
-          (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Cerrar Sesión
-        </ion-button>
-      </ion-card-content>
-    </ion-card> -->
-
   } @else {
-  <ion-card>
-    <ion-card-content>
-      <p>No se pudo cargar la información del usuario.</p>
-      <ion-button expand="block" (click)="logout()">
-        Volver al inicio
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
+  <div class="flex flex-col items-center justify-center h-full p-8 text-center">
+    <ion-icon name="person-outline" class="text-6xl text-muted opacity-20 mb-4"></ion-icon>
+    <p class="text-muted mb-6">No se pudo cargar la información del perfil.</p>
+    <ion-button (click)="logout()" fill="outline">
+      Volver al inicio
+    </ion-button>
+  </div>
   }
 </ion-content>

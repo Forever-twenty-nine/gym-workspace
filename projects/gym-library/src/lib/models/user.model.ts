@@ -1,4 +1,4 @@
-import { Rol} from '../enums/rol.enum';
+import { Rol } from '../enums/rol.enum';
 import { Plan } from '../enums/plan.enum';
 
 export interface User {
@@ -12,5 +12,5 @@ export interface User {
   entrenadoId?: string;
   onboarded?: boolean;
   plan?: Plan;
- 
+  photoURL?: string;
 }

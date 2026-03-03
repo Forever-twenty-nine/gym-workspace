@@ -22,7 +22,7 @@
     "skipLibCheck": true,
     "paths": {
       "gym-library": [
-        "../../dist/gym-library"
+        "../gym-library/src/public-api"
       ]
     }
   },
