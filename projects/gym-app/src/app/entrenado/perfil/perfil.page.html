@@ -160,17 +160,6 @@
           </ion-item>
           }
 
-          <!-- Entrenador -->
-          @if (user.entrenadorId) {
-          <ion-item class="item-interactive">
-            <ion-icon name="person-outline" slot="start" color="primary"></ion-icon>
-            <ion-label class="py-2">
-              <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Entrenador</h3>
-              <p class="text-foreground font-medium mt-1 text-left">{{ user.entrenadorId }}</p>
-            </ion-label>
-          </ion-item>
-          }
-
           <!-- Objetivo -->
           @if (user.role === 'entrenado') {
           <ion-item class="item-interactive">

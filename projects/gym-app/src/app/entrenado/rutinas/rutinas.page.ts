@@ -225,31 +225,24 @@ export class RutinasPage implements OnInit {
   }
 
   iniciarEntrenamiento(rutina: any) {
-    console.log('iniciarEntrenamiento llamado con rutina:', rutina);
-
     // Si el modal está abierto, lo cerramos
     if (this.modalAbierto()) {
       this.cerrarModal();
 
       setTimeout(() => {
         this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
-          .then(success => console.log('Navegación al cronómetro (modal):', success))
           .catch(err => console.error('Error ruteando:', err));
       }, 350);
     } else {
       this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
-        .then(success => console.log('Navegación al cronómetro (directo):', success))
         .catch(err => console.error('Error ruteando:', err));
     }
   }
 
   iniciarEntrenamientoDirecto(event: Event, rutina: any) {
     event.stopPropagation();
-    console.log('iniciarEntrenamientoDirecto llamado con rutina:', rutina);
     this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`)
-      .then(success => console.log('Navegación mini play:', success))
-      .catch(err => console.error('Error ruteando (mini play):', err));
+      .catch(err => console.error('Error ruteando:', err));
   }
-
 
 }

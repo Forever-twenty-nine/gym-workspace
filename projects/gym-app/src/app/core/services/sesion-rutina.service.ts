@@ -221,8 +221,8 @@ export class SesionRutinaService {
       const ref = doc(this.firestore, this.COLLECTION, id);
       const data: any = {
         compartida,
-        nombreUsuario: userName,
-        fotoUsuario: userPhoto,
+        nombreUsuario: userName || 'Usuario',
+        fotoUsuario: userPhoto || null, // Asegurar null en lugar de undefined
         fechaCompartida: compartida ? Timestamp.now() : null
       };
       await updateDoc(ref, data);

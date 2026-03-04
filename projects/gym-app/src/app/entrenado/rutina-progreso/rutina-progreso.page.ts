@@ -167,7 +167,6 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   });
 
   constructor() {
-    console.log('Constructor rutina-progreso');
     addIcons({
       arrowBack,
       timerOutline,
@@ -189,7 +188,6 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     const rutinaId = this.route.snapshot.paramMap.get('rutinaId');
-    console.log('ngOnInit rutina-progreso, rutinaId:', rutinaId);
 
     if (rutinaId) {
       this.rutinaId.set(rutinaId);
@@ -208,7 +206,6 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log('ngOnDestroy rutina-progreso');
     if (this.intervaloCronometro) {
       clearInterval(this.intervaloCronometro);
     }

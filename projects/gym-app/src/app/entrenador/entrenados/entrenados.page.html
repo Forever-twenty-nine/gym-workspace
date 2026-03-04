@@ -3,8 +3,8 @@
 <ion-content [fullscreen]="true">
   <div class="entrenados-container">
     <!-- Listado de Entrenados -->
-    <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName"
-      [estaEntrenando]="estaEntrenando" [getRutinasCount]="getRutinasAsignadasCount" (verCliente)="verCliente($event)"
+    <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
+      [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)" (verCliente)="verCliente($event)"
       (openRutinasModal)="openRutinasModal($event)" (openInvitacionModal)="openInvitacionModal()">
     </app-mis-entrenados>
 
@@ -15,8 +15,8 @@
 
   <!-- Detalle del Entrenado -->
   <app-entrenado-detalle-popover [isOpen]="isModalOpen()" [entrenado]="selectedEntrenado()"
-    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName" [formatearTiempo]="formatearTiempo"
-    [getAntiguedadDias]="getAntiguedadDias" (close)="closeModal()">
+    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)" [formatearTiempo]="formatearTiempo.bind(this)"
+    [getAntiguedadDias]="getAntiguedadDias.bind(this)" (close)="closeModal()">
   </app-entrenado-detalle-popover>
 </ion-content>
 
@@ -28,7 +28,7 @@
 <!-- Modal de Gestión de Rutinas -->
 <app-gestion-rutinas-modal [isOpen]="isRutinasModalOpen()" [entrenado]="selectedEntrenado()"
   [rutinasEntrenado]="rutinasEntrenado()" [rutinasDisponibles]="rutinasDisponibles()" [diasSemana]="diasSemana"
-  [getUserName]="getUserName" [getDiasAsignados]="getDiasAsignados.bind(this)" (close)="closeRutinasModal()"
+  [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)" (close)="closeRutinasModal()"
   (desasignarRutina)="desasignarRutina($event)" (quitarDiaDeRutina)="quitarDiaDeRutina($event.rutinaId, $event.dia)"
   (asignarDiaARutina)="asignarDiaARutina($event.rutina, $event.event)" (asignarRutina)="asignarRutina($event)">
 </app-gestion-rutinas-modal>

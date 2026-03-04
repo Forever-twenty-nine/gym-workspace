@@ -35,7 +35,6 @@ export class AuthService {
     try {
       const savedUser = localStorage.getItem('gym_auth_user');
       if (savedUser) {
-        console.log('🛡️ Auth: Cargando sesión inicial de localStorage...');
         const user = JSON.parse(savedUser) as User;
         this._currentUser.set(user);
         this._isAuthenticated.set(true);
@@ -47,11 +46,8 @@ export class AuthService {
   }
 
   private initializeAuthListener() {
-    console.log('🛡️ Auth: Inicializando listener de Firebase...');
     // Escuchamos cambios de auth de forma directa y sincronizada
     onAuthStateChanged(this.auth, async (firebaseUser) => {
-      console.log('🛡️ Auth: Cambio en Firebase User:', firebaseUser ? firebaseUser.email : 'NULL');
-
       // Limpiar listener previo si existe
       if (this.userSnapshotUnsubscribe) {
         this.userSnapshotUnsubscribe();
@@ -69,7 +65,6 @@ export class AuthService {
           const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
           this.userSnapshotUnsubscribe = onFirestoreSnapshot(userDocRef, (snapshot) => {
             if (snapshot.exists()) {
-              console.log('🛡️ Auth: Cambio detectado en documento de usuario (Real-time)');
               const data = snapshot.data() as User;
               const updatedUser = { ...data, uid: firebaseUser.uid };
               this._currentUser.set(updatedUser);
@@ -82,7 +77,6 @@ export class AuthService {
           this._isLoading.set(false);
         }
       } else {
-        console.warn('🛡️ Auth: Sesión de Firebase terminada (NULL)');
         this._currentUser.set(null);
         this._isAuthenticated.set(false);
         this._isLoading.set(false);
