@@ -12,7 +12,7 @@ import {
 
   IonCardContent,
   IonAvatar, IonButtons, IonBackButton, IonChip, IonList, IonItem, IonLabel, IonInput, IonProgressBar, IonSpinner, IonBadge,
-  IonSelect, IonSelectOption
+  IonSelect, IonSelectOption, IonToggle, IonCheckbox, IonDatetime, IonDatetimeButton, IonModal
 } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
@@ -51,7 +51,8 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { FirebaseStorageService } from '../../core/services/firebase-storage.service';
 import { PlanService } from '../../core/services/plan.service';
-import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { NotificacionService } from '../../core/services/notificacion.service';
+import { AlertController, LoadingController, ToastController, Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-perfil',
@@ -62,6 +63,7 @@ import { AlertController, LoadingController, ToastController } from '@ionic/angu
     IonChip, IonBackButton, IonButtons, IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonIcon, IonAvatar, IonList, IonItem,
     IonLabel, IonInput, IonProgressBar, IonSpinner, IonSelect, IonSelectOption,
+    IonToggle, IonDatetime, IonDatetimeButton, IonModal,
     FormsModule, ReactiveFormsModule, CommonModule
   ],
 })
@@ -72,11 +74,13 @@ export class PerfilPage implements OnInit, OnDestroy {
   public entrenadoService = inject(EntrenadoService);
   private storageService = inject(FirebaseStorageService);
   private planService = inject(PlanService);
+  private notificacionService = inject(NotificacionService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
+  private platform = inject(Platform);
 
   currentUser = computed(() => this.authService.currentUser() as User);
   currentEntrenado = computed(() => {
@@ -91,6 +95,15 @@ export class PerfilPage implements OnInit, OnDestroy {
   editForm!: FormGroup;
   objetivoOptions = Object.values(Objetivo);
   nivelOptions = ['Principiante', 'Intermedio', 'Avanzado', 'Atleta'];
+  diasSemana = [
+    { n: 1, label: 'Lun' },
+    { n: 2, label: 'Mar' },
+    { n: 3, label: 'Mié' },
+    { n: 4, label: 'Jue' },
+    { n: 5, label: 'Vie' },
+    { n: 6, label: 'Sáb' },
+    { n: 0, label: 'Dom' }
+  ];
 
   // Estadísticas computadas
   estadisticas = computed(() => {
@@ -184,8 +197,77 @@ export class PerfilPage implements OnInit, OnDestroy {
       email: [{ value: user?.email || '', disabled: true }],
       plan: [{ value: user?.plan || '', disabled: true }],
       objetivo: [entrenado?.objetivo || ''],
-      nivel: [entrenado?.nivel || '']
+      nivel: [entrenado?.nivel || ''],
+      recordatoriosEntrenamiento: [entrenado?.configNotificaciones?.recordatoriosEntrenamiento || false],
+      horaRecordatorio: [entrenado?.configNotificaciones?.horaRecordatorio || '08:00'],
+      diasRecordatorio: [entrenado?.configNotificaciones?.diasRecordatorio || []]
     });
+  }
+
+  isDiaSelected(dia: number): boolean {
+    const seleccionados = this.editForm.get('diasRecordatorio')?.value as number[];
+    return seleccionados?.includes(dia) || false;
+  }
+
+  toggleDia(dia: number) {
+    const control = this.editForm.get('diasRecordatorio');
+    if (!control) {
+      console.error('❌ Control diasRecordatorio no encontrado');
+      return;
+    }
+
+    const value = control.value;
+    const seleccionados = Array.isArray(value) ? [...value] : [];
+    const index = seleccionados.indexOf(dia);
+
+    if (index > -1) {
+      seleccionados.splice(index, 1);
+    } else {
+      seleccionados.push(dia);
+    }
+
+    console.log(`📅 Toggling día ${dia}. Nuevos seleccionados:`, seleccionados);
+    control.setValue(seleccionados);
+    control.markAsDirty();
+
+    // Si no estamos en modo edición general, guardamos los cambios de notificaciones inmediatamente
+    if (!this.isEditing()) {
+      this.saveNotificationSettings();
+    }
+  }
+
+  /**
+   * Guarda únicamente la configuración de notificaciones
+   */
+  async saveNotificationSettings() {
+    const user = this.currentUser();
+    const entrenadoData = this.currentEntrenado();
+    if (!user || !entrenadoData) return;
+
+    try {
+      const configNotificaciones = {
+        recordatoriosEntrenamiento: this.editForm.value.recordatoriosEntrenamiento,
+        horaRecordatorio: this.editForm.value.horaRecordatorio,
+        diasRecordatorio: this.editForm.value.diasRecordatorio
+      };
+
+      const updatedEntrenado = {
+        ...entrenadoData,
+        configNotificaciones
+      };
+
+      await this.entrenadoService.save(updatedEntrenado);
+
+      // Programar notificaciones locales
+      if (this.platform.is('capacitor')) {
+        await this.notificacionService.programarRecordatoriosEntrenamiento(configNotificaciones);
+      }
+
+      this.showToast('Configuración de recordatorios actualizada', 'success');
+    } catch (e) {
+      console.error('❌ Error guardando config notif:', e);
+      this.showToast('Error al guardar la configuración', 'danger');
+    }
   }
 
   toggleEdit() {
@@ -222,9 +304,19 @@ export class PerfilPage implements OnInit, OnDestroy {
           const updatedEntrenado = {
             ...entrenadoData,
             objetivo: this.editForm.value.objetivo,
-            nivel: this.editForm.value.nivel
+            nivel: this.editForm.value.nivel,
+            configNotificaciones: {
+              recordatoriosEntrenamiento: this.editForm.value.recordatoriosEntrenamiento,
+              horaRecordatorio: this.editForm.value.horaRecordatorio,
+              diasRecordatorio: this.editForm.value.diasRecordatorio
+            }
           };
           await this.entrenadoService.save(updatedEntrenado);
+
+          // Programar notificaciones locales
+          if (this.platform.is('capacitor')) {
+            await this.notificacionService.programarRecordatoriosEntrenamiento(updatedEntrenado.configNotificaciones);
+          }
         }
       }
 

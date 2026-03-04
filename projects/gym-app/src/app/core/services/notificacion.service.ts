@@ -17,15 +17,18 @@ import {
     updateDoc,
     getDocs
 } from 'firebase/firestore';
-import { Notificacion, TipoNotificacion } from 'gym-library';
+import { Notificacion, TipoNotificacion, ConfigNotificacion } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { Platform } from '@ionic/angular';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
     private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
     private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
+    private readonly platform = inject(Platform);
     private readonly COLLECTION = 'notificaciones';
 
     private readonly _notificaciones: WritableSignal<Notificacion[]> = signal<Notificacion[]>([]);
@@ -192,6 +195,64 @@ export class NotificacionService {
                 notif.usuarioId === usuarioId && notif.tipo === tipo
             )
         );
+    }
+
+    /**
+     * 📅 Programa recordatorios de entrenamiento locales
+     */
+    async programarRecordatoriosEntrenamiento(config?: ConfigNotificacion): Promise<void> {
+        if (!this.platform.is('capacitor')) return;
+
+        try {
+            // Primero cancelamos todos los recordatorios existentes
+            await this.cancelarRecordatorios();
+
+            if (!config || !config.recordatoriosEntrenamiento || !config.horaRecordatorio || !config.diasRecordatorio?.length) {
+                return;
+            }
+
+            const [hours, minutes] = config.horaRecordatorio.split(':').map(Number);
+
+            const notifications = config.diasRecordatorio.map(dia => ({
+                title: '¡Hora de entrenar!',
+                body: 'Tienes una rutina esperándote. ¡No faltes!',
+                id: 100 + dia, // IDs únicos por día de la semana
+                schedule: {
+                    on: {
+                        weekday: dia + 1, // Capacitor usa 1 (Dom) a 7 (Sab), nosotros 0-6
+                        hour: hours,
+                        minute: minutes
+                    },
+                    repeats: true,
+                    allowWhileIdle: true
+                }
+            }));
+
+            await LocalNotifications.schedule({ notifications });
+            console.log('✅ Recordatorios programados:', notifications);
+        } catch (e) {
+            console.error('❌ Error programando recordatorios:', e);
+        }
+    }
+
+    /**
+     * 🚫 Cancela todos los recordatorios locales de entrenamiento
+     */
+    async cancelarRecordatorios(): Promise<void> {
+        if (!this.platform.is('capacitor')) return;
+
+        try {
+            const pending = await LocalNotifications.getPending();
+            const idsToCancel = pending.notifications
+                .filter(n => n.id >= 100 && n.id <= 107)
+                .map(n => ({ id: n.id }));
+
+            if (idsToCancel.length > 0) {
+                await LocalNotifications.cancel({ notifications: idsToCancel });
+            }
+        } catch (e) {
+            console.error('❌ Error cancelando recordatorios:', e);
+        }
     }
 
     private mapFromFirestore(data: any): Notificacion {

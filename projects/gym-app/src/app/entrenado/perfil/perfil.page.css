@@ -62,3 +62,20 @@ ion-input {
     --text-muted: #9ca3af;
   }
 }
+
+/* Chips Recordatorios */
+ion-chip {
+  --background: rgba(var(--ion-color-medium-rgb), 0.1);
+  --color: var(--text-muted);
+  border: 1px solid transparent;
+}
+
+ion-chip.chip-active {
+  --background: var(--ion-color-primary);
+  --color: #ffffff;
+  box-shadow: 0 4px 10px rgba(var(--ion-color-primary-rgb), 0.3);
+}
+
+ion-chip:hover {
+  filter: brightness(1.1);
+}

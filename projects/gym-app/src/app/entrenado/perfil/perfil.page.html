@@ -37,7 +37,7 @@
       <div class="flex items-center gap-4 ion-padding">
         <!-- Foto con overlay de cámara -->
         <div class="relative group cursor-pointer" (click)="triggerFileInput()">
-          <ion-avatar class="!w-20 !h-20 border-2 border-white/30 overflow-hidden relative">
+          <ion-avatar class="w-20! h-20! border-2 border-white/30 overflow-hidden relative">
             <img [src]="user.photoURL || '../../../assets/images/test-foto.png'" alt="Foto de perfil"
               class="object-cover w-full h-full">
 
@@ -72,7 +72,7 @@
             Plan {{ user.plan || 'free' }}
           </ion-chip>
           } @else {
-          <ion-item class="--background-transparent !p-0" counter="true">
+          <ion-item class="--background-transparent p-0!" counter="true">
             <ion-label position="stacked" class="text-white/70">Nombre</ion-label>
             <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="text-white font-bold text-xl"
               maxlength="50">
@@ -137,7 +137,7 @@
     <!-- Información Detallada -->
     <section class="ion-padding mt-0">
       <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color">
-        <ion-list lines="inset" class="!bg-transparent !p-0">
+        <ion-list lines="inset" class="bg-transparent! p-0!">
 
           <!-- Email -->
           <ion-item class="item-interactive">
@@ -197,6 +197,51 @@
 
         </ion-list>
       </div>
+
+      <!-- Recordatorios de Entrenamiento (Fuera de la lista para evitar conflictos de interacción) -->
+      @if (user.role === 'entrenado') {
+      <div class="bg-card-bg rounded-2xl overflow-hidden shadow-sm border border-border-color mt-4 p-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <ion-icon name="notifications-outline" color="primary" class="text-xl"></ion-icon>
+            <h3 class="text-muted text-xs font-heading uppercase tracking-wider">Recordatorios de Entrenamiento</h3>
+          </div>
+          <ion-toggle formControlName="recordatoriosEntrenamiento"
+            (ionChange)="!isEditing() && saveNotificationSettings()"></ion-toggle>
+        </div>
+
+        @if (editForm.get('recordatoriosEntrenamiento')?.value) {
+        <div class="mt-4 animate-fade-in space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-foreground/70">Hora del recordatorio</span>
+            <div class="flex items-center gap-2">
+              <ion-datetime-button datetime="timepicker"></ion-datetime-button>
+              <ion-modal [keepContentsMounted]="true">
+                <ng-template>
+                  <ion-datetime id="timepicker" presentation="time" formControlName="horaRecordatorio"
+                    (ionChange)="!isEditing() && saveNotificationSettings()">
+                  </ion-datetime>
+                </ng-template>
+              </ion-modal>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-sm text-foreground/70 block mb-3">Días de la semana</span>
+            <div class="flex flex-wrap gap-2">
+              @for (dia of diasSemana; track dia.n) {
+              <ion-chip [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'"
+                (click)="toggleDia(dia.n)" class="m-0 transition-all duration-200 cursor-pointer"
+                [class.chip-active]="isDiaSelected(dia.n)">
+                <ion-label class="text-xs font-semibold">{{ dia.label }}</ion-label>
+              </ion-chip>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      }
     </section>
 
     <!-- Botones de Acción -->
