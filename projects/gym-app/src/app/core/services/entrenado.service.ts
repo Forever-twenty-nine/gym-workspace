@@ -12,7 +12,9 @@ import {
     Timestamp,
     query,
     where,
-    updateDoc
+    updateDoc,
+    arrayUnion,
+    arrayRemove
 } from 'firebase/firestore';
 import { Entrenado } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -122,6 +124,46 @@ export class EntrenadoService {
     }
 
     /**
+     * 👥 Sigue a un usuario
+     */
+    async followUser(currentUserId: string, targetUserId: string): Promise<void> {
+        return this.runInZone(async () => {
+            const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
+            const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
+
+            // Añadir al target a mis seguidos
+            await updateDoc(currentUserRef, {
+                seguidos: arrayUnion(targetUserId)
+            });
+
+            // Añadirme a los seguidores del target
+            await updateDoc(targetUserRef, {
+                seguidores: arrayUnion(currentUserId)
+            });
+        });
+    }
+
+    /**
+     * 👥 Deja de seguir a un usuario
+     */
+    async unfollowUser(currentUserId: string, targetUserId: string): Promise<void> {
+        return this.runInZone(async () => {
+            const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
+            const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
+
+            // Quitar al target de mis seguidos
+            await updateDoc(currentUserRef, {
+                seguidos: arrayRemove(targetUserId)
+            });
+
+            // Quitarme de los seguidores del target
+            await updateDoc(targetUserRef, {
+                seguidores: arrayRemove(currentUserId)
+            });
+        });
+    }
+
+    /**
      * 🔍 Busca entrenados por ID
      */
     getEntrenadoById(id: string): Signal<Entrenado | null> {
@@ -200,7 +242,10 @@ export class EntrenadoService {
             objetivo: data.objetivo || null,
             entrenadoresId: data.entrenadoresId || [],
             rutinasAsignadasIds: data.rutinasAsignadasIds || [],
-            rutinasCreadas: data.rutinasCreadas || []
+            rutinasCreadas: data.rutinasCreadas || [],
+            nivel: data.nivel || null,
+            seguidores: data.seguidores || [],
+            seguidos: data.seguidos || []
         };
     }
 
@@ -213,6 +258,9 @@ export class EntrenadoService {
         if (entrenado.entrenadoresId) data.entrenadoresId = entrenado.entrenadoresId;
         if (entrenado.rutinasAsignadasIds) data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds;
         if (entrenado.rutinasCreadas) data.rutinasCreadas = entrenado.rutinasCreadas;
+        if (entrenado.nivel !== undefined) data.nivel = entrenado.nivel;
+        if (entrenado.seguidores) data.seguidores = entrenado.seguidores;
+        if (entrenado.seguidos) data.seguidos = entrenado.seguidos;
         return data;
     }
 }

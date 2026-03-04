@@ -14,6 +14,14 @@
       <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ sesion.nombreUsuario || 'Usuario' }}</h3>
       <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ formatearFecha(sesion.fechaInicio) }}</p>
     </ion-label>
+    @if (!isOwnPost()) {
+    <ion-button slot="end" [fill]="isFollowing() ? 'outline' : 'solid'" [color]="isFollowing() ? 'medium' : 'primary'"
+      (click)="toggleFollow($event)" class="font-bold text-xs h-8 m-0 normal-case rounded-full">
+      <ion-icon slot="start" [name]="isFollowing() ? 'person-remove-outline' : 'person-add-outline'"></ion-icon>
+      {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
+    </ion-button>
+    }
+
     <ion-button slot="end" fill="clear" color="medium" class="m-0">
       <ion-icon name="ellipsis-vertical" slot="icon-only"></ion-icon>
     </ion-button>

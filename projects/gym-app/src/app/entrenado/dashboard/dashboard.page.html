@@ -107,7 +107,7 @@
       <div class="w-full flex flex-row items-center gap-3   ">
         <ion-icon name="accessibility-outline" class="!text-xl"></ion-icon>
         <p class="text-base ">
-          Principiante
+          {{ entrenadoDataSignal()?.nivel || 'No definido' }}
         </p>
       </div>
       <!-- objetivo -->
@@ -121,7 +121,7 @@
       <div class=" w-full min-w-28 flex flex-row items-center gap-3">
         <ion-icon name="today-outline" class="!text-xl"></ion-icon>
         <p class="text-base ">
-          4 días por semana
+          {{ frecuenciaSemanal() }} días por semana
         </p>
       </div>
     </div>

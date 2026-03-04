@@ -183,13 +183,25 @@
               </p>
             </ion-label>
             } @else {
-            <ion-label position="stacked" color="primary">Objetivo</ion-label>
-            <ion-select formControlName="objetivo" placeholder="Selecciona tu objetivo" interface="popover"
-              class="w-full text-foreground">
-              @for (opcion of objetivoOptions; track opcion) {
-              <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
-              }
-            </ion-select>
+            <ion-item>
+              <ion-label position="stacked" color="primary">Objetivo</ion-label>
+              <ion-select formControlName="objetivo" placeholder="Selecciona tu objetivo" interface="popover"
+                class="w-full text-foreground">
+                @for (opcion of objetivoOptions; track opcion) {
+                <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked" color="primary">Nivel</ion-label>
+              <ion-select formControlName="nivel" placeholder="Selecciona tu nivel" interface="popover"
+                class="w-full text-foreground">
+                @for (nivel of nivelOptions; track nivel) {
+                <ion-select-option [value]="nivel">{{ nivel }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
             }
           </ion-item>
           }

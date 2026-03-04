@@ -8,4 +8,7 @@ export interface Entrenado {
     rutinasAsignadasIds?: string[]; // IDs de RutinaAsignada
     // Plan Premium
     rutinasCreadas?: string[];
+    nivel?: string;
+    seguidores?: string[]; // IDs de otros Entrenados que lo siguen
+    seguidos?: string[];   // IDs de otros Entrenados a los que sigue
 }

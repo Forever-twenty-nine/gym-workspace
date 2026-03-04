@@ -131,6 +131,24 @@ export class DashboardPage implements OnInit {
     return 'Busca un entrenador para definir tu objetivo';
   });
 
+  frecuenciaSemanal = computed(() => {
+    const user = this.currentUserSignal();
+    const userId = user?.uid;
+    if (!userId) return 0;
+
+    const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(userId)();
+    if (!asignaciones.length) return 0;
+
+    // Obtener días únicos de la semana
+    const diasUnicos = new Set(
+      asignaciones
+        .filter(asig => asig.diaSemana)
+        .map(asig => asig.diaSemana!.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+    );
+
+    return diasUnicos.size;
+  });
+
   invitacionesPendientes = computed(() => {
     const user = this.currentUserSignal();
     const userId = user?.uid;

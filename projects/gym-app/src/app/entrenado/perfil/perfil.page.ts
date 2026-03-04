@@ -90,6 +90,7 @@ export class PerfilPage implements OnInit, OnDestroy {
   private solicitudesUnsubscribe?: Unsubscribe;
   editForm!: FormGroup;
   objetivoOptions = Object.values(Objetivo);
+  nivelOptions = ['Principiante', 'Intermedio', 'Avanzado', 'Atleta'];
 
   // Estadísticas computadas
   estadisticas = computed(() => {
@@ -182,7 +183,8 @@ export class PerfilPage implements OnInit, OnDestroy {
       nombre: [user?.nombre || '', [Validators.required, Validators.minLength(3)]],
       email: [{ value: user?.email || '', disabled: true }],
       plan: [{ value: user?.plan || '', disabled: true }],
-      objetivo: [entrenado?.objetivo || '']
+      objetivo: [entrenado?.objetivo || ''],
+      nivel: [entrenado?.nivel || '']
     });
   }
 
@@ -219,7 +221,8 @@ export class PerfilPage implements OnInit, OnDestroy {
         if (entrenadoData) {
           const updatedEntrenado = {
             ...entrenadoData,
-            objetivo: this.editForm.value.objetivo
+            objetivo: this.editForm.value.objetivo,
+            nivel: this.editForm.value.nivel
           };
           await this.entrenadoService.save(updatedEntrenado);
         }

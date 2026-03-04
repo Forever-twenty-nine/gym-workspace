@@ -22,11 +22,14 @@ import {
   checkmark,
   heart,
   heartOutline,
-  ellipsisVertical
+  ellipsisVertical,
+  personAddOutline,
+  personRemoveOutline
 } from 'ionicons/icons';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
+import { EntrenadoService } from '../../../../core/services/entrenado.service';
 
 @Component({
   selector: 'app-social-card',
@@ -62,6 +65,7 @@ export class SocialCardComponent {
   private readonly sesionService = inject(SesionRutinaService);
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly entrenadoService = inject(EntrenadoService);
 
   // Perfil del usuario actual para los likes
   currentUser = this.authService.currentUser;
@@ -71,6 +75,28 @@ export class SocialCardComponent {
     const user = this.currentUser();
     const likes = this._sesion()?.likes || [];
     return user ? likes.includes(user.uid) : false;
+  });
+
+  // Perfil del entrenado actual para obtener a quién sigue
+  currentEntrenado = computed(() => {
+    const user = this.currentUser();
+    if (!user) return null;
+    return this.entrenadoService.getEntrenado(user.uid)();
+  });
+
+  // Computamos si el usuario actual sigue al autor de la sesión
+  isFollowing = computed(() => {
+    const entrenado = this.currentEntrenado();
+    const targetUserId = this._sesion()?.entrenadoId;
+    if (!entrenado || !targetUserId) return false;
+    return (entrenado.seguidos || []).includes(targetUserId);
+  });
+
+  // Es mi propio post?
+  isOwnPost = computed(() => {
+    const user = this.currentUser();
+    const posterId = this._sesion()?.entrenadoId;
+    return user && posterId ? user.uid === posterId : false;
   });
 
   // Computamos la cantidad de likes
@@ -101,7 +127,9 @@ export class SocialCardComponent {
       checkmark,
       heart,
       heartOutline,
-      ellipsisVertical
+      ellipsisVertical,
+      personAddOutline,
+      personRemoveOutline
     });
   }
 
@@ -133,6 +161,24 @@ export class SocialCardComponent {
           console.error('❌ Error al dar like:', err);
           this._sesion.set(currentSesion); // Revertir si falla
         });
+    }
+  }
+
+  async toggleFollow(event: Event) {
+    event.stopPropagation();
+    const currentUser = this.currentUser();
+    const targetUserId = this._sesion()?.entrenadoId;
+
+    if (!currentUser || !targetUserId) return;
+
+    try {
+      if (this.isFollowing()) {
+        await this.entrenadoService.unfollowUser(currentUser.uid, targetUserId);
+      } else {
+        await this.entrenadoService.followUser(currentUser.uid, targetUserId);
+      }
+    } catch (err) {
+      console.error('❌ Error al cambiar estado de seguimiento:', err);
     }
   }
 
