@@ -1,29 +1,6 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonModal,
-  IonButtons,
-  IonInput,
-  IonTextarea,
-  IonSelect,
-  IonSelectOption,
-  IonCheckbox,
-  IonText,
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -32,51 +9,31 @@ import { AuthService } from '../../core/services/auth.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
+import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
+import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
+import { AccionesRutinaComponent } from './components/acciones-rutina/acciones-rutina.component';
+import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonModal,
-    IonButtons,
-    IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption,
-    IonText
+    HeaderEntrenadorComponent,
+    ListaRutinasComponent,
+    AccionesRutinaComponent,
+    RutinaModalComponent
   ],
-  styles: [`
-    .rutina-modal {
-      --width: 95%;
-      --max-width: 600px;
-      --border-radius: 16px;
-      --backdrop-opacity: 0.3;
-    }
-  `]
+  styles: []
 })
 export class RutinasPage implements OnInit {
   private authService = inject(AuthService);
   private rutinaService = inject(RutinaService);
-  private ejercicioService = inject(EjercicioService);
   private entrenadorService = inject(EntrenadorService);
-  private fb = inject(FormBuilder);
   private toastController = inject(ToastController);
 
+  // --- Señales Datos ---
   rutinasCreadas: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadorService.getRutinasByEntrenador(entrenadorId)() : [];
@@ -87,202 +44,107 @@ export class RutinasPage implements OnInit {
     return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
   });
 
-  // Computed signals para límites de plan
-  readonly hasReachedRutinaLimit = computed(() => {
+  // --- Señales Límites de Plan ---
+  hasReachedRutinaLimit = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     if (!entrenadorId) return false;
     const limits = this.entrenadorService.getLimits(entrenadorId);
-    const currentCount = this.rutinasCreadas().length;
-    return currentCount >= limits.maxRoutines;
+    return this.rutinasCreadas().length >= limits.maxRoutines;
   });
 
-  readonly rutinaLimitMessage = computed(() => {
+  rutinaLimitMessage = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     if (!entrenadorId) return '';
     const limits = this.entrenadorService.getLimits(entrenadorId);
-    const currentCount = this.rutinasCreadas().length;
-    return `Rutinas creadas: ${currentCount}/${limits.maxRoutines}`;
+    return `Rutinas creadas: ${this.rutinasCreadas().length}/${limits.maxRoutines}`;
   });
-  readonly isRutinaModalOpen = signal(false);
-  readonly rutinaModalData = signal<any>(null);
-  readonly rutinaEditForm = signal<FormGroup | null>(null);
-  readonly isRutinaCreating = signal(false);
 
-  // Señal para reactividad del estado del formulario rutinas
-  private readonly rutinaFormStatus = signal<string>('INVALID');
-
-  readonly isSaveDisabled = computed(() => {
-    return this.rutinaFormStatus() === 'INVALID';
-  });
+  // --- Señales UI ---
+  isRutinaModalOpen = signal(false);
+  rutinaSeleccionada = signal<any | null>(null);
+  isRutinaCreating = signal(false);
 
   constructor() {
     addIcons({ fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed });
   }
 
-  ngOnInit() {
-    // Inicializar si es necesario
-  }
+  ngOnInit() { }
 
   verRutina(rutina: any) {
-    // Abrir modal para ver/editar rutina
-    this.openRutinaModal(rutina);
+    this.rutinaSeleccionada.set(rutina);
+    this.isRutinaCreating.set(false);
+    this.isRutinaModalOpen.set(true);
   }
 
   crearRutina() {
-    this.openCreateRutinaModal();
-  }
-
-  // ========================================
-  // MÉTODOS PARA RUTINAS
-  // ========================================
-
-  async deleteRutina(id: string) {
-    await this.rutinaService.delete(id);
-    // Mostrar toast o algo
-  }
-
-  openRutinaModal(item: any) {
-    this.rutinaModalData.set(item);
-    this.isRutinaModalOpen.set(true);
-    this.isRutinaCreating.set(false);
-    this.createRutinaEditForm(item);
-  }
-
-  openCreateRutinaModal() {
-    const newItem = this.createEmptyRutina();
-    this.rutinaModalData.set(newItem);
-    this.isRutinaModalOpen.set(true);
+    this.rutinaSeleccionada.set(null);
     this.isRutinaCreating.set(true);
-    this.createRutinaEditForm(newItem);
+    this.isRutinaModalOpen.set(true);
   }
 
   closeRutinaModal() {
     this.isRutinaModalOpen.set(false);
-    this.rutinaModalData.set(null);
-    this.rutinaEditForm.set(null);
-    this.isRutinaCreating.set(false);
   }
 
-  private createEmptyRutina(): any {
-    const timestamp = Date.now();
+  async saveRutinaChanges(formValue: any) {
     const entrenadorId = this.authService.currentUser()?.uid;
-    return {
-      id: 'r' + timestamp,
-      nombre: '',
-      descripcion: '',
-      ejerciciosIds: [],
-      creadorId: entrenadorId,
-      asignadoIds: [],
-      activa: true,
-      completado: false
-    };
-  }
+    if (!entrenadorId) return;
 
-  private createRutinaEditForm(item: any) {
-    const formConfig: any = {
-      nombre: [item.nombre || ''],
-      descripcion: [item.descripcion || ''],
-      ejerciciosIds: [item.ejerciciosIds || []],
-      creadorId: [item.creadorId || ''],
-      asignadoIds: [item.asignadoIds || []]
-    };
-
-    const form = this.fb.group(formConfig);
-    this.rutinaEditForm.set(form);
-
-    // Suscribirse a cambios de estado para actualizar la señal reactiva
-    form.statusChanges.subscribe(status => {
-      this.rutinaFormStatus.set(status);
-    });
-    // Establecer estado inicial
-    this.rutinaFormStatus.set(form.status);
-  }
-
-  async saveRutinaChanges() {
-    const form = this.rutinaEditForm();
-    const originalData = this.rutinaModalData();
-
-    if (!form || !originalData) return;
-
-    form.markAllAsTouched();
-
-    if (!form.valid) return;
-
-    // Validar límite de rutinas para creación
-    if (this.isRutinaCreating()) {
-      const entrenadorId = this.authService.currentUser()?.uid;
-      if (entrenadorId) {
-        const limits = this.entrenadorService.getLimits(entrenadorId);
-        const currentCount = this.entrenadorService.getRutinasByEntrenador(entrenadorId)().length;
-        if (currentCount >= limits.maxRoutines) {
-          const toast = await this.toastController.create({
-            message: 'Has alcanzado el límite de rutinas para tu plan. Actualiza para crear más.',
-            duration: 3000,
-            color: 'warning',
-            position: 'top'
-          });
-          await toast.present();
-          return;
-        }
-      }
+    // Validación de límite solo si es nueva
+    if (this.isRutinaCreating() && this.hasReachedRutinaLimit()) {
+      this.mostrarToast('Límite de rutinas alcanzado para tu plan.', 'warning');
+      return;
     }
 
     try {
-      const formValue = form.value;
-
-      // Preparar datos para guardar
-      const rutinaData = {
-        ...originalData,
+      const dataToSave = {
+        ...(this.rutinaSeleccionada() || this.createInitialRutinaData(entrenadorId)),
         ...formValue,
         fechaModificacion: new Date()
       };
 
+      await this.rutinaService.save(dataToSave);
+
       if (this.isRutinaCreating()) {
-        rutinaData.fechaCreacion = new Date();
-      }
-
-      await this.rutinaService.save(rutinaData);
-
-      // Si es creación, agregar la rutina al entrenador
-      if (this.isRutinaCreating() && rutinaData.id) {
-        const entrenadorId = this.authService.currentUser()?.uid;
-        if (entrenadorId) {
-          await this.entrenadorService.addRutinaCreada(entrenadorId, rutinaData.id);
-        }
+        await this.entrenadorService.addRutinaCreada(entrenadorId, dataToSave.id);
       }
 
       this.closeRutinaModal();
-      // Mostrar éxito
+      this.mostrarToast(this.isRutinaCreating() ? 'Rutina creada' : 'Cambios guardados', 'success');
     } catch (error) {
       console.error('Error guardando rutina:', error);
-      // Mostrar error
+      this.mostrarToast('Error al guardar la rutina', 'danger');
     }
   }
 
-  getRutinaFormFields(): any[] {
-    return [
-      {
-        name: 'nombre',
-        type: 'text',
-        label: 'Nombre de la Rutina',
-        placeholder: 'Nombre de la rutina'
-      },
-      {
-        name: 'descripcion',
-        type: 'textarea',
-        label: 'Descripción',
-        placeholder: 'Descripción de la rutina...'
-      },
-      {
-        name: 'ejerciciosIds',
-        type: 'ejercicios-multiselect',
-        label: 'Ejercicios Disponibles',
-        options: this.ejerciciosCreados().map(ejercicio => ({
-          value: ejercicio.id,
-          label: ejercicio.nombre,
-          extra: `${ejercicio.series}x${ejercicio.repeticiones}`
-        }))
-      }
-    ];
+  async deleteRutina(id: string) {
+    try {
+      await this.rutinaService.delete(id);
+      this.mostrarToast('Rutina eliminada', 'success');
+    } catch (error) {
+      console.error('Error eliminando rutina:', error);
+      this.mostrarToast('Error al eliminar la rutina', 'danger');
+    }
+  }
+
+  private createInitialRutinaData(entrenadorId: string) {
+    return {
+      id: 'r' + Date.now(),
+      creadorId: entrenadorId,
+      asignadoIds: [],
+      activa: true,
+      completado: false,
+      fechaCreacion: new Date()
+    };
+  }
+
+  private async mostrarToast(message: string, color: 'success' | 'warning' | 'danger') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'top'
+    });
+    await toast.present();
   }
 }

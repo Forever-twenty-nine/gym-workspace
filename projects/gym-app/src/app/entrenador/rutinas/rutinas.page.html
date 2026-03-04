@@ -1,112 +1,20 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Rutinas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header-entrenador></app-header-entrenador>
 
 <ion-content [fullscreen]="true">
   <div class="container">
     <!-- Lista de Rutinas -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mis Rutinas</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
-          @for (rutina of rutinasCreadas(); track rutina.id) {
-          <ion-item button (click)="verRutina(rutina)">
-            <ion-label>
-              <h3>{{ rutina.nombre }}</h3>
-              <p>Duración: {{ rutina.duracion }} min</p>
-            </ion-label>
-            <ion-button fill="clear" slot="end" color="primary" (click)="verRutina(rutina); $event.stopPropagation()">
-              <ion-icon name="pencil"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" slot="end" color="danger"
-              (click)="deleteRutina(rutina.id); $event.stopPropagation()">
-              <ion-icon name="trash"></ion-icon>
-            </ion-button>
-          </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+    <app-lista-rutinas [rutinas]="rutinasCreadas()" (verRutina)="verRutina($event)"
+      (deleteRutina)="deleteRutina($event)">
+    </app-lista-rutinas>
 
-    <!-- Acciones -->
-    <ion-card>
-      <ion-card-content>
-        <!-- Indicador de límite de plan -->
-        <div style="margin-bottom: 16px; text-align: center;">
-          <ion-text [color]="hasReachedRutinaLimit() ? 'warning' : 'medium'" style="font-size: 0.9em;">
-            <ion-icon name="information-circle-outline" style="margin-right: 4px;"></ion-icon>
-            {{ rutinaLimitMessage() }}
-          </ion-text>
-        </div>
-
-        <ion-button expand="block" fill="solid" color="primary" (click)="crearRutina()"
-          [disabled]="hasReachedRutinaLimit()">
-          <ion-icon name="fitness-outline" slot="start"></ion-icon>
-          Crear Nueva Rutina
-          @if (hasReachedRutinaLimit()) {
-          <ion-icon name="lock-closed" slot="end"></ion-icon>
-          }
-        </ion-button>
-
-        @if (hasReachedRutinaLimit()) {
-        <ion-text color="warning" style="display: block; text-align: center; margin-top: 8px; font-size: 0.85em;">
-          Has alcanzado el límite de tu plan. Actualiza para crear más rutinas.
-        </ion-text>
-        }
-      </ion-card-content>
-    </ion-card>
+    <!-- Acciones y Límite de Plan -->
+    <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
+      (crearRutina)="crearRutina()">
+    </app-acciones-rutina>
   </div>
 
   <!-- Modal para crear/editar rutina -->
-  <ion-modal [isOpen]="isRutinaModalOpen()" (willDismiss)="closeRutinaModal()" [breakpoints]="[0, 0.9]"
-    [initialBreakpoint]="0.9" [backdropDismiss]="true" class="rutina-modal">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>{{ isRutinaCreating() ? 'Crear Rutina' : 'Editar Rutina' }}</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeRutinaModal()">
-              <ion-icon name="close"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding">
-        @if (rutinaEditForm()) {
-        <form [formGroup]="rutinaEditForm()!" (ngSubmit)="saveRutinaChanges()">
-          <ion-item>
-            <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre"
-              placeholder="Nombre de la rutina"></ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-textarea label="Descripción" labelPlacement="stacked" formControlName="descripcion"
-              placeholder="Descripción de la rutina..." rows="3"></ion-textarea>
-          </ion-item>
-
-          <!-- Los días de la semana no se piden al crear la rutina porque se asignan en la pestaña Entrenados -->
-          <!-- Ejercicios - simplificado -->
-          <ion-item>
-            <ion-select label="Ejercicios" labelPlacement="stacked" formControlName="ejerciciosIds" multiple
-              cancelText="Cancelar" okText="Aceptar">
-              @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
-              <ion-select-option [value]="ejercicio.id">
-                {{ ejercicio.nombre }} ({{ ejercicio.series }}x{{ ejercicio.repeticiones }})
-              </ion-select-option>
-              }
-            </ion-select>
-          </ion-item>
-
-          <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()">
-            {{ isRutinaCreating() ? 'Crear' : 'Guardar' }}
-          </ion-button>
-        </form>
-        }
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+  <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()" [rutinaData]="rutinaSeleccionada()"
+    [ejercicios]="ejerciciosCreados()" (close)="closeRutinaModal()" (save)="saveRutinaChanges($event)">
+  </app-rutina-modal>
 </ion-content>

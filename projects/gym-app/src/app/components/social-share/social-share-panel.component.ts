@@ -204,7 +204,7 @@ export class SocialSharePanelComponent {
   // Estado
   readonly isGenerating = signal(false);
   readonly previewUrl = signal<string | null>(null);
-  
+
   // Opciones de personalización
   readonly includeStats = signal(true);
   readonly includeLevel = signal(true);
@@ -226,12 +226,12 @@ export class SocialSharePanelComponent {
         this.entrenadoId(),
         options
       );
-      
+
       // Liberar URL anterior si existe
       if (this.previewUrl()) {
         URL.revokeObjectURL(this.previewUrl()!);
       }
-      
+
       const url = URL.createObjectURL(blob);
       this.previewUrl.set(url);
     } catch (error) {

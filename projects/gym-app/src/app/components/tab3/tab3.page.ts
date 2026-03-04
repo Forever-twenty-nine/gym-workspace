@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
-  IonContent, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
   IonButton,
   IonIcon,
   IonItem,
@@ -33,7 +33,7 @@ import { AuthService } from '../../core/services/auth.service';
     IonItem,
     IonLabel,
     IonBadge
-],
+  ],
 })
 export class Tab3Page implements OnInit {
   currentUser: User | null = null;
@@ -48,7 +48,7 @@ export class Tab3Page implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.authService.currentUser();
-   
+
   }
 
   async logout() {

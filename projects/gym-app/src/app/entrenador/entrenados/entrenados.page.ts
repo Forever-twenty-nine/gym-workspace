@@ -1,30 +1,9 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonButton,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonModal,
-  IonAvatar,
-  IonPopover,
-  IonInput,
-  IonTextarea,
-  IonSelect,
-  IonSelectOption,
-  IonBadge,
-  IonItemGroup,
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -38,6 +17,12 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
+import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
+import { MisEntrenadosComponent } from './components/mis-entrenados/mis-entrenados.component';
+import { InvitacionesPendientesComponent } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
+import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
+import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
+import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal/gestion-rutinas-modal.component';
 
 @Component({
   selector: 'app-entrenados',
@@ -45,82 +30,16 @@ import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
   standalone: true,
   imports: [
     CommonModule,
-    DatePipe,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonButton,
-    IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonAvatar,
-    IonPopover,
-    IonModal,
-    IonInput,
-    IonTextarea,
-    IonSelect,
-    IonSelectOption,
-    IonBadge,
-    IonItemGroup
+    HeaderEntrenadorComponent,
+    MisEntrenadosComponent,
+    InvitacionesPendientesComponent,
+    EntrenadoDetallePopoverComponent,
+    InvitacionModalComponent,
+    GestionRutinasModalComponent
   ],
-  styles: [`
-    .entrenado-detail {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .avatar-section {
-      text-align: center;
-    }
-
-    .large-avatar {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 10px;
-    }
-
-    .entrenado-name {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--ion-color-primary);
-      margin: 0;
-    }
-
-    .detail-list {
-      width: 100%;
-      background: transparent;
-    }
-
-    .detail-list ion-item {
-      --border-radius: 12px;
-      --padding-start: 16px;
-      --padding-end: 16px;
-      --padding-top: 12px;
-      --padding-bottom: 12px;
-      margin-bottom: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .detail-list ion-icon {
-      font-size: 24px;
-    }
-
-    .entrenado-popover {
-      --width: 100%;
-      --max-width: 400px;
-      --border-radius: 16px;
-      --backdrop-opacity: 0.3;
-    }
-  `]
+  styles: []
 })
 export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);

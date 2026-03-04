@@ -1,15 +1,46 @@
 import { Component, OnInit, inject, computed, Signal, signal, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButton, IonIcon, IonItem, IonLabel, IonList, IonAvatar, IonBadge, IonSpinner } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonButton,
+  IonIcon,
+  IonBadge,
+  IonSpinner,
+  IonProgressBar
+} from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
-import { person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline, alertCircleOutline, starOutline } from 'ionicons/icons';
+import {
+  person,
+  trophy,
+  checkmarkCircle,
+  mail,
+  star,
+  logOutOutline,
+  shieldOutline,
+  personOutline,
+  fitnessOutline,
+  alertCircleOutline,
+  starOutline,
+  mailOutline,
+  trophyOutline,
+  cameraOutline
+} from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { PlanService } from '../../core/services/plan.service';
+import { FirebaseStorageService } from '../../core/services/firebase-storage.service';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
 import { Rol, SolicitudPlan } from 'gym-library';
+import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
 
 @Component({
   selector: 'app-perfil',
@@ -26,123 +57,12 @@ import { Rol, SolicitudPlan } from 'gym-library';
     IonCardContent,
     IonButton,
     IonIcon,
-    IonAvatar,
     IonBadge,
-    IonSpinner
+    IonSpinner,
+    IonProgressBar,
+    HeaderEntrenadorComponent
   ],
-  styles: [`
-    /* Estilos para el perfil unificado */
-    .profile-card {
-      margin: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-content {
-      padding: 16px;
-    }
-
-    .profile-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .profile-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
-      color: white;
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-
-    .profile-info h2 {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--ion-color-primary);
-    }
-
-    .info-card {
-      margin: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header-compact {
-      padding: 12px 16px 8px;
-    }
-
-    .card-header-compact ion-card-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .info-grid {
-      display: grid;
-      gap: 12px;
-      padding: 8px 16px 16px;
-    }
-
-    .info-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-    }
-
-    .info-text {
-      flex: 1;
-    }
-
-    .info-label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--ion-color-medium);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .info-value {
-      display: block;
-      font-size: 0.95rem;
-      color: var(--ion-color-dark);
-      font-weight: 500;
-    }
-
-    .user-id {
-      font-family: monospace;
-      font-size: 0.85rem;
-      background: var(--ion-color-light);
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    .account-card {
-      margin: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .account-content {
-      padding: 16px;
-    }
-
-    .account-content ion-button {
-      --border-radius: 8px;
-      font-weight: 600;
-      height: 44px;
-    }
-  `]
+  styles: []
 })
 export class PerfilPage implements OnInit, OnDestroy {
   private authService = inject(AuthService);
@@ -152,13 +72,30 @@ export class PerfilPage implements OnInit, OnDestroy {
   private alertCtrl = inject(AlertController);
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
+  private storageService = inject(FirebaseStorageService);
 
   currentUser = computed(() => this.authService.currentUser());
   ultimasolicitud = signal<SolicitudPlan | null>(null);
+  isUploading = signal<boolean>(false);
   private solicitudesUnsubscribe?: Unsubscribe;
 
   constructor() {
-    addIcons({ person, trophy, checkmarkCircle, mail, star, logOutOutline, shieldOutline, personOutline, fitnessOutline, alertCircleOutline, starOutline });
+    addIcons({
+      person,
+      trophy,
+      checkmarkCircle,
+      mail,
+      star,
+      logOutOutline,
+      shieldOutline,
+      personOutline,
+      fitnessOutline,
+      alertCircleOutline,
+      starOutline,
+      mailOutline,
+      trophyOutline,
+      cameraOutline
+    });
 
     // Efecto para recargar la solicitud cuando cambia el usuario
     effect(() => {
@@ -224,7 +161,47 @@ export class PerfilPage implements OnInit, OnDestroy {
     await alert.present();
   }
 
-  private async showToast(message: string, color: 'success' | 'danger') {
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.showToast('Por favor selecciona una imagen válida', 'warning');
+      return;
+    }
+
+    const user = this.currentUser();
+    if (!user) return;
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Subiendo foto...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+    this.isUploading.set(true);
+
+    try {
+      const path = this.storageService.getProfilePath(user.uid, file.name.split('.').pop());
+      const photoURL = await this.storageService.uploadFile(path, file);
+
+      await this.userService.updateUser(user.uid, { photoURL });
+
+      this.showToast('Foto de perfil actualizada', 'success');
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      this.showToast('Error al subir la foto', 'danger');
+    } finally {
+      this.isUploading.set(false);
+      loading.dismiss();
+    }
+  }
+
+  triggerFileInput() {
+    const fileInput = document.getElementById('photo-input') as HTMLInputElement;
+    if (fileInput) fileInput.click();
+  }
+
+  private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
     const toast = await this.toastCtrl.create({
       message,
       duration: 2000,

@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonTitle, 
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -29,21 +29,19 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
+import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
   imports: [
-    IonHeader,
-    IonToolbar,
     IonContent,
     IonCard,
     IonCardContent,
     IonIcon,
-    IonAvatar,
-    IonChip
-],
+    HeaderEntrenadorComponent
+  ],
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
@@ -95,5 +93,5 @@ export class DashboardPage implements OnInit {
     return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
   }
 
-  
+
 }

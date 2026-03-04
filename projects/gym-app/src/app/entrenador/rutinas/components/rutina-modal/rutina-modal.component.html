@@ -1,0 +1,44 @@
+<ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [breakpoints]="[0, 0.9]" [initialBreakpoint]="0.9"
+    [backdropDismiss]="true" class="rutina-modal">
+    <ng-template>
+        <ion-header>
+            <ion-toolbar>
+                <ion-title>{{ isCreating() ? 'Crear Rutina' : 'Editar Rutina' }}</ion-title>
+                <ion-buttons slot="end">
+                    <ion-button (click)="close.emit()">
+                        <ion-icon name="close"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+            <form [formGroup]="form()" (ngSubmit)="handleSave()">
+                <ion-item>
+                    <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre"
+                        placeholder="Nombre de la rutina"></ion-input>
+                </ion-item>
+
+                <ion-item>
+                    <ion-textarea label="Descripción" labelPlacement="stacked" formControlName="descripcion"
+                        placeholder="Descripción de la rutina..." rows="3"></ion-textarea>
+                </ion-item>
+
+                <!-- Selección de Ejercicios -->
+                <ion-item>
+                    <ion-select label="Ejercicios" labelPlacement="stacked" formControlName="ejerciciosIds" multiple
+                        cancelText="Cancelar" okText="Aceptar">
+                        @for (ejercicio of ejercicios(); track ejercicio.id) {
+                        <ion-select-option [value]="ejercicio.id">
+                            {{ ejercicio.nombre }} ({{ ejercicio.series }}x{{ ejercicio.repeticiones }})
+                        </ion-select-option>
+                        }
+                    </ion-select>
+                </ion-item>
+
+                <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="ion-margin-top">
+                    {{ isCreating() ? 'Crear' : 'Guardar' }}
+                </ion-button>
+            </form>
+        </ion-content>
+    </ng-template>
+</ion-modal>

@@ -1,0 +1,49 @@
+.entrenado-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.avatar-section {
+    text-align: center;
+}
+
+.large-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+}
+
+.entrenado-name {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ion-color-primary);
+    margin: 0;
+}
+
+.detail-list {
+    width: 100%;
+    background: transparent;
+}
+
+.detail-list ion-item {
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-list ion-icon {
+    font-size: 24px;
+}
+
+.entrenado-popover {
+    --width: 100%;
+    --max-width: 400px;
+    --border-radius: 16px;
+    --backdrop-opacity: 0.3;
+}

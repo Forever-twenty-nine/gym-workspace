@@ -19,7 +19,7 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () =>
-          import('../../components/tab2/tab2.page').then((m) => m.Tab2Page), 
+          import('../../components/tab2/tab2.page').then((m) => m.Tab2Page),
       },
       {
         path: 'profile',

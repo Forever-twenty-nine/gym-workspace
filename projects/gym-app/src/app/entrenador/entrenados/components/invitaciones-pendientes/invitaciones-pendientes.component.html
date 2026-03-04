@@ -1,0 +1,25 @@
+@if (invitaciones().length > 0) {
+<ion-card>
+    <ion-card-header>
+        <ion-card-title>Invitaciones Pendientes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+        <ion-list>
+            @for (invitacion of invitaciones(); track invitacion.id) {
+            <ion-item>
+                <ion-label>
+                    <h3>{{ invitacion.entrenadoNombre }}</h3>
+                    <p>{{ invitacion.emailEntrenado }}</p>
+                    <p style="font-size: 0.8em; color: var(--ion-color-medium);">
+                        Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                </ion-label>
+                <ion-button slot="end" fill="clear" color="danger" (click)="onCancelar.emit(invitacion.id)">
+                    <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+            </ion-item>
+            }
+        </ion-list>
+    </ion-card-content>
+</ion-card>
+}

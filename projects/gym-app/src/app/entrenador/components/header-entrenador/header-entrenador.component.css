@@ -1,0 +1,13 @@
+ion-toolbar {
+  --background: transparent;
+  --border-style: none;
+}
+
+.notification-btn {
+  --padding-start: 4px;
+  --padding-end: 4px;
+}
+
+ion-badge {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

@@ -1,0 +1,44 @@
+<ion-card>
+    <ion-card-header>
+        <ion-card-title>Mis Entrenados</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+        <ion-list>
+            @for (entrenado of entrenados(); track entrenado.id) {
+            <ion-item button (click)="verCliente.emit(entrenado)">
+                <ion-label>
+                    <h3>
+                        {{ getUserName()(entrenado.id) }}
+                        @if (estaEntrenando()(entrenado.id)) {
+                        <ion-badge color="tertiary" class="ml-2 animate-pulse align-middle">
+                            <ion-icon name="flame" class="mr-1"></ion-icon>
+                            Entrenando
+                        </ion-badge>
+                        }
+                    </h3>
+                    <p>Objetivo: {{ entrenado.objetivo }}</p>
+                    <p style="font-size: 0.9em; color: var(--ion-color-primary);">
+                        <ion-icon name="fitness-outline" style="font-size: 14px;"></ion-icon>
+                        {{ getRutinasCount()(entrenado.id) }} rutinas asignadas
+                    </p>
+                </ion-label>
+                <div slot="end" style="display: flex; gap: 8px;">
+                    <ion-button fill="clear" color="secondary"
+                        (click)="$event.stopPropagation(); openRutinasModal.emit(entrenado)">
+                        <ion-icon name="fitness-outline"></ion-icon>
+                    </ion-button>
+                    <ion-button fill="clear" color="primary">
+                        Ver
+                    </ion-button>
+                </div>
+            </ion-item>
+            }
+        </ion-list>
+
+        <ion-button expand="block" fill="outline" color="primary" class="ion-margin-top"
+            (click)="openInvitacionModal.emit()">
+            <ion-icon name="mail-outline" slot="start"></ion-icon>
+            Invitar Nuevo Entrenado
+        </ion-button>
+    </ion-card-content>
+</ion-card>

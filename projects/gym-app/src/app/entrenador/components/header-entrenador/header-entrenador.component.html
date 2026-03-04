@@ -1,0 +1,22 @@
+<ion-header [translucent]="true" class="ion-no-border">
+    <ion-toolbar class="px-2 pt-2">
+        <div class="flex justify-between items-center w-full px-2">
+            <!-- Foto de perfil - Izquierda -->
+            <ion-avatar class="w-12 h-12 border-2 border-primary/20 shadow-sm overflow-hidden">
+                <img [src]="currentUser()?.photoURL || 'assets/images/test-foto.png'" alt="Perfil"
+                    class="object-cover w-full h-full" />
+            </ion-avatar>
+
+            <!-- Campanita - Derecha -->
+            <ion-button fill="clear" color="dark" class="relative notification-btn">
+                <ion-icon name="notifications-outline" slot="icon-only" class="text-2xl gym-title-color"></ion-icon>
+                @if (invitacionesPendientesCount() > 0) {
+                <ion-badge color="danger"
+                    class="absolute -top-1 -right-1 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] p-0 rounded-full border-2 border-white">
+                    {{ invitacionesPendientesCount() }}
+                </ion-badge>
+                }
+            </ion-button>
+        </div>
+    </ion-toolbar>
+</ion-header>
