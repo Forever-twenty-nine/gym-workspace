@@ -1,65 +1,47 @@
-Seed scripts
+# 🚀 Guía de Scripts y Datos de Prueba
 
-Este directorio contiene scripts para sembrar datos en el emulador de Firebase.
+Este directorio contiene herramientas para facilitar el desarrollo local del proyecto. Aquí encontrarás scripts para limpiar el entorno y generar datos de prueba automáticamente.
 
-scripts/seed-data.ts
-- Script TypeScript (recomendado). Crea 3 entrenadores, 3 entrenados (cada entrenado asignado a un entrenador distinto) y para cada entrenado 3 rutinas (Lunes, Miércoles, Viernes) con 5 ejercicios únicos por rutina. También crea usuarios en Auth (emulador) con UID igual al id de Firestore.
+---
 
-Ejecución (usar emuladores):
+## 🛠️ Comandos Principales (desde la raíz)
 
-# Recomendado: ejecutar con ts-node
-npx ts-node scripts/seed-data.ts
+Para que el desarrollo sea más fluido, puedes usar estos comandos desde la carpeta principal del proyecto:
 
-# Alternativa: compilar y ejecutar
-npx tsc scripts/seed-data.ts --outDir dist && node dist/scripts/seed-data.js
+*   `npm run db:seed`: **(El más importante)** Carga usuarios, rutinas y ejercicios en tus emuladores locales para que no tengas que crear todo a mano.
+*   `npm run kill-emulators`: ¿Los emuladores no arrancan porque el puerto está ocupado? Este script busca y cierra cualquier proceso que esté bloqueando los puertos de Firebase.
 
-Notas:
-- El script fuerza `FIRESTORE_EMULATOR_HOST` y `FIREBASE_AUTH_EMULATOR_HOST` a `127.0.0.1:8080` y `127.0.0.1:9099` si no están definidos.
-- Está diseñado para entornos de desarrollo con los emuladores.
+---
 
-Credenciales generadas por defecto
---------------------------------
-Al ejecutar `scripts/seed-data.ts` contra el emulador, el script crea los siguientes usuarios (email / password) para pruebas:
+## 👥 Cuentas de Prueba (Seed Data)
 
-- Entrenadores:
-	- entrenador1@gym.test — admin123
-	- entrenador2@gym.test — admin123
-	- entrenador3@gym.test — admin123
-- Entrenados:
-	- entrenado1@gym.test — user123
-	- entrenado2@gym.test — user123
-	- entrenado3@gym.test — user123
+Al ejecutar `npm run db:seed`, se crean automáticamente las siguientes cuentas en tu entorno local:
 
-Comandos útiles
----------------
-- Iniciar la app en modo desarrollo (conexión a emuladores si está configurado):
-```powershell
-cd c:\repositorios\gym-workspace
-npm run start
-```
+### 🏋️ Entrenadores
+Cuentas para probar el panel de administración (`gym-admin`):
+*   **Email:** `entrenador1@gym.test` | **Password:** `admin123`
+*   **Email:** `entrenador2@gym.test` | **Password:** `admin123`
+*   **Email:** `entrenador3@gym.test` | **Password:** `admin123`
 
-- Obtener un token de inicio de sesión desde el Auth Emulator (ejemplo curl):
-```bash
-curl 'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=any' \
- -H 'Content-Type: application/json' \
- --data '{"email":"entrenador1@gym.test","password":"admin123","returnSecureToken":true}'
-```
+### 🤸 Entrenados (Alumnos)
+Cuentas para probar la aplicación móvil (`gym-app`):
+*   **Email:** `entrenado1@gym.test` | **Password:** `user123` (Asignado al Entrenador 1)
+*   **Email:** `entrenado2@gym.test` | **Password:** `user123` (Asignado al Entrenador 2)
+*   **Email:** `entrenado3@gym.test` | **Password:** `user123` (Asignado al Entrenador 3)
 
-- Listar/inspeccionar usuarios con Admin SDK (Node):
-```js
-// node
-const admin = require('firebase-admin');
-process.env.FIRESTORE_EMULATOR_HOST='127.0.0.1:8080';
-process.env.FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099';
-admin.initializeApp({projectId:'default-project'});
-admin.auth().listUsers(1000).then(r => console.log(r.users.map(u=>({email:u.email,uid:u.uid}))))
-.catch(console.error);
-```
+> **Nota:** Cada alumno ya viene con **3 rutinas configuradas** (Lunes, Miércoles y Viernes) y una lista de ejercicios para que puedas ver la App funcionando desde el primer segundo.
 
-- UI del Emulator Suite: abre `http://localhost:4000` y navega a la sección `Authentication` para ver los usuarios creados.
+---
 
-Notas de seguridad
------------------
-- Estos usuarios y contraseñas son solo para desarrollo/emulador. No los uses en producción.
-- No subas las claves reales de Firebase al repositorio.
+## 🔍 Cómo ver los datos
+Si quieres ver los datos que se han creado, abre en tu navegador la **Suite de Emuladores de Firebase**:
+👉 [http://localhost:4000](http://localhost:4000)
 
+Desde ahí podrás inspeccionar:
+*   **Authentication**: Todos los usuarios creados.
+*   **Firestore**: Las colecciones de usuarios, rutinas, ejercicios y entrenados.
+
+---
+
+## ⚠️ Recordatorio importante
+Estos scripts están diseñados **exclusivamente para el entorno de desarrollo local**. Nunca los uses contra la base de datos de producción, ya que borrarán o modificarán datos reales.

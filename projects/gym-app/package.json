@@ -52,7 +52,7 @@
     "@ionic/angular-toolkit": "^12.3.0",
     "postcss": "^8.5.6",
     "typescript": "~5.9.3",
-    "vitest": "^3.0.7"
+    "vitest": "^4.0.18"
   },
   "description": "An Ionic project"
 }

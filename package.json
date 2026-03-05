@@ -6,7 +6,7 @@
     "emulator:start:with-export": "firebase emulators:start --project=default-project --import=./emulator-data --export-on-exit=./emulator-data",
     "emulator:export": "firebase emulators:export --project=default-project ./emulator-data",
     "emulator:import": "firebase emulators:start --project=default-project --import=./emulator-data",
-    "kill-emulator-8080": "powershell -NoProfile -File scripts/kill-emulator.ps1",
+    "kill-emulators": "powershell -NoProfile -File scripts/kill-emulator.ps1",
     "gym-admin:serve": "cd projects/gym-admin && npm run start",
     "gym-admin:build": "cd projects/gym-admin && npm run build",
     "gym-admin:test": "cd projects/gym-admin && npm run test",
@@ -22,8 +22,10 @@
     "dev:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"emulator,admin,app\" --prefix-colors \"green,cyan,magenta\"",
     "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
-    "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -- --configuration=firebase",
+    "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -c firebase",
     "gym-admin:with-emulator": "concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
+    "gym-app:with-emulator": "concurrently \"npm run emulator:start:with-export\" \"npm run gym-app:serve\" --names \"emulator,app\" --prefix-colors \"green,magenta\"",
+    "db:seed": "tsx scripts/seed-data.ts",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {
@@ -56,6 +58,7 @@
     "firebase-admin": "^13.7.0",
     "firebase-tools": "^15.8.0",
     "ng-packagr": "^21.2.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3"
   }
 }

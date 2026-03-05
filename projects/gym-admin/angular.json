@@ -42,7 +42,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
+                  "with": "src/environments/environment.secrets.ts"
                 }
               ],
               "outputHashing": "all"
@@ -56,7 +56,7 @@
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.firebase.ts"
+                  "with": "src/environments/environment.secrets.ts"
                 }
               ]
             }
@@ -71,6 +71,9 @@
             },
             "development": {
               "buildTarget": "gym-admin:build:development"
+            },
+            "firebase": {
+              "buildTarget": "gym-admin:build:firebase"
             }
           },
           "defaultConfiguration": "development"

@@ -62,18 +62,20 @@ npm run dev
 
 ```bash
 # Desarrollo
-npm run dev              # Iniciar todo (admin + app)
-npm run gym-admin:serve  # Solo panel admin
-npm run gym-app:serve    # Solo app móvil
+npm run dev                    # Iniciar todo (admin + app)
+npm run dev:with-emulator      # Iniciar todo + emuladores de Firebase
+npm run gym-app:with-emulator  # Iniciar solo la App + emuladores
+npm run gym-admin:serve        # Solo panel admin
+npm run gym-app:serve          # Solo app móvil
+
+# Datos y Utilidades
+npm run db:seed                # Cargar datos de prueba en el emulador
+npm run kill-emulators         # Liberar puertos de Firebase bloqueados
 
 # Build
-npm run library:build    # Compilar librería
-npm run gym-admin:build  # Build admin
-npm run gym-app:build    # Build app
-
-# Testing
-npm test                 # Todos los tests
-npm run gym-admin:test   # Tests admin
+npm run library:build          # Compilar librería base
+npm run gym-admin:build        # Build admin
+npm run gym-app:build          # Build app
 ```
 
 ## 📦 Estructura del Proyecto

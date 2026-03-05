@@ -28,11 +28,6 @@ export * from './lib/models/environment.model';
 export * from './lib/models/sesion-rutina.model';
 export * from './lib/models/estadisticas-entrenado.model';
 /*
- * environments
- */
-export * from './lib/environments/environment';
-export * from './lib/environments/environment.prod';
-/*
  * utils
  */
 export * from './lib/utils/uuid';
