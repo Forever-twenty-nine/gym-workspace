@@ -4,9 +4,6 @@ import { EntrenadoresPage } from './pages/entrenadores/entrenadores.page';
 import { EntrenadosPage } from './pages/entrenados/entrenados.page';
 import { GimnasiosPage } from './pages/gimnasios/gimnasios.page';
 import { UsuariosPage } from './pages/usuarios/usuarios.page';
-import { EntrenadorDetail } from './pages/entrenadores/entrenador-detail/entrenador-detail';
-import { EntrenadoDetail } from './pages/entrenados/entrenado-detail/entrenado-detail';
-import { EntrenadoEstadisticas } from './pages/entrenados/entrenado-estadisticas/entrenado-estadisticas';
 import { SolicitudesPlanPage } from './pages/solicitudes-plan/solicitudes-plan.page';
 
 export const routes: Routes = [
@@ -19,20 +16,8 @@ export const routes: Routes = [
     component: EntrenadoresPage
   },
   {
-    path: 'entrenadores/:id',
-    component: EntrenadorDetail
-  },
-  {
     path: 'entrenados',
     component: EntrenadosPage
-  },
-  {
-    path: 'entrenados/detalle/:id',
-    component: EntrenadoDetail
-  },
-  {
-    path: 'entrenados/estadisticas/:id',
-    component: EntrenadoEstadisticas
   },
   {
     path: 'gimnasios',

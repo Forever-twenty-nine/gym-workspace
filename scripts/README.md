@@ -15,21 +15,24 @@ Para que el desarrollo sea más fluido, puedes usar estos comandos desde la carp
 
 ## 👥 Cuentas de Prueba (Seed Data)
 
-Al ejecutar `npm run db:seed`, se crean automáticamente las siguientes cuentas en tu entorno local:
+Al ejecutar `npm run db:seed`, se crean automáticamente las siguientes cuentas con datos realistas en tu entorno local:
 
 ### 🏋️ Entrenadores
 Cuentas para probar el panel de administración (`gym-admin`):
-*   **Email:** `entrenador1@gym.test` | **Password:** `admin123`
-*   **Email:** `entrenador2@gym.test` | **Password:** `admin123`
-*   **Email:** `entrenador3@gym.test` | **Password:** `admin123`
+*   **Email:** `carlos.rod@gym.test` | **Password:** `admin123` (Carlos Rodríguez)
+*   **Email:** `ana.mtz@gym.test` | **Password:** `admin123` (Ana Martínez)
+*   **Email:** `roberto.snz@gym.test` | **Password:** `admin123` (Roberto Sánchez)
 
-### 🤸 Entrenados (Alumnos)
-Cuentas para probar la aplicación móvil (`gym-app`):
-*   **Email:** `entrenado1@gym.test` | **Password:** `user123` (Asignado al Entrenador 1)
-*   **Email:** `entrenado2@gym.test` | **Password:** `user123` (Asignado al Entrenador 2)
-*   **Email:** `entrenado3@gym.test` | **Password:** `user123` (Asignado al Entrenador 3)
+### 🤸 Entrenados (Alumnos) - Listado Completo
+Se han creado **15 alumnos** (5 por cada entrenador). Password para todos: `user123`
 
-> **Nota:** Cada alumno ya viene con **3 rutinas configuradas** (Lunes, Miércoles y Viernes) y una lista de ejercicios para que puedas ver la App funcionando desde el primer segundo.
+| Entrenador Responsable | Alumno (Email) |
+| :--- | :--- |
+| **Carlos Rodríguez** | `juan.perez@gym.test`, `maria.garcia@gym.test`, `luis.fernandez@gym.test`, `elena.lopez@gym.test`, `diego.torres@gym.test` |
+| **Ana Martínez** | `sofia.ruiz@gym.test`, `javier.castro@gym.test`, `lucia.morales@gym.test`, `andres.gil@gym.test`, `carmen.ortiz@gym.test` |
+| **Roberto Sánchez** | `fernando.vega@gym.test`, `isabel.medina@gym.test`, `ricardo.silva@gym.test`, `patricia.ramos@gym.test`, `hugo.navarro@gym.test` |
+
+> **Nota:** Cada alumno tiene asignadas entre **1 y 3 rutinas semanales aleatorias**, con ejercicios reales (25 disponibles por entrenador).
 
 ---
 

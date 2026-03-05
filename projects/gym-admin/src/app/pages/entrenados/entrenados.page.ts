@@ -1,167 +1,166 @@
-import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-
-import { Router } from '@angular/router';
-import { Entrenado, Rol, Objetivo } from 'gym-library';
+import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { EntrenadoService } from '../../services/entrenado.service';
-import { UserService } from '../../services/user.service';
-import { GimnasioService } from '../../services/gimnasio.service';
 import { EntrenadorService } from '../../services/entrenador.service';
-import { NotificacionService } from '../../services/notificacion.service';
+import { RutinaAsignadaService } from '../../services/rutina-asignada.service';
 import { RutinaService } from '../../services/rutina.service';
+import { UserService } from '../../services/user.service';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
-import { DisplayHelperService } from '../../services/display-helper.service';
-import { EntrenadosTableComponent } from './entrenados-table/entrenados-table.component';@Component({
+import { DataComponent } from '../../components/shared/data/data.component';
+import { ColumnConfig, FieldConfig } from '../../models/data-config.model';
+import { Validators } from '@angular/forms';
+
+@Component({
   selector: 'app-entrenados-page',
-  imports: [
-    EntrenadosTableComponent
-],
-  templateUrl: './entrenados.page.html',
+  standalone: true,
+  imports: [CommonModule, DataComponent],
+  template: `
+    <app-data
+      title="Entrenados"
+      [items]="entrenados()"
+      [columns]="columns"
+      [fields]="fields()"
+      [loading]="loading()"
+      (save)="onSave($event)"
+      (delete)="onDelete($event)">
+    </app-data>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntrenadosPage {
-  // Servicios inyectados
   private readonly entrenadoService = inject(EntrenadoService);
-  private readonly userService = inject(UserService);
-  private readonly gimnasioService = inject(GimnasioService);
   private readonly entrenadorService = inject(EntrenadorService);
-  private readonly notificacionService = inject(NotificacionService);
+  private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
   private readonly rutinaService = inject(RutinaService);
-  readonly toastService = inject(ToastService);
-  private readonly displayHelper = inject(DisplayHelperService);
+  private readonly userService = inject(UserService);
+  private readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
-  private readonly router = inject(Router);
 
-  // Signals reactivas para datos
-  readonly usuarios = computed(() => {
-    try {
-      const users = this.userService.users();
-      if (!Array.isArray(users)) return [];
-
-      return users.map(user => {
-        const needsReview = !user.nombre || !user.role;
-        return {
-          ...user,
-          displayName: user.nombre || user.email || `Usuario ${user.uid}`,
-          needsReview
-        };
-      });
-    } catch (error) {
-      console.error('Error en computed usuarios:', error);
-      return [];
-    }
+  loading = signal(false);
+  
+  entrenados = computed(() => {
+    const list = this.entrenadoService.entrenados();
+    const users = this.userService.users();
+    return list.map(e => {
+      const user = users.find(u => u.uid === e.id);
+      return {
+        ...e,
+        displayName: user?.nombre || user?.email || 'Sin nombre',
+        email: user?.email || ''
+      };
+    });
   });
 
-  readonly entrenadores = computed(() => {
-    try {
-      const entrenadoresList = this.entrenadorService.entrenadores();
-      const usuariosList = this.usuarios();
-
-      if (!Array.isArray(entrenadoresList)) return [];
-      if (!Array.isArray(usuariosList)) return [];
-
-      return entrenadoresList.map(entrenador => {
-        const usuario = usuariosList.find(u => u.uid === entrenador.id);
-        return {
-          ...entrenador,
-          displayName: usuario?.nombre || usuario?.email || `Entrenador ${entrenador.id}`
-        };
-      });
-    } catch (error) {
-      console.error('Error en computed entrenadores:', error);
-      return [];
-    }
-  });
-
-  readonly gimnasios = computed(() => {
-    try {
-      const gimnasiosList = this.gimnasioService.gimnasios();
-      if (!Array.isArray(gimnasiosList)) return [];
-
-      return gimnasiosList.map(gimnasio => ({
-        ...gimnasio,
-        displayName: gimnasio.nombre || `Gimnasio ${gimnasio.id}`
-      }));
-    } catch (error) {
-      console.error('Error en computed gimnasios:', error);
-      return [];
-    }
-  });
-
-  readonly entrenados = computed(() => {
-    try {
-      const entrenadosList = this.entrenadoService.entrenados();
-      const usuariosList = this.usuarios();
-      const entrenadoresList = this.entrenadores();
-      const gimnasiosList = this.gimnasios();
-
-      if (!Array.isArray(entrenadosList) || !Array.isArray(usuariosList) || !Array.isArray(entrenadoresList) || !Array.isArray(gimnasiosList)) {
-        return [];
+  columns: ColumnConfig[] = [
+    { key: 'displayName', label: 'Nombre', type: 'avatar' },
+    { key: 'email', label: 'Email', type: 'text' },
+    { 
+      key: 'nivel', 
+      label: 'Nivel', 
+      type: 'badge',
+      badgeConfig: {
+        trueLabel: 'Premium',
+        falseLabel: 'Estándar',
+        trueClass: 'bg-yellow-100 text-yellow-800',
+        falseClass: 'bg-blue-100 text-blue-800'
       }
+    },
+    { key: 'fechaRegistro', label: 'Registro', type: 'date' }
+  ];
 
-      return entrenadosList.map(entrenado => {
-        try {
-          const usuario = usuariosList.find(u => u.uid === entrenado.id);
-          const entrenadorId = entrenado.entrenadoresId?.[0]; // Tomar el primer entrenador
-          const entrenador = entrenadoresList.find(e => e.id === entrenadorId);
-          const gimnasio = gimnasiosList.find(g => g.id === usuario?.gimnasioId);
+  fields = computed<FieldConfig[]>(() => {
+    const trainers = this.entrenadorService.entrenadores();
+    const allUsers = this.userService.users();
+    const routines = this.rutinaService.rutinas();
+    const assignedRoutines = this.rutinaAsignadaService.getRutinasAsignadas()();
 
-          return {
-            id: entrenado.id,
-            displayName: usuario?.displayName || usuario?.nombre || 'Sin nombre',
-            entrenadorName: entrenador?.displayName || 'Sin entrenador',
-            gimnasioName: gimnasio?.displayName || 'Sin gimnasio',
-            objetivo: usuario?.role === 'entrenado' ? (usuario as any).objetivo : undefined,
-            fechaRegistro: entrenado.fechaRegistro
-          };
-        } catch (error) {
-          console.error(`Error procesando entrenado ${entrenado.id}:`, error);
-          return {
-            id: entrenado.id,
-            displayName: 'Error',
-            entrenadorName: 'Error',
-            gimnasioName: 'Error'
-          };
-        }
-      });
-    } catch (error) {
-      console.error('Error en computed entrenados:', error);
-      return [];
-    }
+    const trainerOptions = trainers.map(t => {
+      const u = allUsers.find(user => user.uid === t.id);
+      return { value: t.id, label: u?.nombre || u?.email || t.id };
+    });
+
+    const routineOptions = routines.map(r => ({ value: r.id!, label: r.nombre }));
+    const assignedRoutineOptions = assignedRoutines.map(ar => ({ 
+      value: ar.id!, 
+      label: `Rutina (${ar.id})` 
+    }));
+
+    return [
+      { name: 'id', label: 'ID (UID)', type: 'text', validators: [Validators.required] },
+      { name: 'fechaRegistro', label: 'Fecha de Registro', type: 'date' },
+      { 
+        name: 'objetivo', 
+        label: 'Objetivo Principal', 
+        type: 'select', 
+        options: [
+          { value: 'volumen', label: 'Volumen' },
+          { value: 'definicion', label: 'Definición' },
+          { value: 'fuerza', label: 'Fuerza' },
+          { value: 'salud', label: 'Salud / Bienestar' }
+        ]
+      },
+      { 
+        name: 'entrenadoresId', 
+        label: 'Entrenadores', 
+        type: 'multiselect', 
+        options: trainerOptions,
+        colSpan: 2 
+      },
+      { 
+        name: 'rutinasAsignadasIds', 
+        label: 'Rutinas Asignadas', 
+        type: 'multiselect', 
+        options: assignedRoutineOptions,
+        colSpan: 2 
+      },
+      { 
+        name: 'rutinasCreadas', 
+        label: 'Rutinas Creadas (Premium)', 
+        type: 'multiselect', 
+        options: routineOptions,
+        colSpan: 2 
+      },
+      { 
+        name: 'nivel', 
+        label: 'Es Premium', 
+        type: 'select', 
+        options: [
+          { value: false, label: 'Estándar' },
+          { value: true, label: 'Premium' }
+        ]
+      }
+    ];
   });
-
-  // Rutinas del sistema
-  readonly rutinas = computed(() => {
-    try {
-      const rutinasList = this.rutinaService.rutinas();
-      if (!Array.isArray(rutinasList)) return [];
-      return rutinasList;
-    } catch (error) {
-      console.error('Error en computed rutinas:', error);
-      return [];
-    }
-  });
-
-  // Signals para el estado del componente
-  readonly isLoading = signal(false);
 
   constructor() {
     this.pageTitleService.setTitle('Entrenados');
-    
-    // Inicializar los listeners para cargar datos al inicio
-    this.entrenadorService.initializeListener();
     this.entrenadoService.initializeListener();
+    // No llamamos a initializeListener() si son privados o inaccesibles
   }
 
-  viewDetails(item: any) {
-    // Navegar a la página de detalle del entrenado
-    this.router.navigate(['/entrenados/detalle', item.id]);
+  async onSave(data: any) {
+    this.loading.set(true);
+    try {
+      await this.entrenadoService.save(data);
+      this.toastService.show('Entrenado guardado correctamente', 'success');
+    } catch (error) {
+      this.toastService.show('Error al guardar entrenado', 'error');
+    } finally {
+      this.loading.set(false);
+    }
   }
 
-  getObjetivosDisponibles() {
-    return Object.values(Objetivo).map(objetivo => ({
-      value: objetivo,
-      label: objetivo
-    }));
+  async onDelete(id: string) {
+    this.loading.set(true);
+    try {
+      await this.entrenadoService.delete(id);
+      this.toastService.show('Entrenado eliminado correctamente', 'success');
+    } catch (error) {
+      this.toastService.show('Error al eliminar entrenado', 'error');
+    } finally {
+      this.loading.set(false);
+    }
   }
 }
+

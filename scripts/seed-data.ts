@@ -34,11 +34,11 @@ async function createTrainer(name: string, email: string, password: string) {
     // Use deterministic uid when provided via name -> slug, to make seed idempotent
     const uid = `trainer_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
 
-    const trainerData = {
+    const trainerUserData = {
+        uid,
         nombre: name,
         email,
         role: 'entrenador',
-        id: uid,
         plan: 'free',
         onboarded: true,
         fechaCreacion: Timestamp.now()
@@ -46,14 +46,20 @@ async function createTrainer(name: string, email: string, password: string) {
 
     // write usuario doc with fixed id
     const docRef = usuariosRef.doc(uid);
-    await docRef.set(trainerData, { merge: true });
+    await docRef.set(trainerUserData, { merge: true });
     await ensureAuthUser(uid, email, password, name);
 
     // Ensure entrenador doc exists and is synced with usuario
     const entrenadoresRef = db.collection('entrenadores').doc(uid);
-    await entrenadoresRef.set({ id: uid, nombre: name, fechaRegistro: Timestamp.now(), ejerciciosCreadasIds: [], rutinasCreadasIds: [], entrenadosAsignadosIds: [] }, { merge: true });
+    await entrenadoresRef.set({ 
+        id: uid, 
+        fechaRegistro: Timestamp.now(), 
+        ejerciciosCreadasIds: [], 
+        rutinasCreadasIds: [], 
+        entrenadosAsignadosIds: [] 
+    }, { merge: true });
 
-    return { uid, ...trainerData };
+    return { ...trainerUserData };
 }
 
 async function createTrainee(name: string, email: string, password: string, trainerUid: string) {
@@ -61,28 +67,27 @@ async function createTrainee(name: string, email: string, password: string, trai
         // deterministic uid for trainees
         const uid = `trainee_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
 
-        const traineeData = {
+        const traineeUserData = {
+                uid,
                 nombre: name,
                 email,
                 role: 'entrenado',
-                id: uid,
-                entrenadoresId: [trainerUid],
                 plan: 'free',
-                objetivo: 'bajar de peso',
-                entrenadorId: trainerUid,
                 onboarded: true,
                 fechaCreacion: Timestamp.now()
         };
 
         const docRef = usuariosRef.doc(uid);
-        await docRef.set(traineeData, { merge: true });
+        await docRef.set(traineeUserData, { merge: true });
         await ensureAuthUser(uid, email, password, name);
 
         // Crear/Sincronizar en la colección 'entrenados' (IMPORTANTE para la app)
         const entrenadosRef = db.collection('entrenados').doc(uid);
         await entrenadosRef.set({ 
-            ...traineeData, 
-            id: uid, 
+            id: uid,
+            objetivo: 'bajar de peso',
+            entrenadoresId: [trainerUid],
+            rutinasAsignadasIds: [],
             fechaRegistro: Timestamp.now() 
         }, { merge: true });
 
@@ -108,7 +113,7 @@ async function createTrainee(name: string, email: string, password: string, trai
             console.warn('⚠️ No se pudo actualizar entrenador al crear entrenado:', e);
         }
 
-        return { uid, ...traineeData };
+        return { ...traineeUserData };
 }
 
 async function createExercise(nombre: string, descripcion: string, entrenadorId?: string) {
@@ -123,7 +128,6 @@ async function createExercise(nombre: string, descripcion: string, entrenadorId?
     };
     if (entrenadorId) {
         data.creadorId = entrenadorId;
-        data.entrenadorId = entrenadorId; // Algunos componentes pueden buscar este campo
     }
     const ref = await db.collection('ejercicios').add(data);
     const id = ref.id;
@@ -134,8 +138,7 @@ async function createExercise(nombre: string, descripcion: string, entrenadorId?
 async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[], usuarioId: string, nombreUsuario: string, entrenadorId?: string) {
     const data: any = {
         nombre,
-        dia,
-        active: true,
+        activa: true,
         descripcion: `Rutina ${nombre} - dia ${dia}`,
         ejerciciosIds,
         fechaCreacion: Timestamp.now(),
@@ -146,7 +149,6 @@ async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[
     };
     if (entrenadorId) {
         data.creadorId = entrenadorId;
-        data.entrenadorId = entrenadorId;
     }
     const ref = await db.collection('rutinas').add(data);
     const id = ref.id;
@@ -174,15 +176,27 @@ async function main() {
 
     // Datos por defecto
     const trainers = [
-        { name: 'Entrenador Uno', email: 'entrenador1@gym.test', password: 'admin123' },
-        { name: 'Entrenador Dos', email: 'entrenador2@gym.test', password: 'admin123' },
-        { name: 'Entrenador Tres', email: 'entrenador3@gym.test', password: 'admin123' }
+        { name: 'Carlos Rodríguez', email: 'carlos.rod@gym.test', password: 'admin123' },
+        { name: 'Ana Martínez', email: 'ana.mtz@gym.test', password: 'admin123' },
+        { name: 'Roberto Sánchez', email: 'roberto.snz@gym.test', password: 'admin123' }
     ];
 
-    const trainees = [
-        { name: 'Entrenado Uno', email: 'entrenado1@gym.test', password: 'user123' },
-        { name: 'Entrenado Dos', email: 'entrenado2@gym.test', password: 'user123' },
-        { name: 'Entrenado Tres', email: 'entrenado3@gym.test', password: 'user123' }
+    const traineePool = [
+        { name: 'Juan Pérez', email: 'juan.perez@gym.test' },
+        { name: 'María García', email: 'maria.garcia@gym.test' },
+        { name: 'Luis Fernández', email: 'luis.fernandez@gym.test' },
+        { name: 'Elena López', email: 'elena.lopez@gym.test' },
+        { name: 'Diego Torres', email: 'diego.torres@gym.test' },
+        { name: 'Sofía Ruiz', email: 'sofia.ruiz@gym.test' },
+        { name: 'Javier Castro', email: 'javier.castro@gym.test' },
+        { name: 'Lucía Morales', email: 'lucia.morales@gym.test' },
+        { name: 'Andrés Gil', email: 'andres.gil@gym.test' },
+        { name: 'Carmen Ortiz', email: 'carmen.ortiz@gym.test' },
+        { name: 'Fernando Vega', email: 'fernando.vega@gym.test' },
+        { name: 'Isabel Medina', email: 'isabel.medina@gym.test' },
+        { name: 'Ricardo Silva', email: 'ricardo.silva@gym.test' },
+        { name: 'Patricia Ramos', email: 'patricia.ramos@gym.test' },
+        { name: 'Hugo Navarro', email: 'hugo.navarro@gym.test' }
     ];
 
     // 1) Crear entrenadores
@@ -192,103 +206,106 @@ async function main() {
         createdTrainers.push(created);
     }
 
-    // 2) Crear entrenados y asignar a cada entrenador distinto
+    // 2) Crear entrenados (5 por entrenador)
     const createdTrainees: any[] = [];
-        for (let i = 0; i < trainees.length; i++) {
-        const tr = trainees[i];
-        const trainerUid = createdTrainers[i].uid;
-        const created = await createTrainee(tr.name, tr.email, tr.password, trainerUid);
-        createdTrainees.push(created);
-
-        // actualizar entrenador: añadir entrenado a entrenadosAsignadosIds
-        const entrenadorRef = db.collection('entrenadores').doc(trainerUid);
-        await entrenadorRef.set({ entrenadosAsignadosIds: [created.uid] }, { merge: true });
-                // También actualizar el documento del entrenador en la colección `usuarios` para que sea visible desde allí
-                try {
-                    const usuarioTrainerRef = db.collection('usuarios').doc(trainerUid);
-                    const usuarioSnap = await usuarioTrainerRef.get();
-                    const usuarioData = usuarioSnap.exists ? (usuarioSnap.data() as Record<string, any>) : {};
-                    const existingAssigned: string[] = usuarioData['entrenadosAsignadosIds'] || [];
-                    await usuarioTrainerRef.set({ entrenadosAsignadosIds: [...new Set([...existingAssigned, created.uid])] }, { merge: true });
-                } catch (uErr) {
-                    console.warn('⚠️ No se pudo actualizar usuario entrenador en `usuarios`:', uErr);
-                }
-    }
-
-    // 3) Para cada entrenado, crear 3 rutinas (Lunes, Miércoles, Viernes) con 5 ejercicios únicos cada una
-    const dias = ['Lunes', 'Miércoles', 'Viernes'];
-
-    for (const trainee of createdTrainees) {
-        const rutinaIds: string[] = [];
-        const entrenadorUid = trainee.entrenadorId;
-        const ejIdsParaEntrenador: string[] = [];
-
-        for (const dia of dias) {
-            // crear 5 ejercicios únicos
-            const ejerciciosIds: string[] = [];
-            for (let e = 1; e <= 5; e++) {
-                const nombre = `${trainee.nombre} - Ejercicio ${dia} #${e}`;
-                const descripcion = `Ejercicio para ${trainee.nombre} en ${dia} #${e}`;
-                const exId = await createExercise(nombre, descripcion, entrenadorUid);
-                ejerciciosIds.push(exId);
-                ejIdsParaEntrenador.push(exId);
-            }
-
-            const rutinaNombre = `${trainee.nombre} - Rutina ${dia}`;
-            const rutinaId = await createRoutine(rutinaNombre, dia, ejerciciosIds, trainee.uid, trainee.nombre, entrenadorUid);
-            rutinaIds.push(rutinaId);
-
-            // Crear registro en 'rutinas-asignadas' para que la app lo muestre como asignada
-            try {
-                const asignadaRef = await db.collection('rutinas-asignadas').add({
-                    rutinaId,
-                    entrenadoId: trainee.uid,
-                    entrenadorId: entrenadorUid,
-                    diaSemana: dia,
-                    fechaAsignacion: Timestamp.now(),
-                    activa: true
-                });
-                await asignadaRef.update({ id: asignadaRef.id });
-            } catch (e) {
-                console.warn('⚠️ No se pudo crear rutina-asignada:', e);
-            }
+    let traineeIdx = 0;
+    for (const trainer of createdTrainers) {
+        const trainerAssignedIds: string[] = [];
+        for (let i = 0; i < 5; i++) {
+            const tr = traineePool[traineeIdx++];
+            const created = await createTrainee(tr.name, tr.email, 'user123', trainer.uid);
+            createdTrainees.push(created);
+            trainerAssignedIds.push(created.uid);
         }
 
-        // actualizar documento del entrenado
-        const traineeUpdate = { 
-            rutinasIds: rutinaIds,
-            rutinasAsignadasIds: rutinaIds // Campo que la app usa para filtrar en RutinasPage
-        };
-        await db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true });
-        await db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true });
-
-        // actualizar entrenador: añadir rutinas y ejercicios creados
-        const entrenadorRef = db.collection('entrenadores').doc(entrenadorUid);
-        const entrenadorSnap = await entrenadorRef.get();
-        const entrenadorData = entrenadorSnap.exists ? (entrenadorSnap.data() as Record<string, any>) : undefined;
+        // actualizar entrenador: añadir entrenados a entrenadosAsignadosIds
+        const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
+        await entrenadorRef.set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true });
         
-        const existingRutinas: string[] = entrenadorData ? (entrenadorData['rutinasCreadasIds'] || []) : [];
-        const existingEjercicios: string[] = entrenadorData ? (entrenadorData['ejerciciosCreadasIds'] || []) : [];
-        
-        const updateData = { 
-            rutinasCreadasIds: [...new Set([...existingRutinas, ...rutinaIds])],
-            ejerciciosCreadasIds: [...new Set([...existingEjercicios, ...ejIdsParaEntrenador])]
-        };
-
-        await entrenadorRef.set(updateData, { merge: true });
-        
-        // También reflejar en el documento `usuarios` del entrenador
+        // También actualizar el documento del entrenador en la colección `usuarios`
         try {
-            const usuarioTrainerRef = db.collection('usuarios').doc(entrenadorUid);
-            await usuarioTrainerRef.set(updateData, { merge: true });
+            const usuarioTrainerRef = db.collection('usuarios').doc(trainer.uid);
+            await usuarioTrainerRef.set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true });
         } catch (uErr) {
-            console.warn('⚠️ No se pudo actualizar rutinas/ejercicios en usuario entrenador:', uErr);
+            console.warn('⚠️ No se pudo actualizar usuario entrenador en `usuarios`:', uErr);
         }
     }
 
-    console.log('✅ Seed completado:');
-    console.log('  - Entrenadores creados:', createdTrainers.map(t => ({ uid: t.uid, nombre: t.nombre, email: t.email })));
-    console.log('  - Entrenados creados:', createdTrainees.map(t => ({ uid: t.uid, nombre: t.nombre, entrenadorId: t.entrenadorId })));
+    // 3) Crear 25 ejercicios reales por entrenador y luego asignar rutinas aleatorias
+    const realGymExercises = [
+        "Sentadilla con Barra", "Press de Banca", "Peso Muerto", "Dominadas", "Press Militar",
+        "Curl de Bíceps con Mancuerna", "Tríceps en Polea Alta", "Zancadas", "Remo con Barra", "Prensa de Piernas",
+        "Elevaciones Laterales", "Press Inclinado", "Fondos de Pecho", "Copa de Tríceps", "Curl Martillo",
+        "Extensión de Cuádriceps", "Curl Femoral", "Elevación de Talones", "Plancha Abdominal", "Abdominales en Polea",
+        "Aperturas con Mancuerna", "Face Pull", "Remo al Mentón", "Hip Thrust", "Pajaros/Elevación Posterior"
+    ];
+
+    const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+    for (const trainer of createdTrainers) {
+        console.log(`📦 Creando 25 ejercicios para entrenador: ${trainer.nombre}`);
+        const trainerExercises: string[] = [];
+        for (const exName of realGymExercises) {
+            const exId = await createExercise(exName, `Descripción detallada de ${exName}`, trainer.uid);
+            trainerExercises.push(exId);
+        }
+
+        // Actualizar entrenador con sus ejercicios
+        const trainerDocUpdate = { ejerciciosCreadasIds: trainerExercises };
+        await db.collection('entrenadores').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
+        await db.collection('usuarios').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
+
+        // Asignar rutinas aleatorias a cada entrenado del entrenador (máx 3 rutinas por semana)
+        const trainerTrainees = createdTrainees.filter(t => t.entrenadorId === trainer.uid);
+        for (const trainee of trainerTrainees) {
+            const numRutinas = Math.floor(Math.random() * 3) + 1; // 1 a 3 rutinas
+            const shuffledDays = [...diasSemana].sort(() => 0.5 - Math.random());
+            const selectedDays = shuffledDays.slice(0, numRutinas);
+            
+            const routineIds: string[] = [];
+            for (const dia of selectedDays) {
+                // Seleccionar 5 ejercicios aleatorios de los 25 del entrenador
+                const routineExercises = [...trainerExercises].sort(() => 0.5 - Math.random()).slice(0, 5);
+                
+                const routineName = `Rutina de ${dia} - ${trainee.nombre}`;
+                const currentRoutineId = await createRoutine(routineName, dia, routineExercises, trainee.uid, trainee.nombre, trainer.uid);
+                routineIds.push(currentRoutineId);
+
+                // Crear registro en 'rutinas-asignadas'
+                try {
+                    const asignadaRef = await db.collection('rutinas-asignadas').add({
+                        rutinaId: currentRoutineId,
+                        entrenadoId: trainee.uid,
+                        entrenadorId: trainer.uid,
+                        diaSemana: dia,
+                        fechaAsignacion: Timestamp.now(),
+                        activa: true
+                    });
+                    await asignadaRef.update({ id: asignadaRef.id });
+                } catch (e) {
+                    console.warn('⚠️ No se pudo crear rutina-asignada:', e);
+                }
+            }
+
+            // Actualizar entrenado con sus rutinas
+            const traineeUpdate = { 
+                rutinasIds: routineIds,
+                rutinasAsignadasIds: routineIds
+            };
+            await db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true });
+            await db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true });
+            
+            // También añadir estas rutinas a las creadas por el entrenador
+            const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
+            const snap = await entrenadorRef.get();
+            const currentRoutines = snap.data()?.['rutinasCreadasIds'] || [];
+            const trainerRoutineUpdate = { rutinasCreadasIds: [...new Set([...currentRoutines, ...routineIds])] };
+            await entrenadorRef.set(trainerRoutineUpdate, { merge: true });
+            await db.collection('usuarios').doc(trainer.uid).set(trainerRoutineUpdate, { merge: true });
+        }
+    }
+
+    console.log('✅ Seed completado con éxito.');
 
     process.exit(0);
 }
