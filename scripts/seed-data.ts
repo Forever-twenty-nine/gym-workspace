@@ -39,7 +39,7 @@ async function createTrainer(name: string, email: string, password: string) {
         email,
         role: 'entrenador',
         id: uid,
-        plan: 'premium',
+        plan: 'free',
         onboarded: true,
         fechaCreacion: Timestamp.now()
     };
