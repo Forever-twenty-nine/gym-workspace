@@ -178,20 +178,30 @@
                   @case ('select') {
                     <select [id]="field.name" [formControlName]="field.name"
                       class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm appearance-none">
-                      <option value="" [disabled]="true">{{ field.placeholder || 'Seleccione una opción' }}</option>
+                      <option value="">{{ field.placeholder || 'Seleccione una opción' }}</option>
                       @for (opt of field.options; track opt.value) {
                         <option [value]="opt.value">{{ opt.label }}</option>
                       }
                     </select>
                   }
                   @case ('multiselect') {
-                    <select [id]="field.name" [formControlName]="field.name" multiple
-                      class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm min-h-32">
-                      @for (opt of field.options; track opt.value) {
-                        <option [value]="opt.value">{{ opt.label }}</option>
-                      }
-                    </select>
-                    <p class="mt-2 text-xs text-gray-400">Mantén presionado Ctrl (Windows) o Command (Mac) para seleccionar varios</p>
+                    <div class="relative group">
+                      <select [id]="field.name" [formControlName]="field.name" multiple
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all bg-white shadow-sm min-h-40 overflow-y-auto appearance-none scrollbar-thin scrollbar-thumb-indigo-200">
+                        @for (opt of field.options; track opt.value) {
+                          <option [value]="opt.value" class="py-2 px-2 hover:bg-indigo-50 rounded-lg cursor-pointer checked:bg-indigo-600 checked:text-white mb-1 transition-colors">
+                            {{ opt.label }}
+                          </option>
+                        }
+                      </select>
+                      <div class="absolute top-3 right-4 pointer-events-none text-gray-400 group-hover:text-indigo-500 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg>
+                      </div>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2">
+                      <span class="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+                      <p class="text-xs font-medium text-gray-500">Usa <kbd class="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-300 text-gray-900 font-sans shadow-sm">Ctrl</kbd> o <kbd class="px-1.5 py-0.5 rounded bg-gray-100 border border-gray-300 text-gray-900 font-sans shadow-sm">Cmd</kbd> para selección múltiple</p>
+                    </div>
                   }
                   @case ('checkbox') {
                     <div class="flex items-center h-full pt-1">

@@ -13,4 +13,5 @@ export interface Ejercicio {
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;
+    creadorId?: string;
 }

@@ -227,7 +227,11 @@ export class RutinaService {
             ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad con ambos formatos
             fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
             fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion,
-            duracion: data.duracion
+            duracion: data.duracion,
+            creadorId: data.creadorId, // IMPORTANTE: Mapear el autor
+            compartida: data.compartida,
+            usuarioId: data.usuarioId,
+            nombreUsuario: data.nombreUsuario
         };
     }
 

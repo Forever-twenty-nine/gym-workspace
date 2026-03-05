@@ -319,6 +319,7 @@ export class EjercicioService {
 			peso: data.peso,
 			descansoSegundos: data.descansoSegundos,
 			serieSegundos: data.serieSegundos,
+			creadorId: data.creadorId, // IMPORTANTE: Mapear el autor
 			fechaCreacion: data.fechaCreacion?.toDate?.() || data.fechaCreacion,
 			fechaModificacion: data.fechaModificacion?.toDate?.() || data.fechaModificacion
 		};

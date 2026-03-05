@@ -23,7 +23,8 @@ import { Validators } from '@angular/forms';
       [fields]="fields()"
       [loading]="loading()"
       (save)="onSave($event)"
-      (delete)="onDelete($event)">
+      (delete)="onDelete($event)"
+      (editOpened)="onOpenEdit($event)">
     </app-data>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -38,6 +39,7 @@ export class EntrenadosPage {
   private readonly pageTitleService = inject(PageTitleService);
 
   loading = signal(false);
+  selectedEntrenadoId = signal<string | null>(null);
   
   entrenados = computed(() => {
     const list = this.entrenadoService.entrenados();
@@ -73,15 +75,31 @@ export class EntrenadosPage {
     const trainers = this.entrenadorService.entrenadores();
     const allUsers = this.userService.users();
     const routines = this.rutinaService.rutinas();
-    const assignedRoutines = this.rutinaAsignadaService.getRutinasAsignadas()();
+    const assignedRoutinesList = this.rutinaAsignadaService.getRutinasAsignadas()();
+    const entrenadoId = this.selectedEntrenadoId();
+    const entrenadosList = this.entrenadoService.entrenados();
+
+    // Encontrar qué entrenadores tiene asignados este entrenado
+    const currentEntrenado = entrenadoId ? entrenadosList.find(e => e.id === entrenadoId) : null;
+    const assignedTrainerIds = currentEntrenado?.entrenadoresId || [];
+
+    // Filtrar rutinas: Solo las que pertenecen a sus entrenadores
+    const filteredRoutines = assignedTrainerIds.length > 0
+      ? routines.filter(r => assignedTrainerIds.includes((r as any).creadorId!))
+      : routines;
+
+    // Filtrar rutinas asignadas: Solo las que corresponden a este entrenado
+    const filteredAssignedRoutines = entrenadoId
+      ? assignedRoutinesList.filter(ar => (ar as any).entrenadoId === entrenadoId || (ar as any).usuarioId === entrenadoId)
+      : assignedRoutinesList;
 
     const trainerOptions = trainers.map(t => {
       const u = allUsers.find(user => user.uid === t.id);
       return { value: t.id, label: u?.nombre || u?.email || t.id };
     });
 
-    const routineOptions = routines.map(r => ({ value: r.id!, label: r.nombre }));
-    const assignedRoutineOptions = assignedRoutines.map(ar => ({ 
+    const routineOptions = filteredRoutines.map(r => ({ value: r.id!, label: r.nombre }));
+    const assignedRoutineOptions = filteredAssignedRoutines.map(ar => ({ 
       value: ar.id!, 
       label: `Rutina (${ar.id})` 
     }));
@@ -135,8 +153,12 @@ export class EntrenadosPage {
 
   constructor() {
     this.pageTitleService.setTitle('Entrenados');
-    this.entrenadoService.initializeListener();
-    // No llamamos a initializeListener() si son privados o inaccesibles
+    // Acceder a las signals para activar los listeners de los servicios
+    const u = this.userService.users();
+    const e = this.entrenadoService.entrenados();
+    const t = this.entrenadorService.entrenadoresSignal();
+    const r = this.rutinaService.rutinas();
+    const ra = this.rutinaAsignadaService.getRutinasAsignadas()();
   }
 
   async onSave(data: any) {
@@ -161,6 +183,10 @@ export class EntrenadosPage {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  onOpenEdit(item: any) {
+    this.selectedEntrenadoId.set(item?.id || null);
   }
 }
 

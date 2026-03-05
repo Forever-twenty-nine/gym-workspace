@@ -14,6 +14,7 @@ export interface Rutina {
     duracion?: number;
     // Social
     compartida?: boolean;
+    creadorId?: string; // ID del entrenador que creó la rutina
     usuarioId?: string;
     nombreUsuario?: string;
     fechaCompartida?: any;

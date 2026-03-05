@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, computed, inject, Injector, runInInjectionContext, Signal } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -57,10 +57,23 @@ export class EntrenadorService {
   private readonly _loading = signal<boolean>(false);
   private readonly _error = signal<string | null>(null);
 
-  // 🔍 Signals públicos de solo lectura
-  readonly entrenadores = this._entrenadores.asReadonly();
-  readonly loading = this._loading.asReadonly();
-  readonly error = this._error.asReadonly();
+  /**
+   * 📊 Signal readonly con todos los entrenadores
+   */
+  get entrenadoresSignal(): Signal<Entrenador[]> {
+    if (!this.isListenerInitialized) {
+      this.initializeListener();
+    }
+    return this._entrenadores.asReadonly();
+  }
+
+  // Alias para mantener compatibilidad con código existente
+  get entrenadores(): Signal<Entrenador[]> {
+    return this.entrenadoresSignal;
+  }
+
+  readonly loadingSignal = this._loading.asReadonly();
+  readonly errorSignal = this._error.asReadonly();
 
   private unsubscribe: (() => void) | null = null;
   private isListenerInitialized = false;

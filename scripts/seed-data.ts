@@ -136,6 +136,7 @@ async function createExercise(nombre: string, descripcion: string, entrenadorId?
 }
 
 async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[], usuarioId: string, nombreUsuario: string, entrenadorId?: string) {
+    console.log(`📝 Creando rutina: ${nombre} para usuario ${usuarioId}`);
     const data: any = {
         nombre,
         activa: true,
@@ -145,14 +146,14 @@ async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[
         fechaModificacion: Timestamp.now(),
         usuarioId,
         nombreUsuario,
-        id: "" // temporal
     };
     if (entrenadorId) {
         data.creadorId = entrenadorId;
     }
-    const ref = await db.collection('rutinas').add(data);
-    const id = ref.id;
-    await ref.update({ id });
+    const docRef = db.collection('rutinas').doc(); // Auto-generar ID
+    const id = docRef.id;
+    await docRef.set({ ...data, id }); 
+    console.log(`✅ Rutina creada en Firestore con ID: ${id}`);
     return id;
 }
 
@@ -256,7 +257,7 @@ async function main() {
         await db.collection('usuarios').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
 
         // Asignar rutinas aleatorias a cada entrenado del entrenador (máx 3 rutinas por semana)
-        const trainerTrainees = createdTrainees.filter(t => t.entrenadorId === trainer.uid);
+        const trainerTrainees = createdTrainees.filter(t => t.role === 'entrenado'); // Cambio aquí para filtrar correctamente
         for (const trainee of trainerTrainees) {
             const numRutinas = Math.floor(Math.random() * 3) + 1; // 1 a 3 rutinas
             const shuffledDays = [...diasSemana].sort(() => 0.5 - Math.random());

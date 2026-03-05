@@ -25,6 +25,7 @@ export class DataComponent {
   // Outputs
   save = output<any>();
   delete = output<string>();
+  editOpened = output<any>();
 
   // State
   isModalOpen = signal(false);
@@ -90,6 +91,7 @@ export class DataComponent {
 
   openEdit(item: any) {
     this.selectedItem.set(item);
+    this.editOpened.emit(item); // Usar editOpened para evitar conflicto con el nombre del método
     this.buildForm(item);
     this.isModalOpen.set(true);
   }
