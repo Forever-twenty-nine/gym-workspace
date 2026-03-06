@@ -135,10 +135,8 @@ export class EntrenadoresPage {
     try {
       if (data.id) {
         await this.entrenadorService.update(data.id, data);
-        this.toastService.show('Entrenador actualizado correctamente', 'success');
       } else {
         await this.entrenadorService.create(data);
-        this.toastService.show('Entrenador creado correctamente', 'success');
       }
     } catch (error) {
       this.toastService.show('Error al guardar entrenador', 'error');
@@ -152,7 +150,6 @@ export class EntrenadoresPage {
     this.loading.set(true);
     try {
       await this.entrenadorService.delete(id);
-      this.toastService.show('Entrenador eliminado correctamente', 'success');
     } catch (error) {
       this.toastService.show('Error al eliminar entrenador', 'error');
     } finally {

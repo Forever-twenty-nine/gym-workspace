@@ -60,10 +60,6 @@ export class RutinasPage {
         this.loading.set(true);
         try {
             await this.rutinaService.save(data);
-            this.toastService.show(
-                data.id ? 'Rutina actualizada correctamente' : 'Rutina creada correctamente',
-                'success'
-            );
         } catch (error) {
             this.toastService.show('Error al guardar rutina', 'error');
         } finally {
@@ -75,7 +71,6 @@ export class RutinasPage {
         this.loading.set(true);
         try {
             await this.rutinaService.delete(id);
-            this.toastService.show('Rutina eliminada correctamente', 'success');
         } catch (error) {
             this.toastService.show('Error al eliminar rutina', 'error');
         } finally {

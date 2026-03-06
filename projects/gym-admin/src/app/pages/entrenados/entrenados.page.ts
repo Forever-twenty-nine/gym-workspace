@@ -121,7 +121,6 @@ export class EntrenadosPage {
     this.loading.set(true);
     try {
       await this.entrenadoService.save(data);
-      this.toastService.show('Entrenado guardado correctamente', 'success');
     } catch (error) {
       this.toastService.show('Error al guardar entrenado', 'error');
     } finally {
@@ -133,7 +132,6 @@ export class EntrenadosPage {
     this.loading.set(true);
     try {
       await this.entrenadoService.delete(id);
-      this.toastService.show('Entrenado eliminado correctamente', 'success');
     } catch (error) {
       this.toastService.show('Error al eliminar entrenado', 'error');
     } finally {

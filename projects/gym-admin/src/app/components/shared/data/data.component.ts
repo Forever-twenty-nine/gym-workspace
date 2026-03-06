@@ -1,9 +1,10 @@
-import { Component, input, output, ChangeDetectionStrategy, signal, computed } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ColumnConfig, FieldConfig } from '../../../models/data-config.model';
 import { ConfirmComponent } from '../confirm/confirm.component';
 import { DataModalComponent } from './data-modal/data-modal.component';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-data',
@@ -21,6 +22,8 @@ import { DataModalComponent } from './data-modal/data-modal.component';
   `]
 })
 export class DataComponent {
+  private readonly toastService = inject(ToastService);
+
   // Inputs
   title = input.required<string>();
   items = input.required<any[]>();
@@ -99,6 +102,10 @@ export class DataComponent {
 
   onSaveModal(data: any) {
     this.save.emit(data);
+    this.toastService.show(
+      data.id ? `${this.title()} actualizado correctamente` : `${this.title()} creado correctamente`,
+      'success'
+    );
     this.closeModal();
   }
 
@@ -120,6 +127,7 @@ export class DataComponent {
   onConfirmDelete() {
     if (this.selectedItem()) {
       this.delete.emit(this.selectedItem().id);
+      this.toastService.show(`${this.title()} eliminado correctamente`, 'success');
       this.closeConfirm();
     }
   }

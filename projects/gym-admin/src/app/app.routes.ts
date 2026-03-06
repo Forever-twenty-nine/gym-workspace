@@ -7,6 +7,7 @@ import { UsuariosPage } from './pages/usuarios/usuarios.page';
 import { SolicitudesPlanPage } from './pages/solicitudes-plan/solicitudes-plan.page';
 import { EjerciciosPage } from './pages/ejercicios/ejercicios.page';
 import { RutinasPage } from './pages/rutinas/rutinas.page';
+import { RutinasAsignadasPage } from './pages/rutinas-asignadas/rutinas-asignadas.page';
 
 export const routes: Routes = [
   {
@@ -28,6 +29,10 @@ export const routes: Routes = [
   {
     path: 'rutinas',
     component: RutinasPage
+  },
+  {
+    path: 'rutinas-asignadas',
+    component: RutinasAsignadasPage
   },
   {
     path: 'gimnasios',

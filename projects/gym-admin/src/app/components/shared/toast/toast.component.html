@@ -1,14 +1,14 @@
-<div class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 space-y-3 w-full max-w-md">
+<div class="space-y-3 w-full max-w-md">
   @for (toast of toasts(); track toast.id) {
     <div 
       [class]="getToastClasses(toast)"
       [class.opacity-0]="!toast.isVisible"
-      [class.-translate-y-full]="!toast.isVisible"
-      class="transform transition-all duration-300 ease-in-out w-full">
+      [class.translate-x-full]="!toast.isVisible"
+      class="transform transition-all duration-300 ease-in-out w-full pointer-events-auto">
       
       <div class="flex items-start">
         <!-- Icono -->
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <svg [class]="getIconClasses(toast.type)" fill="currentColor" viewBox="0 0 20 20">
             @switch (toast.type) {
               @case ('success') {
@@ -33,7 +33,7 @@
         </div>
         
         <!-- Botón cerrar -->
-        <div class="ml-4 flex-shrink-0 flex">
+        <div class="ml-4 shrink-0 flex">
           <button 
             [class]="getCloseButtonClasses(toast.type)"
             (click)="closeToast.emit(toast.id)">

@@ -1,24 +1,23 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
-
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Rol, Objetivo } from 'gym-library';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { Rol } from 'gym-library';
 import { UserService } from '../../services/user.service';
 import { EntrenadoService } from '../../services/entrenado.service';
 import { EntrenadorService } from '../../services/entrenador.service';
 import { GimnasioService } from '../../services/gimnasio.service';
-import { ModalFormComponent, FormFieldConfig } from '../../components/modal-form/modal-form.component';
-import { ToastComponent } from '../../components/shared/toast/toast.component';
-import { UsuariosTable } from '../../components/usuarios-table/usuarios-table';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
+import { DataComponent } from '../../components/shared/data/data.component';
+import { SchemaService } from '../../core/schema.service';
 
 @Component({
   selector: 'app-usuarios-page',
+  standalone: true,
   imports: [
+    CommonModule,
     ReactiveFormsModule,
-    ModalFormComponent,
-    ToastComponent,
-    UsuariosTable
+    DataComponent
   ],
   templateUrl: './usuarios.page.html',
   styles: [`
@@ -36,9 +35,16 @@ export class UsuariosPage {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly entrenadorService = inject(EntrenadorService);
   private readonly gimnasioService = inject(GimnasioService);
-  private readonly fb = inject(FormBuilder);
-  readonly toastService = inject(ToastService);
+  private readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
+  private readonly schemaService = inject(SchemaService);
+
+  // Schema configuration
+  readonly columns = this.schemaService.getColumns('usuario');
+  readonly fields = signal(this.schemaService.getFields('usuario'));
+
+  // Signals para el estado del componente
+  readonly isLoading = signal(false);
 
   constructor() {
     this.pageTitleService.setTitle('Usuarios');
@@ -48,172 +54,51 @@ export class UsuariosPage {
   readonly usuarios = computed(() => {
     return this.userService.users().map(user => ({
       ...user,
+      id: user.uid, // Aseguramos que tenga 'id' para DataComponent
       displayName: user.nombre || user.email || `Usuario ${user.uid}`,
       needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
     }));
   });
 
-  // Signals para el estado del componente
-  readonly isModalOpen = signal(false);
-  readonly modalData = signal<any>(null);
-  readonly editForm = signal<FormGroup | null>(null);
-  readonly isLoading = signal(false);
-  readonly isCreating = signal(false);
-  readonly formFields = signal<FormFieldConfig[]>([]);
-
-  addSampleUsuario() {
-    this.openCreateModal();
-  }
-
-  async deleteUsuario(id: string) {
-    await this.userService.deleteUser(id);
-    this.toastService.log(`Usuario eliminado: ${id}`);
-  }
-
-  async openDetailsModal(item: any) {
-    // Si es entrenado, cargar el objetivo de forma asíncrona
-    if (item.role === Rol.ENTRENADO) {
-      try {
-        const entrenado = this.entrenadoService.getEntrenado(item.uid)();
-        if (entrenado) {
-          item.objetivo = entrenado.objetivo;
-        }
-      } catch (error) {
-        console.warn('Error cargando objetivo del entrenado:', error);
-      }
-    }
-
-    this.modalData.set(item);
-    this.isModalOpen.set(true);
-    this.isCreating.set(false);
-    this.createEditForm(item);
-  }
-
-  openCreateModal() {
-    const newItem = this.createEmptyItem();
-    this.modalData.set(newItem);
-    this.isModalOpen.set(true);
-    this.isCreating.set(true);
-    this.createEditForm(newItem);
-  }
-
-  closeModal() {
-    this.isModalOpen.set(false);
-    this.modalData.set(null);
-    this.editForm.set(null);
-    this.isLoading.set(false);
-    this.isCreating.set(false);
-  }
-
-  private createEmptyItem(): any {
-    const timestamp = Date.now();
-    return {
-      uid: 'u' + timestamp,
-      email: '',
-      password: ''
-    };
-  }
-
-  private createEditForm(item: any) {
-    let formConfig: any = {};
-
-    if (this.isCreating()) {
-      formConfig = {
-        email: [item.email || '', [Validators.required, Validators.email]],
-        password: [item.password || '', [Validators.required, Validators.minLength(6)]]
-      };
-    } else {
-      formConfig = {
-        nombre: [item.nombre || ''],
-        email: [{ value: item.email || '', disabled: true }],
-        role: [item.role || ''],
-        emailVerified: [item.emailVerified || false],
-        onboarded: [item.onboarded || false],
-        plan: [item.plan || 'free']
-      };
-
-      // Agregar objetivo si es entrenado
-      if (item.role === Rol.ENTRENADO) {
-        formConfig.objetivo = [item.objetivo || ''];
-      }
-    }
-
-    const form = this.fb.group(formConfig);
-    this.editForm.set(form);
-
-    // Actualizar campos del formulario
-    this.updateFormFields();
-
-    // Suscribirse a cambios en el rol para actualizar campos dinámicamente
-    if (!this.isCreating()) {
-      form.get('role')?.valueChanges.subscribe((newRole: any) => {
-        this.handleRoleChangeInForm(newRole as Rol, item);
-        this.updateFormFields();
-      });
-    }
-  }
-
-  async saveChanges() {
-    const form = this.editForm();
-    const originalData = this.modalData();
-
-    if (!form || !originalData) {
-      this.toastService.log('Error: Formulario inválido o datos faltantes');
-      return;
-    }
-
-    form.markAllAsTouched();
-
-    if (!form.valid) {
-      this.toastService.log('Error: Por favor, completa todos los campos obligatorios');
-      return;
-    }
-
+  async onSave(data: any) {
     this.isLoading.set(true);
-
     try {
-      let updatedData = { ...originalData, ...form.value };
+      const id = data.uid || data.id;
+      const isEditing = !!id;
 
-      if (this.isCreating()) {
-        const password = updatedData.password;
-        delete updatedData.password;
-
-        const userDataForCreation = {
-          email: updatedData.email,
-        };
-
-        await (this.userService as any).addUser(userDataForCreation, password);
-        this.toastService.log(`✅ Usuario creado con Firebase Auth: ${updatedData.email}`);
-      } else {
-        delete updatedData.password;
-
-        const originalRole = originalData.role;
-        const newRole = updatedData.role;
+      if (isEditing) {
+        const originalUser = this.userService.users().find(u => u.uid === id);
+        const originalRole = originalUser?.role;
+        const newRole = data.role as Rol;
 
         if (originalRole !== newRole && newRole) {
-          await this.handleRoleChange(updatedData.uid, newRole, updatedData);
+          await this.handleRoleChange(id, newRole, data);
         }
 
-        // Si es entrenado y cambió el objetivo, actualizar el documento entrenado
-        if (originalData.role === Rol.ENTRENADO && updatedData.objetivo !== originalData.objetivo) {
-          const currentEntrenado = this.entrenadoService.getEntrenado(updatedData.uid)();
-          if (currentEntrenado) {
-            const updatedEntrenado = { ...currentEntrenado, objetivo: updatedData.objetivo };
-            await this.entrenadoService.save(updatedEntrenado);
-            this.toastService.log(`✅ Objetivo actualizado para entrenado: ${updatedData.nombre || updatedData.email}`);
-          }
-        }
-
-        await this.userService.updateUser(updatedData.uid, updatedData);
-        this.toastService.log(`✅ Usuario actualizado: ${updatedData.nombre || updatedData.email}`);
+        await this.userService.updateUser(id, data);
+        this.toastService.log(`✅ Usuario actualizado: ${data.nombre || data.email}`);
+      } else {
+        const password = 'Gym' + Math.random().toString(36).slice(-8) + '!';
+        await (this.userService as any).addUser(data, password);
+        this.toastService.log(`✅ Usuario creado: ${data.email}`);
       }
-
-      this.closeModal();
     } catch (error) {
       console.error('Error al guardar:', error);
       this.toastService.log(`Error al guardar los cambios: ${error}`);
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  async onDelete(item: any) {
+    const id = item.uid || item.id;
+    if (!id) return;
+    
+    try {
+      await this.userService.deleteUser(id);
+      this.toastService.log(`Usuario eliminado: ${id}`);
+    } catch (error) {
+      this.toastService.log(`Error al eliminar usuario: ${error}`);
     }
   }
 
@@ -225,19 +110,9 @@ export class UsuariosPage {
             id: uid,
             activo: true,
             fechaRegistro: new Date(),
-            objetivo: userData.objetivo || Objetivo.SALUD
+            objetivo: 'salud'
           };
-
-          if (userData.gimnasioId && userData.gimnasioId !== '') {
-            clienteData.gimnasioId = userData.gimnasioId;
-          } else {
-            clienteData.gimnasioId = '';
-          }
-
           await this.entrenadoService.save(clienteData);
-          userData.clienteId = uid;
-
-          this.toastService.log(`✅ Documento Cliente creado para usuario: ${userData.nombre || userData.email}`);
           break;
 
         case Rol.GIMNASIO:
@@ -247,11 +122,7 @@ export class UsuariosPage {
             direccion: '',
             activo: true
           };
-
           await this.gimnasioService.save(gimnasioData);
-          userData.gimnasioId = uid;
-
-          this.toastService.log(`✅ Documento Gimnasio creado para usuario: ${userData.nombre || userData.email}`);
           break;
 
         case Rol.ENTRENADOR:
@@ -263,152 +134,12 @@ export class UsuariosPage {
             entrenadosAsignadosIds: [],
             rutinasCreadasIds: []
           };
-
-          // Crear o sobrescribir el documento del entrenador con el UID del usuario (idempotente)
           await this.entrenadorService.createWithId(uid, entrenadorData);
-
-          userData.entrenadorId = uid;
-
-          this.toastService.log(`✅ Documento Entrenador creado para usuario: ${userData.nombre || userData.email}`);
-          break;
-
-        default:
-          this.toastService.log(`⚠️ Rol ${newRole} no requiere documento específico`);
           break;
       }
     } catch (error) {
       console.error('Error creando documento específico:', error);
-      this.toastService.log(`❌ Error creando documento para rol ${newRole}: ${error}`);
       throw error;
     }
   }
-
-  getRolesDisponibles() {
-    return Object.values(Rol);
-  }
-
-  private handleRoleChangeInForm(newRole: Rol, originalItem: any) {
-    const form = this.editForm();
-    if (!form) return;
-
-    if (newRole === Rol.ENTRENADO) {
-      // Si cambia a ENTRENADO, agregar el control objetivo si no existe
-      if (!form.contains('objetivo')) {
-        // Intentar obtener el objetivo actual del entrenado si existe
-        let objetivoValue = '';
-        if (originalItem.role === Rol.ENTRENADO) {
-          objetivoValue = originalItem.objetivo || '';
-        } else {
-          // Si no era entrenado, intentar cargar de la DB si existe documento
-          const entrenado = this.entrenadoService.getEntrenado(originalItem.uid)();
-          objetivoValue = entrenado?.objetivo || Objetivo.SALUD;
-        }
-        form.addControl('objetivo', this.fb.control(objetivoValue));
-      }
-    } else {
-      // Si cambia de ENTRENADO a otro rol, remover el control objetivo
-      if (form.contains('objetivo')) {
-        form.removeControl('objetivo');
-      }
-    }
-  }
-
-  private updateFormFields() {
-    const form = this.editForm();
-    if (!form) return;
-
-    const isCreating = this.isCreating();
-    const currentRole = form.get('role')?.value;
-
-    if (isCreating) {
-      this.formFields.set([
-        {
-          name: 'email',
-          type: 'text',
-          inputType: 'email',
-          label: 'Email',
-          placeholder: 'email@ejemplo.com',
-          colSpan: 2,
-          required: true
-        },
-        {
-          name: 'password',
-          type: 'text',
-          inputType: 'password',
-          label: 'Contraseña',
-          placeholder: 'Mínimo 6 caracteres',
-          colSpan: 2,
-          required: true
-        }
-      ]);
-    } else {
-      const fields: FormFieldConfig[] = [
-        {
-          name: 'nombre',
-          type: 'text',
-          label: 'Nombre',
-          placeholder: 'Nombre del usuario',
-          colSpan: 2
-        },
-        {
-          name: 'email',
-          type: 'text',
-          inputType: 'email',
-          label: 'Email',
-          placeholder: 'email@ejemplo.com',
-          colSpan: 2,
-          readonly: true
-        },
-        {
-          name: 'role',
-          type: 'select',
-          label: 'Rol',
-          placeholder: 'Seleccionar rol',
-          options: this.getRolesDisponibles().map(rol => ({ value: rol, label: rol })),
-          colSpan: 2
-        },
-        {
-          name: 'emailVerified',
-          type: 'checkbox',
-          label: 'Estado del Email',
-          checkboxLabel: 'Email Verificado',
-          colSpan: 1
-        },
-        {
-          name: 'onboarded',
-          type: 'checkbox',
-          label: 'Estado de Onboarding',
-          checkboxLabel: 'Usuario Completó Onboarding',
-          colSpan: 1
-        },
-        {
-          name: 'plan',
-          type: 'select',
-          label: 'Plan de Suscripción',
-          placeholder: 'Seleccionar plan',
-          options: [
-            { value: 'free', label: 'Gratuito' },
-            { value: 'premium', label: 'Premium' }
-          ],
-          colSpan: 2
-        }
-      ];
-
-      // Agregar campo objetivo si es entrenado
-      if (currentRole === Rol.ENTRENADO) {
-        fields.push({
-          name: 'objetivo',
-          type: 'select',
-          label: 'Objetivo',
-          placeholder: 'Seleccionar objetivo',
-          options: Object.values(Objetivo).map(obj => ({ value: obj, label: obj })),
-          colSpan: 2
-        });
-      }
-
-      this.formFields.set(fields);
-    }
-  }
-
 }
-

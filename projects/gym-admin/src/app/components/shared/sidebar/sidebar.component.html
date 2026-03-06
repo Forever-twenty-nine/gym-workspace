@@ -130,6 +130,27 @@
         </a>
       </li>
       <li>
+        <a routerLink="/rutinas-asignadas" routerLinkActive="bg-gray-700 text-white"
+          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'" [title]="isCollapsed() ? 'Rutinas Asignadas' : ''"
+          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
+          <svg [ngClass]="isCollapsed() ? 'w-6 h-6' : 'w-5 h-5 mr-3'" class="transition-all duration-300" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+            </path>
+          </svg>
+          @if (!isCollapsed()) {
+          Rutinas Asignadas
+          }
+          @if (isCollapsed()) {
+          <span
+            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+            Rutinas Asignadas
+          </span>
+          }
+        </a>
+      </li>
+      <li>
         <a routerLink="/gimnasios" routerLinkActive="bg-gray-700 text-white"
           [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'" [title]="isCollapsed() ? 'Gimnasios' : ''"
           class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">

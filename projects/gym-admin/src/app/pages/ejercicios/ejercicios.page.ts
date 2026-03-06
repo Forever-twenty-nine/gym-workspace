@@ -49,10 +49,6 @@ export class EjerciciosPage {
         this.loading.set(true);
         try {
             await this.ejercicioService.save(data);
-            this.toastService.show(
-                data.id ? 'Ejercicio actualizado correctamente' : 'Ejercicio creado correctamente',
-                'success'
-            );
         } catch (error) {
             this.toastService.show('Error al guardar ejercicio', 'error');
         } finally {
@@ -64,7 +60,6 @@ export class EjerciciosPage {
         this.loading.set(true);
         try {
             await this.ejercicioService.delete(id);
-            this.toastService.show('Ejercicio eliminado correctamente', 'success');
         } catch (error) {
             this.toastService.show('Error al eliminar ejercicio', 'error');
         } finally {

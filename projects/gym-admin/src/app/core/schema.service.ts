@@ -4,6 +4,8 @@ import { ENTRENADO_SCHEMA, ENTRENADO_COLUMNS } from './schemas/entrenado.schema'
 import { ENTRENADOR_SCHEMA, ENTRENADOR_COLUMNS } from './schemas/entrenador.schema';
 import { EJERCICIO_SCHEMA, EJERCICIO_COLUMNS } from './schemas/ejercicio.schema';
 import { RUTINA_SCHEMA, RUTINA_COLUMNS } from './schemas/rutina.schema';
+import { USUARIO_SCHEMA, USUARIO_COLUMNS } from './schemas/usuarios.schema';
+import { RUTINA_ASIGNADA_SCHEMA, RUTINA_ASIGNADA_COLUMNS } from './schemas/rutina-asignada.schema';
 
 @Injectable({
     providedIn: 'root'
@@ -13,14 +15,18 @@ export class SchemaService {
         'entrenado': ENTRENADO_SCHEMA,
         'entrenador': ENTRENADOR_SCHEMA,
         'ejercicio': EJERCICIO_SCHEMA,
-        'rutina': RUTINA_SCHEMA
+        'rutina': RUTINA_SCHEMA,
+        'usuario': USUARIO_SCHEMA,
+        'rutinaAsignada': RUTINA_ASIGNADA_SCHEMA
     };
 
     private columns: Record<string, ColumnConfig[]> = {
         'entrenado': ENTRENADO_COLUMNS,
         'entrenador': ENTRENADOR_COLUMNS,
         'ejercicio': EJERCICIO_COLUMNS,
-        'rutina': RUTINA_COLUMNS
+        'rutina': RUTINA_COLUMNS,
+        'usuario': USUARIO_COLUMNS,
+        'rutinaAsignada': RUTINA_ASIGNADA_COLUMNS
     };
 
     getFields(name: string): FieldConfig[] {
