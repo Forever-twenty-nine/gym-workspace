@@ -172,7 +172,8 @@ export class EntrenadorService {
                 fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
                 ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
                 entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
-                rutinasCreadasIds: data['rutinasCreadasIds'] || []
+                rutinasCreadasIds: data['rutinasCreadasIds'] || [],
+                entrenadosPremiumIds: data['entrenadosPremiumIds'] || []
               };
               entrenadores.push(entrenador);
             });
@@ -209,7 +210,8 @@ export class EntrenadorService {
           fechaRegistro: entrenadorData.fechaRegistro ? Timestamp.fromDate(entrenadorData.fechaRegistro) : Timestamp.now(),
           ejerciciosCreadasIds: entrenadorData.ejerciciosCreadasIds || [],
           entrenadosAsignadosIds: entrenadorData.entrenadosAsignadosIds || [],
-          rutinasCreadasIds: entrenadorData.rutinasCreadasIds || []
+          rutinasCreadasIds: entrenadorData.rutinasCreadasIds || [],
+          entrenadosPremiumIds: (entrenadorData as any).entrenadosPremiumIds || []
         });
         return docRef.id;
       }) as string;
@@ -236,7 +238,8 @@ export class EntrenadorService {
           fechaRegistro: entrenadorData.fechaRegistro ? Timestamp.fromDate(entrenadorData.fechaRegistro) : Timestamp.now(),
           ejerciciosCreadasIds: entrenadorData.ejerciciosCreadasIds || [],
           entrenadosAsignadosIds: entrenadorData.entrenadosAsignadosIds || [],
-          rutinasCreadasIds: entrenadorData.rutinasCreadasIds || []
+          rutinasCreadasIds: entrenadorData.rutinasCreadasIds || [],
+          entrenadosPremiumIds: (entrenadorData as any).entrenadosPremiumIds || []
         });
       });
     } catch (error) {

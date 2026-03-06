@@ -7,7 +7,7 @@
     "emulator:export": "firebase emulators:export --project=default-project ./emulator-data",
     "emulator:import": "firebase emulators:start --project=default-project --import=./emulator-data",
     "kill-emulators": "powershell -NoProfile -File scripts/kill-emulator.ps1",
-    "gym-admin:serve": "cd projects/gym-admin && npm run start",
+    "gym-admin:serve": "cd projects/gym-admin && ng serve -o",
     "gym-admin:build": "cd projects/gym-admin && npm run build",
     "gym-admin:test": "cd projects/gym-admin && npm run test",
     "gym-app:serve": "cd projects/gym-app && ionic serve",
@@ -23,8 +23,8 @@
     "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
     "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
     "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -c firebase",
-    "gym-admin:with-emulator": "concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
-    "gym-app:with-emulator": "concurrently \"npm run emulator:start:with-export\" \"npm run gym-app:serve\" --names \"emulator,app\" --prefix-colors \"green,magenta\"",
+    "gym-admin:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
+    "gym-app:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-app:serve\" --names \"emulator,app\" --prefix-colors \"green,magenta\"",
     "db:seed": "tsx scripts/seed-data.ts",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
@@ -46,6 +46,7 @@
     "@angular/forms": "^21.2.0",
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
+    "reflect-metadata": "^0.2.2",
     "rxjs": "~7.8.2",
     "tslib": "^2.8.1"
   },

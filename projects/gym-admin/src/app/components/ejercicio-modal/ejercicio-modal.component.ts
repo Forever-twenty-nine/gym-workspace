@@ -161,6 +161,7 @@ export class EjercicioModalComponent {
         series: updatedData.series || 3,
         repeticiones: updatedData.repeticiones || 10,
         peso: updatedData.peso || 0,
+        creadorId: this.creadorId() || updatedData.creadorId,
         fechaCreacion: updatedData.fechaCreacion || new Date()
       };
 

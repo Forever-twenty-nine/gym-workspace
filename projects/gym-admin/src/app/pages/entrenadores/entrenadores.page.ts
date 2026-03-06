@@ -10,6 +10,7 @@ import { PageTitleService } from '../../services/page-title.service';
 import { DataComponent } from '../../components/shared/data/data.component';
 import { ColumnConfig, FieldConfig } from '../../models/data-config.model';
 import { Validators } from '@angular/forms';
+import { SchemaService } from '../../core/schema.service';
 
 @Component({
   selector: 'app-entrenadores-page',
@@ -38,9 +39,11 @@ export class EntrenadoresPage {
   private readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
 
+  private readonly schemaService = inject(SchemaService);
+
   loading = signal(false);
   selectedEntrenadorId = signal<string | null>(null);
-  
+
   entrenadores = computed(() => {
     const list = this.entrenadorService.entrenadoresSignal();
     const users = this.userService.users();
@@ -54,11 +57,7 @@ export class EntrenadoresPage {
     });
   });
 
-  columns: ColumnConfig[] = [
-    { key: 'displayName', label: 'Nombre', type: 'avatar' },
-    { key: 'email', label: 'Email', type: 'text' },
-    { key: 'fechaRegistro', label: 'Registro', type: 'date' }
-  ];
+  columns = this.schemaService.getColumns('entrenador');
 
   fields = computed<FieldConfig[]>(() => {
     const entrenadorId = this.selectedEntrenadorId();
@@ -67,16 +66,13 @@ export class EntrenadoresPage {
     const rutinasList = this.rutinaService.rutinas();
     const usersList = this.userService.users();
 
-    // FILTRO ESTRICTO: Solo mostramos lo que pertenece al entrenador actual
-    // Diagnóstico: El seed usa 'creadorId' y IDs en minúsculas
     const currentId = entrenadorId;
-    
+
     const filteredEjercicios = ejerciciosList.filter((e: any) => {
       const cid = (e.creadorId || e.entrenadorId || e.usuarioId);
-      // Comparación flexible para debug: exacta o en minúsculas
       return cid === currentId || (cid && currentId && cid.toLowerCase() === currentId.toLowerCase());
     });
-      
+
     const filteredRutinas = rutinasList.filter((r: any) => {
       const cid = (r.creadorId || r.entrenadorId || r.usuarioId);
       return cid === currentId || (cid && currentId && cid.toLowerCase() === currentId.toLowerCase());
@@ -89,51 +85,16 @@ export class EntrenadoresPage {
     });
     const rutinas = filteredRutinas.map(r => ({ value: r.id, label: r.nombre || r.id }));
 
-    // LOG DE INSPECCIÓN DE DATOS REALES (Muestreo del primer ejercicio para ver sus campos)
-    if (ejerciciosList.length > 0) {
-      const firstEx = ejerciciosList[0] as any;
-      console.log('DEBUG DATA - Primer Ejercicio:', {
-        nombre: firstEx.nombre,
-        creadorId: firstEx.creadorId,
-        entrenadorId: firstEx.entrenadorId,
-        usuarioId: firstEx.usuarioId
-      });
-    }
-    console.log('--- DIAGNÓSTICO FINAL ---');
-    console.log('ID Entrenador Seleccionado:', currentId);
-    console.log('Ejercicios que han pasado el filtro:', ejercicios.length);
-    console.log('Rutinas que han pasado el filtro:', rutinas.length);
-
-    return [
-      { name: 'id', label: 'ID (UID)', type: 'text', validators: [Validators.required] },
-      { name: 'fechaRegistro', label: 'Fecha de Registro', type: 'date' },
-      { 
-        name: 'info_ejercicios', 
-        label: 'Ejercicios Creados (Solo Info)', 
-        type: 'multiselect', 
-        options: ejercicios,
-        colSpan: 2 
-      },
-      { 
-        name: 'entrenadosAsignadosIds', 
-        label: 'Entrenados Asignados', 
-        type: 'multiselect', 
-        options: entrenados,
-        colSpan: 2 
-      },
-      { 
-        name: 'info_rutinas', 
-        label: 'Rutinas Creadas (Solo Info)', 
-        type: 'multiselect', 
-        options: rutinas,
-        colSpan: 2 
-      }
-    ];
+    return this.schemaService.getDynamicSchema('entrenador', {
+      'info_ejercicios': ejercicios,
+      'info_rutinas': rutinas,
+      'entrenadosAsignadosIds': entrenados,
+      'entrenadosPremiumIds': entrenados
+    });
   });
 
   constructor() {
     this.pageTitleService.setTitle('Entrenadores');
-    // Aseguramos que los servicios estén escuchando accediendo a sus signals
     this.userService.users();
     this.entrenadorService.entrenadoresSignal();
     this.ejercicioService.ejercicios();
@@ -143,7 +104,6 @@ export class EntrenadoresPage {
 
   onOpenEdit(item: any) {
     this.selectedEntrenadorId.set(item.id);
-    // Usamos el mismo filtro que en la signal fields para que coincidan
     const currentId = item.id;
     const ex = this.ejercicioService.ejercicios()
       .filter((e: any) => {
@@ -151,14 +111,14 @@ export class EntrenadoresPage {
         return cid === currentId || cid === currentId?.toLowerCase();
       })
       .map(e => e.id);
-      
+
     const rut = this.rutinaService.rutinas()
       .filter((r: any) => {
         const cid = (r.creadorId || r.entrenadorId || r.usuarioId);
         return cid === currentId || cid === currentId?.toLowerCase();
       })
       .map(r => r.id);
-    
+
     item.info_ejercicios = ex;
     item.info_rutinas = rut;
   }
@@ -177,7 +137,7 @@ export class EntrenadoresPage {
       this.toastService.show('Error al guardar entrenador', 'error');
     } finally {
       this.loading.set(false);
-      this.selectedEntrenadorId.set(null); // Reset tras guardar
+      this.selectedEntrenadorId.set(null);
     }
   }
 
@@ -193,4 +153,3 @@ export class EntrenadoresPage {
     }
   }
 }
-

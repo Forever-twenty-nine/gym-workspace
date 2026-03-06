@@ -259,6 +259,9 @@ export class RutinaService {
                 : rutina.fechaModificacion;
         }
 
+        if (rutina.creadorId) {
+            data.creadorId = rutina.creadorId;
+        }
         return data;
     }
 }

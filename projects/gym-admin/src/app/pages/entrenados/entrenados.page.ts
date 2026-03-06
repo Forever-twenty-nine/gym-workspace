@@ -10,6 +10,7 @@ import { PageTitleService } from '../../services/page-title.service';
 import { DataComponent } from '../../components/shared/data/data.component';
 import { ColumnConfig, FieldConfig } from '../../models/data-config.model';
 import { Validators } from '@angular/forms';
+import { SchemaService } from '../../core/schema.service';
 
 @Component({
   selector: 'app-entrenados-page',
@@ -38,9 +39,11 @@ export class EntrenadosPage {
   private readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
 
+  private readonly schemaService = inject(SchemaService);
+
   loading = signal(false);
   selectedEntrenadoId = signal<string | null>(null);
-  
+
   entrenados = computed(() => {
     const list = this.entrenadoService.entrenados();
     const users = this.userService.users();
@@ -54,102 +57,48 @@ export class EntrenadosPage {
     });
   });
 
-  columns: ColumnConfig[] = [
-    { key: 'displayName', label: 'Nombre', type: 'avatar' },
-    { key: 'email', label: 'Email', type: 'text' },
-    { 
-      key: 'nivel', 
-      label: 'Nivel', 
-      type: 'badge',
-      badgeConfig: {
-        trueLabel: 'Premium',
-        falseLabel: 'Estándar',
-        trueClass: 'bg-yellow-100 text-yellow-800',
-        falseClass: 'bg-blue-100 text-blue-800'
-      }
-    },
-    { key: 'fechaRegistro', label: 'Registro', type: 'date' }
-  ];
+  columns = this.schemaService.getColumns('entrenado');
 
   fields = computed<FieldConfig[]>(() => {
-    const trainers = this.entrenadorService.entrenadores();
-    const allUsers = this.userService.users();
-    const routines = this.rutinaService.rutinas();
-    const assignedRoutinesList = this.rutinaAsignadaService.getRutinasAsignadas()();
     const entrenadoId = this.selectedEntrenadoId();
-    const entrenadosList = this.entrenadoService.entrenados();
-
-    // Encontrar qué entrenadores tiene asignados este entrenado
-    const currentEntrenado = entrenadoId ? entrenadosList.find(e => e.id === entrenadoId) : null;
-    const assignedTrainerIds = currentEntrenado?.entrenadoresId || [];
-
-    // Filtrar rutinas: Solo las que pertenecen a sus entrenadores
-    const filteredRoutines = assignedTrainerIds.length > 0
-      ? routines.filter(r => assignedTrainerIds.includes((r as any).creadorId!))
-      : routines;
-
-    // Filtrar rutinas asignadas: Solo las que corresponden a este entrenado
-    const filteredAssignedRoutines = entrenadoId
-      ? assignedRoutinesList.filter(ar => (ar as any).entrenadoId === entrenadoId || (ar as any).usuarioId === entrenadoId)
-      : assignedRoutinesList;
+    const trainers = this.entrenadorService.entrenadoresSignal();
+    const routines = this.rutinaService.rutinas();
+    const allUsers = this.userService.users();
+    const assignedRoutinesList = this.rutinaAsignadaService.getRutinasAsignadas()();
 
     const trainerOptions = trainers.map(t => {
       const u = allUsers.find(user => user.uid === t.id);
       return { value: t.id, label: u?.nombre || u?.email || t.id };
     });
 
-    const routineOptions = filteredRoutines.map(r => ({ value: r.id!, label: r.nombre }));
-    const assignedRoutineOptions = filteredAssignedRoutines.map(ar => ({ 
-      value: ar.id!, 
-      label: `Rutina (${ar.id})` 
-    }));
+    const filteredRoutines = routines.filter((r: any) => {
+      const cid = (r.creadorId || r.entrenadorId || r.usuarioId);
+      return cid === entrenadoId || (cid && entrenadoId && cid.toLowerCase() === entrenadoId.toLowerCase());
+    });
 
-    return [
-      { name: 'id', label: 'ID (UID)', type: 'text', validators: [Validators.required] },
-      { name: 'fechaRegistro', label: 'Fecha de Registro', type: 'date' },
-      { 
-        name: 'objetivo', 
-        label: 'Objetivo Principal', 
-        type: 'select', 
-        options: [
-          { value: 'volumen', label: 'Volumen' },
-          { value: 'definicion', label: 'Definición' },
-          { value: 'fuerza', label: 'Fuerza' },
-          { value: 'salud', label: 'Salud / Bienestar' }
-        ]
-      },
-      { 
-        name: 'entrenadoresId', 
-        label: 'Entrenadores', 
-        type: 'multiselect', 
-        options: trainerOptions,
-        colSpan: 2 
-      },
-      { 
-        name: 'rutinasAsignadasIds', 
-        label: 'Rutinas Asignadas', 
-        type: 'multiselect', 
-        options: assignedRoutineOptions,
-        colSpan: 2 
-      },
-      { 
-        name: 'rutinasCreadas', 
-        label: 'Rutinas Creadas (Premium)', 
-        type: 'multiselect', 
-        options: routineOptions,
-        colSpan: 2 
-      },
-      { 
-        name: 'nivel', 
-        label: 'Es Premium', 
-        type: 'select', 
-        options: [
-          { value: false, label: 'Estándar' },
-          { value: true, label: 'Premium' }
-        ]
-      }
-    ];
+    const filteredAssignedRoutines = assignedRoutinesList.filter((ar: any) => ar.entrenadoId === entrenadoId);
+
+    const routineOptions = filteredRoutines.map(r => ({ value: r.id!, label: r.nombre }));
+    const assignedRoutineOptions = filteredAssignedRoutines.map((ar: any) => {
+      const rutId = (ar as any).rutinaId;
+      const routine = routines.find(r => r.id === rutId);
+      return {
+        value: ar.id!,
+        label: routine ? routine.nombre : `Rutina (${ar.id})`
+      };
+    });
+
+    const userOptions = allUsers.map(u => ({ value: u.uid, label: u.nombre || u.email || u.uid }));
+
+    return this.schemaService.getDynamicSchema('entrenado', {
+      'entrenadoresId': trainerOptions,
+      'rutinasAsignadasIds': assignedRoutineOptions,
+      'rutinasCreadas': routineOptions,
+      'seguidores': userOptions,
+      'seguidos': userOptions
+    });
   });
+
 
   constructor() {
     this.pageTitleService.setTitle('Entrenados');

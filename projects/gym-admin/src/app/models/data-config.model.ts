@@ -16,7 +16,7 @@ export interface ColumnConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'number' | 'email' | 'password' | 'multiselect' | 'date';
+  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'number' | 'email' | 'password' | 'multiselect' | 'date' | 'infolist' | 'heading';
   placeholder?: string;
   options?: { value: any, label: string }[]; // Para selects y multiselect
   validators?: any[];

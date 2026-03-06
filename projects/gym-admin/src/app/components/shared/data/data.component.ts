@@ -1,20 +1,19 @@
-import { Component, input, output, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { ColumnConfig, FieldConfig } from '../../../models/data-config.model';
 import { ConfirmComponent } from '../confirm/confirm.component';
+import { DataModalComponent } from './data-modal/data-modal.component';
 
 @Component({
   selector: 'app-data',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ConfirmComponent],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmComponent, DataModalComponent],
   templateUrl: './data.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DatePipe]
 })
 export class DataComponent {
-  private fb = inject(FormBuilder);
-
   // Inputs
   title = input.required<string>();
   items = input.required<any[]>();
@@ -31,7 +30,6 @@ export class DataComponent {
   isModalOpen = signal(false);
   isConfirmOpen = signal(false);
   selectedItem = signal<any>(null);
-  form: FormGroup = this.fb.group({});
   filterText = signal('');
 
   // Paginación
@@ -63,8 +61,6 @@ export class DataComponent {
   hasPrevious = computed(() => this.currentPage() > 0);
   hasNext = computed(() => this.currentPage() < this.totalPages() - 1);
 
-  constructor() {}
-
   onFilterChange(event: Event) {
     const input = event.target as HTMLInputElement;
     this.filterText.set(input.value);
@@ -85,15 +81,18 @@ export class DataComponent {
 
   openCreate() {
     this.selectedItem.set(null);
-    this.buildForm();
     this.isModalOpen.set(true);
   }
 
   openEdit(item: any) {
     this.selectedItem.set(item);
-    this.editOpened.emit(item); // Usar editOpened para evitar conflicto con el nombre del método
-    this.buildForm(item);
+    this.editOpened.emit(item);
     this.isModalOpen.set(true);
+  }
+
+  onSaveModal(data: any) {
+    this.save.emit(data);
+    this.closeModal();
   }
 
   openDelete(item: any) {
@@ -109,46 +108,6 @@ export class DataComponent {
   closeConfirm() {
     this.isConfirmOpen.set(false);
     this.selectedItem.set(null);
-  }
-
-  private buildForm(item: any = null) {
-    const controls: any = {};
-    this.fields().forEach(field => {
-      let value = item ? item[field.name] : (field.defaultValue ?? (field.type === 'multiselect' ? [] : ''));
-      
-      // Manejo especial para arrays que vienen de Firestore o del modelo
-      if (Array.isArray(value) && field.type !== 'multiselect') {
-        value = value.join(', ');
-      }
-      
-      controls[field.name] = [value, field.validators || []];
-    });
-    this.form = this.fb.group(controls);
-  }
-
-  onSubmit() {
-    if (this.form.valid) {
-      const formValues = { ...this.form.value };
-      
-      // Limpiar y validar arrays antes de emitir
-      this.fields().forEach(field => {
-        const val = formValues[field.name];
-        
-        // Si el campo es un multiselect o termina en 'Ids' / es un array conocido
-        if (field.type === 'multiselect') {
-          // Asegurar que siempre sea un array
-          formValues[field.name] = Array.isArray(val) ? val : [];
-        } else if (typeof val === 'string' && (field.name.toLowerCase().endsWith('ids') || field.name === 'rutinasCreadas')) {
-          formValues[field.name] = val.split(',')
-            .map(s => s.trim())
-            .filter(s => s.length > 0);
-        }
-      });
-
-      const data = { ...this.selectedItem(), ...formValues };
-      this.save.emit(data);
-      this.closeModal();
-    }
   }
 
   onConfirmDelete() {

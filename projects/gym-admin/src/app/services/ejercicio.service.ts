@@ -342,6 +342,9 @@ export class EjercicioService {
 		if (ejercicio.serieSegundos !== undefined) {
 			data.serieSegundos = ejercicio.serieSegundos;
 		}
+		if (ejercicio.creadorId !== undefined) {
+			data.creadorId = ejercicio.creadorId;
+		}
 		return data;
 	}
 }

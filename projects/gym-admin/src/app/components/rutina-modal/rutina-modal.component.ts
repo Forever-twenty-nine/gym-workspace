@@ -209,6 +209,7 @@ export class RutinaModalComponent implements OnInit {
         entrenadoId: null,
         activa: updatedData.activa ?? true,
         completado: updatedData.completado ?? false,
+        creadorId: this.creadorId() || updatedData.creadorId,
         fechaAsignacion: updatedData.fechaAsignacion || new Date()
       };
 

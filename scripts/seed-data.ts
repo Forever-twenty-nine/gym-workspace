@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { Objetivo } from "../projects/gym-library/src/lib/enums/objetivo.enum";
 
 // Forzar emuladores en desarrollo
 process.env['FIRESTORE_EMULATOR_HOST'] = process.env['FIRESTORE_EMULATOR_HOST'] || "127.0.0.1:8080";
@@ -41,7 +42,8 @@ async function createTrainer(name: string, email: string, password: string) {
         role: 'entrenador',
         plan: 'free',
         onboarded: true,
-        fechaCreacion: Timestamp.now()
+        fechaCreacion: Timestamp.now(),
+        fechaRegistro: Timestamp.now()
     };
 
     // write usuario doc with fixed id
@@ -51,69 +53,73 @@ async function createTrainer(name: string, email: string, password: string) {
 
     // Ensure entrenador doc exists and is synced with usuario
     const entrenadoresRef = db.collection('entrenadores').doc(uid);
-    await entrenadoresRef.set({ 
-        id: uid, 
-        fechaRegistro: Timestamp.now(), 
-        ejerciciosCreadasIds: [], 
-        rutinasCreadasIds: [], 
-        entrenadosAsignadosIds: [] 
+    await entrenadoresRef.set({
+        id: uid,
+        fechaRegistro: Timestamp.now(),
+        ejerciciosCreadasIds: [],
+        rutinasCreadasIds: [],
+        entrenadosAsignadosIds: []
     }, { merge: true });
 
     return { ...trainerUserData };
 }
 
 async function createTrainee(name: string, email: string, password: string, trainerUid: string) {
-        const usuariosRef = db.collection('usuarios');
-        // deterministic uid for trainees
-        const uid = `trainee_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+    const usuariosRef = db.collection('usuarios');
+    // deterministic uid for trainees
+    const uid = `trainee_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
 
-        const traineeUserData = {
-                uid,
-                nombre: name,
-                email,
-                role: 'entrenado',
-                plan: 'free',
-                onboarded: true,
-                fechaCreacion: Timestamp.now()
-        };
+    const objetivos = [Objetivo.VOLUMEN, Objetivo.DEFINICION, Objetivo.FUERZA, Objetivo.SALUD];
+    const objetivoAleatorio = objetivos[Math.floor(Math.random() * objetivos.length)];
 
-        const docRef = usuariosRef.doc(uid);
-        await docRef.set(traineeUserData, { merge: true });
-        await ensureAuthUser(uid, email, password, name);
+    const traineeUserData = {
+        uid,
+        nombre: name,
+        email,
+        role: 'entrenado',
+        plan: 'free',
+        onboarded: true,
+        objetivo: objetivoAleatorio,
+        fechaCreacion: Timestamp.now()
+    };
 
-        // Crear/Sincronizar en la colección 'entrenados' (IMPORTANTE para la app)
-        const entrenadosRef = db.collection('entrenados').doc(uid);
-        await entrenadosRef.set({ 
-            id: uid,
-            objetivo: 'bajar de peso',
-            entrenadoresId: [trainerUid],
-            rutinasAsignadasIds: [],
-            fechaRegistro: Timestamp.now() 
-        }, { merge: true });
+    const docRef = usuariosRef.doc(uid);
+    await docRef.set(traineeUserData, { merge: true });
+    await ensureAuthUser(uid, email, password, name);
 
-        // update entrenador docs to include this trainee
-        try {
-            const entrenadorRef = db.collection('entrenadores').doc(trainerUid);
-            const entrenadorSnap = await entrenadorRef.get();
-            const entrenadorData = entrenadorSnap.exists ? (entrenadorSnap.data() as Record<string, any>) : {};
-            const existing = entrenadorData['entrenadosAsignadosIds'] || [];
-            if (!existing.includes(uid)) {
-                await entrenadorRef.set({ entrenadosAsignadosIds: [...new Set([...existing, uid])] }, { merge: true });
-            }
+    // Crear/Sincronizar en la colección 'entrenados' (IMPORTANTE para la app)
+    const entrenadosRef = db.collection('entrenados').doc(uid);
+    await entrenadosRef.set({
+        id: uid,
+        objetivo: objetivoAleatorio,
+        entrenadoresId: [trainerUid],
+        rutinasAsignadasIds: [],
+        fechaRegistro: Timestamp.now()
+    }, { merge: true });
 
-            // also mirror into usuarios document for trainer
-            const usuarioTrainerRef = db.collection('usuarios').doc(trainerUid);
-            const usuarioSnap = await usuarioTrainerRef.get();
-            const usuarioData = usuarioSnap.exists ? (usuarioSnap.data() as Record<string, any>) : {};
-            const existUsuarioAssigned: string[] = usuarioData['entrenadosAsignadosIds'] || [];
-            if (!existUsuarioAssigned.includes(uid)) {
-                await usuarioTrainerRef.set({ entrenadosAsignadosIds: [...new Set([...existUsuarioAssigned, uid])] }, { merge: true });
-            }
-        } catch (e) {
-            console.warn('⚠️ No se pudo actualizar entrenador al crear entrenado:', e);
+    // update entrenador docs to include this trainee
+    try {
+        const entrenadorRef = db.collection('entrenadores').doc(trainerUid);
+        const entrenadorSnap = await entrenadorRef.get();
+        const entrenadorData = entrenadorSnap.exists ? (entrenadorSnap.data() as Record<string, any>) : {};
+        const existing = entrenadorData['entrenadosAsignadosIds'] || [];
+        if (!existing.includes(uid)) {
+            await entrenadorRef.set({ entrenadosAsignadosIds: [...new Set([...existing, uid])] }, { merge: true });
         }
 
-        return { ...traineeUserData };
+        // also mirror into usuarios document for trainer
+        const usuarioTrainerRef = db.collection('usuarios').doc(trainerUid);
+        const usuarioSnap = await usuarioTrainerRef.get();
+        const usuarioData = usuarioSnap.exists ? (usuarioSnap.data() as Record<string, any>) : {};
+        const existUsuarioAssigned: string[] = usuarioData['entrenadosAsignadosIds'] || [];
+        if (!existUsuarioAssigned.includes(uid)) {
+            await usuarioTrainerRef.set({ entrenadosAsignadosIds: [...new Set([...existUsuarioAssigned, uid])] }, { merge: true });
+        }
+    } catch (e) {
+        console.warn('⚠️ No se pudo actualizar entrenador al crear entrenado:', e);
+    }
+
+    return { ...traineeUserData };
 }
 
 async function createExercise(nombre: string, descripcion: string, entrenadorId?: string) {
@@ -152,7 +158,7 @@ async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[
     }
     const docRef = db.collection('rutinas').doc(); // Auto-generar ID
     const id = docRef.id;
-    await docRef.set({ ...data, id }); 
+    await docRef.set({ ...data, id });
     console.log(`✅ Rutina creada en Firestore con ID: ${id}`);
     return id;
 }
@@ -160,20 +166,20 @@ async function createRoutine(nombre: string, dia: string, ejerciciosIds: string[
 async function main() {
     console.log('🚀 Seed: creando 3 entrenadores, 3 entrenados y rutinas (Emulador)');
 
-        // Limpieza rápida: eliminar documentos con role 'gimnasio' si existen
-        try {
-            const gimnasiosSnap = await db.collection('usuarios').where('role', '==', 'gimnasio').get();
-            if (!gimnasiosSnap.empty) {
-                console.log(`🧹 Eliminando ${gimnasiosSnap.size} usuario(s) con role 'gimnasio'`);
-                for (const d of gimnasiosSnap.docs) {
-                    await db.collection('usuarios').doc(d.id).delete();
-                    // intentar también eliminar en auth si existe
-                    try { await auth.deleteUser(d.id); } catch (_) { /* ignore */ }
-                }
+    // Limpieza rápida: eliminar documentos con role 'gimnasio' si existen
+    try {
+        const gimnasiosSnap = await db.collection('usuarios').where('role', '==', 'gimnasio').get();
+        if (!gimnasiosSnap.empty) {
+            console.log(`🧹 Eliminando ${gimnasiosSnap.size} usuario(s) con role 'gimnasio'`);
+            for (const d of gimnasiosSnap.docs) {
+                await db.collection('usuarios').doc(d.id).delete();
+                // intentar también eliminar en auth si existe
+                try { await auth.deleteUser(d.id); } catch (_) { /* ignore */ }
             }
-        } catch (e) {
-            console.warn('⚠️ Error durante limpieza de usuarios gimnasio:', e);
         }
+    } catch (e) {
+        console.warn('⚠️ Error durante limpieza de usuarios gimnasio:', e);
+    }
 
     // Datos por defecto
     const trainers = [
@@ -222,7 +228,7 @@ async function main() {
         // actualizar entrenador: añadir entrenados a entrenadosAsignadosIds
         const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
         await entrenadorRef.set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true });
-        
+
         // También actualizar el documento del entrenador en la colección `usuarios`
         try {
             const usuarioTrainerRef = db.collection('usuarios').doc(trainer.uid);
@@ -262,12 +268,12 @@ async function main() {
             const numRutinas = Math.floor(Math.random() * 3) + 1; // 1 a 3 rutinas
             const shuffledDays = [...diasSemana].sort(() => 0.5 - Math.random());
             const selectedDays = shuffledDays.slice(0, numRutinas);
-            
+
             const routineIds: string[] = [];
             for (const dia of selectedDays) {
                 // Seleccionar 5 ejercicios aleatorios de los 25 del entrenador
                 const routineExercises = [...trainerExercises].sort(() => 0.5 - Math.random()).slice(0, 5);
-                
+
                 const routineName = `Rutina de ${dia} - ${trainee.nombre}`;
                 const currentRoutineId = await createRoutine(routineName, dia, routineExercises, trainee.uid, trainee.nombre, trainer.uid);
                 routineIds.push(currentRoutineId);
@@ -289,13 +295,13 @@ async function main() {
             }
 
             // Actualizar entrenado con sus rutinas
-            const traineeUpdate = { 
+            const traineeUpdate = {
                 rutinasIds: routineIds,
                 rutinasAsignadasIds: routineIds
             };
             await db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true });
             await db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true });
-            
+
             // También añadir estas rutinas a las creadas por el entrenador
             const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
             const snap = await entrenadorRef.get();

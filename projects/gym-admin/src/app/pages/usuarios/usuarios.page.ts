@@ -218,7 +218,7 @@ export class UsuariosPage {
             id: uid,
             activo: true,
             fechaRegistro: new Date(),
-            objetivo: userData.objetivo || Objetivo.MANTENER_PESO
+            objetivo: userData.objetivo || Objetivo.SALUD
           };
 
           if (userData.gimnasioId && userData.gimnasioId !== '') {
@@ -294,7 +294,7 @@ export class UsuariosPage {
         } else {
           // Si no era entrenado, intentar cargar de la DB si existe documento
           const entrenado = this.entrenadoService.getEntrenado(originalItem.uid)();
-          objetivoValue = entrenado?.objetivo || Objetivo.MANTENER_PESO;
+          objetivoValue = entrenado?.objetivo || Objetivo.SALUD;
         }
         form.addControl('objetivo', this.fb.control(objetivoValue));
       }

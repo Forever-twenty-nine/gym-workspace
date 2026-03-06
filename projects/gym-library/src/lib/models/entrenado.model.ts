@@ -1,4 +1,5 @@
 import { Objetivo } from '../enums/objetivo.enum';
+import { NivelEntrenamiento } from '../enums/nivel-entrenamiento.enum';
 
 export interface ConfigNotificacion {
     recordatoriosEntrenamiento: boolean;
@@ -8,14 +9,17 @@ export interface ConfigNotificacion {
 
 export interface Entrenado {
     id: string;
+    // plan free
     fechaRegistro?: Date;
     objetivo?: Objetivo;
     entrenadoresId?: string[];
-    rutinasAsignadasIds?: string[]; // IDs de RutinaAsignada
+    rutinasAsignadasIds?: string[];
+    // social 
+    seguidores?: string[];
+    seguidos?: string[];
+    configNotificaciones?: ConfigNotificacion;
     // Plan Premium
     rutinasCreadas?: string[];
-    nivel?: string;
-    seguidores?: string[]; // IDs de otros Entrenados que lo siguen
-    seguidos?: string[];   // IDs de otros Entrenados a los que sigue
-    configNotificaciones?: ConfigNotificacion;
+    nivel?: NivelEntrenamiento;
+
 }
