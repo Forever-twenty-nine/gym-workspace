@@ -179,7 +179,8 @@ export class DashboardPage implements OnInit {
     const entrenado = this.entrenadoService.getEntrenado(userId)();
     const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(userId)();
     const rutinasDelEntrenado = rutinas.filter(rutina =>
-      entrenado?.rutinasAsignadasIds?.includes(rutina.id)
+      entrenado?.rutinasAsignadasIds?.includes(rutina.id) ||
+      asignaciones.some(asig => asig.rutinaId === rutina.id)
     );
 
     if (asignaciones.length === 0) {
@@ -209,9 +210,24 @@ export class DashboardPage implements OnInit {
       const asignacionesDelDia = asignaciones.filter((asig: RutinaAsignada) => {
         if (!asig.diaSemana) return false;
 
-        // El diaSemana suele venir desde gym-library como "lunes", "martes", etc.
-        const asigDiaNormalizado = asig.diaSemana.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        return asigDiaNormalizado === diaSemanaNormalizado;
+        // Normalización para comparación robusta
+        const diasSemanaMapa: Record<string, string> = {
+          'domingo': 'domingo', 'lunes': 'lunes', 'martes': 'martes',
+          'miercoles': 'miercoles', 'jueves': 'jueves', 'viernes': 'viernes',
+          'sabado': 'sabado', 'dom': 'domingo', 'lun': 'lunes',
+          'mar': 'martes', 'mie': 'miercoles', 'jue': 'jueves',
+          'vie': 'viernes', 'sab': 'sabado'
+        };
+
+        const asigDiaNormalizado = asig.diaSemana.toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim();
+
+        // Intentar mapear si es una abreviatura o nombre completo
+        const diaFinal = diasSemanaMapa[asigDiaNormalizado] || asigDiaNormalizado;
+
+        return diaFinal === diaSemanaNormalizado;
       });
 
       asignacionesDelDia.forEach((asig: RutinaAsignada) => {
@@ -318,7 +334,7 @@ export class DashboardPage implements OnInit {
             id: user.uid,
             entrenadoresId: [invitacion.entrenadorId],
             fechaRegistro: new Date(),
-            objetivo: Objetivo.MANTENER_PESO
+            objetivo: Objetivo.SALUD
           };
           await this.entrenadoService.save(nuevoEntrenado);
         }

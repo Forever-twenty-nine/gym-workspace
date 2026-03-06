@@ -58,7 +58,8 @@ async function createTrainer(name: string, email: string, password: string) {
         fechaRegistro: Timestamp.now(),
         ejerciciosCreadasIds: [],
         rutinasCreadasIds: [],
-        entrenadosAsignadosIds: []
+        entrenadosAsignadosIds: [],
+        entrenadosPremiumIds: []
     }, { merge: true });
 
     return { ...trainerUserData };

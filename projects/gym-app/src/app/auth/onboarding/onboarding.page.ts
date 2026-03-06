@@ -70,7 +70,7 @@ export class OnboardingPage {
   formData = signal({
     nombre: '',
     role: 'entrenado' as 'entrenado' | 'entrenador' | 'gimnasio',
-    objetivo: 'MANTENER_PESO' as keyof typeof Objetivo | ''
+    objetivo: 'SALUD' as keyof typeof Objetivo | ''
   });
 
   errorMessage = signal('');
@@ -303,7 +303,8 @@ export class OnboardingPage {
           fechaRegistro: new Date(),
           ejerciciosCreadasIds: [],
           entrenadosAsignadosIds: [],
-          rutinasCreadasIds: []
+          rutinasCreadasIds: [],
+          entrenadosPremiumIds: []
         };
         await this.entrenadorService.createWithId(uid, entrenadorData);
         break;
@@ -364,12 +365,14 @@ export class OnboardingPage {
    */
   getObjetivoDescription(objetivo: string): string {
     switch (objetivo) {
-      case 'BAJAR_PESO':
-        return 'Te ayudaremos a alcanzar tu peso ideal de forma saludable';
-      case 'AUMENTAR_MUSCULO':
-        return 'Rutinas específicas para ganar masa muscular';
-      case 'MANTENER_PESO':
-        return 'Mantén tu peso actual con ejercicios de mantenimiento';
+      case 'VOLUMEN':
+        return 'Gana masa muscular de forma efectiva';
+      case 'DEFINICION':
+        return 'Reduce grasa manteniendo el músculo';
+      case 'FUERZA':
+        return 'Entrenamiento enfocado en el máximo rendimiento';
+      case 'SALUD':
+        return 'Mejora tu condición física general';
       default:
         return '';
     }
@@ -380,13 +383,15 @@ export class OnboardingPage {
    */
   private mapObjetivoToEnum(objetivo: string | keyof typeof Objetivo | ''): Objetivo {
     switch (objetivo) {
-      case 'BAJAR_PESO':
-        return Objetivo.BAJAR_PESO;
-      case 'AUMENTAR_MUSCULO':
-        return Objetivo.AUMENTAR_MUSCULO;
-      case 'MANTENER_PESO':
+      case 'VOLUMEN':
+        return Objetivo.VOLUMEN;
+      case 'DEFINICION':
+        return Objetivo.DEFINICION;
+      case 'FUERZA':
+        return Objetivo.FUERZA;
+      case 'SALUD':
       default:
-        return Objetivo.MANTENER_PESO;
+        return Objetivo.SALUD;
     }
   }
 }

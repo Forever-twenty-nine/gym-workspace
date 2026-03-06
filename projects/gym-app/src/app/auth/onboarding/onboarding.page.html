@@ -126,9 +126,10 @@
             [ngModel]="formData().objetivo"
             (ngModelChange)="updateFormField('objetivo', $event)"
             placeholder="¿Cuál es tu meta?">
-            <ion-select-option value="BAJAR_PESO">{{ objetivos.BAJAR_PESO }}</ion-select-option>
-            <ion-select-option value="AUMENTAR_MUSCULO">{{ objetivos.AUMENTAR_MUSCULO }}</ion-select-option>
-            <ion-select-option value="MANTENER_PESO">{{ objetivos.MANTENER_PESO }}</ion-select-option>
+            <ion-select-option value="VOLUMEN">{{ objetivos.VOLUMEN }}</ion-select-option>
+            <ion-select-option value="DEFINICION">{{ objetivos.DEFINICION }}</ion-select-option>
+            <ion-select-option value="FUERZA">{{ objetivos.FUERZA }}</ion-select-option>
+            <ion-select-option value="SALUD">{{ objetivos.SALUD }}</ion-select-option>
           </ion-select>
         </ion-item>
 
