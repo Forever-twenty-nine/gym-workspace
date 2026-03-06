@@ -21,6 +21,13 @@ import { PageTitleService } from '../../services/page-title.service';
     UsuariosTable
   ],
   templateUrl: './usuarios.page.html',
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+      min-height: 0;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UsuariosPage {

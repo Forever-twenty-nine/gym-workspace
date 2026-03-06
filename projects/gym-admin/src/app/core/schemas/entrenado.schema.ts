@@ -10,7 +10,7 @@ export const ENTRENADO_COLUMNS: ColumnConfig[] = [
 
 export const ENTRENADO_SCHEMA: FieldConfig[] = [
     // Gestión Base (Plan Free)
-    { name: 'section_free', label: 'Gestión Base (Plan Free)', type: 'heading' },
+    { name: 'section_free', label: 'Gestión Base (Plan Free)', type: 'heading', colSpan: 2 },
     { name: 'id', label: 'ID (UID)', type: 'text', validators: [Validators.required] },
     { name: 'fechaRegistro', label: 'Fecha de Registro', type: 'date' },
     {
@@ -38,7 +38,7 @@ export const ENTRENADO_SCHEMA: FieldConfig[] = [
     },
 
     // Social y Notificaciones
-    { name: 'section_social', label: 'Social y Notificaciones', type: 'heading' },
+    { name: 'section_social', label: 'Social y Notificaciones', type: 'heading', colSpan: 2 },
     {
         name: 'seguidores',
         label: 'Seguidores',
@@ -54,7 +54,7 @@ export const ENTRENADO_SCHEMA: FieldConfig[] = [
     { name: 'configNotificaciones', label: 'Config. Notificaciones', type: 'text', colSpan: 2 },
 
     // Características Premium
-    { name: 'section_premium', label: 'Características Premium', type: 'heading' },
+    { name: 'section_premium', label: 'Características Premium', type: 'heading', colSpan: 2 },
     {
         name: 'rutinasCreadas',
         label: 'Rutinas Creadas (Propias)',

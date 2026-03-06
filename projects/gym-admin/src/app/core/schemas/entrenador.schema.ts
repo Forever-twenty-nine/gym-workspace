@@ -9,12 +9,12 @@ export const ENTRENADOR_COLUMNS: ColumnConfig[] = [
 
 export const ENTRENADOR_SCHEMA: FieldConfig[] = [
     // Gestión Base (Plan Free)
-    { name: 'section_free', label: 'Gestión Base (Plan Free)', type: 'heading' },
+    { name: 'section_free', label: 'Gestión Base (Plan Free)', type: 'heading', colSpan: 2 },
     { name: 'id', label: 'ID (UID)', type: 'text', validators: [Validators.required] },
     { name: 'fechaRegistro', label: 'Fecha de Registro', type: 'date' },
 
     // Asociaciones y Contenido
-    { name: 'section_assoc', label: 'Asociaciones y Contenido', type: 'heading' },
+    { name: 'section_assoc', label: 'Asociaciones y Contenido', type: 'heading', colSpan: 2 },
     {
         name: 'info_ejercicios',
         label: 'Ejercicios Creados',
@@ -35,7 +35,7 @@ export const ENTRENADOR_SCHEMA: FieldConfig[] = [
     },
 
     // Características Premium
-    { name: 'section_premium', label: 'Características Premium', type: 'heading' },
+    { name: 'section_premium', label: 'Características Premium', type: 'heading', colSpan: 2 },
     {
         name: 'entrenadosPremiumIds',
         label: 'Entrenados Premium',

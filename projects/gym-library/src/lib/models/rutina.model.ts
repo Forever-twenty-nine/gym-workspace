@@ -3,19 +3,20 @@ import { Ejercicio } from "./ejercicio.model";
 
 export interface Rutina {
     id: string;
+    // plan free
+    creadorId?: string;
     nombre: string;
-    activa: boolean;   
+    activa: boolean;
     descripcion?: string;
-    ejerciciosIds?: string[]; // Array de IDs de ejercicios
-    // Metadatos
-    fechaCreacion?: Date;
-    fechaModificacion?: Date;
-    // Plan Premium
-    duracion?: number;
+    ejerciciosIds?: string[];
     // Social
     compartida?: boolean;
-    creadorId?: string; // ID del entrenador que creó la rutina
     usuarioId?: string;
     nombreUsuario?: string;
     fechaCompartida?: any;
+    // Plan Premium
+    duracion?: number;
+    // Metadatos
+    fechaCreacion?: Date;
+    fechaModificacion?: Date;
 }

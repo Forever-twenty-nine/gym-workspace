@@ -2,6 +2,8 @@ import { Rol } from '../enums/rol.enum';
 
 export interface Ejercicio {
     id: string;
+    // plan free
+    creadorId?: string;
     nombre: string;
     descripcion?: string;
     series: number;
@@ -13,5 +15,4 @@ export interface Ejercicio {
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;
-    creadorId?: string;
 }

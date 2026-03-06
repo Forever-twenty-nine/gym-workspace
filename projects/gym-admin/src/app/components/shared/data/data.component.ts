@@ -11,7 +11,14 @@ import { DataModalComponent } from './data-modal/data-modal.component';
   imports: [CommonModule, ReactiveFormsModule, ConfirmComponent, DataModalComponent],
   templateUrl: './data.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DatePipe]
+  providers: [DatePipe],
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+      min-height: 0;
+    }
+  `]
 })
 export class DataComponent {
   // Inputs

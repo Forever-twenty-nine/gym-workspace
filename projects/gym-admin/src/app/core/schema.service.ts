@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { ColumnConfig, FieldConfig } from '../models/data-config.model';
 import { ENTRENADO_SCHEMA, ENTRENADO_COLUMNS } from './schemas/entrenado.schema';
 import { ENTRENADOR_SCHEMA, ENTRENADOR_COLUMNS } from './schemas/entrenador.schema';
+import { EJERCICIO_SCHEMA, EJERCICIO_COLUMNS } from './schemas/ejercicio.schema';
+import { RUTINA_SCHEMA, RUTINA_COLUMNS } from './schemas/rutina.schema';
 
 @Injectable({
     providedIn: 'root'
@@ -9,12 +11,16 @@ import { ENTRENADOR_SCHEMA, ENTRENADOR_COLUMNS } from './schemas/entrenador.sche
 export class SchemaService {
     private fields: Record<string, FieldConfig[]> = {
         'entrenado': ENTRENADO_SCHEMA,
-        'entrenador': ENTRENADOR_SCHEMA
+        'entrenador': ENTRENADOR_SCHEMA,
+        'ejercicio': EJERCICIO_SCHEMA,
+        'rutina': RUTINA_SCHEMA
     };
 
     private columns: Record<string, ColumnConfig[]> = {
         'entrenado': ENTRENADO_COLUMNS,
-        'entrenador': ENTRENADOR_COLUMNS
+        'entrenador': ENTRENADOR_COLUMNS,
+        'ejercicio': EJERCICIO_COLUMNS,
+        'rutina': RUTINA_COLUMNS
     };
 
     getFields(name: string): FieldConfig[] {

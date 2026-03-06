@@ -28,6 +28,13 @@ import { SchemaService } from '../../core/schema.service';
       (editOpened)="onOpenEdit($event)">
     </app-data>
   `,
+  styles: [`
+    :host {
+      display: block;
+      height: 100%;
+      min-height: 0;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EntrenadosPage {
