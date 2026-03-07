@@ -105,6 +105,9 @@ export class DataModalComponent {
     }
 
     getOptionLabel(field: FieldConfig, value: any): string {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            return value.nombre || value.label || value.displayName || value.id || 'Objeto';
+        }
         if (!field.options) return value;
         const option = field.options.find(opt => opt.value === value);
         return option ? option.label : value;

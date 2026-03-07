@@ -29,7 +29,9 @@ export class SesionRutinaService {
   private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'sesiones-rutina';
 
+  private readonly _sesiones = signal<SesionRutina[]>([]);
   private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
+  private isGlobalListenerInitialized = false;
 
   // inyección del servicio de rutina
   private readonly rutinaService: RutinaService = inject(RutinaService);
@@ -101,12 +103,49 @@ export class SesionRutinaService {
    * Revierte la normalización al recibir datos de Firestore
    */
   private mapFromFirestore(data: any): SesionRutina {
-    return {
+    const res = {
       ...data,
       fechaInicio: data.fechaInicio instanceof Timestamp ? data.fechaInicio.toDate() : data.fechaInicio,
       fechaFin: data.fechaFin instanceof Timestamp ? data.fechaFin.toDate() : data.fechaFin,
       fechaLeido: data.fechaLeido instanceof Timestamp ? data.fechaLeido.toDate() : data.fechaLeido
-    } as SesionRutina;
+    } as any;
+
+    // Exponer los ejercicios al primer nivel para que el esquema de gym-admin los encuentre
+    if (res.rutinaResumen?.ejercicios) {
+      res.ejercicios = res.rutinaResumen.ejercicios;
+    }
+
+    return res as SesionRutina;
+  }
+
+  /**
+   * Inicializa el listener global para todas las sesiones
+   */
+  private initializeGlobalListener(): void {
+    if (this.isGlobalListenerInitialized) return;
+
+    try {
+      const q = query(collection(this.firestore, this.COLLECTION));
+      onSnapshot(q, (snapshot: QuerySnapshot) => {
+        this.runInZone(() => {
+          const sesiones = snapshot.docs.map(docSnap => this.mapFromFirestore({ id: docSnap.id, ...docSnap.data() }));
+          this._sesiones.set(sesiones);
+        });
+      });
+      this.isGlobalListenerInitialized = true;
+    } catch (e) {
+      console.warn('Error inicializando listener global de sesiones:', e);
+    }
+  }
+
+  /**
+   * Signal readonly con todas las sesiones
+   */
+  get sesiones(): Signal<SesionRutina[]> {
+    if (!this.isGlobalListenerInitialized) {
+      this.initializeGlobalListener();
+    }
+    return this._sesiones.asReadonly();
   }
 
   /**

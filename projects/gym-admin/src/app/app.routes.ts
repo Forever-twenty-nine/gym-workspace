@@ -8,6 +8,7 @@ import { SolicitudesPlanPage } from './pages/solicitudes-plan/solicitudes-plan.p
 import { EjerciciosPage } from './pages/ejercicios/ejercicios.page';
 import { RutinasPage } from './pages/rutinas/rutinas.page';
 import { RutinasAsignadasPage } from './pages/rutinas-asignadas/rutinas-asignadas.page';
+import { SesionesRutinasPage } from './pages/sesiones-rutinas/sesiones-rutinas.page';
 
 export const routes: Routes = [
   {
@@ -33,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'rutinas-asignadas',
     component: RutinasAsignadasPage
+  },
+  {
+    path: 'sesiones-rutina',
+    component: SesionesRutinasPage
   },
   {
     path: 'gimnasios',

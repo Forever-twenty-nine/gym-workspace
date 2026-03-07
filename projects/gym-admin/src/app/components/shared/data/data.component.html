@@ -65,16 +65,22 @@
               <span class="text-gray-600 text-xs italic">{{ item[column.key] | date:'mediumDate' }}</span>
               }
               @case ('boolean') {
-              <span [class]="item[column.key] ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass"
-                class="px-2 py-0.5 rounded-full text-[10px] font-medium">
-                {{ item[column.key] ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+              <span
+                [class]="item[column.key] ? (column.badgeConfig?.trueClass || 'bg-green-100 text-green-700') : (column.badgeConfig?.falseClass || 'bg-gray-100 text-gray-700')"
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold border grow-0 inline-block">
+                {{ item[column.key] ? (column.badgeConfig?.trueLabel || 'SÍ') : (column.badgeConfig?.falseLabel || 'NO')
+                }}
               </span>
               }
               @case ('badge') {
               <span
-                [class]="item[column.key] === 'premium' ? column.badgeConfig?.trueClass : column.badgeConfig?.falseClass"
-                class="px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider">
-                {{ item[column.key] || 'estándar' }}
+                [class]="(item[column.key] === 'premium' || item[column.key] === 'completada' || item[column.key] === true) ? (column.badgeConfig?.trueClass || 'bg-amber-100 text-amber-700 border-amber-200') : (item[column.key] === 'en_progreso' ? 'bg-blue-100 text-blue-700 border-blue-200' : (item[column.key] === 'pendiente' ? 'bg-gray-100 text-gray-700 border-gray-200' : (item[column.key] === 'cancelada' ? 'bg-red-100 text-red-700 border-red-200' : (column.badgeConfig?.falseClass || 'bg-gray-100 text-gray-700 border-gray-200'))))"
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border grow-0 inline-block">
+                {{ item[column.key] === 'completada' ? (column.badgeConfig?.trueLabel || 'Completada') :
+                (item[column.key] === 'en_progreso' ? (column.badgeConfig?.falseLabel || 'En Progreso') :
+                (item[column.key] === 'pendiente' ? 'Pendiente' :
+                (item[column.key] === 'cancelada' ? 'Cancelada' :
+                (item[column.key] || 'estándar')))) }}
               </span>
               }
               @default {

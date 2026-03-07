@@ -20,6 +20,6 @@ export interface SesionRutina {
     nombreUsuario?: string;
     fotoUsuario?: string;
     fechaCompartida?: any;
-    likes?: string[]; // IDs de usuarios que dieron like
+    likes?: string[];
 }
 
