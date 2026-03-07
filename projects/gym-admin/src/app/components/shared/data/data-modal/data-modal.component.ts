@@ -41,7 +41,7 @@ export class DataModalComponent {
         const currentFields = this.fields();
 
         currentFields.forEach(field => {
-            if (field.type === 'heading') return;
+            if (field.type === 'heading' || field.name === 'id') return;
 
             let value = item ? item[field.name] : (field.defaultValue ?? (field.type === 'multiselect' || field.type === 'infolist' ? [] : ''));
 

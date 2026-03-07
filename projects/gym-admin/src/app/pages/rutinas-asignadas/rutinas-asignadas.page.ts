@@ -7,6 +7,8 @@ import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
 import { DataComponent } from '../../components/shared/data/data.component';
 import { SchemaService } from '../../core/schema.service';
+import { UserService } from '../../services/user.service';
+import { RutinaService } from '../../services/rutina.service';
 
 @Component({
   selector: 'app-rutinas-asignadas-page',
@@ -31,9 +33,23 @@ export class RutinasAsignadasPage {
   private readonly toastService = inject(ToastService);
   private readonly pageTitleService = inject(PageTitleService);
   private readonly schemaService = inject(SchemaService);
+  private readonly userService = inject(UserService);
+  private readonly rutinaService = inject(RutinaService);
 
   readonly columns = this.schemaService.getColumns('rutinaAsignada');
-  readonly fields = signal(this.schemaService.getFields('rutinaAsignada'));
+  readonly fields = computed(() => {
+    const routines = this.rutinaService.rutinas();
+    const users = this.userService.users();
+
+    const routineOptions = routines.map(r => ({ value: r.id!, label: r.nombre }));
+    const userOptions = users.map(u => ({ value: u.uid, label: u.nombre || u.email || u.uid }));
+
+    return this.schemaService.getDynamicSchema('rutinaAsignada', {
+      'rutinaId': routineOptions,
+      'entrenadoId': userOptions,
+      'entrenadorId': userOptions
+    });
+  });
   readonly isLoading = signal(false);
 
   constructor() {
@@ -41,10 +57,22 @@ export class RutinasAsignadasPage {
   }
 
   readonly rutinasAsignadas = computed(() => {
-    return this.rutinaAsignadaService.getRutinasAsignadas()().map((ra: RutinaAsignada) => ({
-      ...ra,
-      id: ra.id
-    }));
+    const list = this.rutinaAsignadaService.getRutinasAsignadas()();
+    const routines = this.rutinaService.rutinas();
+    const users = this.userService.users();
+
+    return list.map((ra: RutinaAsignada) => {
+      const routine = routines.find(r => r.id === ra.rutinaId);
+      const entrenado = users.find(u => u.uid === ra.entrenadoId);
+      const entrenador = users.find(u => u.uid === ra.entrenadorId);
+
+      return {
+        ...ra,
+        rutinaNombre: routine?.nombre || ra.rutinaId,
+        entrenadoNombre: entrenado?.nombre || entrenado?.email || ra.entrenadoId,
+        entrenadorNombre: entrenador?.nombre || entrenador?.email || ra.entrenadorId
+      };
+    });
   });
 
   async onSave(data: any) {

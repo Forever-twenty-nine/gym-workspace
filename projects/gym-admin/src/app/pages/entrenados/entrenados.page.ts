@@ -78,28 +78,13 @@ export class EntrenadosPage {
       return { value: t.id, label: u?.nombre || u?.email || t.id };
     });
 
-    const filteredRoutines = routines.filter((r: any) => {
-      const cid = (r.creadorId || r.entrenadorId || r.usuarioId);
-      return cid === entrenadoId || (cid && entrenadoId && cid.toLowerCase() === entrenadoId.toLowerCase());
-    });
-
-    const filteredAssignedRoutines = assignedRoutinesList.filter((ar: any) => ar.entrenadoId === entrenadoId);
-
-    const routineOptions = filteredRoutines.map(r => ({ value: r.id!, label: r.nombre }));
-    const assignedRoutineOptions = filteredAssignedRoutines.map((ar: any) => {
-      const rutId = (ar as any).rutinaId;
-      const routine = routines.find(r => r.id === rutId);
-      return {
-        value: ar.id!,
-        label: routine ? routine.nombre : `Rutina (${ar.id})`
-      };
-    });
+    const routineOptions = routines.map(r => ({ value: r.id!, label: r.nombre }));
 
     const userOptions = allUsers.map(u => ({ value: u.uid, label: u.nombre || u.email || u.uid }));
 
     return this.schemaService.getDynamicSchema('entrenado', {
       'entrenadoresId': trainerOptions,
-      'rutinasAsignadasIds': assignedRoutineOptions,
+      'rutinasAsignadasIds': routineOptions,
       'rutinasCreadas': routineOptions,
       'seguidores': userOptions,
       'seguidos': userOptions

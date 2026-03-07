@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Rol } from 'gym-library';
+import { Rol, Objetivo } from 'gym-library';
 import { UserService } from '../../services/user.service';
 import { EntrenadoService } from '../../services/entrenado.service';
 import { EntrenadorService } from '../../services/entrenador.service';
@@ -110,7 +110,7 @@ export class UsuariosPage {
             id: uid,
             activo: true,
             fechaRegistro: new Date(),
-            objetivo: 'salud'
+            objetivo: Objetivo.SALUD
           };
           await this.entrenadoService.save(clienteData);
           break;

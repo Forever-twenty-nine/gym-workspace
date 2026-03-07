@@ -2,16 +2,17 @@ import { Validators } from '@angular/forms';
 import { ColumnConfig, FieldConfig } from '../../models/data-config.model';
 
 export const RUTINA_ASIGNADA_COLUMNS: ColumnConfig[] = [
-    { key: 'entrenadoId', label: 'ID Entrenado', type: 'text' },
-    { key: 'entrenadorId', label: 'ID Entrenador', type: 'text' },
+    { key: 'rutinaNombre', label: 'Rutina', type: 'text' },
+    { key: 'entrenadoNombre', label: 'Entrenado', type: 'text' },
+    { key: 'entrenadorNombre', label: 'Entrenador', type: 'text' },
     { key: 'diaSemana', label: 'Día Semana', type: 'text' },
     { key: 'fechaAsignacion', label: 'Asignada', type: 'date' }
 ];
 
 export const RUTINA_ASIGNADA_SCHEMA: FieldConfig[] = [
-    { name: 'rutinaId', label: 'ID Rutina', type: 'text', validators: [Validators.required], colSpan: 1 },
-    { name: 'entrenadoId', label: 'ID Entrenado', type: 'text', validators: [Validators.required], colSpan: 1 },
-    { name: 'entrenadorId', label: 'ID Entrenador', type: 'text', validators: [Validators.required], colSpan: 1 },
+    { name: 'rutinaId', label: 'Rutina', type: 'select', validators: [Validators.required], colSpan: 1 },
+    { name: 'entrenadoId', label: 'Entrenado', type: 'select', validators: [Validators.required], colSpan: 1 },
+    { name: 'entrenadorId', label: 'Entrenador', type: 'select', validators: [Validators.required], colSpan: 1 },
     { name: 'diaSemana', label: 'Día de la Semana', type: 'select', options: [
         { label: 'Lunes', value: 'Lunes' },
         { label: 'Martes', value: 'Martes' },
