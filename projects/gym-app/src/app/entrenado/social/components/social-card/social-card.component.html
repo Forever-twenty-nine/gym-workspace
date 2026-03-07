@@ -29,7 +29,7 @@
         </div>
         <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
           <ion-icon name="time" class="text-xs"></ion-icon>
-          {{ formatearFecha(sesion.fechaInicio) }}
+          {{ sesion.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
         </p>
       </div>
     </div>

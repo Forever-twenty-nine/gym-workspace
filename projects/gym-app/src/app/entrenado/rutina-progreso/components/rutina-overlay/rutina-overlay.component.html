@@ -29,10 +29,12 @@
     </p>
     }
 
+    @if (!hideButton()) {
     <div class="w-full mt-8">
         <ion-button [expand]="expand()" [fill]="buttonFill()" [color]="buttonColor()" (click)="action.emit()"
             class="font-bold shadow-md" [class.h-14]="type() === 'start'" [class.text-lg]="type() === 'start'">
             {{ buttonText() }}
         </ion-button>
     </div>
+    }
 </div>

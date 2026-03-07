@@ -27,6 +27,7 @@ export class RutinaOverlayComponent {
     readonly buttonFill = input<'clear' | 'outline' | 'solid' | 'default'>('solid');
     readonly expand = input<'block' | 'full' | undefined>('block');
     readonly yaRealizadaHoy = input<boolean>(false);
+    readonly hideButton = input<boolean>(false);
 
     readonly action = output<void>();
 }

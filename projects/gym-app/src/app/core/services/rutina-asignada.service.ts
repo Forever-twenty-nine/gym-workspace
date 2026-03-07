@@ -14,7 +14,7 @@ import {
     where
 } from 'firebase/firestore';
 
-import { RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
+import { Rutina, RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -147,6 +147,57 @@ export class RutinaAsignadaService {
                 ra.entrenadoId === entrenadoId && ra.activa
             )
         );
+    }
+
+    /**
+     * 🕒 Organiza las rutinas por días de la semana (próximos 7 días)
+     */
+    organizarRutinasSemanales(rutinasAsignadas: Rutina[], asignaciones: RutinaAsignada[]): any[] {
+        const hoy = new Date();
+        const fechas = [];
+        for (let i = 0; i < 7; i++) {
+            const fecha = new Date(hoy);
+            fecha.setDate(hoy.getDate() + i);
+            fechas.push(fecha);
+        }
+
+        const rutinasOrganizadas: { [key: string]: { fecha: Date; rutinas: any[]; diaCorto: string; esHoy: boolean; esFuturo: boolean; } } = {};
+
+        const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+        const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+        fechas.forEach(fecha => {
+            const diaSemanaIndex = fecha.getDay();
+            const diaSemanaNormalizado = diasSemanaSinTilde[diaSemanaIndex];
+            const diaCorto = diasSemanaCorto[diaSemanaIndex];
+            const fechaKey = fecha.toISOString().split('T')[0];
+
+            if (!rutinasOrganizadas[fechaKey]) {
+                const esHoyCheck = fecha.toDateString() === hoy.toDateString();
+                rutinasOrganizadas[fechaKey] = {
+                    fecha: new Date(fecha),
+                    rutinas: [],
+                    diaCorto,
+                    esHoy: esHoyCheck,
+                    esFuturo: !esHoyCheck && fecha.getTime() > hoy.getTime()
+                };
+            }
+
+            const asignacionesDelDia = asignaciones.filter((asig: RutinaAsignada) => {
+                if (!asig.diaSemana) return false;
+                const asigDiaNormalizado = asig.diaSemana.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                return asigDiaNormalizado === diaSemanaNormalizado;
+            });
+
+            asignacionesDelDia.forEach((asig: RutinaAsignada) => {
+                const rutinaCompleta = rutinasAsignadas.find(r => r.id === asig.rutinaId);
+                if (rutinaCompleta) {
+                    rutinasOrganizadas[fechaKey].rutinas.push(rutinaCompleta);
+                }
+            });
+        });
+
+        return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
     }
 
     /**

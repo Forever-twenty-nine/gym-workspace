@@ -1,66 +1,58 @@
-<ion-header [translucent]="true" class="ion-no-border">
-    <ion-toolbar>
+<ion-header class="ion-no-border z-50">
+    <ion-toolbar class="bg-transparent px-4">
         <ion-buttons slot="start">
-            <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline"></ion-back-button>
+            <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline" color="dark" class="bg-white/20 backdrop-blur-md rounded-full"></ion-back-button>
         </ion-buttons>
-        <ion-title class="text-center font-bold">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
-        <ion-buttons slot="end">
-            <ion-button fill="clear" (click)="pausarReanudarRutina()"
-                [disabled]="!rutinaIniciada() || rutinaCompletada()">
-                <ion-icon [name]="rutinaPausada() ? 'play-outline' : 'pause-circle-outline'"
-                    slot="icon-only"></ion-icon>
-            </ion-button>
-        </ion-buttons>
+        <ion-title class="font-bold text-slate-800 dark:text-white text-right pr-0">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="bg-slate-50 dark:bg-slate-900">
-    <!-- Progress Header Component -->
-    <app-rutina-progreso-header [porcentaje]="porcentajeProgreso()" [tiempo]="tiempoTranscurrido()"
-        [estado]="getEstadoRutina()" [iniciada]="rutinaIniciada()">
-    </app-rutina-progreso-header>
+<ion-content [fullscreen]="true" class="bg-slate-50 dark:bg-black">
+    <!-- Imagen de fondo premium -->
+    <div class="fixed inset-0 z-0 bg-cover bg-center pointer-events-none opacity-40 dark:opacity-30"
+      style="background-image: url('assets/images/cardio-progreso-bg.png');">
+      <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-gray-50/10 dark:from-black/40 dark:to-black/60"></div>
+    </div>
 
-    <!-- Start Overlay Component -->
-    @if (!rutinaIniciada() && !rutinaCompletada()) {
-    <app-rutina-overlay type="start" title="¿Listo para empezar?"
-        subtitle="Prepárate para dar lo mejor de ti en esta rutina." icon="play-outline"
-        buttonText="COMENZAR ENTRENAMIENTO" [yaRealizadaHoy]="yaRealizadaHoy()" (action)="iniciarRutina()">
-    </app-rutina-overlay>
-    }
+    <div class="relative z-10">
+        <!-- Progress Header Component -->
+        <app-rutina-progreso-header [porcentaje]="porcentajeProgreso()" [tiempo]="stopwatch.formattedTime()"
+            [estado]="estado()" [iniciada]="rutinaIniciada()">
+        </app-rutina-progreso-header>
 
-    <!-- Exercises List -->
-    @if (rutinaIniciada() || rutinaCompletada()) {
-    <div class="px-2 pb-6 pt-2">
-        <h3 class="text-xs font-bold mb-2 px-2 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-            Ejercicios ({{ ejerciciosCompletados() }}/{{ ejerciciosTotales() }})
-        </h3>
-
-        @for (ejercicio of ejercicios(); track ejercicio.id) {
-        <app-rutina-ejercicio-item [ejercicio]="ejercicio" [completado]="isEjercicioCompletado(ejercicio.id)"
-            (toggle)="toggleEjercicio(ejercicio.id)"
-            (showDetails)="abrirModalFicha(ejercicio)">
-        </app-rutina-ejercicio-item>
+        <!-- Start Overlay Component -->
+        @if (!rutinaIniciada() && !rutinaCompletada()) {
+        <app-rutina-overlay type="start" title="¿Listo para empezar?"
+            subtitle="Prepárate para dar lo mejor de ti en esta rutina." icon="play-outline"
+            buttonText="COMENZAR ENTRENAMIENTO" [yaRealizadaHoy]="yaRealizadaHoy()" (action)="iniciarRutina()"
+            [hideButton]="true">
+        </app-rutina-overlay>
         }
 
-        <!-- Complete Button -->
-        @if (ejerciciosCompletados() === ejerciciosTotales() && !rutinaCompletada()) {
-        <div class="mt-8 animate-bounce-in">
-            <ion-button expand="block" color="success" (click)="completarRutina()"
-                class="h-16 text-lg font-black shadow-lg">
-                FINALIZAR ENTRENAMIENTO
-            </ion-button>
+        <!-- Exercises List -->
+        @if (rutinaIniciada() || rutinaCompletada()) {
+        <div class="px-2 pb-24 pt-2">
+            <h3 class="text-xs font-bold mb-2 px-4 text-slate-500 dark:text-gray-400 uppercase tracking-wider">
+                Ejercicios ({{ ejerciciosCompletados() }}/{{ ejerciciosTotales() }})
+            </h3>
+
+            @for (ejercicio of ejercicios(); track ejercicio.id) {
+            <app-rutina-ejercicio-item [ejercicio]="ejercicio" [completado]="isEjercicioCompletado(ejercicio.id)"
+                (toggle)="toggleEjercicio(ejercicio.id)"
+                (showDetails)="abrirModalFicha(ejercicio)">
+            </app-rutina-ejercicio-item>
+            }
         </div>
         }
-    </div>
-    }
 
-    <!-- Success Overlay Component -->
-    @if (rutinaCompletada()) {
-    <app-rutina-overlay type="success" title="¡Reto cumplido!"
-        subtitle="Has finalizado tu rutina con éxito. ¡Sigue así!" icon="checkmark-circle" buttonText="VOLVER AL PANEL"
-        buttonFill="clear" [expand]="undefined" (action)="goBack()">
-    </app-rutina-overlay>
-    }
+        <!-- Success Overlay Component -->
+        @if (rutinaCompletada()) {
+        <app-rutina-overlay type="success" title="¡Reto cumplido!"
+            subtitle="Has finalizado tu rutina con éxito. ¡Sigue así!" icon="checkmark-circle" buttonText="VOLVER AL PANEL"
+            buttonFill="clear" [expand]="undefined" (action)="goBack()">
+        </app-rutina-overlay>
+        }
+    </div>
 
     <!-- Exercise Detail Modal -->
     <app-rutina-ejercicio-detalle-modal
@@ -69,3 +61,38 @@
         (closeModal)="cerrarModalFicha()">
     </app-rutina-ejercicio-detalle-modal>
 </ion-content>
+
+<!-- Footer con botones de control -->
+@if (!rutinaCompletada()) {
+<ion-footer class="ion-no-border bg-white/60 dark:bg-black/60 backdrop-blur-xl border-t border-white/20">
+    <div class="px-6 py-10" style="padding-bottom: calc(2.5rem + var(--ion-safe-area-bottom, 0px));">
+        <div class="flex items-center gap-4">
+            @if (rutinaIniciada()) {
+                <ion-button (click)="pausarReanudar()" 
+                    fill="clear"
+                    class="h-16 w-16 min-w-[4rem] rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 shadow-lg !m-0 overflow-hidden --padding-start=0 --padding-end=0">
+                    <ion-icon [name]="stopwatch.isPaused() ? 'play' : 'pause'"
+                        slot="icon-only"
+                        class="text-3xl" [class.text-primary]="stopwatch.isPaused()"></ion-icon>
+                </ion-button>
+            }
+            
+            <div class="flex-1">
+                @if (!rutinaIniciada()) {
+                    <ion-button expand="block" color="primary" (click)="iniciarRutina()"
+                        class="h-16 text-lg font-black rounded-3xl shadow-xl !m-0">
+                        COMENZAR ENTRENAMIENTO
+                    </ion-button>
+                } @else {
+                    <ion-button expand="block" [color]="ejerciciosCompletados() === ejerciciosTotales() ? 'success' : 'primary'" 
+                        (click)="completarRutina()"
+                        [disabled]="ejerciciosCompletados() < ejerciciosTotales()"
+                        class="h-16 text-lg font-black rounded-3xl shadow-xl transition-all duration-300 !m-0">
+                        FINALIZAR ENTRENAMIENTO
+                    </ion-button>
+                }
+            </div>
+        </div>
+    </div>
+</ion-footer>
+}
