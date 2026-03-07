@@ -30,14 +30,15 @@
 
     <!-- Exercises List -->
     @if (rutinaIniciada() || rutinaCompletada()) {
-    <div class="px-4 pb-20">
-        <h3 class="text-lg font-bold mb-4 px-1 text-slate-800 dark:text-slate-100">
+    <div class="px-2 pb-6 pt-2">
+        <h3 class="text-xs font-bold mb-2 px-2 text-slate-500 dark:text-slate-400 uppercase tracking-wider">
             Ejercicios ({{ ejerciciosCompletados() }}/{{ ejerciciosTotales() }})
         </h3>
 
         @for (ejercicio of ejercicios(); track ejercicio.id) {
         <app-rutina-ejercicio-item [ejercicio]="ejercicio" [completado]="isEjercicioCompletado(ejercicio.id)"
-            (toggle)="toggleEjercicio(ejercicio.id)">
+            (toggle)="toggleEjercicio(ejercicio.id)"
+            (showDetails)="abrirModalFicha(ejercicio)">
         </app-rutina-ejercicio-item>
         }
 
@@ -60,4 +61,11 @@
         buttonFill="clear" [expand]="undefined" (action)="goBack()">
     </app-rutina-overlay>
     }
+
+    <!-- Exercise Detail Modal -->
+    <app-rutina-ejercicio-detalle-modal
+        [isOpen]="isModalOpen()"
+        [ejercicio]="ejercicioSeleccionado()"
+        (closeModal)="cerrarModalFicha()">
+    </app-rutina-ejercicio-detalle-modal>
 </ion-content>

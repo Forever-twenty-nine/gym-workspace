@@ -10,14 +10,11 @@ import {
     IonIcon,
     IonContent,
     IonBadge,
-    IonText,
-    IonCard,
-    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
-    IonFooter,
-    IonToggle
+    IonToggle,
+    IonFooter
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -47,13 +44,26 @@ import { AuthService } from '../../../../core/services/auth.service';
         IonIcon,
         IonContent,
         IonBadge,
-        IonText,
         IonList,
         IonItem,
         IonLabel,
-        IonToggle
+        IonToggle,
+        IonFooter
     ],
-    templateUrl: './progreso-historial-detalle.component.html'
+    templateUrl: './progreso-historial-detalle.component.html',
+    styles: [`
+        ion-modal {
+            align-items: flex-start;
+            --height: calc(100% - 100px);
+        }
+        ion-content::part(scroll) {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ion-content::part(scroll)::-webkit-scrollbar {
+            display: none;
+        }
+    `]
 })
 export class ProgresoHistorialDetalleComponent {
     private sesionRutinaService = inject(SesionRutinaService);

@@ -1,34 +1,31 @@
-<ion-card (click)="toggle.emit()"
-    class="mx-0 mb-4 rounded-2xl shadow-sm border-none transition-all active:scale-[0.98] overflow-hidden"
-    [style.background]="completado() ? 'rgba(var(--ion-color-success-rgb, 16, 185, 129), 0.1)' : 'var(--ion-card-background)'">
-    <ion-card-content class="p-4 flex items-center gap-4">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300"
-            [style.background]="completado() ? 'var(--ion-color-success)' : 'var(--ion-color-light)'"
-            [style.color]="completado() ? 'white' : 'var(--ion-color-medium)'" [class.shadow-lg]="completado()">
-            <ion-icon [name]="completado() ? 'checkmark-circle' : 'fitness-outline'"></ion-icon>
-        </div>
+<div (click)="showDetails.emit()"
+    class="flex items-center gap-4 py-3 px-4 mb-3 rounded-2xl transition-all active:scale-[0.98] overflow-hidden bg-white dark:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] border border-slate-100 dark:border-slate-700 relative"
+    [style.opacity]="completado() ? '0.5' : '1'">
+    
+    <!-- Checkbox Icon (Only toggles completion) -->
+    <div class="w-12 h-12 flex items-center justify-center transition-all duration-300 flex-shrink-0 -ml-2 rounded-full active:bg-slate-100 dark:active:bg-slate-700"
+        (click)="toggle.emit(); $event.stopPropagation()"
+        [style.color]="completado() ? 'var(--ion-color-success)' : 'var(--ion-color-medium)'">
+        <ion-icon [name]="completado() ? 'checkmark-circle' : 'ellipse-outline'" class="text-[32px]"></ion-icon>
+    </div>
 
-        <div class="flex-1">
-            <h4 class="text-base font-bold m-0 transition-all duration-300"
-                [style.color]="completado() ? 'var(--ion-color-success)' : 'var(--color-title)'"
-                [class.line-through]="completado()" [class.opacity-70]="completado()">
-                {{ ejercicio().nombre }}
-            </h4>
-            <div class="flex items-center gap-3 mt-1 text-xs font-medium" style="color: var(--ion-color-medium);">
-                <span class="flex items-center gap-1">
-                    <ion-icon name="repeat-outline" style="color: var(--ion-color-primary);"></ion-icon>
-                    {{ ejercicio().series }} x {{ ejercicio().repeticiones }}
-                </span>
-                @if (ejercicio().descansoSegundos) {
-                <span class="flex items-center gap-1">
-                    <ion-icon name="time-outline" style="color: var(--ion-color-warning);"></ion-icon>
-                    {{ ejercicio().descansoSegundos }}s
-                </span>
-                }
-            </div>
+    <!-- Content -->
+    <div class="flex-1 min-w-0 pr-8">
+        <h4 class="text-base font-bold m-0 truncate transition-all duration-300 text-slate-800 dark:text-white"
+            [style.color]="completado() ? 'var(--ion-color-success)' : ''"
+            [class.line-through]="completado()">
+            {{ ejercicio().nombre }}
+        </h4>
+        <div class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+            {{ ejercicio().series }} series x {{ ejercicio().repeticiones }} reps
+            @if (ejercicio().descansoSegundos) {
+                <span class="mx-1 opacity-50">•</span> {{ ejercicio().descansoSegundos }}s descanso
+            }
         </div>
+    </div>
 
-        <ion-icon [name]="completado() ? 'checkmark-circle' : 'play-outline'"
-            [color]="completado() ? 'success' : 'medium'" class="text-2xl"></ion-icon>
-    </ion-card-content>
-</ion-card>
+    <!-- Info icon -->
+    <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-slate-400">
+        <ion-icon name="chevron-forward-outline" class="text-xl"></ion-icon>
+    </div>
+</div>

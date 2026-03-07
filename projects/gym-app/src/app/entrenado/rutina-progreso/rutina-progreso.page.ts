@@ -16,6 +16,7 @@ import {
 import { RutinaProgresoHeaderComponent } from './components/rutina-progreso-header/rutina-progreso-header.component';
 import { RutinaEjercicioItemComponent } from './components/rutina-ejercicio-item/rutina-ejercicio-item.component';
 import { RutinaOverlayComponent } from './components/rutina-overlay/rutina-overlay.component';
+import { RutinaEjercicioDetalleModalComponent } from './components/rutina-ejercicio-detalle-modal/rutina-ejercicio-detalle-modal.component';
 
 import { addIcons } from 'ionicons';
 import {
@@ -33,7 +34,8 @@ import {
   close,
   pauseCircleOutline,
   repeatOutline,
-  warningOutline
+  warningOutline,
+  ellipseOutline
 } from 'ionicons/icons';
 import { Rutina, Ejercicio, SesionRutinaStatus } from 'gym-library';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -58,7 +60,8 @@ import { SesionRutina } from 'gym-library';
     IonBackButton,
     RutinaProgresoHeaderComponent,
     RutinaEjercicioItemComponent,
-    RutinaOverlayComponent
+    RutinaOverlayComponent,
+    RutinaEjercicioDetalleModalComponent
   ],
   templateUrl: './rutina-progreso.page.html',
   styles: [`
@@ -91,6 +94,11 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   readonly rutinaLocalIniciada = signal(false);
   readonly ejerciciosCompletadosLocal = signal<string[]>([]);
   readonly isCompleting = signal(false);
+  
+  // Modal Estado
+  readonly ejercicioSeleccionado = signal<Ejercicio | null>(null);
+  readonly isModalOpen = signal(false);
+
   private intervaloCronometro?: any;
   private segundosTranscurridos = 0;
 
@@ -182,7 +190,8 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
       close,
       pauseCircleOutline,
       repeatOutline,
-      warningOutline
+      warningOutline,
+      ellipseOutline
     });
   }
 
@@ -340,6 +349,16 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
   // --------------------------------------------
   // Gestión de ejercicios
   // --------------------------------------------
+
+  abrirModalFicha(ejercicio: Ejercicio) {
+    this.ejercicioSeleccionado.set(ejercicio);
+    this.isModalOpen.set(true);
+  }
+
+  cerrarModalFicha() {
+    this.isModalOpen.set(false);
+    setTimeout(() => this.ejercicioSeleccionado.set(null), 300); // Clean after animation
+  }
 
   async toggleEjercicio(ejercicioId: string) {
     if (!this.rutinaIniciada()) {
