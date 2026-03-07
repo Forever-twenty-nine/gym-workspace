@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { FormatFechaPipe } from '../../../../shared/pipes/format-fecha.pipe';
 import { 
   IonCard, 
   IonCardContent, 
@@ -22,7 +23,9 @@ import { checkmarkCircle, closeCircleOutline, notificationsCircle, chevronUp, ch
     IonAvatar,
     IonButton,
     IonIcon,
-    IonBadge
+    IonBadge,
+    FormatFechaPipe,
+    NgOptimizedImage
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -32,13 +35,8 @@ export class InvitacionesPendientesComponent {
   @Output() toggle = new EventEmitter<void>();
   @Output() aceptar = new EventEmitter<any>();
   @Output() rechazar = new EventEmitter<any>();
-  @Input() formatearFechaFn!: (f: any) => string;
 
   constructor() {
     addIcons({ checkmarkCircle, closeCircleOutline, notificationsCircle, chevronUp, chevronDown });
-  }
-
-  formatearFecha(fecha: any) {
-    return this.formatearFechaFn ? this.formatearFechaFn(fecha) : fecha;
   }
 }

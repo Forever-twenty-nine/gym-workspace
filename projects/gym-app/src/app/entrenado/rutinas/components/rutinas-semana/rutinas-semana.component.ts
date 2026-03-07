@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
     IonIcon,
     IonCard,
@@ -30,7 +30,8 @@ import { fitnessOutline, timeOutline, playCircle, bedOutline, calendarOutline, l
         IonLabel,
         IonBadge,
         IonButton,
-        IonList
+        IonList,
+        NgOptimizedImage
     ],
     templateUrl: './rutinas-semana.component.html'
 })

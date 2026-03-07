@@ -2,9 +2,9 @@
     <ion-toolbar class="px-2 pt-2">
         <div class="flex justify-between items-center w-full px-2">
             <!-- Foto de perfil - Izquierda -->
-            <ion-avatar class="w-12 h-12 border-2 border-primary/20 shadow-sm overflow-hidden">
-                <img [src]="currentUser()?.photoURL || 'assets/images/test-foto.png'" alt="Perfil"
-                    class="object-cover w-full h-full" />
+            <ion-avatar class="w-12 h-12 border-2 border-primary/20 shadow-sm overflow-hidden relative">
+                <img [ngSrc]="currentUser()?.photoURL || 'assets/images/test-foto.png'" fill priority alt="Perfil"
+                    class="object-cover">
             </ion-avatar>
 
             <!-- Campanita - Derecha -->

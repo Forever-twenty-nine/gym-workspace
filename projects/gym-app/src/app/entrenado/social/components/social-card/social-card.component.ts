@@ -1,5 +1,5 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
   IonIcon,
   ActionSheetController
@@ -26,7 +26,8 @@ import { EntrenadoService } from '../../../../core/services/entrenado.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonIcon
+    IonIcon,
+    NgOptimizedImage
   ],
   templateUrl: './social-card.component.html'
 })

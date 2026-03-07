@@ -2,8 +2,10 @@
 
     <!-- Image Background Overlay -->
     <div class="absolute inset-0 z-0 bg-transparent rounded-3xl overflow-hidden">
-        <img src="assets/images/rutinas_card_bg.png" alt=""
-            class="w-full h-full object-cover opacity-70 dark:opacity-40" />
+      <div class="absolute inset-0 z-0">
+        <img ngSrc="assets/images/rutinas_card_bg.png" fill priority alt=""
+             class="object-cover opacity-80 filter brightness-[0.4] contrast-125">
+      </div>
         <div
             class="absolute inset-0 bg-gradient-to-t from-gray-200/50 to-white/30 dark:from-gray-900/80 dark:to-gray-800/40">
         </div>

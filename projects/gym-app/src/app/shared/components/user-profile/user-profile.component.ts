@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Platform, AlertController, LoadingController, ToastController } from '@ionic/angular';
 
@@ -39,6 +39,7 @@ import { NotificacionService } from '../../../core/services/notificacion.service
     IonButton, IonIcon, IonChip, IonLabel,
     IonInput, IonSpinner, IonBadge, IonSelect, IonSelectOption,
     IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonProgressBar,
+    NgOptimizedImage
   ],
 })
 export class UserProfileComponent implements OnInit, OnDestroy {

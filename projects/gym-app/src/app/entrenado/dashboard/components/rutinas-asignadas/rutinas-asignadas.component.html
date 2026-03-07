@@ -81,9 +81,9 @@
     <p class="text-white/70">Tu entrenador {{ entrenador.nombre || entrenador.email || 'Entrenador' }} te asignará
       rutinas próximamente.</p>
     <div class="mt-4 flex items-center justify-center gap-3">
-      <ion-avatar class="!w-10 !h-10 border-2 border-primary">
-        <img [src]="entrenador.photoURL || '../../../../../assets/images/test-foto.png'" alt="Entrenador"
-          class="object-cover w-full h-full">
+      <ion-avatar class="w-10 h-10 border border-white/20 relative">
+        <img [ngSrc]="entrenador.photoURL || 'assets/images/test-foto.png'" fill priority alt="Entrenador"
+             class="object-cover">
       </ion-avatar>
       <div class="text-left">
         <p class="text-sm font-semibold">{{ entrenador.nombre || 'Entrenador' }}</p>

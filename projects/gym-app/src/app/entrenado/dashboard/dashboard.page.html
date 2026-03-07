@@ -5,7 +5,7 @@
     <ion-card class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-2xl relative">
       <!-- Background Image Layer -->
       <div class="absolute inset-0 z-0">
-        <img src="../../../assets/images/test-gym-1.jpg" alt="background" class="w-full h-full object-cover filter brightness-[0.4] contrast-125">
+        <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background" class="object-cover filter brightness-[0.4] contrast-125">
       </div>
 
       <!-- Content Layer -->
@@ -25,7 +25,6 @@
           <app-invitaciones-pendientes
             [invitaciones]="invitacionesPendientes()"
             [mostrar]="mostrarInvitaciones()"
-            [formatearFechaFn]="formatearFechaPublico.bind(this)"
             (toggle)="toggleInvitaciones()"
             (aceptar)="aceptarInvitacion($event)"
             (rechazar)="rechazarInvitacion($event)">

@@ -150,6 +150,88 @@ export class RutinaAsignadaService {
     }
 
     /**
+     * 🕒 Obtiene las próximas 3 rutinas para el dashboard de un entrenado
+     * Encapsula la lógica de búsqueda en los próximos 7 días y relleno con rutinas del entrenado.
+     */
+    getProximasRutinasDashboard(userId: string, rutinasEntrenado: any[]): Signal<any[]> {
+        return computed(() => {
+            const rutinas = this.rutinaService.rutinas();
+            const asignaciones = this.getRutinasAsignadasByEntrenado(userId)();
+            const rutinasDelEntrenado = rutinasEntrenado;
+
+            if (!rutinas.length) return [];
+
+            const hoy = new Date();
+            const proximas: any[] = [];
+            const idsAgregados = new Set<string>();
+            const nombresAgregados = new Set<string>();
+
+            const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+            const diaCortoArr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const diasSemanaMapa: Record<string, string> = {
+                'domingo': 'domingo', 'lunes': 'lunes', 'martes': 'martes',
+                'miercoles': 'miercoles', 'jueves': 'jueves', 'viernes': 'viernes',
+                'sabado': 'sabado', 'dom': 'domingo', 'lun': 'lunes', 'mar': 'martes',
+                'mie': 'miercoles', 'jue': 'jueves', 'vie': 'viernes', 'sab': 'sabado'
+            };
+
+            for (let i = 0; i < 7 && proximas.length < 3; i++) {
+                const fechaBucle = new Date(hoy);
+                fechaBucle.setDate(hoy.getDate() + i);
+
+                const diaSemanaIndex = fechaBucle.getDay();
+                const diaSemanaNombre = diasSemanaSinTilde[diaSemanaIndex];
+                const esHoy = i === 0;
+
+                const asignacionesDelDia = asignaciones.filter(asig => {
+                    if (!asig.diaSemana) return false;
+                    const diaAsigNorm = asig.diaSemana.toLowerCase()
+                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    return (diasSemanaMapa[diaAsigNorm] || diaAsigNorm) === diaSemanaNombre;
+                });
+
+                for (const asig of asignacionesDelDia) {
+                    if (proximas.length >= 3) break;
+                    const rId = asig.rutinaId;
+                    if (!rId || idsAgregados.has(rId)) continue;
+
+                    const rutinaOriginal = rutinas.find(r => r.id === rId);
+                    if (rutinaOriginal) {
+                        if (nombresAgregados.has(rutinaOriginal.nombre)) continue;
+                        idsAgregados.add(rId);
+                        nombresAgregados.add(rutinaOriginal.nombre);
+
+                        proximas.push({
+                            ...rutinaOriginal,
+                            asignadoPor: 'Entrenador',
+                            diaCorto: esHoy ? 'Hoy' : diaCortoArr[diaSemanaIndex],
+                            esEjecutable: esHoy
+                        });
+                    }
+                }
+            }
+
+            if (proximas.length < 3 && rutinasDelEntrenado.length > 0) {
+                for (const rutina of rutinasDelEntrenado) {
+                    if (proximas.length >= 3) break;
+                    if (!idsAgregados.has(rutina.id) && !nombresAgregados.has(rutina.nombre)) {
+                        idsAgregados.add(rutina.id);
+                        nombresAgregados.add(rutina.nombre);
+                        proximas.push({
+                            ...rutina,
+                            asignadoPor: 'Entrenador',
+                            diaCorto: '',
+                            esEjecutable: false
+                        });
+                    }
+                }
+            }
+
+            return proximas;
+        });
+    }
+
+    /**
      * 💾 Guarda una rutina asignada
      */
     async save(rutinaAsignada: RutinaAsignada): Promise<void> {

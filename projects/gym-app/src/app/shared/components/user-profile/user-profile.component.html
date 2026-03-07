@@ -9,7 +9,9 @@
     
     <!-- IMAGEN DE FONDO -->
     <div class="absolute inset-0 z-0 pointer-events-none">
-      <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover object-[center_top]" alt="Background" />
+    <div class="absolute inset-0 z-0">
+      <img ngSrc="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop" fill priority class="object-cover object-[center_top]" alt="Background" />
+    </div>
       <div class="absolute inset-0 bg-linear-to-b from-black/40 via-black/80 to-black/95"></div>
       <div class="absolute inset-0 backdrop-blur-[2px]"></div>
     </div>
@@ -24,7 +26,9 @@
           <div class="relative group cursor-pointer" (click)="triggerFileInput()">
             <div class="w-20 h-20 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl text-white font-bold text-2xl shadow-xl overflow-hidden relative border-2 border-white/40">
               @if (user.photoURL) {
-              <img [src]="user.photoURL" class="w-full h-full object-cover relative z-10" />
+            <div class="w-full h-full relative">
+              <img [ngSrc]="user.photoURL || 'assets/images/test-foto.png'" fill class="object-cover relative z-10" alt="Foto de perfil" />
+            </div>
               } @else {
               {{ getIniciales(user.nombre) }}
               }

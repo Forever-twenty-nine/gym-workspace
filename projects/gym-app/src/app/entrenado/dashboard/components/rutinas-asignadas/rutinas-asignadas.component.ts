@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { 
   IonCard, 
   IonCardContent, 
@@ -20,7 +20,8 @@ import { barbellOutline, chevronForwardOutline, playOutline, calendarOutline } f
     IonCardContent, 
     IonIcon, 
     IonButton,
-    IonAvatar
+    IonAvatar,
+    NgOptimizedImage
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

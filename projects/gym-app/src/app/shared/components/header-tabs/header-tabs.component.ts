@@ -1,4 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { IonHeader, IonToolbar, IonAvatar, IonButton, IonIcon, IonBadge } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { notificationsOutline } from 'ionicons/icons';
@@ -9,7 +10,7 @@ import { Rol } from 'gym-library';
 @Component({
   selector: 'app-header-tabs',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonAvatar, IonButton, IonIcon, IonBadge],
+  imports: [IonHeader, IonToolbar, IonAvatar, IonButton, IonIcon, IonBadge, NgOptimizedImage],
   templateUrl: './header-tabs.component.html',
   styleUrls: ['./header-tabs.component.css']
 })
