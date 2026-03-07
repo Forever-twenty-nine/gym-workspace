@@ -13,7 +13,6 @@ import {
   IonCard,
   IonCardContent,
   IonIcon,
-  IonChip,
   IonAvatar,
   IonButton,
   IonBadge,
@@ -50,6 +49,7 @@ import { EntrenadorService, PlanLimitError } from '../../core/services/entrenado
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { Entrenado, Rutina, RutinaAsignada, User as LibraryUser } from 'gym-library';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 // Extendemos la interfaz User localmente para asegurar la existencia de photoURL
 export interface User extends LibraryUser {
@@ -66,11 +66,11 @@ export interface User extends LibraryUser {
     IonCard,
     IonCardContent,
     IonIcon,
-    IonChip,
     IonAvatar,
     IonButton,
     IonBadge,
-    FormsModule
+    FormsModule,
+    HeaderTabsComponent
   ],
 })
 export class DashboardPage implements OnInit {

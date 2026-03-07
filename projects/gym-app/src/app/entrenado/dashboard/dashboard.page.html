@@ -1,8 +1,4 @@
-<!-- <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Mi Dashboard</ion-title>
-  </ion-toolbar>
-</ion-header> -->
+<app-header-tabs></app-header-tabs>
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
@@ -12,36 +8,7 @@
     </ion-toolbar>
   </ion-header> -->
 
-  <!-- ENTRENADO -->
-  <section class="p-2 mb-4">
-    <div class="flex justify-between items-start">
-      <div class="flex items-center justify-center gap-2">
-        <!-- Foto -->
-        <ion-avatar class="w-12! h-12!">
-          <img [src]="currentUserSignal()?.photoURL || '../../../assets/images/test-foto.png'" alt="Foto de perfil"
-            class="object-cover w-full h-full">
-        </ion-avatar>
-        <div>
-          <!-- Nombre -->
-          <p class="gym-title-color text-base! font-bold! mb-0!">
-            Hola, {{ nombreEntrenado() }}
-          </p>
-          <!-- Plan -->
-          <ion-chip [outline]="true" class="px-3 py-0 border border-solid border-black/60 text-black">
-            Plan {{ tipoPlan().replace('Plan ', '') }}
-          </ion-chip>
 
-        </div>
-      </div>
-
-      <ion-button fill="clear" shape="round" class="p-0!">
-        <ion-icon name="notifications-outline" class="text-2xl gym-text-color"></ion-icon>
-        @if (invitacionesPendientes().length > 0) {
-        <ion-badge color="danger" class="absolute -top-1 -right-1">{{ invitacionesPendientes().length }}</ion-badge>
-        }
-      </ion-button>
-    </div>
-  </section>
 
   <!-- Invitaciones Pendientes - SIEMPRE VISIBLE EN LA PARTE SUPERIOR -->
   @if (invitacionesPendientes().length > 0) {

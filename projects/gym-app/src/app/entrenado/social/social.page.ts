@@ -1,8 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonIcon,
   IonSegment,
@@ -16,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { SocialCardComponent } from './components/social-card/social-card.component';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 @Component({
   selector: 'app-social',
@@ -23,9 +21,10 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader, IonToolbar, IonTitle, IonContent,
+    IonContent,
     IonIcon, IonSegment, IonSegmentButton, IonLabel,
-    SocialCardComponent
+    SocialCardComponent,
+    HeaderTabsComponent
   ],
   styleUrls: ['./social.page.css']
 })

@@ -1,14 +1,7 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
 
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonButton,
-  IonButtons,
-  IonIcon,
-  IonBackButton,
   IonModal,
   IonFooter
 } from '@ionic/angular/standalone';
@@ -38,6 +31,7 @@ import { Router, RouterModule } from '@angular/router';
 import { NavController } from '@ionic/angular/standalone';
 import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 
 @Component({
@@ -45,17 +39,11 @@ import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-sema
   templateUrl: './rutinas.page.html',
   standalone: true,
   imports: [
-    IonBackButton,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonButton,
-    IonButtons,
-    IonIcon,
     RouterModule,
     RutinaDetalleModalComponent,
-    RutinasSemanaComponent
+    RutinasSemanaComponent,
+    HeaderTabsComponent
   ],
 })
 export class RutinasPage implements OnInit {

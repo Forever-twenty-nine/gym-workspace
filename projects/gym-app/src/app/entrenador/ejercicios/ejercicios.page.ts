@@ -29,7 +29,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
-import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 @Component({
   selector: 'app-ejercicios',
@@ -55,7 +55,7 @@ import { HeaderEntrenadorComponent } from '../components/header-entrenador/heade
     IonInput,
     IonTextarea,
     IonText,
-    HeaderEntrenadorComponent
+    HeaderTabsComponent
   ],
   styles: [`
     .ejercicio-modal {

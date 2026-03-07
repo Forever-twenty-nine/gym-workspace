@@ -29,7 +29,7 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
-import { HeaderEntrenadorComponent } from '../components/header-entrenador/header-entrenador.component';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -40,7 +40,7 @@ import { HeaderEntrenadorComponent } from '../components/header-entrenador/heade
     IonCard,
     IonCardContent,
     IonIcon,
-    HeaderEntrenadorComponent
+    HeaderTabsComponent
   ],
 })
 export class DashboardPage implements OnInit {

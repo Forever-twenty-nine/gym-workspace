@@ -1,0 +1,293 @@
+<div class="user-profile-container text-white h-full flex flex-col p-4">
+  @if (isUploading()) {
+  <ion-progress-bar type="indeterminate" color="primary"></ion-progress-bar>
+  }
+
+  @if (currentUser(); as user) {
+  <!-- CONTENEDOR PRINCIPAL - Tarjeta Única -->
+  <div class="rounded-3xl shadow-2xl overflow-hidden relative flex-1 flex flex-col bg-black border border-white/20">
+    
+    <!-- IMAGEN DE FONDO -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+      <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1000&auto=format&fit=crop" class="w-full h-full object-cover object-[center_top]" alt="Background" />
+      <div class="absolute inset-0 bg-linear-to-b from-black/40 via-black/80 to-black/95"></div>
+      <div class="absolute inset-0 backdrop-blur-[2px]"></div>
+    </div>
+
+    <!-- CONTENIDO ELÉVADO -->
+    <div class="relative z-10 flex flex-col flex-1 h-full">
+      
+      <!-- HEADER -->
+      <div class="p-6 pb-4 border-b border-white/10 relative">
+        <div class="flex items-center gap-5">
+          <!-- Foto de perfil -->
+          <div class="relative group cursor-pointer" (click)="triggerFileInput()">
+            <div class="w-20 h-20 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl text-white font-bold text-2xl shadow-xl overflow-hidden relative border-2 border-white/40">
+              @if (user.photoURL) {
+              <img [src]="user.photoURL" class="w-full h-full object-cover relative z-10" />
+              } @else {
+              {{ getIniciales(user.nombre) }}
+              }
+              <div class="absolute inset-0 z-20 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <ion-icon name="camera-outline" class="text-white text-2xl"></ion-icon>
+              </div>
+              @if (isUploading()) {
+              <div class="absolute inset-0 z-30 bg-black/60 flex items-center justify-center">
+                <ion-spinner name="crescent" color="light"></ion-spinner>
+              </div>
+              }
+            </div>
+            <div class="absolute -bottom-1 -right-1 z-40 bg-primary text-white p-1.5 rounded-full shadow-lg border border-white/20">
+              <ion-icon name="camera-outline" class="text-xs block"></ion-icon>
+            </div>
+            <input type="file" id="shared-photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <h2 class="m-0 text-2xl font-bold tracking-tight text-white drop-shadow-md">{{ user.nombre }}</h2>
+            <ion-badge class="w-fit flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[10px] font-bold uppercase tracking-wider text-white border border-white/20 shadow-sm">
+              <ion-icon name="shield-outline"></ion-icon>
+              {{ getRoleDisplayName(user.role) }}
+            </ion-badge>
+          </div>
+        </div>
+
+        <!-- Botón de edición flotante -->
+        @if (viewMode() === 'info') {
+        <ion-button fill="clear" color="light" class="absolute top-4 right-4 m-0 p-0" (click)="toggleEditMode()">
+          <div class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-xl border border-white/20 shadow-lg text-white">
+            <span>Editar</span>
+            <ion-icon name="pencil-outline" class="text-xs ml-1"></ion-icon>
+          </div>
+        </ion-button>
+        } @else {
+        <ion-button fill="clear" color="light" class="absolute top-4 right-4 m-0 p-0" (click)="toggleEditMode()">
+          <div class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide bg-danger/80 px-3 py-1.5 rounded-full backdrop-blur-xl border border-white/20 shadow-lg text-white">
+            <span>Cancelar</span>
+            <ion-icon name="close-outline" class="text-xs ml-1"></ion-icon>
+          </div>
+        </ion-button>
+        }
+      </div>
+
+      <!-- Body section -->
+      <div class="flex-1 p-4 flex flex-col justify-between overflow-hidden">
+        
+        <!-- VISTA: INFORMACIÓN -->
+        @if (viewMode() === 'info') {
+        <div class="animate-fade-in h-full flex flex-col justify-between">
+          <div class="space-y-4">
+          <!-- Glass Card 1: Suscripción -->
+          <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
+            <h3 class="text-primary-foreground/70 text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
+              <ion-icon name="trophy-outline" class="text-lg"></ion-icon>
+              Suscripción y Plan
+            </h3>
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-medium opacity-80">Categoría Actual</span>
+              <span class="bg-primary px-3 py-1 rounded-lg text-xs font-bold shadow-lg uppercase tracking-wider text-white">{{ user.plan || 'free' }}</span>
+            </div>
+            
+            <div class="bg-black/20 rounded-xl p-4 border border-white/5">
+              @if (!user.plan || user.plan === 'free') {
+                @if (ultimasolicitud()?.estado === 'pendiente') {
+                <div class="flex flex-col items-center gap-2 py-2 text-center">
+                  <ion-spinner name="crescent" color="warning"></ion-spinner>
+                  <p class="text-warning font-bold text-sm">Solicitud Pendiente</p>
+                  <p class="text-xs opacity-70 leading-relaxed text-white">Estamos revisando tu petición Premium.</p>
+                </div>
+                } @else if (ultimasolicitud()?.estado === 'rechazada') {
+                <div class="flex flex-col items-center gap-2 py-2 text-center">
+                  <ion-icon name="alert-circle-outline" color="danger" class="text-3xl"></ion-icon>
+                  <p class="text-danger font-bold text-sm">Solicitud Rechazada</p>
+                  <p class="text-[11px] opacity-70 mb-2 italic">Motivo: {{ ultimasolicitud()?.motivoRechazo || 'No especificado' }}</p>
+                  <button class="bg-danger/20 text-danger border border-danger/50 px-4 py-1.5 rounded-lg text-xs font-bold" (click)="solicitarPremium()">Intentar de nuevo</button>
+                </div>
+                } @else {
+                <p class="text-xs opacity-70 mb-3 leading-relaxed tracking-wide text-white">
+                  {{ user.role === 'entrenador' ? 'Límites aplicados. Desbloquea más capacidad P.' : 'Accede a rutinas ilimitadas con Premium.' }}
+                </p>
+                <ion-button expand="block" color="primary" class="font-bold h-11 tracking-wide shadow-lg" style="--border-radius: 0.75rem;" (click)="solicitarPremium()">
+                  <ion-icon name="star-outline" slot="start"></ion-icon>
+                  Solicitar Acceso Premium
+                </ion-button>
+                }
+              } @else {
+              <div class="flex items-center gap-3 text-success font-bold">
+                <ion-icon name="checkmark-circle" class="text-2xl"></ion-icon>
+                <p class="text-sm">Premium Habilitado</p>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Glass Card 2: Personal -->
+          <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
+            <h3 class="text-primary-foreground/70 text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-2 border-b border-white/10 pb-3">
+              <ion-icon name="person-outline" class="text-lg"></ion-icon>
+              Detalles Personales
+            </h3>
+            
+            <div class="divide-y divide-white/5">
+              @if (user.email) {
+              <div class="py-3 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                  <ion-icon name="mail-outline" class="text-xl"></ion-icon>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold uppercase tracking-widest opacity-60">Email</span>
+                  <span class="block text-sm font-semibold">{{ user.email }}</span>
+                </div>
+              </div>
+              }
+
+              @if (user.gimnasioId) {
+              <div class="py-3 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                  <ion-icon name="fitness-outline" class="text-xl"></ion-icon>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold uppercase tracking-widest opacity-60">Centro</span>
+                  <span class="block text-sm font-semibold">{{ user.gimnasioId }}</span>
+                </div>
+              </div>
+              }
+
+              @if (user.role === 'entrenado') {
+              <div class="py-3 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-primary">
+                  <ion-icon name="trophy-outline" class="text-xl text-primary"></ion-icon>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold uppercase tracking-widest opacity-60">Objetivo</span>
+                  <span class="block text-sm font-semibold text-primary drop-shadow-sm">{{ currentEntrenado()?.objetivo || 'Sin definir' }}</span>
+                </div>
+              </div>
+              <div class="py-3 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-tertiary">
+                  <ion-icon name="stats-chart-outline" class="text-xl text-tertiary"></ion-icon>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-bold uppercase tracking-widest opacity-60">Nivel</span>
+                  <span class="block text-sm font-semibold text-tertiary drop-shadow-sm">{{ currentEntrenado()?.nivel || 'Sin definir' }}</span>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          </div>
+
+          <!-- Logout Button Container -->
+          <div class="py-3 mt-auto">
+            <ion-button expand="block" color="danger" class="font-bold h-12 tracking-wide shadow-lg" style="--border-radius: 0.75rem;" (click)="logout()">
+              <ion-icon name="log-out-outline" slot="start"></ion-icon>
+              Cerrar Sesión
+            </ion-button>
+          </div>
+        </div>
+        }
+
+        <!-- VISTA: EDICIÓN -->
+        @if (viewMode() === 'edit') {
+        <div class="animate-fade-in h-full flex flex-col justify-between" [formGroup]="editForm">
+          <div class="space-y-4">
+          
+          <!-- Edit Card -->
+          <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
+            <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4 border-b border-primary/20 pb-2">
+              <ion-icon name="pencil-outline" class="text-lg"></ion-icon>
+              Modificar Perfil
+            </h3>
+
+            <div class="space-y-4">
+              <div>
+                <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1">Nombre Completo</ion-label>
+                <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden flex items-center">
+                  <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="px-4 py-2 text-white w-full" maxlength="50"></ion-input>
+                </div>
+              </div>
+
+              @if (user.role === 'entrenado') {
+              <div>
+                <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1">Objetivo</ion-label>
+                <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
+                  <ion-select formControlName="objetivo" placeholder="Selecciona..." interface="popover" class="w-full text-white">
+                    @for (opcion of objetivoOptions; track opcion) {
+                    <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+                    }
+                  </ion-select>
+                </div>
+              </div>
+
+              <div>
+                <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1">Nivel</ion-label>
+                <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
+                  <ion-select formControlName="nivel" placeholder="Selecciona..." interface="popover" class="w-full text-white">
+                    @for (nivel of nivelOptions; track nivel) {
+                    <ion-select-option [value]="nivel">{{ nivel }}</ion-select-option>
+                    }
+                  </ion-select>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+
+          <!-- Recordatorios (Entrenado) -->
+          @if (user.role === 'entrenado') {
+          <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl">
+            <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                <ion-icon name="notifications-outline" class="text-lg"></ion-icon> Recordatorios
+              </h3>
+              <ion-toggle formControlName="recordatoriosEntrenamiento" color="primary"></ion-toggle>
+            </div>
+            
+            @if (editForm.get('recordatoriosEntrenamiento')?.value) {
+            <div class="animate-fade-in space-y-4">
+              <div class="flex items-center justify-between bg-black/30 p-3 rounded-xl border border-white/5">
+                <span class="text-xs font-bold uppercase tracking-widest opacity-80">Hora</span>
+                <ion-datetime-button datetime="timepicker" class="font-bold text-white"></ion-datetime-button>
+                <ion-modal [keepContentsMounted]="true">
+                  <ng-template>
+                    <ion-datetime id="timepicker" presentation="time" formControlName="horaRecordatorio"></ion-datetime>
+                  </ng-template>
+                </ion-modal>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-2">Días</span>
+                <div class="flex flex-wrap gap-2">
+                  @for (dia of diasSemana; track dia.n) {
+                  <ion-chip [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'light'"
+                    (click)="toggleDia(dia.n)" class="m-0 transition-transform active:scale-90 border border-white/20">
+                    <ion-label class="text-xs font-bold">{{ dia.label }}</ion-label>
+                  </ion-chip>
+                  }
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+          }
+          </div>
+
+          <!-- Guardar -->
+          <div class="py-3 mt-auto">
+            <ion-button expand="block" color="primary" class="font-bold h-12 tracking-wide shadow-lg" style="--border-radius: 0.75rem;" (click)="saveProfile()" [disabled]="editForm.invalid">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              Guardar Cambios
+            </ion-button>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div class="flex flex-col items-center justify-center h-[60vh] text-center px-4">
+    <ion-spinner name="crescent" color="primary" class="mb-4 w-10 h-10"></ion-spinner>
+    <p class="text-white opacity-70 font-medium mb-6">Cargando...</p>
+  </div>
+  }
+</div>

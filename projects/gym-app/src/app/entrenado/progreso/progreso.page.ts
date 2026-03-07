@@ -1,9 +1,6 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonText,
   AlertController
@@ -14,18 +11,17 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { ProgresoHistorialComponent } from './components/progreso-historial/progreso-historial.component';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
 @Component({
   selector: 'app-progreso',
   standalone: true,
   imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonText,
     ProgresoEstadisticasComponent,
-    ProgresoHistorialComponent
+    ProgresoHistorialComponent,
+    HeaderTabsComponent
   ],
   templateUrl: './progreso.page.html',
 })

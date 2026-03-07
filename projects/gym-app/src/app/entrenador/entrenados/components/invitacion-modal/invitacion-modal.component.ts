@@ -11,7 +11,7 @@ import {
     IonInput,
     IonTextarea
 } from '@ionic/angular/standalone';
-import { HeaderEntrenadorComponent } from '../../../components/header-entrenador/header-entrenador.component';
+import { HeaderTabsComponent } from '../../../../shared/components/header-tabs/header-tabs.component';
 
 @Component({
     selector: 'app-invitacion-modal',
@@ -28,7 +28,7 @@ import { HeaderEntrenadorComponent } from '../../../components/header-entrenador
         IonItem,
         IonInput,
         IonTextarea,
-        HeaderEntrenadorComponent
+        HeaderTabsComponent
     ]
 })
 export class InvitacionModalComponent {
