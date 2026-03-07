@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonProgressBar, IonIcon } from '@ionic/angular/standalone';
+import { IonProgressBar } from '@ionic/angular/standalone';
 
 @Component({
     selector: 'app-rutina-progreso-header',
     standalone: true,
-    imports: [CommonModule, IonProgressBar, IonIcon],
+    imports: [CommonModule, IonProgressBar],
     templateUrl: './rutina-progreso-header.component.html',
     styles: [`
     :host {
