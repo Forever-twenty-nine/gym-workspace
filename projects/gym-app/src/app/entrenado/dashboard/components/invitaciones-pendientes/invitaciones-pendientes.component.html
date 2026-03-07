@@ -1,0 +1,48 @@
+<section class="p-2 mb-4">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="font-heading text-lg font-semibold flex items-center gap-2 gym-title-color">
+      <ion-icon name="notifications-circle" class="text-xl"></ion-icon>
+      Invitaciones Pendientes
+      <ion-badge color="primary" class="ml-2">{{ invitaciones.length }}</ion-badge>
+    </h2>
+    <ion-button fill="clear" size="small" (click)="toggle.emit()">
+      <ion-icon [name]="mostrar ? 'chevron-up' : 'chevron-down'"></ion-icon>
+    </ion-button>
+  </div>
+
+  @if (mostrar) {
+  <div class="space-y-3">
+    @for (invitacion of invitaciones; track invitacion.id) {
+    <ion-card class="gym-box-primary shadow-md">
+      <ion-card-content class="p-4">
+        <div class="flex items-start gap-3">
+          <ion-avatar class="flex-shrink-0 !w-12 !h-12">
+            <img src="../../../../../assets/images/test-foto.png" alt="Entrenador">
+          </ion-avatar>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-heading font-semibold text-base mb-1 gym-title-color">{{ invitacion.titulo }}</h3>
+            <p class="text-sm text-gray-600 mb-2">{{ invitacion.mensaje }}</p>
+            @if (invitacion.datos.entrenadorNombre) {
+            <p class="text-xs gym-text-color font-medium">De: {{ invitacion.datos.entrenadorNombre }}</p>
+            }
+            <p class="text-xs text-gray-500 mt-1">{{ formatearFecha(invitacion.fechaCreacion) }}</p>
+          </div>
+          <div class="flex flex-col gap-2 flex-shrink-0">
+            <ion-button fill="solid" color="success" size="small" (click)="aceptar.emit(invitacion)"
+              class="min-w-[80px]">
+              <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+              Aceptar
+            </ion-button>
+            <ion-button fill="outline" color="danger" size="small" (click)="rechazar.emit(invitacion)"
+              class="min-w-[80px]">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Rechazar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+    }
+  </div>
+  }
+</section>

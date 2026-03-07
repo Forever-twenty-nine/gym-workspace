@@ -11,12 +11,8 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonCard,
-  IonCardContent,
-  IonIcon,
-  IonAvatar,
-  IonButton,
-  IonBadge,
-  ToastController
+  ToastController,
+  NavController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -51,6 +47,10 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { Entrenado, Rutina, RutinaAsignada, User as LibraryUser } from 'gym-library';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 
+import { InvitacionesPendientesComponent } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
+import { PlanPersonalizadoComponent } from './components/plan-personalizado/plan-personalizado.component';
+import { RutinasAsignadasComponent } from './components/rutinas-asignadas/rutinas-asignadas.component';
+
 // Extendemos la interfaz User localmente para asegurar la existencia de photoURL
 export interface User extends LibraryUser {
   photoURL?: string;
@@ -64,13 +64,11 @@ export interface User extends LibraryUser {
   imports: [
     IonContent,
     IonCard,
-    IonCardContent,
-    IonIcon,
-    IonAvatar,
-    IonButton,
-    IonBadge,
     FormsModule,
-    HeaderTabsComponent
+    HeaderTabsComponent,
+    InvitacionesPendientesComponent,
+    PlanPersonalizadoComponent,
+    RutinasAsignadasComponent
   ],
 })
 export class DashboardPage implements OnInit {
@@ -83,6 +81,7 @@ export class DashboardPage implements OnInit {
   private invitacionService = inject(InvitacionService);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
   private toastController = inject(ToastController);
+  private navCtrl = inject(NavController);
 
   // Signal para controlar la visibilidad de invitaciones
   mostrarInvitaciones = signal(true);
@@ -183,76 +182,96 @@ export class DashboardPage implements OnInit {
       asignaciones.some(asig => asig.rutinaId === rutina.id)
     );
 
+    // Si no hay asignaciones específicas, mostrar las rutinas del entrenado directamente
     if (asignaciones.length === 0) {
-      return rutinasDelEntrenado.map(rutina => ({
+      return rutinasDelEntrenado.slice(0, 3).map(rutina => ({
         ...rutina,
-        nombre: rutina.nombre,
         fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
         asignadoPor: 'Entrenador',
-        diaCorto: ''
-      })).slice(0, 3);
+        diaCorto: '',
+        esEjecutable: false
+      }));
     }
 
     const hoy = new Date();
     const proximas: any[] = [];
+    const idsAgregados = new Set<string>();
+    const nombresAgregados = new Set<string>(); // Tracker extra por seguridad
 
+    // Definición de días para comparación
+    const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    const diaCortoArr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    
+    // Diccionario de normalización
+    const diasSemanaMapa: Record<string, string> = {
+      'domingo': 'domingo', 'lunes': 'lunes', 'martes': 'martes',
+      'miercoles': 'miercoles', 'jueves': 'jueves', 'viernes': 'viernes',
+      'sabado': 'sabado', 'dom': 'domingo', 'lun': 'lunes', 'mar': 'martes',
+      'mie': 'miercoles', 'jue': 'jueves', 'vie': 'viernes', 'sab': 'sabado'
+    };
+
+    // Recorremos los próximos 7 días buscando rutinas
     for (let i = 0; i < 7 && proximas.length < 3; i++) {
-      const fecha = new Date(hoy);
-      fecha.setDate(hoy.getDate() + i);
-      const diaSemanaIndex = fecha.getDay();
-      const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
-      const diaCortoArr = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const fechaBucle = new Date(hoy);
+      fechaBucle.setDate(hoy.getDate() + i);
+      
+      const diaSemanaIndex = fechaBucle.getDay();
+      const diaSemanaNombre = diasSemanaSinTilde[diaSemanaIndex];
+      const esHoy = i === 0;
 
-      const diaSemanaNormalizado = diasSemanaSinTilde[diaSemanaIndex];
-      const diaCorto = diaCortoArr[diaSemanaIndex];
-      const esHoyCheck = fecha.toDateString() === hoy.toDateString();
-
-      const asignacionesDelDia = asignaciones.filter((asig: RutinaAsignada) => {
+      // Buscamos asignaciones para este día de la semana
+      const asignacionesDelDia = asignaciones.filter(asig => {
         if (!asig.diaSemana) return false;
-
-        // Normalización para comparación robusta
-        const diasSemanaMapa: Record<string, string> = {
-          'domingo': 'domingo', 'lunes': 'lunes', 'martes': 'martes',
-          'miercoles': 'miercoles', 'jueves': 'jueves', 'viernes': 'viernes',
-          'sabado': 'sabado', 'dom': 'domingo', 'lun': 'lunes',
-          'mar': 'martes', 'mie': 'miercoles', 'jue': 'jueves',
-          'vie': 'viernes', 'sab': 'sabado'
-        };
-
-        const asigDiaNormalizado = asig.diaSemana.toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .trim();
-
-        // Intentar mapear si es una abreviatura o nombre completo
-        const diaFinal = diasSemanaMapa[asigDiaNormalizado] || asigDiaNormalizado;
-
-        return diaFinal === diaSemanaNormalizado;
+        const diaAsigNorm = asig.diaSemana.toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        return (diasSemanaMapa[diaAsigNorm] || diaAsigNorm) === diaSemanaNombre;
       });
 
-      asignacionesDelDia.forEach((asig: RutinaAsignada) => {
-        const rutinaOriginal = rutinas.find(r => r.id === asig.rutinaId);
-        // Si la rutina pertenece al entrenado, la agregamos
-        if (rutinaOriginal && rutinasDelEntrenado.some(r => r.id === rutinaOriginal.id) && proximas.length < 3) {
+      // Procesamos las rutinas encontradas para este día
+      for (const asig of asignacionesDelDia) {
+        if (proximas.length >= 3) break;
+        
+        const rId = asig.rutinaId;
+        if (!rId) continue;
+
+        // Evitamos duplicados por ID (tracker global)
+        if (idsAgregados.has(rId)) continue;
+
+        const rutinaOriginal = rutinas.find(r => r.id === rId);
+        if (rutinaOriginal) {
+          // Evitamos duplicados por nombre también por si acaso (evita confusión visual)
+          if (nombresAgregados.has(rutinaOriginal.nombre)) continue;
+
+          idsAgregados.add(rId);
+          nombresAgregados.add(rutinaOriginal.nombre);
+          
           proximas.push({
             ...rutinaOriginal,
-            nombre: rutinaOriginal.nombre,
             fechaAsignada: this.formatearFecha(rutinaOriginal.fechaCreacion || new Date()),
             asignadoPor: 'Entrenador',
-            diaCorto: esHoyCheck ? 'Hoy' : diaCorto
+            diaCorto: esHoy ? 'Hoy' : diaCortoArr[diaSemanaIndex],
+            esEjecutable: esHoy
           });
         }
-      });
+      }
     }
 
-    if (proximas.length === 0 && rutinasDelEntrenado.length > 0) {
-      return rutinasDelEntrenado.map(rutina => ({
-        ...rutina,
-        nombre: rutina.nombre,
-        fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
-        asignadoPor: 'Entrenador',
-        diaCorto: ''
-      })).slice(0, 3);
+    // Si después del bucle de 7 días no tenemos 3 rutinas, rellenamos con las del entrenado que falten
+    if (proximas.length < 3 && rutinasDelEntrenado.length > 0) {
+      for (const rutina of rutinasDelEntrenado) {
+        if (proximas.length >= 3) break;
+        if (!idsAgregados.has(rutina.id) && !nombresAgregados.has(rutina.nombre)) {
+          idsAgregados.add(rutina.id);
+          nombresAgregados.add(rutina.nombre);
+          proximas.push({
+            ...rutina,
+            fechaAsignada: this.formatearFecha(rutina.fechaCreacion || new Date()),
+            asignadoPor: 'Entrenador',
+            diaCorto: '',
+            esEjecutable: false
+          });
+        }
+      }
     }
 
     return proximas;
@@ -369,5 +388,15 @@ export class DashboardPage implements OnInit {
     } catch (error) {
       console.error('Error al rechazar invitación:', error);
     }
+  }
+
+  verRutina(rutina: any) {
+    if (rutina?.id) {
+      this.navCtrl.navigateForward(`/rutina-progreso/${rutina.id}`);
+    }
+  }
+
+  verTodasLasRutinas() {
+    this.navCtrl.navigateForward('/entrenado-tabs/rutinas');
   }
 }

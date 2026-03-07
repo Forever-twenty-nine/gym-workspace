@@ -1,87 +1,133 @@
-<ion-card class="m-0 mb-6 rounded-2xl border-none bg-white dark:bg-[#1c1c1e] shadow-sm overflow-hidden">
-  <!-- Header: Perfil de Usuario con ion-item -->
-  <ion-item lines="none" class="--background-transparent pt-2">
-    <ion-avatar slot="start" class="w-12 h-12">
-      @if (userProfilePhoto()) {
-      <img [src]="userProfilePhoto()" alt="Foto de perfil" class="object-cover w-full h-full">
-      } @else {
-      <div class="w-full h-full bg-primary/10 flex items-center justify-center rounded-full">
-        <span class="text-primary font-bold text-base uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
-      </div>
-      }
-    </ion-avatar>
-    <ion-label class="ml-1">
-      <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ sesion.nombreUsuario || 'Usuario' }}</h3>
-      <p class="text-xs text-gray-500 uppercase tracking-wide mt-1">{{ formatearFecha(sesion.fechaInicio) }}</p>
-    </ion-label>
-    @if (!isOwnPost()) {
-    <ion-button slot="end" [fill]="isFollowing() ? 'outline' : 'solid'" [color]="isFollowing() ? 'medium' : 'primary'"
-      (click)="toggleFollow($event)" class="font-bold text-xs h-8 m-0 normal-case rounded-full">
-      <ion-icon slot="start" [name]="isFollowing() ? 'person-remove-outline' : 'person-add-outline'"></ion-icon>
-      {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
-    </ion-button>
-    }
-
-    <ion-button slot="end" fill="clear" color="medium" class="m-0">
-      <ion-icon name="ellipsis-vertical" slot="icon-only"></ion-icon>
-    </ion-button>
-  </ion-item>
-
-  <!-- Body: Contenido de la rutina -->
-  <ion-card-header class="pt-4 pb-0 px-5">
-    <ion-card-title class="text-2xl font-black tracking-tight text-gray-900 dark:text-white">
-      {{ sesion.rutinaResumen.nombre || 'Rutina' }}
-    </ion-card-title>
-  </ion-card-header>
-
-  <ion-card-content class="pt-5 pb-6 px-5">
-    <!-- Grid de Stats usando ion-grid -->
-    <ion-grid class="p-0">
-      <ion-row class="gap-y-3">
-        <ion-col size="6" class="ion-no-padding pr-2">
-          <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl flex items-center gap-4">
-            <ion-icon name="time-outline" color="warning" class="text-2xl"></ion-icon>
-            <div class="flex flex-col">
-              <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Tiempo</span>
-              <span class="text-base font-black dark:text-white">{{ redondearMinutos(sesion.duracion || 0) }} min</span>
+<div class="m-0 mb-6 rounded-[2.5rem] border border-white/50 dark:border-white/10 bg-white/70 dark:bg-[#121212]/80 backdrop-blur-3xl shadow-2xl shadow-black/5 overflow-hidden transition-all duration-300 hover:scale-[1.01] hover:shadow-black/10">
+  
+  <!-- Header: Perfil de Usuario -->
+  <div class="flex items-center justify-between p-7 pb-4">
+    <div class="flex items-center gap-4">
+      <div class="relative group">
+        <div class="w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-white dark:ring-white/5 shadow-2xl transition-transform group-hover:scale-105">
+          @if (userProfilePhoto()) {
+            <img [src]="userProfilePhoto()" alt="Foto de perfil" class="object-cover w-full h-full">
+          } @else {
+            <div class="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
+              <span class="text-primary font-black text-xl uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
             </div>
-          </div>
-        </ion-col>
-        <ion-col size="6" class="ion-no-padding pl-2">
-          <div class="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl flex items-center gap-4">
-            <ion-icon name="barbell-outline" color="primary" class="text-2xl"></ion-icon>
-            <div class="flex flex-col">
-              <span class="text-[10px] text-gray-400 uppercase font-black tracking-widest">Ejercicios</span>
-              <span class="text-base font-black dark:text-white">{{ sesion.rutinaResumen.ejercicios.length || 0
-                }}</span>
-            </div>
-          </div>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </ion-card-content>
-
-  <!-- Interaction Area -->
-  <div
-    class="px-5 py-3 flex items-center justify-between border-t border-gray-100 dark:border-white/5 bg-gray-50/30 dark:bg-black/10">
-    <ion-button fill="clear" size="default" (click)="toggleLike(); $event.stopPropagation()"
-      [color]="hasLiked() ? 'danger' : 'medium'" class="font-black">
-      <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'" class="text-xl"></ion-icon>
-      {{ likesCount() || 0 }}
-    </ion-button>
-
-    <div class="flex -space-x-2 pr-1">
-      @for (likeUid of (sesion.likes || []).slice(-3).reverse(); track likeUid) {
-      <ion-avatar class="w-8 h-8 border-2 border-white dark:border-[#1c1c1e] shadow-sm overflow-hidden bg-gray-100">
-        @if (getLikeUserPhoto(likeUid)) {
-        <img [src]="getLikeUserPhoto(likeUid)" alt="Usuario que dio like" class="object-cover w-full h-full">
-        } @else {
-        <div class="w-full h-full flex items-center justify-center bg-primary/20">
-          <span class="text-[10px] font-black text-primary">U</span>
+          }
         </div>
-        }
-      </ion-avatar>
+        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-4 border-white dark:border-[#121212] rounded-full shadow-lg"></div>
+      </div>
+      
+      <div class="flex flex-col">
+        <div class="flex items-center gap-2">
+          <h3 class="text-lg font-black text-gray-900 dark:text-white leading-none">
+            {{ sesion.nombreUsuario || 'Usuario' }}
+          </h3>
+          @if(isOwnPost()) {
+            <span class="text-[9px] bg-primary/10 text-primary px-2.5 py-1 rounded-full font-black uppercase tracking-widest border border-primary/20">Tú</span>
+          }
+        </div>
+        <p class="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
+          <ion-icon name="time" class="text-xs"></ion-icon>
+          {{ formatearFecha(sesion.fechaInicio) }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      @if (!isOwnPost()) {
+        <button 
+          (click)="toggleFollow($event)"
+          [class]="isFollowing() 
+            ? 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-white border-transparent' 
+            : 'bg-primary text-white shadow-lg shadow-primary/40 border-primary'"
+          class="px-5 py-2.5 rounded-2xl font-black text-xs transition-all active:scale-90 border flex items-center gap-2"
+        >
+          <ion-icon [name]="isFollowing() ? 'person-remove' : 'person-add'" class="text-base"></ion-icon>
+          {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
+        </button>
+      }
+      
+      @if (isOwnPost()) {
+        <button 
+          (click)="presentOptions($event)"
+          class="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 dark:bg-white/5 text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-white/10"
+        >
+          <ion-icon name="ellipsis-vertical" class="text-xl"></ion-icon>
+        </button>
       }
     </div>
   </div>
-</ion-card>
+
+  <!-- Body: Contenido de la rutina -->
+  <div class="px-7 py-4">
+    <div class="mb-8">
+      <h2 class="text-3xl font-black tracking-tighter text-gray-900 dark:text-white leading-[0.95] mb-2">
+        {{ sesion.rutinaResumen.nombre || 'Entrenamiento' }}
+      </h2>
+      <div class="h-1.5 w-12 bg-primary rounded-full"></div>
+    </div>
+
+    <!-- Grid de Stats con diseño premium -->
+    <div class="grid grid-cols-2 gap-5">
+      <div class="bg-gray-50 dark:bg-white/5 p-6 rounded-[2.5rem] border border-white/50 dark:border-white/5 flex flex-col items-center text-center gap-2 transition-transform hover:translate-y-[-4px]">
+        <div class="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center mb-1">
+          <ion-icon name="time" class="text-2xl text-warning"></ion-icon>
+        </div>
+        <div>
+          <span class="block text-[9px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-[0.25em] mb-1">Duración</span>
+          <span class="text-2xl font-black dark:text-white tabular-nums">{{ redondearMinutos(sesion.duracion || 0) }} <span class="text-sm font-bold opacity-40">m</span></span>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 dark:bg-white/5 p-6 rounded-[2.5rem] border border-white/50 dark:border-white/5 flex flex-col items-center text-center gap-2 transition-transform hover:translate-y-[-4px]">
+        <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-1">
+          <ion-icon name="barbell" class="text-2xl text-primary"></ion-icon>
+        </div>
+        <div>
+          <span class="block text-[9px] text-gray-400 dark:text-gray-500 uppercase font-black tracking-[0.25em] mb-1">Ejercicios</span>
+          <span class="text-2xl font-black dark:text-white tabular-nums">{{ sesion.rutinaResumen.ejercicios.length || 0 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interaction Area -->
+  <div class="px-8 py-6 flex items-center justify-between mt-4 bg-gray-50/50 dark:bg-white/5 border-t border-white dark:border-white/5">
+    <button 
+      (click)="toggleLike(); $event.stopPropagation()"
+      class="flex items-center gap-3 transition-transform active:scale-95 group"
+    >
+      <div 
+        [class]="hasLiked() ? 'bg-danger text-white shadow-lg shadow-danger/40 scale-110' : 'bg-white dark:bg-white/10 text-gray-400 dark:text-gray-500'"
+        class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm border border-transparent dark:border-white/5"
+      >
+        <ion-icon [name]="hasLiked() ? 'heart' : 'heart-outline'" class="text-2xl transition-transform group-hover:scale-110"></ion-icon>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-black text-lg dark:text-white leading-none">{{ likesCount() || 0 }}</span>
+        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Kudos</span>
+      </div>
+    </button>
+
+    <div class="flex flex-col items-end gap-2">
+      <div class="flex -space-x-3 items-center">
+        @for (likeUid of (sesion.likes || []).slice(-3).reverse(); track likeUid) {
+          <div class="w-10 h-10 rounded-2xl border-4 border-white dark:border-[#121212] shadow-xl overflow-hidden bg-gray-200 transition-transform hover:translate-y-[-4px] hover:z-10 relative">
+            @if (getLikeUserPhoto(likeUid)) {
+              <img [src]="getLikeUserPhoto(likeUid)" alt="Usuario que dio like" class="object-cover w-full h-full">
+            } @else {
+              <div class="w-full h-full flex items-center justify-center bg-primary/20">
+                <span class="text-xs font-black text-primary">U</span>
+              </div>
+            }
+          </div>
+        }
+        @if (likesCount() > 3) {
+          <div class="w-10 h-10 rounded-2xl border-4 border-white dark:border-[#121212] bg-gray-900 flex items-center justify-center shadow-xl z-20">
+            <span class="text-[10px] font-black text-white">+{{ likesCount() - 3 }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,98 @@
+<section class="p-2 mt-3 flex justify-between items-center">
+  <h2 class="font-heading text-lg font-semibold flex justify-between items-center text-white">
+    Rutinas asignadas
+  </h2>
+  <ion-button fill="clear" size="small" class="text-white/80" (click)="verTodas.emit()">
+    Ver todas
+  </ion-button>
+</section>
+
+@if (rutinas.length > 0) {
+<!-- Vistazo de Rutinas -->
+<div class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar ms-2 me-2 -mx-2 ps-2 pe-2">
+  @for (rutina of rutinas; track rutina.id || rutina.nombre) {
+  <ion-card 
+    class="rutina-card !h-56 w-[280px] snap-center shrink-0 !m-0 relative shadow-lg !border-0 overflow-hidden active:scale-[0.98] transition-all cursor-pointer"
+    [class.opacity-50]="!rutina.esEjecutable"
+    (click)="rutina.esEjecutable ? verDetalle.emit(rutina) : null">
+    
+    <!-- Background Gradient (different for active/inactive) -->
+    <div 
+      class="absolute inset-0 z-0 transition-opacity"
+      [className]="rutina.esEjecutable 
+        ? 'absolute inset-0 bg-gradient-to-br from-primary/80 via-primary/40 to-black/60 z-0' 
+        : 'absolute inset-0 bg-gradient-to-br from-gray-600/60 to-black/80 z-0'">
+    </div>
+    
+    <ion-card-content class="!flex !flex-col !justify-between !h-full relative z-10 !p-5">
+      <div class="">
+        @if (rutina.esEjecutable) {
+        <span
+          class="bg-primary/90 text-white text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block shadow-sm">
+          EJECUTAR HOY
+        </span>
+        } @else if (rutina.diaCorto) {
+        <span
+          class="bg-white/20 backdrop-blur-md text-white/90 text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block border border-white/30">
+          {{ rutina.diaCorto }}
+        </span>
+        } @else {
+        <span
+          class="bg-black/30 backdrop-blur-md text-white/90 text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block border border-white/10">
+          {{ rutina.fechaAsignada }}
+        </span>
+        }
+
+        <p class="font-heading text-white !font-bold !text-2xl line-clamp-2 leading-tight drop-shadow-md">
+          {{ rutina.nombre }}
+        </p>
+
+        @if (rutina.descripcion) {
+        <p class="text-white/80 !text-sm mt-2 line-clamp-2 leading-snug">
+          {{ rutina.descripcion }}
+        </p>
+        }
+      </div>
+
+      <div class="flex gap-4 items-center mt-auto pt-3">
+        <div class="flex gap-1.5 items-center">
+          <ion-icon name="barbell-outline" class="text-white/90 text-lg"></ion-icon>
+          <p class="text-white/90 text-sm font-medium">{{ rutina.ejerciciosIds?.length || 0 }} Ejercicios</p>
+        </div>
+      </div>
+
+      <div
+        class="absolute bottom-4 right-4 bg-white/20 rounded-full p-2 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg transition-transform active:scale-90">
+        <ion-icon [name]="rutina.esEjecutable ? 'play-outline' : 'calendar-outline'" class="!text-white !text-xl"></ion-icon>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  }
+</div>
+} @else {
+<!-- Rutina sin asignar -->
+<ion-card class="bg-white/10 backdrop-blur-md border border-white/20 shadow-none text-white p-1">
+  <ion-card-content class="ion-padding text-center">
+    <ion-icon name="barbell-outline" class="text-4xl mb-2 opacity-50"></ion-icon>
+    <p class="font-heading !font-bold !text-xl !my-2">
+      No tienes rutinas asignadas
+    </p>
+    @if (entrenador) {
+    <p class="text-white/70">Tu entrenador {{ entrenador.nombre || entrenador.email || 'Entrenador' }} te asignará
+      rutinas próximamente.</p>
+    <div class="mt-4 flex items-center justify-center gap-3">
+      <ion-avatar class="!w-10 !h-10 border-2 border-primary">
+        <img [src]="entrenador.photoURL || '../../../../../assets/images/test-foto.png'" alt="Entrenador"
+          class="object-cover w-full h-full">
+      </ion-avatar>
+      <div class="text-left">
+        <p class="text-sm font-semibold">{{ entrenador.nombre || 'Entrenador' }}</p>
+        <p class="text-xs text-white/50">{{ entrenador.email }}</p>
+      </div>
+    </div>
+    } @else {
+    <p class="text-white/70">Busca un entrenador para que te asigne rutinas personalizadas.</p>
+    }
+  </ion-card-content>
+</ion-card>
+}

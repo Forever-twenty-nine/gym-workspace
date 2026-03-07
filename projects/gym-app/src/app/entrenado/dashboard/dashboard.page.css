@@ -1,15 +1,1 @@
-/* Estilos para la tarjeta de rutina */
-.rutina-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: url('../../../assets/images/test-gym-1.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: brightness(0.6);
-  z-index: 0;
-}
+/* Estilos removidos en favor de componentes y variables globales */

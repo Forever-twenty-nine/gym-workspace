@@ -1,10 +1,16 @@
 <app-header-tabs></app-header-tabs>
 
-<ion-content class="bg-gray-50 dark:bg-black">
-  <div class="max-w-md mx-auto pt-4 pb-20 px-4 animate-fade-in">
-    <!-- Tabs de Segmento -->
+<ion-content class="bg-gray-100 dark:bg-black">
+  <!-- Imagen de fondo premium -->
+  <div class="fixed inset-0 z-0 bg-cover bg-center pointer-events-none opacity-40 dark:opacity-30"
+    style="background-image: url('assets/images/gym-social-bg.png');">
+    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-gray-100/10 dark:from-black/40 dark:to-black/60"></div>
+  </div>
+
+  <div class="relative z-10 max-w-md mx-auto pt-4 pb-20 px-4 animate-fade-in">
+    <!-- Tabs de Segmento con Glassmorphism -->
     <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
-      class="mb-6 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+      class="mb-6 rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
       <ion-segment-button value="para-ti">
         <ion-label class="font-bold text-xs uppercase tracking-wider">Para ti</ion-label>
       </ion-segment-button>
@@ -15,24 +21,33 @@
 
     <!-- Listado de Sesiones -->
     @if (filteredFeed().length === 0) {
-    <div class="flex flex-col items-center justify-center py-24 text-center">
-      <div class="w-24 h-24 bg-gray-100 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-        <ion-icon name="people-outline" class="text-4xl text-gray-300 dark:text-gray-600"></ion-icon>
+    <div
+      class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
+      <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
+        <ion-icon name="people-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
       </div>
       <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
         {{ selectedTab() === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
       </h3>
-      <p class="text-sm font-medium text-gray-500 px-10">
+      <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
         {{ selectedTab() === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas
         para ver su actividad aquí.' }}
       </p>
     </div>
     } @else {
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-6">
       @for (sesion of filteredFeed(); track sesion.id) {
-      <app-social-card [sesion]="sesion"></app-social-card>
+        <app-social-card [sesion]="sesion"></app-social-card>
       }
     </div>
+
+    <!-- Scroll Infinito -->
+    @if (hasMoreItems()) {
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más actividades...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+    }
     }
   </div>
 </ion-content>

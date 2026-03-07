@@ -1,30 +1,20 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  IonCard,
-  IonCardContent,
-  IonAvatar,
   IonIcon,
-  IonButton,
-  IonCardHeader,
-  IonItem,
-  IonLabel,
-  IonCardTitle,
-  IonGrid,
-  IonRow,
-  IonCol
+  ActionSheetController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  barbellOutline,
-  timeOutline,
-  calendarOutline,
-  checkmark,
+  barbell,
+  time,
   heart,
   heartOutline,
   ellipsisVertical,
-  personAddOutline,
-  personRemoveOutline
+  personAdd,
+  personRemove,
+  trash,
+  eyeOffOutline
 } from 'ionicons/icons';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -36,18 +26,7 @@ import { EntrenadoService } from '../../../../core/services/entrenado.service';
   standalone: true,
   imports: [
     CommonModule,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonItem,
-    IonLabel,
-    IonAvatar,
-    IonIcon,
-    IonButton,
-    IonGrid,
-    IonRow,
-    IonCol
+    IonIcon
   ],
   templateUrl: './social-card.component.html'
 })
@@ -66,6 +45,7 @@ export class SocialCardComponent {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly entrenadoService = inject(EntrenadoService);
+  private readonly actionSheetCtrl = inject(ActionSheetController);
 
   // Perfil del usuario actual para los likes
   currentUser = this.authService.currentUser;
@@ -121,15 +101,15 @@ export class SocialCardComponent {
 
   constructor() {
     addIcons({
-      barbellOutline,
-      timeOutline,
-      calendarOutline,
-      checkmark,
+      barbell,
+      time,
       heart,
       heartOutline,
       ellipsisVertical,
-      personAddOutline,
-      personRemoveOutline
+      personAdd,
+      personRemove,
+      trash,
+      eyeOffOutline
     });
   }
 
@@ -179,6 +159,65 @@ export class SocialCardComponent {
       }
     } catch (err) {
       console.error('❌ Error al cambiar estado de seguimiento:', err);
+    }
+  }
+
+  /**
+   * Muestra las opciones de gestión para la propia publicación
+   */
+  async presentOptions(event: Event) {
+    event.stopPropagation();
+
+    // Solo mostrar opciones de gestión si es mi propio post
+    if (!this.isOwnPost()) {
+      // Aquí podrías mostrar opciones para otros (Reportar, etc.) en el futuro
+      return;
+    }
+
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Gestionar Actividad',
+      cssClass: 'premium-action-sheet',
+      buttons: [
+        {
+          text: 'Dejar de compartir',
+          icon: 'eye-off-outline',
+          handler: () => {
+            this.unsharePost();
+          }
+        },
+        {
+          text: 'Eliminar actividad',
+          role: 'destructive',
+          icon: 'trash',
+          handler: () => {
+            this.deletePost();
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  private async unsharePost() {
+    try {
+      await this.sesionService.setCompartida(this.sesion.id, false);
+      // Opcional: Notificar éxito o cerrar modal si aplica
+    } catch (err) {
+      console.error('❌ Error al dejar de compartir:', err);
+    }
+  }
+
+  private async deletePost() {
+    try {
+      await this.sesionService.eliminarSesion(this.sesion.id);
+      // La sesión se eliminará de Firestore y el onSnapshot del feed la quitará de la lista
+    } catch (err) {
+      console.error('❌ Error al eliminar sesión:', err);
     }
   }
 
