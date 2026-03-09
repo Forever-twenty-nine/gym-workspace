@@ -28,11 +28,6 @@ export const routes: Routes = [
           import('../ejercicios/ejercicios.page').then((m) => m.EjerciciosPage),
       },
       {
-        path: 'perfil',
-        loadComponent: () =>
-          import('../perfil/perfil.page').then((m) => m.PerfilPage), 
-      },
-      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

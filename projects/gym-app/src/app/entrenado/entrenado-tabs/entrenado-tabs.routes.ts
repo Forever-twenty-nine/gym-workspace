@@ -27,11 +27,6 @@ export const routes: Routes = [
           import('../progreso/progreso.page').then((m) => m.ProgresoPage),
       },
       {
-        path: 'perfil',
-        loadComponent: () =>
-          import('../perfil/perfil.page').then((m) => m.PerfilPage),
-      },
-      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

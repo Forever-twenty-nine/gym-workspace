@@ -2,15 +2,17 @@ import { Component, inject, OnInit, effect, Injector } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { AppConfigurationService } from './core/services/app-configuration.service';
 import { AuthService } from './core/services/auth.service';
+import { ProfileComponent } from './shared/components/header-tabs/components/profile/profile.component';
+import { NotificationsComponent } from './shared/components/header-tabs/components/notifications/notifications.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  imports: [IonApp, IonRouterOutlet, ProfileComponent, NotificationsComponent],
 })
 export class AppComponent implements OnInit {
   private appConfig = inject(AppConfigurationService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private injector = inject(Injector);
 
   constructor() { }

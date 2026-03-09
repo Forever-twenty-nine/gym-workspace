@@ -1,22 +1,21 @@
 <ion-header [translucent]="true" class="ion-no-border">
     <ion-toolbar class="px-2 pt-2">
-        <div class="flex justify-between items-center w-full px-2">
-            <!-- Foto de perfil - Izquierda -->
-            <ion-avatar class="w-12 h-12 border-2 border-primary/20 shadow-sm overflow-hidden relative">
-                <img [ngSrc]="currentUser()?.photoURL || 'assets/images/test-foto.png'" fill priority alt="Perfil"
-                    class="object-cover">
-            </ion-avatar>
+        <ion-buttons slot="start">
+            <ion-menu-button menu="profile-menu"></ion-menu-button>
+        </ion-buttons>
 
-            <!-- Campanita - Derecha -->
-            <ion-button fill="clear" color="dark" class="relative notification-btn">
-                <ion-icon name="notifications-outline" slot="icon-only" class="text-2xl gym-title-color"></ion-icon>
+        <ion-title class="text-center uppercase tracking-widest font-bold text-lg">Gym App</ion-title>
+
+        <ion-buttons slot="end">
+            <ion-menu-button menu="notifications-menu" class="relative">
+                <ion-icon name="notifications-outline"></ion-icon>
                 @if (notificacionesCount() > 0) {
                 <ion-badge color="danger"
-                    class="absolute -top-1 -right-1 min-w-[20px] h-[20px] flex items-center justify-center text-[10px] p-0 rounded-full border-2 border-white">
+                    class="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[9px] p-0 rounded-full border-2 border-white">
                     {{ notificacionesCount() }}
                 </ion-badge>
                 }
-            </ion-button>
-        </div>
+            </ion-menu-button>
+        </ion-buttons>
     </ion-toolbar>
 </ion-header>

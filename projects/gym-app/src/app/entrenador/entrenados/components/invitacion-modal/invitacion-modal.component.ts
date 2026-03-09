@@ -1,8 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
-import { IonHeader, IonContent, IonModal, IonButton, IonIcon, IonItem, IonInput, IonTextarea, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
-import { HeaderTabsComponent } from '../../../../shared/components/header-tabs/header-tabs.component';
+import { IonHeader, IonContent, IonModal, IonButton, IonItem, IonInput, IonTextarea, IonToolbar, IonButtons, IonTitle } from '@ionic/angular/standalone';
 
 @Component({
     selector: 'app-invitacion-modal',

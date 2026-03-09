@@ -1,0 +1,88 @@
+@if (user) {
+
+<!-- Glass Card: Información -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title class="text-center font-bold py-2">
+      Detalles Personales
+    </ion-card-title>
+  </ion-card-header>
+
+  <ion-list class="bg-transparent" lines="full">
+    <!-- Rol -->
+    <ion-item color="none">
+      <ion-icon slot="start" name="shield-outline"></ion-icon>
+      <ion-label slot="end">
+        <h3>{{ user.role === 'entrenador' ?
+          'Entrenador' : 'Entrenado' }}</h3>
+        <p>Rol</p>
+      </ion-label>
+    </ion-item>
+    <!-- Plan Actual -->
+    <ion-item color="none">
+      <ion-icon slot="start" name="trophy-outline"></ion-icon>
+      <ion-label slot="end">
+        <h3>{{ user.plan || 'Free' }}</h3>
+        <p>Plan Actual</p>
+      </ion-label>
+    </ion-item>
+    <!-- Email -->
+    @if (user.email) {
+    <ion-item color="none">
+      <ion-icon slot="start" name="mail-outline"></ion-icon>
+      <ion-label slot="end">
+        <p>{{ user.email }}</p>
+        <h3>Email</h3>
+      </ion-label>
+    </ion-item>
+    }
+
+    @if (user.gimnasioId) {
+    <ion-item color="none">
+      <ion-icon slot="start" name="fitness-outline"></ion-icon>
+      <ion-label slot="end">
+        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Centro</h3>
+        <p class="text-xs font-semibold text-white m-0 truncate">{{ user.gimnasioId }}</p>
+      </ion-label>
+    </ion-item>
+    }
+
+    @if (user.role === 'entrenado') {
+    <ion-item class="bg-transparent" color="none">
+      <div slot="start" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-primary my-2">
+        <ion-icon name="trophy-outline" class="text-xl text-primary"></ion-icon>
+      </div>
+      <ion-label>
+        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Objetivo</h3>
+        <p class="text-xs font-semibold text-primary m-0 truncate">{{ entrenadoData?.objetivo || 'Sin definir' }}</p>
+      </ion-label>
+    </ion-item>
+    <ion-item class="bg-transparent" color="none">
+      <div slot="start" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-tertiary my-2">
+        <ion-icon name="stats-chart-outline" class="text-xl text-tertiary"></ion-icon>
+      </div>
+      <ion-label>
+        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Nivel</h3>
+        <p class="text-xs font-semibold text-tertiary m-0 truncate">{{ entrenadoData?.nivel || 'Sin definir' }}</p>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+
+  <div class="flex justify-end items-center border-t border-white/10 pt-3 pb-3 px-4">
+    @if (!user.plan || user.plan === 'free') {
+    @if (ultimasolicitud?.estado === 'pendiente') {
+    <ion-button fill="clear" color="warning" disabled size="small">Pendiente</ion-button>
+    } @else if (ultimasolicitud?.estado === 'rechazada') {
+    <ion-button fill="outline" color="danger" size="small" (click)="openPremiumModal()">Reintentar</ion-button>
+    } @else {
+    <ion-button color="primary" class="font-bold tracking-wide" size="small" (click)="openPremiumModal()" fill="solid">
+      <ion-icon name="trophy-outline" slot="start"></ion-icon>
+      Mejorar Plan
+    </ion-button>
+    }
+    } @else {
+    <ion-button fill="clear" color="success" disabled size="small">Activo</ion-button>
+    }
+  </div>
+</ion-card>}

@@ -1,0 +1,108 @@
+<!-- Modal de Edición -->
+<ion-modal [isOpen]="isOpen" (didDismiss)="close()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar color="dark">
+        <ion-buttons slot="start">
+          <ion-button (click)="close()">Cancelar</ion-button>
+        </ion-buttons>
+        <ion-title class="text-center font-bold">Editar Perfil</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="saveProfile()" [disabled]="editForm.invalid" color="primary" class="font-bold">Guardar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding" color="dark">
+      @if (user) {
+      <div class="max-w-md mx-auto h-full flex flex-col pt-4" [formGroup]="editForm">
+        
+        <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-xl mb-6">
+          <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4 border-b border-primary/20 pb-2">
+            <ion-icon name="person-outline" class="text-lg"></ion-icon>
+            Información General
+          </h3>
+
+          <div class="space-y-4">
+            <div>
+              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Nombre Completo</ion-label>
+              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden flex items-center">
+                <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="px-4 py-2 text-white w-full" maxlength="50"></ion-input>
+              </div>
+            </div>
+
+            @if (user.role === 'entrenado') {
+            <div>
+              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Objetivo</ion-label>
+              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
+                <ion-select formControlName="objetivo" placeholder="Selecciona..." interface="action-sheet" class="w-full text-white">
+                  @for (opcion of objetivoOptions; track opcion) {
+                  <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+                  }
+                </ion-select>
+              </div>
+            </div>
+
+            <div>
+              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Nivel</ion-label>
+              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
+                <ion-select formControlName="nivel" placeholder="Selecciona..." interface="action-sheet" class="w-full text-white">
+                  @for (nivel of nivelOptions; track nivel) {
+                  <ion-select-option [value]="nivel">{{ nivel }}</ion-select-option>
+                  }
+                </ion-select>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+
+        @if (user.role === 'entrenado') {
+        <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-xl mb-6">
+          <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+            <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+              <ion-icon name="notifications-outline" class="text-lg"></ion-icon> Recordatorios
+            </h3>
+            <ion-toggle formControlName="recordatoriosEntrenamiento" color="primary"></ion-toggle>
+          </div>
+          
+          @if (editForm.get('recordatoriosEntrenamiento')?.value) {
+          <div class="animate-fade-in space-y-4 pt-2">
+            <div class="flex items-center justify-between bg-black/30 p-3 rounded-xl border border-white/5 text-white">
+              <span class="text-xs font-bold uppercase tracking-widest opacity-80">Hora</span>
+              <ion-datetime-button datetime="timepicker_modal" class="font-bold"></ion-datetime-button>
+              <ion-modal [keepContentsMounted]="true">
+                <ng-template>
+                  <ion-datetime id="timepicker_modal" presentation="time" formControlName="horaRecordatorio"></ion-datetime>
+                </ng-template>
+              </ion-modal>
+            </div>
+
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-2 text-white">Días Requeridos</span>
+              <div class="flex flex-wrap gap-2">
+                @for (dia of diasSemana; track dia.n) {
+                <ion-chip [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'"
+                  (click)="toggleDia(dia.n)" class="m-0 transition-transform active:scale-95 border border-white/20 px-2 py-1">
+                  <ion-label class="text-xs font-bold">{{ dia.label }}</ion-label>
+                </ion-chip>
+                }
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+      </div>
+      }
+    </ion-content>
+    <ion-footer class="ion-no-border" color="dark">
+      <ion-toolbar color="dark" class="px-4 pb-4 pt-2">
+        <ion-button expand="block" color="danger" fill="outline" class="font-bold h-12 tracking-wide border-2" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar Sesión
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ng-template>
+</ion-modal>
