@@ -33,6 +33,16 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "public",
+                "output": "."
+              },
+              {
+                "glob": "icons/*.png",
+                "input": "public",
+                "output": "."
               }
             ],
             "styles": [
@@ -68,7 +78,8 @@
                   "with": "src/environments/environment.secrets.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

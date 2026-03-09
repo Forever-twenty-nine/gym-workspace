@@ -26,6 +26,7 @@
     "gym-admin:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
     "gym-app:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-app:serve\" --names \"emulator,app\" --prefix-colors \"green,magenta\"",
     "db:seed": "tsx scripts/seed-data.ts",
+    "deploy": "npm run gym-admin:build && npm run gym-app:build && firebase deploy",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
   "prettier": {

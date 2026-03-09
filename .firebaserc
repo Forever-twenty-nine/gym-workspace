@@ -1,5 +1,18 @@
 {
   "projects": {
-    "default": "default-project"
-  }
+    "default": "gym-app-81f5c"
+  },
+  "targets": {
+    "gym-app-81f5c": {
+      "hosting": {
+        "gym-app": [
+          "gym-app-81f5c"
+        ],
+        "gym-admin": [
+          "gym-admin-81f5c"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

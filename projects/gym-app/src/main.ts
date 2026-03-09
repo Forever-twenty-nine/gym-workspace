@@ -6,7 +6,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { applyInitialTheme } from 'theme';
-import { InjectionToken } from '@angular/core';
+import { InjectionToken, isDevMode } from '@angular/core';
 import { environment } from './environments/environment';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
@@ -14,6 +14,7 @@ import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 
 import { FIRESTORE, AUTH, STORAGE } from './app/core/firebase.tokens';
+import { provideServiceWorker } from '@angular/service-worker';
 
 // Inicializar Firebase nativo
 const firebaseApp = initializeApp(environment.firebase);
@@ -42,7 +43,10 @@ bootstrapApplication(AppComponent, {
     // Proveedores de Firebase nativo usando Tokens
     { provide: FIRESTORE, useValue: firestore },
     { provide: AUTH, useValue: auth },
-    { provide: STORAGE, useValue: storage },
+    { provide: STORAGE, useValue: storage }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
 
   ],
 });
