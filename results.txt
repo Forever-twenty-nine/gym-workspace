@@ -1,5 +1,0 @@
-﻿158 : F:\repositorios\gym-workspace\projects\gym-app\src\app\entrenado\dashboard\dashboard.page.ts
-180 : F:\repositorios\gym-workspace\projects\gym-app\src\app\entrenado\progreso\components\progreso-historial-detalle\progreso-historial-detalle.component.ts
-461 : F:\repositorios\gym-workspace\projects\gym-app\src\app\entrenado\rutina-progreso\rutina-progreso.page.ts
-236 : F:\repositorios\gym-workspace\projects\gym-app\src\app\entrenado\rutinas\rutinas.page.ts
-245 : F:\repositorios\gym-workspace\projects\gym-app\src\app\entrenado\social\components\social-card\social-card.component.ts

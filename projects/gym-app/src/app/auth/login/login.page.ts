@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -6,13 +6,15 @@ import {
   IonContent,
   IonInput,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonCheckbox
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
 import { Rol } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
+import { StorageService } from '../../core/services/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -23,20 +25,36 @@ import { UserService } from '../../core/services/user.service';
     IonInput,
     IonButton,
     IonIcon,
+    IonCheckbox,
     FormsModule
   ]
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
 
   readonly email = signal('');
   readonly password = signal('');
+  readonly rememberMe = signal(false);
   readonly errorMessage = signal('');
 
   constructor() {
     addIcons({ arrowBackOutline, personOutline, lockClosedOutline });
+  }
+
+  async ngOnInit() {
+    const saved = await this.storageService.get('remembered_credentials') as any;
+    if (saved) {
+      this.email.set(saved.email);
+      this.password.set(saved.password);
+      this.rememberMe.set(true);
+    }
+  }
+
+  toggleRememberMe(checked: boolean) {
+    this.rememberMe.set(checked);
   }
 
   goToRegister() {
@@ -59,6 +77,15 @@ export class LoginPage {
     try {
       const success = await this.authService.loginWithEmail(this.email(), this.password());
       if (success) {
+        if (this.rememberMe()) {
+          await this.storageService.set('remembered_credentials', {
+            email: this.email(),
+            password: this.password()
+          });
+        } else {
+          await this.storageService.remove('remembered_credentials');
+        }
+
         const user = this.authService.currentUser();
         if (user) {
           this.redirectToRolePage(user.role);

@@ -1,7 +1,21 @@
 <ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()">
     <ng-template>
         <ion-header>
-            <app-header-tabs></app-header-tabs>
+
+            <ion-toolbar>
+
+                <ion-buttons slot="start">
+                    <ion-button (click)="cancel()">Cancelar</ion-button>
+                </ion-buttons>
+
+                <ion-title class="ion-text-center">Enviar Invitación</ion-title>
+
+                <ion-buttons slot="end">
+                    <ion-button (click)="save.emit()" [strong]="true" [disabled]="isSaveDisabled()">Confirmar</ion-button>
+                </ion-buttons>
+
+            </ion-toolbar>
+
         </ion-header>
         <ion-content class="ion-padding">
             <form [formGroup]="form()" (ngSubmit)="save.emit()">
@@ -16,11 +30,6 @@
                         formControlName="mensaje" placeholder="¡Hola! Me gustaría ser tu entrenador..." rows="4">
                     </ion-textarea>
                 </ion-item>
-
-                <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="ion-margin-top">
-                    <ion-icon name="mail-outline" slot="start"></ion-icon>
-                    Enviar Invitación
-                </ion-button>
 
             </form>
         </ion-content>

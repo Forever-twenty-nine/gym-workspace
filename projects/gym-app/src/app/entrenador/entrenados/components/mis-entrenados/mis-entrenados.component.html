@@ -1,37 +1,55 @@
-<ion-card>
+<ion-card class="">
+
+    <div class="absolute inset-0 z-[-1]">
+        <img src="assets/images/trainer-bg.png" alt="Card Background" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-linear-to-b from-black/60 to-[#171717]/90"></div>
+    </div>
+
     <ion-card-header>
-        <ion-card-title>Mis Entrenados</ion-card-title>
+        <ion-card-title class="text-xl p-4 text-center font-bold">Mis Entrenados</ion-card-title>
     </ion-card-header>
+
     <ion-card-content>
-        <ion-list>
+        <ion-list class="p-4 " style="background: none;">
             @for (entrenado of entrenados(); track entrenado.id) {
-            <ion-item button (click)="verCliente.emit(entrenado)">
-                <ion-label>
-                    <h3>
+            <ion-item-sliding class="ion-margin-bottom" #slidingItem>
+                <!-- Para que funcione el sliding con fondo, usamos el color gris oscuro de la card en vez de transparente para que tape los botones de atrás -->
+                <ion-item [button]="true" style="--background: #2a2a2a; --color: white; border-radius: 8px;"
+                    (click)="slidingItem.open('end')">
+
+                    <ion-avatar slot="start">
+                        <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+                    </ion-avatar>
+
+                    <ion-label slot="start" class="mx-2">
                         {{ getUserName()(entrenado.id) }}
-                        @if (estaEntrenando()(entrenado.id)) {
-                        <ion-badge color="tertiary" class="ml-2 animate-pulse align-middle">
-                            <ion-icon name="flame" class="mr-1"></ion-icon>
-                            Entrenando
-                        </ion-badge>
-                        }
-                    </h3>
-                    <p>Objetivo: {{ entrenado.objetivo }}</p>
-                    <p style="font-size: 0.9em; color: var(--ion-color-primary);">
-                        <ion-icon name="fitness-outline" style="font-size: 14px;"></ion-icon>
-                        {{ getRutinasCount()(entrenado.id) }} rutinas asignadas
-                    </p>
-                </ion-label>
-                <div slot="end" style="display: flex; gap: 8px;">
-                    <ion-button fill="clear" color="secondary"
-                        (click)="$event.stopPropagation(); openRutinasModal.emit(entrenado)">
-                        <ion-icon name="fitness-outline"></ion-icon>
-                    </ion-button>
-                    <ion-button fill="clear" color="primary">
-                        Ver
-                    </ion-button>
-                </div>
-            </ion-item>
+                    </ion-label>
+
+                    <ion-note slot="end" class="mx-2">
+                        {{ entrenado.objetivo }}
+                    </ion-note>
+
+                    <div slot="end" class="ms-4">
+                        <ion-icon name="chevron-back-outline" style="color: #666; font-size: 1.2rem;"></ion-icon>
+                    </div>
+
+                </ion-item>
+
+
+                <ion-item-options side="end" style="background: transparent; border-bottom: none;">
+                    <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)"
+                        style="border-radius: 8px; margin-left: 8px;">
+                        <ion-icon slot="start" name="barbell-outline"></ion-icon>
+                        Rutinas
+                    </ion-item-option>
+
+                    <ion-item-option color="primary" (click)="verCliente.emit(entrenado)"
+                        style="border-radius: 8px; margin-left: 8px;">
+                        <ion-icon slot="start" name="eye-outline"></ion-icon>
+                        Ver Info
+                    </ion-item-option>
+                </ion-item-options>
+            </ion-item-sliding>
             }
         </ion-list>
 
@@ -41,4 +59,5 @@
             Invitar Nuevo Entrenado
         </ion-button>
     </ion-card-content>
+
 </ion-card>

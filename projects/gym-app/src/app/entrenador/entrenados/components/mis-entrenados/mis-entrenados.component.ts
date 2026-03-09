@@ -8,11 +8,17 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonBadge,
     IonIcon,
-    IonButton
+    IonButton,
+    IonAvatar,
+    IonNote,
+    IonItemOptions,
+    IonItemOption,
+    IonItemSliding
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
 import { Entrenado } from 'gym-library';
+import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-mis-entrenados',
@@ -27,16 +33,26 @@ import { Entrenado } from 'gym-library';
         IonList,
         IonItem,
         IonLabel,
-        IonBadge,
         IonIcon,
-        IonButton
+        IonButton,
+        IonAvatar,
+        IonNote,
+        IonItemOptions,
+        IonItemOption,
+        IonItemSliding
     ]
 })
 export class MisEntrenadosComponent {
-    entrenados = input.required<Entrenado[]>();
 
-    // Callbacks passed from parent to avoid service duplication if desired
-    // Or just pass the methods as inputs
+    constructor() {
+        addIcons({
+            'eye-outline': eyeOutline,
+            'barbell-outline': barbellOutline,
+            'mail-outline': mailOutline,
+            'chevron-back-outline': chevronBackOutline,
+        });
+    }
+    entrenados = input.required<Entrenado[]>();
     getUserName = input.required<(id: string) => string>();
     estaEntrenando = input.required<(id: string) => boolean>();
     getRutinasCount = input.required<(id: string) => number>();
@@ -44,4 +60,8 @@ export class MisEntrenadosComponent {
     verCliente = output<Entrenado>();
     openRutinasModal = output<Entrenado>();
     openInvitacionModal = output<void>();
+
+    getAvatarUrl() {
+        return 'https://ionicframework.com/docs/img/demos/avatar.svg';
+    }
 }
