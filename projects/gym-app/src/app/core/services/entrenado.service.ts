@@ -243,6 +243,7 @@ export class EntrenadoService {
             entrenadoresId: data.entrenadoresId || [],
             rutinasAsignadasIds: data.rutinasAsignadasIds || [],
             rutinasCreadas: data.rutinasCreadas || [],
+            ejerciciosCreadosIds: data.ejerciciosCreadosIds || [],
             nivel: data.nivel || null,
             seguidores: data.seguidores || [],
             seguidos: data.seguidos || []
@@ -258,10 +259,61 @@ export class EntrenadoService {
         if (entrenado.entrenadoresId) data.entrenadoresId = entrenado.entrenadoresId;
         if (entrenado.rutinasAsignadasIds) data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds;
         if (entrenado.rutinasCreadas) data.rutinasCreadas = entrenado.rutinasCreadas;
+        if (entrenado.ejerciciosCreadosIds) data.ejerciciosCreadosIds = entrenado.ejerciciosCreadosIds;
         if (entrenado.nivel !== undefined) data.nivel = entrenado.nivel;
         if (entrenado.seguidores) data.seguidores = entrenado.seguidores;
         if (entrenado.seguidos) data.seguidos = entrenado.seguidos;
         return data;
+    }
+
+    /**
+     * ➕ Agrega un ejercicio a la lista de ejercicios creados de un entrenado
+     */
+    async addEjercicioCreado(entrenadoId: string, ejercicioId: string): Promise<void> {
+        const entrenado = this.getEntrenado(entrenadoId)();
+        if (!entrenado) return;
+
+        const ejerciciosCreadosIds = [...(entrenado.ejerciciosCreadosIds || [])];
+        if (!ejerciciosCreadosIds.includes(ejercicioId)) {
+            ejerciciosCreadosIds.push(ejercicioId);
+            await this.save({ ...entrenado, ejerciciosCreadosIds });
+        }
+    }
+
+    /**
+     * ➖ Quita un ejercicio de la lista de ejercicios creados de un entrenado
+     */
+    async removeEjercicioCreado(entrenadoId: string, ejercicioId: string): Promise<void> {
+        const entrenado = this.getEntrenado(entrenadoId)();
+        if (entrenado) {
+            const ejerciciosCreadosIds = (entrenado.ejerciciosCreadosIds || []).filter((id: string) => id !== ejercicioId);
+            await this.save({ ...entrenado, ejerciciosCreadosIds });
+        }
+    }
+
+    /**
+     * ➕ Agrega una rutina a la lista de rutinas creadas de un entrenado
+     */
+    async addRutinaCreada(entrenadoId: string, rutinaId: string): Promise<void> {
+        const entrenado = this.getEntrenado(entrenadoId)();
+        if (!entrenado) return;
+
+        const rutinasCreadas = [...(entrenado.rutinasCreadas || [])];
+        if (!rutinasCreadas.includes(rutinaId)) {
+            rutinasCreadas.push(rutinaId);
+            await this.save({ ...entrenado, rutinasCreadas });
+        }
+    }
+
+    /**
+     * ➖ Quita una rutina de la lista de rutinas creadas de un entrenado
+     */
+    async removeRutinaCreada(entrenadoId: string, rutinaId: string): Promise<void> {
+        const entrenado = this.getEntrenado(entrenadoId)();
+        if (entrenado) {
+            const rutinasCreadas = (entrenado.rutinasCreadas || []).filter((id: string) => id !== rutinaId);
+            await this.save({ ...entrenado, rutinasCreadas });
+        }
     }
 }
 

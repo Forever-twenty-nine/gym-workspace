@@ -29,5 +29,21 @@
       <ion-label>Progreso</ion-label>
     </ion-tab-button>
 
+    @if (isPremium()) {
+      <!-- Tab de Ejercicios -->
+      <ion-tab-button tab="ejercicios" href="/entrenado-tabs/ejercicios">
+        <ion-icon name="barbell-outline" class="icon-default"></ion-icon>
+        <ion-icon name="barbell" class="hidden icon-active"></ion-icon>
+        <ion-label>Ejercicios</ion-label>
+      </ion-tab-button>
+
+      <!-- Tab de Mis Rutinas -->
+      <ion-tab-button tab="mis-rutinas" href="/entrenado-tabs/mis-rutinas">
+        <ion-icon name="fitness-outline" class="icon-default"></ion-icon>
+        <ion-icon name="fitness" class="hidden icon-active"></ion-icon>
+        <ion-label>Mis Rutinas</ion-label>
+      </ion-tab-button>
+    }
+
   </ion-tab-bar>
 </ion-tabs>

@@ -39,8 +39,11 @@ export class RutinasPage implements OnInit {
 
   rutinasAsignadas = computed(() => {
     const userId = this.authService.currentUser()?.uid;
-    const ids = this.entrenadoService.getEntrenado(userId || '')()?.rutinasAsignadasIds || [];
-    return this.todasLasRutinas().filter(r => ids.includes(r.id));
+    const entrenado = this.entrenadoService.getEntrenado(userId || '')();
+    const idsAsignadas = entrenado?.rutinasAsignadasIds || [];
+    const idsCreadas = entrenado?.rutinasCreadas || [];
+    const allIds = [...new Set([...idsAsignadas, ...idsCreadas])];
+    return this.todasLasRutinas().filter(r => allIds.includes(r.id));
   });
 
   constructor() {

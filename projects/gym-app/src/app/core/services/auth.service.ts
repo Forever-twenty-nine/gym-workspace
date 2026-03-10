@@ -9,7 +9,7 @@ import {
   User as FirebaseUser,
   createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { Firestore, doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe } from 'firebase/firestore';
+import { Firestore, doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
 import { User, Rol } from 'gym-library';
 import { AUTH, FIRESTORE } from '../firebase.tokens';
 
@@ -73,7 +73,7 @@ export class AuthService {
           });
 
         } catch (error) {
-          console.error('🛡️ Auth: Error cargando perfil:', error);
+          console.error('🛡️ Auth: Error procesando sesión:', error);
           this._isLoading.set(false);
         }
       } else {
@@ -140,7 +140,8 @@ export class AuthService {
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(this.auth, provider);
       if (cred.user) {
-        const user = await this.getUserData(cred.user);
+        // Obtenemos o creamos los datos en Firestore
+        const user = await this.getUserData(cred.user, true);
         this._currentUser.set(user);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
@@ -149,7 +150,7 @@ export class AuthService {
       this._isLoading.set(false);
       return false;
     } catch (error: any) {
-      if (isDevMode()) console.error('Error en login con Google:', error);
+      if (isDevMode()) console.error('🛡️ Auth: Error en login con Google:', error);
       this._error.set(this.getErrorMessage(error));
       this._isLoading.set(false);
       return false;
@@ -162,13 +163,8 @@ export class AuthService {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       if (userCredential.user) {
-        const newUser: User = {
-          uid: userCredential.user.uid,
-          nombre: userCredential.user.displayName || userCredential.user.email || 'Usuario',
-          email: userCredential.user.email || '',
-          role: this.inferRoleFromEmail(email),
-          onboarded: false
-        };
+        // Forzamos la creación del documento en Firestore inmediatamente
+        const newUser = await this.getUserData(userCredential.user, true);
         this._currentUser.set(newUser);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
@@ -177,12 +173,10 @@ export class AuthService {
       this._isLoading.set(false);
       return false;
     } catch (error: any) {
-      if (isDevMode()) console.error('Error en registro:', error);
+      if (isDevMode()) console.error('🛡️ Auth: Error en registro:', error);
       this._error.set(this.getRegistrationErrorMessage(error));
       this._isLoading.set(false);
       return false;
-    } finally {
-      this._isLoading.set(false);
     }
   }
 
@@ -191,7 +185,7 @@ export class AuthService {
     await signOut(this.auth);
   }
 
-  private async getUserData(firebaseUser: FirebaseUser): Promise<User> {
+  private async getUserData(firebaseUser: FirebaseUser, createIfMissing = false): Promise<User> {
     const userDocRef = doc(this.firestore, `usuarios/${firebaseUser.uid}`);
     const userSnap = await getDoc(userDocRef);
 
@@ -203,18 +197,26 @@ export class AuthService {
         userData.photoURL = firebaseUser.photoURL;
       }
     } else {
+      // Si no existe, preparamos un objeto básico
       userData = {
         uid: firebaseUser.uid,
-        nombre: firebaseUser.displayName || firebaseUser.email || 'Usuario',
+        nombre: firebaseUser.displayName || firebaseUser.email || 'Nuevo Usuario',
         email: firebaseUser.email || '',
         photoURL: firebaseUser.photoURL || undefined,
-        role: undefined,
+        role: this.inferRoleFromEmail(firebaseUser.email || ''),
         onboarded: false
       };
-    }
 
-    if (!userData.role) {
-      userData.role = this.inferRoleFromEmail(userData.email || '');
+      // Si se nos pide crear el documento (en registro o primer login con Google)
+      if (createIfMissing) {
+        try {
+          // Guardamos en Firestore
+          await setDoc(userDocRef, userData);
+          if (isDevMode()) console.log('🛡️ Auth: Nuevo perfil de usuario creado en Firestore');
+        } catch (e) {
+          console.error('🛡️ Auth: Error al crear perfil inicial en Firestore:', e);
+        }
+      }
     }
 
     return { ...userData, uid: firebaseUser.uid };
@@ -235,7 +237,10 @@ export class AuthService {
       case 'auth/user-not-found':
       case 'auth/wrong-password': return 'Email o contraseña incorrectos';
       case 'auth/too-many-requests': return 'Demasiados intentos. Intenta más tarde';
-      default: return 'Error al iniciar sesión';
+      case 'auth/popup-closed-by-user': return 'La ventana de Google se cerró antes de completar';
+      case 'auth/operation-not-allowed': return 'El inicio de sesión con Google no está habilitado en Firebase';
+      case 'auth/unauthorized-domain': return 'Este dominio (localhost) no está autorizado en Firebase';
+      default: return `Error al iniciar sesión: ${errorCode || error.message || 'Error desconocido'}`;
     }
   }
 

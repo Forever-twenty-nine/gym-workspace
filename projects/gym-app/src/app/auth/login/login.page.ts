@@ -107,10 +107,11 @@ export class LoginPage implements OnInit {
           this.redirectToRolePage(user.role);
         }
       } else {
-        this.errorMessage.set('Error al autenticar con Google');
+        const error = this.authService.error();
+        this.errorMessage.set(error || 'Error al autenticar con Google');
       }
     } catch (error: any) {
-      this.errorMessage.set(error?.message || 'Ocurrió un error inesperado');
+      this.errorMessage.set(error?.message || 'Error inesperado');
       console.error('Google login error:', error);
     }
   }

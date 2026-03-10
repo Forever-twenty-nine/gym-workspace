@@ -216,13 +216,14 @@ export class SesionRutinaService {
   /**
    * Actualiza el estado de compartir de una sesión consumida
    */
-  async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string): Promise<void> {
+  async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string, fotoProgreso?: string): Promise<void> {
     return this.runInZone(async () => {
       const ref = doc(this.firestore, this.COLLECTION, id);
       const data: any = {
         compartida,
         nombreUsuario: userName || 'Usuario',
         fotoUsuario: userPhoto || null, // Asegurar null en lugar de undefined
+        fotoProgreso: fotoProgreso || null,
         fechaCompartida: compartida ? Timestamp.now() : null
       };
       await updateDoc(ref, data);
@@ -319,7 +320,8 @@ export class SesionRutinaService {
       fechaInicio: data.fechaInicio instanceof Timestamp ? data.fechaInicio.toDate() : (data.fechaInicio ? new Date(data.fechaInicio) : new Date()),
       fechaFin: data.fechaFin instanceof Timestamp ? data.fechaFin.toDate() : (data.fechaFin ? new Date(data.fechaFin) : undefined),
       fechaCompartida: data.fechaCompartida instanceof Timestamp ? data.fechaCompartida.toDate() : (data.fechaCompartida ? new Date(data.fechaCompartida) : undefined),
-      likes: data.likes || []
+      likes: data.likes || [],
+      fotoProgreso: data.fotoProgreso || null
     } as SesionRutina;
   }
 }

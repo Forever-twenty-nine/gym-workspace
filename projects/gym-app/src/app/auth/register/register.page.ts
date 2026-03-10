@@ -183,27 +183,10 @@ export class RegisterPage {
     try {
       const { email, password } = this.registerForm.value;
 
-      // Crear cuenta en Firebase Auth
+      // Crear cuenta en Firebase Auth (ahora crea automáticamente el documento en Firestore)
       const result = await this.authService.registerWithEmail(email, password);
 
       if (result) {
-        // Registro exitoso
-        // Crear perfil de usuario en Firestore
-        const userData = {
-          nombre: '', // Se completará en onboarding
-          email: email,
-          emailVerified: false,
-          role: Rol.ENTRENADO, // Por defecto, puede cambiarse después
-          fechaCreacion: new Date(),
-          activo: true
-        };
-
-        // Usar el UID del usuario actual (después del registro exitoso)
-        const currentUser = this.authService.currentUser();
-        if (currentUser) {
-          await this.userService.updateUser(currentUser.uid, userData);
-        }
-
         this.successMessage.set('Cuenta creada exitosamente. Redirigiendo...');
 
         // Pequeño delay para mostrar el mensaje de éxito
@@ -230,10 +213,31 @@ export class RegisterPage {
           this.errorMessage.set('Error al crear la cuenta. Inténtalo de nuevo.');
         }
       }
-
     } catch (error: any) {
       console.error('Error inesperado al registrar usuario:', error);
       this.errorMessage.set('Error inesperado. Inténtalo de nuevo.');
+    }
+  }
+
+  /**
+   * Registra o inicia sesión con Google
+   */
+  async loginWithGoogle() {
+    this.errorMessage.set('');
+    try {
+      const success = await this.authService.loginWithGoogle();
+      if (success) {
+        this.successMessage.set('Autenticado con Google correctamente. Redirigiendo...');
+        setTimeout(() => {
+          this.router.navigate(['/onboarding']);
+        }, 1500);
+      } else {
+        const error = this.authService.error();
+        this.errorMessage.set(error || 'Error al autenticar con Google');
+      }
+    } catch (error: any) {
+      console.error('Error in Google login:', error);
+      this.errorMessage.set('Ocurrió un error inesperado al usar Google');
     }
   }
 
@@ -249,12 +253,5 @@ export class RegisterPage {
    */
   goToWelcome() {
     this.router.navigate(['/welcome']);
-  }
-
-  /**
-   * Navega directamente al onboarding (solo para testing)
-   */
-  goToOnboarding() {
-    this.router.navigate(['/onboarding']);
   }
 }

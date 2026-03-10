@@ -43,4 +43,14 @@ export class FirebaseStorageService {
     getProfilePath(uid: string, extension: string = 'jpg'): string {
         return `profiles/${uid}/profile_${Date.now()}.${extension}`;
     }
+
+    /**
+     * Genera una ruta para la foto de progreso de una sesión
+     * @param uid UID del usuario
+     * @param sesionId ID de la sesión
+     * @param extension Extensión del archivo
+     */
+    getProgressPhotoPath(uid: string, sesionId: string, extension: string = 'jpg'): string {
+        return `progreso/${uid}/${sesionId}_${Date.now()}.${extension}`;
+    }
 }

@@ -25,7 +25,7 @@
         A través de:
       </p>
       <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
-        class="normal-case mb-6 !mt-0 ">
+        class="normal-case mb-6 !mt-0" (click)="loginWithGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google" />
         <span class="pl-3 text-base">Cuenta de Google</span>
       </ion-button>
@@ -82,12 +82,6 @@
 
 
 
-      <!-- Botón de Testing - Solo desarrollo -->
-      <div class="text-center mt-2 fixed top-3 right-3 ">
-        <ion-button fill="clear" size="small" color="medium" (click)="goToOnboarding()" class="text-white text-sm">
-          🚀 Skip to Onboarding
-        </ion-button>
-      </div>
 
 
     </div>

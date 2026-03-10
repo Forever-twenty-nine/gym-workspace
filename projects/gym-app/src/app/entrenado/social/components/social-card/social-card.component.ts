@@ -1,11 +1,14 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { IonIcon, ActionSheetController } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
+import {
+  IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  barbell, time, heart, heartOutline, ellipsisVertical,
-  personAdd, personRemove, trash, eyeOffOutline
+  barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
+  personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline
 } from 'ionicons/icons';
+
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
@@ -15,7 +18,10 @@ import { FormatFechaPipe } from '../../../../shared/pipes/format-fecha.pipe';
 @Component({
   selector: 'app-social-card',
   standalone: true,
-  imports: [CommonModule, IonIcon, NgOptimizedImage, FormatFechaPipe],
+  imports: [
+    CommonModule, IonIcon, FormatFechaPipe,
+    IonCard, IonItem, IonLabel, IonButtons, IonButton
+  ],
   templateUrl: './social-card.component.html'
 })
 export class SocialCardComponent {
@@ -48,7 +54,7 @@ export class SocialCardComponent {
   });
 
   constructor() {
-    addIcons({ barbell, time, heart, heartOutline, ellipsisVertical, personAdd, personRemove, trash, eyeOffOutline });
+    addIcons({ barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal, personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline });
   }
 
   async toggleLike() {

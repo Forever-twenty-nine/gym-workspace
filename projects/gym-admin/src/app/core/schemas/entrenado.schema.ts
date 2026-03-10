@@ -65,6 +65,12 @@ export const ENTRENADO_SCHEMA: FieldConfig[] = [
         colSpan: 2
     },
     {
+        name: 'ejerciciosCreadosIds',
+        label: 'Ejercicios Creados (Propios)',
+        type: 'infolist',
+        colSpan: 2
+    },
+    {
         name: 'nivel',
         label: 'Nivel de Experiencia',
         type: 'select',

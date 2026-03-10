@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { CommonModule } from '@angular/common';
 import { EntrenadoService } from '../../services/entrenado.service';
 import { EntrenadorService } from '../../services/entrenador.service';
+import { EjercicioService } from '../../services/ejercicio.service';
 import { RutinaAsignadaService } from '../../services/rutina-asignada.service';
 import { RutinaService } from '../../services/rutina.service';
 import { UserService } from '../../services/user.service';
@@ -40,6 +41,7 @@ import { SchemaService } from '../../core/schema.service';
 export class EntrenadosPage {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly entrenadorService = inject(EntrenadorService);
+  private readonly ejercicioService = inject(EjercicioService);
   private readonly rutinaAsignadaService = inject(RutinaAsignadaService);
   private readonly rutinaService = inject(RutinaService);
   private readonly userService = inject(UserService);
@@ -70,6 +72,7 @@ export class EntrenadosPage {
     const entrenadoId = this.selectedEntrenadoId();
     const trainers = this.entrenadorService.entrenadoresSignal();
     const routines = this.rutinaService.rutinas();
+    const exercises = this.ejercicioService.ejercicios();
     const allUsers = this.userService.users();
     const assignedRoutinesList = this.rutinaAsignadaService.getRutinasAsignadas()();
 
@@ -81,11 +84,13 @@ export class EntrenadosPage {
     const routineOptions = routines.map(r => ({ value: r.id!, label: r.nombre }));
 
     const userOptions = allUsers.map(u => ({ value: u.uid, label: u.nombre || u.email || u.uid }));
+    const exerciseOptions = exercises.map((e: any) => ({ value: e.id!, label: e.nombre }));
 
     return this.schemaService.getDynamicSchema('entrenado', {
       'entrenadoresId': trainerOptions,
       'rutinasAsignadasIds': routineOptions,
       'rutinasCreadas': routineOptions,
+      'ejerciciosCreadosIds': exerciseOptions,
       'seguidores': userOptions,
       'seguidos': userOptions
     });

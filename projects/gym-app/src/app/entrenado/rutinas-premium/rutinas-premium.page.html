@@ -1,0 +1,108 @@
+<app-header-tabs title="Mis Rutinas"></app-header-tabs>
+
+<ion-content>
+  <ion-list>
+    @for (rutina of rutinasPropias(); track rutina.id) {
+      <ion-item-group>
+        <ion-item lines="none">
+          <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ rutina.nombre }}</h2>
+            <p>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</p>
+          </ion-label>
+          <ion-buttons slot="end">
+            <ion-button (click)="editarRutina(rutina)">
+              <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button color="danger" (click)="eliminarRutina(rutina.id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-item>
+
+        <ion-item lines="inset">
+          <div style="display: flex; flex-direction: column; width: 100%; gap: 8px; padding: 4px 0 12px 0;">
+            <ion-label color="medium" style="font-size: 0.75em; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">
+              Días Programados
+            </ion-label>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+              @for (dia of getDiasAsignados(rutina.id); track dia) {
+                <ion-badge color="secondary" style="display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 12px;">
+                  {{ dia }}
+                  <ion-icon name="close-circle-outline" style="font-size: 16px; cursor: pointer;" 
+                    (click)="quitarDia(rutina.id, dia)"></ion-icon>
+                </ion-badge>
+              }
+
+              <ion-item lines="none" style="--background: transparent; --padding-start: 0; min-height: 32px; --inner-padding-end: 0;">
+                <ion-select label="" aria-label="Añadir día" interface="popover" placeholder="+ Añadir día"
+                  (ionChange)="asignarDia(rutina, $event)"
+                  style="--placeholder-color: var(--ion-color-primary); font-size: 0.85em; --placeholder-opacity: 1; font-weight: 500;">
+                  @for (dia of diasSemana; track dia) {
+                    <ion-select-option [value]="dia">{{ dia }}</ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
+            </div>
+          </div>
+        </ion-item>
+      </ion-item-group>
+    } @empty {
+      <div style="text-align: center; padding: 20px;">
+        <p>No tienes rutinas propias aún.</p>
+      </div>
+    }
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="nuevaRutina()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <ion-modal [isOpen]="isModalOpen()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isCreating() ? 'Nueva Rutina' : 'Editar Rutina' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <form [formGroup]="form">
+          <ion-item>
+            <ion-label position="stacked">Nombre</ion-label>
+            <ion-input formControlName="nombre" placeholder="Ej: Mi Rutina de Empuje"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Descripción (opcional)</ion-label>
+            <ion-textarea formControlName="descripcion" placeholder="¿De qué trata esta rutina?"></ion-textarea>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Ejercicios</ion-label>
+            <ion-select formControlName="ejerciciosIds" multiple="true" placeholder="Selecciona ejercicios">
+              @for (ej of todosLosEjercicios(); track ej.id) {
+                <ion-select-option [value]="ej.id">{{ ej.nombre }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <div style="margin-top: 20px;">
+            <ion-button expand="block" (click)="guardar()" [disabled]="form.invalid">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              Guardar
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

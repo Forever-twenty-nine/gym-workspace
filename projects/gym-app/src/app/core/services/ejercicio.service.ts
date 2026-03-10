@@ -310,7 +310,8 @@ export class EjercicioService {
 			descansoSegundos: data.descansoSegundos,
 			serieSegundos: data.serieSegundos,
 			fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : data.fechaCreacion,
-			fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion
+			fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion,
+			creadorId: data.creadorId
 		};
 	}
 
@@ -327,6 +328,7 @@ export class EjercicioService {
 		if (ejercicio.serieSegundos !== undefined) data.serieSegundos = ejercicio.serieSegundos;
 		if (ejercicio.fechaCreacion) data.fechaCreacion = ejercicio.fechaCreacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaCreacion) : ejercicio.fechaCreacion;
 		if (ejercicio.fechaModificacion) data.fechaModificacion = ejercicio.fechaModificacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaModificacion) : ejercicio.fechaModificacion;
+		if (ejercicio.creadorId) data.creadorId = ejercicio.creadorId;
 
 		return data;
 	}

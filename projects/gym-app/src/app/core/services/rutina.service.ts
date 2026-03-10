@@ -231,7 +231,8 @@ export class RutinaService {
             ejerciciosIds: data.ejerciciosIds || data.ejercicios || [], // Compatibilidad
             fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : data.fechaCreacion,
             fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion,
-            duracion: data.duracion
+            duracion: data.duracion,
+            creadorId: data.creadorId
         };
     }
 
@@ -246,6 +247,7 @@ export class RutinaService {
         if (rutina.fechaCreacion) data.fechaCreacion = rutina.fechaCreacion instanceof Date ? Timestamp.fromDate(rutina.fechaCreacion) : rutina.fechaCreacion;
         if (rutina.fechaModificacion) data.fechaModificacion = rutina.fechaModificacion instanceof Date ? Timestamp.fromDate(rutina.fechaModificacion) : rutina.fechaModificacion;
         if (rutina.duracion && rutina.duracion > 0) data.duracion = rutina.duracion;
+        if (rutina.creadorId) data.creadorId = rutina.creadorId;
 
         return data;
     }

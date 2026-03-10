@@ -226,6 +226,7 @@ export class EntrenadoService {
             entrenadoresId: data.entrenadoresId || [],
             rutinasAsignadasIds: data.rutinasAsignadasIds || [],
             rutinasCreadas: data.rutinasCreadas || [],
+            ejerciciosCreadosIds: data.ejerciciosCreadosIds || [],
             fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
             objetivo: data.objetivo || undefined
         };
@@ -247,6 +248,10 @@ export class EntrenadoService {
 
         if (entrenado.rutinasCreadas !== undefined) {
             data.rutinasCreadas = entrenado.rutinasCreadas !== null ? entrenado.rutinasCreadas : deleteField();
+        }
+
+        if (entrenado.ejerciciosCreadosIds !== undefined) {
+            data.ejerciciosCreadosIds = entrenado.ejerciciosCreadosIds !== null ? entrenado.ejerciciosCreadosIds : deleteField();
         }
 
         if (entrenado.objetivo !== undefined) {

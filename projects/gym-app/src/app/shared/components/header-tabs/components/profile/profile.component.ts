@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Platform, LoadingController, ToastController, MenuController } from '@ionic/angular';
+import { Platform, LoadingController, ToastController, MenuController } from '@ionic/angular/standalone';
 
 import {
   IonButton, IonIcon, IonBadge, IonMenu, IonSpinner, IonProgressBar,
@@ -165,37 +165,40 @@ export class ProfileComponent implements OnInit, OnDestroy {
   async logout() {
     const loading = await this.loadingCtrl.create({
       message: 'Cerrando sesión...',
-      spinner: 'crescent',
-      cssClass: 'custom-loading'
+      spinner: 'crescent'
     });
     await loading.present();
 
     try {
-      const user = this.currentUser();
-      const userName = user?.nombre?.split(' ')[0] || 'Usuario';
-      
       this.isLoggingOut.set(true);
-      if (this.menuCtrl) {
-        await this.menuCtrl.close();
-      }
-      
-      // Delay de 800ms para una transición más suave y premium
-      await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Cerramos sesión después de la animación del menú
+      // PASO CRÍTICO: Esperar a que el menú se cierre TOTALMENTE antes de que el @if 
+      // de app.component destruya este componente. Si se destruye antes, el backdrop se queda "huérfano" y bloquea la UI.
+      if (this.menuCtrl) {
+        await this.menuCtrl.close('profile-menu');
+        await this.menuCtrl.close(); // Doble cierre por seguridad
+      }
+
+      // Pequeño delay adicional para que Ionic limpie el DOM del menú
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Cerramos sesión en Firebase (esto disparará el @if y destruirá este componente)
       await this.authService.logout();
       
-      this.showToast(`${userName}, has cerrado sesión correctamente`, 'success');
+      // Limpiar caché local
+      localStorage.removeItem('gym_auth_user');
       
-      // Redirigimos al user
+      // Redirigir al login
       await this.router.navigate(['/login'], { replaceUrl: true });
+      
+      this.showToast('Sesión cerrada correctamente', 'success');
     } catch (error) {
-      console.error('Error during logout:', error);
-      this.showToast('Hubo un error al cerrar sesión', 'danger');
-      await this.router.navigate(['/login'], { replaceUrl: true });
+      console.error('🛡️ Profile: Error en logout:', error);
+      // Fallback: Si el router se queda bloqueado, forzamos recarga
+      window.location.href = '/login';
     } finally {
-      await loading.dismiss();
       this.isLoggingOut.set(false);
+      await loading.dismiss();
     }
   }
 

@@ -21,5 +21,6 @@ export interface SesionRutina {
     fotoUsuario?: string;
     fechaCompartida?: any;
     likes?: string[];
+    fotoProgreso?: string;
 }
 

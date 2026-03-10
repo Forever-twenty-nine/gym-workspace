@@ -20,6 +20,7 @@ export interface Entrenado {
     configNotificaciones?: ConfigNotificacion;
     // Plan Premium
     rutinasCreadas?: string[];
+    ejerciciosCreadosIds?: string[];
     nivel?: NivelEntrenamiento;
 
 }

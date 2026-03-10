@@ -21,6 +21,7 @@
     "dev:all": "concurrently \"npm run library:watch\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"lib,admin,app\" --prefix-colors \"yellow,cyan,magenta\"",
     "dev:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" \"npm run gym-app:serve\" --names \"emulator,admin,app\" --prefix-colors \"green,cyan,magenta\"",
     "dev:with-firebase": "npm run library:build && concurrently \"npm run gym-admin:serve:firebase\" \"npm run gym-app:serve:firebase\" --names \"admin,app\" --prefix-colors \"cyan,magenta\"",
+    "dev:firebase": "npm run dev:with-firebase",
     "gym-admin:serve:firebase": "cd projects/gym-admin && npm run start -- --configuration=firebase",
     "gym-app:serve:firebase": "cd projects/gym-app && ionic serve -c firebase",
     "gym-admin:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",

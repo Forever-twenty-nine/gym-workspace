@@ -81,6 +81,35 @@
                         </ion-label>
                         <ion-toggle slot="end" [checked]="sesionSeleccionada.compartida" (ionChange)="toggleCompartir($event)" style="--handle-background-checked: var(--ion-color-primary);"></ion-toggle>
                     </ion-item>
+
+                    <!-- Sección de Foto Premium -->
+                    @if (isPremium() && sesionSeleccionada.compartida) {
+                    <div class="px-4 pb-4 pt-1 border-t border-white/10 mt-1">
+                        <p class="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-3">Foto del entrenamiento (Premium)</p>
+                        
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-white/5 border border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-all group"
+                             (click)="triggerPhotoInput()">
+                            
+                            @if (fotoProgresoUrl()) {
+                                <img [src]="fotoProgresoUrl()" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <ion-icon name="camera-outline" class="text-3xl text-white"></ion-icon>
+                                </div>
+                            } @else {
+                                <ion-icon name="camera-outline" class="text-3xl text-white/30 mb-2"></ion-icon>
+                                <span class="text-xs text-white/40 font-bold">Subir foto del entrenamiento</span>
+                            }
+
+                            @if (isUploading()) {
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+                                    <ion-spinner name="crescent" color="primary"></ion-spinner>
+                                    <span class="text-[10px] text-white font-bold mt-2 uppercase tracking-widest">Subiendo...</span>
+                                </div>
+                            }
+                        </div>
+                        <input type="file" id="foto-progreso-input" class="hidden" accept="image/*" (change)="onPhotoSelected($event)">
+                    </div>
+                    }
                 </div>
 
                 <!-- Lista de ejercicios de la sesión -->

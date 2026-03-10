@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Platform, LoadingController, ToastController } from '@ionic/angular';
+import { Platform, LoadingController, ToastController } from '@ionic/angular/standalone';
 import {
   IonButton, IonIcon, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
   IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
