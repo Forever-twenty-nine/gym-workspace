@@ -1,7 +1,10 @@
 {
-  "name": "app",
-  "short_name": "app",
+  "name": "GymApp",
+  "short_name": "GymApp",
+  "theme_color": "#000000",
+  "background_color": "#000000",
   "display": "standalone",
+  "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
   "icons": [
