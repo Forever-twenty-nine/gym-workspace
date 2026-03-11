@@ -1,7 +1,7 @@
 <ion-app>
   @if (authService.currentUser()) {
-    <app-profile></app-profile>
-    <app-notifications></app-notifications>
+    <app-profile [attr.aria-hidden]="'false'"></app-profile>
+    <app-notifications [attr.aria-hidden]="'false'"></app-notifications>
   }
   <ion-router-outlet id="main-content"></ion-router-outlet>
 </ion-app>

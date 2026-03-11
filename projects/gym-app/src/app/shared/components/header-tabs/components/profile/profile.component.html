@@ -1,104 +1,64 @@
 <ion-menu side="start" menuId="profile-menu" contentId="main-content">
-  <div class="user-profile-container text-white h-full flex flex-col p-4 bg-black">
-    @if (isUploading()) {
-    <ion-progress-bar type="indeterminate" color="primary"></ion-progress-bar>
-    }
+  <ion-header class="ion-no-border" class="ion-padding">
+    <ion-toolbar color="black">
+      <ion-title>Mi Perfil</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="openEditModal()">
+          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
+  <ion-content class="ion-padding" color="black">
     @if (currentUser(); as user) {
-    <!-- CONTENEDOR PRINCIPAL - Tarjeta Única -->
-    <div class="rounded-3xl shadow-2xl overflow-hidden relative flex-1 flex flex-col bg-black border border-white/20">
-      
-      <!-- FONDO PREMIUM (Sustituimos Unsplash por un Mesh Gradient CSS para evitar avisos) -->
-      <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div class="absolute inset-0 bg-black"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/80 to-black/95"></div>
+    <div class="flex flex-col items-center gap-4 py-8 mb-6">
+      <div class="relative">
+        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl">
+          @if (user.photoURL) {
+          <img [ngSrc]="user.photoURL" fill class="object-cover" alt="Foto de perfil" />
+          } @else {
+          <div class="w-full h-full bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
+            {{ getIniciales(user.nombre) }}
+          </div>
+          }
+        </div>
       </div>
 
-      <!-- CONTENIDO ELÉVADO -->
-      <div class="relative z-10 flex flex-col flex-1 h-full">
-        
-        <!-- HEADER -->
-        <div class="p-6 pb-4 border-b border-white/10">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-4">
-              <!-- Foto de perfil -->
-              <div class="relative group cursor-pointer shrink-0" (click)="triggerFileInput()">
-                <div class="w-16 h-16 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-xl text-white font-bold text-2xl shadow-xl overflow-hidden relative border-2 border-white/40">
-                  @if (user.photoURL) {
-                  <div class="w-full h-full relative">
-                    <img [ngSrc]="user.photoURL || 'assets/images/test-foto.png'" fill class="object-cover relative z-10" alt="Foto de perfil" />
-                  </div>
-                  } @else {
-                  {{ getIniciales(user.nombre) }}
-                  }
-                  <div class="absolute inset-0 z-20 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ion-icon name="camera-outline" class="text-white text-xl"></ion-icon>
-                  </div>
-                  @if (isUploading()) {
-                  <div class="absolute inset-0 z-30 bg-black/60 flex items-center justify-center">
-                    <ion-spinner name="crescent" color="light"></ion-spinner>
-                  </div>
-                  }
-                </div>
-                <div class="absolute -bottom-1 -right-1 z-40 bg-primary text-white p-1.5 rounded-full shadow-lg border border-white/20">
-                  <ion-icon name="camera-outline" class="text-[10px] block"></ion-icon>
-                </div>
-                <input type="file" id="shared-photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
-              </div>
-
-              <div class="flex flex-col gap-1.5">
-                <h2 class="m-0 text-lg font-bold tracking-tight text-white drop-shadow-md leading-tight">{{ user.nombre }}</h2>
-              </div>
-            </div>
-
-            <!-- Botón de edición modal -->
-            <button class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg text-white transition-transform active:scale-95 mt-1" (click)="openEditModal()">
-              <ion-icon name="pencil-outline" class="text-base"></ion-icon>
-            </button>
-          </div>
-        </div>
-
-        <!-- Body section -->
-        <div class="flex-1 p-4 flex flex-col justify-between overflow-y-auto">
-          <div class="animate-fade-in h-auto flex flex-col justify-between pb-8">
-            <app-profile-info-card 
-              [user]="user" 
-              [ultimasolicitud]="ultimasolicitud()" 
-              [entrenadoData]="currentEntrenado()"
-              (openPremiumModalClicked)="openPremiumModal()">
-            </app-profile-info-card>
-            
-            <div class="mt-6 pt-4 border-t border-white/10">
-              <ion-button expand="block" color="danger" fill="outline" class="font-bold h-12 tracking-wide border-2" style="--border-radius: 0.75rem; --border-width: 2px;" (click)="logout()">
-                <ion-icon name="log-out-outline" slot="start"></ion-icon>
-                Cerrar Sesión
-              </ion-button>
-            </div>
-          </div>
-        </div>
+      <div class="text-center">
+        <h2 class="ion-no-margin text-2xl font-bold text-white">{{ user.nombre }}</h2>
+        <p class="ion-no-margin text-white/60 font-medium">{{ getRoleDisplayName(user.role) }}</p>
       </div>
     </div>
+
+    <app-profile-info-card [user]="user" [ultimasolicitud]="ultimasolicitud()" [entrenadoData]="currentEntrenado()"
+      (openPremiumModalClicked)="openPremiumModal()">
+    </app-profile-info-card>
     } @else if (!isLoggingOut()) {
-    <div class="flex-1 flex flex-col items-center justify-center p-6 bg-black z-20 h-full">
+    <div class="flex flex-col items-center justify-center p-6 h-full">
       <ion-spinner name="crescent" color="primary"></ion-spinner>
       <p class="mt-4 text-white font-medium">Cargando...</p>
     </div>
     }
-  </div>
+  </ion-content>
+
+  @if (currentUser()) {
+  <ion-footer class="ion-no-border">
+    <ion-toolbar color="black" class="ion-padding">
+      <ion-button expand="block" color="danger" fill="outline" class="font-bold h-12" (click)="logout()">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Cerrar Sesión
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+  }
 </ion-menu>
 
 <!-- Modal de Edición -->
-<app-edit-profile-modal 
-  [isOpen]="isEditModalOpen()" 
-  [user]="currentUser()" 
-  [entrenadoData]="currentEntrenado()" 
-  (modalClosed)="closeEditModal()"
-  (logoutClicked)="logout()">
+<app-edit-profile-modal [isOpen]="isEditModalOpen()" [user]="currentUser()" [entrenadoData]="currentEntrenado()"
+  (modalClosed)="closeEditModal()" (logoutClicked)="logout()">
 </app-edit-profile-modal>
 
 <!-- Modal de Solicitud Premium -->
-<app-premium-request-modal
-  [isOpen]="isPremiumModalOpen()"
-  [user]="currentUser()"
-  (modalClosed)="closePremiumModal()">
+<app-premium-request-modal [isOpen]="isPremiumModalOpen()" [user]="currentUser()" (modalClosed)="closePremiumModal()">
 </app-premium-request-modal>

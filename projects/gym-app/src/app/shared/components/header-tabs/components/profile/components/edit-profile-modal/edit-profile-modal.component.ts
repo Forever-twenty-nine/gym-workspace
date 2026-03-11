@@ -1,14 +1,15 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Platform, LoadingController, ToastController } from '@ionic/angular/standalone';
 import {
-  IonButton, IonIcon, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
+  IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
   IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
-  IonTitle, IonContent, IonButtons, IonFooter
+  IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
+  IonAvatar, IonNote
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { personOutline, notificationsOutline, logOutOutline } from 'ionicons/icons';
+import { personOutline, notificationsOutline, cameraOutline } from 'ionicons/icons';
 
 import { User as LibraryUser, Objetivo } from 'gym-library';
 export interface User extends LibraryUser {
@@ -18,16 +19,17 @@ export interface User extends LibraryUser {
 import { UserService } from '../../../../../../../core/services/user.service';
 import { EntrenadoService } from '../../../../../../../core/services/entrenado.service';
 import { NotificacionService } from '../../../../../../../core/services/notificacion.service';
+import { FirebaseStorageService } from '../../../../../../../core/services/firebase-storage.service';
 
 @Component({
   selector: 'app-edit-profile-modal',
   templateUrl: './edit-profile-modal.component.html',
   standalone: true,
   imports: [
-    CommonModule, FormsModule, ReactiveFormsModule,
-    IonButton, IonIcon, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
+    CommonModule, FormsModule, ReactiveFormsModule, NgOptimizedImage,
+    IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
     IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
-    IonTitle, IonContent, IonButtons, IonFooter
+    IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
   ],
 })
 export class EditProfileModalComponent implements OnInit, OnChanges {
@@ -35,7 +37,6 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   @Input() user: User | null = null;
   @Input() entrenadoData: any = null;
   @Output() modalClosed = new EventEmitter<void>();
-  @Output() logoutClicked = new EventEmitter<void>();
 
   private userService = inject(UserService);
   private entrenadoService = inject(EntrenadoService);
@@ -44,6 +45,9 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
   private platform = inject(Platform);
+  private storageService = inject(FirebaseStorageService);
+
+  isUploading = signal<boolean>(false);
 
   editForm!: FormGroup;
   objetivoOptions = Object.values(Objetivo);
@@ -59,11 +63,7 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
   ];
 
   constructor() {
-    addIcons({ personOutline, notificationsOutline, logOutOutline });
-  }
-
-  logout() {
-    this.logoutClicked.emit();
+    addIcons({ personOutline, notificationsOutline, cameraOutline });
   }
 
   ngOnInit() {
@@ -152,6 +152,46 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
     }
   }
 
+  async onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.showToast('Por favor selecciona una imagen válida', 'warning');
+      return;
+    }
+
+    if (!this.user) return;
+
+    const loading = await this.loadingCtrl.create({ message: 'Subiendo foto...', spinner: 'crescent' });
+    await loading.present();
+    this.isUploading.set(true);
+
+    try {
+      const path = this.storageService.getProfilePath(this.user.uid, file.name.split('.').pop());
+      const photoURL = await this.storageService.uploadFile(path, file);
+      await this.userService.updateUser(this.user.uid, { photoURL });
+
+      // Update local user object to reflect change in UI
+      if (this.user) {
+        this.user = { ...this.user, photoURL };
+      }
+
+      this.showToast('Foto de perfil actualizada', 'success');
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      this.showToast('Error al subir la foto', 'danger');
+    } finally {
+      this.isUploading.set(false);
+      loading.dismiss();
+    }
+  }
+
+  triggerFileInput() {
+    const fileInput = document.getElementById('modal-photo-input') as HTMLInputElement;
+    if (fileInput) fileInput.click();
+  }
+
   private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
     const toast = await this.toastCtrl.create({ message, duration: 2000, color, position: 'bottom' });
     toast.present();
@@ -159,5 +199,10 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
 
   close() {
     this.modalClosed.emit();
+  }
+
+  getIniciales(nombre?: string): string {
+    if (!nombre) return 'U';
+    return nombre.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
   }
 }

@@ -7,7 +7,8 @@ import {
   IonInput,
   IonButton,
   IonIcon,
-  IonCheckbox
+  IonCheckbox,
+  NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
@@ -34,6 +35,7 @@ export class LoginPage implements OnInit {
   private readonly userService = inject(UserService);
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
+  private readonly navCtrl = inject(NavController);
 
   readonly email = signal('');
   readonly password = signal('');
@@ -42,6 +44,13 @@ export class LoginPage implements OnInit {
 
   constructor() {
     addIcons({ arrowBackOutline, personOutline, lockClosedOutline });
+  }
+
+  goToWelcome() {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    this.navCtrl.navigateBack('/welcome');
   }
 
   async ngOnInit() {
@@ -64,9 +73,6 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/forgot-password']);
   }
 
-  goToWelcome() {
-    this.router.navigate(['/welcome']);
-  }
 
   async login() {
     this.errorMessage.set('');
@@ -120,20 +126,24 @@ export class LoginPage implements OnInit {
    * Redirige al usuario según su rol
    */
   private redirectToRolePage(role?: string): void {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
     switch (role) {
       case Rol.ENTRENADO:
-        this.router.navigate(['/entrenado-tabs']);
+        this.navCtrl.navigateRoot('/entrenado-tabs');
         break;
       case Rol.ENTRENADOR:
       case Rol.PERSONAL_TRAINER:
-        this.router.navigate(['/entrenador-tabs']);
+        this.navCtrl.navigateRoot('/entrenador-tabs');
         break;
       case Rol.GIMNASIO:
-        this.router.navigate(['/gimnasio-tabs']);
+        this.navCtrl.navigateRoot('/gimnasio-tabs');
         break;
       default:
         // Si no tiene rol definido, enviar a onboarding
-        this.router.navigate(['/onboarding']);
+        this.navCtrl.navigateRoot('/onboarding');
     }
   }
 }

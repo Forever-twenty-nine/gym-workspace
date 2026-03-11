@@ -1,49 +1,36 @@
 <ion-tabs class="gym-tab-entrenado">
-  <ion-tab-bar slot="bottom" >
+  <ion-tab-bar slot="bottom">
 
     <!-- Tab de Dashboard -->
     <ion-tab-button tab="dashboard" href="/entrenado-tabs/dashboard">
       <ion-icon name="home-outline" class="icon-default"></ion-icon>
       <ion-icon name="home" class="hidden icon-active"></ion-icon>
-      <ion-label>Inicio</ion-label>
     </ion-tab-button>
 
     <!-- Tab de Rutinas -->
     <ion-tab-button tab="rutinas" href="/entrenado-tabs/rutinas">
       <ion-icon name="calendar-outline" class="icon-default"></ion-icon>
       <ion-icon name="calendar" class="hidden icon-active"></ion-icon>
-      <ion-label>Rutinas</ion-label>
     </ion-tab-button>
+
+    @if (isPremium()) {
+    <!-- Tab de Agregar Premium -->
+    <ion-tab-button (click)="openPremiumMenu()">
+      <ion-icon src="assets/icon/dumbbell-add.svg" [style.color]="isCenterTabActive() ? 'var(--ion-color-primary, #a3e635)' : 'var(--ion-tab-bar-color, #999999)'" style="font-size: 38px;"></ion-icon>
+    </ion-tab-button>
+    }
 
     <!-- Tab de Social -->
     <ion-tab-button tab="social" href="/entrenado-tabs/social">
       <ion-icon name="people-outline" class="icon-default"></ion-icon>
       <ion-icon name="people" class="hidden icon-active"></ion-icon>
-      <ion-label>Comunidad</ion-label>
     </ion-tab-button>
 
     <!-- Tab de Progreso -->
     <ion-tab-button tab="progreso" href="/entrenado-tabs/progreso">
       <ion-icon name="stats-chart-outline" class="icon-default"></ion-icon>
       <ion-icon name="stats-chart" class="hidden icon-active"></ion-icon>
-      <ion-label>Progreso</ion-label>
     </ion-tab-button>
-
-    @if (isPremium()) {
-      <!-- Tab de Ejercicios -->
-      <ion-tab-button tab="ejercicios" href="/entrenado-tabs/ejercicios">
-        <ion-icon name="barbell-outline" class="icon-default"></ion-icon>
-        <ion-icon name="barbell" class="hidden icon-active"></ion-icon>
-        <ion-label>Ejercicios</ion-label>
-      </ion-tab-button>
-
-      <!-- Tab de Mis Rutinas -->
-      <ion-tab-button tab="mis-rutinas" href="/entrenado-tabs/mis-rutinas">
-        <ion-icon name="fitness-outline" class="icon-default"></ion-icon>
-        <ion-icon name="fitness" class="hidden icon-active"></ion-icon>
-        <ion-label>Mis Rutinas</ion-label>
-      </ion-tab-button>
-    }
 
   </ion-tab-bar>
 </ion-tabs>

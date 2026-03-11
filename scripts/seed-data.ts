@@ -7,7 +7,7 @@ import { Objetivo } from "../projects/gym-library/src/lib/enums/objetivo.enum";
 process.env['FIRESTORE_EMULATOR_HOST'] = process.env['FIRESTORE_EMULATOR_HOST'] || "127.0.0.1:8080";
 process.env['FIREBASE_AUTH_EMULATOR_HOST'] = process.env['FIREBASE_AUTH_EMULATOR_HOST'] || "127.0.0.1:9099";
 
-initializeApp({ projectId: "default-project" });
+initializeApp({ projectId: "demo-gym" });
 
 const auth = getAuth();
 const db = getFirestore();

@@ -13,4 +13,5 @@ export interface User {
   onboarded?: boolean;
   plan?: Plan;
   photoURL?: string;
+  mensajesGlobalesLeidos?: string[];
 }

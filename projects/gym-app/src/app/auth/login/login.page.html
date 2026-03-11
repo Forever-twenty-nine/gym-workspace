@@ -9,7 +9,7 @@
   <!-- bg gradient & blur -->
   <div class="fixed inset-0 z-0">
     <div class="w-full h-full bg-[url('/assets/images/bg.jpg')] bg-cover bg-center blur-xs"></div>
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/70 to-black pointer-events-none"></div>
+    <div class="absolute inset-0 bg-linear-to-b from-transparent via-black/70 to-black pointer-events-none"></div>
   </div>
 
   <!-- content -->
@@ -23,7 +23,7 @@
         Inicia sesión con:
       </p>
       <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
-        class="normal-case mb-4 !mt-0 " (click)="loginWithGoogle()">
+        class="normal-case mb-4 mt-0! " (click)="loginWithGoogle()">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google" />
         <span class="pl-3 text-base">Cuenta de Google</span>
       </ion-button>
@@ -56,7 +56,7 @@
 
         <div class="flex gap-2 items-center justify-center mb-4">
           <ion-button expand="block" fill="clean" size="default" shape="round" color="primary"
-            (click)="goToForgotPassword()" class="!mt-0">
+            (click)="goToForgotPassword()" class="mt-0!">
             ¿Olvidaste tu contraseña?
           </ion-button>
         </div>

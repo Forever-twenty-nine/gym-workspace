@@ -48,6 +48,10 @@ export const routes: Routes = [
     component: SolicitudesPlanPage
   },
   {
+    path: 'mensajes-globales',
+    loadComponent: () => import('./pages/mensajes-globales/mensajes-globales').then(c => c.MensajesGlobalesComponent)
+  },
+  {
     path: '',
     redirectTo: '/usuarios',
     pathMatch: 'full'

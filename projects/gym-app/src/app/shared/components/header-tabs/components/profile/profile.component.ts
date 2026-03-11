@@ -4,7 +4,8 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Platform, LoadingController, ToastController, MenuController } from '@ionic/angular/standalone';
 
 import {
-  IonButton, IonIcon, IonBadge, IonMenu, IonSpinner, IonProgressBar,
+  IonButton, IonIcon, IonBadge, IonMenu, IonSpinner,
+  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonFooter
 } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
@@ -24,7 +25,6 @@ import { UserService } from '../../../../../core/services/user.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { RutinaService } from '../../../../../core/services/rutina.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
-import { FirebaseStorageService } from '../../../../../core/services/firebase-storage.service';
 import { PlanService } from '../../../../../core/services/plan.service';
 import { NotificacionService } from '../../../../../core/services/notificacion.service';
 
@@ -38,7 +38,8 @@ import { PremiumRequestModalComponent } from './components/premium-request-modal
   standalone: true,
   imports: [
     CommonModule,
-    IonIcon, IonMenu, IonSpinner, IonProgressBar, IonButton,
+    IonIcon, IonMenu, IonSpinner, IonButton,
+    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonFooter,
     NgOptimizedImage, EditProfileModalComponent, ProfileInfoCardComponent, PremiumRequestModalComponent
   ],
 })
@@ -47,7 +48,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private rutinaService = inject(RutinaService);
   public entrenadoService = inject(EntrenadoService);
-  private storageService = inject(FirebaseStorageService);
   private planService = inject(PlanService);
   private notificacionService = inject(NotificacionService);
   private router = inject(Router);
@@ -65,7 +65,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   rutinas = signal<Rutina[]>([]);
   ultimasolicitud = signal<SolicitudPlan | null>(null);
 
-  isUploading = signal<boolean>(false);
   isEditModalOpen = signal<boolean>(false);
   isPremiumModalOpen = signal<boolean>(false);
 
@@ -120,41 +119,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  async onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      this.showToast('Por favor selecciona una imagen válida', 'warning');
-      return;
-    }
-
-    const user = this.currentUser();
-    if (!user) return;
-
-    const loading = await this.loadingCtrl.create({ message: 'Subiendo foto...', spinner: 'crescent' });
-    await loading.present();
-    this.isUploading.set(true);
-
-    try {
-      const path = this.storageService.getProfilePath(user.uid, file.name.split('.').pop());
-      const photoURL = await this.storageService.uploadFile(path, file);
-      await this.userService.updateUser(user.uid, { photoURL });
-      this.showToast('Foto de perfil actualizada', 'success');
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      this.showToast('Error al subir la foto', 'danger');
-    } finally {
-      this.isUploading.set(false);
-      loading.dismiss();
-    }
-  }
-
-  triggerFileInput() {
-    const fileInput = document.getElementById('shared-photo-input') as HTMLInputElement;
-    if (fileInput) fileInput.click();
-  }
-
   private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
     const toast = await this.toastCtrl.create({ message, duration: 2000, color, position: 'bottom' });
     toast.present();
@@ -184,13 +148,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       // Cerramos sesión en Firebase (esto disparará el @if y destruirá este componente)
       await this.authService.logout();
-      
+
       // Limpiar caché local
       localStorage.removeItem('gym_auth_user');
-      
+
       // Redirigir al login
       await this.router.navigate(['/login'], { replaceUrl: true });
-      
+
       this.showToast('Sesión cerrada correctamente', 'success');
     } catch (error) {
       console.error('🛡️ Profile: Error en logout:', error);

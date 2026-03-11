@@ -2,107 +2,130 @@
 <ion-modal [isOpen]="isOpen" (didDismiss)="close()">
   <ng-template>
     <ion-header class="ion-no-border">
-      <ion-toolbar color="dark">
+      <ion-toolbar color="black" class="ion-padding-horizontal">
         <ion-buttons slot="start">
           <ion-button (click)="close()">Cancelar</ion-button>
         </ion-buttons>
-        <ion-title class="text-center font-bold">Editar Perfil</ion-title>
+        <ion-title class="font-bold text-center">Editar</ion-title>
         <ion-buttons slot="end">
-          <ion-button (click)="saveProfile()" [disabled]="editForm.invalid" color="primary" class="font-bold">Guardar</ion-button>
+          <ion-button (click)="saveProfile()" [disabled]="editForm.invalid" color="primary"
+            class="font-bold">GUARDAR</ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding" color="dark">
+
+    <ion-content color="black">
       @if (user) {
-      <div class="max-w-md mx-auto h-full flex flex-col pt-4" [formGroup]="editForm">
-        
-        <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-xl mb-6">
-          <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4 border-b border-primary/20 pb-2">
-            <ion-icon name="person-outline" class="text-lg"></ion-icon>
-            Información General
-          </h3>
+      <div class="max-w-md mx-auto" [formGroup]="editForm">
 
-          <div class="space-y-4">
-            <div>
-              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Nombre Completo</ion-label>
-              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden flex items-center">
-                <ion-input formControlName="nombre" type="text" placeholder="Tu nombre" class="px-4 py-2 text-white w-full" maxlength="50"></ion-input>
+        <!-- Edición de Foto -->
+        <div class="flex flex-col items-center py-10 bg-gradient-to-b from-white/5 to-transparent mb-4">
+          <div class="relative cursor-pointer group" (click)="triggerFileInput()">
+            <div
+              class="w-32 h-32 rounded-full border-4 border-primary/30 shadow-[0_0_30px_rgba(var(--ion-color-primary-rgb),0.2)] overflow-hidden bg-white/5 backdrop-blur-sm relative transition-transform active:scale-95">
+              @if (user.photoURL) {
+              <img [ngSrc]="user.photoURL" fill class="object-cover" alt="Foto de perfil" />
+              } @else {
+              <div class="w-full h-full flex items-center justify-center text-4xl font-bold text-primary bg-primary/10">
+                {{ getIniciales(user.nombre) }}
               </div>
+              }
+
+              <!-- Hover Overlay -->
+              <div
+                class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="material-symbols-rounded text-white text-3xl">add_a_photo</span>
+              </div>
+
+              @if (isUploading()) {
+              <div class="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                <ion-spinner name="crescent" color="primary"></ion-spinner>
+              </div>
+              }
             </div>
 
-            @if (user.role === 'entrenado') {
-            <div>
-              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Objetivo</ion-label>
-              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
-                <ion-select formControlName="objetivo" placeholder="Selecciona..." interface="action-sheet" class="w-full text-white">
-                  @for (opcion of objetivoOptions; track opcion) {
-                  <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
-                  }
-                </ion-select>
-              </div>
+            <!-- Botón flotante -->
+            <div
+              class="absolute -bottom-1 -right-1 z-20 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-4 border-[#121212] transition-transform active:scale-90"
+              style="background-color: #d2ff00 !important;">
+              <span class="material-symbols-rounded !text-black !text-2xl !font-bold">add_a_photo</span>
             </div>
-
-            <div>
-              <ion-label class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-1 text-white">Nivel</ion-label>
-              <div class="bg-black/40 border border-white/10 rounded-xl overflow-hidden px-2 py-1">
-                <ion-select formControlName="nivel" placeholder="Selecciona..." interface="action-sheet" class="w-full text-white">
-                  @for (nivel of nivelOptions; track nivel) {
-                  <ion-select-option [value]="nivel">{{ nivel }}</ion-select-option>
-                  }
-                </ion-select>
-              </div>
-            </div>
-            }
           </div>
+          <input type="file" id="modal-photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+          <p class="mt-4 text-[10px] font-extrabold uppercase tracking-[0.2em] text-primary/80">Toca para cambiar foto
+          </p>
         </div>
 
-        @if (user.role === 'entrenado') {
-        <div class="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-xl mb-6">
-          <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
-            <h3 class="text-primary text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-              <ion-icon name="notifications-outline" class="text-lg"></ion-icon> Recordatorios
-            </h3>
-            <ion-toggle formControlName="recordatoriosEntrenamiento" color="primary"></ion-toggle>
-          </div>
-          
+        <ion-list lines="none" class="bg-transparent ion-no-padding">
+          <ion-list-header class="ion-padding-horizontal mb-2">
+            <ion-label color="primary" class="font-bold text-xs tracking-widest uppercase">Información
+              General</ion-label>
+          </ion-list-header>
+
+          <ion-item class="rounded-2xl mx-4 mb-4">
+            <ion-input label="Nombre Completo" label-placement="stacked" formControlName="nombre" type="text"
+              placeholder="Escribe tu nombre"></ion-input>
+          </ion-item>
+
+          @if (user.role === 'entrenado') {
+          <ion-item class="rounded-2xl mx-4 mb-4">
+            <ion-select label="Objetivo" label-placement="stacked" formControlName="objetivo"
+              placeholder="Selecciona..." interface="action-sheet">
+              @for (opcion of objetivoOptions; track opcion) {
+              <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="rounded-2xl mx-4 mb-4">
+            <ion-select label="Nivel" label-placement="stacked" formControlName="nivel" placeholder="Selecciona..."
+              interface="action-sheet">
+              @for (nivel of nivelOptions; track nivel) {
+              <ion-select-option [value]="nivel">{{ nivel }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <ion-list-header class="ion-padding-horizontal mt-4 mb-2">
+            <ion-label color="primary" class="font-bold text-xs tracking-widest uppercase">Ajustes</ion-label>
+          </ion-list-header>
+
+          <ion-item class="rounded-2xl mx-4 mb-4">
+            <span slot="start" class="material-symbols-rounded text-primary">notifications</span>
+            <ion-label>Recordatorios</ion-label>
+            <ion-toggle formControlName="recordatoriosEntrenamiento" slot="end" color="primary"></ion-toggle>
+          </ion-item>
+
           @if (editForm.get('recordatoriosEntrenamiento')?.value) {
-          <div class="animate-fade-in space-y-4 pt-2">
-            <div class="flex items-center justify-between bg-black/30 p-3 rounded-xl border border-white/5 text-white">
-              <span class="text-xs font-bold uppercase tracking-widest opacity-80">Hora</span>
-              <ion-datetime-button datetime="timepicker_modal" class="font-bold"></ion-datetime-button>
+          <div class="mx-4 mb-8">
+            <ion-item class="rounded-t-2xl">
+              <ion-label class="text-white/60 text-xs">Hora de entrenamiento</ion-label>
+              <ion-datetime-button datetime="timepicker_modal" slot="end"></ion-datetime-button>
               <ion-modal [keepContentsMounted]="true">
                 <ng-template>
-                  <ion-datetime id="timepicker_modal" presentation="time" formControlName="horaRecordatorio"></ion-datetime>
+                  <ion-datetime id="timepicker_modal" presentation="time"
+                    formControlName="horaRecordatorio"></ion-datetime>
                 </ng-template>
               </ion-modal>
-            </div>
+            </ion-item>
 
-            <div>
-              <span class="text-[10px] font-bold uppercase tracking-widest opacity-70 ml-1 block mb-2 text-white">Días Requeridos</span>
+            <div class="bg-dark p-4 rounded-b-2xl border-t border-white/5">
+              <p class="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">Días de entrenamiento</p>
               <div class="flex flex-wrap gap-2">
                 @for (dia of diasSemana; track dia.n) {
                 <ion-chip [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'"
-                  (click)="toggleDia(dia.n)" class="m-0 transition-transform active:scale-95 border border-white/20 px-2 py-1">
-                  <ion-label class="text-xs font-bold">{{ dia.label }}</ion-label>
+                  (click)="toggleDia(dia.n)" class="m-0">
+                  <ion-label class="font-bold">{{ dia.label }}</ion-label>
                 </ion-chip>
                 }
               </div>
             </div>
           </div>
           }
-        </div>
-        }
-
+          }
+        </ion-list>
       </div>
       }
     </ion-content>
-    <ion-footer class="ion-no-border" color="dark">
-      <ion-toolbar color="dark" class="px-4 pb-4 pt-2">
-        <ion-button expand="block" color="danger" fill="outline" class="font-bold h-12 tracking-wide border-2" (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Cerrar Sesión
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
   </ng-template>
 </ion-modal>

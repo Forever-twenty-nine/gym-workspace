@@ -179,6 +179,24 @@
           }
         </a>
       </li>
+      <li>
+        <a routerLink="/mensajes-globales" routerLinkActive="bg-gray-700 text-white"
+          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'"
+          [title]="isCollapsed() ? 'Mensajes Globales' : ''"
+          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
+          <span class="material-icons transition-all duration-300"
+            [ngClass]="isCollapsed() ? 'text-2xl' : 'text-xl mr-3'">campaign</span>
+          @if (!isCollapsed()) {
+          Mensajes Globales
+          }
+          @if (isCollapsed()) {
+          <span
+            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+            Mensajes Globales
+          </span>
+          }
+        </a>
+      </li>
     </ul>
   </nav>
 </aside>

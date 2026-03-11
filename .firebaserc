@@ -12,6 +12,16 @@
           "gym-admin-81f5c"
         ]
       }
+    },
+    "demo-gym": {
+      "hosting": {
+        "gym-app": [
+          "gym-app"
+        ],
+        "gym-admin": [
+          "gym-admin"
+        ]
+      }
     }
   },
   "etags": {}

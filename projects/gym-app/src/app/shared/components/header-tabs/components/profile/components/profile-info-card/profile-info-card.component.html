@@ -11,78 +11,70 @@
   <ion-list class="bg-transparent" lines="full">
     <!-- Rol -->
     <ion-item color="none">
-      <ion-icon slot="start" name="shield-outline"></ion-icon>
-      <ion-label slot="end">
-        <h3>{{ user.role === 'entrenador' ?
+      <span slot="start" class="material-symbols-rounded text-primary !text-3xl">badge</span>
+      <ion-label slot="end" class="text-right">
+        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.role === 'entrenador' ?
           'Entrenador' : 'Entrenado' }}</h3>
-        <p>Rol</p>
+        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Rol</p>
       </ion-label>
     </ion-item>
     <!-- Plan Actual -->
     <ion-item color="none">
-      <ion-icon slot="start" name="trophy-outline"></ion-icon>
-      <ion-label slot="end">
-        <h3>{{ user.plan || 'Free' }}</h3>
-        <p>Plan Actual</p>
+      <span slot="start" class="material-symbols-rounded text-primary !text-3xl">workspace_premium</span>
+      <ion-label slot="end" class="text-right">
+        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.plan || 'Free' }}</h3>
+        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Plan Actual</p>
       </ion-label>
     </ion-item>
-    <!-- Email -->
-    @if (user.email) {
-    <ion-item color="none">
-      <ion-icon slot="start" name="mail-outline"></ion-icon>
-      <ion-label slot="end">
-        <p>{{ user.email }}</p>
-        <h3>Email</h3>
-      </ion-label>
-    </ion-item>
-    }
 
     @if (user.gimnasioId) {
     <ion-item color="none">
-      <ion-icon slot="start" name="fitness-outline"></ion-icon>
-      <ion-label slot="end">
-        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Centro</h3>
-        <p class="text-xs font-semibold text-white m-0 truncate">{{ user.gimnasioId }}</p>
+      <span slot="start" class="material-symbols-rounded text-primary !text-3xl">fitness_center</span>
+      <ion-label slot="end" class="text-right">
+        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.gimnasioId }}</h3>
+        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Centro</p>
       </ion-label>
     </ion-item>
     }
 
     @if (user.role === 'entrenado') {
     <ion-item class="bg-transparent" color="none">
-      <div slot="start" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-primary my-2">
-        <ion-icon name="trophy-outline" class="text-xl text-primary"></ion-icon>
-      </div>
-      <ion-label>
-        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Objetivo</h3>
-        <p class="text-xs font-semibold text-primary m-0 truncate">{{ entrenadoData?.objetivo || 'Sin definir' }}</p>
+      <span slot="start" class="material-symbols-rounded text-primary !text-3xl">target</span>
+      <ion-label slot="end" class="text-right">
+        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.objetivo || 'Sin definir' }}</h3>
+        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Objetivo</p>
       </ion-label>
     </ion-item>
     <ion-item class="bg-transparent" color="none">
-      <div slot="start" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-tertiary my-2">
-        <ion-icon name="stats-chart-outline" class="text-xl text-tertiary"></ion-icon>
-      </div>
-      <ion-label>
-        <h3 class="text-[10px] font-bold uppercase tracking-widest opacity-60 text-white m-0">Nivel</h3>
-        <p class="text-xs font-semibold text-tertiary m-0 truncate">{{ entrenadoData?.nivel || 'Sin definir' }}</p>
+      <span slot="start" class="material-symbols-rounded text-primary !text-3xl">leaderboard</span>
+      <ion-label slot="end" class="text-right">
+        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.nivel || 'Sin definir' }}</h3>
+        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Nivel</p>
       </ion-label>
     </ion-item>
     }
   </ion-list>
 
-  <div class="flex justify-end items-center border-t border-white/10 pt-3 pb-3 px-4">
-    @if (!user.plan || user.plan === 'free') {
-    @if (ultimasolicitud?.estado === 'pendiente') {
-    <ion-button fill="clear" color="warning" disabled size="small">Pendiente</ion-button>
-    } @else if (ultimasolicitud?.estado === 'rechazada') {
-    <ion-button fill="outline" color="danger" size="small" (click)="openPremiumModal()">Reintentar</ion-button>
-    } @else {
-    <ion-button color="primary" class="font-bold tracking-wide" size="small" (click)="openPremiumModal()" fill="solid">
-      <ion-icon name="trophy-outline" slot="start"></ion-icon>
-      Mejorar Plan
-    </ion-button>
-    }
-    } @else {
-    <ion-button fill="clear" color="success" disabled size="small">Activo</ion-button>
-    }
-  </div>
-</ion-card>}
+
+</ion-card>
+
+
+
+<div class="flex justify-center ion-padding-top ion-padding-bottom">
+  @if (!user.plan || user.plan === 'free') {
+  @if (ultimasolicitud?.estado === 'pendiente') {
+  <ion-button fill="clear" color="warning" disabled size="small">Pendiente</ion-button>
+  } @else if (ultimasolicitud?.estado === 'rechazada') {
+  <ion-button fill="outline" color="danger" size="small" (click)="openPremiumModal()">Reintentar</ion-button>
+  } @else {
+  <ion-button color="primary" class="font-bold tracking-wide" size="small" (click)="openPremiumModal()" fill="solid">
+    <ion-icon name="trophy-outline" slot="start"></ion-icon>
+    Mejorar Plan
+  </ion-button>
+  }
+  } @else {
+  <ion-button fill="solid" color="success" disabled size="small">Activo</ion-button>
+  }
+</div>
+
+}

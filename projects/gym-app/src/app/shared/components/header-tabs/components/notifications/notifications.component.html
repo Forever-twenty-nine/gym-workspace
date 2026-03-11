@@ -4,7 +4,74 @@
             <ion-title>Notificaciones</ion-title>
         </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">
-        <p class="text-center text-gray-500 py-4">No tienes notificaciones pendientes</p>
+    <ion-content>
+        @if (mensajesNoLeidos().length === 0 && invitacionesPendientes().length === 0 && mensajesLeidos().length === 0) {
+            <div style="text-align: center; color: var(--ion-color-medium); padding: 40px 20px;">
+                <ion-icon name="mail-outline" style="font-size: 48px; margin-bottom: 16px;"></ion-icon>
+                <p>No tienes notificaciones pendientes</p>
+            </div>
+        } @else {
+            <ion-list lines="full">
+                <!-- Invitaciones -->
+                @if (invitacionesPendientes().length > 0) {
+                    <ion-item-divider sticky>
+                        <ion-label>Invitaciones Pendientes</ion-label>
+                    </ion-item-divider>
+
+                    @for (inv of invitacionesPendientes(); track inv.id) {
+                        <ion-item lines="none">
+                            <ion-icon slot="start" name="person-add-outline" color="secondary"></ion-icon>
+                            <ion-label>
+                                <h2 style="font-weight: bold;">Invitación de {{ inv.entrenadorNombre }}</h2>
+                                <p class="ion-text-wrap">{{ inv.mensajePersonalizado || 'Te ha invitado a vincularse como tu entrenador' }}</p>
+                            </ion-label>
+                        </ion-item>
+                        <ion-item lines="full">
+                            <div slot="end" style="display: flex; gap: 8px; padding-bottom: 12px;">
+                                <ion-button size="small" (click)="aceptarInvitacion(inv.id)">Aceptar</ion-button>
+                                <ion-button size="small" fill="outline" color="danger" (click)="rechazarInvitacion(inv.id)">Rechazar</ion-button>
+                            </div>
+                        </ion-item>
+                    }
+                }
+
+                <!-- Mensajes Globales (No Leídos) -->
+                @if (mensajesNoLeidos().length > 0) {
+                    <ion-item-divider sticky>
+                        <ion-label>Nuevos Anuncios</ion-label>
+                    </ion-item-divider>
+                    
+                    @for (msg of mensajesNoLeidos(); track msg.id) {
+                        <ion-item button detail="true" (click)="openMensaje(msg)">
+                            <ion-icon slot="start" name="information-circle-outline" color="primary"></ion-icon>
+                            <ion-label>
+                                <h2 style="font-weight: bold;">{{ msg.titulo }}</h2>
+                                <p class="ion-text-wrap">{{ msg.mensaje }}</p>
+                                <p style="font-size: 0.75rem; color: var(--ion-color-medium);">
+                                    {{ msg.fechaCreacion | date:'short' }}
+                                </p>
+                            </ion-label>
+                        </ion-item>
+                    }
+                }
+
+                <!-- Mensajes Globales (Ya Leídos) -->
+                @if (mensajesLeidos().length > 0) {
+                    <ion-item-divider sticky>
+                        <ion-label>Anuncios Anteriores</ion-label>
+                    </ion-item-divider>
+                    
+                    @for (msg of mensajesLeidos(); track msg.id) {
+                        <ion-item button detail="true" (click)="openMensaje(msg)" style="opacity: 0.7;">
+                            <ion-icon slot="start" name="mail-outline" color="medium"></ion-icon>
+                            <ion-label>
+                                <h2>{{ msg.titulo }}</h2>
+                                <p class="ion-text-wrap">{{ msg.mensaje }}</p>
+                            </ion-label>
+                        </ion-item>
+                    }
+                }
+            </ion-list>
+        }
     </ion-content>
 </ion-menu>

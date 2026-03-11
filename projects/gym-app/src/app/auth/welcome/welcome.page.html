@@ -1,7 +1,7 @@
 <ion-content [fullscreen]="true" class="ion-padding" style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
 
   <!-- bg gradient -->
-  <div class="fixed inset-0 bg-gradient-to-b from-transparent via-black/70 to-black/90 pointer-events-none z-0"></div>
+  <div class="fixed inset-0 bg-linear-to-b from-transparent via-black/70 to-black/90 pointer-events-none z-0"></div>
 
   <!-- content -->
   <div class="z-10 p-2 relative flex items-end justify-center min-h-dvh -mt-4 -mb-4">
@@ -9,7 +9,7 @@
     <div class="pb-8">
       <img src="/assets/images/logo.png" width="100" height="100" alt="Fondo" class="mb-6" />
       <h1 class="font-heading text-4xl text-white font-semibold mb-4">
-        <span class="text-[var(--brand-primary-color)]">
+        <span class="text-(--brand-primary-color)">
           Entrenamientos</span>
         diseñados sólo para ti!
       </h1>
@@ -37,7 +37,7 @@
           shape="round"
           color="primary"
           (click)="goToLogin()"
-          class="!mt-0">
+          class="mt-0!">
           Iniciar Sesión
         </ion-button>
       </div>

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import {
   IonContent,
   IonButton,
+  NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -23,16 +24,23 @@ import {
 ]
 })
 export class WelcomePage {
+  private navCtrl = inject(NavController);
 
   constructor(private router: Router) {
     addIcons({fitnessOutline,personAddOutline,arrowForwardOutline,logInOutline});
   }
 
   goToRegister() {
-    this.router.navigate(['/register']);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    this.navCtrl.navigateForward('/register');
   }
 
   goToLogin() {
-    this.router.navigate(['/login']);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    this.navCtrl.navigateForward('/login');
   }
 }
