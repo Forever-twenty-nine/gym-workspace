@@ -1,21 +1,25 @@
-<ion-card class="ion-no-margin mb-6 overflow-hidden rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#121212]">
+<ion-card
+  class="ion-no-margin mb-6 overflow-hidden rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#121212]">
   <!-- Header: Perfil de Usuario -->
   <ion-item lines="none" class="ion-no-padding px-4 py-3 bg-transparent">
-    <div slot="start" class="relative w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-100 dark:bg-gray-800 border border-black/10 dark:border-white/10 flex items-center justify-center">
+    <div slot="start"
+      class="relative w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-100 dark:bg-gray-800 border border-black/10 dark:border-white/10 flex items-center justify-center">
       @if (userProfilePhoto()) {
-        <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" class="w-full h-full object-cover" alt="Foto de perfil">
+      <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" class="w-full h-full object-cover"
+        alt="Foto de perfil">
       } @else {
-        <span class="text-primary font-bold text-sm uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
+      <span class="text-primary font-bold text-sm uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
       }
     </div>
-    
+
     <ion-label class="mt-1">
       <div class="flex items-center gap-1.5">
         <h3 class="font-bold text-sm m-0 text-gray-900 dark:text-white truncate">
           {{ sesion.nombreUsuario || 'Usuario' }}
         </h3>
         @if(isOwnPost()) {
-          <span class="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Tú</span>
+        <span
+          class="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Tú</span>
         }
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 m-0 mt-0.5 font-medium">
@@ -25,26 +29,27 @@
 
     <ion-buttons slot="end">
       @if (!isOwnPost()) {
-        <ion-button (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear" size="small" class="font-bold text-xs">
-          {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
-        </ion-button>
+      <ion-button (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear"
+        size="small" class="font-bold text-xs">
+        {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
+      </ion-button>
       }
       @if (isOwnPost()) {
-        <ion-button (click)="presentOptions($event)" color="medium">
-          <ion-icon slot="icon-only" name="ellipsis-horizontal" class="text-sm"></ion-icon>
-        </ion-button>
+      <ion-button (click)="presentOptions($event)" color="medium">
+        <ion-icon slot="icon-only" name="ellipsis-horizontal" class="text-sm"></ion-icon>
+      </ion-button>
       }
     </ion-buttons>
   </ion-item>
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion.fotoProgreso) {
-    <div class="w-full aspect-[4/5] sm:aspect-square relative bg-gray-100 dark:bg-gray-900">
-      <img [src]="sesion.fotoProgreso" class="w-full h-full object-cover" alt="Foto del entrenamiento">
-    </div>
+  <div class="w-full aspect-[4/5] sm:aspect-square relative bg-gray-100 dark:bg-gray-900">
+    <img [src]="sesion.fotoProgreso" class="w-full h-full object-cover" alt="Foto del entrenamiento">
+  </div>
   } @else {
-    <!-- Separator if no image, to make it look clean -->
-    <div class="h-px w-full bg-black/5 dark:bg-white/5"></div>
+  <!-- Separator if no image, to make it look clean -->
+  <div class="h-px w-full bg-black/5 dark:bg-white/5"></div>
   }
 
   <!-- Body: Contenido de la rutina y acciones -->
@@ -52,7 +57,8 @@
     <!-- Action buttons (Like, Comment, etc) -->
     <div class="flex items-center justify-between mb-2 -mx-2 mt-1">
       <div class="flex items-center">
-        <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()" [color]="hasLiked() ? 'danger' : 'dark'" class="ion-no-margin h-9 w-9">
+        <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
+          [color]="hasLiked() ? 'danger' : 'light'" class="ion-no-margin h-9 w-9">
           <ion-icon slot="icon-only" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
         </ion-button>
         <!-- Future: Comment/Share icons could go here -->
@@ -61,15 +67,16 @@
 
     <!-- Likes count -->
     @if (likesCount() > 0) {
-      <div class="font-bold text-sm mb-1.5 text-gray-900 dark:text-white">
-        {{ likesCount() }} Me gusta
-      </div>
+    <div class="font-bold text-sm mb-1.5 text-gray-900 dark:text-white">
+      {{ likesCount() }} Me gusta
+    </div>
     }
 
     <!-- Routine Title and Description -->
     <div class="text-sm text-gray-900 dark:text-gray-100 leading-snug">
       <span class="font-bold mr-1">{{ sesion.nombreUsuario || 'Usuario' }}</span>
-      <span>completó su sesión de <span class="font-semibold">{{ sesion.rutinaResumen.nombre || 'Entrenamiento' }}</span>.</span>
+      <span>completó su sesión de <span class="font-semibold">{{ sesion.rutinaResumen.nombre || 'Entrenamiento'
+          }}</span>.</span>
     </div>
 
     <!-- Secondary stats inline -->
@@ -86,4 +93,3 @@
     </div>
   </div>
 </ion-card>
-

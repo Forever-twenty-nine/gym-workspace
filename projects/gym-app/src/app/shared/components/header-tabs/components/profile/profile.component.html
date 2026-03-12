@@ -10,7 +10,7 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="ion-padding" color="black">
+  <ion-content class="ion-padding">
     @if (currentUser(); as user) {
     <div class="flex flex-col items-center gap-4 py-8 mb-6">
       <div class="relative">
@@ -26,8 +26,8 @@
       </div>
 
       <div class="text-center">
-        <h2 class="ion-no-margin text-2xl font-bold text-white">{{ user.nombre }}</h2>
-        <p class="ion-no-margin text-white/60 font-medium">{{ getRoleDisplayName(user.role) }}</p>
+        <h2 class="ion-no-margin text-2xl font-bold">{{ user.nombre }}</h2>
+        <p class="ion-no-margin font-medium">{{ getRoleDisplayName(user.role) }}</p>
       </div>
     </div>
 

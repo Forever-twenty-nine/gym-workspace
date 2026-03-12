@@ -1,6 +1,6 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonMenu, IonList, IonItem, IonLabel, ModalController, IonIcon, IonButton, IonItemDivider, IonNote } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonMenu, IonList, IonItem, IonLabel, ModalController, IonIcon, IonButton, IonItemDivider, IonNote, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, personAddOutline, fitnessOutline, informationCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../../core/services/auth.service';
@@ -33,6 +33,7 @@ export class NotificationsComponent {
   private mensajesGlobalesService = inject(MensajesGlobalesService);
   private invitacionService = inject(InvitacionService);
   private modalCtrl = inject(ModalController);
+  private toastCtrl = inject(ToastController);
 
   currentUser = this.authService.currentUser;
   
@@ -71,10 +72,23 @@ export class NotificationsComponent {
   }
 
   async aceptarInvitacion(id: string) {
-    await this.invitacionService.aceptarInvitacion(id);
+    try {
+      await this.invitacionService.aceptarInvitacion(id);
+      const toast = await this.toastCtrl.create({ message: 'Invitación aceptada exitosamente', duration: 2000, color: 'success' });
+      await toast.present();
+    } catch (e) {
+      const toast = await this.toastCtrl.create({ message: 'Error al aceptar la invitación', duration: 2000, color: 'danger' });
+      await toast.present();
+    }
   }
 
   async rechazarInvitacion(id: string) {
-    await this.invitacionService.rechazarInvitacion(id);
+    try {
+      await this.invitacionService.rechazarInvitacion(id);
+      const toast = await this.toastCtrl.create({ message: 'Invitación rechazada', duration: 2000, color: 'medium' });
+      await toast.present();
+    } catch (e) {
+      console.error('Error al rechazar invitación:', e);
+    }
   }
 }

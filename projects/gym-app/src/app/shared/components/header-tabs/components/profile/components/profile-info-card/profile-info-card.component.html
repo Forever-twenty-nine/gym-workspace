@@ -13,17 +13,17 @@
     <ion-item color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">badge</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.role === 'entrenador' ?
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ user.role === 'entrenador' ?
           'Entrenador' : 'Entrenado' }}</h3>
-        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Rol</p>
+        <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Rol</p>
       </ion-label>
     </ion-item>
     <!-- Plan Actual -->
     <ion-item color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">workspace_premium</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.plan || 'Free' }}</h3>
-        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Plan Actual</p>
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ user.plan || 'Free' }}</h3>
+        <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Plan Actual</p>
       </ion-label>
     </ion-item>
 
@@ -31,8 +31,8 @@
     <ion-item color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">fitness_center</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ user.gimnasioId }}</h3>
-        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Centro</p>
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ user.gimnasioId }}</h3>
+        <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Centro</p>
       </ion-label>
     </ion-item>
     }
@@ -41,15 +41,17 @@
     <ion-item class="bg-transparent" color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">target</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.objetivo || 'Sin definir' }}</h3>
-        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Objetivo</p>
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.objetivo || 'Sin definir' }}
+        </h3>
+        <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Objetivo</p>
       </ion-label>
     </ion-item>
     <ion-item class="bg-transparent" color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">leaderboard</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!text-white !font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.nivel || 'Sin definir' }}</h3>
-        <p class="!text-white/50 !text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Nivel</p>
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ entrenadoData?.nivel || 'Sin definir' }}
+        </h3>
+        <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Nivel</p>
       </ion-label>
     </ion-item>
     }

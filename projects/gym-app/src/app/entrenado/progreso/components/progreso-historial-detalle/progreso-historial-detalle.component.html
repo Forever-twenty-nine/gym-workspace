@@ -16,11 +16,11 @@
         </ion-header>
 
         <ion-content class="ion-padding"
-            style="--background: url('assets/images/gym_progress_bg.png') center/cover no-repeat; --color: white;">
+            style="--background: url('assets/images/gym_progress_bg.png') center/cover no-repeat;">
 
-            <!-- Overlay oscuro pero más suave que la versión anterior para evitar que se vea "demasiado oscuro" -->
+            <!-- Overlay suave para adaptar al tema claro u oscuro -->
             <div slot="fixed"
-                class="w-full h-full bg-linear-to-br from-black/70 via-black/40 to-primary/60 pointer-events-none z-0">
+                class="w-full h-full bg-linear-to-br from-white/40 via-white/20 to-transparent dark:from-black/70 dark:via-black/40 dark:to-primary/60 pointer-events-none z-0">
             </div>
 
             <div class="relative z-10 w-full pt-2 pb-6">
@@ -37,32 +37,32 @@
                         }
                     </div>
 
-                    <h2 class="text-2xl font-black text-white mb-2 text-center">
+                    <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-2 text-center">
                         {{ sesionSeleccionada.rutinaResumen?.nombre || 'Rutina' }}
                     </h2>
                     
-                    <p class="text-medium m-0 flex items-center gap-2 text-white/70">
+                    <p class="text-medium m-0 flex items-center gap-2 text-gray-600 dark:text-white/70">
                         <ion-icon name="calendar-outline" class="text-lg"></ion-icon>
                         {{ formatearFecha(sesionSeleccionada.fechaInicio) }}
                     </p>
                 </div>
 
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 mx-1 mb-6 p-5 shadow-lg">
+                <div class="bg-white/60 dark:bg-white/10 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/20 mx-1 mb-6 p-5 shadow-sm dark:shadow-lg">
                     <div class="flex flex-row justify-around items-center">
                         <div class="flex flex-col items-center">
-                            <p class="text-[10px] m-0 mb-1 font-bold uppercase tracking-wider text-white/50">Duración</p>
+                            <p class="text-[10px] m-0 mb-1 font-bold uppercase tracking-wider text-gray-500 dark:text-white/50">Duración</p>
                             <div class="flex items-center gap-1">
-                                <ion-icon name="time-outline" class="text-white text-xl"></ion-icon>
-                                <span class="text-xl font-bold text-white">
+                                <ion-icon name="time-outline" class="text-gray-900 dark:text-white text-xl"></ion-icon>
+                                <span class="text-xl font-bold text-gray-900 dark:text-white">
                                     {{ redondearMinutos(sesionSeleccionada.duracion || 0) }}m
                                 </span>
                             </div>
                         </div>
 
-                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="w-px h-10 bg-gray-300 dark:bg-white/10"></div>
 
                         <div class="flex flex-col items-center">
-                            <p class="text-[10px] m-0 mb-1 font-bold uppercase tracking-wider text-white/50">Estado</p>
+                            <p class="text-[10px] m-0 mb-1 font-bold uppercase tracking-wider text-gray-500 dark:text-white/50">Estado</p>
                             <ion-badge [color]="getColorEstado(sesionSeleccionada)"
                                 class="px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm">
                                 {{ getEstadoSesion(sesionSeleccionada) }}
@@ -72,22 +72,22 @@
                 </div>
 
                 <!-- Compartir en Comunidad -->
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 mx-1 mb-6 p-2 shadow-lg">
-                    <ion-item lines="none" class="bg-transparent" style="--background: transparent; --color: white;">
+                <div class="bg-white/60 dark:bg-white/10 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/20 mx-1 mb-6 p-2 shadow-sm dark:shadow-lg">
+                    <ion-item lines="none" class="bg-transparent" style="--background: transparent;">
                         <ion-icon name="share-social-outline" slot="start" class="text-primary text-xl"></ion-icon>
                         <ion-label>
-                            <h3 class="text-sm font-bold text-white">Compartir en comunidad</h3>
-                            <p class="text-[10px] font-medium text-white/50 uppercase tracking-tighter">Hacer visible en el feed</p>
+                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Compartir en comunidad</h3>
+                            <p class="text-[10px] font-medium text-gray-500 dark:text-white/50 uppercase tracking-tighter">Hacer visible en el feed</p>
                         </ion-label>
                         <ion-toggle slot="end" [checked]="sesionSeleccionada.compartida" (ionChange)="toggleCompartir($event)" style="--handle-background-checked: var(--ion-color-primary);"></ion-toggle>
                     </ion-item>
 
                     <!-- Sección de Foto Premium -->
                     @if (isPremium() && sesionSeleccionada.compartida) {
-                    <div class="px-4 pb-4 pt-1 border-t border-white/10 mt-1">
-                        <p class="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-3">Foto del entrenamiento (Premium)</p>
+                    <div class="px-4 pb-4 pt-1 border-t border-gray-200 dark:border-white/10 mt-1">
+                        <p class="text-[10px] font-bold text-gray-500 dark:text-white/50 uppercase tracking-widest mb-3">Foto del entrenamiento (Premium)</p>
                         
-                        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-white/5 border border-dashed border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-all group"
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 border border-dashed border-gray-300 dark:border-white/20 flex flex-col items-center justify-center cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 transition-all group"
                              (click)="triggerPhotoInput()">
                             
                             @if (fotoProgresoUrl()) {
@@ -96,14 +96,14 @@
                                     <ion-icon name="camera-outline" class="text-3xl text-white"></ion-icon>
                                 </div>
                             } @else {
-                                <ion-icon name="camera-outline" class="text-3xl text-white/30 mb-2"></ion-icon>
-                                <span class="text-xs text-white/40 font-bold">Subir foto del entrenamiento</span>
+                                <ion-icon name="camera-outline" class="text-3xl text-gray-400 dark:text-white/30 mb-2"></ion-icon>
+                                <span class="text-xs text-gray-500 dark:text-white/40 font-bold">Subir foto del entrenamiento</span>
                             }
 
                             @if (isUploading()) {
-                                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+                                <div class="absolute inset-0 bg-white/80 dark:bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-20">
                                     <ion-spinner name="crescent" color="primary"></ion-spinner>
-                                    <span class="text-[10px] text-white font-bold mt-2 uppercase tracking-widest">Subiendo...</span>
+                                    <span class="text-[10px] text-gray-900 dark:text-white font-bold mt-2 uppercase tracking-widest">Subiendo...</span>
                                 </div>
                             }
                         </div>
@@ -115,17 +115,17 @@
                 <!-- Lista de ejercicios de la sesión -->
                 @if(sesionSeleccionada.rutinaResumen?.ejercicios?.length) {
                 <div class="mx-1 mb-8">
-                    <h3 class="text-xs font-bold mb-3 px-1 uppercase tracking-wide text-white/50">Ejercicios Realizados</h3>
-                    <div class="rounded-2xl overflow-hidden border border-white/20 bg-white/5 backdrop-blur-sm shadow-lg">
+                    <h3 class="text-xs font-bold mb-3 px-1 uppercase tracking-wide text-gray-500 dark:text-white/50">Ejercicios Realizados</h3>
+                    <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-white/20 bg-white/60 dark:bg-white/5 backdrop-blur-sm shadow-sm dark:shadow-lg">
                         <ion-list class="py-0 bg-transparent">
                             @for(ejercicio of sesionSeleccionada.rutinaResumen.ejercicios; track $index) {
-                            <ion-item class="--border-color: rgba(255, 255, 255, 0.1);" lines="full"
-                                style="--background: transparent; --color: white;">
+                            <ion-item class="--border-color: rgba(0, 0, 0, 0.1); dark:--border-color: rgba(255, 255, 255, 0.1);" lines="full"
+                                style="--background: transparent;">
                                 <ion-badge slot="start"
-                                    class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] m-0 shrink-0 bg-white/20 text-white">
+                                    class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] m-0 shrink-0 bg-gray-200 dark:bg-white/20 text-gray-800 dark:text-white">
                                     {{ $index + 1 }}
                                 </ion-badge>
-                                <ion-label class="font-medium text-sm my-3 ion-text-wrap text-white">
+                                <ion-label class="font-medium text-sm my-3 ion-text-wrap text-gray-900 dark:text-white">
                                     {{ ejercicio.nombre || 'Ejercicio' }}
                                 </ion-label>
                             </ion-item>

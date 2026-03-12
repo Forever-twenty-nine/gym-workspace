@@ -1,14 +1,14 @@
-<ion-card class="rounded-3xl shadow-xl text-white relative overflow-hidden bg-gray-900 m-4 mt-6 mb-8 border-none"
+<ion-card class="rounded-3xl shadow-xl relative overflow-hidden bg-white dark:bg-gray-900 m-4 mt-6 mb-8 border-none"
     style="background-image: url('assets/images/gym_progress_bg.png'); background-size: cover; background-position: center;">
 
-    <!-- Overlay oscuro para garantizar contraste -->
-    <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-primary/60 pointer-events-none z-0">
+    <!-- Overlay para adaptar al tema claro u oscuro -->
+    <div class="absolute inset-0 bg-gradient-to-br from-white/40 via-white/20 to-transparent dark:from-black/80 dark:via-black/50 dark:to-primary/60 pointer-events-none z-0">
     </div>
 
     <ion-card-header class="relative z-10 px-4 pt-4 pb-2 flex flex-row justify-between items-center gap-2">
-        <ion-card-title class="text-lg font-bold text-white m-0">Historial</ion-card-title>
+        <ion-card-title class="text-lg font-bold text-gray-900 dark:text-white m-0">Historial</ion-card-title>
         <ion-select [value]="filtroSeleccionado" (ionChange)="cambiarFiltro($event)" interface="popover"
-            class="text-white text-xs font-medium bg-white/10 rounded-lg px-2 py-1 min-h-0 border border-white/20 m-0 m-w-[120px]">
+            class="text-gray-900 dark:text-white text-xs font-medium bg-white/60 dark:bg-white/10 rounded-lg px-2 py-1 min-h-0 border border-gray-200 dark:border-white/20 m-0 min-w-[120px]">
             <ion-select-option value="esta_semana">Esta semana</ion-select-option>
             <ion-select-option value="semana_pasada">Semana pasada</ion-select-option>
         </ion-select>
@@ -17,11 +17,11 @@
     <ion-card-content class="relative z-10 px-3 pb-4">
         @if (sesiones.length > 0) {
         @if (sesionesFiltradas.length > 0) {
-        <ion-list lines="none" class="space-y-2 py-0" style="background: transparent;">
+        <ion-list lines="none" class="space-y-2 py-0 bg-transparent">
             @for (sesion of sesionesFiltradas; track sesion.id) {
-            <ion-item class="rounded-xl overflow-hidden shadow-sm border border-white/20 relative" button="true"
+            <ion-item class="rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-white/20 relative backdrop-blur-sm bg-white/50 dark:bg-white/10" button="true"
                 (click)="verDetalle(sesion)" detail="false"
-                style="--background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px);">
+                style="--background: transparent;">
 
                 <!-- Icono lateral -->
                 <ion-icon [name]="sesion.completada ? 'checkmark-circle-outline' : 'time-outline'"
@@ -30,17 +30,17 @@
 
                 <ion-label>
                     <div class="flex flex-row items-center justify-start gap-3 w-full overflow-hidden">
-                        <h2 class="font-bold text-sm m-0 whitespace-nowrap truncate max-w-[40%] text-white">
+                        <h2 class="font-bold text-sm m-0 whitespace-nowrap truncate max-w-[40%] text-gray-900 dark:text-white">
                             {{
                             sesion.rutinaResumen?.nombre || 'Mi Rutina' }}</h2>
 
-                        <div class="text-xs flex items-center gap-2 whitespace-nowrap text-white/80">
+                        <div class="text-xs flex items-center gap-2 whitespace-nowrap text-gray-500 dark:text-white/80">
                             <span class="flex items-center gap-1">
                                 <ion-icon name="calendar-outline"></ion-icon>
                                 {{ formatearFecha(sesion.fechaInicio) }}
                             </span>
 
-                            <span class="text-white/40">|</span>
+                            <span class="text-gray-300 dark:text-white/40">|</span>
 
                             @if (sesion.completada) {
                             <span class="flex items-center gap-1 text-orange-500 font-semibold">
@@ -67,16 +67,16 @@
             }
         </ion-list>
         } @else {
-        <div class="flex flex-col items-center justify-center p-6 opacity-60 text-center text-white">
+        <div class="flex flex-col items-center justify-center p-6 opacity-60 text-center text-gray-900 dark:text-white">
             <ion-icon name="calendar-outline" class="text-4xl mb-2"></ion-icon>
             <p class="text-sm font-medium m-0">No hay rutinas para este periodo.</p>
         </div>
         }
         } @else {
-        <div class="flex flex-col items-center justify-center p-8 opacity-60 text-center text-white">
+        <div class="flex flex-col items-center justify-center p-8 opacity-60 text-center text-gray-900 dark:text-white">
             <ion-icon name="fitness-outline" class="text-5xl mb-3"></ion-icon>
             <p class="text-base font-medium m-0">Aún no has comenzado ninguna rutina.</p>
-            <p class="text-sm mt-1 text-white/80">Tu progreso aparecerá aquí.</p>
+            <p class="text-sm mt-1 text-gray-500 dark:text-white/80">Tu progreso aparecerá aquí.</p>
         </div>
         }
     </ion-card-content>
