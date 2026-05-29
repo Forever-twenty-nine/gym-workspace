@@ -50,6 +50,7 @@
     "@angular/language-service": "^21.2.0",
     "@capacitor/cli": "8.3.4",
     "@ionic/angular-toolkit": "12.3.0",
+    "jsdom": "^21.1.1",
     "postcss": "8.5.15",
     "typescript": "~5.9.3",
     "vitest": "4.1.7"

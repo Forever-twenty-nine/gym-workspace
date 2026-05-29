@@ -1,7 +1,9 @@
 {
   "name": "gym-library",
   "version": "0.0.1",
-  "scripts": {},
+  "scripts": {
+    "test": "vitest run"
+  },
   "peerDependencies": {
     "@angular/common": "^21.2.0",
     "@angular/core": "^21.2.0",
@@ -12,5 +14,8 @@
     "tslib": "^2.8.1"
   },
   "sideEffects": false,
-  "devDependencies": {}
+  "devDependencies": {
+    "vitest": "4.1.7",
+    "jsdom": "^21.1.1"
+  }
 }

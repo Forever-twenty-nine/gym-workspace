@@ -123,22 +123,11 @@
           }
         },
         "test": {
-          "builder": "@angular/build:vitest",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": "src/polyfills.ts",
-            "inlineStyleLanguage": "css",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              }
-            ],
-            "styles": [
-              "src/global.css",
-              "src/theme/variables.css"
-            ],
-            "scripts": []
+            "runner": "vitest",
+            "runnerConfig": true,
+            "buildTarget": "app:build:development"
           }
         },
         "lint": {

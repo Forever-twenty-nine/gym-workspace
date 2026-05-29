@@ -38,6 +38,7 @@
     "@angular/build": "21.2.13",
     "@angular/cli": "21.2.13",
     "@angular/compiler-cli": "21.2.15",
+    "jsdom": "^21.1.1",
     "postcss": "8.5.15",
     "typescript": "^5.9.3",
     "vitest": "4.1.7"

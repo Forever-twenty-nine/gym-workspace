@@ -82,17 +82,10 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-          "builder": "@angular/build:vitest",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "runner": "vitest",
+            "buildTarget": "gym-admin:build:development"
           }
         }
       }
