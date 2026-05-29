@@ -38,7 +38,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'social',
         pathMatch: 'full',
       },
     ],

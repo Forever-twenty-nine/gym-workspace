@@ -1,5 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonMenuButton, IonButtons, IonIcon, IonBadge, MenuController, IonButton } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar,  IonMenuButton, IonButtons, IonIcon, IonBadge, MenuController, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { notificationsOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
@@ -10,7 +10,7 @@ import { Rol } from 'gym-library';
 @Component({
   selector: 'app-header-tabs',
   standalone: true,
-  imports: [IonTitle, IonHeader, IonToolbar, IonMenuButton, IonButtons, IonIcon, IonBadge, IonButton],
+  imports: [ IonHeader, IonToolbar, IonMenuButton, IonButtons, IonIcon, IonBadge, IonButton],
   templateUrl: './header-tabs.component.html'
 })
 export class HeaderTabsComponent {

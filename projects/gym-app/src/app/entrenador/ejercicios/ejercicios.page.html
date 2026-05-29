@@ -1,19 +1,49 @@
 <app-header-tabs></app-header-tabs>
 
 <ion-content [fullscreen]="true">
-  <div class="container">
-    <!-- Lista de Ejercicios -->
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Mis Ejercicios</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-list>
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }
+
+  <div class="main-container ion-padding relative z-10">
+    <div
+      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      <div class="container">
+        <!-- Acciones -->
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4">
+          <!-- Indicador de límite de plan -->
+          <div style="margin-bottom: 16px; text-align: center;">
+            <ion-text [color]="hasReachedEjercicioLimit() ? 'warning' : 'medium'" style="font-size: 0.9em;">
+              <ion-icon name="information-circle-outline" style="margin-right: 4px;"></ion-icon>
+              {{ ejercicioLimitMessage() }}
+            </ion-text>
+          </div>
+
+          <ion-button expand="block" fill="solid" color="primary" (click)="crearEjercicio()"
+            [disabled]="hasReachedEjercicioLimit()">
+            <ion-icon name="barbell" slot="start"></ion-icon>
+            Crear Nuevo Ejercicio
+            @if (hasReachedEjercicioLimit()) {
+            <ion-icon name="lock-closed" slot="end"></ion-icon>
+            }
+          </ion-button>
+
+          @if (hasReachedEjercicioLimit()) {
+          <ion-text color="warning" style="display: block; text-align: center; margin-top: 8px; font-size: 0.85em;">
+            Has alcanzado el límite de tu plan. Actualiza para crear más ejercicios.
+          </ion-text>
+          }
+        </div>
+
+        <ion-list style="background: transparent;" class="p-0 m-0">
           @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
-          <ion-item button (click)="verEjercicio(ejercicio)">
+          <ion-item button (click)="verEjercicio(ejercicio)" class="--background: transparent; mb-1">
             <ion-label>
-              <h3>{{ ejercicio.nombre }}</h3>
-              <p>{{ ejercicio.descripcion }}</p>
+              <h3 class="font-bold text-white">{{ ejercicio.nombre }}</h3>
             </ion-label>
             <ion-button fill="clear" slot="end" color="primary"
               (click)="verEjercicio(ejercicio); $event.stopPropagation()">
@@ -26,36 +56,8 @@
           </ion-item>
           }
         </ion-list>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Acciones -->
-    <ion-card>
-      <ion-card-content>
-        <!-- Indicador de límite de plan -->
-        <div style="margin-bottom: 16px; text-align: center;">
-          <ion-text [color]="hasReachedEjercicioLimit() ? 'warning' : 'medium'" style="font-size: 0.9em;">
-            <ion-icon name="information-circle-outline" style="margin-right: 4px;"></ion-icon>
-            {{ ejercicioLimitMessage() }}
-          </ion-text>
-        </div>
-
-        <ion-button expand="block" fill="solid" color="primary" (click)="crearEjercicio()"
-          [disabled]="hasReachedEjercicioLimit()">
-          <ion-icon name="barbell" slot="start"></ion-icon>
-          Crear Nuevo Ejercicio
-          @if (hasReachedEjercicioLimit()) {
-          <ion-icon name="lock-closed" slot="end"></ion-icon>
-          }
-        </ion-button>
-
-        @if (hasReachedEjercicioLimit()) {
-        <ion-text color="warning" style="display: block; text-align: center; margin-top: 8px; font-size: 0.85em;">
-          Has alcanzado el límite de tu plan. Actualiza para crear más ejercicios.
-        </ion-text>
-        }
-      </ion-card-content>
-    </ion-card>
+      </div>
+    </div>
   </div>
 
   <!-- Modal para crear/editar ejercicio -->

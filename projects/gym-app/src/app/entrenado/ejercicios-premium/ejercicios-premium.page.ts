@@ -17,8 +17,10 @@ import {
   IonTextarea,
   ToastController,
   IonFab,
-  IonFabButton
+  IonFabButton,
+  IonCard
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add, close, saveOutline, trashOutline, pencilOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -49,8 +51,9 @@ import { Ejercicio } from 'gym-library';
     IonTextarea,
     IonFab,
     IonFabButton,
+    NgOptimizedImage,
     HeaderTabsComponent
-  ]
+]
 })
 export class EjerciciosPremiumPage implements OnInit {
   private authService = inject(AuthService);
@@ -59,7 +62,10 @@ export class EjerciciosPremiumPage implements OnInit {
   private fb = inject(FormBuilder);
   private toastController = inject(ToastController);
 
-  readonly userId = computed(() => this.authService.currentUser()?.uid);
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+
+  readonly userId = computed(() => this.currentUserSignal()?.uid);
   
   ejerciciosCreados = computed(() => {
     const uid = this.userId();

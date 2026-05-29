@@ -13,18 +13,18 @@
       <ion-icon name="calendar" class="hidden icon-active"></ion-icon>
     </ion-tab-button>
 
+    <!-- Tab de Social -->
+    <ion-tab-button tab="social" href="/entrenado-tabs/social">
+      <ion-icon name="people-outline" class="icon-default"></ion-icon>
+      <ion-icon name="people" class="hidden icon-active"></ion-icon>
+    </ion-tab-button>
+
     @if (isPremium()) {
     <!-- Tab de Agregar Premium -->
     <ion-tab-button (click)="openPremiumMenu()">
       <ion-icon src="assets/icon/dumbbell-add.svg" [style.color]="isCenterTabActive() ? 'var(--ion-color-primary, #a3e635)' : 'var(--ion-tab-bar-color, #999999)'" style="font-size: 38px;"></ion-icon>
     </ion-tab-button>
     }
-
-    <!-- Tab de Social -->
-    <ion-tab-button tab="social" href="/entrenado-tabs/social">
-      <ion-icon name="people-outline" class="icon-default"></ion-icon>
-      <ion-icon name="people" class="hidden icon-active"></ion-icon>
-    </ion-tab-button>
 
     <!-- Tab de Progreso -->
     <ion-tab-button tab="progreso" href="/entrenado-tabs/progreso">

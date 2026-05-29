@@ -202,7 +202,7 @@ export class AuthService {
         uid: firebaseUser.uid,
         nombre: firebaseUser.displayName || firebaseUser.email || 'Nuevo Usuario',
         email: firebaseUser.email || '',
-        photoURL: firebaseUser.photoURL || undefined,
+        photoURL: firebaseUser.photoURL || null,
         role: this.inferRoleFromEmail(firebaseUser.email || ''),
         onboarded: false
       };

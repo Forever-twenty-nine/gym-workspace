@@ -1,53 +1,116 @@
 <app-header-tabs></app-header-tabs>
 
-<ion-content class="bg-gray-100 dark:bg-black">
-  <!-- Imagen de fondo premium -->
-  <div class="fixed inset-0 z-0 bg-cover bg-center pointer-events-none opacity-40 dark:opacity-30"
-    style="background-image: url('assets/images/gym-social-bg.png');">
-    <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-gray-100/10 dark:from-black/40 dark:to-black/60"></div>
+<ion-content [fullscreen]="true">
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
+  }
 
-  <div class="relative z-10 max-w-md mx-auto pt-4 pb-20 px-4 animate-fade-in">
-    <!-- Tabs de Segmento con Glassmorphism -->
-    <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
-      class="mb-6 rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
-      <ion-segment-button value="para-ti">
-        <ion-label class="font-bold text-xs uppercase tracking-wider">Para ti</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="siguiendo">
-        <ion-label class="font-bold text-xs uppercase tracking-wider">Siguiendo</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-
-    <!-- Listado de Sesiones -->
-    @if (filteredFeed().length === 0) {
+  <div class="main-container ion-padding relative z-10">
     <div
-      class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
-      <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-        <ion-icon name="people-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
+      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      <!-- Tabs de Segmento con Glassmorphism -->
+      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
+        class="mb-6 rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
+        <ion-segment-button value="para-ti">
+          <ion-label class="font-bold text-xs uppercase tracking-wider">Para ti</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="siguiendo">
+          <ion-label class="font-bold text-xs uppercase tracking-wider">Siguiendo</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="descubrir">
+          <ion-label class="font-bold text-xs uppercase tracking-wider">Descubrir</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <!-- Listado de Sesiones / Discovery -->
+      @if (selectedTab() === 'descubrir') {
+        <div class="flex flex-col gap-8">
+          
+          <!-- Seccion 1: Partner Horario (Utility Card) -->
+          <div>
+            <div class="flex items-center gap-2 mb-4 px-2">
+              <ion-icon name="time-outline" class="text-xl text-blue-500"></ion-icon>
+              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Coincidencia Horaria</h3>
+            </div>
+            @if (sugerenciasHorario().length === 0) {
+              <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay sugerencias en tu franja horaria por el momento.</p>
+            } @else {
+              <div class="flex flex-col gap-4">
+                @for (item of sugerenciasHorario(); track item.id) {
+                  <app-match-card tipo="horario" [data]="item"></app-match-card>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Seccion 2: Desafíos Comunitarios (Lúdica Card) -->
+          <div>
+            <div class="flex items-center gap-2 mb-4 px-2">
+              <ion-icon name="trophy-outline" class="text-xl text-amber-500"></ion-icon>
+              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Desafíos Activos</h3>
+            </div>
+            @if (desafiosActivos().length === 0) {
+              <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay desafíos comunitarios activos por el momento.</p>
+            } @else {
+              <div class="flex flex-col gap-4">
+                @for (item of desafiosActivos(); track item.id) {
+                  <app-match-card tipo="desafio" [data]="item"></app-match-card>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Seccion 3: Afinidad y Estilo de Vida (Social Pura Card) -->
+          <div>
+            <div class="flex items-center gap-2 mb-4 px-2">
+              <ion-icon name="sparkles-outline" class="text-xl text-primary"></ion-icon>
+              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Mismas Vibras</h3>
+            </div>
+            @if (sugerenciasAfinidad().length === 0) {
+              <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay sugerencias con afinidades comunes por el momento.</p>
+            } @else {
+              <div class="flex flex-col gap-4">
+                @for (item of sugerenciasAfinidad(); track item.id) {
+                  <app-match-card tipo="afinidad" [data]="item"></app-match-card>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+      } @else if (filteredFeed().length === 0) {
+      <div
+        class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
+        <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
+          <ion-icon name="people-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
+        </div>
+        <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
+          {{ selectedTab() === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
+        </h3>
+        <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
+          {{ selectedTab() === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas
+          para ver su actividad aquí.' }}
+        </p>
       </div>
-      <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-        {{ selectedTab() === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
-      </h3>
-      <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
-        {{ selectedTab() === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas
-        para ver su actividad aquí.' }}
-      </p>
-    </div>
-    } @else {
-    <div class="flex flex-col gap-6">
-      @for (sesion of filteredFeed(); track sesion.id) {
-        <app-social-card [sesion]="sesion"></app-social-card>
+      } @else {
+      <div class="flex flex-col gap-6">
+        @for (sesion of filteredFeed(); track sesion.id) {
+          <app-social-card [sesion]="sesion"></app-social-card>
+        }
+      </div>
+
+      <!-- Scroll Infinito -->
+      @if (hasMoreItems()) {
+      <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+        <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más actividades...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+      }
       }
     </div>
-
-    <!-- Scroll Infinito -->
-    @if (hasMoreItems()) {
-    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
-      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más actividades...">
-      </ion-infinite-scroll-content>
-    </ion-infinite-scroll>
-    }
-    }
   </div>
 </ion-content>

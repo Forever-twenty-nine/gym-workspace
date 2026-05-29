@@ -21,8 +21,10 @@ import {
   IonFab,
   IonFabButton,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonCard
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add, close, saveOutline, trashOutline, pencilOutline, calendarOutline, closeCircleOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -59,8 +61,9 @@ import { Rutina, Ejercicio, RutinaAsignada } from 'gym-library';
     IonFabButton,
     IonSelect,
     IonSelectOption,
+    NgOptimizedImage,
     HeaderTabsComponent
-  ]
+]
 })
 export class RutinasPremiumPage implements OnInit {
   private authService = inject(AuthService);
@@ -71,9 +74,12 @@ export class RutinasPremiumPage implements OnInit {
   private toastController = inject(ToastController);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
 
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+
   readonly diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-  readonly userId = computed(() => this.authService.currentUser()?.uid);
+  readonly userId = computed(() => this.currentUserSignal()?.uid);
   
   rutinasPropias = computed(() => {
     const uid = this.userId();

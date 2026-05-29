@@ -4,10 +4,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": [],
-    "paths": {
-      "gym-library": ["../../projects/gym-library/src/public-api"]
-    }
+    "rootDir": "../",
+    "types": []
   },
   "include": [
     "src/**/*.ts"

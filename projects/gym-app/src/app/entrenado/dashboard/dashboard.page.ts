@@ -38,13 +38,12 @@ export interface User extends LibraryUser {
   standalone: true,
   imports: [
     IonContent,
-    IonCard,
     FormsModule,
     NgOptimizedImage,
     HeaderTabsComponent,
     PlanPersonalizadoComponent,
     RutinasAsignadasComponent
-  ],
+],
 })
 export class DashboardPage implements OnInit {
   private entrenadoService = inject(EntrenadoService);
@@ -56,6 +55,8 @@ export class DashboardPage implements OnInit {
   private navCtrl = inject(NavController);
 
   currentUserSignal = this.authService.currentUser as Signal<User | null>;
+
+  isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   entrenadoDataSignal = computed(() => {
     const userId = this.currentUserSignal()?.uid;

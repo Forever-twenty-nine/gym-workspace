@@ -228,7 +228,15 @@ export class EntrenadoService {
             rutinasCreadas: data.rutinasCreadas || [],
             ejerciciosCreadosIds: data.ejerciciosCreadosIds || [],
             fechaRegistro: data.fechaRegistro?.toDate?.() || data.fechaRegistro || new Date(),
-            objetivo: data.objetivo || undefined
+            objetivo: data.objetivo || undefined,
+            // Campos de matching e interacciones
+            bio: data.bio || null,
+            tags: data.tags || [],
+            disciplinas: data.disciplinas || [],
+            franjaHoraria: data.franjaHoraria || null,
+            nivel: data.nivel || null,
+            seguidores: data.seguidores || [],
+            seguidos: data.seguidos || []
         };
     }
 
@@ -262,6 +270,29 @@ export class EntrenadoService {
             data.fechaRegistro = entrenado.fechaRegistro instanceof Date
                 ? Timestamp.fromDate(entrenado.fechaRegistro)
                 : entrenado.fechaRegistro;
+        }
+
+        // Mapeo seguro de campos de matching
+        if (entrenado.bio !== undefined) {
+            data.bio = entrenado.bio !== null ? entrenado.bio : deleteField();
+        }
+        if (entrenado.tags !== undefined) {
+            data.tags = entrenado.tags !== null ? entrenado.tags : deleteField();
+        }
+        if (entrenado.disciplinas !== undefined) {
+            data.disciplinas = entrenado.disciplinas !== null ? entrenado.disciplinas : deleteField();
+        }
+        if (entrenado.franjaHoraria !== undefined) {
+            data.franjaHoraria = entrenado.franjaHoraria !== null ? entrenado.franjaHoraria : deleteField();
+        }
+        if (entrenado.nivel !== undefined) {
+            data.nivel = entrenado.nivel !== null ? entrenado.nivel : deleteField();
+        }
+        if (entrenado.seguidores !== undefined) {
+            data.seguidores = entrenado.seguidores !== null ? entrenado.seguidores : deleteField();
+        }
+        if (entrenado.seguidos !== undefined) {
+            data.seguidos = entrenado.seguidos !== null ? entrenado.seguidos : deleteField();
         }
 
         return data;

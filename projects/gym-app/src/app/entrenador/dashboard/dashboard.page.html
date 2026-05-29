@@ -1,122 +1,99 @@
 <app-header-tabs></app-header-tabs>
 
-<ion-content [fullscreen]="true" class="relative" id="main-content">
-
-  <div class="fixed inset-0 z-[-1]">
-    <img src="assets/images/trainer-bg.png" alt="Trainer Background" class="w-full h-full object-cover">
-    <div class="absolute inset-0 bg-linear-to-b from-black/50 to-[#171717]/90"></div>
+<ion-content [fullscreen]="true">
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
+  }
 
-  <div class="p-5 max-w-(--breakpoint-md) mx-auto">
-    <!-- HEADER SALUDO -->
-    <div class="mb-8 fade-in">
-      <h2 class="font-[var(--font-heading)] text-3xl font-bold m-0 text-white">
-        Hola, <span class="text-(--ion-color-primary)">{{ entrenador().nombre }}</span>
-      </h2>
-      <p class="text-xs text-white/60 mt-1">{{ entrenador().plan }}</p>
-    </div>
+  <div class="main-container ion-padding relative z-10">
+    <div
+      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-4 min-h-[70vh]">
 
-
-
-    <!-- ESTADÍSTICAS ION-GRID + ION-CARD -->
-    <ion-grid class="p-0 mb-8 fade-in">
-
-      <ion-card class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg)">
-
-        <ion-row class="gap-y-4">
-          <!-- Entrenados -->
-          <ion-col size="12" size-sm="4">
-            <ion-card
-              class="m-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg) active:scale-95 transition-transform">
-              <ion-card-content class="flex flex-col items-center justify-center p-4">
-                <div
-                  class="w-11 h-11 rounded-xl flex items-center justify-center mb-2 bg-[rgba(187,228,10,0.2)] text-(--ion-color-primary)">
-                  <ion-icon name="people-outline" class="text-2xl"></ion-icon>
+      <!-- ESTADÍSTICAS ION-GRID + DIV -->
+      <ion-grid class="p-0 mb-6 fade-in">
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
+          <ion-row class="p-2">
+            <!-- Entrenados -->
+            <ion-col size="4" class="p-1">
+              <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(187,228,10,0.2)] text-(--ion-color-primary)">
+                  <ion-icon name="people-outline" class="text-lg"></ion-icon>
                 </div>
                 <div class="text-center">
-                  <span class="block text-2xl font-extrabold text-white">{{ entrenadosAsignadosCount() }}</span>
-                  <span class="text-[10px] text-white/50 uppercase tracking-widest">Entrenados</span>
+                  <span class="block text-xl font-extrabold text-white leading-tight">{{ entrenadosAsignadosCount() }}</span>
+                  <span class="text-[8px] text-white/50 uppercase tracking-wider block">Entrados</span>
                 </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
+              </div>
+            </ion-col>
 
-          <!-- Ejercicios -->
-          <ion-col size="12" size-sm="4">
-            <ion-card
-              class="m-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg) active:scale-95 transition-transform">
-              <ion-card-content class="flex flex-col items-center justify-center p-4">
-                <div
-                  class="w-11 h-11 rounded-xl flex items-center justify-center mb-2 bg-[rgba(45,211,111,0.2)] text-(--ion-color-success)">
-                  <ion-icon name="barbell-outline" class="text-2xl"></ion-icon>
+            <!-- Ejercicios -->
+            <ion-col size="4" class="p-1">
+              <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(45,211,111,0.2)] text-(--ion-color-success)">
+                  <ion-icon name="barbell-outline" class="text-lg"></ion-icon>
                 </div>
                 <div class="text-center">
-                  <span class="block text-2xl font-extrabold text-white">{{ ejerciciosCreadosCount() }}</span>
-                  <span class="text-[10px] text-white/50 uppercase tracking-widest">Ejercicios</span>
+                  <span class="block text-xl font-extrabold text-white leading-tight">{{ ejerciciosCreadosCount() }}</span>
+                  <span class="text-[8px] text-white/50 uppercase tracking-wider block">Ejercicios</span>
                 </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
+              </div>
+            </ion-col>
 
-          <!-- Rutinas -->
-          <ion-col size="12" size-sm="4">
-            <ion-card
-              class="m-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg) active:scale-95 transition-transform">
-              <ion-card-content class="flex flex-col items-center justify-center p-4">
-                <div
-                  class="w-11 h-11 rounded-xl flex items-center justify-center mb-2 bg-[rgba(80,227,194,0.2)] text-(--ion-color-tertiary)">
-                  <ion-icon name="fitness-outline" class="text-2xl"></ion-icon>
+            <!-- Rutinas -->
+            <ion-col size="4" class="p-1">
+              <div class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(80,227,194,0.2)] text-(--ion-color-tertiary)">
+                  <ion-icon name="fitness-outline" class="text-lg"></ion-icon>
                 </div>
                 <div class="text-center">
-                  <span class="block text-2xl font-extrabold text-white">{{ rutinasCreadasCount() }}</span>
-                  <span class="text-[10px] text-white/50 uppercase tracking-widest">Rutinas</span>
+                  <span class="block text-xl font-extrabold text-white leading-tight">{{ rutinasCreadasCount() }}</span>
+                  <span class="text-[8px] text-white/50 uppercase tracking-wider block">Rutinas</span>
                 </div>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-card>
+              </div>
+            </ion-col>
+          </ion-row>
+        </div>
+      </ion-grid>
 
-    </ion-grid>
-
-    <!-- PRÓXIMOS ENTRENAMIENTOS -->
-    <ion-card class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg) fade-in">
-
-      <ion-card-header>
-        <ion-card-title class="text-center py-4">Próximos entrenamientos</ion-card-title>
-      </ion-card-header>
-
-      <ion-card-content>
-        @if (entrenadosConRutinasProximas().length > 0) {
-        <ion-list style="background: transparent;">
-          @for (entrenado of entrenadosConRutinasProximas(); track entrenado.id) {
-          <ion-item lines="" class="py-4">
-            <ion-avatar slot="start">
-              <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
-            </ion-avatar>
-            <ion-label class="text-center">
-              <h2 class="font-bold text-lg text-white mb-1">{{ entrenado.nombre }}</h2>
-              <p class="text-sm text-white/50 font-medium">{{ entrenado.nombreRutina }}</p>
-            </ion-label>
-            <div slot="end" class="">
-              <ion-button color="primary" [disabled]="true" class="text-xs font-bold">
-                {{ entrenado.diaTexto }}
-              </ion-button>
-            </div>
-          </ion-item>
+      <!-- PRÓXIMOS ENTRENAMIENTOS -->
+      <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl fade-in p-4">
+        <div class="py-2 border-b border-white/5 mb-3">
+          <h3 class="text-center text-xs font-bold uppercase tracking-widest text-white/70 m-0">Próximos entrenamientos</h3>
+        </div>
+        <div class="p-0">
+          @if (entrenadosConRutinasProximas().length > 0) {
+          <ion-list style="background: transparent;" class="p-0">
+            @for (entrenado of entrenadosConRutinasProximas(); track entrenado.id) {
+            <ion-item lines="none" class="--background: transparent; mb-1">
+              <ion-avatar slot="start" class="w-10 h-10">
+                <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+              </ion-avatar>
+              <ion-label>
+                <h2 class="font-bold text-sm text-white">{{ entrenado.nombre }}</h2>
+                <p class="text-[10px] text-white/40 truncate">{{ entrenado.nombreRutina }}</p>
+              </ion-label>
+              <div slot="end">
+                <span class="text-[10px] font-bold px-2 py-1 rounded-md bg-(--ion-color-primary) text-black">
+                  {{ entrenado.diaTexto }}
+                </span>
+              </div>
+            </ion-item>
+            }
+          </ion-list>
+          } @else {
+          <div
+            class="m-0 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-10 text-center text-white/50">
+            <ion-icon name="calendar-outline" class="text-6xl mb-4 opacity-20"></ion-icon>
+            <p class="text-base">No hay rutinas asignadas para los próximos 3 días.</p>
+          </div>
           }
-        </ion-list>
-        } @else {
-        <ion-card
-          class="m-0 bg-white/5 backdrop-blur-xl border border-white/10 rounded-(--app-border-radius-lg) p-10 text-center text-white/50">
-          <ion-icon name="calendar-outline" class="text-6xl mb-4 opacity-20"></ion-icon>
-          <p class="text-base">No hay rutinas asignadas para los próximos 3 días.</p>
-        </ion-card>
-        }
-      </ion-card-content>
+        </div>
+      </div>
 
-    </ion-card>
-
+    </div>
   </div>
-
 </ion-content>

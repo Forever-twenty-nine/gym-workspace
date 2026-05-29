@@ -4,8 +4,10 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   IonContent,
-  ToastController
+  ToastController,
+  IonCard
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus } from 'gym-library';
@@ -32,18 +34,21 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     CommonModule,
     ReactiveFormsModule,
     IonContent,
+    NgOptimizedImage,
     HeaderTabsComponent,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,
     InvitacionModalComponent,
     GestionRutinasModalComponent
-  ],
+],
   styles: []
 })
 export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
+
+  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);

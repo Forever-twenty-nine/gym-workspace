@@ -41,7 +41,35 @@ export const ENTRENADO_SCHEMA: FieldConfig[] = [
     },
 
     // Social y Notificaciones
-    { name: 'section_social', label: 'Social y Notificaciones', type: 'heading', colSpan: 2 },
+    { name: 'section_social', label: 'Social, Matching y Notificaciones', type: 'heading', colSpan: 2 },
+    {
+        name: 'bio',
+        label: 'Biografía Corta',
+        type: 'textarea',
+        placeholder: 'Escribe una breve biografía para el perfil social',
+        colSpan: 2
+    },
+    {
+        name: 'tags',
+        label: 'Tags de Estilo de Vida (Afinidad)',
+        type: 'infolist',
+        placeholder: 'Tags del estilo de vida fitness',
+        colSpan: 2
+    },
+    {
+        name: 'disciplinas',
+        label: 'Disciplinas de Entrenamiento',
+        type: 'infolist',
+        placeholder: 'Disciplinas practicadas',
+        colSpan: 2
+    },
+    {
+        name: 'franjaHoraria',
+        label: 'Franja Horaria de Entrenamiento',
+        type: 'text',
+        placeholder: 'Ej: {"inicio": "19:00", "fin": "21:00"}',
+        colSpan: 2
+    },
     {
         name: 'seguidores',
         label: 'Seguidores',

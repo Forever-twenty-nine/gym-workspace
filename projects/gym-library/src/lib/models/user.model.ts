@@ -12,6 +12,6 @@ export interface User {
   entrenadoId?: string;
   onboarded?: boolean;
   plan?: Plan;
-  photoURL?: string;
+  photoURL?: string | null;
   mensajesGlobalesLeidos?: string[];
 }

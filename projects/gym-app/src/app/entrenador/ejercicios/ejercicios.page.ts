@@ -23,6 +23,7 @@ import {
   IonText,
   ToastController
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -41,10 +42,6 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonToolbar,
     IonTitle,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonButton,
     IonIcon,
     IonItem,
@@ -55,8 +52,9 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonInput,
     IonTextarea,
     IonText,
+    NgOptimizedImage,
     HeaderTabsComponent
-  ],
+],
   styles: [`
     .ejercicio-modal {
       --width: 95%;
@@ -73,6 +71,9 @@ export class EjerciciosPage implements OnInit {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
   private toastController = inject(ToastController);
+
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;

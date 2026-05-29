@@ -1,8 +1,10 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import {
   IonContent,
-  ToastController
+  ToastController,
+  IonCard
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -32,6 +34,8 @@ export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private entrenadorService = inject(EntrenadorService);
   private toastController = inject(ToastController);
+
+  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
 
   // --- Señales Datos ---
   rutinasCreadas: Signal<any[]> = computed(() => {

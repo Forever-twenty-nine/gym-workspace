@@ -1,0 +1,149 @@
+<ion-card class="!m-0 !rounded-3xl overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative">
+  <!-- 1. TARJETA DE UTILIDAD (El Partner Horario) -->
+  <div *ngIf="tipo === 'horario'" class="p-6 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
+          <ion-icon name="time-outline" class="text-xl"></ion-icon>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider font-extrabold text-blue-600 dark:text-blue-400">Partner Horario</h4>
+          <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Coincidencia Logística</p>
+        </div>
+      </div>
+      <ion-badge color="primary" class="font-bold text-xs uppercase tracking-wide px-3 py-1 rounded-full">
+        {{ data.franjaHoraria?.inicio }} - {{ data.franjaHoraria?.fin }}
+      </ion-badge>
+    </div>
+
+    <div class="bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/15 rounded-2xl p-4 flex flex-col gap-2">
+      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rango de Entrenamiento</p>
+      <div class="flex items-center gap-3">
+        <ion-icon name="hourglass-outline" class="text-lg text-blue-500"></ion-icon>
+        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">
+          Coincide en tu rango preferido para entrenar.
+        </span>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Disciplinas Comunes</p>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let disc of data.disciplinas" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-gray-200/50 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300">
+          {{ disc }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="mt-2 flex gap-3">
+      <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full !rounded-2xl overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'">
+        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'sparkles-outline'" slot="start"></ion-icon>
+        {{ matchConcretado() ? '¡Chat Desbloqueado!' : interacted() ? 'Interés Enviado' : 'Coincidir Horario' }}
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- 2. TARJETA LÚDICA (El Desafío Cruzado) -->
+  <div *ngIf="tipo === 'desafio'" class="p-6 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+          <ion-icon name="trophy-outline" class="text-xl"></ion-icon>
+        </div>
+        <div>
+          <h4 class="text-xs uppercase tracking-wider font-extrabold text-amber-600 dark:text-amber-400">Desafío Cruzado</h4>
+          <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Competencia y Retos</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 text-xs font-extrabold text-amber-600 dark:text-amber-400 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+        <ion-icon name="flame-outline"></ion-icon>
+        <span>Activo</span>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-5 relative overflow-hidden">
+      <!-- Decoración de fondo -->
+      <ion-icon name="trophy-outline" class="absolute -right-4 -bottom-4 text-7xl text-amber-500/5 pointer-events-none"></ion-icon>
+      
+      <p class="text-lg font-black text-gray-900 dark:text-white leading-snug tracking-tight mb-2">
+        "{{ data.titulo }}"
+      </p>
+      
+      <div *ngIf="data.logroRelacionado" class="text-xs font-semibold text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-3">
+        <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold">Récord</span>
+        {{ data.logroRelacionado }}
+      </div>
+    </div>
+
+    <!-- Trainee Creador Secundario -->
+    <div class="flex items-center justify-between border-t border-white/10 pt-4 mt-1">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-200/50 flex items-center justify-center border border-white/20">
+          <img *ngIf="data.creadorFoto" [src]="data.creadorFoto" alt="Creador" class="w-full h-full object-cover">
+          <ion-icon *ngIf="!data.creadorFoto" name="person-outline" class="text-sm text-gray-500"></ion-icon>
+        </div>
+        <div class="text-left">
+          <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200 leading-none mb-0.5">{{ data.creadorNombre }}</p>
+          <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none">Creador del Reto</p>
+        </div>
+      </div>
+      <span *ngIf="data.disciplina" class="text-[10px] font-extrabold uppercase px-2 py-1 rounded bg-gray-200/30 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 border border-white/5">
+        {{ data.disciplina }}
+      </span>
+    </div>
+
+    <!-- Acciones -->
+    <div class="flex gap-3">
+      <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full !rounded-2xl overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'warning'">
+        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'flame-outline'" slot="start"></ion-icon>
+        {{ matchConcretado() ? '¡Desafío Aceptado!' : interacted() ? 'Reto Enviado' : 'Aceptar Desafío' }}
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- 3. TARJETA SOCIAL PURA (Afinidad y Estilo de Vida) -->
+  <div *ngIf="tipo === 'afinidad'" class="p-6 flex flex-col gap-4">
+    <div class="flex items-center gap-3">
+      <!-- Foto de Perfil Grande -->
+      <div class="w-16 h-16 rounded-3xl overflow-hidden bg-gray-200/50 flex items-center justify-center border-2 border-primary/20 shadow-md">
+        <img *ngIf="data.fotoUsuario" [src]="data.fotoUsuario" alt="Perfil" class="w-full h-full object-cover">
+        <ion-icon *ngIf="!data.fotoUsuario" name="person-outline" class="text-2xl text-gray-500"></ion-icon>
+      </div>
+      
+      <div class="text-left flex-1 min-w-0">
+        <h4 class="text-xs uppercase tracking-wider font-extrabold text-primary mb-0.5">Afinidad y Vibras</h4>
+        <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight truncate leading-none mb-1">
+          {{ data.id || 'Atleta' }}
+        </p>
+        <span *ngIf="data.nivel" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+          {{ data.nivel }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Biografía Corta -->
+    <div *ngIf="data.bio" class="bg-gray-100/50 dark:bg-gray-900/40 border border-white/10 rounded-2xl p-4">
+      <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 leading-relaxed italic">
+        "{{ data.bio }}"
+      </p>
+    </div>
+
+    <!-- Tags del Estilo de Vida -->
+    <div>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let tag of data.tags" class="text-xs font-black text-primary bg-primary/10 hover:bg-primary/25 border border-primary/20 px-3 py-1.5 rounded-xl transition-colors duration-200 cursor-pointer">
+          #{{ tag }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="mt-2 flex gap-3">
+      <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full !rounded-2xl overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'">
+        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'heart-outline'" slot="start"></ion-icon>
+        {{ matchConcretado() ? '¡Match Conectado!' : interacted() ? 'Like Enviado' : 'Conectar Vibras' }}
+      </ion-button>
+    </div>
+  </div>
+</ion-card>

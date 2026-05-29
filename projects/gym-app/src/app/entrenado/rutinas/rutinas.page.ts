@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
-import { IonContent } from '@ionic/angular/standalone';
+import { IonContent, IonCard } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline, playOutline, timeOutline, calendarOutline,
@@ -21,7 +22,7 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
-  imports: [IonContent, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent, HeaderTabsComponent],
+  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent, HeaderTabsComponent],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
@@ -31,6 +32,9 @@ export class RutinasPage implements OnInit {
   private router = inject(Router);
   private injector = inject(Injector);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
+
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   private todasLasRutinas = signal<Rutina[]>([]);
   readonly modalAbierto = signal(false);

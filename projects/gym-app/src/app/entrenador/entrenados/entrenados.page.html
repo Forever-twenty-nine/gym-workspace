@@ -1,16 +1,29 @@
 <app-header-tabs></app-header-tabs>
 
 <ion-content [fullscreen]="true">
-  <div class="entrenados-container">
-    <!-- Listado de Entrenados -->
-    <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
-      [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)" (verCliente)="verCliente($event)"
-      (openRutinasModal)="openRutinasModal($event)" (openInvitacionModal)="openInvitacionModal()">
-    </app-mis-entrenados>
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }
 
-    <!-- Invitaciones Pendientes -->
-    <app-invitaciones-pendientes [invitaciones]="invitacionesPendientes()" (onCancelar)="cancelarInvitacion($event)">
-    </app-invitaciones-pendientes>
+  <div class="main-container ion-padding relative z-10">
+    <div
+      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      <div class="entrenados-container">
+        <!-- Listado de Entrenados -->
+        <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
+          [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)" (verCliente)="verCliente($event)"
+          (openRutinasModal)="openRutinasModal($event)" (openInvitacionModal)="openInvitacionModal()">
+        </app-mis-entrenados>
+
+        <!-- Invitaciones Pendientes -->
+        <app-invitaciones-pendientes [invitaciones]="invitacionesPendientes()" (onCancelar)="cancelarInvitacion($event)">
+        </app-invitaciones-pendientes>
+      </div>
+    </div>
   </div>
 
   <!-- Detalle del Entrenado -->

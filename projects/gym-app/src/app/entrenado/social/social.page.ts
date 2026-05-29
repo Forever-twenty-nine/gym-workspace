@@ -8,14 +8,18 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { addIcons } from 'ionicons';
 import { peopleOutline } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
 import { SocialCardComponent } from './components/social-card/social-card.component';
+import { MatchCardComponent } from './components/match-card/match-card.component';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+import { MatchService } from '../../core/services/match.service';
+import { DesafioService } from '../../core/services/desafio.service';
 
 @Component({
   selector: 'app-social',
@@ -24,9 +28,11 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
   imports: [
     CommonModule,
     IonContent,
+    NgOptimizedImage,
     IonIcon, IonSegment, IonSegmentButton, IonLabel,
     IonInfiniteScroll, IonInfiniteScrollContent,
     SocialCardComponent,
+    MatchCardComponent,
     HeaderTabsComponent
   ]
 })
@@ -34,17 +40,35 @@ export class SocialPage {
   private sesionRutinaService = inject(SesionRutinaService);
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
+  private matchService = inject(MatchService);
+  private desafioService = inject(DesafioService);
+
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   feedSocial = this.sesionRutinaService.getSesionesCompartidas();
-  selectedTab = signal<'para-ti' | 'siguiendo'>('para-ti');
+  selectedTab = signal<'para-ti' | 'siguiendo' | 'descubrir'>('para-ti');
   visibleItemsCount = signal<number>(10);
 
-  // Perfil del entrenado actual para obtener a quién sigue
+  // Perfil del entrenado actual
   currentEntrenado = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return null;
     return this.entrenadoService.getEntrenado(user.uid)();
   });
+
+  // Sugerencias sociales calculadas reactivamente
+  sugerenciasHorario = computed(() => {
+    const curr = this.currentEntrenado();
+    return curr ? this.matchService.getSugerenciasHorario(curr)() : [];
+  });
+
+  sugerenciasAfinidad = computed(() => {
+    const curr = this.currentEntrenado();
+    return curr ? this.matchService.getSugerenciasAfinidad(curr)() : [];
+  });
+
+  desafiosActivos = this.desafioService.desafios;
 
   // Feed filtrado según la pestaña seleccionada
   filteredFeed = computed(() => {
@@ -55,10 +79,13 @@ export class SocialPage {
     let result = [];
     if (tab === 'para-ti') {
       result = feed;
-    } else {
+    } else if (tab === 'siguiendo') {
       // Solo mostrar sesiones de usuarios que el entrenado actual sigue
       const seguidos = entrenado?.seguidos || [];
       result = feed.filter(sesion => seguidos.includes(sesion.entrenadoId));
+    } else {
+      // Descubrir no usa el feed de sesiones rutinarias
+      return [];
     }
 
     // Aplicar límite para scroll infinito
@@ -70,6 +97,8 @@ export class SocialPage {
     const feed = this.feedSocial();
     const tab = this.selectedTab();
     const entrenado = this.currentEntrenado();
+
+    if (tab === 'descubrir') return false;
 
     let totalItems = 0;
     if (tab === 'para-ti') {

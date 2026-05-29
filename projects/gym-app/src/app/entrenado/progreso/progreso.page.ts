@@ -3,8 +3,10 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import {
   IonContent,
   IonText,
-  AlertController
+  AlertController,
+  IonCard
 } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -19,10 +21,11 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
   imports: [
     IonContent,
     IonText,
+    NgOptimizedImage,
     ProgresoEstadisticasComponent,
     ProgresoHistorialComponent,
     HeaderTabsComponent
-  ],
+],
   templateUrl: './progreso.page.html',
 })
 export class ProgresoPage implements OnInit {
@@ -31,6 +34,9 @@ export class ProgresoPage implements OnInit {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly alertController = inject(AlertController);
+
+  readonly currentUserSignal = this.authService.currentUser;
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   readonly isLoading = signal(false);
 

@@ -7,6 +7,11 @@ export interface ConfigNotificacion {
     diasRecordatorio?: number[]; // [0, 1, 2, 3, 4, 5, 6] (0 = Domingo)
 }
 
+export interface FranjaHoraria {
+    inicio: string; // Formato "HH:mm"
+    fin: string;    // Formato "HH:mm"
+}
+
 export interface Entrenado {
     id: string;
     // plan free
@@ -23,4 +28,9 @@ export interface Entrenado {
     ejerciciosCreadosIds?: string[];
     nivel?: NivelEntrenamiento;
 
+    // Campos de Matching
+    bio?: string;
+    tags?: string[];
+    disciplinas?: string[];
+    franjaHoraria?: FranjaHoraria;
 }

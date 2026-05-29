@@ -1,63 +1,51 @@
-<ion-card class="">
-
-    <div class="absolute inset-0 z-[-1]">
-        <img src="assets/images/trainer-bg.png" alt="Card Background" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-linear-to-b from-black/60 to-[#171717]/90"></div>
-    </div>
-
-    <ion-card-header>
-        <ion-card-title class="text-xl p-4 text-center font-bold">Mis Entrenados</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-        <ion-list class="p-4 " style="background: none;">
-            @for (entrenado of entrenados(); track entrenado.id) {
-            <ion-item-sliding class="ion-margin-bottom" #slidingItem>
-                <!-- Para que funcione el sliding con fondo, usamos el color gris oscuro de la card en vez de transparente para que tape los botones de atrás -->
-                <ion-item [button]="true" style="--background: #2a2a2a; --color: white; border-radius: 8px;"
-                    (click)="slidingItem.open('end')">
-
-                    <ion-avatar slot="start">
-                        <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
-                    </ion-avatar>
-
-                    <ion-label slot="start" class="mx-2">
-                        {{ getUserName()(entrenado.id) }}
-                    </ion-label>
-
-                    <ion-note slot="end" class="mx-2">
-                        {{ entrenado.objetivo }}
-                    </ion-note>
-
-                    <div slot="end" class="ms-4">
-                        <ion-icon name="chevron-back-outline" style="color: #666; font-size: 1.2rem;"></ion-icon>
-                    </div>
-
-                </ion-item>
-
-
-                <ion-item-options side="end" style="background: transparent; border-bottom: none;">
-                    <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)"
-                        style="border-radius: 8px; margin-left: 8px;">
-                        <ion-icon slot="start" name="barbell-outline"></ion-icon>
-                        Rutinas
-                    </ion-item-option>
-
-                    <ion-item-option color="primary" (click)="verCliente.emit(entrenado)"
-                        style="border-radius: 8px; margin-left: 8px;">
-                        <ion-icon slot="start" name="eye-outline"></ion-icon>
-                        Ver Info
-                    </ion-item-option>
-                </ion-item-options>
-            </ion-item-sliding>
-            }
-        </ion-list>
-
-        <ion-button expand="block" fill="outline" color="primary" class="ion-margin-top"
+<div class="mb-6">
+    <!-- Botón de Invitación al inicio -->
+    <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4">
+        <ion-button expand="block" fill="solid" color="primary"
             (click)="openInvitacionModal.emit()">
             <ion-icon name="mail-outline" slot="start"></ion-icon>
             Invitar Nuevo Entrenado
         </ion-button>
-    </ion-card-content>
+    </div>
 
-</ion-card>
+    <ion-list class="p-0 m-0" style="background: none;">
+        @for (entrenado of entrenados(); track entrenado.id) {
+        <ion-item-sliding class="ion-margin-bottom" #slidingItem>
+            <ion-item [button]="true" style="--background: rgba(255,255,255,0.05); --color: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"
+                (click)="slidingItem.open('end')" class="mb-2">
+
+                <ion-avatar slot="start">
+                    <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+                </ion-avatar>
+
+                <ion-label slot="start" class="mx-2">
+                    <h3 class="font-bold text-white">{{ getUserName()(entrenado.id) }}</h3>
+                </ion-label>
+
+                <ion-note slot="end" class="mx-2 text-white/50 text-xs">
+                    {{ entrenado.objetivo }}
+                </ion-note>
+
+                <div slot="end" class="ms-4">
+                    <ion-icon name="chevron-back-outline" style="color: #bbb; font-size: 1.2rem;"></ion-icon>
+                </div>
+
+            </ion-item>
+
+            <ion-item-options side="end" style="background: transparent; border-bottom: none;">
+                <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)"
+                    style="border-radius: 8px; margin-left: 8px;">
+                    <ion-icon slot="start" name="barbell-outline"></ion-icon>
+                    Rutinas
+                </ion-item-option>
+
+                <ion-item-option color="primary" (click)="verCliente.emit(entrenado)"
+                    style="border-radius: 8px; margin-left: 8px;">
+                    <ion-icon slot="start" name="eye-outline"></ion-icon>
+                    Ver Info
+                </ion-item-option>
+            </ion-item-options>
+        </ion-item-sliding>
+        }
+    </ion-list>
+</div>

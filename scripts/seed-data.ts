@@ -65,7 +65,64 @@ async function createTrainer(name: string, email: string, password: string) {
     return { ...trainerUserData };
 }
 
-async function createTrainee(name: string, email: string, password: string, trainerUid: string) {
+const mockBios = [
+    "Foco en powerlifting y ganancia de fuerza. Entreno con metal a tope.",
+    "Buscando cambiar hábitos y comer más sano. ¡Running y funcional!",
+    "Crossfit addict. Entrenando para mi próxima competencia de box.",
+    "Calistenia y control corporal. Entreno temprano por la mañana.",
+    "Definición y musculación. Consistencia antes que intensidad."
+];
+
+const mockTags = [
+    ["EntrenaConMetal", "FuerzaMax", "Fierrero"],
+    ["NutricionKeto", "VidaSana", "Cardio"],
+    ["Crossfit", "Comunidad", "Superacion"],
+    ["Calistenia", "StreetWorkout", "Salud"],
+    ["ObjetivoDefinicion", "GymBro", "Musculacion"]
+];
+
+const mockDisciplinas = [
+    ["Powerlifting", "Musculación"],
+    ["Running", "Musculación"],
+    ["Crossfit"],
+    ["Calistenia"],
+    ["Musculación"]
+];
+
+const mockFranjas = [
+    { inicio: "19:00", fin: "21:00" },
+    { inicio: "18:30", fin: "20:30" },
+    { inicio: "07:00", fin: "09:00" },
+    { inicio: "08:00", fin: "10:00" },
+    { inicio: "20:00", fin: "22:00" }
+];
+
+async function createMockSharedSession(traineeId: string, traineeName: string, routineId: string, routineName: string) {
+    const sesionId = `session_${traineeId}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const data = {
+        id: sesionId,
+        entrenadoId: traineeId,
+        fechaInicio: Timestamp.fromDate(new Date(Date.now() - 3600000 * 2)),
+        fechaFin: Timestamp.fromDate(new Date(Date.now() - 3600000)),
+        duracion: 3600,
+        status: 'completada',
+        completada: true,
+        compartida: true,
+        nombreUsuario: traineeName,
+        fotoUsuario: null,
+        fechaCompartida: Timestamp.now(),
+        likes: [],
+        rutinaResumen: {
+            id: routineId,
+            nombre: routineName,
+            ejercicios: []
+        }
+    };
+    await db.collection('sesiones-rutina').doc(sesionId).set(data);
+    console.log(`📱 Creada sesión compartida mock: ${sesionId} para ${traineeName}`);
+}
+
+async function createTrainee(name: string, email: string, password: string, trainerUid: string, index: number) {
     const usuariosRef = db.collection('usuarios');
     // deterministic uid for trainees
     const uid = `trainee_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
@@ -73,15 +130,31 @@ async function createTrainee(name: string, email: string, password: string, trai
     const objetivos = [Objetivo.VOLUMEN, Objetivo.DEFINICION, Objetivo.FUERZA, Objetivo.SALUD];
     const objetivoAleatorio = objetivos[Math.floor(Math.random() * objetivos.length)];
 
+    const bio = mockBios[index % mockBios.length];
+    const tags = mockTags[index % mockTags.length];
+    const disciplinas = mockDisciplinas[index % mockDisciplinas.length];
+    const franjaHoraria = mockFranjas[index % mockFranjas.length];
+    
+    // El primer entrenado de cada entrenador es Premium por defecto
+    const plan = (index % 5 === 0) ? 'premium' : 'free';
+
     const traineeUserData = {
         uid,
         nombre: name,
         email,
         role: 'entrenado',
-        plan: 'free',
+        plan,
         onboarded: true,
         objetivo: objetivoAleatorio,
-        fechaCreacion: Timestamp.now()
+        fechaCreacion: Timestamp.now(),
+        // Campos de matching
+        bio,
+        tags,
+        disciplinas,
+        franjaHoraria,
+        nivel: 'intermedio',
+        seguidores: [],
+        seguidos: []
     };
 
     const docRef = usuariosRef.doc(uid);
@@ -95,7 +168,16 @@ async function createTrainee(name: string, email: string, password: string, trai
         objetivo: objetivoAleatorio,
         entrenadoresId: [trainerUid],
         rutinasAsignadasIds: [],
-        fechaRegistro: Timestamp.now()
+        fechaRegistro: Timestamp.now(),
+        plan,
+        // Campos de matching
+        bio,
+        tags,
+        disciplinas,
+        franjaHoraria,
+        nivel: 'intermedio',
+        seguidores: [],
+        seguidos: []
     }, { merge: true });
 
     // update entrenador docs to include this trainee
@@ -120,7 +202,7 @@ async function createTrainee(name: string, email: string, password: string, trai
         console.warn('⚠️ No se pudo actualizar entrenador al crear entrenado:', e);
     }
 
-    return { ...traineeUserData };
+    return { ...traineeUserData, trainerUid };
 }
 
 async function createExercise(nombre: string, descripcion: string, entrenadorId?: string) {
@@ -221,7 +303,7 @@ async function main() {
         const trainerAssignedIds: string[] = [];
         for (let i = 0; i < 5; i++) {
             const tr = traineePool[traineeIdx++];
-            const created = await createTrainee(tr.name, tr.email, 'user123', trainer.uid);
+            const created = await createTrainee(tr.name, tr.email, 'user123', trainer.uid, traineeIdx - 1);
             createdTrainees.push(created);
             trainerAssignedIds.push(created.uid);
         }
@@ -263,8 +345,8 @@ async function main() {
         await db.collection('entrenadores').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
         await db.collection('usuarios').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
 
-        // Asignar rutinas aleatorias a cada entrenado del entrenador (máx 3 rutinas por semana)
-        const trainerTrainees = createdTrainees.filter(t => t.role === 'entrenado'); // Cambio aquí para filtrar correctamente
+        // Asignar rutinas aleatorias a cada entrenado de ESTE entrenador (máx 3 rutinas por semana)
+        const trainerTrainees = createdTrainees.filter(t => t.role === 'entrenado' && t.trainerUid === trainer.uid);
         for (const trainee of trainerTrainees) {
             const numRutinas = Math.floor(Math.random() * 3) + 1; // 1 a 3 rutinas
             const shuffledDays = [...diasSemana].sort(() => 0.5 - Math.random());
@@ -303,6 +385,11 @@ async function main() {
             await db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true });
             await db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true });
 
+            // Crear una sesión compartida como prueba para poblar el feed social
+            if (routineIds.length > 0) {
+                await createMockSharedSession(trainee.uid, trainee.nombre, routineIds[0], `Rutina de Fuerza - ${trainee.nombre}`);
+            }
+
             // También añadir estas rutinas a las creadas por el entrenador
             const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
             const snap = await entrenadorRef.get();
@@ -310,6 +397,40 @@ async function main() {
             const trainerRoutineUpdate = { rutinasCreadasIds: [...new Set([...currentRoutines, ...routineIds])] };
             await entrenadorRef.set(trainerRoutineUpdate, { merge: true });
             await db.collection('usuarios').doc(trainer.uid).set(trainerRoutineUpdate, { merge: true });
+        }
+    }
+
+    // 4) Crear datos de seguimiento (seguidores/seguidos) recíprocos entre los entrenados
+    console.log('👥 Estableciendo relaciones de seguimiento entre entrenados...');
+    for (let i = 0; i < createdTrainees.length; i++) {
+        const currentTrainee = createdTrainees[i];
+        
+        // Cada entrenado seguirá a otros 2 entrenados aleatorios
+        const otherTrainees = createdTrainees.filter(t => t.uid !== currentTrainee.uid);
+        const shuffled = otherTrainees.sort(() => 0.5 - Math.random());
+        const toFollow = shuffled.slice(0, 2);
+        
+        const seguidosIds = toFollow.map(t => t.uid);
+        
+        // Actualizar seguidos del entrenado actual
+        const currentRef = db.collection('entrenados').doc(currentTrainee.uid);
+        const currentUserRef = db.collection('usuarios').doc(currentTrainee.uid);
+        await currentRef.set({ seguidos: seguidosIds }, { merge: true });
+        await currentUserRef.set({ seguidos: seguidosIds }, { merge: true });
+        
+        // Actualizar seguidores en los entrenados que fueron seguidos
+        for (const targetTrainee of toFollow) {
+            const targetRef = db.collection('entrenados').doc(targetTrainee.uid);
+            const targetUserRef = db.collection('usuarios').doc(targetTrainee.uid);
+            
+            const targetSnap = await targetRef.get();
+            const existingSeguidores = targetSnap.data()?.['seguidores'] || [];
+            
+            if (!existingSeguidores.includes(currentTrainee.uid)) {
+                const updatedSeguidores = [...existingSeguidores, currentTrainee.uid];
+                await targetRef.set({ seguidores: updatedSeguidores }, { merge: true });
+                await targetUserRef.set({ seguidores: updatedSeguidores }, { merge: true });
+            }
         }
     }
 

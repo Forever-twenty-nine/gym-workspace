@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 import { IonContent, IonCard, IonCardContent, IonIcon, IonAvatar, IonList, IonItem, IonLabel, IonGrid, IonRow, IonCol, IonToolbar, IonHeader, IonTitle, IonCardHeader, IonCardTitle, IonButton } from '@ionic/angular/standalone';
+import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline, chevronForwardOutline, barbellOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -18,8 +19,6 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
   standalone: true,
   imports: [
     IonContent,
-    IonCard,
-    IonCardContent,
     IonIcon,
     IonAvatar,
     IonList,
@@ -28,10 +27,9 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
     IonGrid,
     IonRow,
     IonCol,
+    NgOptimizedImage,
     HeaderTabsComponent,
-    IonCardHeader,
-    IonCardTitle,
-    IonButton
+
   ],
 })
 export class DashboardPage implements OnInit {
@@ -42,6 +40,8 @@ export class DashboardPage implements OnInit {
   private userService = inject(UserService);
   private entrenadorService = inject(EntrenadorService);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
+
+  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
 
   entrenadorData = computed(() => {
     const uid = this.authService.currentUser()?.uid;

@@ -1,28 +1,41 @@
 <app-header-tabs title="Mis Ejercicios"></app-header-tabs>
 
-<ion-content>
-  <ion-list>
-    @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
-      <ion-item>
-        <ion-label>
-          <h2>{{ ejercicio.nombre }}</h2>
-          <p>{{ ejercicio.series }} series x {{ ejercicio.repeticiones }} reps - {{ ejercicio.peso }}kg</p>
-        </ion-label>
-        <ion-buttons slot="end">
-          <ion-button (click)="editarEjercicio(ejercicio)">
-            <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-          <ion-button color="danger" (click)="eliminarEjercicio(ejercicio.id)">
-            <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-item>
-    } @empty {
-      <div style="text-align: center; padding: 20px;">
-        <p>No has creado ejercicios aún.</p>
-      </div>
-    }
-  </ion-list>
+<ion-content [fullscreen]="true">
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }
+
+  <div class="main-container ion-padding relative z-10">
+    <div
+      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      <ion-list style="background: transparent;">
+        @for (ejercicio of ejerciciosCreados(); track ejercicio.id) {
+          <ion-item style="--background: transparent;">
+            <ion-label>
+              <h2>{{ ejercicio.nombre }}</h2>
+              <p>{{ ejercicio.series }} series x {{ ejercicio.repeticiones }} reps - {{ ejercicio.peso }}kg</p>
+            </ion-label>
+            <ion-buttons slot="end">
+              <ion-button (click)="editarEjercicio(ejercicio)">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button color="danger" (click)="eliminarEjercicio(ejercicio.id)">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-buttons>
+          </ion-item>
+        } @empty {
+          <div style="text-align: center; padding: 20px;">
+            <p>No has creado ejercicios aún.</p>
+          </div>
+        }
+      </ion-list>
+    </div>
+  </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="nuevoEjercicio()">

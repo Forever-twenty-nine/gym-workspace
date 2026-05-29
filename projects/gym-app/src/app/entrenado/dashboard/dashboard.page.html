@@ -1,38 +1,28 @@
 <app-header-tabs></app-header-tabs>
 
 <ion-content [fullscreen]="true">
-  <div class="main-container ion-padding">
-    <ion-card
-      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl relative bg-white dark:bg-[#121212]">
-      <!-- Background Image Layer -->
-      <div class="absolute inset-0 z-0 opacity-25 dark:opacity-100">
-        <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
-          class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-      </div>
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }
 
-      <!-- Content Layer -->
-      <div class="relative z-10 px-4 py-6 min-h-[80vh]">
+  <div class="main-container ion-padding relative z-10">
+    <div
+      class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
 
-        <!-- Welcome Section -->
-        <header class="mb-8 pl-2">
-          <p class="text-primary font-bold uppercase tracking-widest text-xs mb-1">Tu Progreso</p>
-          <h1 class="text-gray-900 dark:text-white text-3xl font-heading font-black">
-            Hola, {{ nombreEntrenado() }}
-          </h1>
-          <p class="text-gray-500 dark:text-white/60 text-sm mt-1">Sigue con tu entrenamiento de hoy</p>
-        </header>
+      <!-- Plan Personalizado Component -->
+      <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
+        [frecuencia]="frecuenciaSemanal()">
+      </app-plan-personalizado>
 
-        <!-- Plan Personalizado Component -->
-        <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
-          [frecuencia]="frecuenciaSemanal()">
-        </app-plan-personalizado>
+      <!-- Rutinas Asignadas Component -->
+      <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
+        (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
+      </app-rutinas-asignadas>
 
-        <!-- Rutinas Asignadas Component -->
-        <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
-          (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
-        </app-rutinas-asignadas>
-
-      </div>
-    </ion-card>
+    </div>
   </div>
 </ion-content>
