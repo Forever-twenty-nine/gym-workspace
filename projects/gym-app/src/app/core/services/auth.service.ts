@@ -203,7 +203,7 @@ export class AuthService {
         nombre: firebaseUser.displayName || firebaseUser.email || 'Nuevo Usuario',
         email: firebaseUser.email || '',
         photoURL: firebaseUser.photoURL || null,
-        role: this.inferRoleFromEmail(firebaseUser.email || ''),
+        role: Rol.ENTRENADO,
         onboarded: false
       };
 
@@ -220,14 +220,6 @@ export class AuthService {
     }
 
     return { ...userData, uid: firebaseUser.uid };
-  }
-
-  private inferRoleFromEmail(email: string): Rol {
-    const emailLower = email.toLowerCase();
-    if (emailLower.includes('trainer') || emailLower.includes('entrenador')) return Rol.ENTRENADOR;
-    if (emailLower.includes('gimnasio') || emailLower.includes('gym')) return Rol.GIMNASIO;
-    if (emailLower.includes('personal')) return Rol.PERSONAL_TRAINER;
-    return Rol.ENTRENADO;
   }
 
   private getErrorMessage(error: any): string {

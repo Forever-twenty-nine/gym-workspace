@@ -218,3 +218,7 @@ firebase-export-*/
 .capacitor/
 ios/
 android/app/src/main/assets/public/
+
+# Playwright E2E Tests
+playwright-report/
+test-results/
