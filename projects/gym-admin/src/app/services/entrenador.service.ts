@@ -12,7 +12,7 @@ import {
   setDoc,
   Timestamp
 } from 'firebase/firestore';
-import { Entrenador } from 'gym-library';
+import { Entrenador, Plan, Rol, PlanLimits, ROL_PLAN_LIMITS } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { EntrenadoService } from './entrenado.service';
@@ -79,7 +79,7 @@ export class EntrenadorService {
   private isListenerInitialized = false;
 
   // Cache para límites por entrenador (evita búsquedas repetidas)
-  private limitsCache = new Map<string, { maxClients: number; maxRoutines: number; maxExercises: number }>();
+  private limitsCache = new Map<string, PlanLimits>();
 
   constructor() { }
 
@@ -94,17 +94,13 @@ export class EntrenadorService {
   }
 
   // Métodos para límites de plan
-  getLimits(entrenadorId: string) {
+  getLimits(entrenadorId: string): PlanLimits {
     if (this.limitsCache.has(entrenadorId)) {
       return this.limitsCache.get(entrenadorId)!;
     }
     const user = this.userService.users().find(u => u.uid === entrenadorId);
-    const isFree = user?.plan === 'free';
-    const limits = {
-      maxClients: isFree ? 3 : Infinity,
-      maxRoutines: isFree ? 3 : Infinity,
-      maxExercises: isFree ? 10 : Infinity,
-    };
+    const plan = user?.plan || Plan.FREE;
+    const limits = ROL_PLAN_LIMITS[Rol.ENTRENADOR][plan];
     this.limitsCache.set(entrenadorId, limits);
     return limits;
   }
@@ -127,7 +123,7 @@ export class EntrenadorService {
 
     const limits = this.getLimits(entrenadorId);
     const currentArray = (entrenador[arrayKey] as string[]) || [];
-    this.validateLimit(entrenadorId, currentArray.length, limits[maxKey], itemName);
+    this.validateLimit(entrenadorId, currentArray.length, limits[maxKey] as number, itemName);
 
     if (!currentArray.includes(itemId)) {
       const updatedArray = [...currentArray, itemId];
@@ -403,16 +399,15 @@ export class EntrenadorService {
 
     // Validación de plan: free no puede crear ejercicios con campos premium
     const limits = this.getLimits(entrenadorId);
-    if (limits.maxExercises === 3) { // Plan free
+    if (!limits.allowCustomTimers) { // Plan free
       const ejercicio = this.ejercicioService.getEjercicio(ejercicioId)();
       if (ejercicio && (ejercicio.descansoSegundos !== undefined || ejercicio.serieSegundos !== undefined)) {
         throw new PlanLimitError('En el plan free no se pueden configurar tiempos de descanso o serie. Actualiza a premium.');
       }
     }
 
-    const limitsGeneral = this.getLimits(entrenadorId);
     const currentCount = entrenador.ejerciciosCreadasIds?.length || 0;
-    this.validateLimit(entrenadorId, currentCount, limitsGeneral.maxExercises, 'ejercicios');
+    this.validateLimit(entrenadorId, currentCount, limits.maxExercises, 'ejercicios');
 
     const ejerciciosCreadasIds = [...(entrenador.ejerciciosCreadasIds || [])];
     if (!ejerciciosCreadasIds.includes(ejercicioId)) {
@@ -449,7 +444,7 @@ export class EntrenadorService {
 
     // Validación de plan: free no puede crear rutinas con campos premium
     const limits = this.getLimits(entrenadorId);
-    if (limits.maxRoutines === 5) { // Plan free
+    if (!limits.allowCustomDuration) { // Plan free
       const rutina = this.rutinaService.getRutina(rutinaId)();
       if (rutina && rutina.duracion !== undefined) {
         throw new PlanLimitError('En el plan free no se pueden configurar duración. Actualiza a premium.');

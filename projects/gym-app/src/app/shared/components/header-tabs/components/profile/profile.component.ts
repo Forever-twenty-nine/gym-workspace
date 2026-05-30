@@ -80,7 +80,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     effect(() => {
       const user = this.currentUser();
-      if (user) {
+      if (user && user.role !== 'gimnasio') {
         this.iniciarListenerSolicitudes(user.uid);
       }
     });

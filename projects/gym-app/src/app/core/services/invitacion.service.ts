@@ -179,8 +179,12 @@ export class InvitacionService {
                 id: `notif-${invitacion.id}`,
                 usuarioId: invitacion.entrenadoId || '', // La ve el entrenado
                 tipo: TipoNotificacion.INVITACION_PENDIENTE,
-                titulo: `Invitación de ${entrenadorNombre}`,
-                mensaje: mensajePersonalizado || `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`,
+                titulo: tipo === 'gimnasio_a_entrenador' 
+                    ? `Invitación de ${entrenadorNombre} (Gimnasio)` 
+                    : `Invitación de ${entrenadorNombre}`,
+                mensaje: mensajePersonalizado || (tipo === 'gimnasio_a_entrenador'
+                    ? `${entrenadorNombre} te ha invitado a unirte a su gimnasio`
+                    : `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`),
                 leida: false,
                 datos: {
                     invitacionId: invitacion.id,

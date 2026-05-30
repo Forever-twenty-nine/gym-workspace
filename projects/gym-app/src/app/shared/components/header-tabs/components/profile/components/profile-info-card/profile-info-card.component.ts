@@ -38,6 +38,17 @@ export class ProfileInfoCardComponent {
     });
   }
 
+  getRoleDisplayName(role?: string): string {
+    switch (role) {
+      case 'gimnasio': return 'Gimnasio';
+      case 'entrenado': return 'Entrenado';
+      case 'entrenador': return 'Entrenador';
+      case 'personal_trainer': return 'Personal Trainer';
+      case 'user': return 'Usuario';
+      default: return 'Usuario';
+    }
+  }
+
   openPremiumModal() {
     this.openPremiumModalClicked.emit();
   }

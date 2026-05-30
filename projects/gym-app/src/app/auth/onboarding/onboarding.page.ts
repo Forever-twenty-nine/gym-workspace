@@ -24,7 +24,7 @@ import {
   fitnessOutline,
   rocketOutline
 } from 'ionicons/icons';
-import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio } from 'gym-library';
+import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -316,7 +316,8 @@ export class OnboardingPage {
           id: uid,
           nombre: formData.nombre || 'Gimnasio',
           direccion: '',
-          activo: true
+          activo: true,
+          plan: Plan.FREE
         };
         await this.gimnasioService.save(gimnasioData);
         break;
@@ -327,7 +328,8 @@ export class OnboardingPage {
           nombre: `Gimnasio - PT ${formData.nombre || ''}`,
           direccion: '',
           activo: true,
-          isPersonalTrainer: true
+          isPersonalTrainer: true,
+          plan: Plan.FREE
         };
         await this.gimnasioService.save(gimnasioPTData);
 

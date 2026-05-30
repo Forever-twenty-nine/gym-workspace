@@ -12,19 +12,16 @@ export const routes: Routes = [
           import('../gimnasio-dashboard/gimnasio-dashboard.page').then((m) => m.GimnasioDashboardPage),
       },
       {
-        path: 'users',
+        path: 'entrenadores',
         loadComponent: () =>
           import('../gimnasio-users/gimnasio-users.page').then((m) => m.GimnasioUsersPage),
+        data: { roleFilter: 'entrenador' }
       },
       {
-        path: 'settings',
+        path: 'entrenados',
         loadComponent: () =>
-          import('../../components/tab2/tab2.page').then((m) => m.Tab2Page),
-      },
-      {
-        path: 'profile',
-        loadComponent: () =>
-          import('../../components/tab3/tab3.page').then((m) => m.Tab3Page),
+          import('../gimnasio-users/gimnasio-users.page').then((m) => m.GimnasioUsersPage),
+        data: { roleFilter: 'entrenado' }
       },
       {
         path: '',

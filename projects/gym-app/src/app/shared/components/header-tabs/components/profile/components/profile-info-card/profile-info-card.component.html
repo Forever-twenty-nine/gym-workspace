@@ -13,8 +13,7 @@
     <ion-item color="none">
       <span slot="start" class="material-symbols-rounded text-primary !text-3xl">badge</span>
       <ion-label slot="end" class="text-right">
-        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ user.role === 'entrenador' ?
-          'Entrenador' : 'Entrenado' }}</h3>
+        <h3 class="!font-bold !m-0 !text-base !leading-tight">{{ getRoleDisplayName(user.role) }}</h3>
         <p class="!text-[11px] !m-0 !uppercase !tracking-wider !font-medium">Rol</p>
       </ion-label>
     </ion-item>

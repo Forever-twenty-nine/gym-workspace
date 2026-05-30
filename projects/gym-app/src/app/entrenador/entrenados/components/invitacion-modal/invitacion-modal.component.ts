@@ -27,6 +27,7 @@ export class InvitacionModalComponent {
     isOpen = input.required<boolean>();
     form = input.required<FormGroup>();
     isSaveDisabled = input.required<boolean>();
+    mensajePlaceholder = input<string>('¡Hola! Me gustaría ser tu entrenador...');
 
     close = output<void>();
     save = output<void>();

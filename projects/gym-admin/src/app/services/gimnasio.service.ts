@@ -60,6 +60,7 @@ export class GimnasioService {
                             nombre: data['nombre'] || '',
                             direccion: data['direccion'] || '',
                             activo: data['activo'] || false,
+                            plan: data['plan'] || 'free',
                             isPersonalTrainer: data['isPersonalTrainer'] || false,
                             entrenadoresIds: data['entrenadoresIds'] || [],
                             entrenadosIds: data['entrenadosIds'] || []
@@ -98,6 +99,7 @@ export class GimnasioService {
                             nombre: data['nombre'] || '',
                             direccion: data['direccion'] || '',
                             activo: data['activo'] || false,
+                            plan: data['plan'] || 'free',
                             isPersonalTrainer: data['isPersonalTrainer'] || false,
                             entrenadoresIds: data['entrenadoresIds'] || [],
                             entrenadosIds: data['entrenadosIds'] || []
@@ -119,6 +121,7 @@ export class GimnasioService {
             try {
                 const gimnasioData: any = {
                     activo: gimnasio.activo,
+                    plan: gimnasio.plan || 'free',
                     isPersonalTrainer: gimnasio.isPersonalTrainer || false,
                     entrenadoresIds: gimnasio.entrenadoresIds || [],
                     entrenadosIds: gimnasio.entrenadosIds || []

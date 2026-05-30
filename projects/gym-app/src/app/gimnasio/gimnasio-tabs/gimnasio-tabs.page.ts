@@ -8,10 +8,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  settingsOutline, 
   peopleOutline, 
   statsChartOutline, 
-  personOutline 
+  fitnessOutline 
 } from 'ionicons/icons';
 
 @Component({
@@ -23,10 +22,9 @@ import {
 export class GimnasioTabsPage {
   constructor() {
     addIcons({ 
-      settingsOutline, 
       peopleOutline, 
       statsChartOutline, 
-      personOutline 
+      fitnessOutline 
     });
   }
 }

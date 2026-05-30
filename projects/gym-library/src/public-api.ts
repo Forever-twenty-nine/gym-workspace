@@ -10,6 +10,10 @@ export * from './lib/enums/tipo-notificacion.enum';
 export * from './lib/enums/tipo-mensaje.enum';
 export { SesionRutinaStatus } from './lib/enums/sesion-rutina-status.enum';
 export { Plan } from './lib/enums/plan.enum';
+/**
+ * constants
+ */
+export * from './lib/constants/plan-limits.constant';
 /*
  * modelos
  */

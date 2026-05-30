@@ -76,12 +76,18 @@ export class PlanService {
             orderBy('fechaCreacion', 'desc')
         );
 
-        return onSnapshot(q, (snapshot) => {
-            const solicitudes = snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            })) as SolicitudPlan[];
-            callback(solicitudes);
+        return onSnapshot(q, {
+            next: (snapshot) => {
+                const solicitudes = snapshot.docs.map(doc => ({
+                    ...doc.data(),
+                    id: doc.id
+                })) as SolicitudPlan[];
+                callback(solicitudes);
+            },
+            error: (err) => {
+                console.warn('⚠️ PlanService: Error en el listener de solicitudes:', err);
+                callback([]);
+            }
         });
     }
 }
