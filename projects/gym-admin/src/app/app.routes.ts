@@ -52,6 +52,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/mensajes-globales/mensajes-globales').then(c => c.MensajesGlobalesComponent)
   },
   {
+    path: 'social',
+    loadComponent: () => import('./pages/social/social.page').then(c => c.SocialPage)
+  },
+  {
     path: '',
     redirectTo: '/usuarios',
     pathMatch: 'full'

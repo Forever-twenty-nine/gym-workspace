@@ -20,6 +20,7 @@ import { FIRESTORE } from '../firebase.tokens';
 import { EntrenadoService } from './entrenado.service';
 import { MensajeService } from './mensaje.service';
 import { NotificacionService } from './notificacion.service';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -31,6 +32,7 @@ export class MatchService {
     private readonly entrenadoService = inject(EntrenadoService);
     private readonly mensajeService = inject(MensajeService);
     private readonly notificacionService = inject(NotificacionService);
+    private readonly userService = inject(UserService);
 
     private readonly _interactions: WritableSignal<MatchInteraction[]> = signal<MatchInteraction[]>([]);
     private isListenerInitialized = false;
@@ -134,13 +136,23 @@ export class MatchService {
 
                 // C. Crear un mensaje de bienvenida automático en el chat para habilitar la conversación
                 const msgId = `msg-welcome-${usuarioOrigenId}-${usuarioDestinoId}-${Date.now()}`;
+                const originUser = this.userService.getUserByUid(usuarioOrigenId)();
+                const originName = originUser?.nombre || 'Un atleta';
+                
+                let contenido = `¡Conexión establecida! Nos interesa entrenar a la misma hora o compartir el mismo estilo de vida. ¡Empecemos a coordinar!`;
+                if (tipo === 'desafio') {
+                    contenido = `“A vos y a ${originName} les gusta el mismo ritmo. ¿Por qué no arman un grupo?”`;
+                } else if (tipo === 'afinidad') {
+                    contenido = `¡Hay equipo! Encontramos a tu partner ideal para esta semana. ¡Vamos a entrenar!`;
+                }
+
                 await this.mensajeService.save({
                     id: msgId,
                     remitenteId: usuarioOrigenId,
                     remitenteTipo: Rol.ENTRENADO,
                     destinatarioId: usuarioDestinoId,
                     destinatarioTipo: Rol.ENTRENADO,
-                    contenido: `¡Conexión establecida! Nos interesa entrenar a la misma hora o compartir el mismo estilo de vida. ¡Empecemos a coordinar!`,
+                    contenido: contenido,
                     tipo: TipoMensaje.TEXTO,
                     leido: false,
                     entregado: true,

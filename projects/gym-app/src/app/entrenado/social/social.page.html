@@ -11,7 +11,8 @@
 
   <div class="main-container ion-padding relative z-10">
     <div
-      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      
       <!-- Tabs de Segmento con Glassmorphism -->
       <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
         class="mb-6 rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
@@ -21,13 +22,69 @@
         <ion-segment-button value="siguiendo">
           <ion-label class="font-bold text-xs uppercase tracking-wider">Siguiendo</ion-label>
         </ion-segment-button>
+        <ion-segment-button value="activar-hoy">
+          <ion-label class="font-bold text-xs uppercase tracking-wider">Activar Hoy</ion-label>
+        </ion-segment-button>
         <ion-segment-button value="descubrir">
           <ion-label class="font-bold text-xs uppercase tracking-wider">Descubrir</ion-label>
         </ion-segment-button>
       </ion-segment>
 
-      <!-- Listado de Sesiones / Discovery -->
-      @if (selectedTab() === 'descubrir') {
+      <!-- PESTAÑA: ACTIVAR HOY (Filtro de Disponibilidad Horaria) -->
+      @if (selectedTab() === 'activar-hoy') {
+        <div class="flex flex-col gap-6">
+          <div class="px-2">
+            <h3 class="text-lg font-black text-gray-900 dark:text-white tracking-tight leading-none mb-1">Activar Hoy 📅🕒</h3>
+            <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">Atletas libres en tu zona o en tu misma franja horaria hoy.</p>
+          </div>
+
+          @if (sugerenciasDisponibilidad().length === 0) {
+            <div class="flex flex-col items-center justify-center py-20 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
+              <div class="w-20 h-20 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
+                <ion-icon name="time-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
+              </div>
+              <h3 class="text-lg font-black text-gray-900 dark:text-white mb-2 tracking-tight">Todo listo por hoy</h3>
+              <p class="text-xs font-medium text-gray-600 dark:text-white/70 px-8">No quedan más atletas con tu misma franja horaria disponibles hoy. ¡Intenta más tarde!</p>
+            </div>
+          } @else {
+            <div class="flex flex-col gap-4">
+              @for (usuario of sugerenciasDisponibilidad(); track usuario.id) {
+                <div class="p-5 rounded-3xl shadow-md border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md flex flex-col gap-4 transition-all duration-300 hover:scale-[1.01]">
+                  <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-2xl overflow-hidden bg-gray-200/50 flex items-center justify-center border border-primary/20 shadow-sm">
+                      <img *ngIf="getUsuarioPhoto(usuario.id)" [src]="getUsuarioPhoto(usuario.id)" alt="Perfil" class="w-full h-full object-cover">
+                      <ion-icon *ngIf="!getUsuarioPhoto(usuario.id)" name="person-outline" class="text-xl text-gray-500"></ion-icon>
+                    </div>
+                    <div class="text-left flex-1 min-w-0">
+                      <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-blue-600 dark:text-blue-400 leading-none mb-1">Coincidencia Horaria</h4>
+                      <p class="text-base font-black text-gray-900 dark:text-white truncate leading-none mb-1.5">{{ getUsuarioName(usuario.id) }}</p>
+                      <ion-badge color="primary" class="font-bold text-[9px] uppercase px-2 py-0.5 rounded-full">
+                        Libre: {{ usuario.franjaHoraria?.inicio }} - {{ usuario.franjaHoraria?.fin }}
+                      </ion-badge>
+                    </div>
+                  </div>
+
+                  <div *ngIf="usuario.bio" class="bg-gray-100/50 dark:bg-gray-900/40 border border-white/5 rounded-xl p-3">
+                    <p class="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-relaxed italic">"{{ usuario.bio }}"</p>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-3 mt-1">
+                    <button (click)="pasarUsuario(usuario.id)" class="px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/10 transition-colors">
+                      Pasar
+                    </button>
+                    <button (click)="conectarUsuario(usuario.id)" class="px-5 py-2.5 rounded-2xl font-black text-xs uppercase tracking-wider bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/20 transition-colors flex items-center gap-1.5">
+                      <ion-icon name="checkmark-outline"></ion-icon> Conectar
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <!-- PESTAÑA: DESCUBRIR (Modo Gym Bro y Coincidencias) -->
+      @else if (selectedTab() === 'descubrir') {
         <div class="flex flex-col gap-8">
           
           <!-- Seccion 1: Partner Horario (Utility Card) -->
@@ -64,11 +121,11 @@
             }
           </div>
 
-          <!-- Seccion 3: Afinidad y Estilo de Vida (Social Pura Card) -->
+          <!-- Seccion 3: Gym Bro / Partner de Ruta (Social Pura Card) -->
           <div>
             <div class="flex items-center gap-2 mb-4 px-2">
-              <ion-icon name="sparkles-outline" class="text-xl text-primary"></ion-icon>
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Mismas Vibras</h3>
+              <ion-icon name="barbell-outline" class="text-xl text-primary"></ion-icon>
+              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Partners de Ruta 🏋️‍♂️💪</h3>
             </div>
             @if (sugerenciasAfinidad().length === 0) {
               <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay sugerencias con afinidades comunes por el momento.</p>
@@ -82,7 +139,10 @@
           </div>
 
         </div>
-      } @else if (filteredFeed().length === 0) {
+      }
+
+      <!-- VACÍO O FEED COMPLETO -->
+      @else if (filteredFeed().length === 0) {
       <div
         class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
         <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
@@ -92,14 +152,20 @@
           {{ selectedTab() === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
         </h3>
         <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
-          {{ selectedTab() === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas
-          para ver su actividad aquí.' }}
+          {{ selectedTab() === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
         </p>
       </div>
-      } @else {
+      }
+
+      <!-- FEED ACTIVO -->
+      @else {
       <div class="flex flex-col gap-6">
-        @for (sesion of filteredFeed(); track sesion.id) {
-          <app-social-card [sesion]="sesion"></app-social-card>
+        @for (item of filteredFeed(); track item.id) {
+          @if (item.isDesafio) {
+            <app-desafio-feed-card [desafio]="item" (dismissed)="dismissDesafio(item.id, $event)"></app-desafio-feed-card>
+          } @else {
+            <app-social-card [sesion]="item"></app-social-card>
+          }
         }
       </div>
 
@@ -111,6 +177,7 @@
       </ion-infinite-scroll>
       }
       }
+
     </div>
   </div>
 </ion-content>

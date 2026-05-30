@@ -19,10 +19,6 @@ import {
     imports: [
         CommonModule,
         DatePipe,
-        IonCard,
-        IonCardHeader,
-        IonCardTitle,
-        IonCardContent,
         IonList,
         IonItem,
         IonLabel,

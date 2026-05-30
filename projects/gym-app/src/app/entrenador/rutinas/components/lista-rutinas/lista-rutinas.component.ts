@@ -18,10 +18,6 @@ import {
     standalone: true,
     imports: [
         CommonModule,
-        IonCard,
-        IonCardHeader,
-        IonCardTitle,
-        IonCardContent,
         IonList,
         IonItem,
         IonLabel,

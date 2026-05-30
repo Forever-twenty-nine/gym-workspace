@@ -1,14 +1,19 @@
 <ion-card class="!m-0 !rounded-3xl overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative">
+  
   <!-- 1. TARJETA DE UTILIDAD (El Partner Horario) -->
   <div *ngIf="tipo === 'horario'" class="p-6 flex flex-col gap-4">
     <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500">
-          <ion-icon name="time-outline" class="text-xl"></ion-icon>
+      <div class="flex items-center gap-3">
+        <!-- Foto de Perfil Companion -->
+        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-gray-200/50 flex items-center justify-center border border-blue-500/20 shadow-md">
+          <img *ngIf="userProfilePhoto()" [src]="userProfilePhoto()" alt="Perfil" class="w-full h-full object-cover">
+          <ion-icon *ngIf="!userProfilePhoto()" name="person-outline" class="text-lg text-gray-500"></ion-icon>
         </div>
         <div>
-          <h4 class="text-xs uppercase tracking-wider font-extrabold text-blue-600 dark:text-blue-400">Partner Horario</h4>
-          <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Coincidencia Logística</p>
+          <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-blue-600 dark:text-blue-400 leading-none mb-1">Partner Horario</h4>
+          <p class="text-base font-black text-gray-900 dark:text-white tracking-tight leading-none">
+            {{ userName() }}
+          </p>
         </div>
       </div>
       <ion-badge color="primary" class="font-bold text-xs uppercase tracking-wide px-3 py-1 rounded-full">
@@ -21,7 +26,7 @@
       <div class="flex items-center gap-3">
         <ion-icon name="hourglass-outline" class="text-lg text-blue-500"></ion-icon>
         <span class="text-sm font-bold text-gray-800 dark:text-gray-200">
-          Coincide en tu rango preferido para entrenar.
+          Coincide en tu rango preferido para entrenar hoy.
         </span>
       </div>
     </div>
@@ -38,8 +43,8 @@
     <!-- Acciones -->
     <div class="mt-2 flex gap-3">
       <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full !rounded-2xl overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'">
-        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'sparkles-outline'" slot="start"></ion-icon>
-        {{ matchConcretado() ? '¡Chat Desbloqueado!' : interacted() ? 'Interés Enviado' : 'Coincidir Horario' }}
+        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'time-outline'" slot="start"></ion-icon>
+        {{ matchConcretado() ? '¡Coincidencia Lograda!' : interacted() ? 'Interés Enviado' : 'Coincidir Horario' }}
       </ion-button>
     </div>
   </div>
@@ -52,8 +57,8 @@
           <ion-icon name="trophy-outline" class="text-xl"></ion-icon>
         </div>
         <div>
-          <h4 class="text-xs uppercase tracking-wider font-extrabold text-amber-600 dark:text-amber-400">Desafío Cruzado</h4>
-          <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight">Competencia y Retos</p>
+          <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-amber-600 dark:text-amber-400">Desafío Cruzado</h4>
+          <p class="text-base font-black text-gray-900 dark:text-white tracking-tight">Competencia y Retos</p>
         </div>
       </div>
       <div class="flex items-center gap-1 text-xs font-extrabold text-amber-600 dark:text-amber-400 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
@@ -66,7 +71,7 @@
       <!-- Decoración de fondo -->
       <ion-icon name="trophy-outline" class="absolute -right-4 -bottom-4 text-7xl text-amber-500/5 pointer-events-none"></ion-icon>
       
-      <p class="text-lg font-black text-gray-900 dark:text-white leading-snug tracking-tight mb-2">
+      <p class="text-base font-black text-gray-900 dark:text-white leading-snug tracking-tight mb-2">
         "{{ data.titulo }}"
       </p>
       
@@ -80,11 +85,11 @@
     <div class="flex items-center justify-between border-t border-white/10 pt-4 mt-1">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-200/50 flex items-center justify-center border border-white/20">
-          <img *ngIf="data.creadorFoto" [src]="data.creadorFoto" alt="Creador" class="w-full h-full object-cover">
-          <ion-icon *ngIf="!data.creadorFoto" name="person-outline" class="text-sm text-gray-500"></ion-icon>
+          <img *ngIf="userProfilePhoto()" [src]="userProfilePhoto()" alt="Creador" class="w-full h-full object-cover">
+          <ion-icon *ngIf="!userProfilePhoto()" name="person-outline" class="text-sm text-gray-500"></ion-icon>
         </div>
         <div class="text-left">
-          <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200 leading-none mb-0.5">{{ data.creadorNombre }}</p>
+          <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200 leading-none mb-0.5">{{ userName() }}</p>
           <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none">Creador del Reto</p>
         </div>
       </div>
@@ -102,19 +107,19 @@
     </div>
   </div>
 
-  <!-- 3. TARJETA SOCIAL PURA (Afinidad y Estilo de Vida) -->
+  <!-- 3. TARJETA SOCIAL PURA (Afinidad y Estilo de Vida - Gym Bro / Partner de Ruta) -->
   <div *ngIf="tipo === 'afinidad'" class="p-6 flex flex-col gap-4">
     <div class="flex items-center gap-3">
       <!-- Foto de Perfil Grande -->
       <div class="w-16 h-16 rounded-3xl overflow-hidden bg-gray-200/50 flex items-center justify-center border-2 border-primary/20 shadow-md">
-        <img *ngIf="data.fotoUsuario" [src]="data.fotoUsuario" alt="Perfil" class="w-full h-full object-cover">
-        <ion-icon *ngIf="!data.fotoUsuario" name="person-outline" class="text-2xl text-gray-500"></ion-icon>
+        <img *ngIf="userProfilePhoto()" [src]="userProfilePhoto()" alt="Perfil" class="w-full h-full object-cover">
+        <ion-icon *ngIf="!userProfilePhoto()" name="person-outline" class="text-2xl text-gray-500"></ion-icon>
       </div>
       
       <div class="text-left flex-1 min-w-0">
-        <h4 class="text-xs uppercase tracking-wider font-extrabold text-primary mb-0.5">Afinidad y Vibras</h4>
+        <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-primary mb-0.5">Partner de Ruta 🏋️‍♂️💪</h4>
         <p class="text-lg font-black text-gray-900 dark:text-white tracking-tight truncate leading-none mb-1">
-          {{ data.id || 'Atleta' }}
+          {{ userName() }}
         </p>
         <span *ngIf="data.nivel" class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
           {{ data.nivel }}
@@ -141,8 +146,8 @@
     <!-- Acciones -->
     <div class="mt-2 flex gap-3">
       <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full !rounded-2xl overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'">
-        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'heart-outline'" slot="start"></ion-icon>
-        {{ matchConcretado() ? '¡Match Conectado!' : interacted() ? 'Like Enviado' : 'Conectar Vibras' }}
+        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'people-outline'" slot="start"></ion-icon>
+        {{ matchConcretado() ? '¡Hay equipo!' : interacted() ? 'Interés Enviado' : '¿Entrenamos? 🤝' }}
       </ion-button>
     </div>
   </div>

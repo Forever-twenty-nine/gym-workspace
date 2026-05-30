@@ -14,8 +14,6 @@ import {
     standalone: true,
     imports: [
         CommonModule,
-        IonCard,
-        IonCardContent,
         IonText,
         IonIcon,
         IonButton

@@ -1,0 +1,54 @@
+<ion-card class="!m-0 !rounded-3xl overflow-hidden shadow-md border border-white/20 dark:border-white/10 bg-linear-to-br from-amber-500/10 via-orange-600/5 to-transparent backdrop-blur-xl relative">
+  <div class="p-5 flex flex-col gap-4">
+    <!-- Cabecera -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-500">
+          <ion-icon name="trophy-outline" class="text-base"></ion-icon>
+        </div>
+        <div>
+          <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-amber-600 dark:text-amber-400 leading-none">Desafío Cruzado</h4>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 text-[9px] font-extrabold text-amber-600 dark:text-amber-400 uppercase bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/25">
+        <ion-icon name="flame-outline"></ion-icon>
+        <span>Reto Activo</span>
+      </div>
+    </div>
+
+    <!-- Cuerpo del Desafío -->
+    <div class="bg-white/40 dark:bg-black/40 border border-white/10 dark:border-white/5 rounded-2xl p-4">
+      <p class="text-sm font-black text-gray-900 dark:text-white leading-snug tracking-tight italic text-center">
+        "{{ desafio.titulo }}"
+      </p>
+      
+      <div *ngIf="desafio.logroRelacionado" class="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1 mt-2">
+        <span class="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300 font-extrabold uppercase text-[8px]">Récord</span>
+        {{ desafio.logroRelacionado }}
+      </div>
+    </div>
+
+    <!-- Creador y Botones -->
+    <div class="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-200/50 flex items-center justify-center border border-amber-500/25">
+          <img *ngIf="creatorPhoto()" [src]="creatorPhoto()" alt="Creador" class="w-full h-full object-cover">
+          <ion-icon *ngIf="!creatorPhoto()" name="person-outline" class="text-xs text-gray-500"></ion-icon>
+        </div>
+        <div class="text-left">
+          <p class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-none mb-0.5">{{ creatorName() }}</p>
+          <p class="text-[9px] text-gray-500 leading-none">Te desafía</p>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <ion-button size="small" fill="clear" color="medium" (click)="ignorarDesafio()" [disabled]="interacted()" class="font-extrabold text-xs">
+          Pasar
+        </ion-button>
+        <ion-button size="small" fill="solid" color="warning" (click)="aceptarDesafio()" [disabled]="interacted()" class="font-extrabold text-xs !rounded-xl overflow-hidden">
+          Aceptar
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-card>

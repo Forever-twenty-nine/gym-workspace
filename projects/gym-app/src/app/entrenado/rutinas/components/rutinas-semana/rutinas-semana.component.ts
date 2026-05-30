@@ -31,7 +31,6 @@ import { fitnessOutline, timeOutline, playCircle, bedOutline, calendarOutline, l
         IonBadge,
         IonButton,
         IonList,
-        NgOptimizedImage
     ],
     templateUrl: './rutinas-semana.component.html'
 })

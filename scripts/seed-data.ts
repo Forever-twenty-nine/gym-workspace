@@ -434,6 +434,79 @@ async function main() {
         }
     }
 
+    // 5) Crear desafíos mocks
+    console.log('🎯 Creando desafíos mocks...');
+    const desafiosMock = [
+        {
+            id: 'desafio_1',
+            creadorId: 'trainee_juanperez',
+            creadorNombre: 'Juan Pérez',
+            titulo: 'Hoy metí 5km en 22 min, ¿quién se la banca?',
+            logroRelacionado: 'Running 5k - 22:15',
+            disciplina: 'Running',
+            fechaCreacion: Timestamp.now(),
+            activo: true
+        },
+        {
+            id: 'desafio_2',
+            creadorId: 'trainee_mariagarcia',
+            creadorNombre: 'María García',
+            titulo: 'Sentadilla 120kg x 5 reps. ¿Quién me sigue el ritmo de piernas?',
+            logroRelacionado: 'Sentadilla 120kg',
+            disciplina: 'Powerlifting',
+            fechaCreacion: Timestamp.now(),
+            activo: true
+        },
+        {
+            id: 'desafio_3',
+            creadorId: 'trainee_luisfernandez',
+            creadorNombre: 'Luis Fernández',
+            titulo: 'Reto de flexiones de brazos: 50 en un minuto.',
+            logroRelacionado: '50 flexiones',
+            disciplina: 'Calistenia',
+            fechaCreacion: Timestamp.now(),
+            activo: true
+        }
+    ];
+
+    for (const d of desafiosMock) {
+        await db.collection('desafios').doc(d.id).set(d);
+        console.log(`✅ Creado desafío mock: ${d.titulo}`);
+    }
+
+    // 6) Crear interacciones/matches mocks
+    console.log('🤝 Creando matches fitness y likes mocks...');
+    const matchesMock = [
+        // A. Match mutuo (hay equipo) de tipo afinidad/Gym Bro
+        {
+            id: 'match-trainee_juanperez-trainee_mariagarcia',
+            tipo: 'afinidad',
+            usuarioOrigenId: 'trainee_juanperez',
+            usuarioDestinoId: 'trainee_mariagarcia',
+            interesOrigen: true,
+            interesDestino: true,
+            mutuo: true,
+            fechaCreacion: Timestamp.now(),
+            fechaMatch: Timestamp.now()
+        },
+        // B. Match pendiente de tipo horario
+        {
+            id: 'match-trainee_mariagarcia-trainee_luisfernandez',
+            tipo: 'horario',
+            usuarioOrigenId: 'trainee_mariagarcia',
+            usuarioDestinoId: 'trainee_luisfernandez',
+            interesOrigen: true,
+            interesDestino: false,
+            mutuo: false,
+            fechaCreacion: Timestamp.now()
+        }
+    ];
+
+    for (const m of matchesMock) {
+        await db.collection('matches').doc(m.id).set(m);
+        console.log(`✅ Creado match mock: ${m.id} (${m.tipo}, mutuo: ${m.mutuo})`);
+    }
+
     console.log('✅ Seed completado con éxito.');
 
     process.exit(0);

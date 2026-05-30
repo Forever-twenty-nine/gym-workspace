@@ -26,10 +26,6 @@ import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ion
     standalone: true,
     imports: [
         CommonModule,
-        IonCard,
-        IonCardHeader,
-        IonCardTitle,
-        IonCardContent,
         IonList,
         IonItem,
         IonLabel,

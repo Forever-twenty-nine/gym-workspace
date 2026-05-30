@@ -246,7 +246,11 @@ export class EntrenadoService {
             ejerciciosCreadosIds: data.ejerciciosCreadosIds || [],
             nivel: data.nivel || null,
             seguidores: data.seguidores || [],
-            seguidos: data.seguidos || []
+            seguidos: data.seguidos || [],
+            bio: data.bio || '',
+            tags: data.tags || [],
+            disciplinas: data.disciplinas || [],
+            franjaHoraria: data.franjaHoraria || null
         };
     }
 
@@ -263,6 +267,10 @@ export class EntrenadoService {
         if (entrenado.nivel !== undefined) data.nivel = entrenado.nivel;
         if (entrenado.seguidores) data.seguidores = entrenado.seguidores;
         if (entrenado.seguidos) data.seguidos = entrenado.seguidos;
+        if (entrenado.bio !== undefined) data.bio = entrenado.bio;
+        if (entrenado.tags !== undefined) data.tags = entrenado.tags;
+        if (entrenado.disciplinas !== undefined) data.disciplinas = entrenado.disciplinas;
+        if (entrenado.franjaHoraria !== undefined) data.franjaHoraria = entrenado.franjaHoraria;
         return data;
     }
 

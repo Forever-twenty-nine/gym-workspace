@@ -11,6 +11,7 @@ import {
 } from 'ionicons/icons';
 import { MatchService } from '../../../../core/services/match.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
 import { Entrenado } from 'gym-library';
 
 @Component({
@@ -24,6 +25,7 @@ import { Entrenado } from 'gym-library';
 export class MatchCardComponent {
   private readonly matchService = inject(MatchService);
   private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserService);
   private readonly toastCtrl = inject(ToastController);
 
   @Input({ required: true }) tipo!: 'horario' | 'desafio' | 'afinidad';
@@ -34,6 +36,22 @@ export class MatchCardComponent {
   // Estado local para evitar doble submit
   interacted = signal<boolean>(false);
   matchConcretado = signal<boolean>(false);
+
+  userName = computed(() => {
+    if (!this.data) return 'Atleta';
+    if (this.tipo === 'desafio') {
+      return this.data.creadorNombre || '';
+    }
+    return this.data.id ? this.userService.getUserByUid(this.data.id)()?.nombre || 'Atleta' : 'Atleta';
+  });
+
+  userProfilePhoto = computed(() => {
+    if (!this.data) return null;
+    if (this.tipo === 'desafio') {
+      return this.data.creadorFoto || null;
+    }
+    return this.data.id ? this.userService.getUserByUid(this.data.id)()?.photoURL || null : null;
+  });
 
   constructor() {
     addIcons({
@@ -68,7 +86,13 @@ export class MatchCardComponent {
 
       if (isMatch) {
         this.matchConcretado.set(true);
-        this.showToast('¡HAY MATCH MUTUO! Se ha abierto un chat para coordinar.');
+        if (this.tipo === 'afinidad') {
+          this.showToast('¡Hay equipo! Encontramos a tu partner ideal para esta semana.');
+        } else if (this.tipo === 'desafio') {
+          this.showToast(`“A vos y a ${this.userName()} les gusta el mismo ritmo. ¿Por qué no arman un grupo?”`);
+        } else {
+          this.showToast('¡HAY MATCH MUTUO! Se ha abierto un chat para coordinar.');
+        }
       } else {
         this.showToast('Interés enviado. Esperando respuesta del compañero.');
       }

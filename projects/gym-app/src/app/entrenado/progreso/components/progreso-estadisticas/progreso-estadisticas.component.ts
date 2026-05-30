@@ -24,9 +24,9 @@ import {
     selector: 'app-progreso-estadisticas',
     standalone: true,
     imports: [
-        IonIcon, IonCard, IonCardHeader, IonCardTitle,
-        IonCardSubtitle, IonCardContent, IonGrid, IonRow, IonCol, IonText
-    ],
+    IonIcon, IonCard,
+    IonCardContent, IonGrid, IonRow, IonCol, IonText
+],
     templateUrl: './progreso-estadisticas.component.html'
 })
 export class ProgresoEstadisticasComponent {
