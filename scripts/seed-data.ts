@@ -507,6 +507,47 @@ async function main() {
         console.log(`✅ Creado match mock: ${m.id} (${m.tipo}, mutuo: ${m.mutuo})`);
     }
 
+    // 7) Crear Gimnasio Central nucleando a todos los usuarios
+    console.log('🏛️ Creando Gimnasio Central y nucleando a todos los entrenadores y atletas...');
+    const gymUid = 'gym_central';
+    const gymEmail = 'central@gym.test';
+    const gymName = 'Gimnasio Central';
+
+    const gimnasioDoc = {
+        id: gymUid,
+        nombre: gymName,
+        direccion: 'Av. Siempre Viva 742',
+        activo: true,
+        isPersonalTrainer: false,
+        entrenadoresIds: createdTrainers.map(t => t.uid),
+        entrenadosIds: createdTrainees.map(t => t.uid)
+    };
+    await db.collection('gimnasios').doc(gymUid).set(gimnasioDoc, { merge: true });
+
+    const gymUserData = {
+        uid: gymUid,
+        nombre: gymName,
+        email: gymEmail,
+        role: 'gimnasio',
+        onboarded: true,
+        fechaCreacion: Timestamp.now()
+    };
+    await db.collection('usuarios').doc(gymUid).set(gymUserData, { merge: true });
+    await ensureAuthUser(gymUid, gymEmail, 'admin123', gymName);
+
+    // Asociar a todos los entrenadores con este gimnasio
+    for (const trainer of createdTrainers) {
+        await db.collection('entrenadores').doc(trainer.uid).set({ gimnasioId: gymUid }, { merge: true });
+        await db.collection('usuarios').doc(trainer.uid).set({ gimnasioId: gymUid }, { merge: true });
+    }
+
+    // Asociar a todos los entrenados con este gimnasio
+    for (const trainee of createdTrainees) {
+        await db.collection('entrenados').doc(trainee.uid).set({ gimnasioId: gymUid }, { merge: true });
+        await db.collection('usuarios').doc(trainee.uid).set({ gimnasioId: gymUid }, { merge: true });
+    }
+    console.log(`🏛️ Gimnasio Central vinculado exitosamente con ${createdTrainers.length} entrenadores y ${createdTrainees.length} atletas.`);
+
     console.log('✅ Seed completado con éxito.');
 
     process.exit(0);

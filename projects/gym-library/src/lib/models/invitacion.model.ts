@@ -1,12 +1,23 @@
 export interface Invitacion {
     id: string;
-    entrenadorId: string;           // Quién envía la invitación
-    entrenadoId: string;            // Quién recibe la invitación
-    entrenadorNombre: string;       // Nombre del entrenador (para display)
-    entrenadoNombre: string;        // Nombre del entrenado (para display)
-    emailEntrenado: string;         // Email del entrenado
+    
+    // Campos polimórficos (Nuevos)
+    remitenteId?: string;
+    destinatarioId?: string;
+    remitenteNombre?: string;
+    destinatarioNombre?: string;
+    emailDestinatario?: string;
+    tipo?: 'gimnasio_a_entrenador' | 'entrenador_a_entrenado';
+
+    // Campos legados para compatibilidad
+    entrenadorId?: string;
+    entrenadoId?: string;
+    entrenadorNombre?: string;
+    entrenadoNombre?: string;
+    emailEntrenado?: string;
+
     estado: 'pendiente' | 'aceptada' | 'rechazada';
-    mensajePersonalizado?: string;  // Mensaje opcional del entrenador
+    mensajePersonalizado?: string;  // Mensaje opcional
 
     // Fechas
     fechaCreacion: Date;

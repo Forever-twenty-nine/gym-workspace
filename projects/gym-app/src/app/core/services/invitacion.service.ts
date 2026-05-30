@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
+import { GimnasioService } from './gimnasio.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -146,7 +147,8 @@ export class InvitacionService {
         entrenadorNombre: string,
         entrenadoNombre: string,
         emailEntrenado: string,
-        mensajePersonalizado?: string
+        mensajePersonalizado?: string,
+        tipo: 'gimnasio_a_entrenador' | 'entrenador_a_entrenado' = 'entrenador_a_entrenado'
     ): Promise<void> {
         const invitacion: Invitacion = {
             id: `inv-${entrenadorId}-${entrenadoId}-${Date.now()}`,
@@ -155,6 +157,12 @@ export class InvitacionService {
             entrenadorNombre,
             entrenadoNombre,
             emailEntrenado,
+            remitenteId: entrenadorId,
+            destinatarioId: entrenadoId,
+            remitenteNombre: entrenadorNombre,
+            destinatarioNombre: entrenadoNombre,
+            emailDestinatario: emailEntrenado,
+            tipo,
             estado: 'pendiente',
             mensajePersonalizado,
             fechaCreacion: new Date(),
@@ -169,7 +177,7 @@ export class InvitacionService {
             const notificacionService = this.injector.get(NotificacionService);
             const notificacion: Notificacion = {
                 id: `notif-${invitacion.id}`,
-                usuarioId: invitacion.entrenadoId, // La ve el entrenado
+                usuarioId: invitacion.entrenadoId || '', // La ve el entrenado
                 tipo: TipoNotificacion.INVITACION_PENDIENTE,
                 titulo: `Invitación de ${entrenadorNombre}`,
                 mensaje: mensajePersonalizado || `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`,
@@ -215,38 +223,62 @@ export class InvitacionService {
                 throw new Error(`Invitación ${invitacionId} no encontrada`);
             }
 
-            const entrenadoId = invitacion.entrenadoId;
-            const entrenadorId = invitacion.entrenadorId;
+            const entrenadoId = invitacion.entrenadoId || '';
+            const entrenadorId = invitacion.entrenadorId || '';
+            const tipo = invitacion.tipo || 'entrenador_a_entrenado';
 
             // 1) Marcar invitación como aceptada
             await this.updateEstado(invitacionId, 'aceptada');
 
-            // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
-            const entrenadoService = this.injector.get(EntrenadoService);
-            const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId)();
-            const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === entrenadoId) || null;
-            if (entrenado) {
-                const entrenadoresId = [...(entrenado.entrenadoresId || [])];
-                if (!entrenadoresId.includes(entrenadorId)) {
-                    entrenadoresId.push(entrenadorId);
-                    const entrenadoActualizado = { ...entrenado, entrenadoresId } as any;
-                    await entrenadoService.save(entrenadoActualizado);
-                }
-            }
+            if (tipo === 'gimnasio_a_entrenador') {
+                const gimnasioId = invitacion.remitenteId || entrenadorId;
+                const entrenadorIdAsociado = invitacion.destinatarioId || entrenadoId;
 
-            // 3) Actualizar entrenador: agregar entrenadoId a entrenadosAsignadosIds
-            const entrenadorService = this.injector.get(EntrenadorService);
-            const entrenador = entrenadorService.getEntrenadorById(entrenadorId)();
-            if (entrenador) {
-                const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
-                if (!entrenadosAsignadosIds.includes(entrenadoId)) {
-                    // Check limit before adding
-                    const limits = entrenadorService.getLimits(entrenadorId);
-                    if (entrenadosAsignadosIds.length >= limits.maxClients) {
-                        throw new PlanLimitError('Has alcanzado el límite de clientes para tu plan. Actualiza para conectar más.');
+                // Actualizar perfil Entrenador: agregar gimnasioId
+                const entrenadorService = this.injector.get(EntrenadorService);
+                const entrenador = entrenadorService.getEntrenadorById(entrenadorIdAsociado)();
+                if (entrenador) {
+                    await entrenadorService.update(entrenadorIdAsociado, { gimnasioId });
+                }
+
+                // Actualizar perfil Gimnasio: agregar entrenador a entrenadoresIds
+                const gimnasioService = this.injector.get(GimnasioService);
+                const gimnasio = gimnasioService.getGimnasioById(gimnasioId)();
+                if (gimnasio) {
+                    const entrenadoresIds = [...(gimnasio.entrenadoresIds || [])];
+                    if (!entrenadoresIds.includes(entrenadorIdAsociado)) {
+                        entrenadoresIds.push(entrenadorIdAsociado);
+                        await gimnasioService.save({ ...gimnasio, entrenadoresIds });
                     }
-                    entrenadosAsignadosIds.push(entrenadoId);
-                    await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
+                }
+            } else {
+                // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
+                const entrenadoService = this.injector.get(EntrenadoService);
+                const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId)();
+                const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === entrenadoId) || null;
+                if (entrenado) {
+                    const entrenadoresId = [...(entrenado.entrenadoresId || [])];
+                    if (!entrenadoresId.includes(entrenadorId)) {
+                        entrenadoresId.push(entrenadorId);
+                        const entrenadoActualizado = { ...entrenado, entrenadoresId } as any;
+                        await entrenadoService.save(entrenadoActualizado);
+                    }
+                }
+
+                // 3) Actualizar entrenador: agregar entrenadoId a entrenadosAsignadosIds
+                const entrenadorService = this.injector.get(EntrenadorService);
+                const entrenador = entrenadorService.getEntrenadorById(entrenadorId)();
+                if (entrenador) {
+                    const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
+                    if (!entrenadosAsignadosIds.includes(entrenadoId)) {
+                        // Check limit before adding
+                        const limits = entrenadorService.getLimits(entrenadorId);
+                        if (entrenadosAsignadosIds.length >= limits.maxClients) {
+                            throw new PlanLimitError('Has alcanzado el límite de clientes para tu plan. Actualiza para conectar más.');
+                        }
+                        entrenadosAsignadosIds.push(entrenadoId);
+                        await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
+                    }
                 }
             }
 
@@ -320,7 +352,7 @@ export class InvitacionService {
                 const notificacionService = this.injector.get(NotificacionService);
                 await notificacionService.save({
                     id: `notif-${invitacionId}`,
-                    usuarioId: invitacion.entrenadoId,
+                    usuarioId: invitacion.entrenadoId || '',
                     tipo: TipoNotificacion.INVITACION_RECHAZADA,
                     titulo: 'Invitación rechazada',
                     mensaje: 'Has rechazado la invitación del entrenador',
@@ -338,7 +370,7 @@ export class InvitacionService {
                 // Crear notificación para el entrenador informando rechazo
                 await notificacionService.save({
                     id: `notif-${invitacionId}-entrenador`,
-                    usuarioId: invitacion.entrenadorId,
+                    usuarioId: invitacion.entrenadorId || '',
                     tipo: TipoNotificacion.INVITACION_RECHAZADA,
                     titulo: 'Tu invitación fue rechazada',
                     mensaje: `${invitacion.entrenadoNombre} rechazó tu invitación`,

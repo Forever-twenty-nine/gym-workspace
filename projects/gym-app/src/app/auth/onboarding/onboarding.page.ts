@@ -69,7 +69,7 @@ export class OnboardingPage {
   
   formData = signal({
     nombre: '',
-    role: 'entrenado' as 'entrenado' | 'entrenador' | 'gimnasio',
+    role: 'entrenado' as 'entrenado' | 'entrenador' | 'gimnasio' | 'personal_trainer',
     objetivo: 'SALUD' as keyof typeof Objetivo | ''
   });
 
@@ -276,6 +276,8 @@ export class OnboardingPage {
         return Rol.ENTRENADOR;
       case 'gimnasio':
         return Rol.GIMNASIO;
+      case 'personal_trainer':
+        return Rol.PERSONAL_TRAINER;
       default:
         return Rol.ENTRENADO;
     }
@@ -319,6 +321,27 @@ export class OnboardingPage {
         await this.gimnasioService.save(gimnasioData);
         break;
 
+      case 'personal_trainer':
+        const gimnasioPTData: Gimnasio = {
+          id: uid,
+          nombre: `Gimnasio - PT ${formData.nombre || ''}`,
+          direccion: '',
+          activo: true,
+          isPersonalTrainer: true
+        };
+        await this.gimnasioService.save(gimnasioPTData);
+
+        const entrenadorPTData: Omit<Entrenador, 'id'> = {
+          gimnasioId: uid,
+          fechaRegistro: new Date(),
+          ejerciciosCreadasIds: [],
+          entrenadosAsignadosIds: [],
+          rutinasCreadasIds: [],
+          entrenadosPremiumIds: []
+        };
+        await this.entrenadorService.createWithId(uid, entrenadorPTData);
+        break;
+
       default:
         throw new Error(`Rol no soportado: ${role}`);
     }
@@ -334,6 +357,7 @@ export class OnboardingPage {
         this.router.navigate(['/entrenado-tabs']);
         break;
       case 'entrenador':
+      case 'personal_trainer':
         this.router.navigate(['/entrenador-tabs']);
         break;
       case 'gimnasio':
@@ -355,6 +379,8 @@ export class OnboardingPage {
         return 'Gestión de entrenados y creación de rutinas';
       case 'gimnasio':
         return 'Administración completa del gimnasio';
+      case 'personal_trainer':
+        return 'Perfil híbrido de entrenador y administración de tu propio espacio';
       default:
         return '';
     }

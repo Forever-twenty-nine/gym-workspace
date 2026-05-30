@@ -227,7 +227,7 @@ export class InvitacionService {
             const notificacionService = this.injector.get(NotificacionService);
             const notificacion: Notificacion = {
                 id: `notif-${invitacion.id}`,
-                usuarioId: invitacion.entrenadoId, // La ve el entrenado
+                usuarioId: invitacion.entrenadoId || '', // La ve el entrenado
                 tipo: TipoNotificacion.INVITACION_PENDIENTE,
                 titulo: `Invitación de ${entrenadorNombre}`,
                 mensaje: mensajePersonalizado || `${entrenadorNombre} te ha invitado a vincularse como tu entrenador`,
@@ -272,20 +272,20 @@ export class InvitacionService {
                 throw new Error(`Invitación ${invitacionId} no encontrada`);
             }
 
-            const entrenadoId = invitacion.entrenadoId;
-            const entrenadorId = invitacion.entrenadorId;
+            const entrenadoId = invitacion.entrenadoId || '';
+            const entrenadorId = invitacion.entrenadorId || '';
 
             // 1) Marcar invitación como aceptada
             await this.updateEstado(invitacionId, 'aceptada');
 
             // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
             const entrenadoService = this.injector.get(EntrenadoService);
-            const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId)();
-            const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === entrenadoId) || null;
+            const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId || '')();
+            const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === (entrenadoId || '')) || null;
             if (entrenado) {
                 const entrenadoresId = [...(entrenado.entrenadoresId || [])];
-                if (!entrenadoresId.includes(entrenadorId)) {
-                    entrenadoresId.push(entrenadorId);
+                if (!entrenadoresId.includes(entrenadorId || '')) {
+                    entrenadoresId.push(entrenadorId || '');
                     const entrenadoActualizado = { ...entrenado, entrenadoresId } as any;
                     await entrenadoService.save(entrenadoActualizado);
                 }
@@ -293,17 +293,17 @@ export class InvitacionService {
 
             // 3) Actualizar entrenador: agregar entrenadoId a entrenadosAsignadosIds
             const entrenadorService = this.injector.get(EntrenadorService);
-            const entrenador = entrenadorService.getEntrenadorById(entrenadorId)();
+            const entrenador = entrenadorService.getEntrenadorById(entrenadorId || '')();
             if (entrenador) {
                 const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
-                if (!entrenadosAsignadosIds.includes(entrenadoId)) {
+                if (!entrenadosAsignadosIds.includes(entrenadoId || '')) {
                     // Check limit before adding
-                    const limits = entrenadorService.getLimits(entrenadorId);
+                    const limits = entrenadorService.getLimits(entrenadorId || '');
                     if (entrenadosAsignadosIds.length >= limits.maxClients) {
                         throw new PlanLimitError('Has alcanzado el límite de clientes para tu plan. Actualiza para conectar más.');
                     }
-                    entrenadosAsignadosIds.push(entrenadoId);
-                    await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
+                    entrenadosAsignadosIds.push(entrenadoId || '');
+                    await entrenadorService.update(entrenadorId || '', { entrenadosAsignadosIds });
                 }
             }
 

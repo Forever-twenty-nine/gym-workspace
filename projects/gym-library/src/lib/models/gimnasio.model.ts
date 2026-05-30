@@ -6,4 +6,7 @@ export interface Gimnasio {
   nombre: string;
   direccion: string;
   activo: boolean;
+  isPersonalTrainer?: boolean;
+  entrenadoresIds?: string[];
+  entrenadosIds?: string[];
 }

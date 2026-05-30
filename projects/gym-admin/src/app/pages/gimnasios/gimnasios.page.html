@@ -1,6 +1,127 @@
-<div class="w-full px-4 py-8">
-  <div class="bg-white rounded-lg shadow-md p-6 text-center">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Funcionalidad Próxima</h2>
-    <p class="text-gray-600">Esta sección está en desarrollo y estará disponible próximamente.</p>
+<div class="w-full px-6 py-8">
+  <!-- Tarjetas de Resumen Rápido -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Gimnasios</p>
+        <h3 class="text-3xl font-bold text-gray-800 mt-1">{{ gimnasioService.gimnasioCount() }}</h3>
+      </div>
+      <div class="p-3 rounded-lg bg-blue-50 text-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Activos</p>
+        <h3 class="text-3xl font-bold text-emerald-600 mt-1">{{ gimnasioService.gimnasioActivoCount() }}</h3>
+      </div>
+      <div class="p-3 rounded-lg bg-emerald-50 text-emerald-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Personal Trainers</p>
+        <h3 class="text-3xl font-bold text-indigo-600 mt-1">
+          {{ getPersonalTrainersCount() }}
+        </h3>
+      </div>
+      <div class="p-3 rounded-lg bg-indigo-50 text-indigo-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla Principal de Gimnasios -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+      <h2 class="text-lg font-bold text-gray-800">Listado de Gimnasios</h2>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <th class="px-6 py-4">Gimnasio</th>
+            <th class="px-6 py-4">Dirección</th>
+            <th class="px-6 py-4">Tipo</th>
+            <th class="px-6 py-4 text-center">Entrenadores</th>
+            <th class="px-6 py-4 text-center">Alumnos</th>
+            <th class="px-6 py-4 text-center">Estado</th>
+            <th class="px-6 py-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-sm">
+          @for (gym of gimnasioService.gimnasios(); track gym.id) {
+            <tr class="hover:bg-gray-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-gray-600 uppercase">
+                    {{ gym.nombre.slice(0, 2) }}
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-800">{{ gym.nombre }}</div>
+                    <div class="text-xs text-gray-400">ID: {{ gym.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-gray-600">
+                {{ gym.direccion || 'Sin dirección registrada' }}
+              </td>
+              <td class="px-6 py-4">
+                @if (gym.isPersonalTrainer) {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+                    Personal Trainer
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                    Tradicional
+                  </span>
+                }
+              </td>
+              <td class="px-6 py-4 text-center font-medium text-gray-700">
+                {{ gym.entrenadoresIds?.length || 0 }}
+              </td>
+              <td class="px-6 py-4 text-center font-medium text-gray-700">
+                {{ gym.entrenadosIds?.length || 0 }}
+              </td>
+              <td class="px-6 py-4 text-center">
+                @if (gym.activo) {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+                    Activo
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                    Inactivo
+                  </span>
+                }
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button
+                  (click)="toggleActivo(gym)"
+                  [class]="gym.activo ? 'text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100' : 'text-emerald-600 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100'"
+                  class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold transition-all">
+                  {{ gym.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="px-6 py-12 text-center text-gray-400">
+                No hay gimnasios registrados en el sistema.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>

@@ -14,6 +14,7 @@ export interface FranjaHoraria {
 
 export interface Entrenado {
     id: string;
+    gimnasioId?: string;
     // plan free
     fechaRegistro?: Date;
     objetivo?: Objetivo;

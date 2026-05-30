@@ -59,7 +59,10 @@ export class GimnasioService {
                             id: doc.id,
                             nombre: data['nombre'] || '',
                             direccion: data['direccion'] || '',
-                            activo: data['activo'] || false
+                            activo: data['activo'] || false,
+                            isPersonalTrainer: data['isPersonalTrainer'] || false,
+                            entrenadoresIds: data['entrenadoresIds'] || [],
+                            entrenadosIds: data['entrenadosIds'] || []
                         });
                     }
                 });
@@ -94,7 +97,10 @@ export class GimnasioService {
                             id: docSnap.id,
                             nombre: data['nombre'] || '',
                             direccion: data['direccion'] || '',
-                            activo: data['activo'] || false
+                            activo: data['activo'] || false,
+                            isPersonalTrainer: data['isPersonalTrainer'] || false,
+                            entrenadoresIds: data['entrenadoresIds'] || [],
+                            entrenadosIds: data['entrenadosIds'] || []
                         });
                     } else {
                         gimnasioSignal.set(null);
@@ -112,7 +118,10 @@ export class GimnasioService {
         return this.runInZone(async () => {
             try {
                 const gimnasioData: any = {
-                    activo: gimnasio.activo
+                    activo: gimnasio.activo,
+                    isPersonalTrainer: gimnasio.isPersonalTrainer || false,
+                    entrenadoresIds: gimnasio.entrenadoresIds || [],
+                    entrenadosIds: gimnasio.entrenadosIds || []
                 };
 
                 if (gimnasio.nombre !== undefined && gimnasio.nombre !== null) {
