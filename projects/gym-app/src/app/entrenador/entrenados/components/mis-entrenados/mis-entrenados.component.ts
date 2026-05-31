@@ -57,6 +57,15 @@ export class MisEntrenadosComponent {
     openRutinasModal = output<Entrenado>();
     openInvitacionModal = output<void>();
 
+    async toggleSliding(slidingItem: IonItemSliding) {
+        const isOpened = await slidingItem.getOpenAmount() > 0;
+        if (isOpened) {
+            await slidingItem.close();
+        } else {
+            await slidingItem.open('end');
+        }
+    }
+
     getAvatarUrl() {
         return 'https://ionicframework.com/docs/img/demos/avatar.svg';
     }

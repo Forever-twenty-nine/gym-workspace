@@ -34,6 +34,8 @@
   --ion-color-primary-tint: var(--brand-primary-tint);
 
   --ion-color-secondary: var(--brand-secondary-color);
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
   --ion-color-tertiary: var(--brand-tertiary-color);
   --ion-color-success: var(--brand-success-color);
   --ion-color-warning: var(--brand-warning-color);

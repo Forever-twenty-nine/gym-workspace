@@ -258,10 +258,8 @@ export class EntrenadorService {
    */
   getEjerciciosByEntrenador(entrenadorId: string) {
     return computed(() => {
-      const entrenador = this._entrenadores().find(e => e.id === entrenadorId);
-      if (!entrenador || !entrenador.ejerciciosCreadasIds) return [];
       return this.ejercicioService.ejercicios().filter(ejercicio =>
-        entrenador.ejerciciosCreadasIds.includes(ejercicio.id)
+        ejercicio.creadorId === entrenadorId
       );
     });
   }

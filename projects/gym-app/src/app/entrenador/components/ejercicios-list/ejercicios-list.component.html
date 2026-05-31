@@ -1,0 +1,21 @@
+<ion-list style="background: transparent;" class="p-0 m-0">
+  @for (ejercicio of ejercicios; track ejercicio.id) {
+  <ion-item button (click)="onVer(ejercicio)" class="--background: transparent; mb-1">
+    <ion-label>
+      <h3 class="font-bold text-white">{{ ejercicio.nombre }}</h3>
+    </ion-label>
+    <ion-button fill="clear" slot="end" color="primary" (click)="onVer(ejercicio); $event.stopPropagation()">
+      <ion-icon name="pencil"></ion-icon>
+    </ion-button>
+    <ion-button fill="clear" slot="end" color="danger" (click)="onEliminar(ejercicio.id); $event.stopPropagation()">
+      <ion-icon name="trash"></ion-icon>
+    </ion-button>
+  </ion-item>
+  } @empty {
+  <ion-item class="--background: transparent; ion-text-center">
+    <ion-label class="text-white opacity-60">
+      <p class="m-0 py-4">No hay ejercicios creados. ¡Crea el primero!</p>
+    </ion-label>
+  </ion-item>
+  }
+</ion-list>

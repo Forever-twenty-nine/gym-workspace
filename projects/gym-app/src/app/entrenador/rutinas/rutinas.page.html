@@ -7,24 +7,19 @@
     <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
       class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
-  }
-
-  <div class="main-container ion-padding relative z-10">
-    <div
-      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
-      <div class="container">
-        <!-- Acciones y Límite de Plan -->
-        <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
-          (crearRutina)="crearRutina()">
-        </app-acciones-rutina>
-
-        <!-- Lista de Rutinas -->
-        <app-lista-rutinas [rutinas]="rutinasCreadas()" (verRutina)="verRutina($event)"
-          (deleteRutina)="deleteRutina($event)">
-        </app-lista-rutinas>
-      </div>
-    </div>
+  }@else {
+  <div
+    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
   </div>
+  }
+  <!-- Acciones y Límite de Plan -->
+  <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
+    (crearRutina)="crearRutina()">
+  </app-acciones-rutina>
+
+  <!-- Lista de Rutinas -->
+  <app-lista-rutinas [rutinas]="rutinasCreadas()" (verRutina)="verRutina($event)" (deleteRutina)="deleteRutina($event)">
+  </app-lista-rutinas>
 
   <!-- Modal para crear/editar rutina -->
   <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()" [rutinaData]="rutinaSeleccionada()"

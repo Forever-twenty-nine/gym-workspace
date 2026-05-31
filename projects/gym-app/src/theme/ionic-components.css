@@ -237,3 +237,63 @@ ion-item.ion-invalid ion-input {
 ion-item.ion-valid ion-input {
   --border-color: var(--ion-color-success);
 }
+
+/* -- Custom Sliding Items (.gym-sliding-item) -- */
+.gym-sliding-item {
+  margin-bottom: 12px;
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden; /* Helps contain the sliding cards */
+}
+
+.gym-sliding-item ion-item {
+  --background: #19221d; /* Solid opaque dark background that matches the gradient and prevents transparency overlap */
+  --color: white;
+  --border-radius: 12px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 255, 255, 0.08);
+  margin: 0;
+}
+
+/* Opaque card look matching dark theme */
+.dark .gym-sliding-item ion-item {
+  --background: #141c19; /* Solid deep opaque gray-teal-green */
+  --border-color: rgba(255, 255, 255, 0.06);
+}
+
+.gym-sliding-item ion-item-options {
+  background: transparent;
+  border: none;
+}
+
+.gym-sliding-item ion-item-option {
+  --border-radius: 10px;
+  height: calc(100% - 2px); /* Matches item height precisely minus border */
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+  overflow: hidden;
+}
+
+.gym-sliding-item ion-item-option:active {
+  transform: scale(0.95);
+}
+
+/* Fix text and icon color for secondary color option (Rutinas) */
+.gym-sliding-item ion-item-option[color="secondary"] {
+  --color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.gym-sliding-item ion-item-option[color="secondary"] ion-icon {
+  color: #ffffff !important;
+}
+
+/* Fix icon size and alignment inside sliding buttons */
+.gym-sliding-item ion-item-option ion-icon {
+  font-size: 1.2rem;
+  margin-right: 4px;
+}

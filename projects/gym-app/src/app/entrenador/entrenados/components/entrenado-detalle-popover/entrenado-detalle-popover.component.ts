@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
     IonHeader,
@@ -12,10 +12,7 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent
+    IonListHeader
 } from '@ionic/angular/standalone';
 import { Entrenado } from 'gym-library';
 
@@ -25,24 +22,20 @@ import { Entrenado } from 'gym-library';
     styleUrls: ['./entrenado-detalle-popover.component.css'],
     standalone: true,
     imports: [
-        CommonModule,
-        DatePipe,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
-        IonContent,
-        IonPopover,
-        IonButton,
-        IonIcon,
-        IonAvatar,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonCard,
-        IonCardHeader,
-        IonCardTitle,
-        IonCardContent
-    ]
+    CommonModule,
+    DatePipe,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonPopover,
+    IonButton,
+    IonAvatar,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonListHeader
+]
 })
 export class EntrenadoDetallePopoverComponent {
     isOpen = input.required<boolean>();
@@ -55,4 +48,46 @@ export class EntrenadoDetallePopoverComponent {
     getAntiguedadDias = input.required<(entrenado: Entrenado) => number | null>();
 
     close = output<void>();
+
+    // Estadísticas generadas dinámicamente para iterar con @for
+    itemsEstadisticas = computed(() => {
+        const stats = this.estadisticas();
+        const entr = this.entrenado();
+        if (!stats) return [];
+
+        const antiguedad = entr ? this.getAntiguedadDias()(entr) : null;
+
+        return [
+            {
+                icon: 'fitness_center',
+                color: 'primary',
+                titulo: 'Rutinas asignadas',
+                valor: `${stats.rutinasAsignadas} rutinas activas`
+            },
+            {
+                icon: 'check_circle',
+                color: 'success',
+                titulo: 'Entrenamientos finalizados',
+                valor: `${stats.completadas} sesiones`
+            },
+            {
+                icon: 'whatshot',
+                color: 'tertiary',
+                titulo: 'Sesiones en progreso',
+                valor: `${stats.enProgreso} sesiones`
+            },
+            {
+                icon: 'schedule',
+                color: 'warning',
+                titulo: 'Tiempo total entrenado',
+                valor: this.formatearTiempo()(stats.tiempoTotal)
+            },
+            {
+                icon: 'calendar_month',
+                color: 'medium',
+                titulo: 'Antigüedad',
+                valor: antiguedad !== null ? `${antiguedad} días` : 'Sin registro'
+            }
+        ];
+    });
 }

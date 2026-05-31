@@ -1,4 +1,5 @@
 <ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()">
+    
     <ng-template>
         <ion-header>
             <ion-toolbar color="primary">
@@ -8,12 +9,24 @@
                 </ion-button>
             </ion-toolbar>
         </ion-header>
-        <ion-content class="ion-padding">
+        <ion-content class="ion-padding" style="--background: transparent;">
+            <!-- Background Layer -->
+            @if (isPremium()) {
+            <div class="fixed inset-0 z-[-1] opacity-25 dark:opacity-100 pointer-events-none">
+                <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
+                    class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+            </div>
+            } @else {
+            <div
+                class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-[-1] pointer-events-none">
+            </div>
+            }
+
             <!-- Rutinas asignadas -->
             <ion-card>
-                <ion-card-header>
+                <!-- <ion-card-header>
                     <ion-card-title>Rutinas del Entrenado</ion-card-title>
-                </ion-card-header>
+                </ion-card-header> -->
                 <ion-card-content>
                     @if (rutinasEntrenado().length > 0) {
                     <ion-list>
@@ -76,9 +89,9 @@
 
             <!-- Rutinas disponibles para asignar -->
             <ion-card>
-                <ion-card-header>
+                <!-- <ion-card-header>
                     <ion-card-title>Rutinas Disponibles</ion-card-title>
-                </ion-card-header>
+                </ion-card-header> -->
                 <ion-card-content>
                     @if (rutinasDisponibles().length > 0) {
                     <ion-list>

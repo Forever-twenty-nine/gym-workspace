@@ -7,30 +7,30 @@
     <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
       class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
+  }@else {
+  <div
+    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
+  </div>
   }
 
-  <div class="main-container ion-padding relative z-10">
-    <div
-      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
-      <div class="entrenados-container">
-        <!-- Listado de Entrenados -->
-        <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
-          [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)" (verCliente)="verCliente($event)"
-          (openRutinasModal)="openRutinasModal($event)" (openInvitacionModal)="openInvitacionModal()">
-        </app-mis-entrenados>
+  <!-- Listado de Entrenados -->
+  <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
+    [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)"
+    (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)"
+    (openInvitacionModal)="openInvitacionModal()">
+  </app-mis-entrenados>
 
-        <!-- Invitaciones Pendientes -->
-        <app-invitaciones-pendientes [invitaciones]="invitacionesPendientes()" (onCancelar)="cancelarInvitacion($event)">
-        </app-invitaciones-pendientes>
-      </div>
-    </div>
-  </div>
+  <!-- Invitaciones Pendientes -->
+  <app-invitaciones-pendientes [invitaciones]="invitacionesPendientes()" (onCancelar)="cancelarInvitacion($event)">
+  </app-invitaciones-pendientes>
 
   <!-- Detalle del Entrenado -->
   <app-entrenado-detalle-popover [isOpen]="isModalOpen()" [entrenado]="selectedEntrenado()"
-    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)" [formatearTiempo]="formatearTiempo.bind(this)"
-    [getAntiguedadDias]="getAntiguedadDias.bind(this)" (close)="closeModal()">
+    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)"
+    [formatearTiempo]="formatearTiempo.bind(this)" [getAntiguedadDias]="getAntiguedadDias.bind(this)"
+    (close)="closeModal()">
   </app-entrenado-detalle-popover>
+
 </ion-content>
 
 <!-- Modal de Invitación -->
@@ -41,7 +41,8 @@
 <!-- Modal de Gestión de Rutinas -->
 <app-gestion-rutinas-modal [isOpen]="isRutinasModalOpen()" [entrenado]="selectedEntrenado()"
   [rutinasEntrenado]="rutinasEntrenado()" [rutinasDisponibles]="rutinasDisponibles()" [diasSemana]="diasSemana"
-  [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)" (close)="closeRutinasModal()"
-  (desasignarRutina)="desasignarRutina($event)" (quitarDiaDeRutina)="quitarDiaDeRutina($event.rutinaId, $event.dia)"
+  [plan]="plan()" [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)"
+  (close)="closeRutinasModal()" (desasignarRutina)="desasignarRutina($event)"
+  (quitarDiaDeRutina)="quitarDiaDeRutina($event.rutinaId, $event.dia)"
   (asignarDiaARutina)="asignarDiaARutina($event.rutina, $event.event)" (asignarRutina)="asignarRutina($event)">
 </app-gestion-rutinas-modal>

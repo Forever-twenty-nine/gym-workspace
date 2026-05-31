@@ -1,5 +1,5 @@
-import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, output, computed } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
     IonHeader,
     IonToolbar,
@@ -20,33 +20,32 @@ import {
     IonSelect,
     IonSelectOption
 } from '@ionic/angular/standalone';
-import { Entrenado, Rutina } from 'gym-library';
+import { Entrenado, Rutina, Plan } from 'gym-library';
 
 @Component({
     selector: 'app-gestion-rutinas-modal',
     templateUrl: './gestion-rutinas-modal.component.html',
     standalone: true,
     imports: [
-        CommonModule,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
-        IonContent,
-        IonModal,
-        IonButton,
-        IonIcon,
-        IonCard,
-        IonCardHeader,
-        IonCardTitle,
-        IonCardContent,
-        IonList,
-        IonItem,
-        IonItemGroup,
-        IonLabel,
-        IonBadge,
-        IonSelect,
-        IonSelectOption
-    ]
+    CommonModule,
+    NgOptimizedImage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonModal,
+    IonButton,
+    IonIcon,
+    IonCard,
+    IonCardContent,
+    IonList,
+    IonItem,
+    IonItemGroup,
+    IonLabel,
+    IonBadge,
+    IonSelect,
+    IonSelectOption
+]
 })
 export class GestionRutinasModalComponent {
     isOpen = input.required<boolean>();
@@ -54,6 +53,9 @@ export class GestionRutinasModalComponent {
     rutinasEntrenado = input<Rutina[]>([]);
     rutinasDisponibles = input<Rutina[]>([]);
     diasSemana = input<string[]>([]);
+    plan = input<Plan>(Plan.FREE);
+
+    isPremium = computed(() => this.plan() === Plan.PREMIUM);
 
     // Callbacks
     getUserName = input.required<(id: string) => string>();

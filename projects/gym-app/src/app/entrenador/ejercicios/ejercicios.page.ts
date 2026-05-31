@@ -14,8 +14,6 @@ import {
   IonButton,
   IonIcon,
   IonItem,
-  IonLabel,
-  IonList,
   IonModal,
   IonButtons,
   IonInput,
@@ -31,6 +29,7 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+import { EjerciciosListComponent } from '../components/ejercicios-list/ejercicios-list.component';
 
 @Component({
   selector: 'app-ejercicios',
@@ -45,15 +44,16 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonButton,
     IonIcon,
     IonItem,
-    IonLabel,
-    IonList,
     IonModal,
     IonButtons,
     IonInput,
     IonTextarea,
     IonText,
     NgOptimizedImage,
-    HeaderTabsComponent
+    HeaderTabsComponent,
+    IonCard,
+    IonCardContent,
+    EjerciciosListComponent
 ],
   styles: [`
     .ejercicio-modal {

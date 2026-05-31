@@ -1,24 +1,18 @@
-<div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4">
-    <!-- Indicador de límite de plan -->
-    <div style="margin-bottom: 16px; text-align: center;">
-        <ion-text [color]="hasReachedLimit() ? 'warning' : 'medium'" style="font-size: 0.9em;">
-            <ion-icon name="information-circle-outline" style="margin-right: 4px;"></ion-icon>
-            {{ limitMessage() }}
-        </ion-text>
-    </div>
+<div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4 text-center">
 
-    <ion-button expand="block" fill="solid" color="primary" (click)="crearRutina.emit()"
-        [disabled]="hasReachedLimit()">
+    <ion-button expand="block" fill="solid" color="primary" (click)="crearRutina.emit()" [disabled]="hasReachedLimit()">
         <ion-icon name="fitness-outline" slot="start"></ion-icon>
         Crear Nueva Rutina
         @if (hasReachedLimit()) {
         <ion-icon name="lock-closed" slot="end"></ion-icon>
         }
     </ion-button>
-
-    @if (hasReachedLimit()) {
-    <ion-text color="warning" style="display: block; text-align: center; margin-top: 8px; font-size: 0.85em;">
-        Has alcanzado el límite de tu plan. Actualiza para crear más rutinas.
-    </ion-text>
-    }
+    <div class="mb-4">
+        <ion-text [color]="hasReachedLimit() ? 'warning' : 'medium'" class="text-sm">
+            {{ limitMessage() }}
+            @if (hasReachedLimit()) {
+            <p class="text-xs mt-1 mb-0">Límite alcanzado. Actualiza para crear más.</p>
+            }
+        </ion-text>
+    </div>
 </div>

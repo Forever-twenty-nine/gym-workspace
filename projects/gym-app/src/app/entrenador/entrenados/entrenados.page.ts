@@ -10,7 +10,7 @@ import {
 import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline } from 'ionicons/icons';
-import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus } from 'gym-library';
+import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { UserService } from '../../core/services/user.service';
@@ -48,7 +48,8 @@ export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
 
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
+  readonly plan = computed(() => this.authService.currentUser()?.plan || Plan.FREE);
+  readonly isPremium = computed(() => this.plan() === Plan.PREMIUM);
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);
@@ -139,11 +140,16 @@ export class EntrenadosPage implements OnInit {
   });
 
   rutinasDisponibles = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return [];
+
     const items = this.rutinasEntrenado();
     const itemIds = items.map(r => r.id);
     const todasLasRutinas = this.rutinaService.rutinas();
 
-    return todasLasRutinas.filter(r => !itemIds.includes(r.id));
+    return todasLasRutinas.filter(
+      r => !itemIds.includes(r.id) && r.creadorId === entrenadorId
+    );
   });
 
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {

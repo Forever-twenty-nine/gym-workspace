@@ -1,50 +1,37 @@
-<div class="mb-6">
+<div class="">
     <!-- Botón de Invitación al inicio -->
-    <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4">
-        <ion-button expand="block" fill="solid" color="primary"
-            (click)="openInvitacionModal.emit()">
-            <ion-icon name="mail-outline" slot="start"></ion-icon>
-            Invitar Nuevo Entrenado
-        </ion-button>
-    </div>
+    <ion-button expand="block" fill="solid" class="m-4" color="primary" (click)="openInvitacionModal.emit()">
+        <ion-icon name="mail-outline" slot="start"></ion-icon>
+        <ion-label>Nuevo Entrenado </ion-label>
+    </ion-button>
 
-    <ion-list class="p-0 m-0" style="background: none;">
+    <ion-list class="p-2 m-2" style="background: none;">
         @for (entrenado of entrenados(); track entrenado.id) {
-        <ion-item-sliding class="ion-margin-bottom" #slidingItem>
-            <ion-item [button]="true" style="--background: rgba(255,255,255,0.05); --color: white; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);"
-                (click)="slidingItem.open('end')" class="mb-2">
-
+        <ion-item-sliding class="gym-sliding-item" #slidingItem>
+            <!-- Item principal que muestra el nombre del entrenado y su objetivo -->
+            <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
                 <ion-avatar slot="start">
                     <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
                 </ion-avatar>
-
                 <ion-label slot="start" class="mx-2">
                     <h3 class="font-bold text-white">{{ getUserName()(entrenado.id) }}</h3>
                 </ion-label>
-
                 <ion-note slot="end" class="mx-2 text-white/50 text-xs">
                     {{ entrenado.objetivo }}
                 </ion-note>
-
-                <div slot="end" class="ms-4">
-                    <ion-icon name="chevron-back-outline" style="color: #bbb; font-size: 1.2rem;"></ion-icon>
-                </div>
-
             </ion-item>
-
-            <ion-item-options side="end" style="background: transparent; border-bottom: none;">
-                <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)"
-                    style="border-radius: 8px; margin-left: 8px;">
+            <!-- Opciones al deslizar el item -->
+            <ion-item-options side="end">
+                <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)">
                     <ion-icon slot="start" name="barbell-outline"></ion-icon>
-                    Rutinas
-                </ion-item-option>
 
-                <ion-item-option color="primary" (click)="verCliente.emit(entrenado)"
-                    style="border-radius: 8px; margin-left: 8px;">
+                </ion-item-option>
+                <ion-item-option color="primary" (click)="verCliente.emit(entrenado)">
                     <ion-icon slot="start" name="eye-outline"></ion-icon>
-                    Ver Info
+
                 </ion-item-option>
             </ion-item-options>
+
         </ion-item-sliding>
         }
     </ion-list>
