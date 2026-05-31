@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 import { EntrenadoresPage } from './pages/entrenadores/entrenadores.page';
 import { EntrenadosPage } from './pages/entrenados/entrenados.page';
@@ -9,55 +8,66 @@ import { EjerciciosPage } from './pages/ejercicios/ejercicios.page';
 import { RutinasPage } from './pages/rutinas/rutinas.page';
 import { RutinasAsignadasPage } from './pages/rutinas-asignadas/rutinas-asignadas.page';
 import { SesionesRutinasPage } from './pages/sesiones-rutinas/sesiones-rutinas.page';
+import { adminAuthGuard } from './core/guards/admin-auth.guard';
 
 export const routes: Routes = [
   {
-    path: 'usuarios',
-    component: UsuariosPage
-  },
-  {
-    path: 'entrenadores',
-    component: EntrenadoresPage
-  },
-  {
-    path: 'entrenados',
-    component: EntrenadosPage
-  },
-  {
-    path: 'ejercicios',
-    component: EjerciciosPage
-  },
-  {
-    path: 'rutinas',
-    component: RutinasPage
-  },
-  {
-    path: 'rutinas-asignadas',
-    component: RutinasAsignadasPage
-  },
-  {
-    path: 'sesiones-rutina',
-    component: SesionesRutinasPage
-  },
-  {
-    path: 'gimnasios',
-    component: GimnasiosPage
-  },
-  {
-    path: 'solicitudes-plan',
-    component: SolicitudesPlanPage
-  },
-  {
-    path: 'mensajes-globales',
-    loadComponent: () => import('./pages/mensajes-globales/mensajes-globales').then(c => c.MensajesGlobalesComponent)
-  },
-  {
-    path: 'social',
-    loadComponent: () => import('./pages/social/social.page').then(c => c.SocialPage)
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.page').then(c => c.LoginPage)
   },
   {
     path: '',
-    redirectTo: '/usuarios',
-    pathMatch: 'full'
+    canActivate: [adminAuthGuard],
+    children: [
+      {
+        path: 'usuarios',
+        component: UsuariosPage
+      },
+      {
+        path: 'entrenadores',
+        component: EntrenadoresPage
+      },
+      {
+        path: 'entrenados',
+        component: EntrenadosPage
+      },
+      {
+        path: 'ejercicios',
+        component: EjerciciosPage
+      },
+      {
+        path: 'rutinas',
+        component: RutinasPage
+      },
+      {
+        path: 'rutinas-asignadas',
+        component: RutinasAsignadasPage
+      },
+      {
+        path: 'sesiones-rutina',
+        component: SesionesRutinasPage
+      },
+      {
+        path: 'gimnasios',
+        component: GimnasiosPage
+      },
+      {
+        path: 'solicitudes-plan',
+        component: SolicitudesPlanPage
+      },
+      {
+        path: 'mensajes-globales',
+        loadComponent: () => import('./pages/mensajes-globales/mensajes-globales').then(c => c.MensajesGlobalesComponent)
+      },
+      {
+        path: 'social',
+        loadComponent: () => import('./pages/social/social.page').then(c => c.SocialPage)
+      },
+      {
+        path: '',
+        redirectTo: 'usuarios',
+        pathMatch: 'full'
+      }
+    ]
   }
 ];

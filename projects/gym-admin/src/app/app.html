@@ -1,17 +1,22 @@
 <div class="min-h-screen bg-linear-to-br from-slate-900 via-blue-900 to-slate-900">
-  <!-- Sidebar -->
-  <app-sidebar></app-sidebar>
+  @if (authService.isAdmin()) {
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
 
-  <!-- Contenido de la página -->
-  <main [ngClass]="isCollapsed() ? 'pl-16' : 'pl-64'"
-    class="transition-all duration-300 h-screen flex flex-col overflow-hidden">
-    <div class="flex-1 flex flex-col p-4 md:p-6 min-h-0">
-      <app-header></app-header>
-      <div class="flex-1 min-h-0">
-        <router-outlet></router-outlet>
+    <!-- Contenido de la página -->
+    <main [ngClass]="isCollapsed() ? 'pl-16' : 'pl-64'"
+      class="transition-all duration-300 h-screen flex flex-col overflow-hidden">
+      <div class="flex-1 flex flex-col p-4 md:p-6 min-h-0">
+        <app-header></app-header>
+        <div class="flex-1 min-h-0">
+          <router-outlet></router-outlet>
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
+  } @else {
+    <!-- Vista de login ocupando toda la pantalla -->
+    <router-outlet></router-outlet>
+  }
 
   <!-- Sistema de Notificaciones Toast -->
   <div class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-md w-full pointer-events-none">

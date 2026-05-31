@@ -29,7 +29,8 @@ export async function ensureAuthUser(
   uid: string,
   email: string,
   password = "changeme123",
-  displayName?: string
+  displayName?: string,
+  claims?: Record<string, any>
 ) {
   try {
     await auth.createUser({ uid, email, password, displayName });
@@ -45,6 +46,11 @@ export async function ensureAuthUser(
     } else {
       console.error('❌ Error auth.createUser:', e);
     }
+  }
+
+  if (claims) {
+    await auth.setCustomUserClaims(uid, claims);
+    console.log(`🔑 Custom claims asignados a ${email}:`, claims);
   }
 }
 
@@ -652,6 +658,24 @@ async function main() {
     console.log("🎉 POBLADO UNIFICADO FINALIZADO CON ÉXITO");
     console.log("🎉 TODOS LOS GIMNASIOS Y PTs ESTÁN DISPONIBLES AL MISMO TIEMPO");
     console.log("🎉 ========================================================");
+
+    console.log("\n👑 Creando Super Admin para Gym Admin...");
+    await ensureAuthUser(
+      globalAuth,
+      'super_admin_gym',
+      'admin@gym.com',
+      'admin123',
+      'Super Admin',
+      { admin: true }
+    );
+    await globalDb.collection('usuarios').doc('super_admin_gym').set({
+      uid: 'super_admin_gym',
+      email: 'admin@gym.com',
+      nombre: 'Super Admin',
+      role: 'admin',
+      fechaCreacion: Timestamp.now()
+    }, { merge: true });
+    console.log("👑 Super Admin creado con éxito (admin@gym.com / admin123)\n");
   }
 
   process.exit(0);

@@ -6,6 +6,7 @@ import { HeaderComponent } from './components/shared/header/header.component';
 import { ToastComponent } from './components/shared/toast/toast.component';
 import { SidebarService } from './services/sidebar.service';
 import { ToastService } from './services/toast.service';
+import { AdminAuthService } from './services/admin-auth.service';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,7 @@ import { ToastService } from './services/toast.service';
 export class App {
   private sidebarService = inject(SidebarService);
   private toastService = inject(ToastService);
+  public authService = inject(AdminAuthService);
 
   isCollapsed = this.sidebarService.isCollapsed;
   toasts = this.toastService.toasts;

@@ -52,12 +52,14 @@ export class UsuariosPage {
 
   // Signals reactivas para datos
   readonly usuarios = computed(() => {
-    return this.userService.users().map(user => ({
-      ...user,
-      id: user.uid, // Aseguramos que tenga 'id' para DataComponent
-      displayName: user.nombre || user.email || `Usuario ${user.uid}`,
-      needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
-    }));
+    return this.userService.users()
+      .filter(user => (user.role as string) !== 'admin')
+      .map(user => ({
+        ...user,
+        id: user.uid, // Aseguramos que tenga 'id' para DataComponent
+        displayName: user.nombre || user.email || `Usuario ${user.uid}`,
+        needsReview: !user.role // Solo marcar para revisar si no tiene rol asignado
+      }));
   });
 
   async onSave(data: any) {
