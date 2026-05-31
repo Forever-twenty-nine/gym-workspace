@@ -59,20 +59,10 @@ export class GimnasioDashboardPage implements OnInit {
     if (!gymId) {
       return { totalUsers: 0, activeUsers: 0, newReports: 0, systemAlerts: 0 };
     }
-
+  
     // 1. Filtrar los usuarios asociados a este gimnasio
     const gymUsers = this.userService.users().filter(u => u.gimnasioId === gymId);
     
-    // 2. Si está vacío (no hay datos seeded o no cargados), usar datos mock de fallback
-    if (gymUsers.length === 0) {
-      return {
-        totalUsers: 156,
-        activeUsers: 89,
-        newReports: 12,
-        systemAlerts: 3
-      };
-    }
-
     const totalUsers = gymUsers.length;
     const activeUsers = gymUsers.filter(u => u.onboarded).length;
 

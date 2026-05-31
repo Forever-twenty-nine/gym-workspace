@@ -1,0 +1,53 @@
+<app-header-tabs></app-header-tabs>
+
+<ion-content [fullscreen]="true">
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/gym-social-bg.png" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }@else {
+    <div
+      class="bg-linear-to-br from-blue-900 via-gray-900 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
+    </div>
+  }
+    <div
+      class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      <div class="users-container">
+
+        <!-- Buscador Reactivo -->
+        <ion-searchbar placeholder="Buscar entrenados..." class="mb-4" (ionInput)="searchQuery.set($event.detail.value || '')"></ion-searchbar>
+
+        <!-- Listado de Entrenados -->
+        <div class="p-0">
+          @for (group of groupedUsers(); track group.trainerName) {
+            
+            <ion-list-header class="bg-white/10 text-(--brand-color-primary) rounded-xl mb-4 mt-4 backdrop-blur-md px-4 min-h-10">
+              <ion-label class="font-bold tracking-wider text-lg uppercase"> {{ group.trainerName }}</ion-label>
+            </ion-list-header>
+
+            <ion-list style="background: transparent;" class="p-0">
+              @for (user of group.users; track user.uid) {
+                <ion-item lines="none" class="--background: transparent; mb-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
+                  <ion-avatar slot="start" class="w-10 h-10 border border-white/10">
+                    <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
+                  </ion-avatar>
+                  <ion-label class="m-2">
+                    <h2 class="font-bold text-sm text-white">{{ user.nombre || 'Usuario sin nombre' }}</h2>
+                  </ion-label>
+                </ion-item>
+              }
+            </ion-list>
+
+          } @empty {
+            <div class="text-center py-8 text-white/40 text-xs">
+              No se encontraron entrenados vinculados a tu gimnasio.
+            </div>
+          }
+        </div>
+
+      </div>
+    </div>
+  
+</ion-content>

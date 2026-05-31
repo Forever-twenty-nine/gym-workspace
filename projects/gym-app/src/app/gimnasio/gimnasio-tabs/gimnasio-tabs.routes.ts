@@ -14,14 +14,12 @@ export const routes: Routes = [
       {
         path: 'entrenadores',
         loadComponent: () =>
-          import('../gimnasio-users/gimnasio-users.page').then((m) => m.GimnasioUsersPage),
-        data: { roleFilter: 'entrenador' }
+          import('../gimnasio-entrenadores/gimnasio-entrenadores.page').then((m) => m.GimnasioEntrenadoresPage),
       },
       {
         path: 'entrenados',
         loadComponent: () =>
-          import('../gimnasio-users/gimnasio-users.page').then((m) => m.GimnasioUsersPage),
-        data: { roleFilter: 'entrenado' }
+          import('../gimnasio-entrenados/gimnasio-entrenados.page').then((m) => m.GimnasioEntrenadosPage),
       },
       {
         path: '',
