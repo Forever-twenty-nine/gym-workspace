@@ -72,7 +72,9 @@ export class RutinasPage implements OnInit {
     addIcons({ fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.entrenadorService.initializeListener();
+  }
 
   verRutina(rutina: any) {
     this.rutinaSeleccionada.set(rutina);

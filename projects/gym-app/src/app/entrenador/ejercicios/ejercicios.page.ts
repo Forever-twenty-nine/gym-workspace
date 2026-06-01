@@ -1,26 +1,14 @@
-import { Component, OnInit, inject, computed, Signal, signal, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import {
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
   IonCardContent,
   IonButton,
   IonIcon,
-  IonItem,
-  IonModal,
-  IonButtons,
-  IonInput,
-  IonTextarea,
-  IonText,
-  ToastController
-} from '@ionic/angular/standalone';
+  ToastController, IonText } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
@@ -30,46 +18,28 @@ import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 import { EjerciciosListComponent } from '../components/ejercicios-list/ejercicios-list.component';
+import { EjercicioModalComponent } from '../components/ejercicio-modal/ejercicio-modal.component';
 
 @Component({
   selector: 'app-ejercicios',
   templateUrl: './ejercicios.page.html',
   standalone: true,
-  imports: [
-    ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
+  imports: [IonText,
     IonContent,
     IonButton,
     IonIcon,
-    IonItem,
-    IonModal,
-    IonButtons,
-    IonInput,
-    IonTextarea,
-    IonText,
     NgOptimizedImage,
     HeaderTabsComponent,
     IonCard,
     IonCardContent,
-    EjerciciosListComponent
-],
-  styles: [`
-    .ejercicio-modal {
-      --width: 95%;
-      --max-width: 600px;
-      --border-radius: 16px;
-      --backdrop-opacity: 0.3;
-    }
-  `]
+    EjerciciosListComponent,
+    EjercicioModalComponent]
 })
 export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
   private entrenadorService = inject(EntrenadorService);
   private userService = inject(UserService);
-  private fb = inject(FormBuilder);
   private toastController = inject(ToastController);
 
   readonly currentUserSignal = this.authService.currentUser;
@@ -105,22 +75,14 @@ export class EjerciciosPage implements OnInit {
   });
   readonly isEjercicioModalOpen = signal(false);
   readonly ejercicioModalData = signal<any>(null);
-  readonly ejercicioEditForm = signal<FormGroup | null>(null);
   readonly isEjercicioCreating = signal(false);
-
-  // Señal para rastrear el estado del formulario en modo zoneless
-  private readonly ejercicioFormStatus = signal<string>('INVALID');
-
-  readonly isSaveDisabled = computed(() => {
-    return this.ejercicioFormStatus() === 'INVALID';
-  });
 
   constructor() {
     addIcons({ barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star });
   }
 
   ngOnInit() {
-    // Inicializar si es necesario
+    this.entrenadorService.initializeListener();
   }
 
   verEjercicio(ejercicio: any) {
@@ -137,14 +99,12 @@ export class EjerciciosPage implements OnInit {
 
   async deleteEjercicio(id: string) {
     await this.ejercicioService.delete(id);
-    // Mostrar toast o algo
   }
 
   openEjercicioModal(item: any) {
     this.ejercicioModalData.set(item);
     this.isEjercicioModalOpen.set(true);
     this.isEjercicioCreating.set(false);
-    this.createEjercicioEditForm(item);
   }
 
   openCreateEjercicioModal() {
@@ -152,13 +112,11 @@ export class EjerciciosPage implements OnInit {
     this.ejercicioModalData.set(newItem);
     this.isEjercicioModalOpen.set(true);
     this.isEjercicioCreating.set(true);
-    this.createEjercicioEditForm(newItem);
   }
 
   closeEjercicioModal() {
     this.isEjercicioModalOpen.set(false);
     this.ejercicioModalData.set(null);
-    this.ejercicioEditForm.set(null);
     this.isEjercicioCreating.set(false);
   }
 
@@ -180,43 +138,10 @@ export class EjerciciosPage implements OnInit {
     };
   }
 
-  private createEjercicioEditForm(item: any) {
-    const formConfig: any = {
-      nombre: [item.nombre || ''],
-      descripcion: [item.descripcion || ''],
-      series: [item.series || 1],
-      repeticiones: [item.repeticiones || 1],
-      peso: [item.peso || 0],
-      creadorId: [item.creadorId || ''],
-      creadorTipo: [item.creadorTipo || 'entrenador']
-    };
-
-    // Solo incluir campos premium si no es plan free
-    if (!this.isFreePlan()) {
-      formConfig.serieSegundos = [item.serieSegundos || 0];
-      formConfig.descansoSegundos = [item.descansoSegundos || 60];
-    }
-
-    const form = this.fb.group(formConfig);
-    this.ejercicioEditForm.set(form);
-
-    // Suscribirse a cambios de estado para actualizar la señal reactiva
-    form.statusChanges.subscribe(status => {
-      this.ejercicioFormStatus.set(status);
-    });
-    // Establecer estado inicial
-    this.ejercicioFormStatus.set(form.status);
-  }
-
-  async saveEjercicioChanges() {
-    const form = this.ejercicioEditForm();
+  async saveEjercicioChanges(formValue: any) {
     const originalData = this.ejercicioModalData();
 
-    if (!form || !originalData) return;
-
-    form.markAllAsTouched();
-
-    if (!form.valid) return;
+    if (!formValue || !originalData) return;
 
     // Validar límite de ejercicios para creación
     if (this.isEjercicioCreating()) {
@@ -238,8 +163,6 @@ export class EjerciciosPage implements OnInit {
     }
 
     try {
-      const formValue = form.value;
-
       const ejercicioData: any = {
         ...originalData,
         nombre: formValue.nombre,
@@ -271,10 +194,8 @@ export class EjerciciosPage implements OnInit {
       }
 
       this.closeEjercicioModal();
-      // Mostrar éxito
     } catch (error) {
       console.error('Error guardando ejercicio:', error);
-      // Mostrar error
     }
   }
 }

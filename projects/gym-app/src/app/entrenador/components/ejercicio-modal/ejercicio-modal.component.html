@@ -1,0 +1,69 @@
+<ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [breakpoints]="[0, 0.9]"
+  [initialBreakpoint]="0.9" [backdropDismiss]="true" class="ejercicio-modal">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>{{ isCreating() ? 'Crear Ejercicio' : 'Editar Ejercicio' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="close.emit()">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      @if (form()) {
+      <form [formGroup]="form()!" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 pb-6">
+        <ion-item class="gym-modal-item">
+          <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre"
+            placeholder="Nombre del ejercicio"></ion-input>
+        </ion-item>
+
+        <ion-item class="gym-modal-item">
+          <ion-textarea label="Descripción" labelPlacement="stacked" formControlName="descripcion"
+            placeholder="Descripción del ejercicio..." rows="3"></ion-textarea>
+        </ion-item>
+
+        <ion-item class="gym-modal-item">
+          <ion-input label="Series" labelPlacement="stacked" type="number" formControlName="series"
+            placeholder="Número de series"></ion-input>
+        </ion-item>
+
+        <ion-item class="gym-modal-item">
+          <ion-input label="Repeticiones" labelPlacement="stacked" type="number" formControlName="repeticiones"
+            placeholder="Repeticiones por serie"></ion-input>
+        </ion-item>
+
+        <ion-item class="gym-modal-item">
+          <ion-input label="Peso (kg)" labelPlacement="stacked" type="number" step="0.5" formControlName="peso"
+            placeholder="Peso en kilogramos"></ion-input>
+        </ion-item>
+
+        <!-- Campos premium - solo visibles para planes pagos -->
+        @if (!isFreePlan()) {
+        <ion-item class="gym-modal-item">
+          <ion-input label="Duración de Serie (seg)" labelPlacement="stacked" type="number"
+            formControlName="serieSegundos" placeholder="Duración por serie"></ion-input>
+        </ion-item>
+
+        <ion-item class="gym-modal-item">
+          <ion-input label="Descanso (seg)" labelPlacement="stacked" type="number" formControlName="descansoSegundos"
+            placeholder="Tiempo de descanso entre series"></ion-input>
+        </ion-item>
+        } @else {
+        <ion-item class="gym-modal-item">
+          <ion-text color="medium" style="font-size: 0.9em; padding: 8px 0;">
+            <ion-icon name="star" style="margin-right: 4px;"></ion-icon>
+            Los campos de duración y descanso están disponibles en planes premium.
+          </ion-text>
+        </ion-item>
+        }
+
+        <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="mt-4">
+          {{ isCreating() ? 'Crear' : 'Guardar' }}
+        </ion-button>
+      </form>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

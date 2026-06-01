@@ -1,10 +1,4 @@
 <div class="">
-    <!-- Botón de Invitación al inicio -->
-    <ion-button expand="block" fill="solid" class="m-4" color="primary" (click)="openInvitacionModal.emit()">
-        <ion-icon name="mail-outline" slot="start"></ion-icon>
-        <ion-label>Nuevo Entrenado </ion-label>
-    </ion-button>
-
     <ion-list class="p-2 m-2" style="background: none;">
         @for (entrenado of entrenados(); track entrenado.id) {
         <ion-item-sliding class="gym-sliding-item" #slidingItem>

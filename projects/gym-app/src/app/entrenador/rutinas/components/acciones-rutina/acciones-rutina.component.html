@@ -1,5 +1,4 @@
 <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4 text-center">
-
     <ion-button expand="block" fill="solid" color="primary" (click)="crearRutina.emit()" [disabled]="hasReachedLimit()">
         <ion-icon name="fitness-outline" slot="start"></ion-icon>
         Crear Nueva Rutina
@@ -7,7 +6,7 @@
         <ion-icon name="lock-closed" slot="end"></ion-icon>
         }
     </ion-button>
-    <div class="mb-4">
+    <div class="mt-3">
         <ion-text [color]="hasReachedLimit() ? 'warning' : 'medium'" class="text-sm">
             {{ limitMessage() }}
             @if (hasReachedLimit()) {

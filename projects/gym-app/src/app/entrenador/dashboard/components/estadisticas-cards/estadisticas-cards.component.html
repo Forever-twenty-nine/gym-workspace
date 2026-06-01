@@ -1,0 +1,52 @@
+@if (isPremium()) {
+<ion-grid class="p-0 mb-6 fade-in">
+  <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
+    <ion-row class="p-2">
+      <!-- Entrenados -->
+      <ion-col size="4" class="p-1">
+        <div
+          class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(187,228,10,0.2)] text-(--ion-color-primary)">
+            <ion-icon name="people-outline" class="text-lg"></ion-icon>
+          </div>
+          <div class="text-center">
+            <span class="block text-xl font-extrabold text-white leading-tight">{{ entrenadosCount() }}</span>
+            <span class="text-[8px] text-white/50 uppercase tracking-wider block">Entrados</span>
+          </div>
+        </div>
+      </ion-col>
+
+      <!-- Ejercicios -->
+      <ion-col size="4" class="p-1">
+        <div
+          class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(45,211,111,0.2)] text-(--ion-color-success)">
+            <ion-icon name="barbell-outline" class="text-lg"></ion-icon>
+          </div>
+          <div class="text-center">
+            <span class="block text-xl font-extrabold text-white leading-tight">{{ ejerciciosCount() }}</span>
+            <span class="text-[8px] text-white/50 uppercase tracking-wider block">Ejercicios</span>
+          </div>
+        </div>
+      </ion-col>
+
+      <!-- Rutinas -->
+      <ion-col size="4" class="p-1">
+        <div
+          class="flex flex-col items-center justify-center p-2 rounded-xl bg-white/5 border border-white/5 active:scale-95 transition-transform">
+          <div
+            class="w-8 h-8 rounded-lg flex items-center justify-center mb-1 bg-[rgba(80,227,194,0.2)] text-(--ion-color-tertiary)">
+            <ion-icon name="fitness-outline" class="text-lg"></ion-icon>
+          </div>
+          <div class="text-center">
+            <span class="block text-xl font-extrabold text-white leading-tight">{{ rutinasCount() }}</span>
+            <span class="text-[8px] text-white/50 uppercase tracking-wider block">Rutinas</span>
+          </div>
+        </div>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-grid>
+}

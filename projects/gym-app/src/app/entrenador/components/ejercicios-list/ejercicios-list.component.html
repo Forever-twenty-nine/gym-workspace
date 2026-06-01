@@ -1,16 +1,30 @@
-<ion-list style="background: transparent;" class="p-0 m-0">
+<ion-list style="background: none;" class="p-2 m-2">
   @for (ejercicio of ejercicios; track ejercicio.id) {
-  <ion-item button (click)="onVer(ejercicio)" class="--background: transparent; mb-1">
-    <ion-label>
-      <h3 class="font-bold text-white">{{ ejercicio.nombre }}</h3>
-    </ion-label>
-    <ion-button fill="clear" slot="end" color="primary" (click)="onVer(ejercicio); $event.stopPropagation()">
-      <ion-icon name="pencil"></ion-icon>
-    </ion-button>
-    <ion-button fill="clear" slot="end" color="danger" (click)="onEliminar(ejercicio.id); $event.stopPropagation()">
-      <ion-icon name="trash"></ion-icon>
-    </ion-button>
-  </ion-item>
+  <ion-item-sliding class="gym-sliding-item" #slidingItem>
+    <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
+      <!-- <ion-avatar slot="start" class="flex items-center justify-center">
+        <ion-icon name="barbell-outline" class="text-white" style="font-size: 1.5rem;"></ion-icon>
+      </ion-avatar> -->
+      <ion-label slot="start" class="mx-2">
+        <h3 class="font-bold text-white">{{ ejercicio.nombre }}</h3>
+        <!-- @if (ejercicio.descripcion) {
+        <p class="text-white/60 text-xs mt-1 truncate max-w-xs">{{ ejercicio.descripcion }}</p>
+        } -->
+      </ion-label>
+      <ion-note slot="end" class="mx-2 text-white/50 text-xs">
+        {{ ejercicio.series }}x{{ ejercicio.repeticiones }}@if(ejercicio.peso) { ({{ ejercicio.peso }}kg)}
+      </ion-note>
+    </ion-item>
+    
+    <ion-item-options side="end">
+      <ion-item-option color="primary" (click)="onVer(ejercicio); slidingItem.close()">
+        <ion-icon slot="start" name="pencil-outline"></ion-icon>
+      </ion-item-option>
+      <ion-item-option color="danger" (click)="onEliminar(ejercicio.id); slidingItem.close()">
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+      </ion-item-option>
+    </ion-item-options>
+  </ion-item-sliding>
   } @empty {
   <ion-item class="--background: transparent; ion-text-center">
     <ion-label class="text-white opacity-60">

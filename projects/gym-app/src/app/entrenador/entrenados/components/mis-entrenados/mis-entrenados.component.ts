@@ -55,7 +55,6 @@ export class MisEntrenadosComponent {
 
     verCliente = output<Entrenado>();
     openRutinasModal = output<Entrenado>();
-    openInvitacionModal = output<void>();
 
     async toggleSliding(slidingItem: IonItemSliding) {
         const isOpened = await slidingItem.getOpenAmount() > 0;

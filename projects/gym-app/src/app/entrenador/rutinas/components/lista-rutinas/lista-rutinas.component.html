@@ -1,17 +1,25 @@
-<ion-list style="background: transparent;" class="p-0 m-0">
+<ion-list style="background: none;" class="p-2 m-2">
     @for (rutina of rutinas(); track rutina.id) {
-    <ion-item button (click)="verRutina.emit(rutina)">
-        <ion-label>
-            <h3>{{ rutina.nombre }}</h3>
-        </ion-label>
-        <ion-button fill="clear" slot="end" color="primary"
-            (click)="verRutina.emit(rutina); $event.stopPropagation()">
-            <ion-icon name="pencil"></ion-icon>
-        </ion-button>
-        <ion-button fill="clear" slot="end" color="danger"
-            (click)="deleteRutina.emit(rutina.id); $event.stopPropagation()">
-            <ion-icon name="trash"></ion-icon>
-        </ion-button>
-    </ion-item>
+    <ion-item-sliding class="gym-sliding-item" #slidingItem>
+        <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
+            <ion-label slot="start" class="mx-2">
+                <h3 class="font-bold text-white">{{ rutina.nombre }}</h3>
+            </ion-label>
+            @if (rutina.ejerciciosIds?.length || rutina.ejercicios?.length) {
+            <ion-note slot="end" class="mx-2 text-white/50 text-xs">
+                {{ (rutina.ejerciciosIds || rutina.ejercicios).length }} ej.
+            </ion-note>
+            }
+        </ion-item>
+        <!-- -->
+        <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="verRutina.emit(rutina); slidingItem.close()">
+                <ion-icon slot="start" name="pencil-outline"></ion-icon>
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="deleteRutina.emit(rutina.id); slidingItem.close()">
+                <ion-icon slot="start" name="trash-outline"></ion-icon>
+            </ion-item-option>
+        </ion-item-options>
+    </ion-item-sliding>
     }
 </ion-list>

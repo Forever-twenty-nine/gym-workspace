@@ -1,8 +1,6 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
-import { IonContent, IonCard, IonCardContent, IonIcon, IonAvatar, IonList, IonItem, IonLabel, IonGrid, IonRow, IonCol, IonToolbar, IonHeader, IonTitle, IonCardHeader, IonCardTitle, IonButton, IonListHeader } from '@ionic/angular/standalone';
+import { IonContent } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
-import { addIcons } from 'ionicons';
-import { peopleOutline, fitnessOutline, statsChartOutline, calendarOutline, chevronForwardOutline, barbellOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -12,6 +10,8 @@ import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
+import { EstadisticasCardsComponent } from './components/estadisticas-cards/estadisticas-cards.component';
+import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,18 +19,11 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
   standalone: true,
   imports: [
     IonContent,
-    IonIcon,
-    IonAvatar,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonGrid,
-    IonRow,
-    IonCol,
     NgOptimizedImage,
     HeaderTabsComponent,
-    IonListHeader
-],
+    EstadisticasCardsComponent,
+    ProximosEntrenadosComponent
+  ],
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
@@ -100,7 +93,6 @@ export class DashboardPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ peopleOutline, fitnessOutline, statsChartOutline, calendarOutline, chevronForwardOutline, barbellOutline });
     // Inicializar listeners para asegurar que los datos estén disponibles
     this.entrenadorService.initializeListener();
     this.entrenadoService.initializeListener();

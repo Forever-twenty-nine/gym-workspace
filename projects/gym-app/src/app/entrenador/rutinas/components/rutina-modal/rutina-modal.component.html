@@ -12,19 +12,19 @@
             </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding">
-            <form [formGroup]="form()" (ngSubmit)="handleSave()">
-                <ion-item>
+            <form [formGroup]="form()" (ngSubmit)="handleSave()" class="flex flex-col gap-4 pb-6">
+                <ion-item class="gym-modal-item">
                     <ion-input label="Nombre" labelPlacement="stacked" formControlName="nombre"
                         placeholder="Nombre de la rutina"></ion-input>
                 </ion-item>
 
-                <ion-item>
+                <ion-item class="gym-modal-item">
                     <ion-textarea label="Descripción" labelPlacement="stacked" formControlName="descripcion"
                         placeholder="Descripción de la rutina..." rows="3"></ion-textarea>
                 </ion-item>
 
                 <!-- Selección de Ejercicios -->
-                <ion-item>
+                <ion-item class="gym-modal-item">
                     <ion-select label="Ejercicios" labelPlacement="stacked" formControlName="ejerciciosIds" multiple
                         cancelText="Cancelar" okText="Aceptar">
                         @for (ejercicio of ejercicios(); track ejercicio.id) {
@@ -35,7 +35,7 @@
                     </ion-select>
                 </ion-item>
 
-                <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="ion-margin-top">
+                <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="mt-4">
                     {{ isCreating() ? 'Crear' : 'Guardar' }}
                 </ion-button>
             </form>

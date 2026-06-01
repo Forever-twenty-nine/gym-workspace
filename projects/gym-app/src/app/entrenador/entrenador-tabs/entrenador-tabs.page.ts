@@ -25,7 +25,6 @@ import {
     IonTabBar,
     IonTabButton,
     IonIcon,
-    IonLabel
 ]
 })
 export class EntrenadorTabsPage {

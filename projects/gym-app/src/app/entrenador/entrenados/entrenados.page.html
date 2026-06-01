@@ -13,11 +13,29 @@
   </div>
   }
 
+  <!-- Acciones y Límite de Plan -->
+  <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4 text-center">
+    <ion-button expand="block" fill="solid" color="primary" (click)="openInvitacionModal()" [disabled]="hasReachedClientLimit()">
+      <ion-icon name="mail-outline" slot="start"></ion-icon>
+      Nuevo Entrenado
+      @if (hasReachedClientLimit()) {
+      <ion-icon name="lock-closed" slot="end"></ion-icon>
+      }
+    </ion-button>
+    <div class="mt-3">
+      <ion-text [color]="hasReachedClientLimit() ? 'warning' : 'medium'" class="text-sm">
+        {{ clientLimitMessage() }}
+        @if (hasReachedClientLimit()) {
+        <p class="text-xs mt-1 mb-0">Límite alcanzado. Actualiza para crear más.</p>
+        }
+      </ion-text>
+    </div>
+  </div>
+
   <!-- Listado de Entrenados -->
   <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
     [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)"
-    (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)"
-    (openInvitacionModal)="openInvitacionModal()">
+    (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)">
   </app-mis-entrenados>
 
   <!-- Invitaciones Pendientes -->

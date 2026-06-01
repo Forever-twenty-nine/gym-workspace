@@ -242,7 +242,7 @@ export class RutinaService {
             activa: rutina.activa ?? true
         };
 
-        if (rutina.descripcion) data.descripcion = rutina.descripcion;
+        data.descripcion = rutina.descripcion || '';
         if (rutina.ejerciciosIds && rutina.ejerciciosIds.length > 0) data.ejerciciosIds = rutina.ejerciciosIds;
         if (rutina.fechaCreacion) data.fechaCreacion = rutina.fechaCreacion instanceof Date ? Timestamp.fromDate(rutina.fechaCreacion) : rutina.fechaCreacion;
         if (rutina.fechaModificacion) data.fechaModificacion = rutina.fechaModificacion instanceof Date ? Timestamp.fromDate(rutina.fechaModificacion) : rutina.fechaModificacion;

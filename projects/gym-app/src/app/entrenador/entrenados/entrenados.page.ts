@@ -5,14 +5,18 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import {
   IonContent,
   ToastController,
-  IonCard
+  IonCard,
+  IonButton,
+  IonIcon,
+  IonText
 } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline } from 'ionicons/icons';
+import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -34,6 +38,9 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     CommonModule,
     ReactiveFormsModule,
     IonContent,
+    IonButton,
+    IonIcon,
+    IonText,
     NgOptimizedImage,
     HeaderTabsComponent,
     MisEntrenadosComponent,
@@ -47,9 +54,27 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
 export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
+  private entrenadorService = inject(EntrenadorService);
 
   readonly plan = computed(() => this.authService.currentUser()?.plan || Plan.FREE);
   readonly isPremium = computed(() => this.plan() === Plan.PREMIUM);
+
+  readonly hasReachedClientLimit = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return false;
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.entrenadosAsociados().length;
+    return currentCount >= limits.maxClients;
+  });
+
+  readonly clientLimitMessage = computed(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return '';
+    const limits = this.entrenadorService.getLimits(entrenadorId);
+    const currentCount = this.entrenadosAsociados().length;
+    return `Clientes activos: ${currentCount}/${limits.maxClients}`;
+  });
+
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
   private rutinaService = inject(RutinaService);
@@ -172,11 +197,12 @@ export class EntrenadosPage implements OnInit {
   }
 
   constructor() {
-    addIcons({ closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline });
+    addIcons({ closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed });
   }
 
   ngOnInit() {
-    // Inicializar si es necesario
+    this.entrenadorService.initializeListener();
+    this.entrenadoService.initializeListener();
   }
 
   verCliente(entrenado: Entrenado) {
