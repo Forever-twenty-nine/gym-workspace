@@ -30,8 +30,6 @@ import { EjercicioModalComponent } from '../components/ejercicio-modal/ejercicio
     IonIcon,
     NgOptimizedImage,
     HeaderTabsComponent,
-    IonCard,
-    IonCardContent,
     EjerciciosListComponent,
     EjercicioModalComponent]
 })

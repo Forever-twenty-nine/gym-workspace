@@ -25,18 +25,17 @@ import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ion
     templateUrl: './mis-entrenados.component.html',
     standalone: true,
     imports: [
-        CommonModule,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonIcon,
-        IonButton,
-        IonAvatar,
-        IonNote,
-        IonItemOptions,
-        IonItemOption,
-        IonItemSliding
-    ]
+    CommonModule,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonIcon,
+    IonAvatar,
+    IonNote,
+    IonItemOptions,
+    IonItemOption,
+    IonItemSliding
+]
 })
 export class MisEntrenadosComponent {
 
