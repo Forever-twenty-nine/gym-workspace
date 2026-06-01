@@ -1,0 +1,35 @@
+<!-- VACÍO O FEED COMPLETO -->
+@if (filteredFeed().length === 0) {
+  <div class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
+    <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
+      <ion-icon name="people-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
+    </div>
+    <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
+      {{ tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
+    </h3>
+    <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
+      {{ tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
+    </p>
+  </div>
+}
+
+<!-- FEED ACTIVO -->
+@else {
+  <div class="flex flex-col gap-6">
+    @for (item of filteredFeed(); track item.id) {
+      @if (item.isDesafio) {
+        <app-desafio-feed-card [desafio]="item" (dismissed)="dismissDesafio(item.id, $event)"></app-desafio-feed-card>
+      } @else {
+        <app-social-card [sesion]="item"></app-social-card>
+      }
+    }
+  </div>
+
+  <!-- Scroll Infinito -->
+  @if (hasMoreItems()) {
+    <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content loadingSpinner="bubbles" loadingText="Cargando más actividades...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  }
+}

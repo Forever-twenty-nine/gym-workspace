@@ -20,7 +20,7 @@ import {
     IonBadge
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCircleOutline, lockClosed } from 'ionicons/icons';
+import { close, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCircleOutline, lockClosed, peopleOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutina-detalle-modal',
@@ -63,6 +63,7 @@ export class RutinaDetalleModalComponent {
     @Input() ejercicios: any[] = [];
     @Output() didDismiss = new EventEmitter<void>();
     @Output() iniciarEntrenamiento = new EventEmitter<any>();
+    @Output() buscarGymbro = new EventEmitter<any>();
 
     constructor() {
         addIcons({
@@ -72,7 +73,8 @@ export class RutinaDetalleModalComponent {
             repeatOutline,
             playCircle,
             syncCircleOutline,
-            lockClosed
+            lockClosed,
+            peopleOutline
         });
     }
 
@@ -82,5 +84,9 @@ export class RutinaDetalleModalComponent {
 
     iniciar() {
         this.iniciarEntrenamiento.emit(this.rutina);
+    }
+
+    compartirRutinaGymbro() {
+        this.buscarGymbro.emit(this.rutina);
     }
 }

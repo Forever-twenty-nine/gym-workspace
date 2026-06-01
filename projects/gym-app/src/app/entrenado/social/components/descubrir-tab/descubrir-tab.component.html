@@ -1,0 +1,54 @@
+<div class="flex flex-col gap-8">
+  
+  <!-- Seccion 1: Partner Horario (Utility Card) -->
+  <div>
+    <div class="flex items-center gap-2 mb-4 px-2">
+      <ion-icon name="time-outline" class="text-xl text-blue-500"></ion-icon>
+      <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Coincidencia Horaria</h3>
+    </div>
+    @if (sugerenciasHorario().length === 0) {
+      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay sugerencias en tu franja horaria por el momento.</p>
+    } @else {
+      <div class="flex flex-col gap-4">
+        @for (item of sugerenciasHorario(); track item.id) {
+          <app-match-card tipo="horario" [data]="item"></app-match-card>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Seccion 2: Desafíos Comunitarios (Lúdica Card) -->
+  <div>
+    <div class="flex items-center gap-2 mb-4 px-2">
+      <ion-icon name="trophy-outline" class="text-xl text-amber-500"></ion-icon>
+      <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Desafíos Activos</h3>
+    </div>
+    @if (desafiosActivos().length === 0) {
+      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay desafíos comunitarios activos por el momento.</p>
+    } @else {
+      <div class="flex flex-col gap-4">
+        @for (item of desafiosActivos(); track item.id) {
+          <app-match-card tipo="desafio" [data]="item"></app-match-card>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Seccion 3: Gym Bro / Partner de Ruta (Social Pura Card) -->
+  <div>
+    <div class="flex items-center gap-2 mb-4 px-2">
+      <ion-icon name="barbell-outline" class="text-xl text-primary"></ion-icon>
+      <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Partners de Ruta 🏋️‍♂️💪</h3>
+    </div>
+    @if (sugerenciasAfinidad().length === 0) {
+      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 px-2 italic">No hay sugerencias con afinidades comunes por el momento.</p>
+    } @else {
+      <div class="flex flex-col gap-4">
+        @for (item of sugerenciasAfinidad(); track item.id) {
+          <app-match-card tipo="afinidad" [data]="item"></app-match-card>
+        }
+      </div>
+    }
+  </div>
+
+</div>

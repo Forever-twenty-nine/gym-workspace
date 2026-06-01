@@ -19,7 +19,7 @@
   <!-- Modal Detalles Rutina -->
   <app-rutina-detalle-modal [isOpen]="modalAbierto()" [rutina]="rutinaSeleccionada()"
     [ejercicios]="ejerciciosCompletos()" [esFuturo]="esFuturoSeleccionado()" (didDismiss)="cerrarModal()"
-    (iniciarEntrenamiento)="iniciarEntrenamiento($event)">
+    (iniciarEntrenamiento)="iniciarEntrenamiento($event)" (buscarGymbro)="publicarComoDesafio($event)">
   </app-rutina-detalle-modal>
 
 </ion-content>

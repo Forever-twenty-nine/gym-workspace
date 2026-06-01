@@ -205,8 +205,15 @@ export class MatchService {
             const all = this.entrenadoService.entrenados();
             if (!currentUser || !currentUser.franjaHoraria) return [];
 
+            const currentUserProfile = this.userService.getUserByUid(currentUser.id)();
+            const currentUserGymId = currentUserProfile?.gimnasioId;
+
             return all.filter(e => {
                 if (e.id === currentUser.id) return false;
+
+                const targetUserProfile = this.userService.getUserByUid(e.id)();
+                if (targetUserProfile?.gimnasioId !== currentUserGymId) return false;
+
                 if (!e.franjaHoraria) return false;
 
                 // Comprobar solapamiento de rango de horas
@@ -236,8 +243,15 @@ export class MatchService {
             const all = this.entrenadoService.entrenados();
             if (!currentUser || !currentUser.tags || currentUser.tags.length === 0) return [];
 
+            const currentUserProfile = this.userService.getUserByUid(currentUser.id)();
+            const currentUserGymId = currentUserProfile?.gimnasioId;
+
             return all.filter(e => {
                 if (e.id === currentUser.id) return false;
+
+                const targetUserProfile = this.userService.getUserByUid(e.id)();
+                if (targetUserProfile?.gimnasioId !== currentUserGymId) return false;
+
                 if (!e.tags || e.tags.length === 0) return false;
 
                 // Comprobar si comparten al menos un tag de afinidad
