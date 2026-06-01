@@ -1,6 +1,5 @@
 <app-header-tabs></app-header-tabs>
 
-
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
   @if (isPremium()) {
@@ -8,11 +7,15 @@
     <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
       class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
+  }@else {
+  <div
+    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
+  </div>
   }
 
   <div class="main-container ion-padding relative z-10">
     <div
-      class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+      class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
       @if (estadisticasGenerales(); as stats) {
       <div class="w-full">
         <!-- Estadísticas Generales Premium -->
