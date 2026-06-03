@@ -9,7 +9,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
-import { ActivarHoyTabComponent } from './components/activar-hoy-tab/activar-hoy-tab.component';
+import { ConvocatoriasComponent } from './components/convocatorias/convocatorias.component';
 import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.component';
 import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
 
@@ -23,7 +23,7 @@ import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
     NgOptimizedImage,
     IonSegment, IonSegmentButton, IonLabel,
     HeaderTabsComponent,
-    ActivarHoyTabComponent,
+    ConvocatoriasComponent,
     DescubrirTabComponent,
     FeedTabComponent
   ]

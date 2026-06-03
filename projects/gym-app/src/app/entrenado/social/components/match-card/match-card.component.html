@@ -1,53 +1,5 @@
 <ion-card class="m-0! rounded-3xl! overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative">
   
-  <!-- 1. TARJETA DE UTILIDAD (El Partner Horario) -->
-  <div *ngIf="tipo === 'horario'" class="p-6 flex flex-col gap-4">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <!-- Foto de Perfil Companion -->
-        <div class="w-12 h-12 rounded-2xl overflow-hidden bg-gray-200/50 flex items-center justify-center border border-blue-500/20 shadow-md">
-          <img *ngIf="userProfilePhoto()" [src]="userProfilePhoto()" alt="Perfil" class="w-full h-full object-cover">
-          <ion-icon *ngIf="!userProfilePhoto()" name="person-outline" class="text-lg text-gray-500"></ion-icon>
-        </div>
-        <div>
-          <h4 class="text-[10px] uppercase tracking-widest font-extrabold text-blue-600 dark:text-blue-400 leading-none mb-1">Partner Horario</h4>
-          <p class="text-base font-black text-gray-900 dark:text-white tracking-tight leading-none">
-            {{ userName() }}
-          </p>
-        </div>
-      </div>
-      <ion-badge color="primary" class="font-bold text-xs uppercase tracking-wide px-3 py-1 rounded-full">
-        {{ data.franjaHoraria?.inicio }} - {{ data.franjaHoraria?.fin }}
-      </ion-badge>
-    </div>
-
-    <div class="bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/15 rounded-2xl p-4 flex flex-col gap-2">
-      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rango de Entrenamiento</p>
-      <div class="flex items-center gap-3">
-        <ion-icon name="hourglass-outline" class="text-lg text-blue-500"></ion-icon>
-        <span class="text-sm font-bold text-gray-800 dark:text-gray-200">
-          Coincide en tu rango preferido para entrenar hoy.
-        </span>
-      </div>
-    </div>
-
-    <div>
-      <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Disciplinas Comunes</p>
-      <div class="flex flex-wrap gap-2">
-        <span *ngFor="let disc of data.disciplinas" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-gray-200/50 dark:bg-gray-800/60 text-gray-700 dark:text-gray-300">
-          {{ disc }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Acciones -->
-    <div class="mt-2 flex gap-3">
-      <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full rounded-2xl! overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'">
-        <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'time-outline'" slot="start"></ion-icon>
-        {{ matchConcretado() ? '¡Coincidencia Lograda!' : interacted() ? 'Interés Enviado' : 'Coincidir Horario' }}
-      </ion-button>
-    </div>
-  </div>
 
   <!-- 2. TARJETA LÚDICA (El Desafío Cruzado) -->
   <div *ngIf="tipo === 'desafio'" class="p-6 flex flex-col gap-4">
@@ -93,9 +45,6 @@
           <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none">Creador del Reto</p>
         </div>
       </div>
-      <span *ngIf="data.disciplina" class="text-[10px] font-extrabold uppercase px-2 py-1 rounded bg-gray-200/30 dark:bg-gray-800/40 text-gray-600 dark:text-gray-400 border border-white/5">
-        {{ data.disciplina }}
-      </span>
     </div>
 
     <!-- Acciones -->

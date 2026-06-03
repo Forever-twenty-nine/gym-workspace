@@ -22,6 +22,11 @@ export const routes: Routes = [
           import('../social/social.page').then((m) => m.SocialPage),
       },
       {
+        path: 'creaciones',
+        loadComponent: () =>
+          import('../creaciones/creaciones.page').then((m) => m.CreacionesPage),
+      },
+      {
         path: 'progreso',
         loadComponent: () =>
           import('../progreso/progreso.page').then((m) => m.ProgresoPage),

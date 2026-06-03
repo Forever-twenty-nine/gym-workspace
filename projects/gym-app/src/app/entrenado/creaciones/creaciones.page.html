@@ -1,0 +1,135 @@
+<app-header-tabs title="Creaciones"></app-header-tabs>
+
+<ion-content [fullscreen]="true" style="--background: transparent;">
+  <!-- Background Image Layer (Fixed) -->
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }
+
+  <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
+    
+    <!-- Bloque 1: Acciones de Agregar -->
+    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
+      <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Elegir qué agregar</ion-label>
+      
+      <div class="grid grid-cols-3 gap-3">
+        <!-- Agregar Convocatoria (Abierto a todos) -->
+        <ion-button (click)="abrirModalConvocatoria()" 
+                    fill="clear" 
+                    class="h-auto py-3 rounded-2xl border border-white/20 bg-white/20 dark:bg-black/20 flex flex-col gap-1.5 justify-center items-center text-primary transition-all active:scale-95 m-0!">
+          <div class="flex flex-col items-center gap-1.5 text-center text-slate-800 dark:text-slate-100">
+            <ion-icon name="paper-plane-outline" class="text-2xl text-blue-500"></ion-icon>
+            <span class="text-[10px] font-black uppercase tracking-wider leading-tight">Convocar</span>
+          </div>
+        </ion-button>
+
+        <!-- Crear Rutina (Premium) -->
+        <ion-button (click)="crearRutina()" 
+                    fill="clear" 
+                    class="h-auto py-3 rounded-2xl border border-white/20 bg-white/20 dark:bg-black/20 flex flex-col gap-1.5 justify-center items-center text-primary transition-all active:scale-95 m-0!">
+          <div class="flex flex-col items-center gap-1.5 text-center text-slate-800 dark:text-slate-100 relative">
+            @if (!isPremium()) {
+              <ion-icon name="lock-closed" class="absolute -top-1 -right-2 text-[10px] text-amber-500"></ion-icon>
+            }
+            <ion-icon name="calendar-outline" class="text-2xl text-emerald-500"></ion-icon>
+            <span class="text-[10px] font-black uppercase tracking-wider leading-tight">Rutina</span>
+          </div>
+        </ion-button>
+
+        <!-- Crear Ejercicio (Premium) -->
+        <ion-button (click)="crearEjercicio()" 
+                    fill="clear" 
+                    class="h-auto py-3 rounded-2xl border border-white/20 bg-white/20 dark:bg-black/20 flex flex-col gap-1.5 justify-center items-center text-primary transition-all active:scale-95 m-0!">
+          <div class="flex flex-col items-center gap-1.5 text-center text-slate-800 dark:text-slate-100 relative">
+            @if (!isPremium()) {
+              <ion-icon name="lock-closed" class="absolute -top-1 -right-2 text-[10px] text-amber-500"></ion-icon>
+            }
+            <ion-icon name="barbell-outline" class="text-2xl text-purple-500"></ion-icon>
+            <span class="text-[10px] font-black uppercase tracking-wider leading-tight">Ejercicio</span>
+          </div>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Bloque 2: Mis Ejercicios Creados -->
+    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
+      <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Mis Ejercicios Creados</ion-label>
+      
+      @if (isPremium()) {
+        <ion-list lines="full" class="bg-transparent m-0!">
+          @for (ej of ejerciciosCreados(); track ej.id) {
+            <ion-item class="--background: transparent; --padding-start: 4px; --padding-end: 4px;">
+              <ion-label>
+                <h2 class="font-bold text-gray-900 dark:text-white">{{ ej.nombre }}</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ ej.series }} series x {{ ej.repeticiones }} reps - {{ ej.peso }}kg</p>
+              </ion-label>
+              <ion-button slot="end" fill="clear" color="danger" (click)="eliminarEjercicio(ej.id)" class="m-0!">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-item>
+          } @empty {
+            <div class="text-center py-6">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 italic">No has creado ejercicios personalizados aún.</p>
+            </div>
+          }
+        </ion-list>
+      } @else {
+        <!-- Cerrado Premium -->
+        <div class="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/25 rounded-2xl p-5 text-center flex flex-col items-center gap-2">
+          <ion-icon name="lock-closed" class="text-2xl text-amber-500"></ion-icon>
+          <h4 class="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 m-0 leading-none">Ejercicios Personalizados (🔒 Premium)</h4>
+          <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-300 leading-relaxed m-0">Sube a premium para registrar tus propios movimientos, configurar series y pesos personalizados.</p>
+        </div>
+      }
+    </div>
+
+    <!-- Bloque 3: Mis Rutinas Creadas -->
+    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
+      <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Mis Rutinas Creadas</ion-label>
+      
+      @if (isPremium()) {
+        <ion-list lines="full" class="bg-transparent m-0!">
+          @for (rut of rutinasPropias(); track rut.id) {
+            <ion-item class="--background: transparent; --padding-start: 4px; --padding-end: 4px;">
+              <ion-label>
+                <h2 class="font-bold text-gray-900 dark:text-white">{{ rut.nombre }}</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ rut.descripcion || 'Sin descripción' }}</p>
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  @for (ejId of rut.ejerciciosIds; track ejId) {
+                    <ion-badge color="medium" class="font-bold text-[8px] uppercase px-1.5 py-0.5 rounded">{{ getNombreEjercicio(ejId) }}</ion-badge>
+                  }
+                </div>
+              </ion-label>
+              <ion-button slot="end" fill="clear" color="danger" (click)="eliminarRutina(rut.id)" class="m-0!">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-button>
+            </ion-item>
+          } @empty {
+            <div class="text-center py-6">
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400 italic">No has creado rutinas semanales aún.</p>
+            </div>
+          }
+        </ion-list>
+      } @else {
+        <!-- Cerrado Premium -->
+        <div class="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/25 rounded-2xl p-5 text-center flex flex-col items-center gap-2">
+          <ion-icon name="lock-closed" class="text-2xl text-amber-500"></ion-icon>
+          <h4 class="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 m-0 leading-none">Planificador de Rutinas (🔒 Premium)</h4>
+          <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-300 leading-relaxed m-0">Organiza tus rutinas semanales de manera ilimitada y añade ejercicios específicos para cada día.</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+  <!-- Componente Modal de Convocatoria -->
+  <app-crear-convocatoria-modal 
+    [isOpen]="isConvocatoriaModalOpen()" 
+    (close)="cerrarModalConvocatoria()"
+    (saved)="onConvocatoriaSaved()">
+  </app-crear-convocatoria-modal>
+
+</ion-content>

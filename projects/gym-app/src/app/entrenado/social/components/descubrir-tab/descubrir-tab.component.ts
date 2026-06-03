@@ -2,7 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { timeOutline, trophyOutline, barbellOutline } from 'ionicons/icons';
+import { trophyOutline, barbellOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../core/services/entrenado.service';
 import { MatchService } from '../../../../core/services/match.service';
@@ -34,12 +34,6 @@ export class DescubrirTabComponent {
     return this.entrenadoService.getEntrenado(user.uid)();
   });
 
-  // Sugerencias sociales calculadas reactivamente
-  sugerenciasHorario = computed(() => {
-    const curr = this.currentEntrenado();
-    return curr ? this.matchService.getSugerenciasHorario(curr)() : [];
-  });
-
   sugerenciasAfinidad = computed(() => {
     const curr = this.currentEntrenado();
     return curr ? this.matchService.getSugerenciasAfinidad(curr)() : [];
@@ -56,6 +50,7 @@ export class DescubrirTabComponent {
   });
 
   constructor() {
-    addIcons({ timeOutline, trophyOutline, barbellOutline });
+    addIcons({ trophyOutline, barbellOutline });
   }
 }
+

@@ -589,6 +589,50 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
     });
   }
 
+  // 6.5) Crear convocatorias fitness
+  console.log('   Creando convocatorias fitness...');
+  if (createdTrainees.length >= 2) {
+    const hoy = new Date();
+    const manana = new Date();
+    manana.setDate(hoy.getDate() + 1);
+
+    // Convocatoria de Clara (trainee 1)
+    const t1 = createdTrainees[0];
+    const convId1 = `conv-${t1.uid}-1`;
+    await db.collection('convocatorias').doc(convId1).set({
+      id: convId1,
+      creadorId: t1.uid,
+      creadorNombre: t1.nombre,
+      creadorFoto: t1.photoURL || null,
+      gimnasioId: gymUid,
+      fechaCreacion: Timestamp.now(),
+      fechaEntrenamiento: Timestamp.fromDate(hoy),
+      horaInicio: "19:00",
+      horaFin: "20:30",
+      mensaje: "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
+      interesados: [],
+      activo: true
+    });
+
+    // Convocatoria de Mateo (trainee 2)
+    const t2 = createdTrainees[1];
+    const convId2 = `conv-${t2.uid}-2`;
+    await db.collection('convocatorias').doc(convId2).set({
+      id: convId2,
+      creadorId: t2.uid,
+      creadorNombre: t2.nombre,
+      creadorFoto: t2.photoURL || null,
+      gimnasioId: gymUid,
+      fechaCreacion: Timestamp.now(),
+      fechaEntrenamiento: Timestamp.fromDate(manana),
+      horaInicio: "08:00",
+      horaFin: "09:30",
+      mensaje: "Pecho y bíceps mañana temprano. ¿Quién se une para ayudarnos a sacar las últimas reps al fallo? 🔥",
+      interesados: [],
+      activo: true
+    });
+  }
+
   // 7) Crear Gimnasio / Personal Trainer Central modularizado
   const trainersIds = createdTrainers.map(t => t.uid);
   const traineesIds = createdTrainees.map(t => t.uid);
@@ -641,7 +685,7 @@ async function main() {
     const collectionsToClear = [
       'usuarios', 'entrenadores', 'entrenados', 'gimnasios', 
       'rutinas', 'ejercicios', 'rutinas-asignadas', 
-      'sesiones-rutina', 'desafios', 'matches'
+      'sesiones-rutina', 'desafios', 'matches', 'convocatorias'
     ];
     for (const collection of collectionsToClear) {
       await clearCollection(globalDb, collection);

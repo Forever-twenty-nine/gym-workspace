@@ -1,14 +1,13 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  IonCard, IonButton, IonIcon, IonBadge, ToastController
-} from '@ionic/angular/standalone';
+   IonCard, IonButton, IonIcon, ToastController
+ } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  timeOutline, barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-  chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline,
-  hourglassOutline
-} from 'ionicons/icons';
+   barbellOutline, trophyOutline, flameOutline, sparklesOutline,
+   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline
+ } from 'ionicons/icons';
 import { MatchService } from '../../../../core/services/match.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
@@ -18,7 +17,7 @@ import { Entrenado } from 'gym-library';
   selector: 'app-match-card',
   standalone: true,
   imports: [
-    CommonModule, IonCard, IonButton, IonIcon, IonBadge
+    CommonModule, IonCard, IonButton, IonIcon
   ],
   templateUrl: './match-card.component.html'
 })
@@ -28,7 +27,7 @@ export class MatchCardComponent {
   private readonly userService = inject(UserService);
   private readonly toastCtrl = inject(ToastController);
 
-  @Input({ required: true }) tipo!: 'horario' | 'desafio' | 'afinidad';
+  @Input({ required: true }) tipo!: 'desafio' | 'afinidad';
   @Input({ required: true }) data!: any; // Perfil de Entrenado o Desafio
 
   currentUser = this.authService.currentUser;
@@ -55,11 +54,11 @@ export class MatchCardComponent {
 
   constructor() {
     addIcons({
-      timeOutline, barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline,
-      hourglassOutline
+      barbellOutline, trophyOutline, flameOutline, sparklesOutline,
+      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline
     });
   }
+
 
   async interactuar() {
     const user = this.currentUser();

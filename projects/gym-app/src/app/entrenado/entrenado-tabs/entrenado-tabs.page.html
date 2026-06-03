@@ -1,35 +1,29 @@
-<ion-tabs class="gym-tab-entrenado">
-  <ion-tab-bar slot="bottom">
+<ion-tabs>
+  <ion-tab-bar slot="bottom" style="height: 48px; min-height: 48px;">
 
     <!-- Tab de Dashboard -->
     <ion-tab-button tab="dashboard" href="/entrenado-tabs/dashboard">
-      <ion-icon name="home-outline" class="icon-default"></ion-icon>
-      <ion-icon name="home" class="hidden icon-active"></ion-icon>
+      <ion-icon name="home-outline"></ion-icon>
     </ion-tab-button>
 
     <!-- Tab de Rutinas -->
     <ion-tab-button tab="rutinas" href="/entrenado-tabs/rutinas">
-      <ion-icon name="calendar-outline" class="icon-default"></ion-icon>
-      <ion-icon name="calendar" class="hidden icon-active"></ion-icon>
+      <ion-icon name="calendar-outline"></ion-icon>
     </ion-tab-button>
 
-    <!-- Tab de Social -->
+    <!-- Tab de Social (Centro) -->
     <ion-tab-button tab="social" href="/entrenado-tabs/social">
-      <ion-icon name="people-outline" class="icon-default"></ion-icon>
-      <ion-icon name="people" class="hidden icon-active"></ion-icon>
+      <ion-icon name="people-outline"></ion-icon>
     </ion-tab-button>
 
-    @if (isPremium()) {
-    <!-- Tab de Agregar Premium -->
-    <ion-tab-button (click)="openPremiumMenu()">
-      <ion-icon src="assets/icon/dumbbell-add.svg" [style.color]="isCenterTabActive() ? 'var(--ion-color-primary, #a3e635)' : 'var(--ion-tab-bar-color, #999999)'" style="font-size: 38px;"></ion-icon>
+    <!-- Tab de Creaciones (Acciones - Siempre visible) -->
+    <ion-tab-button tab="creaciones" href="/entrenado-tabs/creaciones">
+      <ion-icon name="add-circle-outline" style="font-size: 26px;"></ion-icon>
     </ion-tab-button>
-    }
 
     <!-- Tab de Progreso -->
     <ion-tab-button tab="progreso" href="/entrenado-tabs/progreso">
-      <ion-icon name="stats-chart-outline" class="icon-default"></ion-icon>
-      <ion-icon name="stats-chart" class="hidden icon-active"></ion-icon>
+      <ion-icon name="stats-chart-outline"></ion-icon>
     </ion-tab-button>
 
   </ion-tab-bar>

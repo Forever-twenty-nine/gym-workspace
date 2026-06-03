@@ -4,16 +4,10 @@ import {
   IonTabs,
   IonTabBar,
   IonTabButton,
-  IonIcon,
-  IonLabel,
-  ActionSheetController
+  IonIcon
 } from '@ionic/angular/standalone';
-import { CommonModule } from '@angular/common';
-import { inject, computed, signal } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
-import { UserService } from '../../core/services/user.service';
-import { Plan } from 'gym-library';
 import { addIcons } from 'ionicons';
 import {
   homeOutline,
@@ -32,6 +26,8 @@ import {
   people,
   addOutline,
   add,
+  addCircleOutline,
+  addCircle,
   closeOutline,
   close
 } from 'ionicons/icons';
@@ -43,7 +39,6 @@ import { Subscription } from 'rxjs';
   templateUrl: './entrenado-tabs.page.html',
   standalone: true,
   imports: [
-    CommonModule,
     IonTabs,
     IonTabBar,
     IonTabButton,
@@ -51,24 +46,17 @@ import { Subscription } from 'rxjs';
   ]
 })
 export class EntrenadoTabsPage implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private userService = inject(UserService);
-  private actionSheetCtrl = inject(ActionSheetController);
   private router = inject(Router);
   private routerSubscription?: Subscription;
-
-  readonly isPremium = computed(() => {
-    const user = this.authService.currentUser();
-    if (!user) return false;
-
-    // Check if the plan is premium in the User object
-    return user.plan === Plan.PREMIUM;
-  });
 
   isCenterTabActive = signal(false);
 
   constructor() {
-    addIcons({ homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, statsChartOutline, statsChart, fitnessOutline, fitness, personOutline, person, peopleOutline, people, addOutline, add, closeOutline, close });
+    addIcons({ 
+      homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, 
+      statsChartOutline, statsChart, fitnessOutline, fitness, personOutline, person, 
+      peopleOutline, people, addOutline, add, addCircleOutline, addCircle, closeOutline, close 
+    });
   }
 
   ngOnInit() {
@@ -87,34 +75,6 @@ export class EntrenadoTabsPage implements OnInit, OnDestroy {
   }
 
   private checkIfCenterTabActive(url: string) {
-    this.isCenterTabActive.set(url.includes('/ejercicios') || url.includes('/mis-rutinas'));
-  }
-
-  async openPremiumMenu() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Opciones Premium',
-      buttons: [
-        {
-          text: 'Mis Rutinas',
-          icon: 'fitness-outline',
-          handler: () => {
-            this.router.navigate(['/entrenado-tabs/mis-rutinas']);
-          }
-        },
-        {
-          text: 'Ejercicios',
-          icon: 'barbell-outline',
-          handler: () => {
-            this.router.navigate(['/entrenado-tabs/ejercicios']);
-          }
-        },
-        {
-          text: 'Cancelar',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-    await actionSheet.present();
+    this.isCenterTabActive.set(url.includes('/creaciones'));
   }
 }
