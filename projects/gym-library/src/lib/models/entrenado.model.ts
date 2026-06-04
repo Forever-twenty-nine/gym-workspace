@@ -33,4 +33,5 @@ export interface Entrenado {
     bio?: string;
     franjaHoraria?: FranjaHoraria;
     visibleDescubrir?: boolean;
+    photoURL?: string;
 }

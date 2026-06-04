@@ -24,7 +24,7 @@
             <div
               class="w-20 h-20 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(var(--ion-color-primary-rgb),0.15)] overflow-hidden bg-white/5 backdrop-blur-sm relative transition-transform active:scale-95">
               @if (user.photoURL) {
-              <img [ngSrc]="user.photoURL" fill class="object-cover" alt="Foto de perfil" />
+              <img [ngSrc]="user.photoURL" width="80" height="80" class="object-cover w-full h-full" alt="Foto de perfil" />
               } @else {
               <div class="w-full h-full flex items-center justify-center text-2xl font-bold text-primary bg-primary/10">
                 {{ getIniciales(user.nombre) }}

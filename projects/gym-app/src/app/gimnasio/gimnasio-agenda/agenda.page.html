@@ -1,29 +1,60 @@
 <app-header-tabs title="Agenda"></app-header-tabs>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
+
   <!-- Background Layer -->
-  <div class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none"></div>
+  @if (isPremium()) {
+  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+    <img ngSrc="assets/images/gym-social-bg.png" priority fill alt="background"
+      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+  </div>
+  }@else {
+  <div
+    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
+  </div>
+  }
 
   <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
     
-    <!-- Info Card -->
-    <div class="bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl p-4 shadow-lg flex flex-col gap-1">
-      <h3 class="text-sm font-black text-gray-900 dark:text-white m-0 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-lg" style="font-size: 20px;">info</span>
-        Visualizador de Actividad
-      </h3>
-      <p class="text-[10px] font-semibold text-gray-700 dark:text-gray-300 m-0">Revisa la agenda oficial y las convocatorias activas de tu gimnasio para la semana en curso.</p>
+    <!-- Selector de Segmento con Botón de Ayuda Inline -->
+    <div class="flex items-center gap-3">
+      <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-full p-1 flex-1" style="--border-radius: 9999px;">
+        <ion-segment-button value="oficial" class="font-extrabold text-xs" style="--border-radius: 9999px;">
+          <ion-label>Agenda Oficial (WODs)</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="atletas" class="font-extrabold text-xs" style="--border-radius: 9999px;">
+          <ion-label>Propuestas de Atletas</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+      
+      <!-- Icono de ayuda (Trigger del Popover) -->
+      <button id="help-trigger-agenda" class="w-9 h-9 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-md hover:bg-white/40 active:scale-95 transition-all flex items-center justify-center border border-white/20 text-white shadow-md cursor-pointer shrink-0" style="border-radius: 50% !important;">
+        <span class="material-symbols-outlined text-lg">info</span>
+      </button>
     </div>
 
-    <!-- Selector de Segmento -->
-    <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-2xl p-1">
-      <ion-segment-button value="oficial" class="font-extrabold text-xs">
-        <ion-label>Agenda Oficial (WODs)</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="atletas" class="font-extrabold text-xs">
-        <ion-label>Propuestas de Atletas</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    <!-- Tooltip / Popover Explicativo -->
+    <ion-popover trigger="help-trigger-agenda" triggerAction="click"
+                 style="--width: 290px; --max-width: 290px; --background: transparent; --box-shadow: none; --border-radius: 16px;">
+      <ng-template>
+        <div class="p-4 bg-white/95 dark:bg-slate-900/95 text-gray-800 dark:text-gray-200 backdrop-blur-md rounded-2xl flex flex-col gap-3 shadow-2xl border border-white/20 dark:border-white/10">
+          <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800/80 pb-2">
+            <span class="material-symbols-outlined text-(--ion-color-primary) text-lg">info</span>
+            <span class="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">Visualizador de Actividad</span>
+          </div>
+          <p class="text-[11px] leading-relaxed m-0 font-semibold text-gray-700 dark:text-gray-300">
+            Revisa la agenda oficial y las convocatorias de tu gimnasio para la semana en curso:
+          </p>
+          <ul class="text-[10px] leading-relaxed m-0 pl-4 flex flex-col gap-1.5 font-semibold text-gray-600 dark:text-gray-400 list-disc">
+            <li><strong class="text-gray-800 dark:text-gray-200">Agenda Oficial (WODs):</strong> Entrenamientos planificados por el gimnasio o entrenadores.</li>
+            <li><strong class="text-gray-800 dark:text-gray-200">Propuestas de Atletas:</strong> Convocatorias y entrenamientos creados por los propios alumnos.</li>
+          </ul>
+          <p class="text-[9px] text-gray-400 dark:text-gray-500 italic mt-1 text-center">
+            ¡Haz clic en cualquier clase para ver más detalles!
+          </p>
+        </div>
+      </ng-template>
+    </ion-popover>
 
     <!-- Contenido de Convocatorias Oficiales (WODs) -->
     @if (segmentoActivo() === 'oficial') {

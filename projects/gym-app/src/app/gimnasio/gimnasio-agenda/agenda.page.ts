@@ -5,7 +5,8 @@ import {
   IonIcon,
   IonLabel,
   IonSegment,
-  IonSegmentButton
+  IonSegmentButton,
+  IonPopover
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -28,6 +29,7 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonLabel,
     IonSegment,
     IonSegmentButton,
+    IonPopover,
     HeaderTabsComponent
   ]
 })
@@ -35,6 +37,8 @@ export class AgendaPage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private convocatoriaService = inject(ConvocatoriaService);
+
+  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
 
   readonly currentUserSignal = this.authService.currentUser;
   

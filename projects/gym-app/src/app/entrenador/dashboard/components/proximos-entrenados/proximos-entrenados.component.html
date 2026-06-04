@@ -9,7 +9,7 @@
     <div class="gym-sliding-item">
       <ion-item [button]="false" [detail]="false" class="--background: transparent;">
         <ion-avatar slot="start">
-          <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+          <img [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
         </ion-avatar>
         <ion-label slot="start" class="mx-2">
           <h3 class="font-bold text-white">{{ getUserName()(entrenado.id) }}</h3>

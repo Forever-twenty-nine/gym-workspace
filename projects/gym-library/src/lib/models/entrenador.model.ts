@@ -9,4 +9,5 @@ export interface Entrenador {
     rutinasCreadasIds: string[];
     // plan premium
     entrenadosPremiumIds: string[];
+    photoURL?: string;
 }

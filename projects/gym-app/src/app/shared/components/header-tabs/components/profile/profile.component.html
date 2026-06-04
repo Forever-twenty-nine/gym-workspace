@@ -14,9 +14,9 @@
     @if (currentUser(); as user) {
     <div class="flex flex-col items-center gap-4 py-8 mb-6">
       <div class="relative">
-        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl">
+        <div class="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl">
           @if (user.photoURL) {
-          <img [ngSrc]="user.photoURL" fill class="object-cover" alt="Foto de perfil" />
+          <img [ngSrc]="user.photoURL" width="96" height="96" class="object-cover w-full h-full" alt="Foto de perfil" />
           } @else {
           <div class="w-full h-full bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
             {{ getIniciales(user.nombre) }}

@@ -1,25 +1,98 @@
 import { initializeApp } from "firebase-admin/app";
 import { getAuth, Auth } from "firebase-admin/auth";
 import { getFirestore, Timestamp, Firestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 import { Objetivo } from "../projects/gym-library/src/lib/enums/objetivo.enum";
 import { SeedConfig, TrainerConfig, TraineeConfig, GymConfig, DesafioConfig, MatchConfig } from "./interfaces/seed-config.interface";
 
 import { mockBios, mockTags, mockDisciplinas, mockFranjas, realGymExercises } from "./constants/common-mocks";
 import { gymFreeAllFreeConfig } from "./constants/gym-free-all-free";
 import { gymPremiumAllPremiumConfig } from "./constants/gym-premium-all-premium";
-import { gymFreeMixedConfig } from "./constants/gym-free-mixed";
-import { gymPremiumMixedConfig } from "./constants/gym-premium-mixed";
 import { ptFreeAllFreeConfig } from "./constants/pt-free-all-free";
 import { ptPremiumAllPremiumConfig } from "./constants/pt-premium-all-premium";
 
 // Forzar emuladores en desarrollo
 process.env['FIRESTORE_EMULATOR_HOST'] = process.env['FIRESTORE_EMULATOR_HOST'] || "127.0.0.1:8080";
 process.env['FIREBASE_AUTH_EMULATOR_HOST'] = process.env['FIREBASE_AUTH_EMULATOR_HOST'] || "127.0.0.1:9099";
+process.env['FIREBASE_STORAGE_EMULATOR_HOST'] = process.env['FIREBASE_STORAGE_EMULATOR_HOST'] || "127.0.0.1:9199";
 
 initializeApp({ projectId: "demo-gym" });
 
 const globalAuth = getAuth();
 const globalDb = getFirestore();
+const globalBucket = getStorage().bucket("default-project.appspot.com");
+
+// Objeto de estadísticas para reporte final consolidado
+const stats = {
+  authCreated: 0,
+  authUpdated: 0,
+  claimsAssigned: 0,
+  trainersCreated: 0,
+  traineesCreated: 0,
+  gymsCreated: 0,
+  exercisesCreated: 0,
+  routinesCreated: 0,
+  routinesAssigned: 0,
+  sessionsCreated: 0,
+  challengesCreated: 0,
+  matchesCreated: 0,
+  messagesCreated: 0,
+  convocatoriasCreated: 0,
+  collectionsCleared: [] as string[]
+};
+
+/**
+ * Retorna el nombre de la imagen local de perfil correspondiente
+ */
+function getLocalImageName(name: string, role: string, plan: string): string {
+  const normalized = name.toLowerCase();
+  const isPremium = plan === 'premium';
+  
+  if (role === 'gimnasio') {
+    return isPremium ? 'gym_premium.png' : 'gym_free.png';
+  }
+  
+  if (role === 'entrenador' || role === 'personal_trainer') {
+    const isFemale = normalized.includes('ana') || normalized.includes('maria') || normalized.includes('valeria');
+    if (isFemale) {
+      return isPremium ? 'trainer_premium_female.png' : 'trainer_free_female.png';
+    } else {
+      return isPremium ? 'trainer_premium_male.png' : 'trainer_free_male.png';
+    }
+  } else {
+    // Entrenado
+    const isFemale = normalized.includes('maria') || normalized.includes('sofia') || normalized.includes('clara') ||
+                     normalized.includes('lucia') || normalized.includes('carmen') || normalized.includes('isabel') ||
+                     normalized.includes('patricia') || normalized.includes('carla') || normalized.includes('daniela') ||
+                     normalized.includes('florencia') || normalized.includes('marina') || normalized.includes('alumna');
+    if (isFemale) {
+      return isPremium ? 'trainee_premium_female.png' : 'trainee_free_female.png';
+    } else {
+      return isPremium ? 'trainee_premium_male.png' : 'trainee_free_male.png';
+    }
+  }
+}
+
+/**
+ * Sube una imagen de perfil al Firebase Storage local y retorna su URL pública
+ */
+export async function uploadProfileImage(userId: string, localImageName: string): Promise<string> {
+  const localPath = `c:\\repositorios\\gym-workspace\\projects\\gym-app\\src\\assets\\images\\profiles\\${localImageName}`;
+  const destination = `profiles/${userId}/profile.png`;
+  
+  try {
+    await globalBucket.upload(localPath, {
+      destination,
+      metadata: {
+        contentType: 'image/png',
+      }
+    });
+    return `http://127.0.0.1:9199/v0/b/default-project.appspot.com/o/profiles%2F${userId}%2Fprofile.png?alt=media`;
+  } catch (e) {
+    console.warn(`⚠️ No se pudo subir la imagen de perfil para ${userId} a Storage:`, e);
+    return `assets/images/profiles/${localImageName}`;
+  }
+}
 
 /**
  * Asegura que exista el usuario en Firebase Authentication.
@@ -30,16 +103,17 @@ export async function ensureAuthUser(
   email: string,
   password = "changeme123",
   displayName?: string,
-  claims?: Record<string, any>
+  claims?: Record<string, any>,
+  photoURL?: string
 ) {
   try {
-    await auth.createUser({ uid, email, password, displayName });
-    console.log(`🔐 Auth creado: ${email} (uid=${uid})`);
+    await auth.createUser({ uid, email, password, displayName, photoURL });
+    stats.authCreated++;
   } catch (e: any) {
     if (e.code === 'auth/email-already-exists' || e.code === 'auth/uid-already-exists') {
       try {
-        await auth.updateUser(uid, { email, password, displayName });
-        console.log(`🔁 Auth existente actualizado: ${email} (uid=${uid})`);
+        await auth.updateUser(uid, { email, password, displayName, photoURL });
+        stats.authUpdated++;
       } catch (uErr) {
         console.warn(`⚠️ No se pudo actualizar usuario auth ${uid}:`, uErr);
       }
@@ -50,7 +124,7 @@ export async function ensureAuthUser(
 
   if (claims) {
     await auth.setCustomUserClaims(uid, claims);
-    console.log(`🔑 Custom claims asignados a ${email}:`, claims);
+    stats.claimsAssigned++;
   }
 }
 
@@ -66,14 +140,13 @@ export async function clearCollection(db: Firestore, collectionPath: string) {
     batch.delete(doc.ref);
   });
   await batch.commit();
-  console.log(`🧹 Colección Firestore limpia: "${collectionPath}" (${snapshot.size} docs)`);
+  stats.collectionsCleared.push(collectionPath);
 }
 
 /**
  * Elimina de forma masiva los usuarios deterministicos del Firebase Authentication local.
  */
 export async function clearAuthUsers(auth: Auth, configs: SeedConfig[]) {
-  console.log("🧹 Limpiando usuarios antiguos de Firebase Auth local...");
   const uids: string[] = [];
   
   for (const config of configs) {
@@ -95,7 +168,7 @@ export async function clearAuthUsers(auth: Auth, configs: SeedConfig[]) {
   for (let i = 0; i < uniqueUids.length; i += chunkSize) {
     const chunk = uniqueUids.slice(i, i + chunkSize);
     try {
-      const result = await auth.deleteUsers(chunk);
+      await auth.deleteUsers(chunk);
     } catch (e) {
       console.warn("⚠️ Advertencia al limpiar Auth:", e);
     }
@@ -110,8 +183,9 @@ export async function createTrainer(
   auth: Auth,
   trainerConfig: TrainerConfig
 ) {
-  const usuariosRef = db.collection('usuarios');
   const uid = `trainer_${trainerConfig.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+  const localImage = getLocalImageName(trainerConfig.name, 'entrenador', trainerConfig.plan);
+  const photoURL = await uploadProfileImage(uid, localImage);
 
   const trainerUserData = {
     uid,
@@ -120,24 +194,25 @@ export async function createTrainer(
     role: 'entrenador',
     plan: trainerConfig.plan,
     onboarded: true,
+    photoURL,
     fechaCreacion: Timestamp.now(),
     fechaRegistro: Timestamp.now()
   };
 
-  const docRef = usuariosRef.doc(uid);
-  await docRef.set(trainerUserData, { merge: true });
-  await ensureAuthUser(auth, uid, trainerConfig.email, trainerConfig.password || "changeme123", trainerConfig.name);
+  await Promise.all([
+    db.collection('usuarios').doc(uid).set(trainerUserData, { merge: true }),
+    ensureAuthUser(auth, uid, trainerConfig.email, trainerConfig.password || "changeme123", trainerConfig.name, undefined, photoURL),
+    db.collection('entrenadores').doc(uid).set({
+      id: uid,
+      fechaRegistro: Timestamp.now(),
+      ejerciciosCreadasIds: [],
+      rutinasCreadasIds: [],
+      entrenadosAsignadosIds: [],
+      entrenadosPremiumIds: []
+    }, { merge: true })
+  ]);
 
-  const entrenadoresRef = db.collection('entrenadores').doc(uid);
-  await entrenadoresRef.set({
-    id: uid,
-    fechaRegistro: Timestamp.now(),
-    ejerciciosCreadasIds: [],
-    rutinasCreadasIds: [],
-    entrenadosAsignadosIds: [],
-    entrenadosPremiumIds: []
-  }, { merge: true });
-
+  stats.trainersCreated++;
   return { ...trainerUserData };
 }
 
@@ -151,7 +226,6 @@ export async function createTrainee(
   trainerUid: string,
   index: number
 ) {
-  const usuariosRef = db.collection('usuarios');
   const uid = `trainee_${traineeConfig.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
 
   const objetivos = [Objetivo.VOLUMEN, Objetivo.DEFINICION, Objetivo.FUERZA, Objetivo.SALUD];
@@ -159,6 +233,9 @@ export async function createTrainee(
 
   const bio = mockBios[index % mockBios.length];
   const franjaHoraria = mockFranjas[index % mockFranjas.length];
+
+  const localImage = getLocalImageName(traineeConfig.name, 'entrenado', traineeConfig.plan);
+  const photoURL = await uploadProfileImage(uid, localImage);
 
   const traineeUserData = {
     uid,
@@ -174,49 +251,31 @@ export async function createTrainee(
     nivel: traineeConfig.nivel,
     seguidores: [],
     seguidos: [],
-    visibleDescubrir: true
+    visibleDescubrir: true,
+    photoURL
   };
 
-  const docRef = usuariosRef.doc(uid);
-  await docRef.set(traineeUserData, { merge: true });
-  await ensureAuthUser(auth, uid, traineeConfig.email, traineeConfig.password || "user123", traineeConfig.name);
+  await Promise.all([
+    db.collection('usuarios').doc(uid).set(traineeUserData, { merge: true }),
+    ensureAuthUser(auth, uid, traineeConfig.email, traineeConfig.password || "user123", traineeConfig.name, undefined, photoURL),
+    db.collection('entrenados').doc(uid).set({
+      id: uid,
+      objetivo: objetivoAleatorio,
+      entrenadoresId: [trainerUid],
+      rutinasAsignadasIds: [],
+      fechaRegistro: Timestamp.now(),
+      plan: traineeConfig.plan,
+      bio,
+      franjaHoraria,
+      nivel: traineeConfig.nivel,
+      seguidores: [],
+      seguidos: [],
+      visibleDescubrir: true,
+      photoURL
+    }, { merge: true })
+  ]);
 
-  const entrenadosRef = db.collection('entrenados').doc(uid);
-  await entrenadosRef.set({
-    id: uid,
-    objetivo: objetivoAleatorio,
-    entrenadoresId: [trainerUid],
-    rutinasAsignadasIds: [],
-    fechaRegistro: Timestamp.now(),
-    plan: traineeConfig.plan,
-    bio,
-    franjaHoraria,
-    nivel: traineeConfig.nivel,
-    seguidores: [],
-    seguidos: [],
-    visibleDescubrir: true
-  }, { merge: true });
-
-  try {
-    const entrenadorRef = db.collection('entrenadores').doc(trainerUid);
-    const entrenadorSnap = await entrenadorRef.get();
-    const entrenadorData = entrenadorSnap.exists ? (entrenadorSnap.data() as Record<string, any>) : {};
-    const existing = entrenadorData['entrenadosAsignadosIds'] || [];
-    if (!existing.includes(uid)) {
-      await entrenadorRef.set({ entrenadosAsignadosIds: [...new Set([...existing, uid])] }, { merge: true });
-    }
-
-    const usuarioTrainerRef = db.collection('usuarios').doc(trainerUid);
-    const usuarioSnap = await usuarioTrainerRef.get();
-    const usuarioData = usuarioSnap.exists ? (usuarioSnap.data() as Record<string, any>) : {};
-    const existUsuarioAssigned: string[] = usuarioData['entrenadosAsignadosIds'] || [];
-    if (!existUsuarioAssigned.includes(uid)) {
-      await usuarioTrainerRef.set({ entrenadosAsignadosIds: [...new Set([...existUsuarioAssigned, uid])] }, { merge: true });
-    }
-  } catch (e) {
-    console.warn('⚠️ No se pudo actualizar entrenador al crear entrenado:', e);
-  }
-
+  stats.traineesCreated++;
   return { ...traineeUserData, trainerUid };
 }
 
@@ -233,6 +292,10 @@ export async function createGym(
 ) {
   const gymUid = gymConfig.id;
   const isPT = gymConfig.isPersonalTrainer || false;
+  const roleType = isPT ? 'personal_trainer' : 'gimnasio';
+
+  const localImage = getLocalImageName(gymConfig.nombre, roleType, gymConfig.plan);
+  const photoURL = await uploadProfileImage(gymUid, localImage);
 
   const gimnasioDoc = {
     id: gymUid,
@@ -242,9 +305,9 @@ export async function createGym(
     isPersonalTrainer: isPT,
     plan: gymConfig.plan,
     entrenadoresIds: isPT ? [gymUid] : trainersIds,
-    entrenadosIds: traineesIds
+    entrenadosIds: traineesIds,
+    ...(photoURL ? { photoURL } : {})
   };
-  await db.collection('gimnasios').doc(gymUid).set(gimnasioDoc, { merge: true });
 
   const gymUserData = {
     uid: gymUid,
@@ -253,10 +316,15 @@ export async function createGym(
     role: isPT ? 'personal_trainer' : 'gimnasio',
     onboarded: true,
     plan: gymConfig.plan || 'free',
-    fechaCreacion: Timestamp.now()
+    fechaCreacion: Timestamp.now(),
+    ...(photoURL ? { photoURL } : {})
   };
-  await db.collection('usuarios').doc(gymUid).set(gymUserData, { merge: true });
-  await ensureAuthUser(auth, gymUid, gymConfig.email, 'admin123', gymConfig.nombre);
+
+  const dbPromises: Promise<any>[] = [
+    db.collection('gimnasios').doc(gymUid).set(gimnasioDoc, { merge: true }),
+    db.collection('usuarios').doc(gymUid).set(gymUserData, { merge: true }),
+    ensureAuthUser(auth, gymUid, gymConfig.email, 'admin123', gymConfig.nombre, undefined, photoURL)
+  ];
 
   if (isPT) {
     const ptTrainerData = {
@@ -264,21 +332,31 @@ export async function createGym(
       gimnasioId: gymUid,
       fechaRegistro: Timestamp.now(),
       entrenadosAsignadosIds: traineesIds,
-      entrenadosPremiumIds: gymConfig.plan === 'premium' ? traineesIds : []
+      entrenadosPremiumIds: gymConfig.plan === 'premium' ? traineesIds : [],
+      ...(photoURL ? { photoURL } : {})
     };
-    await db.collection('entrenadores').doc(gymUid).set(ptTrainerData, { merge: true });
-    await db.collection('usuarios').doc(gymUid).set({ entrenadosAsignadosIds: traineesIds }, { merge: true });
+    dbPromises.push(
+      db.collection('entrenadores').doc(gymUid).set(ptTrainerData, { merge: true }),
+      db.collection('usuarios').doc(gymUid).set({ entrenadosAsignadosIds: traineesIds }, { merge: true })
+    );
   } else {
     for (const trainerId of trainersIds) {
-      await db.collection('entrenadores').doc(trainerId).set({ gimnasioId: gymUid }, { merge: true });
-      await db.collection('usuarios').doc(trainerId).set({ gimnasioId: gymUid }, { merge: true });
+      dbPromises.push(
+        db.collection('entrenadores').doc(trainerId).set({ gimnasioId: gymUid }, { merge: true }),
+        db.collection('usuarios').doc(trainerId).set({ gimnasioId: gymUid }, { merge: true })
+      );
     }
   }
 
   for (const traineeId of traineesIds) {
-    await db.collection('entrenados').doc(traineeId).set({ gimnasioId: gymUid }, { merge: true });
-    await db.collection('usuarios').doc(traineeId).set({ gimnasioId: gymUid }, { merge: true });
+    dbPromises.push(
+      db.collection('entrenados').doc(traineeId).set({ gimnasioId: gymUid }, { merge: true }),
+      db.collection('usuarios').doc(traineeId).set({ gimnasioId: gymUid }, { merge: true })
+    );
   }
+
+  await Promise.all(dbPromises);
+  stats.gymsCreated++;
 
   return { ...gimnasioDoc, role: gymUserData.role, email: gymConfig.email };
 }
@@ -292,7 +370,11 @@ export async function createExercise(
   descripcion: string,
   entrenadorId?: string
 ) {
+  const ref = db.collection('ejercicios').doc();
+  const id = ref.id;
+
   const data: any = {
+    id,
     nombre,
     descripcion,
     series: Math.floor(Math.random() * 3) + 3,
@@ -301,12 +383,13 @@ export async function createExercise(
     fechaCreacion: Timestamp.now(),
     fechaModificacion: Timestamp.now()
   };
+
   if (entrenadorId) {
     data.creadorId = entrenadorId;
   }
-  const ref = await db.collection('ejercicios').add(data);
-  const id = ref.id;
-  await ref.update({ id });
+
+  await ref.set(data);
+  stats.exercisesCreated++;
   return id;
 }
 
@@ -322,7 +405,6 @@ export async function createRoutine(
   nombreUsuario: string,
   entrenadorId?: string
 ) {
-  console.log(`📝 Creando rutina: ${nombre} para usuario ${usuarioId}`);
   const data: any = {
     nombre,
     activa: true,
@@ -339,7 +421,7 @@ export async function createRoutine(
   const docRef = db.collection('rutinas').doc();
   const id = docRef.id;
   await docRef.set({ ...data, id });
-  console.log(`✅ Rutina creada en Firestore con ID: ${id}`);
+  stats.routinesCreated++;
   return id;
 }
 
@@ -374,7 +456,7 @@ export async function createMockSharedSession(
     }
   };
   await db.collection('sesiones-rutina').doc(sesionId).set(data);
-  console.log(`📱 Creada sesión compartida mock: ${sesionId} para ${traineeName}`);
+  stats.sessionsCreated++;
 }
 
 /**
@@ -385,11 +467,9 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   console.log(`🚀 Generando Datos para ${isPT ? "Personal Trainer" : "Gimnasio"}: "${config.gym.nombre}" [Plan: ${config.gym.plan}]`);
 
   // 1) Crear entrenadores individuales (si existen)
-  const createdTrainers: any[] = [];
-  for (const t of config.trainers) {
-    const created = await createTrainer(db, auth, t);
-    createdTrainers.push(created);
-  }
+  const createdTrainers = await Promise.all(
+    config.trainers.map(t => createTrainer(db, auth, t))
+  );
 
   // 2) Crear entrenados (balanceados o directos al PT)
   const createdTrainees: any[] = [];
@@ -397,40 +477,35 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   const gymUid = config.gym.id;
 
   if (numTrainers > 0) {
-    for (let i = 0; i < config.trainees.length; i++) {
-      const traineeConf = config.trainees[i];
-      const assignedTrainer = createdTrainers[i % numTrainers];
-      const created = await createTrainee(db, auth, traineeConf, assignedTrainer.uid, i);
-      createdTrainees.push(created);
-    }
+    createdTrainees.push(...await Promise.all(
+      config.trainees.map((traineeConf, i) => {
+        const assignedTrainer = createdTrainers[i % numTrainers];
+        return createTrainee(db, auth, traineeConf, assignedTrainer.uid, i);
+      })
+    ));
 
-    // Actualizar la lista de entrenados asignados en cada entrenador
-    for (let i = 0; i < numTrainers; i++) {
-      const trainer = createdTrainers[i];
+    // Actualizar la lista de entrenados asignados en cada entrenador de manera consolidada
+    await Promise.all(createdTrainers.map(async (trainer) => {
       const trainerAssignedIds = createdTrainees
         .filter(t => t.trainerUid === trainer.uid)
         .map(t => t.uid);
 
-      await db.collection('entrenadores').doc(trainer.uid).set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true });
-      try {
-        await db.collection('usuarios').doc(trainer.uid).set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true });
-      } catch (uErr) {
-        console.warn('⚠️ No se pudo actualizar usuario entrenador en `usuarios`:', uErr);
-      }
-    }
+      await Promise.all([
+        db.collection('entrenadores').doc(trainer.uid).set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true }),
+        db.collection('usuarios').doc(trainer.uid).set({ entrenadosAsignadosIds: trainerAssignedIds }, { merge: true })
+      ]);
+    }));
   } else if (isPT) {
     console.log(`   Asignando ${config.trainees.length} alumnos directamente al Personal Trainer...`);
-    for (let i = 0; i < config.trainees.length; i++) {
-      const traineeConf = config.trainees[i];
-      const created = await createTrainee(db, auth, traineeConf, gymUid, i);
-      createdTrainees.push(created);
-    }
+    createdTrainees.push(...await Promise.all(
+      config.trainees.map((traineeConf, i) => createTrainee(db, auth, traineeConf, gymUid, i))
+    ));
   }
 
   // 3) Crear ejercicios y asignar rutinas de forma uniforme
   const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-  const trainersToProcess = [...createdTrainers];
+  const trainersToProcess: any[] = [...createdTrainers];
   if (isPT && trainersToProcess.length === 0) {
     trainersToProcess.push({
       uid: gymUid,
@@ -440,27 +515,29 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   }
 
   for (const trainer of trainersToProcess) {
-    console.log(`   Creando ejercicios para: ${trainer.nombre}`);
+    console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
     
     // Si el entrenador es Free o el gimnasio es Free, acotamos los ejercicios creados a un máximo de 10
     const limitExercises = (trainer.plan === 'free' || config.gym.plan === 'free');
     const exercisesToCreate = limitExercises ? config.exercises.slice(0, 10) : config.exercises;
 
-    const trainerExercises: string[] = [];
-    for (const exName of exercisesToCreate) {
-      const exId = await createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid);
-      trainerExercises.push(exId);
-    }
+    const trainerExercises = await Promise.all(
+      exercisesToCreate.map(exName => createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid))
+    );
 
     const trainerDocUpdate = { ejerciciosCreadasIds: trainerExercises };
     if (!isPT || trainer.uid !== gymUid) {
-      await db.collection('entrenadores').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
-      await db.collection('usuarios').doc(trainer.uid).set(trainerDocUpdate, { merge: true });
+      await Promise.all([
+        db.collection('entrenadores').doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
+        db.collection('usuarios').doc(trainer.uid).set(trainerDocUpdate, { merge: true })
+      ]);
     }
 
     // Rutinas
     const trainerTrainees = createdTrainees.filter(t => t.trainerUid === trainer.uid);
-    for (const trainee of trainerTrainees) {
+    const allTrainerRoutines: string[] = [];
+
+    await Promise.all(trainerTrainees.map(async (trainee) => {
       const isFreeUser = trainee.plan === 'free';
       const numRutinas = isFreeUser ? 1 : (Math.floor(Math.random() * 3) + 1);
 
@@ -468,15 +545,21 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
       const selectedDays = shuffledDays.slice(0, numRutinas);
 
       const routineIds: string[] = [];
-      for (const dia of selectedDays) {
-        const routineExercises = [...trainerExercises].sort(() => 0.5 - Math.random()).slice(0, Math.min(5, trainerExercises.length));
+      
+      await Promise.all(selectedDays.map(async (dia) => {
+        const routineExercises = [...trainerExercises]
+          .sort(() => 0.5 - Math.random())
+          .slice(0, Math.min(5, trainerExercises.length));
 
         const routineName = `Rutina de ${dia} - ${trainee.nombre}`;
         const currentRoutineId = await createRoutine(db, routineName, dia, routineExercises, trainee.uid, trainee.nombre, trainer.uid);
         routineIds.push(currentRoutineId);
 
         try {
-          const asignadaRef = await db.collection('rutinas-asignadas').add({
+          const asignadaRef = db.collection('rutinas-asignadas').doc();
+          const asignadaId = asignadaRef.id;
+          await asignadaRef.set({
+            id: asignadaId,
             rutinaId: currentRoutineId,
             entrenadoId: trainee.uid,
             entrenadorId: trainer.uid,
@@ -484,77 +567,91 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
             fechaAsignacion: Timestamp.now(),
             activa: true
           });
-          await asignadaRef.update({ id: asignadaRef.id });
+          stats.routinesAssigned++;
         } catch (e) {
           console.warn('⚠️ No se pudo crear rutina-asignada:', e);
         }
-      }
+      }));
+
+      allTrainerRoutines.push(...routineIds);
 
       const traineeUpdate = {
         rutinasIds: routineIds,
         rutinasAsignadasIds: routineIds
       };
-      await db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true });
-      await db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true });
+      
+      await Promise.all([
+        db.collection('usuarios').doc(trainee.uid).set(traineeUpdate, { merge: true }),
+        db.collection('entrenados').doc(trainee.uid).set(traineeUpdate, { merge: true })
+      ]);
 
       if (routineIds.length > 0) {
         await createMockSharedSession(db, trainee.uid, trainee.nombre, routineIds[0], `Rutina de Fuerza - ${trainee.nombre}`);
       }
+    }));
 
+    // Actualizar el entrenador consolidadamente una sola vez al final del loop del entrenador
+    if (allTrainerRoutines.length > 0) {
       if (!isPT || trainer.uid !== gymUid) {
         const entrenadorRef = db.collection('entrenadores').doc(trainer.uid);
         const snap = await entrenadorRef.get();
         const currentRoutines = snap.data()?.['rutinasCreadasIds'] || [];
-        const trainerRoutineUpdate = { rutinasCreadasIds: [...new Set([...currentRoutines, ...routineIds])] };
-        await entrenadorRef.set(trainerRoutineUpdate, { merge: true });
-        await db.collection('usuarios').doc(trainer.uid).set(trainerRoutineUpdate, { merge: true });
+        const trainerRoutineUpdate = { rutinasCreadasIds: [...new Set([...currentRoutines, ...allTrainerRoutines])] };
+        await Promise.all([
+          entrenadorRef.set(trainerRoutineUpdate, { merge: true }),
+          db.collection('usuarios').doc(trainer.uid).set(trainerRoutineUpdate, { merge: true })
+        ]);
       } else {
         const ptTrainerRef = db.collection('entrenadores').doc(gymUid);
         const snap = await ptTrainerRef.get();
         const currentRoutines = snap.exists ? (snap.data()?.['rutinasCreadasIds'] || []) : [];
         const ptTrainerUpdate = {
           ejerciciosCreadasIds: trainerExercises,
-          rutinasCreadasIds: [...new Set([...currentRoutines, ...routineIds])]
+          rutinasCreadasIds: [...new Set([...currentRoutines, ...allTrainerRoutines])]
         };
         await ptTrainerRef.set(ptTrainerUpdate, { merge: true });
       }
     }
   }
 
-  // 4) Crear seguidores/seguidos
+  // 4) Crear seguidores/seguidos en memoria (para evitar race conditions y lecturas de db repetitivas)
   console.log('   Estableciendo relaciones de seguimiento...');
+  const seguidosMap = new Map<string, Set<string>>();
+  const seguidoresMap = new Map<string, Set<string>>();
+  
+  for (const t of createdTrainees) {
+    seguidosMap.set(t.uid, new Set<string>());
+    seguidoresMap.set(t.uid, new Set<string>());
+  }
+
   for (let i = 0; i < createdTrainees.length; i++) {
     const currentTrainee = createdTrainees[i];
     const otherTrainees = createdTrainees.filter(t => t.uid !== currentTrainee.uid);
     if (otherTrainees.length > 0) {
-      const shuffled = otherTrainees.sort(() => 0.5 - Math.random());
+      const shuffled = [...otherTrainees].sort(() => 0.5 - Math.random());
       const toFollow = shuffled.slice(0, Math.min(2, shuffled.length));
-      const seguidosIds = toFollow.map(t => t.uid);
-
-      const currentRef = db.collection('entrenados').doc(currentTrainee.uid);
-      const currentUserRef = db.collection('usuarios').doc(currentTrainee.uid);
-      await currentRef.set({ seguidos: seguidosIds }, { merge: true });
-      await currentUserRef.set({ seguidos: seguidosIds }, { merge: true });
-
+      
       for (const targetTrainee of toFollow) {
-        const targetRef = db.collection('entrenados').doc(targetTrainee.uid);
-        const targetUserRef = db.collection('usuarios').doc(targetTrainee.uid);
-
-        const targetSnap = await targetRef.get();
-        const existingSeguidores = targetSnap.data()?.['seguidores'] || [];
-
-        if (!existingSeguidores.includes(currentTrainee.uid)) {
-          const updatedSeguidores = [...existingSeguidores, currentTrainee.uid];
-          await targetRef.set({ seguidores: updatedSeguidores }, { merge: true });
-          await targetUserRef.set({ seguidores: updatedSeguidores }, { merge: true });
-        }
+        seguidosMap.get(currentTrainee.uid)!.add(targetTrainee.uid);
+        seguidoresMap.get(targetTrainee.uid)!.add(currentTrainee.uid);
       }
     }
   }
 
+  // Escribir todas las relaciones de seguimiento en paralelo
+  await Promise.all(createdTrainees.map(async (t) => {
+    const seguidos = Array.from(seguidosMap.get(t.uid)!);
+    const seguidores = Array.from(seguidoresMap.get(t.uid)!);
+    
+    await Promise.all([
+      db.collection('entrenados').doc(t.uid).set({ seguidos, seguidores }, { merge: true }),
+      db.collection('usuarios').doc(t.uid).set({ seguidos, seguidores }, { merge: true })
+    ]);
+  }));
+
   // 5) Crear desafíos mocks
   console.log('   Creando desafíos...');
-  for (const d of config.desafios) {
+  await Promise.all(config.desafios.map(async (d) => {
     const matchTrainee = createdTrainees.find(t => t.nombre.toLowerCase().replace(/[^a-z0-9]/g, '') === d.creadorId.replace('trainee_', ''));
     const finalCreatorId = matchTrainee ? matchTrainee.uid : d.creadorId;
     const finalCreatorName = matchTrainee ? matchTrainee.nombre : d.creadorNombre;
@@ -565,11 +662,12 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
       creadorNombre: finalCreatorName,
       fechaCreacion: Timestamp.now()
     });
-  }
+    stats.challengesCreated++;
+  }));
 
   // 6) Crear interacciones/matches mocks
   console.log('   Creando matches fitness y mensajes asociados...');
-  for (const m of config.matches) {
+  await Promise.all(config.matches.map(async (m) => {
     const sourceTrainee = createdTrainees.find(t => t.nombre.toLowerCase().replace(/[^a-z0-9]/g, '') === m.usuarioOrigenId.replace('trainee_', ''));
     const destTrainee = createdTrainees.find(t => t.nombre.toLowerCase().replace(/[^a-z0-9]/g, '') === m.usuarioDestinoId.replace('trainee_', ''));
 
@@ -583,40 +681,41 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
       fechaCreacion: Timestamp.now(),
       fechaMatch: m.mutuo ? Timestamp.now() : null
     });
+    stats.matchesCreated++;
 
     if (m.mutuo) {
       const msgId1 = `msg-seed-1-${m.id}`;
       const msgId2 = `msg-seed-2-${m.id}`;
 
-      // Mensaje 1 (Origen a Destino)
-      await db.collection('mensajes').doc(msgId1).set({
-        id: msgId1,
-        remitenteId: finalSourceId,
-        remitenteTipo: 'entrenado',
-        destinatarioId: finalDestId,
-        destinatarioTipo: 'entrenado',
-        contenido: `¡Hola! Vi que nos gusta entrenar en el mismo horario. ¿Te parece si compartimos rutina mañana? 🏋️‍♂️💪`,
-        tipo: 'TEXTO',
-        leido: false,
-        entregado: true,
-        fechaEnvio: Timestamp.fromDate(new Date(Date.now() - 3600000)) // hace 1 hora
-      });
-
-      // Mensaje 2 (Destino a Origen)
-      await db.collection('mensajes').doc(msgId2).set({
-        id: msgId2,
-        remitenteId: finalDestId,
-        remitenteTipo: 'entrenado',
-        destinatarioId: finalSourceId,
-        destinatarioTipo: 'entrenado',
-        contenido: `¡Totalmente! Nos vemos a las 19:00 cerca de la zona de peso libre.`,
-        tipo: 'TEXTO',
-        leido: true,
-        entregado: true,
-        fechaEnvio: Timestamp.now()
-      });
+      await Promise.all([
+        db.collection('mensajes').doc(msgId1).set({
+          id: msgId1,
+          remitenteId: finalSourceId,
+          remitenteTipo: 'entrenado',
+          destinatarioId: finalDestId,
+          destinatarioTipo: 'entrenado',
+          contenido: `¡Hola! Vi que nos gusta entrenar en el mismo horario. ¿Te parece si compartimos rutina mañana? 🏋️‍♂️💪`,
+          tipo: 'TEXTO',
+          leido: false,
+          entregado: true,
+          fechaEnvio: Timestamp.fromDate(new Date(Date.now() - 3600000))
+        }),
+        db.collection('mensajes').doc(msgId2).set({
+          id: msgId2,
+          remitenteId: finalDestId,
+          remitenteTipo: 'entrenado',
+          destinatarioId: finalSourceId,
+          destinatarioTipo: 'entrenado',
+          contenido: `¡Totalmente! Nos vemos a las 19:00 cerca de la zona de peso libre.`,
+          tipo: 'TEXTO',
+          leido: true,
+          entregado: true,
+          fechaEnvio: Timestamp.now()
+        })
+      ]);
+      stats.messagesCreated += 2;
     }
-  }
+  }));
 
   // 6.5) Crear convocatorias fitness
   console.log('   Creando convocatorias fitness...');
@@ -625,84 +724,88 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
     const manana = new Date();
     manana.setDate(hoy.getDate() + 1);
 
-    // Convocatoria de Clara (trainee 1)
     const t1 = createdTrainees[0];
     const convId1 = `conv-${t1.uid}-1`;
-    await db.collection('convocatorias').doc(convId1).set({
-      id: convId1,
-      creadorId: t1.uid,
-      creadorNombre: t1.nombre,
-      creadorFoto: t1.photoURL || null,
-      gimnasioId: gymUid,
-      fechaCreacion: Timestamp.now(),
-      fechaEntrenamiento: Timestamp.fromDate(hoy),
-      horaInicio: "19:00",
-      horaFin: "20:30",
-      mensaje: "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
-      interesados: [],
-      activo: true
-    });
-
-    // Convocatoria de Mateo (trainee 2)
     const t2 = createdTrainees[1];
     const convId2 = `conv-${t2.uid}-2`;
-    await db.collection('convocatorias').doc(convId2).set({
-      id: convId2,
-      creadorId: t2.uid,
-      creadorNombre: t2.nombre,
-      creadorFoto: t2.photoURL || null,
-      gimnasioId: gymUid,
-      fechaCreacion: Timestamp.now(),
-      fechaEntrenamiento: Timestamp.fromDate(manana),
-      horaInicio: "08:00",
-      horaFin: "09:30",
-      mensaje: "Pecho y bíceps mañana temprano. ¿Quién se une para ayudarnos a sacar las últimas reps al fallo? 🔥",
-      interesados: [],
-      activo: true
-    });
 
-    // Convocatorias oficiales de los entrenadores (WODs)
-    if (trainersToProcess.length > 0) {
-      const trainer = trainersToProcess[0];
-      
-      const convIdOficial = `conv-${trainer.uid}-wod`;
-      await db.collection('convocatorias').doc(convIdOficial).set({
-        id: convIdOficial,
-        creadorId: trainer.uid,
-        creadorNombre: trainer.nombre,
-        creadorFoto: null,
+    const convPromises = [
+      db.collection('convocatorias').doc(convId1).set({
+        id: convId1,
+        creadorId: t1.uid,
+        creadorNombre: t1.nombre,
+        creadorFoto: t1.photoURL || null,
         gimnasioId: gymUid,
         fechaCreacion: Timestamp.now(),
         fechaEntrenamiento: Timestamp.fromDate(hoy),
-        horaInicio: "08:00",
-        horaFin: "09:30",
-        mensaje: "Calentamiento: 5 min movilidad. WOD: AMRAP 20 min de: 5 Pull-ups, 10 Push-ups, 15 Squats. ¡A darlo todo! 🏋️‍♂️🔥",
-        interesados: [t1.uid], // Clara se sumó
-        activo: true,
-        creadorRol: "entrenador",
-        titulo: "WOD del Día: Resistencia Acondicionamiento",
-        esOficial: true
-      });
-      
-      const convIdOficial2 = `conv-${trainer.uid}-wod2`;
-      await db.collection('convocatorias').doc(convIdOficial2).set({
-        id: convIdOficial2,
-        creadorId: trainer.uid,
-        creadorNombre: trainer.nombre,
-        creadorFoto: null,
+        horaInicio: "19:00",
+        horaFin: "20:30",
+        mensaje: "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
+        interesados: [],
+        activo: true
+      }),
+      db.collection('convocatorias').doc(convId2).set({
+        id: convId2,
+        creadorId: t2.uid,
+        creadorNombre: t2.nombre,
+        creadorFoto: t2.photoURL || null,
         gimnasioId: gymUid,
         fechaCreacion: Timestamp.now(),
         fechaEntrenamiento: Timestamp.fromDate(manana),
-        horaInicio: "18:00",
-        horaFin: "19:30",
-        mensaje: "Entrenamiento de fuerza enfocado en Powerlifting (Peso Muerto y Sentadilla). Técnica y series pesadas.",
+        horaInicio: "08:00",
+        horaFin: "09:30",
+        mensaje: "Pecho y bíceps mañana temprano. ¿Quién se une para ayudarnos a sacar las últimas reps al fallo? 🔥",
         interesados: [],
-        activo: true,
-        creadorRol: "entrenador",
-        titulo: "Clase Especial: Fuerza y Técnica",
-        esOficial: true
-      });
+        activo: true
+      })
+    ];
+    stats.convocatoriasCreated += 2;
+
+    if (trainersToProcess.length > 0) {
+      const trainer = trainersToProcess[0];
+      const convIdOficial = `conv-${trainer.uid}-wod`;
+      const convIdOficial2 = `conv-${trainer.uid}-wod2`;
+
+      convPromises.push(
+        db.collection('convocatorias').doc(convIdOficial).set({
+          id: convIdOficial,
+          creadorId: trainer.uid,
+          creadorNombre: trainer.nombre,
+          creadorFoto: trainer.photoURL || null,
+          gimnasioId: gymUid,
+          fechaCreacion: Timestamp.now(),
+          fechaEntrenamiento: Timestamp.fromDate(hoy),
+          horaInicio: "08:00",
+          horaFin: "09:30",
+          mensaje: "Calentamiento: 5 min movilidad. WOD: AMRAP 20 min de: 5 Pull-ups, 10 Push-ups, 15 Squats. ¡A darlo todo! 🏋️‍♂️🔥",
+          interesados: [t1.uid],
+          activo: true,
+          creadorRol: "entrenador",
+          titulo: "WOD del Día: Resistencia Acondicionamiento",
+          esOficial: true
+        }),
+        db.collection('convocatorias').doc(convIdOficial2).set({
+          id: convIdOficial2,
+          creadorId: trainer.uid,
+          creadorNombre: trainer.nombre,
+          creadorFoto: trainer.photoURL || null,
+          gimnasioId: gymUid,
+          fechaCreacion: Timestamp.now(),
+          fechaEntrenamiento: Timestamp.fromDate(manana),
+          horaInicio: "18:00",
+          horaFin: "19:30",
+          mensaje: "Entrenamiento de fuerza enfocado en Powerlifting (Peso Muerto y Sentadilla). Técnica y series pesadas.",
+          interesados: [],
+          activo: true,
+          creadorRol: "entrenador",
+          titulo: "Clase Especial: Fuerza y Técnica",
+          esOficial: true
+        })
+      );
+      stats.convocatoriasCreated += 2;
     }
+
+    await Promise.all(convPromises);
   }
 
   // 7) Crear Gimnasio / Personal Trainer Central modularizado
@@ -710,6 +813,32 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   const traineesIds = createdTrainees.map(t => t.uid);
   
   await createGym(db, auth, config.gym, trainersIds, traineesIds);
+}
+
+function printSummaryTable() {
+  console.log("\n📊 ========================================================");
+  console.log("📊 RESUMEN DE EJECUCIÓN (SEED DATA SUMMARY)");
+  console.log("📊 ========================================================");
+  console.table({
+    "Usuarios Auth Creados": stats.authCreated,
+    "Usuarios Auth Actualizados": stats.authUpdated,
+    "Claims de Permisos Asignados": stats.claimsAssigned,
+    "Entrenadores Creados": stats.trainersCreated,
+    "Atletas (Trainees) Creados": stats.traineesCreated,
+    "Gimnasios / PTs Creados": stats.gymsCreated,
+    "Ejercicios Creados": stats.exercisesCreated,
+    "Rutinas Creadas": stats.routinesCreated,
+    "Rutinas Asignadas": stats.routinesAssigned,
+    "Sesiones Compartidas Mock": stats.sessionsCreated,
+    "Desafíos Creados": stats.challengesCreated,
+    "Matches Fitness Creados": stats.matchesCreated,
+    "Mensajes Mock Creados": stats.messagesCreated,
+    "Convocatorias Fitness Creadas": stats.convocatoriasCreated,
+  });
+  if (stats.collectionsCleared.length > 0) {
+    console.log(`🧹 Colecciones Firestore limpiadas: ${stats.collectionsCleared.join(', ')}`);
+  }
+  console.log("========================================================\n");
 }
 
 async function main() {
@@ -720,8 +849,6 @@ async function main() {
   const allConfigs: SeedConfig[] = [
     gymFreeAllFreeConfig,
     gymPremiumAllPremiumConfig,
-    gymFreeMixedConfig,
-    gymPremiumMixedConfig,
     ptFreeAllFreeConfig,
     ptPremiumAllPremiumConfig
   ];
@@ -731,8 +858,6 @@ async function main() {
     
     if (configName === 'gym-free-all-free') selectedConfig = gymFreeAllFreeConfig;
     if (configName === 'gym-premium-all-premium') selectedConfig = gymPremiumAllPremiumConfig;
-    if (configName === 'gym-free-mixed') selectedConfig = gymFreeMixedConfig;
-    if (configName === 'gym-premium-mixed') selectedConfig = gymPremiumMixedConfig;
     if (configName === 'pt-free-all-free') selectedConfig = ptFreeAllFreeConfig;
     if (configName === 'pt-premium-all-premium') selectedConfig = ptPremiumAllPremiumConfig;
 
@@ -773,7 +898,6 @@ async function main() {
 
     console.log("🎉 ========================================================");
     console.log("🎉 POBLADO UNIFICADO FINALIZADO CON ÉXITO");
-    console.log("🎉 TODOS LOS GIMNASIOS Y PTs ESTÁN DISPONIBLES AL MISMO TIEMPO");
     console.log("🎉 ========================================================");
 
     console.log("\n👑 Creando Super Admin para Gym Admin...");
@@ -795,6 +919,7 @@ async function main() {
     console.log("👑 Super Admin creado con éxito (admin@gym.com / admin123)\n");
   }
 
+  printSummaryTable();
   process.exit(0);
 }
 
