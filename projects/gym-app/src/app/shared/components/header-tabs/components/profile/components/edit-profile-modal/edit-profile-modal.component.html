@@ -19,14 +19,14 @@
       <div class="max-w-md mx-auto" [formGroup]="editForm">
 
         <!-- Edición de Foto -->
-        <div class="flex flex-col items-center py-10 bg-gradient-to-b from-white/5 to-transparent mb-4">
+        <div class="flex flex-col items-center py-5 bg-gradient-to-b from-white/5 to-transparent mb-2">
           <div class="relative cursor-pointer group" (click)="triggerFileInput()">
             <div
-              class="w-32 h-32 rounded-full border-4 border-primary/30 shadow-[0_0_30px_rgba(var(--ion-color-primary-rgb),0.2)] overflow-hidden bg-white/5 backdrop-blur-sm relative transition-transform active:scale-95">
+              class="w-20 h-20 rounded-full border-2 border-primary/30 shadow-[0_0_20px_rgba(var(--ion-color-primary-rgb),0.15)] overflow-hidden bg-white/5 backdrop-blur-sm relative transition-transform active:scale-95">
               @if (user.photoURL) {
               <img [ngSrc]="user.photoURL" fill class="object-cover" alt="Foto de perfil" />
               } @else {
-              <div class="w-full h-full flex items-center justify-center text-4xl font-bold text-primary bg-primary/10">
+              <div class="w-full h-full flex items-center justify-center text-2xl font-bold text-primary bg-primary/10">
                 {{ getIniciales(user.nombre) }}
               </div>
               }
@@ -34,7 +34,7 @@
               <!-- Hover Overlay -->
               <div
                 class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span class="material-symbols-rounded text-white text-3xl">add_a_photo</span>
+                <span class="material-symbols-rounded text-white text-xl">add_a_photo</span>
               </div>
 
               @if (isUploading()) {
@@ -46,14 +46,13 @@
 
             <!-- Botón flotante -->
             <div
-              class="absolute -bottom-1 -right-1 z-20 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center border-4 border-[#121212] transition-transform active:scale-90"
+              class="absolute -bottom-1 -right-1 z-20 w-8 h-8 rounded-full shadow-2xl flex items-center justify-center border-2 border-[#121212] transition-transform active:scale-90"
               style="background-color: #d2ff00 !important;">
-              <span class="material-symbols-rounded !text-black !text-2xl !font-bold">add_a_photo</span>
+              <span class="material-symbols-rounded !text-black !text-base !font-bold">add_a_photo</span>
             </div>
           </div>
           <input type="file" id="modal-photo-input" class="hidden" accept="image/*" (change)="onFileSelected($event)">
-          <p class="mt-4 text-[10px] font-extrabold uppercase tracking-[0.2em] text-primary/80">Toca para cambiar foto
-          </p>
+          <p class="mt-2 text-[9px] font-extrabold uppercase tracking-[0.2em] text-primary/80">Toca para cambiar foto</p>
         </div>
 
         <ion-list lines="none" class="bg-transparent ion-no-padding">
@@ -97,7 +96,7 @@
           </ion-item>
 
           @if (editForm.get('recordatoriosEntrenamiento')?.value) {
-          <div class="mx-4 mb-8">
+          <div class="mx-4 mb-4">
             <ion-item class="rounded-t-2xl">
               <ion-label class="text-white/60 text-xs">Hora de entrenamiento</ion-label>
               <ion-datetime-button datetime="timepicker_modal" slot="end"></ion-datetime-button>
@@ -121,6 +120,35 @@
               </div>
             </div>
           </div>
+          }
+
+          <ion-item class="rounded-2xl mx-4 mb-4">
+            <span slot="start" class="material-symbols-rounded text-primary">visibility</span>
+            <ion-label>
+              <h2 class="font-bold text-sm text-white leading-tight">Visible en Descubrir</h2>
+              <p class="text-xs text-white/50 leading-tight mt-0.5">Permite a otros chocar los 5 contigo</p>
+            </ion-label>
+            <ion-toggle formControlName="visibleDescubrir" slot="end" color="primary"></ion-toggle>
+          </ion-item>
+
+          <!-- Perfil Deportivo / Descubrir (Condicional si visible en descubrir está activo) -->
+          @if (editForm.get('visibleDescubrir')?.value) {
+            <ion-list-header class="ion-padding-horizontal mt-4 mb-2">
+              <ion-label color="primary" class="font-bold text-xs tracking-widest uppercase">Perfil Fitness (Descubrir)</ion-label>
+            </ion-list-header>
+
+            <ion-item class="rounded-2xl mx-4 mb-4">
+              <ion-textarea label="Sobre mí (Biografía)" label-placement="stacked" formControlName="bio" placeholder="Escribe una breve biografía..." [autoGrow]="true" rows="2"></ion-textarea>
+            </ion-item>
+
+            <div class="flex gap-4 mx-4 mb-4">
+              <ion-item class="rounded-2xl w-1/2 m-0!">
+                <ion-input label="Entrena Desde" label-placement="stacked" type="time" formControlName="franjaInicio"></ion-input>
+              </ion-item>
+              <ion-item class="rounded-2xl w-1/2 m-0!">
+                <ion-input label="Entrena Hasta" label-placement="stacked" type="time" formControlName="franjaFin"></ion-input>
+              </ion-item>
+            </div>
           }
           }
         </ion-list>

@@ -102,6 +102,17 @@ export class DesafioService {
         });
     }
 
+    getDesafiosByGimnasio(gimnasioId: string): Signal<Desafio[]> {
+        return computed(() => {
+            const now = new Date();
+            return this.desafios().filter(d =>
+                d.gimnasioId === gimnasioId &&
+                d.activo &&
+                new Date(d.fechaVencimiento) > now
+            );
+        });
+    }
+
     getDesafiosByCreador(creadorId: string): Signal<Desafio[]> {
         return computed(() =>
             this.desafios().filter(d => d.creadorId === creadorId)
@@ -114,10 +125,16 @@ export class DesafioService {
             creadorId: data.creadorId || '',
             creadorNombre: data.creadorNombre || '',
             creadorFoto: data.creadorFoto || null,
+            gimnasioId: data.gimnasioId || '',
             titulo: data.titulo || '',
             logroRelacionado: data.logroRelacionado || null,
             disciplina: data.disciplina || null,
-            fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date()),
+            fechaCreacion: data.fechaCreacion instanceof Timestamp
+                ? data.fechaCreacion.toDate()
+                : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date()),
+            fechaVencimiento: data.fechaVencimiento instanceof Timestamp
+                ? data.fechaVencimiento.toDate()
+                : (data.fechaVencimiento ? new Date(data.fechaVencimiento) : new Date()),
             activo: data.activo ?? true
         };
     }
@@ -126,6 +143,7 @@ export class DesafioService {
         const data: any = {
             creadorId: desafio.creadorId,
             creadorNombre: desafio.creadorNombre,
+            gimnasioId: desafio.gimnasioId,
             titulo: desafio.titulo,
             activo: desafio.activo ?? true
         };
@@ -134,7 +152,14 @@ export class DesafioService {
         if (desafio.logroRelacionado) data.logroRelacionado = desafio.logroRelacionado;
         if (desafio.disciplina) data.disciplina = desafio.disciplina;
         if (desafio.fechaCreacion) {
-            data.fechaCreacion = desafio.fechaCreacion instanceof Date ? Timestamp.fromDate(desafio.fechaCreacion) : desafio.fechaCreacion;
+            data.fechaCreacion = desafio.fechaCreacion instanceof Date
+                ? Timestamp.fromDate(desafio.fechaCreacion)
+                : desafio.fechaCreacion;
+        }
+        if (desafio.fechaVencimiento) {
+            data.fechaVencimiento = desafio.fechaVencimiento instanceof Date
+                ? Timestamp.fromDate(desafio.fechaVencimiento)
+                : desafio.fechaVencimiento;
         }
 
         return data;

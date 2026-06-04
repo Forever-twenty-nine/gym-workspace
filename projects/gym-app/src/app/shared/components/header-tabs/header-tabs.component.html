@@ -7,6 +7,15 @@
         <!-- <ion-title class="text-center uppercase tracking-widest font-bold text-lg">Gym App</ion-title> -->
 
         <ion-buttons slot="end">
+            <ion-button (click)="openChatList()" class="relative overflow-visible" style="--overflow: visible; margin-right: 8px;">
+                <ion-icon slot="icon-only" name="chatbubbles-outline"></ion-icon>
+                @if (unreadChatsCount() > 0) {
+                <ion-badge color="danger"
+                    class="absolute top-0 left-0 min-w-4.5 h-4.5 flex items-center justify-center text-[9px] p-0 rounded-full border-2 border-white -translate-x-1 -translate-y-1 z-10">
+                    {{ unreadChatsCount() }}
+                </ion-badge>
+                }
+            </ion-button>
             <ion-button (click)="openNotifications()" class="relative overflow-visible" style="--overflow: visible;">
                 <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
                 @if (notificacionesCount() > 0) {

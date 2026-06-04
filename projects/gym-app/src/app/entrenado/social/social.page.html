@@ -20,9 +20,6 @@
     <ion-segment-button value="siguiendo">
       <ion-label class="font-bold text-xs uppercase tracking-wider">Siguiendo</ion-label>
     </ion-segment-button>
-    <ion-segment-button value="activar-hoy">
-      <ion-label class="font-bold text-xs uppercase tracking-wider">Activar Hoy</ion-label>
-    </ion-segment-button>
     <ion-segment-button value="descubrir">
       <ion-label class="font-bold text-xs uppercase tracking-wider">Descubrir</ion-label>
     </ion-segment-button>
@@ -33,14 +30,29 @@
   <div class="relative z-10 px-4 pb-6 pt-1">
     <!-- Renderizado condicional por componente -->
     @switch (selectedTab()) {
-      @case ('activar-hoy') {
-        <app-convocatorias></app-convocatorias>
-      }
       @case ('descubrir') {
         <app-descubrir-tab></app-descubrir-tab>
       }
       @case ('para-ti') {
-        <app-feed-tab tab="para-ti"></app-feed-tab>
+        <!-- Seccion de Desafíos Activos -->
+        @if (desafiosActivos().length > 0) {
+          <div class="mb-6 px-1">
+            <div class="flex items-center gap-2 mb-4 px-1">
+              <ion-icon name="trophy-outline" class="text-xl text-amber-500"></ion-icon>
+              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Desafíos Activos</h3>
+            </div>
+            <div class="flex flex-col gap-4">
+              @for (item of desafiosActivos(); track item.id) {
+                <app-desafio-feed-card [desafio]="item"></app-desafio-feed-card>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="flex flex-col gap-4">
+          <app-convocatorias class="block"></app-convocatorias>
+          <app-feed-tab tab="para-ti" class="block"></app-feed-tab>
+        </div>
       }
       @case ('siguiendo') {
         <app-feed-tab tab="siguiendo"></app-feed-tab>

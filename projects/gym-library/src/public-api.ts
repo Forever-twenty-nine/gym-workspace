@@ -33,6 +33,7 @@ export * from './lib/models/environment.model';
 export * from './lib/models/sesion-rutina.model';
 export * from './lib/models/estadisticas-entrenado.model';
 export * from './lib/models/desafio.model';
+export * from './lib/models/desafio-participacion.model';
 export * from './lib/models/match-interaction.model';
 export * from './lib/models/convocatoria.model';
 /*

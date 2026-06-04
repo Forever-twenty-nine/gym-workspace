@@ -31,7 +31,6 @@ export interface Entrenado {
 
     // Campos de Matching
     bio?: string;
-    tags?: string[];
-    disciplinas?: string[];
     franjaHoraria?: FranjaHoraria;
+    visibleDescubrir?: boolean;
 }

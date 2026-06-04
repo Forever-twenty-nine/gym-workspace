@@ -1,0 +1,100 @@
+<!-- Cabecera del Chat con Glassmorphism -->
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-linear-to-r from-slate-900 to-black text-white px-2 py-1">
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrar()" color="light">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <!-- Info del Atleta Destinatario -->
+    <div class="flex items-center gap-2.5 text-left py-1">
+      <div class="w-9 h-9 rounded-full overflow-hidden bg-slate-800 border border-white/20 flex items-center justify-center shadow-sm">
+        @if (partnerPhoto()) {
+          <img [src]="partnerPhoto()" alt="Partner" class="w-full h-full object-cover">
+        } @else {
+          <ion-icon name="person-outline" class="text-sm text-gray-400"></ion-icon>
+        }
+      </div>
+      <div>
+        <h3 class="text-sm font-black text-white tracking-tight leading-none mb-0.5">{{ partnerName() }}</h3>
+        <span class="text-[9px] font-extrabold uppercase text-emerald-400 tracking-wider">Partner Conectado ⚡</span>
+      </div>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Contenido del Chat con Fondo Oscuro Premium -->
+<ion-content class="bg-slate-950" style="--background: #090d16;">
+  <!-- Capa de degradado de fondo -->
+  <div class="absolute inset-0 pointer-events-none bg-radial-gradient from-primary/5 via-transparent to-transparent"></div>
+
+  <div class="relative z-10 flex flex-col justify-end min-h-full pb-4">
+    
+    @if (mensajesFiltrados().length === 0) {
+      <!-- Estado Inicial -->
+      <div class="flex flex-col items-center justify-center p-8 text-center my-auto">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 animate-pulse">
+          <ion-icon name="chatbubbles-outline" class="text-2xl" style="font-size: 24px;"></ion-icon>
+        </div>
+        <h4 class="text-sm font-black text-white mb-1">¡Saluda a tu nuevo compañero!</h4>
+        <p class="text-xs font-semibold text-gray-500 max-w-xs leading-relaxed">
+          Comiencen a coordinar su entrenamiento. Chocar esos 5 fue solo el primer paso.
+        </p>
+      </div>
+    } @else {
+      <!-- Lista de Burbujas de Chat -->
+      <div class="flex flex-col gap-3.5 px-4 pt-4">
+        @for (msg of mensajesFiltrados(); track msg.id) {
+          <!-- Contenedor Alineado -->
+          <div class="flex w-full" [ngClass]="msg.remitenteId === currentUser()?.uid ? 'justify-end' : 'justify-start'">
+            
+            <!-- Burbuja -->
+            <div class="max-w-[78%] rounded-2xl px-4 py-2.5 shadow-md flex flex-col gap-0.5"
+                 [ngClass]="msg.remitenteId === currentUser()?.uid 
+                  ? 'bg-linear-to-br from-primary to-blue-600 text-white rounded-tr-none' 
+                  : 'bg-white/10 dark:bg-slate-900/60 border border-white/5 text-gray-100 rounded-tl-none'">
+              
+              <p class="text-sm font-semibold leading-relaxed m-0 text-left select-text whitespace-pre-wrap">{{ msg.contenido }}</p>
+              
+              <!-- Timestamp de envío -->
+              <span class="block text-[8px] font-bold text-right tracking-wide select-none opacity-60"
+                    [ngClass]="msg.remitenteId === currentUser()?.uid ? 'text-white/80' : 'text-gray-400'">
+                {{ formatTime(msg.fechaEnvio) }}
+              </span>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>
+
+<!-- Caja de Entrada Fija -->
+<ion-footer class="ion-no-border">
+  <div class="bg-slate-900 border-t border-white/10 px-4 py-2.5 pb-safe-area flex items-center gap-3">
+    
+    <!-- Textarea autocreciente -->
+    <div class="flex-1 bg-white/5 border border-white/10 rounded-2xl px-3 py-1 flex items-center">
+      <ion-textarea 
+        placeholder="Escribe un mensaje..." 
+        [ngModel]="nuevoMensaje()"
+        (ngModelChange)="nuevoMensaje.set($event)"
+        (keydown.enter)="enviarMensaje($event)"
+        [rows]="1"
+        [autoGrow]="true"
+        class="text-white text-xs font-semibold focus:outline-none w-full"
+        style="--padding-top: 8px; --padding-bottom: 8px; --placeholder-color: #94a3b8; --placeholder-opacity: 0.6;">
+      </ion-textarea>
+    </div>
+
+    <!-- Botón Enviar -->
+    <button (click)="enviarMensaje()" 
+            [disabled]="!nuevoMensaje().trim()" 
+            class="w-10 h-10 rounded-xl bg-primary hover:bg-primary-hover active:scale-95 disabled:opacity-40 disabled:scale-100 disabled:bg-slate-800 text-white flex items-center justify-center shadow-lg shadow-primary/20 transition-all duration-200">
+      <ion-icon name="send" class="text-sm"></ion-icon>
+    </button>
+  </div>
+</ion-footer>

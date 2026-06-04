@@ -6,7 +6,7 @@ import {
   IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
   IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
   IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
-  IonAvatar, IonNote
+  IonAvatar, IonNote, IonTextarea
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, notificationsOutline, cameraOutline } from 'ionicons/icons';
@@ -30,6 +30,7 @@ import { FirebaseStorageService } from '../../../../../../../core/services/fireb
     IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
     IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
     IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
+    IonTextarea
   ],
 })
 export class EditProfileModalComponent implements OnInit, OnChanges {
@@ -85,7 +86,11 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
       nivel: [this.entrenadoData?.nivel || ''],
       recordatoriosEntrenamiento: [this.entrenadoData?.configNotificaciones?.recordatoriosEntrenamiento || false],
       horaRecordatorio: [this.entrenadoData?.configNotificaciones?.horaRecordatorio || '08:00'],
-      diasRecordatorio: [this.entrenadoData?.configNotificaciones?.diasRecordatorio || []]
+      diasRecordatorio: [this.entrenadoData?.configNotificaciones?.diasRecordatorio || []],
+      visibleDescubrir: [this.entrenadoData?.visibleDescubrir ?? true],
+      bio: [this.entrenadoData?.bio || ''],
+      franjaInicio: [this.entrenadoData?.franjaHoraria?.inicio || '18:00'],
+      franjaFin: [this.entrenadoData?.franjaHoraria?.fin || '20:00']
     });
   }
 
@@ -129,6 +134,12 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
             ...this.entrenadoData,
             objetivo: this.editForm.value.objetivo,
             nivel: this.editForm.value.nivel,
+            visibleDescubrir: this.editForm.value.visibleDescubrir,
+            bio: this.editForm.value.bio,
+            franjaHoraria: (this.editForm.value.franjaInicio && this.editForm.value.franjaFin) ? {
+              inicio: this.editForm.value.franjaInicio,
+              fin: this.editForm.value.franjaFin
+            } : null,
             configNotificaciones: {
               recordatoriosEntrenamiento: this.editForm.value.recordatoriosEntrenamiento,
               horaRecordatorio: this.editForm.value.horaRecordatorio,

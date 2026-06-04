@@ -1,48 +1,59 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import {
-  IonIcon,
+  IonContent,
   IonButton,
-  IonBadge,
+  IonIcon,
   IonLabel,
+  IonSegment,
+  IonSegmentButton,
   ToastController,
   AlertController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  add, close, handRightOutline, handRight, trashOutline, 
-  sparkles, timeOutline, personOutline, paperPlaneOutline, chatbubblesOutline 
+  add, calendarOutline, timeOutline, personOutline, 
+  trashOutline, handRightOutline, checkmarkCircleOutline,
+  chevronDownOutline, chevronUpOutline
 } from 'ionicons/icons';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
-import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
-import { Convocatoria } from 'gym-library';
+import { ConvocatoriaService } from '../../core/services/convocatoria.service';
+import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
+import { Convocatoria, Rol } from 'gym-library';
+import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear-agenda-modal.component';
 
 @Component({
-  selector: 'app-convocatorias',
-  templateUrl: './convocatorias.component.html',
+  selector: 'app-agenda',
+  templateUrl: './agenda.page.html',
   standalone: true,
   imports: [
     CommonModule,
-    IonIcon,
+    IonContent,
     IonButton,
-    IonBadge,
-    IonLabel
+    IonIcon,
+    IonLabel,
+    IonSegment,
+    IonSegmentButton,
+    HeaderTabsComponent,
+    CrearAgendaModalComponent
   ]
 })
-export class ConvocatoriasComponent {
+export class AgendaPage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private convocatoriaService = inject(ConvocatoriaService);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
-  private router = inject(Router);
 
   readonly currentUserSignal = this.authService.currentUser;
+  
+  // Segment: 'oficial' | 'atletas'
+  segmentoActivo = signal<'oficial' | 'atletas'>('oficial');
+  isCrearModalOpen = signal(false);
 
-  // Obtener convocatorias de Firestore filtradas y ordenadas
-  convocatoriasActivas = computed(() => {
+  // Convocatorias del gimnasio filtradas por tipo
+  convocatoriasGimnasio = computed(() => {
     const list = this.convocatoriaService.convocatorias();
     const user = this.currentUserSignal();
     if (!user || !user.gimnasioId) return [];
@@ -63,11 +74,12 @@ export class ConvocatoriasComponent {
           const dateEntrenamiento = new Date(c.fechaEntrenamiento);
           return dateEntrenamiento >= startOfToday && dateEntrenamiento <= endOfNextWeek;
         } else {
+          // No mostrar convocatorias de atletas pasadas hace más de 24 horas para mantener limpia la agenda
           const endTraining = new Date(c.fechaEntrenamiento);
           const [hours, minutes] = c.horaFin.split(':').map(Number);
           endTraining.setHours(hours, minutes, 0, 0);
 
-          const expirationTime = new Date(endTraining.getTime() + 2 * 60 * 60 * 1000);
+          const expirationTime = new Date(endTraining.getTime() + 24 * 60 * 60 * 1000);
           return now < expirationTime;
         }
       })
@@ -80,45 +92,49 @@ export class ConvocatoriasComponent {
       });
   });
 
+  // Convocatorias oficiales (creadas por entrenadores/gimnasio)
+  convocatoriasOficiales = computed(() => {
+    return this.convocatoriasGimnasio().filter(c => c.esOficial);
+  });
+
+  // Convocatorias propuestas por atletas
+  convocatoriasAtletas = computed(() => {
+    return this.convocatoriasGimnasio().filter(c => !c.esOficial);
+  });
+
   constructor() {
     addIcons({ 
-      add, close, handRightOutline, handRight, trashOutline, 
-      sparkles, timeOutline, personOutline, paperPlaneOutline, chatbubblesOutline 
+      add, calendarOutline, timeOutline, personOutline, 
+      trashOutline, handRightOutline, checkmarkCircleOutline,
+      chevronDownOutline, chevronUpOutline
     });
   }
 
-  irACreaciones() {
-    this.router.navigate(['/entrenado-tabs/creaciones']);
+  ngOnInit() {
+    // Escuchar cambios de usuarios para asegurar que se resuelvan nombres
+    this.userService.users;
   }
 
-  async toggleChocarLos5(convocatoria: Convocatoria) {
-    const user = this.currentUserSignal();
-    if (!user) return;
+  abrirCrearModal() {
+    this.isCrearModalOpen.set(true);
+  }
 
-    if (convocatoria.creadorId === user.uid) {
-      this.showToast('No puedes chocar los 5 en tu propia convocatoria', 'warning');
-      return;
-    }
+  cerrarCrearModal() {
+    this.isCrearModalOpen.set(false);
+  }
 
-    const yaChoco = convocatoria.interesados.includes(user.uid);
-    try {
-      await this.convocatoriaService.toggleInteres(convocatoria.id, user.uid, !yaChoco);
-      
-      if (!yaChoco) {
-        this.showToast(`¡Le chocaste los 5 a ${convocatoria.creadorNombre}! ✋`, 'success');
-      } else {
-        this.showToast('Interés retirado', 'medium');
-      }
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al registrar tu interés', 'danger');
-    }
+  onSesionSaved() {
+    // Firestore actualiza en tiempo real
+  }
+
+  cambiarSegmento(event: any) {
+    this.segmentoActivo.set(event.detail.value);
   }
 
   async confirmarEliminacion(id: string) {
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar convocatoria',
-      message: '¿Estás seguro de que deseas eliminar esta publicación de entrenamiento?',
+      header: 'Eliminar entrenamiento',
+      message: '¿Estás seguro de que deseas eliminar esta sesión de la agenda?',
       buttons: [
         {
           text: 'Cancelar',
@@ -130,10 +146,10 @@ export class ConvocatoriasComponent {
           handler: async () => {
             try {
               await this.convocatoriaService.delete(id);
-              this.showToast('Convocatoria eliminada con éxito', 'success');
+              this.showToast('Entrenamiento eliminado con éxito', 'success');
             } catch (e) {
               console.error(e);
-              this.showToast('Error al eliminar la convocatoria', 'danger');
+              this.showToast('Error al eliminar la sesión', 'danger');
             }
           }
         }
@@ -169,7 +185,7 @@ export class ConvocatoriasComponent {
     return this.userService.getUserByUid(uid)()?.photoURL || null;
   }
 
-  private async showToast(message: string, color: 'success' | 'warning' | 'danger' | 'medium') {
+  private async showToast(message: string, color: 'success' | 'danger') {
     const toast = await this.toastCtrl.create({
       message,
       duration: 2000,

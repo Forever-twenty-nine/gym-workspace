@@ -39,6 +39,14 @@ export class MatchService {
 
     constructor() { }
 
+    /**
+     * Retorna una señal reactiva con todas las interacciones de match que involucran al usuario
+     */
+    getInteractions(userId: string): Signal<MatchInteraction[]> {
+        this.initializeListener(userId);
+        return this._interactions.asReadonly();
+    }
+
     private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
         if (this.zoneRunner) {
             return this.zoneRunner.run(callback);
@@ -198,7 +206,7 @@ export class MatchService {
     }
 
     /**
-     * Obtener sugerencias para la Tarjeta de Utilidad (Coincidencia horaria y disciplinas)
+     * Obtener sugerencias para la Tarjeta de Utilidad (Coincidencia horaria)
      */
     getSugerenciasHorario(currentUser: Entrenado): Signal<Entrenado[]> {
         return computed(() => {
@@ -210,6 +218,7 @@ export class MatchService {
 
             return all.filter(e => {
                 if (e.id === currentUser.id) return false;
+                if (e.visibleDescubrir === false) return false;
 
                 const targetUserProfile = this.userService.getUserByUid(e.id)();
                 if (targetUserProfile?.gimnasioId !== currentUserGymId) return false;
@@ -222,44 +231,31 @@ export class MatchService {
                 const targetStart = this.parseTimeToMinutes(e.franjaHoraria.inicio);
                 const targetEnd = this.parseTimeToMinutes(e.franjaHoraria.fin);
 
-                const overlap = (currentStart < targetEnd && currentEnd > targetStart);
-                if (!overlap) return false;
-
-                // Comprobar si tienen al menos una disciplina común
-                const commonDisciplines = (currentUser.disciplinas || []).filter(d => 
-                    (e.disciplinas || []).includes(d)
-                );
-
-                return commonDisciplines.length > 0;
+                return (currentStart < targetEnd && currentEnd > targetStart);
             });
         });
     }
 
     /**
-     * Obtener sugerencias para la Tarjeta Social Pura (Afinidad por estilo de vida/tags)
+     * Obtener sugerencias para la Tarjeta Social Pura (Afinidad por estilo de vida / Objetivo)
      */
     getSugerenciasAfinidad(currentUser: Entrenado): Signal<Entrenado[]> {
         return computed(() => {
             const all = this.entrenadoService.entrenados();
-            if (!currentUser || !currentUser.tags || currentUser.tags.length === 0) return [];
+            if (!currentUser || !currentUser.objetivo) return [];
 
             const currentUserProfile = this.userService.getUserByUid(currentUser.id)();
             const currentUserGymId = currentUserProfile?.gimnasioId;
 
             return all.filter(e => {
                 if (e.id === currentUser.id) return false;
+                if (e.visibleDescubrir === false) return false;
 
                 const targetUserProfile = this.userService.getUserByUid(e.id)();
                 if (targetUserProfile?.gimnasioId !== currentUserGymId) return false;
 
-                if (!e.tags || e.tags.length === 0) return false;
-
-                // Comprobar si comparten al menos un tag de afinidad
-                const commonTags = currentUser.tags!.filter(t => 
-                    e.tags!.includes(t)
-                );
-
-                return commonTags.length > 0;
+                // Comprobar si comparten el mismo objetivo de entrenamiento
+                return e.objetivo === currentUser.objetivo;
             });
         });
     }

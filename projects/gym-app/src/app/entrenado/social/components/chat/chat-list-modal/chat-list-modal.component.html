@@ -1,0 +1,86 @@
+<!-- Cabecera de la Bandeja de Entrada -->
+<ion-header class="ion-no-border">
+  <ion-toolbar class="bg-linear-to-r from-slate-900 to-black text-white px-2 py-1">
+    <ion-title class="text-sm font-black uppercase tracking-widest text-white text-center">Bandeja de Mensajes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()" color="light">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  
+  <!-- Buscador Premium -->
+  <ion-toolbar class="bg-slate-900 px-2 pb-2">
+    <ion-searchbar 
+      placeholder="Buscar conversación..." 
+      [value]="searchQuery()"
+      (ionInput)="onSearch($event)"
+      style="--background: rgba(255,255,255,0.06); --color: white; --placeholder-color: #94a3b8; --icon-color: #94a3b8; --border-radius: 16px;">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Contenido Principal -->
+<ion-content class="bg-slate-950" style="--background: #090d16;">
+  <div class="absolute inset-0 pointer-events-none bg-radial-gradient from-primary/5 via-transparent to-transparent"></div>
+
+  <div class="relative z-10 p-4">
+    
+    @if (chatsFiltrados().length === 0) {
+      <!-- Estado vacío -->
+      <div class="flex flex-col items-center justify-center p-10 text-center my-12 bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/10">
+        <div class="w-16 h-16 rounded-full bg-white/20 dark:bg-gray-800/50 flex items-center justify-center text-gray-400 mb-5">
+          <ion-icon name="chatbubbles-outline" class="text-3xl"></ion-icon>
+        </div>
+        <h3 class="text-sm font-black text-white mb-2">Sin conversaciones activas</h3>
+        <p class="text-xs font-semibold text-gray-400 max-w-xs px-2 leading-relaxed">
+          Tus chats aparecerán aquí cuando chocas los 5 con otros atletas en la sección <b>Descubrir</b> y conectas.
+        </p>
+      </div>
+    } @else {
+      <!-- Listado de Hilos de Chat -->
+      <div class="flex flex-col gap-2.5">
+        @for (chat of chatsFiltrados(); track chat.otherUserId) {
+          <div (click)="abrirConversacion(chat.otherUserId)" 
+               class="p-4 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:bg-white/60 dark:hover:bg-black/60 shadow-xs relative">
+            
+            <!-- Avatar y Detalle -->
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <!-- Foto de Perfil -->
+              <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs flex-shrink-0">
+                @if (chat.otherUser?.photoURL) {
+                  <img [src]="chat.otherUser?.photoURL" alt="Avatar" class="w-full h-full object-cover">
+                } @else {
+                  <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
+                }
+              </div>
+
+              <!-- Nombre y snippet del último mensaje -->
+              <div class="text-left min-w-0 flex-1">
+                <h4 class="text-xs font-black text-gray-900 dark:text-white leading-none mb-1.5 truncate">{{ chat.otherUser?.nombre || 'Compañero' }}</h4>
+                <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-450 leading-none truncate m-0">
+                  {{ chat.lastMsg.contenido }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Hora e Insignia no leídos -->
+            <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+              <span class="text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {{ formatTime(chat.lastMsg.fechaEnvio) }}
+              </span>
+              
+              @if (chat.unreadCount > 0) {
+                <ion-badge color="danger" class="min-w-5 h-5 flex items-center justify-center text-[10px] font-bold p-0 rounded-full border border-white/10">
+                  {{ chat.unreadCount }}
+                </ion-badge>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>

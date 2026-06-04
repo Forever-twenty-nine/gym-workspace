@@ -12,6 +12,11 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
 import { ConvocatoriasComponent } from './components/convocatorias/convocatorias.component';
 import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.component';
 import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
+import { DesafioFeedCardComponent } from './components/desafio-feed-card/desafio-feed-card.component';
+import { DesafioService } from '../../core/services/desafio.service';
+import { IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { trophyOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-social',
@@ -21,22 +26,32 @@ import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
     CommonModule,
     IonContent,
     NgOptimizedImage,
-    IonSegment, IonSegmentButton, IonLabel,
+    IonSegment, IonSegmentButton, IonLabel, IonIcon,
     HeaderTabsComponent,
     ConvocatoriasComponent,
     DescubrirTabComponent,
-    FeedTabComponent
+    FeedTabComponent,
+    DesafioFeedCardComponent
   ]
 })
 export class SocialPage {
   private authService = inject(AuthService);
+  private desafioService = inject(DesafioService);
 
   readonly currentUserSignal = this.authService.currentUser;
   readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
-  selectedTab = signal<'para-ti' | 'siguiendo' | 'descubrir' | 'activar-hoy'>('para-ti');
+  selectedTab = signal<'para-ti' | 'siguiendo' | 'descubrir'>('para-ti');
 
-  constructor() {}
+  desafiosActivos = computed(() => {
+    const gimnasioId = this.currentUserSignal()?.gimnasioId;
+    if (!gimnasioId) return [];
+    return this.desafioService.getDesafiosByGimnasio(gimnasioId)();
+  });
+
+  constructor() {
+    addIcons({ trophyOutline });
+  }
 
   segmentChanged(event: any) {
     this.selectedTab.set(event.detail.value);

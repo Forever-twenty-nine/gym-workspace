@@ -248,12 +248,11 @@ export class EntrenadoService {
             seguidores: data.seguidores || [],
             seguidos: data.seguidos || [],
             bio: data.bio || '',
-            tags: data.tags || [],
-            disciplinas: data.disciplinas || [],
-            franjaHoraria: data.franjaHoraria || null
+            franjaHoraria: data.franjaHoraria || null,
+            visibleDescubrir: data.visibleDescubrir ?? true
         };
     }
-
+ 
     private mapToFirestore(entrenado: Entrenado): any {
         const data: any = {};
         if (entrenado.objetivo !== undefined) data.objetivo = entrenado.objetivo;
@@ -268,9 +267,8 @@ export class EntrenadoService {
         if (entrenado.seguidores) data.seguidores = entrenado.seguidores;
         if (entrenado.seguidos) data.seguidos = entrenado.seguidos;
         if (entrenado.bio !== undefined) data.bio = entrenado.bio;
-        if (entrenado.tags !== undefined) data.tags = entrenado.tags;
-        if (entrenado.disciplinas !== undefined) data.disciplinas = entrenado.disciplinas;
         if (entrenado.franjaHoraria !== undefined) data.franjaHoraria = entrenado.franjaHoraria;
+        if (entrenado.visibleDescubrir !== undefined) data.visibleDescubrir = entrenado.visibleDescubrir;
         return data;
     }
 

@@ -119,14 +119,19 @@ export class RutinasPage implements OnInit {
             if (!user) return;
 
             try {
+              const fechaVencimiento = new Date();
+              fechaVencimiento.setDate(fechaVencimiento.getDate() + 7);
+
               await this.desafioService.save({
                 id: crypto.randomUUID(),
                 creadorId: user.uid,
                 creadorNombre: user.nombre || 'Atleta',
-                creadorFoto: user.photoURL || undefined,
+                creadorFoto: user.photoURL || null,
+                gimnasioId: user.gimnasioId || '',
                 titulo: `¿Quién se suma a entrenar la rutina "${rutina.nombre}" hoy? 🏋️‍♂️💪`,
                 disciplina: 'Fuerza',
                 fechaCreacion: new Date(),
+                fechaVencimiento,
                 activo: true
               });
 

@@ -16,7 +16,7 @@ import {
     arrayUnion,
     arrayRemove
 } from 'firebase/firestore';
-import { Convocatoria } from 'gym-library';
+import { Convocatoria, Rol } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
@@ -113,7 +113,11 @@ export class ConvocatoriaService {
             horaFin: data.horaFin || '00:00',
             mensaje: data.mensaje || '',
             interesados: data.interesados || [],
-            activo: data.activo ?? true
+            activo: data.activo ?? true,
+            creadorRol: data.creadorRol || Rol.ENTRENADO,
+            titulo: data.titulo || '',
+            esOficial: data.esOficial ?? false,
+            esSemanal: data.esSemanal ?? false
         };
     }
 
@@ -130,6 +134,10 @@ export class ConvocatoriaService {
 
         if (convocatoria.creadorFoto !== undefined) data.creadorFoto = convocatoria.creadorFoto;
         if (convocatoria.mensaje !== undefined) data.mensaje = convocatoria.mensaje;
+        if (convocatoria.creadorRol !== undefined) data.creadorRol = convocatoria.creadorRol;
+        if (convocatoria.titulo !== undefined) data.titulo = convocatoria.titulo;
+        if (convocatoria.esOficial !== undefined) data.esOficial = convocatoria.esOficial;
+        if (convocatoria.esSemanal !== undefined) data.esSemanal = convocatoria.esSemanal;
         
         if (convocatoria.fechaCreacion) {
             data.fechaCreacion = convocatoria.fechaCreacion instanceof Date ? Timestamp.fromDate(convocatoria.fechaCreacion) : convocatoria.fechaCreacion;

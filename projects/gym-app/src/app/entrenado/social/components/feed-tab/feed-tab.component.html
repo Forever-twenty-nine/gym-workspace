@@ -15,10 +15,10 @@
 
 <!-- FEED ACTIVO -->
 @else {
-  <div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-4">
     @for (item of filteredFeed(); track item.id) {
       @if (item.isDesafio) {
-        <app-desafio-feed-card [desafio]="item" (dismissed)="dismissDesafio(item.id, $event)"></app-desafio-feed-card>
+        <app-desafio-feed-card [desafio]="item"></app-desafio-feed-card>
       } @else {
         <app-social-card [sesion]="item"></app-social-card>
       }

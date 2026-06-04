@@ -64,23 +64,22 @@ export class FeedTabComponent {
     const ocultados = this.desafiosOcultados();
     const currentUserGymId = this.authService.currentUser()?.gimnasioId;
 
-    let result = [];
+    let result: any[] = [];
     if (tab === 'para-ti') {
       const currentUserId = this.authService.currentUser()?.uid;
       
       // Filtrar desafíos del mismo gimnasio (que no sean propios ni ocultados)
-      const filteredDesafios = activeDesafios
+      const filteredDesafios: any[] = activeDesafios
         .filter(d => {
           if (d.creadorId === currentUserId) return false;
           if (ocultados.includes(d.id)) return false;
-          const creatorProfile = this.userService.getUserByUid(d.creadorId)();
-          return creatorProfile?.gimnasioId === currentUserGymId;
+          // gimnasioId ya está en el modelo; filtrar directamente
+          return d.gimnasioId === currentUserGymId;
         })
-        .map(d => ({ 
-          ...d, 
+        .map(d => (Object.assign({}, d, { 
           isDesafio: true, 
           fechaOrden: d.fechaCreacion instanceof Date ? d.fechaCreacion : new Date(d.fechaCreacion)
-        }));
+        }) as any));
 
       // Sesiones compartidas de la comunidad del mismo gimnasio
       const mappedFeed = feed
@@ -88,11 +87,10 @@ export class FeedTabComponent {
           const posterProfile = this.userService.getUserByUid(s.entrenadoId)();
           return posterProfile?.gimnasioId === currentUserGymId;
         })
-        .map(s => ({ 
-          ...s, 
+        .map(s => (Object.assign({}, s, { 
           isDesafio: false, 
           fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date() 
-        }));
+        }) as any));
 
       // Mezclar desafíos y sesiones compartidas ordenando por fecha de creación/compartido
       result = [...filteredDesafios, ...mappedFeed].sort((a, b) => b.fechaOrden.getTime() - a.fechaOrden.getTime());
@@ -104,11 +102,10 @@ export class FeedTabComponent {
           const posterProfile = this.userService.getUserByUid(sesion.entrenadoId)();
           return posterProfile?.gimnasioId === currentUserGymId;
         })
-        .map(s => ({
-          ...s,
+        .map(s => (Object.assign({}, s, {
           isDesafio: false,
           fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date() 
-        }));
+        }) as any));
     } else {
       return [];
     }

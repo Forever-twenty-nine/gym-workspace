@@ -7,15 +7,19 @@
     <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
       class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
   </div>
+  }@else {
+  <div
+    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
+  </div>
   }
 
   <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
     
     <!-- Bloque 1: Acciones de Agregar -->
-    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
+    <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
       <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Elegir qué agregar</ion-label>
       
-      <div class="grid grid-cols-3 gap-3">
+      <div class="grid grid-cols-4 gap-3">
         <!-- Agregar Convocatoria (Abierto a todos) -->
         <ion-button (click)="abrirModalConvocatoria()" 
                     fill="clear" 
@@ -23,6 +27,16 @@
           <div class="flex flex-col items-center gap-1.5 text-center text-slate-800 dark:text-slate-100">
             <ion-icon name="paper-plane-outline" class="text-2xl text-blue-500"></ion-icon>
             <span class="text-[10px] font-black uppercase tracking-wider leading-tight">Convocar</span>
+          </div>
+        </ion-button>
+
+        <!-- Lanzar Desafío (Abierto a todos) -->
+        <ion-button (click)="abrirModalDesafio()" 
+                    fill="clear" 
+                    class="h-auto py-3 rounded-2xl border border-white/20 bg-white/20 dark:bg-black/20 flex flex-col gap-1.5 justify-center items-center text-primary transition-all active:scale-95 m-0!">
+          <div class="flex flex-col items-center gap-1.5 text-center text-slate-800 dark:text-slate-100">
+            <ion-icon name="trophy-outline" class="text-2xl text-amber-500"></ion-icon>
+            <span class="text-[10px] font-black uppercase tracking-wider leading-tight">Desafío</span>
           </div>
         </ion-button>
 
@@ -55,7 +69,7 @@
     </div>
 
     <!-- Bloque 2: Mis Ejercicios Creados -->
-    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
+    <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
       <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Mis Ejercicios Creados</ion-label>
       
       @if (isPremium()) {
@@ -87,7 +101,7 @@
     </div>
 
     <!-- Bloque 3: Mis Rutinas Creadas -->
-    <div class="dashboard-main-card !m-0 !rounded-[2rem] overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
+    <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-3">
       <ion-label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none px-1">Mis Rutinas Creadas</ion-label>
       
       @if (isPremium()) {
@@ -131,5 +145,12 @@
     (close)="cerrarModalConvocatoria()"
     (saved)="onConvocatoriaSaved()">
   </app-crear-convocatoria-modal>
+
+  <!-- Componente Modal de Desafío -->
+  <app-crear-desafio-modal
+    [isOpen]="isDesafioModalOpen()"
+    (close)="cerrarModalDesafio()"
+    (saved)="onDesafioSaved()">
+  </app-crear-desafio-modal>
 
 </ion-content>

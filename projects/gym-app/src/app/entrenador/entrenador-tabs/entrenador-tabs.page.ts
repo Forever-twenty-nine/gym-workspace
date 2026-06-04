@@ -13,7 +13,8 @@ import {
   peopleOutline, 
   personOutline ,
   barbellOutline,
-  fitnessOutline
+  fitnessOutline,
+  calendarOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -35,7 +36,8 @@ export class EntrenadorTabsPage {
       peopleOutline,
       personOutline,
       barbellOutline,
-      fitnessOutline
+      fitnessOutline,
+      calendarOutline
     });
   }
 }

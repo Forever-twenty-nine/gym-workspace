@@ -158,8 +158,6 @@ export async function createTrainee(
   const objetivoAleatorio = objetivos[index % objetivos.length];
 
   const bio = mockBios[index % mockBios.length];
-  const tags = mockTags[index % mockTags.length];
-  const disciplinas = mockDisciplinas[index % mockDisciplinas.length];
   const franjaHoraria = mockFranjas[index % mockFranjas.length];
 
   const traineeUserData = {
@@ -172,12 +170,11 @@ export async function createTrainee(
     objetivo: objetivoAleatorio,
     fechaCreacion: Timestamp.now(),
     bio,
-    tags,
-    disciplinas,
     franjaHoraria,
     nivel: traineeConfig.nivel,
     seguidores: [],
-    seguidos: []
+    seguidos: [],
+    visibleDescubrir: true
   };
 
   const docRef = usuariosRef.doc(uid);
@@ -193,12 +190,11 @@ export async function createTrainee(
     fechaRegistro: Timestamp.now(),
     plan: traineeConfig.plan,
     bio,
-    tags,
-    disciplinas,
     franjaHoraria,
     nivel: traineeConfig.nivel,
     seguidores: [],
-    seguidos: []
+    seguidos: [],
+    visibleDescubrir: true
   }, { merge: true });
 
   try {
@@ -572,7 +568,7 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   }
 
   // 6) Crear interacciones/matches mocks
-  console.log('   Creando matches fitness...');
+  console.log('   Creando matches fitness y mensajes asociados...');
   for (const m of config.matches) {
     const sourceTrainee = createdTrainees.find(t => t.nombre.toLowerCase().replace(/[^a-z0-9]/g, '') === m.usuarioOrigenId.replace('trainee_', ''));
     const destTrainee = createdTrainees.find(t => t.nombre.toLowerCase().replace(/[^a-z0-9]/g, '') === m.usuarioDestinoId.replace('trainee_', ''));
@@ -587,6 +583,39 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
       fechaCreacion: Timestamp.now(),
       fechaMatch: m.mutuo ? Timestamp.now() : null
     });
+
+    if (m.mutuo) {
+      const msgId1 = `msg-seed-1-${m.id}`;
+      const msgId2 = `msg-seed-2-${m.id}`;
+
+      // Mensaje 1 (Origen a Destino)
+      await db.collection('mensajes').doc(msgId1).set({
+        id: msgId1,
+        remitenteId: finalSourceId,
+        remitenteTipo: 'entrenado',
+        destinatarioId: finalDestId,
+        destinatarioTipo: 'entrenado',
+        contenido: `¡Hola! Vi que nos gusta entrenar en el mismo horario. ¿Te parece si compartimos rutina mañana? 🏋️‍♂️💪`,
+        tipo: 'TEXTO',
+        leido: false,
+        entregado: true,
+        fechaEnvio: Timestamp.fromDate(new Date(Date.now() - 3600000)) // hace 1 hora
+      });
+
+      // Mensaje 2 (Destino a Origen)
+      await db.collection('mensajes').doc(msgId2).set({
+        id: msgId2,
+        remitenteId: finalDestId,
+        remitenteTipo: 'entrenado',
+        destinatarioId: finalSourceId,
+        destinatarioTipo: 'entrenado',
+        contenido: `¡Totalmente! Nos vemos a las 19:00 cerca de la zona de peso libre.`,
+        tipo: 'TEXTO',
+        leido: true,
+        entregado: true,
+        fechaEnvio: Timestamp.now()
+      });
+    }
   }
 
   // 6.5) Crear convocatorias fitness
@@ -631,6 +660,49 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
       interesados: [],
       activo: true
     });
+
+    // Convocatorias oficiales de los entrenadores (WODs)
+    if (trainersToProcess.length > 0) {
+      const trainer = trainersToProcess[0];
+      
+      const convIdOficial = `conv-${trainer.uid}-wod`;
+      await db.collection('convocatorias').doc(convIdOficial).set({
+        id: convIdOficial,
+        creadorId: trainer.uid,
+        creadorNombre: trainer.nombre,
+        creadorFoto: null,
+        gimnasioId: gymUid,
+        fechaCreacion: Timestamp.now(),
+        fechaEntrenamiento: Timestamp.fromDate(hoy),
+        horaInicio: "08:00",
+        horaFin: "09:30",
+        mensaje: "Calentamiento: 5 min movilidad. WOD: AMRAP 20 min de: 5 Pull-ups, 10 Push-ups, 15 Squats. ¡A darlo todo! 🏋️‍♂️🔥",
+        interesados: [t1.uid], // Clara se sumó
+        activo: true,
+        creadorRol: "entrenador",
+        titulo: "WOD del Día: Resistencia Acondicionamiento",
+        esOficial: true
+      });
+      
+      const convIdOficial2 = `conv-${trainer.uid}-wod2`;
+      await db.collection('convocatorias').doc(convIdOficial2).set({
+        id: convIdOficial2,
+        creadorId: trainer.uid,
+        creadorNombre: trainer.nombre,
+        creadorFoto: null,
+        gimnasioId: gymUid,
+        fechaCreacion: Timestamp.now(),
+        fechaEntrenamiento: Timestamp.fromDate(manana),
+        horaInicio: "18:00",
+        horaFin: "19:30",
+        mensaje: "Entrenamiento de fuerza enfocado en Powerlifting (Peso Muerto y Sentadilla). Técnica y series pesadas.",
+        interesados: [],
+        activo: true,
+        creadorRol: "entrenador",
+        titulo: "Clase Especial: Fuerza y Técnica",
+        esOficial: true
+      });
+    }
   }
 
   // 7) Crear Gimnasio / Personal Trainer Central modularizado
@@ -685,7 +757,8 @@ async function main() {
     const collectionsToClear = [
       'usuarios', 'entrenadores', 'entrenados', 'gimnasios', 
       'rutinas', 'ejercicios', 'rutinas-asignadas', 
-      'sesiones-rutina', 'desafios', 'matches', 'convocatorias'
+      'sesiones-rutina', 'desafios', 'matches', 'convocatorias',
+      'mensajes'
     ];
     for (const collection of collectionsToClear) {
       await clearCollection(globalDb, collection);

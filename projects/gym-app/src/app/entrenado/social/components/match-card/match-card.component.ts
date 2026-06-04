@@ -6,7 +6,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
    barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline
+   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline
  } from 'ionicons/icons';
 import { MatchService } from '../../../../core/services/match.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -27,8 +27,9 @@ export class MatchCardComponent {
   private readonly userService = inject(UserService);
   private readonly toastCtrl = inject(ToastController);
 
-  @Input({ required: true }) tipo!: 'desafio' | 'afinidad';
+  @Input({ required: true }) tipo!: 'desafio' | 'afinidad' | 'horario';
   @Input({ required: true }) data!: any; // Perfil de Entrenado o Desafio
+  @Input() showActions = true;
 
   currentUser = this.authService.currentUser;
   
@@ -52,10 +53,16 @@ export class MatchCardComponent {
     return this.data.id ? this.userService.getUserByUid(this.data.id)()?.photoURL || null : null;
   });
 
+  userInitials = computed(() => {
+    const name = this.userName();
+    if (!name || name === 'Atleta') return 'A';
+    return name.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
+  });
+
   constructor() {
     addIcons({
       barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline
+      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline
     });
   }
 

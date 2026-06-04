@@ -1,3 +1,5 @@
+import { Rol } from '../enums/rol.enum';
+
 export interface Convocatoria {
     id: string;
     creadorId: string;
@@ -11,4 +13,8 @@ export interface Convocatoria {
     mensaje?: string;   // Nota/Objetivo opcional
     interesados: string[]; // UIDs de usuarios que "chocaron los 5"
     activo: boolean;
+    creadorRol?: Rol;
+    titulo?: string;
+    esOficial?: boolean;
+    esSemanal?: boolean;
 }

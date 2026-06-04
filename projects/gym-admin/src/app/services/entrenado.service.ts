@@ -221,7 +221,7 @@ export class EntrenadoService {
      * 🔄 Mapea datos de Firestore a modelo Entrenado
      */
     private mapFromFirestore(data: any): Entrenado {
-        return {
+        const result: any = {
             id: data.id,
             entrenadoresId: data.entrenadoresId || [],
             rutinasAsignadasIds: data.rutinasAsignadasIds || [],
@@ -231,13 +231,21 @@ export class EntrenadoService {
             objetivo: data.objetivo || undefined,
             // Campos de matching e interacciones
             bio: data.bio || null,
-            tags: data.tags || [],
-            disciplinas: data.disciplinas || [],
             franjaHoraria: data.franjaHoraria || null,
             nivel: data.nivel || null,
             seguidores: data.seguidores || [],
             seguidos: data.seguidos || []
         };
+
+        // Añadir campos adicionales sólo si existen en Firestore
+        if (data.tags !== undefined) {
+            result.tags = data.tags || [];
+        }
+        if (data.disciplinas !== undefined) {
+            result.disciplinas = data.disciplinas || [];
+        }
+
+        return result as Entrenado;
     }
 
     /**
@@ -276,11 +284,14 @@ export class EntrenadoService {
         if (entrenado.bio !== undefined) {
             data.bio = entrenado.bio !== null ? entrenado.bio : deleteField();
         }
-        if (entrenado.tags !== undefined) {
-            data.tags = entrenado.tags !== null ? entrenado.tags : deleteField();
+        // `tags` y `disciplinas` pueden no formar parte del tipo `Entrenado` en la librería,
+        // acceder mediante `any` para evitar errores de compilación en admin.
+        const eAny: any = entrenado as any;
+        if (eAny.tags !== undefined) {
+            data.tags = eAny.tags !== null ? eAny.tags : deleteField();
         }
-        if (entrenado.disciplinas !== undefined) {
-            data.disciplinas = entrenado.disciplinas !== null ? entrenado.disciplinas : deleteField();
+        if (eAny.disciplinas !== undefined) {
+            data.disciplinas = eAny.disciplinas !== null ? eAny.disciplinas : deleteField();
         }
         if (entrenado.franjaHoraria !== undefined) {
             data.franjaHoraria = entrenado.franjaHoraria !== null ? entrenado.franjaHoraria : deleteField();

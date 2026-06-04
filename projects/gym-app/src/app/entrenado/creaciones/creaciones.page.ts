@@ -14,7 +14,7 @@ import {
 import { addIcons } from 'ionicons';
 import { 
   paperPlaneOutline, calendarOutline, barbellOutline, 
-  lockClosed, trashOutline, close 
+  lockClosed, trashOutline, close, trophyOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -22,6 +22,7 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
 import { CrearConvocatoriaModalComponent } from '../social/components/convocatorias/components/crear-convocatoria-modal/crear-convocatoria-modal.component';
+import { CrearDesafioModalComponent } from '../social/components/desafios/components/crear-desafio-modal/crear-desafio-modal.component';
 
 @Component({
   selector: 'app-creaciones',
@@ -38,7 +39,8 @@ import { CrearConvocatoriaModalComponent } from '../social/components/convocator
     IonList,
     IonBadge,
     HeaderTabsComponent,
-    CrearConvocatoriaModalComponent
+    CrearConvocatoriaModalComponent,
+    CrearDesafioModalComponent
   ]
 })
 export class CreacionesPage implements OnInit {
@@ -54,6 +56,7 @@ export class CreacionesPage implements OnInit {
   readonly userId = computed(() => this.currentUserSignal()?.uid);
 
   isConvocatoriaModalOpen = signal(false);
+  isDesafioModalOpen = signal(false);
 
   // Ejercicios creados
   ejerciciosCreados = computed(() => {
@@ -76,7 +79,7 @@ export class CreacionesPage implements OnInit {
   constructor() {
     addIcons({ 
       paperPlaneOutline, calendarOutline, barbellOutline, 
-      lockClosed, trashOutline, close 
+      lockClosed, trashOutline, close, trophyOutline
     });
   }
 
@@ -91,6 +94,18 @@ export class CreacionesPage implements OnInit {
   }
 
   onConvocatoriaSaved() {
+    // Se actualiza reactivamente por Firestore
+  }
+
+  abrirModalDesafio() {
+    this.isDesafioModalOpen.set(true);
+  }
+
+  cerrarModalDesafio() {
+    this.isDesafioModalOpen.set(false);
+  }
+
+  onDesafioSaved() {
     // Se actualiza reactivamente por Firestore
   }
 
