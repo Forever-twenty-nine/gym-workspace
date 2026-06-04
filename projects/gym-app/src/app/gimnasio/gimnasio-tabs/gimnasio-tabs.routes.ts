@@ -12,6 +12,11 @@ export const routes: Routes = [
           import('../gimnasio-dashboard/gimnasio-dashboard.page').then((m) => m.GimnasioDashboardPage),
       },
       {
+        path: 'agenda',
+        loadComponent: () =>
+          import('../gimnasio-agenda/agenda.page').then((m) => m.AgendaPage),
+      },
+      {
         path: 'entrenadores',
         loadComponent: () =>
           import('../gimnasio-entrenadores/gimnasio-entrenadores.page').then((m) => m.GimnasioEntrenadoresPage),
