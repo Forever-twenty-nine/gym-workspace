@@ -47,9 +47,9 @@
             <!-- Avatar y Detalle -->
             <div class="flex items-center gap-3 min-w-0 flex-1">
               <!-- Foto de Perfil -->
-              <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs flex-shrink-0">
+              <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs shrink-0">
                 @if (chat.otherUser?.photoURL) {
-                  <img [src]="chat.otherUser?.photoURL" alt="Avatar" class="w-full h-full object-cover">
+                  <img [src]="chat.otherUser.photoURL" alt="Avatar" class="w-full h-full object-cover">
                 } @else {
                   <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
                 }
@@ -65,7 +65,7 @@
             </div>
 
             <!-- Hora e Insignia no leídos -->
-            <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+            <div class="flex flex-col items-end gap-1.5 shrink-0">
               <span class="text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {{ formatTime(chat.lastMsg.fechaEnvio) }}
               </span>
