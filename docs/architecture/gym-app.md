@@ -20,4 +20,3 @@ Gym-app es la aplicación móvil Ionic multiplataforma (Android/iOS) para client
 - Dashboards y navegación por rol
 - Visualización y gestión de rutinas
 - Integración con Firebase
-
