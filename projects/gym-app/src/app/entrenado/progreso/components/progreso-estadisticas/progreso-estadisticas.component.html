@@ -1,60 +1,100 @@
-<ion-card class="rounded-3xl shadow-xl relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-xl m-4 mt-6 mb-8 border border-white/20 dark:border-white/10">
-
-    <!-- Decoraciones de fondo absoluto -->
-    <div class="absolute top-0 right-0 -mr-8 -mt-8 opacity-10 dark:opacity-20 text-gray-400 dark:text-white pointer-events-none z-0">
-        <ion-icon name="trophy-outline" style="font-size: 140px;"></ion-icon>
+<ion-card class="rounded-3xl shadow-xl overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-xl m-0 border border-white/20 dark:border-white/10">
+  <ion-card-content class="relative z-10 p-5">
+    
+    <!-- Nivel + XP (datos reales de DB) -->
+    <div class="mb-5">
+      <div class="flex items-baseline justify-between mb-1.5">
+        <div>
+          <span class="text-xs uppercase tracking-[1px] text-gray-500 dark:text-white/60 font-medium">Nivel</span>
+          <span class="text-4xl font-black text-gray-900 dark:text-white ml-2">{{ getNivel() }}</span>
+        </div>
+        <div class="text-right text-xs text-gray-500 dark:text-white/70">
+          {{ getExperiencia() }} / {{ getExperienciaProximo() }} XP
+        </div>
+      </div>
+      <div class="h-2.5 bg-white/30 dark:bg-white/10 rounded-full overflow-hidden">
+        <div 
+          class="h-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500 rounded-full"
+          [style.width.%]="getXpPercent()">
+        </div>
+      </div>
     </div>
-    <div class="absolute bottom-0 left-0 -ml-8 -mb-8 opacity-5 dark:opacity-10 text-gray-400 dark:text-white pointer-events-none z-0">
-        <ion-icon name="fitness-outline" style="font-size: 100px;"></ion-icon>
+
+    <!-- Rachas (limpio, sin iconos) -->
+    <div class="grid grid-cols-2 gap-3 mb-5">
+      <div class="bg-white/60 dark:bg-white/10 rounded-2xl p-3 border border-white/30 dark:border-white/10">
+        <div class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-white/70 font-medium mb-0.5">Racha actual</div>
+        <div class="text-3xl font-black text-gray-900 dark:text-white">{{ getRacha() }} <span class="text-sm font-medium">días</span></div>
+      </div>
+      <div class="bg-white/60 dark:bg-white/10 rounded-2xl p-3 border border-white/30 dark:border-white/10">
+        <div class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-white/70 font-medium mb-0.5">Mejor racha</div>
+        <div class="text-3xl font-black text-gray-900 dark:text-white">{{ getMejorRacha() }} <span class="text-sm font-medium">días</span></div>
+      </div>
     </div>
 
-    <ion-card-content class="relative z-10 pt-6 pb-6 px-4">
-        <ion-grid>
-            <ion-row>
-                <!-- Card: Completadas -->
-                <ion-col size="6" size-md="3" class="p-2">
-                    <div
-                        class="bg-white/60 dark:bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-gray-200 dark:border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full shadow-sm dark:shadow-none">
-                        <ion-icon name="checkmark-circle-outline" class="text-3xl text-emerald-500 dark:text-emerald-300 mb-1"></ion-icon>
-                        <ion-text class="text-3xl font-black text-gray-900 dark:text-white">{{ stats.completadas }}</ion-text>
-                        <ion-text
-                            class="text-[10px] text-gray-500 dark:text-white/90 font-bold uppercase tracking-widest text-center mt-1">Completadas</ion-text>
-                    </div>
-                </ion-col>
+    <!-- Métricas clave (sin iconos ni emojis) -->
+    <div class="grid grid-cols-3 gap-2 mb-5">
+      <div class="text-center bg-white/60 dark:bg-white/10 rounded-2xl py-3 border border-white/30 dark:border-white/10">
+        <div class="text-2xl font-black text-gray-900 dark:text-white">{{ stats?.completadas || 0 }}</div>
+        <div class="text-[10px] text-gray-500 dark:text-white/70 font-medium tracking-wider mt-0.5">COMPLETADAS</div>
+      </div>
+      <div class="text-center bg-white/60 dark:bg-white/10 rounded-2xl py-3 border border-white/30 dark:border-white/10">
+        <div class="text-2xl font-black text-gray-900 dark:text-white">{{ formatearTiempo(stats?.tiempoTotal || 0) }}</div>
+        <div class="text-[10px] text-gray-500 dark:text-white/70 font-medium tracking-wider mt-0.5">TIEMPO TOTAL</div>
+      </div>
+      <div class="text-center bg-white/60 dark:bg-white/10 rounded-2xl py-3 border border-white/30 dark:border-white/10">
+        <div class="text-2xl font-black text-gray-900 dark:text-white">{{ stats?.sesionesTotales || 0 }}</div>
+        <div class="text-[10px] text-gray-500 dark:text-white/70 font-medium tracking-wider mt-0.5">ENTRENAMIENTOS</div>
+      </div>
+    </div>
 
-                <!-- Card: Tiempo Total -->
-                <ion-col size="6" size-md="3" class="p-2">
-                    <div
-                        class="bg-white/60 dark:bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-gray-200 dark:border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full shadow-sm dark:shadow-none">
-                        <ion-icon name="time-outline" class="text-3xl text-orange-400 dark:text-orange-200 mb-1"></ion-icon>
-                        <ion-text class="text-2xl font-black mt-1 text-gray-900 dark:text-white">{{ formatearTiempo(stats.tiempoTotal) }}</ion-text>
-                        <ion-text
-                            class="text-[10px] text-gray-500 dark:text-white/90 font-bold uppercase tracking-widest text-center mt-1">Tiempo</ion-text>
-                    </div>
-                </ion-col>
+    <!-- Gráfico de actividad semanal (barras CSS) -->
+    <div class="mb-5">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <div class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-white/80">Actividad últimos 7 días</div>
+        <div class="text-[10px] text-gray-400">sesiones</div>
+      </div>
+      <div class="flex items-end h-20 gap-1.5 bg-white/40 dark:bg-black/20 rounded-2xl p-2">
+        @for (day of weeklyActivity(); track $index) {
+          <div class="flex-1 flex flex-col items-center justify-end">
+            <div 
+              class="w-full min-h-[4px] bg-primary/80 rounded-t-md transition-all"
+              [style.height.%]="day.value > 0 ? (day.value / (maxWeeklyValue() || 1) * 100) : 4">
+            </div>
+            <div class="text-[9px] text-gray-500 dark:text-white/60 mt-1 font-medium">{{ day.label }}</div>
+          </div>
+        }
+      </div>
+    </div>
 
-                <!-- Card: Asignadas -->
-                <ion-col size="6" size-md="3" class="p-2">
-                    <div
-                        class="bg-white/60 dark:bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-gray-200 dark:border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full shadow-sm dark:shadow-none">
-                        <ion-icon name="fitness-outline" class="text-3xl text-sky-500 dark:text-sky-200 mb-1"></ion-icon>
-                        <ion-text class="text-2xl font-black mt-1 text-gray-900 dark:text-white">{{ stats.rutinasAsignadas }}</ion-text>
-                        <ion-text
-                            class="text-[10px] text-gray-500 dark:text-white/90 font-bold uppercase tracking-widest text-center mt-1">Asignadas</ion-text>
-                    </div>
-                </ion-col>
+    <!-- Rutinas con más actividad (barras horizontales) -->
+    @if (topRutinas().length > 0) {
+    <div class="mb-5">
+      <div class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-white/80 px-1 mb-2">Rutinas más entrenadas</div>
+      <div class="space-y-2">
+        @for (r of topRutinas(); track r.name) {
+          <div class="flex items-center gap-2 text-xs">
+            <div class="w-28 truncate text-gray-700 dark:text-white/90 font-medium">{{ r.name }}</div>
+            <div class="flex-1 h-2 bg-white/30 dark:bg-white/10 rounded-full overflow-hidden">
+              <div class="h-2 bg-emerald-400/80 rounded-full transition-all" [style.width.%]="r.percent"></div>
+            </div>
+            <div class="w-6 text-right font-semibold text-gray-600 dark:text-white/70">{{ r.count }}</div>
+          </div>
+        }
+      </div>
+    </div>
+    }
 
-                <!-- Card: En progreso -->
-                <ion-col size="6" size-md="3" class="p-2">
-                    <div
-                        class="bg-white/60 dark:bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-gray-200 dark:border-white/20 flex flex-col items-center justify-center transition-transform active:scale-95 h-full shadow-sm dark:shadow-none">
-                        <ion-icon name="flame-outline" class="text-3xl text-rose-400 dark:text-rose-300 mb-1"></ion-icon>
-                        <ion-text class="text-2xl font-black mt-1 text-gray-900 dark:text-white">{{ stats.enProgreso }}</ion-text>
-                        <ion-text
-                            class="text-[10px] text-gray-500 dark:text-white/90 font-bold uppercase tracking-widest text-center mt-1">En Progreso</ion-text>
-                    </div>
-                </ion-col>
-            </ion-row>
-        </ion-grid>
-    </ion-card-content>
+    <!-- Tasa de completado -->
+    <div>
+      <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-white/80 px-1 mb-1.5">
+        <span>Tasa de completado</span>
+        <span class="font-black text-gray-900 dark:text-white">{{ completionRate() }}%</span>
+      </div>
+      <div class="h-2.5 bg-white/30 dark:bg-white/10 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-emerald-400 to-primary rounded-full transition-all" [style.width.%]="completionRate()"></div>
+      </div>
+    </div>
+
+  </ion-card-content>
 </ion-card>

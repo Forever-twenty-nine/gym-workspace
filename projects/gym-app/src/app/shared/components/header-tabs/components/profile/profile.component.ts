@@ -4,8 +4,8 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Platform, LoadingController, ToastController, MenuController } from '@ionic/angular/standalone';
 
 import {
-  IonButton, IonIcon, IonBadge, IonMenu, IonSpinner,
-  IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonFooter
+  IonButton, IonIcon, IonMenu, IonSpinner,
+  IonHeader, IonToolbar, IonContent, IonButtons, IonFooter
 } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
@@ -13,7 +13,8 @@ import {
   logOutOutline, personOutline, mailOutline, shieldOutline, timeOutline, checkmarkCircleOutline,
   trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline,
   closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline,
-  checkmarkCircle, person, trophy, mail, star, helpCircleOutline
+  checkmarkCircle, person, trophy, mail, star, helpCircleOutline,
+  flagOutline, barChartOutline
 } from 'ionicons/icons';
 
 import { User as LibraryUser, Rutina, Plan, SolicitudPlan, Objetivo } from 'gym-library';
@@ -29,7 +30,6 @@ import { PlanService } from '../../../../../core/services/plan.service';
 import { NotificacionService } from '../../../../../core/services/notificacion.service';
 
 import { EditProfileModalComponent } from './components/edit-profile-modal/edit-profile-modal.component';
-import { ProfileInfoCardComponent } from './components/profile-info-card/profile-info-card.component';
 import { PremiumRequestModalComponent } from './components/premium-request-modal/premium-request-modal.component';
 
 @Component({
@@ -39,8 +39,8 @@ import { PremiumRequestModalComponent } from './components/premium-request-modal
   imports: [
     CommonModule,
     IonIcon, IonMenu, IonSpinner, IonButton,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonFooter,
-    NgOptimizedImage, EditProfileModalComponent, ProfileInfoCardComponent, PremiumRequestModalComponent
+    IonHeader, IonToolbar, IonContent, IonButtons, IonFooter,
+    NgOptimizedImage, EditProfileModalComponent, PremiumRequestModalComponent
   ],
 })
 export class ProfileComponent implements OnInit, OnDestroy {
@@ -75,7 +75,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       logOutOutline, personOutline, mailOutline, shieldOutline, timeOutline, checkmarkCircleOutline,
       trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline,
       closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline,
-      checkmarkCircle, person, trophy, mail, star, helpCircleOutline
+      checkmarkCircle, person, trophy, mail, star, helpCircleOutline,
+      flagOutline, barChartOutline
     });
 
     effect(() => {

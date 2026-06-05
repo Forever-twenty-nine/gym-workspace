@@ -18,10 +18,11 @@
                 (click)="verDetalle(sesion)" detail="false"
                 style="--background: transparent;">
 
-                <!-- Icono lateral -->
-                <ion-icon [name]="sesion.completada ? 'checkmark-circle-outline' : 'time-outline'"
-                    [color]="getColorEstado(sesion)" slot="start" class="text-2xl mr-3">
-                </ion-icon>
+                <!-- Estado minimal sin icono grande -->
+                <div slot="start" class="w-2.5 h-2.5 rounded-full mr-3 flex-shrink-0"
+                     [class.bg-emerald-500]="sesion.completada"
+                     [class.bg-amber-400]="!sesion.completada">
+                </div>
 
                 <ion-label>
                     <div class="flex flex-row items-center justify-start gap-3 w-full overflow-hidden">
@@ -30,22 +31,16 @@
                             sesion.rutinaResumen?.nombre || 'Mi Rutina' }}</h2>
 
                         <div class="text-xs flex items-center gap-2 whitespace-nowrap text-gray-500 dark:text-white/80">
-                            <span class="flex items-center gap-1">
-                                <ion-icon name="calendar-outline"></ion-icon>
-                                {{ formatearFecha(sesion.fechaInicio) }}
-                            </span>
-
-                            <span class="text-gray-300 dark:text-white/40">|</span>
+                            <span>{{ formatearFecha(sesion.fechaInicio) }}</span>
+                            <span class="text-gray-300 dark:text-white/40">•</span>
 
                             @if (sesion.completada) {
-                            <span class="flex items-center gap-1 text-orange-500 font-semibold">
-                                <ion-icon name="time-outline"></ion-icon>
+                            <span class="text-orange-500 font-semibold">
                                 {{ redondearMinutos(sesion.duracion || 0) }} min
                             </span>
                             } @else {
-                            <span class="text-primary font-semibold flex items-center gap-1">
-                                En progreso <span class="bg-primary/10 px-1 rounded">{{ getProgresoSesion(sesion)
-                                    }}%</span>
+                            <span class="text-primary font-semibold">
+                                {{ getProgresoSesion(sesion) }}% completado
                             </span>
                             }
                         </div>
@@ -63,13 +58,11 @@
         </ion-list>
         } @else {
         <div class="flex flex-col items-center justify-center p-6 opacity-60 text-center text-gray-900 dark:text-white">
-            <ion-icon name="calendar-outline" class="text-4xl mb-2"></ion-icon>
             <p class="text-sm font-medium m-0">No hay rutinas para este periodo.</p>
         </div>
         }
         } @else {
         <div class="flex flex-col items-center justify-center p-8 opacity-60 text-center text-gray-900 dark:text-white">
-            <ion-icon name="fitness-outline" class="text-5xl mb-3"></ion-icon>
             <p class="text-base font-medium m-0">Aún no has comenzado ninguna rutina.</p>
             <p class="text-sm mt-1 text-gray-500 dark:text-white/80">Tu progreso aparecerá aquí.</p>
         </div>

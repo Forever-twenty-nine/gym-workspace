@@ -23,6 +23,9 @@
 
   <!-- Modal para crear/editar rutina -->
   <app-rutina-modal [isOpen]="isRutinaModalOpen()" [isCreating]="isRutinaCreating()" [rutinaData]="rutinaSeleccionada()"
-    [ejercicios]="ejerciciosCreados()" (close)="closeRutinaModal()" (save)="saveRutinaChanges($event)">
+    [ejercicios]="ejerciciosCreados()" 
+    [diasSemana]="diasSemana"
+    (close)="closeRutinaModal()" 
+    (save)="saveRutinaChanges($event)">
   </app-rutina-modal>
 </ion-content>

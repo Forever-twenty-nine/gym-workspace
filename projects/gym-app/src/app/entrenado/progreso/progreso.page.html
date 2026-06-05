@@ -18,8 +18,12 @@
       class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
       @if (estadisticasGenerales(); as stats) {
       <div class="w-full">
-        <!-- Estadísticas Generales Premium -->
-        <app-progreso-estadisticas [stats]="stats"></app-progreso-estadisticas>
+        <!-- Estadísticas Generales con gráficos (rediseño limpio) -->
+        <app-progreso-estadisticas 
+          [stats]="stats" 
+          [sesiones]="historialSesiones()" 
+          [dbStats]="dbEstadisticas()">
+        </app-progreso-estadisticas>
 
         <!-- Historial de Sesiones -->
         <app-progreso-historial [sesiones]="historialSesiones()"

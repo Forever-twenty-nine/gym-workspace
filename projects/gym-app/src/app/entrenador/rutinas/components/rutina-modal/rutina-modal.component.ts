@@ -14,8 +14,11 @@ import {
     IonInput,
     IonTextarea,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonBadge
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -49,6 +52,9 @@ export class RutinaModalComponent {
     rutinaData = input<any | null>(null);
     ejercicios = input<any[]>([]);
 
+    // Lista de días para el selector simple a nivel de rutina
+    diasSemana = input<string[]>(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']);
+
     close = output<void>();
     save = output<any>();
 
@@ -57,7 +63,8 @@ export class RutinaModalComponent {
         descripcion: [''],
         ejerciciosIds: [[]],
         creadorId: [''],
-        asignadoIds: [[]]
+        asignadoIds: [[]],
+        diasSemana: [[]]  // Días de la semana para esta rutina (un solo selector multi)
     }));
 
     // Track form status reactively
@@ -70,6 +77,8 @@ export class RutinaModalComponent {
     });
 
     constructor() {
+        addIcons({ close });
+
         effect(() => {
             const data = this.rutinaData();
             if (data) {
@@ -78,7 +87,8 @@ export class RutinaModalComponent {
                     descripcion: data.descripcion || '',
                     ejerciciosIds: data.ejerciciosIds || [],
                     creadorId: data.creadorId || '',
-                    asignadoIds: data.asignadoIds || []
+                    asignadoIds: data.asignadoIds || [],
+                    diasSemana: data.diasSemana || []
                 });
             } else {
                 this.form().reset({
@@ -86,7 +96,8 @@ export class RutinaModalComponent {
                     descripcion: '',
                     ejerciciosIds: [],
                     creadorId: '',
-                    asignadoIds: []
+                    asignadoIds: [],
+                    diasSemana: []
                 });
             }
         });

@@ -15,13 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { ProgresoHistorialDetalleComponent } from '../progreso-historial-detalle/progreso-historial-detalle.component';
 import { addIcons } from 'ionicons';
-import {
-    calendarOutline,
-    timeOutline,
-    trashOutline,
-    fitnessOutline,
-    checkmarkCircleOutline
-} from 'ionicons/icons';
+import { trashOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-progreso-historial',
@@ -51,13 +45,7 @@ export class ProgresoHistorialComponent {
     sesionSeleccionada: any = null;
 
     constructor() {
-        addIcons({
-            calendarOutline,
-            timeOutline,
-            trashOutline,
-            fitnessOutline,
-            checkmarkCircleOutline
-        });
+        addIcons({ trashOutline });
     }
 
     formatearFecha(fecha?: Date | string): string {
@@ -70,17 +58,7 @@ export class ProgresoHistorialComponent {
         });
     }
 
-    getEstadoSesion(sesion: any): string {
-        if (sesion.completada) return 'Completada';
-        if (sesion.fechaInicio) return 'En progreso';
-        return 'Pendiente';
-    }
 
-    getColorEstado(sesion: any): string {
-        if (sesion.completada) return 'success';
-        if (sesion.fechaInicio) return 'primary';
-        return 'medium';
-    }
 
     getProgresoSesion(sesion: any): number {
         return sesion.porcentajeCompletado || 0;

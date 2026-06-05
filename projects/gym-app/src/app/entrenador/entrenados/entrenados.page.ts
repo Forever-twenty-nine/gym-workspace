@@ -392,6 +392,26 @@ export class EntrenadosPage implements OnInit {
       };
       await this.entrenadoService.save(entrenadoActualizado);
 
+      // Si la rutina tiene días definidos en su plantilla (un solo selector), crear las asignaciones automáticas
+      const dias = (rutina as any)?.diasSemana || [];
+      for (const dia of dias) {
+        const yaTiene = this.asignacionesEntrenado().some(a =>
+          a.rutinaId === rutina.id && a.entrenadoId === entrenado.id && a.diaSemana === dia
+        );
+        if (!yaTiene) {
+          const nueva: any = {
+            id: '',
+            rutinaId: rutina.id,
+            entrenadoId: entrenado.id,
+            entrenadorId: this.authService.currentUser()?.uid,
+            diaSemana: dia,
+            fechaAsignacion: new Date(),
+            activa: true
+          };
+          await this.rutinaAsignadaService.save(nueva);
+        }
+      }
+
       const toast = await this.toastController.create({
         message: `Rutina ${rutina.nombre} habilitada para el entrenado`,
         duration: 2000,
@@ -450,9 +470,17 @@ export class EntrenadosPage implements OnInit {
   }
 
   getDiasAsignados(rutinaId: string): string[] {
-    return this.asignacionesEntrenado()
+    const perAsignacion = this.asignacionesEntrenado()
       .filter(a => a.rutinaId === rutinaId && a.diaSemana)
       .map(a => a.diaSemana!);
+
+    if (perAsignacion.length > 0) {
+      return perAsignacion;
+    }
+
+    // Fallback: usar los días definidos en la propia rutina (un solo selector a nivel de plantilla)
+    const rutina = this.rutinaService.rutinas().find(r => r.id === rutinaId);
+    return (rutina as any)?.diasSemana || [];
   }
 
   async quitarDiaDeRutina(rutinaId: string, dia: string) {

@@ -35,6 +35,22 @@
                     </ion-select>
                 </ion-item>
 
+                <!-- Días de la semana - UN SOLO SELECTOR a nivel de la rutina -->
+                <ion-item class="gym-modal-item">
+                    <ion-select 
+                        label="Días de la semana" 
+                        labelPlacement="stacked" 
+                        formControlName="diasSemana" 
+                        multiple
+                        cancelText="Cancelar" 
+                        okText="Aceptar"
+                        placeholder="Selecciona los días">
+                        @for (dia of diasSemana(); track dia) {
+                        <ion-select-option [value]="dia">{{ dia }}</ion-select-option>
+                        }
+                    </ion-select>
+                </ion-item>
+
                 <ion-button expand="block" type="submit" [disabled]="isSaveDisabled()" class="mt-4">
                     {{ isCreating() ? 'Crear' : 'Guardar' }}
                 </ion-button>

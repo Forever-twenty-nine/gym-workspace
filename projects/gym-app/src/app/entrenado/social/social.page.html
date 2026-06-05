@@ -1,17 +1,5 @@
-<!-- Background Image Layer (Fixed) -->
-@if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-} @else {
-  <div class="fixed inset-0 z-0 bg-linear-to-br from-blue-900 via-green-700 to-blue-900 pointer-events-none"></div>
-}
-
-
-
 <!-- Tabs de Segmento con Glassmorphism (Fijo fuera de ion-content) -->
-<div class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
+<ion-header class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
   <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
     class="rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
     <ion-segment-button value="para-ti">
@@ -24,10 +12,21 @@
       <ion-label class="font-bold text-xs uppercase tracking-wider">Descubrir</ion-label>
     </ion-segment-button>
   </ion-segment>
-</div>
+</ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
-  <div class="relative z-10 px-4 pb-6 pt-1">
+  <!-- Background Image Layer (Fixed) - inside ion-content like all other tab pages so it extends properly under the tab bar -->
+  @if (isPremium()) {
+    <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
+      <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
+        class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
+    </div>
+  } @else {
+    <div
+      class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none"></div>
+  }
+
+  <div class="relative z-10 px-4 pb-6 pt-2">
     <!-- Renderizado condicional por componente -->
     @switch (selectedTab()) {
       @case ('descubrir') {
@@ -37,10 +36,6 @@
         <!-- Seccion de Desafíos Activos -->
         @if (desafiosActivos().length > 0) {
           <div class="mb-6 px-1">
-            <div class="flex items-center gap-2 mb-4 px-1">
-              <ion-icon name="trophy-outline" class="text-xl text-amber-500"></ion-icon>
-              <h3 class="text-sm font-extrabold text-gray-900 dark:text-white uppercase tracking-wider">Desafíos Activos</h3>
-            </div>
             <div class="flex flex-col gap-4">
               @for (item of desafiosActivos(); track item.id) {
                 <app-desafio-feed-card [desafio]="item"></app-desafio-feed-card>

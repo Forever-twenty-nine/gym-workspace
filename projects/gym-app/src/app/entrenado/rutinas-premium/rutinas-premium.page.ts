@@ -190,9 +190,17 @@ export class RutinasPremiumPage implements OnInit {
   }
 
   getDiasAsignados(rutinaId: string): string[] {
-    return this.asignaciones()
+    const perAsignacion = this.asignaciones()
       .filter(a => a.rutinaId === rutinaId && a.diaSemana)
       .map(a => a.diaSemana!);
+
+    if (perAsignacion.length > 0) {
+      return perAsignacion;
+    }
+
+    // Fallback a los días de la rutina plantilla (un solo selector)
+    const rutina = this.rutinaService.rutinas().find(r => r.id === rutinaId);
+    return (rutina as any)?.diasSemana || [];
   }
 
   async asignarDia(rutina: Rutina, event: any) {

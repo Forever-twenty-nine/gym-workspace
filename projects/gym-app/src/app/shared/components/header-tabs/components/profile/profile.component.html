@@ -1,56 +1,116 @@
-<ion-menu side="start" menuId="profile-menu" contentId="main-content" swipeGesture="true">
-  <ion-header class="ion-no-border" class="ion-padding">
-    <ion-toolbar color="black">
-      <ion-title>Mi Perfil</ion-title>
+<ion-menu side="start" menuId="profile-menu" contentId="main-content" swipeGesture="true" class="profile-drawer">
+  <!-- Minimal header just for safe-area / spacing, no title -->
+  <ion-header class="ion-no-border">
+    <ion-toolbar class="ion-no-padding" style="--background: transparent; --border-color: transparent;">
       <ion-buttons slot="end">
-        <ion-button (click)="openEditModal()">
-          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-        </ion-button>
+        <!-- edit moved to user row below to avoid duplication -->
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="ion-padding">
+  <ion-content class="ion-padding" style="--background: transparent;">
     @if (currentUser(); as user) {
-    <div class="flex flex-col items-center gap-4 py-8 mb-6">
-      <div class="relative">
-        <div class="relative w-24 h-24 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl">
-          @if (user.photoURL) {
-          <img [ngSrc]="user.photoURL" width="96" height="96" class="object-cover w-full h-full" alt="Foto de perfil" />
-          } @else {
-          <div class="w-full h-full bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
-            {{ getIniciales(user.nombre) }}
+      <!-- Main glass panel (matches the style of main screens / dashboard cards) -->
+      <div class="rounded-3xl overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-xl p-4">
+        <!-- Compact user header with edit action inline (single edit affordance, no redundant title) -->
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-full overflow-hidden border border-primary/30 shrink-0 shadow-sm">
+            @if (user.photoURL) {
+              <img [ngSrc]="user.photoURL" width="44" height="44" class="w-full h-full object-cover" alt="Foto de perfil" />
+            } @else {
+              <div class="w-full h-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
+                {{ getIniciales(user.nombre) }}
+              </div>
+            }
           </div>
-          }
+          <div class="flex-1 min-w-0">
+            <h2 class="ion-no-margin text-[16px] font-semibold truncate">{{ user.nombre }}</h2>
+            <p class="ion-no-margin text-xs text-medium">{{ getRoleDisplayName(user.role) }}</p>
+          </div>
+          <!-- Single edit button next to the user info -->
+          <ion-button fill="clear" size="small" (click)="openEditModal()" class="ion-no-margin" style="--padding-start: 2px; --padding-end: 2px;">
+            <ion-icon slot="icon-only" name="pencil-outline" style="font-size: 17px; opacity: 0.75;"></ion-icon>
+          </ion-button>
         </div>
-      </div>
 
-      <div class="text-center">
-        <h2 class="ion-no-margin text-2xl font-bold">{{ user.nombre }}</h2>
-        <p class="ion-no-margin font-medium">{{ getRoleDisplayName(user.role) }}</p>
-      </div>
-    </div>
+        <!-- Essential info - compact glass style matching app cards -->
+        <div class="rounded-2xl overflow-hidden border border-white/10 dark:border-white/10 bg-black/20 dark:bg-white/5 mb-4 text-sm">
+          <div class="divide-y divide-white/10 dark:divide-white/10">
+            <!-- Plan -->
+            <div class="flex items-center justify-between px-3 py-2.25">
+              <div class="flex items-center gap-2">
+                <ion-icon name="star-outline" class="text-primary text-base"></ion-icon>
+                <span class="text-medium">Plan</span>
+              </div>
+              <span class="font-semibold" [class.text-success]="user.plan === 'premium'">
+                {{ user.plan || 'Free' }}
+              </span>
+            </div>
 
-    <app-profile-info-card [user]="user" [ultimasolicitud]="ultimasolicitud()" [entrenadoData]="currentEntrenado()"
-      (openPremiumModalClicked)="openPremiumModal()">
-    </app-profile-info-card>
+            @if (user.role === 'entrenado' && currentEntrenado()) {
+              <div class="flex items-center justify-between px-3 py-2.25">
+                <div class="flex items-center gap-2">
+                  <ion-icon name="flag-outline" class="text-primary text-base"></ion-icon>
+                  <span class="text-medium">Objetivo</span>
+                </div>
+                <span class="font-medium text-right max-w-[52%] truncate">
+                  {{ currentEntrenado()?.objetivo || 'Sin definir' }}
+                </span>
+              </div>
+
+              <div class="flex items-center justify-between px-3 py-2.25">
+                <div class="flex items-center gap-2">
+                  <ion-icon name="bar-chart-outline" class="text-primary text-base"></ion-icon>
+                  <span class="text-medium">Nivel</span>
+                </div>
+                <span class="font-medium">
+                  {{ currentEntrenado()?.nivel || 'Sin definir' }}
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Premium status / upsell (simplified) -->
+        @if (!user.plan || user.plan === 'free') {
+          @if (ultimasolicitud()?.estado === 'pendiente') {
+            <ion-button expand="block" fill="clear" color="warning" disabled>
+              Solicitud de Premium pendiente
+            </ion-button>
+          } @else if (ultimasolicitud()?.estado === 'rechazada') {
+            <ion-button expand="block" fill="outline" color="danger" (click)="openPremiumModal()">
+              Reintentar Premium
+            </ion-button>
+          } @else {
+            <ion-button expand="block" color="primary" (click)="openPremiumModal()">
+              <ion-icon name="trophy-outline" slot="start"></ion-icon>
+              Mejorar a Premium
+            </ion-button>
+          }
+        } @else {
+          <div class="flex items-center justify-center gap-1.5 py-2 text-sm text-success font-medium">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Premium activo</span>
+          </div>
+        }
+      </div>
     } @else if (!isLoggingOut()) {
-    <div class="flex flex-col items-center justify-center p-6 h-full">
-      <ion-spinner name="crescent" color="primary"></ion-spinner>
-      <p class="mt-4 text-white font-medium">Cargando...</p>
-    </div>
+      <div class="flex flex-col items-center justify-center p-6 h-full">
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+        <p class="mt-4 text-white font-medium">Cargando...</p>
+      </div>
     }
   </ion-content>
 
   @if (currentUser()) {
-  <ion-footer class="ion-no-border">
-    <ion-toolbar color="black" class="ion-padding">
-      <ion-button expand="block" color="danger" fill="outline" class="font-bold h-12" (click)="logout()">
-        <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Cerrar Sesión
-      </ion-button>
-    </ion-toolbar>
-  </ion-footer>
+    <ion-footer class="ion-no-border">
+      <ion-toolbar class="ion-padding" style="--background: transparent; --border-color: transparent;">
+        <ion-button expand="block" color="danger" fill="outline" class="font-semibold h-11" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Cerrar sesión
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
   }
 </ion-menu>
 

@@ -1,10 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import {
-  IonContent,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel
-} from '@ionic/angular/standalone';
+import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonHeader } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
@@ -30,8 +25,9 @@ import { trophyOutline } from 'ionicons/icons';
     ConvocatoriasComponent,
     DescubrirTabComponent,
     FeedTabComponent,
-    DesafioFeedCardComponent
-  ]
+    DesafioFeedCardComponent,
+    IonHeader
+]
 })
 export class SocialPage {
   private authService = inject(AuthService);

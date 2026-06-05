@@ -76,6 +76,10 @@
  ion-menu::part(container) {
    width: 85% !important;
    max-width: 400px !important;
+   /* Dark glass background to match the aesthetic of the main screens and cards */
+   background-color: rgba(10, 10, 12, 0.95);
+   backdrop-filter: blur(20px);
+   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.35);
  }
 
  ion-menu::part(backdrop) {

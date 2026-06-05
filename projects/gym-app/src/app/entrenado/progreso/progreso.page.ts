@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, inject, computed, effect } from '@angular/core';
 
 import {
   IonContent,
@@ -11,6 +11,7 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
+import { EstadisticasEntrenadoService } from '../../core/services/estadisticas-entrenado.service';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { ProgresoHistorialComponent } from './components/progreso-historial/progreso-historial.component';
 
@@ -27,11 +28,12 @@ import { ProgresoHistorialComponent } from './components/progreso-historial/prog
 ],
   templateUrl: './progreso.page.html',
 })
-export class ProgresoPage implements OnInit {
+export class ProgresoPage implements OnInit, OnDestroy {
   private readonly rutinaService = inject(RutinaService);
   private readonly authService = inject(AuthService);
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly sesionRutinaService = inject(SesionRutinaService);
+  private readonly estadisticasService = inject(EstadisticasEntrenadoService);
   private readonly alertController = inject(AlertController);
 
   readonly currentUserSignal = this.authService.currentUser;
@@ -39,9 +41,27 @@ export class ProgresoPage implements OnInit {
 
   readonly isLoading = signal(false);
 
-  constructor() { }
+  private userListenerInitialized = false;
+
+  constructor() {
+    // Auto init listener when user changes
+    effect(() => {
+      const user = this.currentUserSignal();
+      if (user?.uid && !this.userListenerInitialized) {
+        this.estadisticasService.initializeListener(user.uid);
+        this.userListenerInitialized = true;
+      }
+    });
+  }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    const uid = this.currentUserSignal()?.uid;
+    if (uid) {
+      this.estadisticasService.stopListener(uid);
+    }
   }
 
   rutinasAsignadas = computed(() => {
@@ -91,6 +111,12 @@ export class ProgresoPage implements OnInit {
       enProgreso: sesionesEnProgreso,
       tiempoTotal
     };
+  });
+
+  dbEstadisticas = computed(() => {
+    const uid = this.currentUserSignal()?.uid;
+    if (!uid) return null;
+    return this.estadisticasService.getEstadisticas(uid)();
   });
 
   async confirmarEliminacion(sesionId: string) {

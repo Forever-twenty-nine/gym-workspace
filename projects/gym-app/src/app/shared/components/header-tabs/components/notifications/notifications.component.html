@@ -1,11 +1,11 @@
 <ion-menu side="end" menuId="notifications-menu" contentId="main-content" swipeGesture="true">
-    <ion-header>
-        <ion-toolbar class="px-4">
+    <ion-header class="ion-no-border">
+        <ion-toolbar class="px-4" style="--background: transparent; --border-color: transparent;">
             <ion-title>Notificaciones</ion-title>
         </ion-toolbar>
     </ion-header>
 
-    <ion-content class="px-4">
+    <ion-content class="px-4" style="--background: transparent;">
         @if (canUseChat()) {
         <div class="pt-2 pb-3">
             <ion-button expand="block" fill="outline" color="primary" (click)="openChatList()" class="h-11">

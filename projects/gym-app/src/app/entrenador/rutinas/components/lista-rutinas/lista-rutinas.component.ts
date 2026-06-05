@@ -37,7 +37,7 @@ export class ListaRutinasComponent {
     deleteRutina = output<string>();
 
     constructor() {
-        addIcons({ pencilOutline, trashOutline, calendarOutline });
+        addIcons({ pencilOutline, trashOutline });
     }
 
     async toggleSliding(slidingItem: IonItemSliding) {

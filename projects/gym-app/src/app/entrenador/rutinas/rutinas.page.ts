@@ -67,6 +67,9 @@ export class RutinasPage implements OnInit {
   rutinaSeleccionada = signal<any | null>(null);
   isRutinaCreating = signal(false);
 
+  // Días de la semana (un solo selector multi en el modal de editar rutina)
+  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
   constructor() {
     addIcons({ fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed });
   }
