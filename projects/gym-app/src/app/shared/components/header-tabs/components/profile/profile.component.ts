@@ -88,6 +88,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.rutinas.set(this.rutinaService.rutinas());
+    // Aseguramos que el gesto de swipe desde el borde izquierdo funcione
+    this.menuCtrl.enable(true, 'profile-menu');
   }
 
   ngOnDestroy() {

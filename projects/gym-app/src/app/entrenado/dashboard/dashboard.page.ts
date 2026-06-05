@@ -23,8 +23,6 @@ import { AuthService } from '../../core/services/auth.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { Entrenado, User as LibraryUser } from 'gym-library';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
-
 import { PlanPersonalizadoComponent } from './components/plan-personalizado/plan-personalizado.component';
 import { RutinasAsignadasComponent } from './components/rutinas-asignadas/rutinas-asignadas.component';
 
@@ -40,7 +38,6 @@ export interface User extends LibraryUser {
     IonContent,
     FormsModule,
     NgOptimizedImage,
-    HeaderTabsComponent,
     PlanPersonalizadoComponent,
     RutinasAsignadasComponent
 ],

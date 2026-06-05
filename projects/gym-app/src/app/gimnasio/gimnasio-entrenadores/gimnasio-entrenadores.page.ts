@@ -23,7 +23,7 @@ import { UserService } from '../../core/services/user.service';
 import { GimnasioService } from '../../core/services/gimnasio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { InvitacionModalComponent } from '../../entrenador/entrenados/components/invitacion-modal/invitacion-modal.component';
 
 @Component({
@@ -42,7 +42,6 @@ import { InvitacionModalComponent } from '../../entrenador/entrenados/components
     IonIcon,
     IonSearchbar,
     NgOptimizedImage,
-    HeaderTabsComponent,
     InvitacionModalComponent
   ],
 })

@@ -23,7 +23,7 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { MisEntrenadosComponent } from './components/mis-entrenados/mis-entrenados.component';
 import { InvitacionesPendientesComponent } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
@@ -42,7 +42,6 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     IonIcon,
     IonText,
     NgOptimizedImage,
-    HeaderTabsComponent,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,

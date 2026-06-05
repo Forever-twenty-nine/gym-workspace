@@ -1,10 +1,22 @@
-<ion-menu side="end" menuId="notifications-menu" contentId="main-content">
+<ion-menu side="end" menuId="notifications-menu" contentId="main-content" swipeGesture="true">
     <ion-header>
         <ion-toolbar class="px-4">
             <ion-title>Notificaciones</ion-title>
         </ion-toolbar>
     </ion-header>
+
     <ion-content class="px-4">
+        @if (canUseChat()) {
+        <div class="pt-2 pb-3">
+            <ion-button expand="block" fill="outline" color="primary" (click)="openChatList()" class="h-11">
+                <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
+                Mensajes / Chats
+                @if (unreadChatsCount() > 0) {
+                <ion-badge color="danger" class="ml-2">{{ unreadChatsCount() }}</ion-badge>
+                }
+            </ion-button>
+        </div>
+        }
         @if (mensajesNoLeidos().length === 0 && invitacionesPendientes().length === 0 && mensajesLeidos().length === 0)
         {
         <div style="text-align: center; color: var(--ion-color-medium); padding: 40px 20px;">

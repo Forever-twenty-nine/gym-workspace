@@ -8,7 +8,7 @@ import {
 import { NgOptimizedImage } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { ConvocatoriasComponent } from './components/convocatorias/convocatorias.component';
 import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.component';
 import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
@@ -27,7 +27,6 @@ import { trophyOutline } from 'ionicons/icons';
     IonContent,
     NgOptimizedImage,
     IonSegment, IonSegmentButton, IonLabel, IonIcon,
-    HeaderTabsComponent,
     ConvocatoriasComponent,
     DescubrirTabComponent,
     FeedTabComponent,

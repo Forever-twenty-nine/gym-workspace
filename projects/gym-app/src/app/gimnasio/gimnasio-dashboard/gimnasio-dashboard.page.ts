@@ -10,15 +10,14 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 
 @Component({
   selector: 'app-gimnasio-dashboard',
   templateUrl: 'gimnasio-dashboard.page.html',
   standalone: true,
   imports: [
-    IonContent,
-    HeaderTabsComponent
+    IonContent
   ],
 })
 export class GimnasioDashboardPage implements OnInit {

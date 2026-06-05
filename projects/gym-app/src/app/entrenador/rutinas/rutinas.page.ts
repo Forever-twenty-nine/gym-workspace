@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
 import { AccionesRutinaComponent } from './components/acciones-rutina/acciones-rutina.component';
 import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
@@ -22,7 +22,6 @@ import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.com
   standalone: true,
   imports: [
     IonContent,
-    HeaderTabsComponent,
     ListaRutinasComponent,
     AccionesRutinaComponent,
     RutinaModalComponent

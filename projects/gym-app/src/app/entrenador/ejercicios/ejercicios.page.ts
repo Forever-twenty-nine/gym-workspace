@@ -16,7 +16,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { EjerciciosListComponent } from '../components/ejercicios-list/ejercicios-list.component';
 import { EjercicioModalComponent } from '../components/ejercicio-modal/ejercicio-modal.component';
 
@@ -29,7 +29,6 @@ import { EjercicioModalComponent } from '../components/ejercicio-modal/ejercicio
     IonButton,
     IonIcon,
     NgOptimizedImage,
-    HeaderTabsComponent,
     EjerciciosListComponent,
     EjercicioModalComponent]
 })

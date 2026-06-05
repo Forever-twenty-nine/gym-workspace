@@ -20,7 +20,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { RutinaService } from '../../core/services/rutina.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { CrearConvocatoriaModalComponent } from '../social/components/convocatorias/components/crear-convocatoria-modal/crear-convocatoria-modal.component';
 import { CrearDesafioModalComponent } from '../social/components/desafios/components/crear-desafio-modal/crear-desafio-modal.component';
 
@@ -38,7 +38,6 @@ import { CrearDesafioModalComponent } from '../social/components/desafios/compon
     IonLabel,
     IonList,
     IonBadge,
-    HeaderTabsComponent,
     CrearConvocatoriaModalComponent,
     CrearDesafioModalComponent
   ]

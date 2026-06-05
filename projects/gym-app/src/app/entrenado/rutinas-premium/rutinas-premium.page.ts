@@ -32,7 +32,7 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { Rutina, Ejercicio, RutinaAsignada } from 'gym-library';
 
 @Component({
@@ -61,8 +61,7 @@ import { Rutina, Ejercicio, RutinaAsignada } from 'gym-library';
     IonFabButton,
     IonSelect,
     IonSelectOption,
-    NgOptimizedImage,
-    HeaderTabsComponent
+    NgOptimizedImage
 ]
 })
 export class RutinasPremiumPage implements OnInit {

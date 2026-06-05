@@ -13,7 +13,7 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { ProgresoHistorialComponent } from './components/progreso-historial/progreso-historial.component';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 
 @Component({
   selector: 'app-progreso',
@@ -23,8 +23,7 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonText,
     NgOptimizedImage,
     ProgresoEstadisticasComponent,
-    ProgresoHistorialComponent,
-    HeaderTabsComponent
+    ProgresoHistorialComponent
 ],
   templateUrl: './progreso.page.html',
 })

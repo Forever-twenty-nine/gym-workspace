@@ -17,14 +17,14 @@ import { DesafioService } from '../../core/services/desafio.service';
 import { Router, RouterModule } from '@angular/router';
 import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { AlertController, ToastController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
-  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent, HeaderTabsComponent],
+  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);

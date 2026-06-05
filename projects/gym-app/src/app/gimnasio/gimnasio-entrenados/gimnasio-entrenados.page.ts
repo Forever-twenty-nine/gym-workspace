@@ -14,7 +14,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 
 @Component({
   selector: 'app-gimnasio-entrenados',
@@ -29,8 +29,7 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonLabel,
     IonSearchbar,
     IonListHeader,
-    NgOptimizedImage,
-    HeaderTabsComponent
+    NgOptimizedImage
   ],
 })
 export class GimnasioEntrenadosPage implements OnInit {

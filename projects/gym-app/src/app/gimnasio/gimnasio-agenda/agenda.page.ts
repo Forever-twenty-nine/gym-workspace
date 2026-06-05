@@ -16,7 +16,7 @@ import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { Convocatoria } from 'gym-library';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 
 @Component({
   selector: 'app-gimnasio-agenda',
@@ -29,8 +29,7 @@ import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-
     IonLabel,
     IonSegment,
     IonSegmentButton,
-    IonPopover,
-    HeaderTabsComponent
+    IonPopover
   ]
 })
 export class AgendaPage implements OnInit {

@@ -26,7 +26,7 @@ import { add, close, saveOutline, trashOutline, pencilOutline } from 'ionicons/i
 import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { Ejercicio } from 'gym-library';
 
 @Component({
@@ -51,8 +51,7 @@ import { Ejercicio } from 'gym-library';
     IonTextarea,
     IonFab,
     IonFabButton,
-    NgOptimizedImage,
-    HeaderTabsComponent
+    NgOptimizedImage
 ]
 })
 export class EjerciciosPremiumPage implements OnInit {

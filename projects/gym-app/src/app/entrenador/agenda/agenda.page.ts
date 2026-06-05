@@ -20,7 +20,7 @@ import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { Convocatoria, Rol } from 'gym-library';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear-agenda-modal.component';
 
 @Component({
@@ -35,7 +35,6 @@ import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear
     IonLabel,
     IonSegment,
     IonSegmentButton,
-    HeaderTabsComponent,
     CrearAgendaModalComponent
   ]
 })

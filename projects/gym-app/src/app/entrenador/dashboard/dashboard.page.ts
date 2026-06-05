@@ -8,7 +8,7 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
-import { HeaderTabsComponent } from '../../shared/components/header-tabs/header-tabs.component';
+
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { EstadisticasCardsComponent } from './components/estadisticas-cards/estadisticas-cards.component';
 import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
@@ -20,7 +20,6 @@ import { ProximosEntrenadosComponent } from './components/proximos-entrenados/pr
   imports: [
     IonContent,
     NgOptimizedImage,
-    HeaderTabsComponent,
     EstadisticasCardsComponent,
     ProximosEntrenadosComponent
   ],
