@@ -1,11 +1,13 @@
 import { Objetivo } from "../../projects/gym-library/src/lib/enums/objetivo.enum";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import { NivelEntrenamiento } from "../../projects/gym-library/src/lib/enums/nivel-entrenamiento.enum";
 
 export interface GymConfig {
   id: string;
   nombre: string;
   email: string;
   direccion: string;
-  plan: 'free' | 'premium';
+  plan: Plan;
   isPersonalTrainer?: boolean;
 }
 
@@ -13,15 +15,15 @@ export interface TrainerConfig {
   name: string;
   email: string;
   password?: string;
-  plan: 'free' | 'premium';
+  plan: Plan;
 }
 
 export interface TraineeConfig {
   name: string;
   email: string;
   password?: string;
-  plan: 'free' | 'premium';
-  nivel: 'principiante' | 'intermedio' | 'avanzado';
+  plan: Plan;
+  nivel: NivelEntrenamiento;
 }
 
 export interface DesafioConfig {
@@ -52,4 +54,4 @@ export interface SeedConfig {
   desafios: DesafioConfig[];
   matches: MatchConfig[];
 }
-export { Objetivo };
+export { Objetivo, Plan, NivelEntrenamiento };

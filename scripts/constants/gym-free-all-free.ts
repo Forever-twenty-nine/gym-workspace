@@ -1,5 +1,7 @@
 import { SeedConfig } from "../interfaces/seed-config.interface";
 import { realGymExercises } from "./common-mocks";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import { NivelEntrenamiento } from "../../projects/gym-library/src/lib/enums/nivel-entrenamiento.enum";
 
 export const gymFreeAllFreeConfig: SeedConfig = {
   gym: {
@@ -7,20 +9,20 @@ export const gymFreeAllFreeConfig: SeedConfig = {
     nombre: "Gimnasio Comunitario (Plan Free)",
     email: "comunitario@gym.test",
     direccion: "Calle Falsa 123",
-    plan: "free"
+    plan: Plan.FREE
   },
   trainers: [
     {
       name: "Juan Entrenador Free",
       email: "juan.free@gym.test",
       password: "admin123",
-      plan: "free"
+      plan: Plan.FREE
     },
     {
       name: "Maria Entrenadora Free",
       email: "maria.free@gym.test",
       password: "admin123",
-      plan: "free"
+      plan: Plan.FREE
     }
   ],
   trainees: [
@@ -29,44 +31,44 @@ export const gymFreeAllFreeConfig: SeedConfig = {
       name: "Lucas Principiante",
       email: "lucas.principiante@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "principiante"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Pedro Intermedio",
       email: "pedro.intermedio@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "intermedio"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Tomas Avanzado",
       email: "tomas.avanzado@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "avanzado"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     // 3 para Maria Entrenadora Free (Trainees 3, 4, 5)
     {
       name: "Sofia Principiante",
       email: "sofia.principiante@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "principiante"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Clara Intermedio",
       email: "clara.intermedio@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "intermedio"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Mateo Avanzado",
       email: "mateo.avanzado@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "avanzado"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.AVANZADO
     }
   ],
   // 10 ejercicios reales de la lista común para respetar el límite de maxExercises: 10 para entrenador free

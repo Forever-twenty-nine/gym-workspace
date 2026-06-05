@@ -1,9 +1,10 @@
 import * as path from "path";
 import { getSeedBucket } from "./context";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
 
-function getLocalImageName(name: string, role: string, plan: string): string {
+function getLocalImageName(name: string, role: string, plan: Plan): string {
   const normalized = name.toLowerCase();
-  const isPremium = plan === "premium";
+  const isPremium = plan === Plan.PREMIUM;
 
   if (role === "gimnasio") {
     return isPremium ? "gym_premium.png" : "gym_free.png";
@@ -69,7 +70,7 @@ export async function resolveProfilePhoto(
   userId: string,
   name: string,
   role: string,
-  plan: string
+  plan: Plan
 ): Promise<string | undefined> {
   return uploadProfileImage(userId, getLocalImageName(name, role, plan));
 }

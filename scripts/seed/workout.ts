@@ -1,21 +1,33 @@
 import { Firestore, Timestamp } from "firebase-admin/firestore";
 import { SeedConfig } from "../interfaces/seed-config.interface";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
 import { stats } from "./context";
 import { rndInt, sessionIdSuffix, shuffleScoped } from "./random";
+import type { Ejercicio } from "../../projects/gym-library/src/lib/models/ejercicio.model";
+import type { Rutina } from "../../projects/gym-library/src/lib/models/rutina.model";
+import type { RutinaAsignada } from "../../projects/gym-library/src/lib/models/rutina-asignada.model";
+import type { SesionRutina } from "../../projects/gym-library/src/lib/models/sesion-rutina.model";
+import {
+  buildEjercicio,
+  buildRutina,
+  buildRutinaAsignada,
+  buildSesionRutinaMock,
+  toFirestoreWrite,
+} from "./builders";
 
 const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
 export interface SeedTrainerRef {
   uid: string;
   nombre: string;
-  plan: string;
+  plan: Plan;
   photoURL?: string;
 }
 
 export interface SeedTraineeRef {
   uid: string;
   nombre: string;
-  plan: string;
+  plan: Plan;
   trainerUid: string;
   photoURL?: string;
 }
@@ -30,22 +42,16 @@ export async function createExercise(
   const id = ref.id;
   const scopeBase = `exercise:${entrenadorId ?? "global"}:${nombre}`;
 
-  const data: Record<string, unknown> = {
-    id,
-    nombre,
-    descripcion,
+  // Note: we still use random here for variety in seed; the builder is used as base shape
+  const base = buildEjercicio(id, nombre, descripcion, entrenadorId);
+  const data = {
+    ...base,
     series: rndInt(`${scopeBase}:series`, 3, 5),
     repeticiones: rndInt(`${scopeBase}:reps`, 8, 12),
     peso: rndInt(`${scopeBase}:peso`, 10, 29),
-    fechaCreacion: Timestamp.now(),
-    fechaModificacion: Timestamp.now(),
   };
 
-  if (entrenadorId) {
-    data.creadorId = entrenadorId;
-  }
-
-  await ref.set(data);
+  await ref.set(toFirestoreWrite(data));
   stats.exercisesCreated++;
   return id;
 }
@@ -59,23 +65,12 @@ export async function createRoutine(
   nombreUsuario: string,
   entrenadorId?: string
 ) {
-  const data: Record<string, unknown> = {
-    nombre,
-    activa: true,
-    descripcion: `Rutina ${nombre} - dia ${dia}`,
-    ejerciciosIds,
-    fechaCreacion: Timestamp.now(),
-    fechaModificacion: Timestamp.now(),
-    usuarioId,
-    nombreUsuario,
-  };
-  if (entrenadorId) {
-    data.creadorId = entrenadorId;
-  }
-
   const docRef = db.collection("rutinas").doc();
   const id = docRef.id;
-  await docRef.set({ ...data, id });
+  const data = buildRutina(id, nombre, ejerciciosIds, usuarioId, nombreUsuario, entrenadorId);
+  // override description for day info
+  (data as any).descripcion = `Rutina ${nombre} - dia ${dia}`;
+  await docRef.set(toFirestoreWrite(data));
   stats.routinesCreated++;
   return id;
 }
@@ -88,21 +83,8 @@ export async function createMockSharedSession(
   routineName: string
 ) {
   const sesionId = `session_${traineeId}_${sessionIdSuffix(traineeId, routineId)}`;
-  await db.collection("sesiones-rutina").doc(sesionId).set({
-    id: sesionId,
-    entrenadoId: traineeId,
-    fechaInicio: Timestamp.fromDate(new Date(Date.now() - 3600000 * 2)),
-    fechaFin: Timestamp.fromDate(new Date(Date.now() - 3600000)),
-    duracion: 3600,
-    status: "completada",
-    completada: true,
-    compartida: true,
-    nombreUsuario: traineeName,
-    fotoUsuario: null,
-    fechaCompartida: Timestamp.now(),
-    likes: [],
-    rutinaResumen: { id: routineId, nombre: routineName, ejercicios: [] },
-  });
+  const sesion = buildSesionRutinaMock(sesionId, traineeId, traineeName, routineId, routineName);
+  await db.collection("sesiones-rutina").doc(sesionId).set(toFirestoreWrite(sesion));
   stats.sessionsCreated++;
 }
 
@@ -124,9 +106,10 @@ export async function seedTrainerWorkouts(
   }
 
   for (const trainer of trainersToProcess) {
-    console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
+    // console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
 
-    const limitExercises = trainer.plan === "free" || config.gym.plan === "free";
+
+    const limitExercises = trainer.plan === Plan.FREE || config.gym.plan === Plan.FREE;
     const exercisesToCreate = limitExercises ? config.exercises.slice(0, 10) : config.exercises;
 
     const trainerExercises = await Promise.all(
@@ -148,7 +131,7 @@ export async function seedTrainerWorkouts(
 
     await Promise.all(
       trainerTrainees.map(async (trainee) => {
-        const numRutinas = trainee.plan === "free"
+        const numRutinas = trainee.plan === Plan.FREE
           ? 1
           : rndInt(`rutinas-count:${config.gym.id}:${trainer.uid}:${trainee.uid}`, 1, 3);
 
@@ -180,15 +163,8 @@ export async function seedTrainerWorkouts(
 
             try {
               const asignadaRef = db.collection("rutinas-asignadas").doc();
-              await asignadaRef.set({
-                id: asignadaRef.id,
-                rutinaId: currentRoutineId,
-                entrenadoId: trainee.uid,
-                entrenadorId: trainer.uid,
-                diaSemana: dia,
-                fechaAsignacion: Timestamp.now(),
-                activa: true,
-              });
+              const asignada = buildRutinaAsignada(asignadaRef.id, currentRoutineId, trainee.uid, trainer.uid, dia);
+              await asignadaRef.set(toFirestoreWrite(asignada));
               stats.routinesAssigned++;
             } catch (e) {
               console.warn("⚠️ No se pudo crear rutina-asignada:", e);

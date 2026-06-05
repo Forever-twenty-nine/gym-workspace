@@ -46,3 +46,14 @@ Rellena el entorno local con usuarios, rutinas y datos de ejemplo para probar si
 2. npm run db:seed
 3. Abrir gym-admin o gym-app e iniciar sesión (ver login-credentials.md)
 ```
+
+## Verificación de modelos (importante)
+
+El seed ahora está tipado contra los modelos de `gym-library`.
+
+- `npm run seed:typecheck` — chequea que los builders y el código del seed sigan siendo compatibles con los interfaces de la librería (usa tsc, no requiere vitest).
+- `npm run seed:test` — corre los tests de conformance (requiere `npm install` primero para tener vitest).
+
+Si cambias un modelo en `projects/gym-library/src/lib/models/*.model.ts` (agregás un campo requerido, renombrás algo, movés un campo de User a Entrenado, etc.), el typecheck o el test van a fallar. Esto evita que el seed inserte datos desfasados.
+
+Antes de commitear cambios en la librería, corré `npm run seed:typecheck`.

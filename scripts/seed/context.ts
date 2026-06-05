@@ -92,27 +92,56 @@ export function getSeedBucket() {
 }
 
 export function printSummaryTable() {
-  console.log("\n📊 ========================================================");
-  console.log("📊 RESUMEN DE EJECUCIÓN (SEED DATA SUMMARY)");
-  console.log("📊 ========================================================");
-  console.table({
-    "Usuarios Auth Creados": stats.authCreated,
-    "Usuarios Auth Actualizados": stats.authUpdated,
-    "Claims de Permisos Asignados": stats.claimsAssigned,
-    "Entrenadores Creados": stats.trainersCreated,
-    "Atletas (Trainees) Creados": stats.traineesCreated,
-    "Gimnasios / PTs Creados": stats.gymsCreated,
-    "Ejercicios Creados": stats.exercisesCreated,
-    "Rutinas Creadas": stats.routinesCreated,
-    "Rutinas Asignadas": stats.routinesAssigned,
-    "Sesiones Compartidas Mock": stats.sessionsCreated,
-    "Desafíos Creados": stats.challengesCreated,
-    "Matches Fitness Creados": stats.matchesCreated,
-    "Mensajes Mock Creados": stats.messagesCreated,
-    "Convocatorias Fitness Creadas": stats.convocatoriasCreated,
-  });
-  if (stats.collectionsCleared.length > 0) {
-    console.log(`🧹 Colecciones Firestore limpiadas: ${stats.collectionsCleared.join(", ")}`);
+  console.log("\n========================================================");
+  console.log("RESUMEN DE EJECUCIÓN (SEED DATA SUMMARY)");
+  console.log("========================================================");
+
+  const cleaned = new Set(stats.collectionsCleared || []);
+
+  const rows = [
+    { Coleccion: "usuarios", Creados: stats.authCreated, Limpia: cleaned.has("usuarios") ? "✓" : "" },
+    { Coleccion: "entrenadores", Creados: stats.trainersCreated, Limpia: cleaned.has("entrenadores") ? "✓" : "" },
+    { Coleccion: "entrenados", Creados: stats.traineesCreated, Limpia: cleaned.has("entrenados") ? "✓" : "" },
+    { Coleccion: "gimnasios", Creados: stats.gymsCreated, Limpia: cleaned.has("gimnasios") ? "✓" : "" },
+    { Coleccion: "ejercicios", Creados: stats.exercisesCreated, Limpia: cleaned.has("ejercicios") ? "✓" : "" },
+    { Coleccion: "rutinas", Creados: stats.routinesCreated, Limpia: cleaned.has("rutinas") ? "✓" : "" },
+    { Coleccion: "rutinas-asignadas", Creados: stats.routinesAssigned, Limpia: cleaned.has("rutinas-asignadas") ? "✓" : "" },
+    { Coleccion: "sesiones-rutina", Creados: stats.sessionsCreated, Limpia: cleaned.has("sesiones-rutina") ? "✓" : "" },
+    { Coleccion: "desafios", Creados: stats.challengesCreated, Limpia: cleaned.has("desafios") ? "✓" : "" },
+    { Coleccion: "matches", Creados: stats.matchesCreated, Limpia: cleaned.has("matches") ? "✓" : "" },
+    { Coleccion: "mensajes", Creados: stats.messagesCreated, Limpia: cleaned.has("mensajes") ? "✓" : "" },
+    { Coleccion: "convocatorias", Creados: stats.convocatoriasCreated, Limpia: cleaned.has("convocatorias") ? "✓" : "" },
+    { Coleccion: "Usuarios Auth Actualizados", Creados: stats.authUpdated, Limpia: "" },
+    { Coleccion: "Claims de Permisos Asignados", Creados: stats.claimsAssigned, Limpia: "" },
+  ];
+
+  // Manual box table (no (index) column, clean headers Coleccion | Creados | Limpia)
+  function drawTable(headers, data) {
+    const colWidths = headers.map((h, i) =>
+      Math.max(h.length, ...data.map(row => String(row[i]).length))
+    );
+
+    const top = '┌' + colWidths.map(w => '─'.repeat(w + 2)).join('┬') + '┐';
+    const sep = '├' + colWidths.map(w => '─'.repeat(w + 2)).join('┼') + '┤';
+    const bot = '└' + colWidths.map(w => '─'.repeat(w + 2)).join('┴') + '┘';
+
+    const headerRow = '│ ' + headers.map((h, i) => h.padEnd(colWidths[i])).join(' │ ') + ' │';
+
+    console.log(top);
+    console.log(headerRow);
+    console.log(sep);
+
+    for (const row of data) {
+      const line = '│ ' + row.map((cell, i) => String(cell).padEnd(colWidths[i])).join(' │ ') + ' │';
+      console.log(line);
+    }
+
+    console.log(bot);
   }
+
+  const headers = ['Coleccion', 'Creados', 'Limpia'];
+  const data = rows.map(r => [r.Coleccion, r.Creados, r.Limpia]);
+  drawTable(headers, data);
+
   console.log("========================================================\n");
 }

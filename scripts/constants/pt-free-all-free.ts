@@ -1,5 +1,7 @@
 import { SeedConfig } from "../interfaces/seed-config.interface";
 import { realGymExercises } from "./common-mocks";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import { NivelEntrenamiento } from "../../projects/gym-library/src/lib/enums/nivel-entrenamiento.enum";
 
 export const ptFreeAllFreeConfig: SeedConfig = {
   gym: {
@@ -7,7 +9,7 @@ export const ptFreeAllFreeConfig: SeedConfig = {
     nombre: "Gimnasio - PT Carlos Free",
     email: "carlos.pt.free@gym.test",
     direccion: "Calle del Sol 400",
-    plan: "free",
+    plan: Plan.FREE,
     isPersonalTrainer: true
   },
   trainers: [], // Vacío porque el PT actúa como el entrenador único
@@ -17,22 +19,22 @@ export const ptFreeAllFreeConfig: SeedConfig = {
       name: "Juan Alumno Free",
       email: "juan.alumno.pt@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "principiante"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Maria Alumna Free",
       email: "maria.alumna.pt@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "intermedio"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Luis Alumno Free",
       email: "luis.alumno.pt@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "avanzado"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.AVANZADO
     }
   ],
   // 10 ejercicios creados por el PT para respetar maxExercises: 10 de entrenador free

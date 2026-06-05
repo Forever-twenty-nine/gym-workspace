@@ -14,6 +14,12 @@
   },
   "include": [
     "./**/*.ts",
-    "../projects/gym-library/src/lib/enums/**/*.ts"
+    "../projects/gym-library/src/lib/enums/**/*.ts",
+    "../projects/gym-library/src/lib/models/**/*.ts"
+  ],
+  "exclude": [
+    "./**/*.spec.ts",
+    "./**/*.test.ts",
+    "./vitest.config.ts"
   ]
 }

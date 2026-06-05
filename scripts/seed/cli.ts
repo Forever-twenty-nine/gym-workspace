@@ -51,6 +51,13 @@ export async function runSeedCli(argv: string[]): Promise<boolean> {
   const db = getSeedDb();
   const auth = getSeedAuth();
 
+  // simple pseudo-animation / progress while seeding (quiet mode)
+  let anim = 0;
+  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  const spinner = setInterval(() => {
+    process.stdout.write(`\r${frames[anim++ % frames.length]} Seeding... `);
+  }, 80);
+
   const configArg = argv.find((arg) => arg.startsWith("--config="));
   const configName = configArg ? configArg.split("=")[1] : null;
 
@@ -63,29 +70,36 @@ export async function runSeedCli(argv: string[]): Promise<boolean> {
 
     await clearSeedProfile(db, auth, selectedConfig);
     await runSeed(db, auth, selectedConfig);
+    clearInterval(spinner);
+    process.stdout.write('\r'); // clear spinner line, no success text
     return true;
   }
 
-  console.log("🚀 ========================================================");
-  console.log("🚀 INICIANDO POBLADO UNIFICADO DE TODA LA BASE DE DATOS LOCAL");
-  console.log("🚀 ========================================================\n");
+  // quiet mode: no big startup banner
+  // console.log("🚀 ========================================================");
+  // console.log("🚀 INICIANDO POBLADO UNIFICADO DE TODA LA BASE DE DATOS LOCAL");
+  // console.log("🚀 ========================================================\n");
 
   for (const collection of FIRESTORE_COLLECTIONS_TO_CLEAR) {
     await clearCollection(db, collection);
   }
 
   await clearAuthUsers(auth, ALL_SEED_CONFIGS);
-  console.log("\n✨ Base de datos local completamente limpia. Iniciando inyecciones...\n");
+  // console.log("\n✨ Base de datos local completamente limpia. Iniciando inyecciones...\n");
 
   for (const config of ALL_SEED_CONFIGS) {
     await runSeed(db, auth, config);
   }
 
-  console.log("🎉 ========================================================");
-  console.log("🎉 POBLADO UNIFICADO FINALIZADO CON ÉXITO");
-  console.log("🎉 ========================================================");
+  clearInterval(spinner);
+  process.stdout.write('\r'); // clear spinner line, no success text
 
-  console.log("\n👑 Creando Super Admin para Gym Admin...");
+  // quiet: no success banners, only errors if any. Super admin creation kept but silent on success.
+  // console.log("🎉 ========================================================");
+  // console.log("🎉 POBLADO UNIFICADO FINALIZADO CON ÉXITO");
+  // console.log("🎉 ========================================================");
+
+  // console.log("\n👑 Creando Super Admin para Gym Admin...");
   await ensureAuthUser(auth, "super_admin_gym", "admin@gym.com", "admin123", "Super Admin", {
     admin: true,
   });
@@ -99,6 +113,6 @@ export async function runSeedCli(argv: string[]): Promise<boolean> {
     },
     { merge: true }
   );
-  console.log("👑 Super Admin creado con éxito (admin@gym.com / admin123)\n");
+  // console.log("👑 Super Admin creado con éxito (admin@gym.com / admin123)\n");
   return true;
 }

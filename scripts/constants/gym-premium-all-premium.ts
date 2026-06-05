@@ -1,5 +1,7 @@
 import { SeedConfig } from "../interfaces/seed-config.interface";
 import { realGymExercises } from "./common-mocks";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import { NivelEntrenamiento } from "../../projects/gym-library/src/lib/enums/nivel-entrenamiento.enum";
 
 export const gymPremiumAllPremiumConfig: SeedConfig = {
   gym: {
@@ -7,26 +9,26 @@ export const gymPremiumAllPremiumConfig: SeedConfig = {
     nombre: "Gimnasio Premium Elite",
     email: "elite@gym.test",
     direccion: "Av. Libertador 4500",
-    plan: "premium"
+    plan: Plan.PREMIUM
   },
   trainers: [
     {
       name: "Carlos Rodríguez Premium",
       email: "carlos.premium@gym.test",
       password: "admin123",
-      plan: "premium"
+      plan: Plan.PREMIUM
     },
     {
       name: "Ana Martínez Premium",
       email: "ana.premium@gym.test",
       password: "admin123",
-      plan: "premium"
+      plan: Plan.PREMIUM
     },
     {
       name: "Roberto Sánchez Premium",
       email: "roberto.premium@gym.test",
       password: "admin123",
-      plan: "premium"
+      plan: Plan.PREMIUM
     }
   ],
   trainees: [
@@ -35,108 +37,108 @@ export const gymPremiumAllPremiumConfig: SeedConfig = {
       name: "Juan Perez Premium",
       email: "juan.perez.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Maria Garcia Premium",
       email: "maria.garcia.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Luis Fernandez Premium",
       email: "luis.fernandez.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "principiante"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Elena Lopez Premium",
       email: "elena.lopez.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Diego Torres Premium",
       email: "diego.torres.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     // 5 para Ana (5-9)
     {
       name: "Sofia Ruiz Premium",
       email: "sofia.ruiz.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "principiante"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Javier Castro Premium",
       email: "javier.castro.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Lucia Morales Premium",
       email: "lucia.morales.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Andres Gil Premium",
       email: "andres.gil.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "principiante"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Carmen Ortiz Premium",
       email: "carmen.ortiz.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     // 5 para Roberto (10-14)
     {
       name: "Fernando Vega Premium",
       email: "fernando.vega.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Isabel Medina Premium",
       email: "isabel.medina.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "principiante"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Ricardo Silva Premium",
       email: "ricardo.silva.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Patricia Ramos Premium",
       email: "patricia.ramos.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Hugo Navarro Premium",
       email: "hugo.navarro.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "principiante"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     }
   ],
   // 25 ejercicios para cada entrenador (sin restricciones)

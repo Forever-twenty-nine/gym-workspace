@@ -1,4 +1,6 @@
 import { SeedConfig } from "../interfaces/seed-config.interface";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import { NivelEntrenamiento } from "../../projects/gym-library/src/lib/enums/nivel-entrenamiento.enum";
 import { realGymExercises } from "./common-mocks";
 
 export const gymFreeMixedConfig: SeedConfig = {
@@ -7,20 +9,20 @@ export const gymFreeMixedConfig: SeedConfig = {
     nombre: "Gimnasio del Barrio (Plan Free - Mixto)",
     email: "barrio@gym.test",
     direccion: "Av. San Martín 150",
-    plan: "free"
+    plan: Plan.FREE
   },
   trainers: [
     {
       name: "Juan Entrenador Premium (En Gym Free)",
       email: "juan.gymfree@gym.test",
       password: "admin123",
-      plan: "premium"
+      plan: Plan.PREMIUM
     },
     {
       name: "Maria Entrenadora Free (En Gym Free)",
       email: "maria.gymfree@gym.test",
       password: "admin123",
-      plan: "free"
+      plan: Plan.FREE
     }
   ],
   trainees: [
@@ -29,58 +31,58 @@ export const gymFreeMixedConfig: SeedConfig = {
       name: "Lucas Mixto Premium",
       email: "lucas.mix.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Pedro Mixto Free",
       email: "pedro.mix.free@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "intermedio"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Tomas Mixto Free",
       email: "tomas.mix.free@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "principiante"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Laura Mixto Premium",
       email: "laura.mix.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     // 4 asignados a Maria (Free)
     {
       name: "Sofia Mixto Free",
       email: "sofia.mix.free@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "principiante"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.PRINCIPIANTE
     },
     {
       name: "Clara Mixto Premium",
       email: "clara.mix.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "avanzado"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.AVANZADO
     },
     {
       name: "Mateo Mixto Free",
       email: "mateo.mix.free@gym.test",
       password: "user123",
-      plan: "free",
-      nivel: "intermedio"
+      plan: Plan.FREE,
+      nivel: NivelEntrenamiento.INTERMEDIO
     },
     {
       name: "Gabriel Mixto Premium",
       email: "gabriel.mix.prem@gym.test",
       password: "user123",
-      plan: "premium",
-      nivel: "intermedio"
+      plan: Plan.PREMIUM,
+      nivel: NivelEntrenamiento.INTERMEDIO
     }
   ],
   // 12 ejercicios totales (respetando maxExercises: 30 de gimnasio free)

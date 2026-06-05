@@ -1,6 +1,20 @@
 import { Auth } from "firebase-admin/auth";
 import { Firestore, Timestamp } from "firebase-admin/firestore";
 import { Objetivo } from "../../projects/gym-library/src/lib/enums/objetivo.enum";
+import type { User } from "../../projects/gym-library/src/lib/models/user.model";
+import type { Entrenador } from "../../projects/gym-library/src/lib/models/entrenador.model";
+import type { Entrenado } from "../../projects/gym-library/src/lib/models/entrenado.model";
+import type { Gimnasio } from "../../projects/gym-library/src/lib/models/gimnasio.model";
+import { Plan } from "../../projects/gym-library/src/lib/enums/plan.enum";
+import {
+  buildTrainerUser,
+  buildEntrenadorDoc,
+  buildTraineeUser,
+  buildEntrenadoDoc,
+  buildGymDoc,
+  buildGymUser,
+  toFirestoreWrite,
+} from "./builders";
 import {
   GymConfig,
   TraineeConfig,
@@ -16,20 +30,11 @@ export async function createTrainer(db: Firestore, auth: Auth, trainerConfig: Tr
   const uid = toSeedUid("trainer", trainerConfig.name);
   const photoURL = await resolveProfilePhoto(uid, trainerConfig.name, "entrenador", trainerConfig.plan);
 
-  const trainerUserData = {
-    uid,
-    nombre: trainerConfig.name,
-    email: trainerConfig.email,
-    role: "entrenador",
-    plan: trainerConfig.plan,
-    onboarded: true,
-    photoURL,
-    fechaCreacion: Timestamp.now(),
-    fechaRegistro: Timestamp.now(),
-  };
+  const trainerUser = buildTrainerUser(uid, trainerConfig.name, trainerConfig.email, trainerConfig.plan, photoURL);
+  const entrenadorDoc = buildEntrenadorDoc(uid);
 
   await Promise.all([
-    db.collection("usuarios").doc(uid).set(trainerUserData, { merge: true }),
+    db.collection("usuarios").doc(uid).set(toFirestoreWrite(trainerUser), { merge: true }),
     ensureAuthUser(
       auth,
       uid,
@@ -39,21 +44,11 @@ export async function createTrainer(db: Firestore, auth: Auth, trainerConfig: Tr
       undefined,
       photoURL
     ),
-    db.collection("entrenadores").doc(uid).set(
-      {
-        id: uid,
-        fechaRegistro: Timestamp.now(),
-        ejerciciosCreadasIds: [],
-        rutinasCreadasIds: [],
-        entrenadosAsignadosIds: [],
-        entrenadosPremiumIds: [],
-      },
-      { merge: true }
-    ),
+    db.collection("entrenadores").doc(uid).set(toFirestoreWrite(entrenadorDoc), { merge: true }),
   ]);
 
   stats.trainersCreated++;
-  return { ...trainerUserData };
+  return { ...trainerUser };
 }
 
 export async function createTrainee(
@@ -71,26 +66,33 @@ export async function createTrainee(
   const franjaHoraria = mockFranjas[index % mockFranjas.length];
   const photoURL = await resolveProfilePhoto(uid, traineeConfig.name, "entrenado", traineeConfig.plan);
 
-  const traineeUserData = {
+  const traineeUser = buildTraineeUser({
     uid,
     nombre: traineeConfig.name,
     email: traineeConfig.email,
-    role: "entrenado",
     plan: traineeConfig.plan,
-    onboarded: true,
+    nivel: traineeConfig.nivel,
     objetivo: objetivoAleatorio,
-    fechaCreacion: Timestamp.now(),
     bio,
     franjaHoraria,
-    nivel: traineeConfig.nivel,
-    seguidores: [],
-    seguidos: [],
-    visibleDescubrir: true,
+    trainerUid,
     photoURL,
-  };
+  });
+  const entrenadoDoc = buildEntrenadoDoc({
+    uid,
+    nombre: traineeConfig.name,
+    email: traineeConfig.email,
+    plan: traineeConfig.plan,
+    nivel: traineeConfig.nivel,
+    objetivo: objetivoAleatorio,
+    bio,
+    franjaHoraria,
+    trainerUid,
+    photoURL,
+  });
 
   await Promise.all([
-    db.collection("usuarios").doc(uid).set(traineeUserData, { merge: true }),
+    db.collection("usuarios").doc(uid).set(toFirestoreWrite(traineeUser), { merge: true }),
     ensureAuthUser(
       auth,
       uid,
@@ -100,28 +102,11 @@ export async function createTrainee(
       undefined,
       photoURL
     ),
-    db.collection("entrenados").doc(uid).set(
-      {
-        id: uid,
-        objetivo: objetivoAleatorio,
-        entrenadoresId: [trainerUid],
-        rutinasAsignadasIds: [],
-        fechaRegistro: Timestamp.now(),
-        plan: traineeConfig.plan,
-        bio,
-        franjaHoraria,
-        nivel: traineeConfig.nivel,
-        seguidores: [],
-        seguidos: [],
-        visibleDescubrir: true,
-        photoURL,
-      },
-      { merge: true }
-    ),
+    db.collection("entrenados").doc(uid).set(toFirestoreWrite(entrenadoDoc), { merge: true }),
   ]);
 
   stats.traineesCreated++;
-  return { ...traineeUserData, trainerUid };
+  return { ...traineeUser, trainerUid };
 }
 
 export async function createGym(
@@ -136,32 +121,19 @@ export async function createGym(
   const roleType = isPT ? "personal_trainer" : "gimnasio";
   const photoURL = await resolveProfilePhoto(gymUid, gymConfig.nombre, roleType, gymConfig.plan);
 
-  const gimnasioDoc = {
-    id: gymUid,
-    nombre: gymConfig.nombre,
-    direccion: gymConfig.direccion,
-    activo: true,
-    isPersonalTrainer: isPT,
-    plan: gymConfig.plan,
-    entrenadoresIds: isPT ? [gymUid] : trainersIds,
-    entrenadosIds: traineesIds,
-    ...(photoURL ? { photoURL } : {}),
-  };
+  const gimnasioDoc = buildGymDoc(
+    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, isPersonalTrainer: isPT, photoURL },
+    isPT ? [gymUid] : trainersIds,
+    traineesIds
+  );
 
-  const gymUserData = {
-    uid: gymUid,
-    nombre: gymConfig.nombre,
-    email: gymConfig.email,
-    role: isPT ? "personal_trainer" : "gimnasio",
-    onboarded: true,
-    plan: gymConfig.plan || "free",
-    fechaCreacion: Timestamp.now(),
-    ...(photoURL ? { photoURL } : {}),
-  };
+  const gymUserData = buildGymUser(
+    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, isPersonalTrainer: isPT, photoURL }
+  );
 
   const dbPromises: Promise<unknown>[] = [
-    db.collection("gimnasios").doc(gymUid).set(gimnasioDoc, { merge: true }),
-    db.collection("usuarios").doc(gymUid).set(gymUserData, { merge: true }),
+    db.collection("gimnasios").doc(gymUid).set(toFirestoreWrite(gimnasioDoc), { merge: true }),
+    db.collection("usuarios").doc(gymUid).set(toFirestoreWrite(gymUserData), { merge: true }),
     ensureAuthUser(auth, gymUid, gymConfig.email, "admin123", gymConfig.nombre, undefined, photoURL),
   ];
 
@@ -173,7 +145,7 @@ export async function createGym(
           gimnasioId: gymUid,
           fechaRegistro: Timestamp.now(),
           entrenadosAsignadosIds: traineesIds,
-          entrenadosPremiumIds: gymConfig.plan === "premium" ? traineesIds : [],
+          entrenadosPremiumIds: gymConfig.plan === Plan.PREMIUM ? traineesIds : [],
           ...(photoURL ? { photoURL } : {}),
         },
         { merge: true }

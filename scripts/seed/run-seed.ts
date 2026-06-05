@@ -8,9 +8,8 @@ import { seedTrainerWorkouts } from "./workout";
 
 export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   const isPT = config.gym.isPersonalTrainer || false;
-  console.log(
-    `🚀 Generando Datos para ${isPT ? "Personal Trainer" : "Gimnasio"}: "${config.gym.nombre}" [Plan: ${config.gym.plan}]`
-  );
+  // minimal log only on error path; for quiet run, no per-config noise
+  // console.log(`Seeding ${isPT ? 'PT' : 'Gym'}: ${config.gym.nombre}`);
 
   const { trainers, trainees } = await seedUsers(db, auth, config);
   const trainersForSocial = await seedTrainerWorkouts(db, config, isPT, config.gym.id, trainers, trainees);

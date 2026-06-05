@@ -3,6 +3,9 @@ import { Firestore } from "firebase-admin/firestore";
 import { SeedConfig } from "../interfaces/seed-config.interface";
 import { createTrainee, createTrainer } from "./entities";
 import { SeedTraineeRef, SeedTrainerRef } from "./workout";
+import type { Entrenador } from "../../projects/gym-library/src/lib/models/entrenador.model";
+import type { Entrenado } from "../../projects/gym-library/src/lib/models/entrenado.model";
+import type { User } from "../../projects/gym-library/src/lib/models/user.model";
 
 export async function seedUsers(
   db: Firestore,
@@ -18,9 +21,9 @@ export async function seedUsers(
 
   const trainers: SeedTrainerRef[] = createdTrainers.map((t) => ({
     uid: t.uid,
-    nombre: t.nombre,
-    plan: t.plan,
-    photoURL: t.photoURL,
+    nombre: t.nombre!,
+    plan: t.plan!,
+    photoURL: t.photoURL ?? undefined,
   }));
 
   const trainees: SeedTraineeRef[] = [];
@@ -36,10 +39,10 @@ export async function seedUsers(
     trainees.push(
       ...createdTrainees.map((t) => ({
         uid: t.uid,
-        nombre: t.nombre,
-        plan: t.plan,
+        nombre: t.nombre!,
+        plan: t.plan!,
         trainerUid: t.trainerUid,
-        photoURL: t.photoURL,
+        photoURL: t.photoURL ?? undefined,
       }))
     );
 
@@ -50,28 +53,29 @@ export async function seedUsers(
           .map((t) => t.uid);
         await Promise.all([
           db.collection("entrenadores").doc(trainer.uid).set(
-            { entrenadosAsignadosIds: trainerAssignedIds },
+            { entrenadosAsignadosIds: trainerAssignedIds } satisfies Partial<Entrenador>,
             { merge: true }
           ),
           db.collection("usuarios").doc(trainer.uid).set(
-            { entrenadosAsignadosIds: trainerAssignedIds },
+            { entrenadosAsignadosIds: trainerAssignedIds } satisfies Partial<User> & Record<string, unknown>,
             { merge: true }
           ),
         ]);
       })
     );
   } else if (isPT) {
-    console.log(`   Asignando ${config.trainees.length} alumnos directamente al Personal Trainer...`);
+    // console.log(`   Asignando ${config.trainees.length} alumnos directamente al Personal Trainer...`);
+
     const createdTrainees = await Promise.all(
       config.trainees.map((traineeConf, i) => createTrainee(db, auth, traineeConf, gymUid, i))
     );
     trainees.push(
       ...createdTrainees.map((t) => ({
         uid: t.uid,
-        nombre: t.nombre,
-        plan: t.plan,
+        nombre: t.nombre!,
+        plan: t.plan!,
         trainerUid: t.trainerUid,
-        photoURL: t.photoURL,
+        photoURL: t.photoURL ?? undefined,
       }))
     );
   }
