@@ -5,12 +5,16 @@ import { DesafioAdminService } from '../../services/desafio-admin.service';
 import { UserService } from '../../services/user.service';
 import { ToastService } from '../../services/toast.service';
 import { PageTitleService } from '../../services/page-title.service';
-import { MatchInteraction, Desafio } from 'gym-library';
+import { DataComponent } from '../../components/shared/data/data.component';
+import { SchemaService } from '../../core/schema.service';
+import { MatchInteraction, Desafio, Mensaje } from 'gym-library';
+import { MensajeService } from '../../services/mensaje.service';
+import { TabsComponent, TabItem } from '../../components/shared/tabs/tabs.component';
 
 @Component({
     selector: 'app-social-page',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, DataComponent, TabsComponent],
     templateUrl: './social.page.html'
 })
 export class SocialPage {
@@ -19,13 +23,11 @@ export class SocialPage {
     private readonly userService = inject(UserService);
     private readonly toastService = inject(ToastService);
     private readonly pageTitleService = inject(PageTitleService);
+    private readonly schemaService = inject(SchemaService);
+    private readonly mensajeService = inject(MensajeService);
 
-    // Pestaña activa: 'matches' | 'desafios'
-    activeTab = signal<'matches' | 'desafios'>('matches');
-
-    // Filtros de matches
-    filtroMatch = signal<'todos' | 'mutuo' | 'pendiente'>('todos');
-    filtroTipo = signal<'todos' | 'horario' | 'desafio' | 'afinidad'>('todos');
+    // Pestaña activa: 'matches' | 'desafios' | 'mensajes'
+    activeTab = signal<'matches' | 'desafios' | 'mensajes'>('matches');
 
     // Matches cargados
     rawMatches = this.matchAdminService.matches;
@@ -33,14 +35,12 @@ export class SocialPage {
     // Desafíos cargados
     desafios = this.desafioAdminService.desafios;
 
-    // Matches con nombres y datos de usuario mapeados
+    // Matches con nombres y datos de usuario mapeados (sin filtros custom)
     mappedMatches = computed(() => {
         const matches = this.rawMatches();
         const users = this.userService.users();
-        const fMatch = this.filtroMatch();
-        const fTipo = this.filtroTipo();
 
-        let result = matches.map(m => {
+        return matches.map(m => {
             const userOrig = users.find(u => u.uid === m.usuarioOrigenId);
             const userDest = users.find(u => u.uid === m.usuarioDestinoId);
             return {
@@ -51,61 +51,123 @@ export class SocialPage {
                 destEmail: userDest?.email || ''
             };
         });
-
-        // Filtrar por estado mutuo
-        if (fMatch === 'mutuo') {
-            result = result.filter(m => m.mutuo);
-        } else if (fMatch === 'pendiente') {
-            result = result.filter(m => !m.mutuo);
-        }
-
-        // Filtrar por tipo
-        if (fTipo !== 'todos') {
-            result = result.filter(m => m.tipo === fTipo);
-        }
-
-        return result;
     });
 
+    matchColumns = this.schemaService.getColumns('match');
+    desafioColumns = this.schemaService.getColumns('desafio');
+    matchFields = this.schemaService.getFields('match');
+    desafioFields = computed(() => {
+      const base = this.schemaService.getFields('desafio');
+      const users = this.userService.users();
+      const userOptions = users.map(u => ({ value: u.uid, label: u.nombre || u.email || u.uid }));
+      return base.map(field => {
+        if (field.name === 'creadorId') {
+          return { ...field, type: 'select' as const, options: userOptions, label: 'Creador' };
+        }
+        return field;
+      });
+    });
+
+    // Mensajes personales (enriquecidos con nombres)
+    mensajes = this.mensajeService.mensajes;
+
+    mensajesEnriquecidos = computed(() => {
+      const list = this.mensajes();
+      const users = this.userService.users();
+      const matches = this.rawMatches();
+
+      // Solo mensajes entre usuarios que tienen match mutuo
+      const matchedPairs = new Set(
+        matches
+          .filter(m => m.mutuo)
+          .map(m => {
+            const ids = [m.usuarioOrigenId, m.usuarioDestinoId].sort();
+            return ids.join('-');
+          })
+      );
+
+      return list
+        .filter((m: Mensaje) => {
+          const ids = [m.remitenteId, m.destinatarioId].sort();
+          return matchedPairs.has(ids.join('-'));
+        })
+        .map((m: Mensaje) => {
+          const remitente = users.find(u => u.uid === m.remitenteId);
+          const destinatario = users.find(u => u.uid === m.destinatarioId);
+          return {
+            ...m,
+            remitenteNombre: remitente?.nombre || remitente?.email || m.remitenteId,
+            destinatarioNombre: destinatario?.nombre || destinatario?.email || m.destinatarioId,
+          };
+        });
+    });
+
+    mensajeColumns = this.schemaService.getColumns('mensaje');
+    mensajeFields = this.schemaService.getFields('mensaje');
+
+    // Tabs definition for unified compact tabs component (live counts)
+    tabs = computed<TabItem[]>(() => [
+      { id: 'matches', label: 'Matches & Conexiones', count: this.mappedMatches().length, accent: 'blue' },
+      { id: 'desafios', label: 'Desafíos Comunitarios', count: this.desafios().length, accent: 'amber' },
+      { id: 'mensajes', label: 'Mensajes Personales', count: this.mensajesEnriquecidos().length, accent: 'purple' }
+    ]);
+
     constructor() {
-        this.pageTitleService.setTitle('Social & Matching');
-        // Inicializar listeners de usuarios
+        this.updatePageTitle();
+        // Inicializar listeners
         const u = this.userService.users();
+        this.mensajeService.mensajes; // init listener for personal messages
     }
 
-    setTab(tab: 'matches' | 'desafios') {
-        this.activeTab.set(tab);
+    setTab(tab: string) {
+        this.activeTab.set(tab as 'matches' | 'desafios' | 'mensajes');
+        this.updatePageTitle();
     }
 
-    setFiltroMatch(filtro: 'todos' | 'mutuo' | 'pendiente') {
-        this.filtroMatch.set(filtro);
+    private updatePageTitle() {
+        const tab = this.activeTab();
+        let title = 'Social & Matching';
+        if (tab === 'matches') {
+            title = 'Matches & Conexiones';
+        } else if (tab === 'desafios') {
+            title = 'Desafíos Comunitarios';
+        } else if (tab === 'mensajes') {
+            title = 'Mensajes Personales';
+        }
+        this.pageTitleService.setTitle(title);
     }
 
-    setFiltroTipo(tipo: 'todos' | 'horario' | 'desafio' | 'afinidad') {
-        this.filtroTipo.set(tipo);
-    }
-
-    async toggleDesafioActivo(desafio: Desafio) {
+    async onSaveDesafio(data: any) {
         try {
-            await this.desafioAdminService.toggleActivo(desafio.id, desafio.activo);
-            this.toastService.show(
-                `Desafío ${desafio.activo ? 'desactivado' : 'activado'} con éxito.`,
-                'success'
-            );
-        } catch (error) {
-            console.error(error);
-            this.toastService.show('Error al cambiar el estado del desafío.', 'error');
+            if (!data.id) {
+                // Defaults para creación desde admin
+                data.fechaCreacion = new Date();
+                // Si no se especifica creador, dejar que el form lo ponga o default
+                if (!data.creadorId) {
+                    data.creadorId = '';
+                    data.creadorNombre = 'Admin';
+                }
+            }
+            await this.desafioAdminService.save(data);
+            this.toastService.show('Desafío guardado', 'success');
+        } catch (e) {
+            console.error(e);
+            this.toastService.show('Error al guardar desafío', 'error');
         }
     }
 
-    async eliminarDesafio(desafio: Desafio) {
-        if (confirm(`¿Estás seguro de eliminar de forma permanente el desafío "${desafio.titulo}"?`)) {
-            try {
-                await this.desafioAdminService.eliminarDesafio(desafio.id);
-                this.toastService.show('Desafío eliminado correctamente.', 'success');
-            } catch (error) {
-                console.error(error);
-                this.toastService.show('Error al eliminar el desafío.', 'error');
+    async eliminarDesafio(event: string | Desafio) {
+        const id = typeof event === 'string' ? event : event.id;
+        const d = this.desafios().find(x => x.id === id);
+        if (d) {
+            if (confirm(`¿Estás seguro de eliminar de forma permanente el desafío "${d.titulo}"?`)) {
+                try {
+                    await this.desafioAdminService.eliminarDesafio(id);
+                    this.toastService.show('Desafío eliminado correctamente.', 'success');
+                } catch (error) {
+                    console.error(error);
+                    this.toastService.show('Error al eliminar el desafío.', 'error');
+                }
             }
         }
     }

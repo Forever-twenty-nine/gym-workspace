@@ -8,6 +8,8 @@ import {
     doc,
     updateDoc,
     deleteDoc,
+    addDoc,
+    setDoc,
     Timestamp
 } from 'firebase/firestore';
 import { Desafio } from 'gym-library';
@@ -40,10 +42,12 @@ export class DesafioAdminService {
                         creadorId: data.creadorId || '',
                         creadorNombre: data.creadorNombre || '',
                         creadorFoto: data.creadorFoto || null,
+                        gimnasioId: data.gimnasioId || '',
                         titulo: data.titulo || '',
                         logroRelacionado: data.logroRelacionado || null,
                         disciplina: data.disciplina || null,
-                        fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : new Date(data.fechaCreacion),
+                        fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date()),
+                        fechaVencimiento: data.fechaVencimiento instanceof Timestamp ? data.fechaVencimiento.toDate() : (data.fechaVencimiento ? new Date(data.fechaVencimiento) : undefined),
                         activo: data.activo ?? true
                     } as Desafio;
                 });
@@ -72,5 +76,41 @@ export class DesafioAdminService {
     async eliminarDesafio(desafioId: string): Promise<void> {
         const desafioRef = doc(this.firestore, this.COLLECTION, desafioId);
         await deleteDoc(desafioRef);
+    }
+
+    /**
+     * Guarda/actualiza un desafío (para edición vía modal)
+     * Soporta crear (si no tiene id) y actualizar.
+     */
+    async save(desafio: Desafio): Promise<void> {
+        const data: any = {
+            creadorId: desafio.creadorId || '',
+            creadorNombre: desafio.creadorNombre || '',
+            creadorFoto: desafio.creadorFoto || null,
+            gimnasioId: desafio.gimnasioId || '',
+            titulo: desafio.titulo || '',
+            logroRelacionado: desafio.logroRelacionado || null,
+            disciplina: desafio.disciplina || null,
+            activo: desafio.activo ?? true,
+        };
+
+        if (desafio.fechaCreacion) {
+            data.fechaCreacion = desafio.fechaCreacion instanceof Date 
+                ? Timestamp.fromDate(desafio.fechaCreacion) 
+                : desafio.fechaCreacion;
+        }
+        if (desafio.fechaVencimiento) {
+            data.fechaVencimiento = desafio.fechaVencimiento instanceof Date 
+                ? Timestamp.fromDate(desafio.fechaVencimiento) 
+                : desafio.fechaVencimiento;
+        }
+
+        if (desafio.id) {
+            const ref = doc(this.firestore, this.COLLECTION, desafio.id);
+            await setDoc(ref, data, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            await addDoc(col, data);
+        }
     }
 }

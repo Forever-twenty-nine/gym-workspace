@@ -59,7 +59,8 @@ export class EntrenadoresPage {
       return {
         ...e,
         displayName: user?.nombre || user?.email || 'Sin nombre',
-        email: user?.email || ''
+        email: user?.email || '',
+        photoURL: user?.photoURL || null
       };
     });
   });

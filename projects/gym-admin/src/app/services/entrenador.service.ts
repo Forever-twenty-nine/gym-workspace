@@ -384,7 +384,8 @@ export class EntrenadorService {
           ...entrenador,
           displayName: usuario?.nombre || usuario?.email || `Usuario ${entrenador.id}`,
           email: usuario?.email || '',
-          plan: usuario?.plan || 'free'
+          plan: usuario?.plan || 'free',
+          photoURL: usuario?.photoURL || null
         };
       });
     });

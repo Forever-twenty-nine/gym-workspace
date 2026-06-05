@@ -3,7 +3,7 @@ import { Signal } from '@angular/core';
 export interface ColumnConfig {
   key: string;
   label: string;
-  type: 'text' | 'date' | 'boolean' | 'badge' | 'avatar';
+  type: 'text' | 'date' | 'time' | 'boolean' | 'badge' | 'avatar';
   class?: string;
   badgeConfig?: {
     trueLabel: string;
@@ -16,7 +16,7 @@ export interface ColumnConfig {
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'number' | 'email' | 'password' | 'multiselect' | 'date' | 'infolist' | 'heading';
+  type: 'text' | 'textarea' | 'select' | 'checkbox' | 'number' | 'email' | 'password' | 'multiselect' | 'date' | 'time' | 'infolist' | 'heading';
   placeholder?: string;
   options?: { value: any, label: string }[]; // Para selects y multiselect
   validators?: any[];

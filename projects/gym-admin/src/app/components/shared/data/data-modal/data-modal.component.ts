@@ -50,6 +50,11 @@ export class DataModalComponent {
                 value = this.formatDateForInput(value);
             }
 
+            // Formateo específico para input type="time" (soporta string "HH:mm", Date o Timestamp)
+            if (field.type === 'time' && value) {
+                value = this.formatTimeForInput(value);
+            }
+
             // Manejo especial para arrays
             if (Array.isArray(value) && field.type !== 'multiselect' && field.type !== 'infolist') {
                 value = value.join(', ');
@@ -80,6 +85,33 @@ export class DataModalComponent {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
+    }
+
+    private formatTimeForInput(time: any): string {
+        if (!time) return '';
+
+        // If already a proper HH:mm string
+        if (typeof time === 'string' && /^\d{2}:\d{2}/.test(time)) {
+            return time.substring(0, 5);
+        }
+
+        let date: Date;
+        if (time instanceof Date) {
+            date = time;
+        } else if (time && typeof time === 'object' && 'seconds' in time) {
+            // Firestore Timestamp
+            date = new Date(time.seconds * 1000);
+        } else {
+            date = new Date(time);
+        }
+
+        if (isNaN(date.getTime())) {
+            return String(time).substring(0, 5);
+        }
+
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
     }
 
     onSubmit() {

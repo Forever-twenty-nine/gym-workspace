@@ -111,40 +111,6 @@
         </a>
       </li>
       <li>
-        <a routerLink="/rutinas-asignadas" routerLinkActive="bg-gray-700 text-white"
-          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'" [title]="isCollapsed() ? 'Rutinas Asignadas' : ''"
-          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
-          <span class="material-icons transition-all duration-300"
-            [ngClass]="isCollapsed() ? 'text-2xl' : 'text-xl mr-3'">event_available</span>
-          @if (!isCollapsed()) {
-          Rutinas Asignadas
-          }
-          @if (isCollapsed()) {
-          <span
-            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
-            Rutinas Asignadas
-          </span>
-          }
-        </a>
-      </li>
-      <li>
-        <a routerLink="/sesiones-rutina" routerLinkActive="bg-gray-700 text-white"
-          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'" [title]="isCollapsed() ? 'Sesiones de Rutina' : ''"
-          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
-          <span class="material-icons transition-all duration-300"
-            [ngClass]="isCollapsed() ? 'text-2xl' : 'text-xl mr-3'">history</span>
-          @if (!isCollapsed()) {
-          Sesiones de Rutina
-          }
-          @if (isCollapsed()) {
-          <span
-            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
-            Sesiones de Rutina
-          </span>
-          }
-        </a>
-      </li>
-      <li>
         <a routerLink="/gimnasios" routerLinkActive="bg-gray-700 text-white"
           [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'" [title]="isCollapsed() ? 'Gimnasios' : ''"
           class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
@@ -175,6 +141,42 @@
           <span
             class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
             Solicitudes de Plan
+          </span>
+          }
+        </a>
+      </li>
+      <li>
+        <a routerLink="/convocatorias" routerLinkActive="bg-gray-700 text-white"
+          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'"
+          [title]="isCollapsed() ? 'Convocatorias' : ''"
+          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
+          <span class="material-icons transition-all duration-300"
+            [ngClass]="isCollapsed() ? 'text-2xl' : 'text-xl mr-3'">event</span>
+          @if (!isCollapsed()) {
+          Convocatorias
+          }
+          @if (isCollapsed()) {
+          <span
+            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+            Convocatorias
+          </span>
+          }
+        </a>
+      </li>
+      <li>
+        <a routerLink="/invitaciones" routerLinkActive="bg-gray-700 text-white"
+          [ngClass]="isCollapsed() ? 'justify-center px-2' : 'px-4'"
+          [title]="isCollapsed() ? 'Invitaciones' : ''"
+          class="flex items-center py-3 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200 relative group">
+          <span class="material-icons transition-all duration-300"
+            [ngClass]="isCollapsed() ? 'text-2xl' : 'text-xl mr-3'">person_add</span>
+          @if (!isCollapsed()) {
+          Invitaciones
+          }
+          @if (isCollapsed()) {
+          <span
+            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+            Invitaciones
           </span>
           }
         </a>

@@ -4,10 +4,10 @@ import { EntrenadosPage } from './pages/entrenados/entrenados.page';
 import { GimnasiosPage } from './pages/gimnasios/gimnasios.page';
 import { UsuariosPage } from './pages/usuarios/usuarios.page';
 import { SolicitudesPlanPage } from './pages/solicitudes-plan/solicitudes-plan.page';
+import { ConvocatoriasPage } from './pages/convocatorias/convocatorias.page';
+import { InvitacionesPage } from './pages/invitaciones/invitaciones.page';
 import { EjerciciosPage } from './pages/ejercicios/ejercicios.page';
 import { RutinasPage } from './pages/rutinas/rutinas.page';
-import { RutinasAsignadasPage } from './pages/rutinas-asignadas/rutinas-asignadas.page';
-import { SesionesRutinasPage } from './pages/sesiones-rutinas/sesiones-rutinas.page';
 import { adminAuthGuard } from './core/guards/admin-auth.guard';
 
 export const routes: Routes = [
@@ -40,20 +40,20 @@ export const routes: Routes = [
         component: RutinasPage
       },
       {
-        path: 'rutinas-asignadas',
-        component: RutinasAsignadasPage
-      },
-      {
-        path: 'sesiones-rutina',
-        component: SesionesRutinasPage
-      },
-      {
         path: 'gimnasios',
         component: GimnasiosPage
       },
       {
         path: 'solicitudes-plan',
         component: SolicitudesPlanPage
+      },
+      {
+        path: 'convocatorias',
+        component: ConvocatoriasPage
+      },
+      {
+        path: 'invitaciones',
+        component: InvitacionesPage
       },
       {
         path: 'mensajes-globales',

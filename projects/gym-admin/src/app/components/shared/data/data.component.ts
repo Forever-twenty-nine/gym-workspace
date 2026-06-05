@@ -30,6 +30,8 @@ export class DataComponent {
   columns = input.required<ColumnConfig[]>();
   fields = input.required<FieldConfig[]>();
   loading = input<boolean>(false);
+  showCreate = input<boolean>(true);
+  showActions = input<boolean>(true);
 
   // Outputs
   save = output<any>();
@@ -134,5 +136,56 @@ export class DataComponent {
 
   getDisplayValue(item: any, key: string): any {
     return item[key];
+  }
+
+  getBadgeClass(value: any, column: any): string {
+    const v = String(value || '').toLowerCase();
+    const config = column.badgeConfig;
+    const isTrue = value === true || v === 'true' || v === 'yes' || v === 'si';
+
+    if (v === 'entrenado' || v === 'trainee' || isTrue) {
+      return config?.trueClass || 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+    }
+    if (v === 'entrenador' || v === 'trainer' || v === 'personal_trainer') {
+      return 'bg-blue-100 text-blue-700 border border-blue-200';
+    }
+    if (v === 'gimnasio' || v === 'gym') {
+      return 'bg-purple-100 text-purple-700 border border-purple-200';
+    }
+    if (v === 'premium' || v === 'completada' || v === 'oficial') {
+      return config?.trueClass || 'bg-amber-100 text-amber-700 border border-amber-200';
+    }
+    if (v === 'en_progreso' || v === 'pendiente') {
+      return 'bg-blue-100 text-blue-700 border border-blue-200';
+    }
+    if (v === 'cancelada' || v === 'rechazada' || v === 'inactiva') {
+      return 'bg-red-100 text-red-700 border border-red-200';
+    }
+    return config?.falseClass || 'bg-gray-100 text-gray-700 border border-gray-200';
+  }
+
+  getBadgeLabel(value: any, column: any): string {
+    const v = String(value || '').toLowerCase();
+    const config = column.badgeConfig;
+    const isTrue = value === true || v === 'true' || v === 'yes' || v === 'si';
+
+    if (v === 'entrenado') return config?.trueLabel || 'Entrenado';
+    if (v === 'entrenador' || v === 'personal_trainer') return 'Entrenador';
+    if (v === 'gimnasio') return 'Gimnasio';
+    if (v === 'completada') return config?.trueLabel || 'Completada';
+    if (v === 'en_progreso') return 'En Progreso';
+    if (v === 'pendiente') return 'Pendiente';
+    if (v === 'cancelada') return 'Cancelada';
+    if (v === 'oficial') return 'Oficial';
+    if (isTrue) return config?.trueLabel || 'Sí';
+    if (v === 'false' || value === false) return config?.falseLabel || 'No';
+
+    return value || '—';
+  }
+
+  onAvatarError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    // Hide broken image so the initials background shows
+    img.style.display = 'none';
   }
 }

@@ -177,6 +177,8 @@ export async function seedConvocatorias(
           mensaje: "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
           interesados: [],
           activo: true,
+          creadorRol: 'entrenado',
+          esOficial: false,
         })
       )
     ),
@@ -194,6 +196,8 @@ export async function seedConvocatorias(
           mensaje: "Pecho y bíceps mañana temprano. ¿Quién se une para ayudarnos a sacar las últimas reps al fallo? 🔥",
           interesados: [],
           activo: true,
+          creadorRol: 'entrenado',
+          esOficial: false,
         })
       )
     ),

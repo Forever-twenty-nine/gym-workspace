@@ -20,7 +20,7 @@ import { addIcons } from 'ionicons';
 import { close, sparkles, paperPlaneOutline, helpCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../../../core/services/convocatoria.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
-import { Convocatoria } from 'gym-library';
+import { Convocatoria, Rol } from 'gym-library';
 
 @Component({
   selector: 'app-crear-convocatoria-modal',
@@ -156,7 +156,8 @@ export class CrearConvocatoriaModalComponent implements OnInit {
         horaFin: formValue.horaFin,
         mensaje: formValue.mensaje || '',
         interesados: [],
-        activo: true
+        activo: true,
+        creadorRol: Rol.ENTRENADO
       };
 
       await this.convocatoriaService.save(nuevaConvocatoria);

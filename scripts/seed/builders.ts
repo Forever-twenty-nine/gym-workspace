@@ -285,7 +285,7 @@ export function buildConvocatoria(input: {
     mensaje: input.mensaje,
     interesados: input.interesados ?? [],
     activo: input.activo,
-    ...(input.creadorRol ? { creadorRol: input.creadorRol as any } : {}),
+    creadorRol: (input.creadorRol || 'entrenado') as any,
     ...(input.titulo ? { titulo: input.titulo } : {}),
     ...(input.esOficial !== undefined ? { esOficial: input.esOficial } : {}),
   };
