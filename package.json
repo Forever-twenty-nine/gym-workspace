@@ -27,6 +27,7 @@
     "gym-admin:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-admin:serve\" --names \"emulator,admin\" --prefix-colors \"green,cyan\"",
     "gym-app:with-emulator": "npm run library:build && concurrently \"npm run emulator:start:with-export\" \"npm run gym-app:serve\" --names \"emulator,app\" --prefix-colors \"green,magenta\"",
     "db:seed": "tsx scripts/seed-data.ts",
+    "db:seed:deterministic": "tsx scripts/seed-data.ts -- --deterministic",
     "deploy": "npm run library:build && npm run gym-admin:build && npm run gym-app:build && firebase deploy",
     "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
   },
@@ -57,6 +58,7 @@
     "@angular/build": "21.2.13",
     "@angular/cli": "21.2.13",
     "@angular/compiler-cli": "21.2.15",
+    "@types/node": "^22.19.19",
     "concurrently": "^9.2.1",
     "firebase-admin": "13.10.0",
     "firebase-tools": "15.19.0",

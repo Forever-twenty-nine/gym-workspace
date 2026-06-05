@@ -1,0 +1,253 @@
+import { Firestore, Timestamp } from "firebase-admin/firestore";
+import { SeedConfig } from "../interfaces/seed-config.interface";
+import { stats } from "./context";
+import { rndInt, sessionIdSuffix, shuffleScoped } from "./random";
+
+const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+export interface SeedTrainerRef {
+  uid: string;
+  nombre: string;
+  plan: string;
+  photoURL?: string;
+}
+
+export interface SeedTraineeRef {
+  uid: string;
+  nombre: string;
+  plan: string;
+  trainerUid: string;
+  photoURL?: string;
+}
+
+export async function createExercise(
+  db: Firestore,
+  nombre: string,
+  descripcion: string,
+  entrenadorId?: string
+) {
+  const ref = db.collection("ejercicios").doc();
+  const id = ref.id;
+  const scopeBase = `exercise:${entrenadorId ?? "global"}:${nombre}`;
+
+  const data: Record<string, unknown> = {
+    id,
+    nombre,
+    descripcion,
+    series: rndInt(`${scopeBase}:series`, 3, 5),
+    repeticiones: rndInt(`${scopeBase}:reps`, 8, 12),
+    peso: rndInt(`${scopeBase}:peso`, 10, 29),
+    fechaCreacion: Timestamp.now(),
+    fechaModificacion: Timestamp.now(),
+  };
+
+  if (entrenadorId) {
+    data.creadorId = entrenadorId;
+  }
+
+  await ref.set(data);
+  stats.exercisesCreated++;
+  return id;
+}
+
+export async function createRoutine(
+  db: Firestore,
+  nombre: string,
+  dia: string,
+  ejerciciosIds: string[],
+  usuarioId: string,
+  nombreUsuario: string,
+  entrenadorId?: string
+) {
+  const data: Record<string, unknown> = {
+    nombre,
+    activa: true,
+    descripcion: `Rutina ${nombre} - dia ${dia}`,
+    ejerciciosIds,
+    fechaCreacion: Timestamp.now(),
+    fechaModificacion: Timestamp.now(),
+    usuarioId,
+    nombreUsuario,
+  };
+  if (entrenadorId) {
+    data.creadorId = entrenadorId;
+  }
+
+  const docRef = db.collection("rutinas").doc();
+  const id = docRef.id;
+  await docRef.set({ ...data, id });
+  stats.routinesCreated++;
+  return id;
+}
+
+export async function createMockSharedSession(
+  db: Firestore,
+  traineeId: string,
+  traineeName: string,
+  routineId: string,
+  routineName: string
+) {
+  const sesionId = `session_${traineeId}_${sessionIdSuffix(traineeId, routineId)}`;
+  await db.collection("sesiones-rutina").doc(sesionId).set({
+    id: sesionId,
+    entrenadoId: traineeId,
+    fechaInicio: Timestamp.fromDate(new Date(Date.now() - 3600000 * 2)),
+    fechaFin: Timestamp.fromDate(new Date(Date.now() - 3600000)),
+    duracion: 3600,
+    status: "completada",
+    completada: true,
+    compartida: true,
+    nombreUsuario: traineeName,
+    fotoUsuario: null,
+    fechaCompartida: Timestamp.now(),
+    likes: [],
+    rutinaResumen: { id: routineId, nombre: routineName, ejercicios: [] },
+  });
+  stats.sessionsCreated++;
+}
+
+export async function seedTrainerWorkouts(
+  db: Firestore,
+  config: SeedConfig,
+  isPT: boolean,
+  gymUid: string,
+  trainers: SeedTrainerRef[],
+  trainees: SeedTraineeRef[]
+) {
+  const trainersToProcess: SeedTrainerRef[] = [...trainers];
+  if (isPT && trainersToProcess.length === 0) {
+    trainersToProcess.push({
+      uid: gymUid,
+      nombre: config.gym.nombre,
+      plan: config.gym.plan,
+    });
+  }
+
+  for (const trainer of trainersToProcess) {
+    console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
+
+    const limitExercises = trainer.plan === "free" || config.gym.plan === "free";
+    const exercisesToCreate = limitExercises ? config.exercises.slice(0, 10) : config.exercises;
+
+    const trainerExercises = await Promise.all(
+      exercisesToCreate.map((exName) =>
+        createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid)
+      )
+    );
+
+    const trainerDocUpdate = { ejerciciosCreadasIds: trainerExercises };
+    if (!isPT || trainer.uid !== gymUid) {
+      await Promise.all([
+        db.collection("entrenadores").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
+        db.collection("usuarios").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
+      ]);
+    }
+
+    const trainerTrainees = trainees.filter((t) => t.trainerUid === trainer.uid);
+    const allTrainerRoutines: string[] = [];
+
+    await Promise.all(
+      trainerTrainees.map(async (trainee) => {
+        const numRutinas = trainee.plan === "free"
+          ? 1
+          : rndInt(`rutinas-count:${config.gym.id}:${trainer.uid}:${trainee.uid}`, 1, 3);
+
+        const selectedDays = shuffleScoped(
+          DIAS_SEMANA,
+          `rutinas-dias:${config.gym.id}:${trainer.uid}:${trainee.uid}`
+        ).slice(0, numRutinas);
+
+        const routineIds: string[] = [];
+
+        await Promise.all(
+          selectedDays.map(async (dia) => {
+            const routineExercises = shuffleScoped(
+              trainerExercises,
+              `rutina-ejercicios:${config.gym.id}:${trainer.uid}:${trainee.uid}:${dia}`
+            ).slice(0, Math.min(5, trainerExercises.length));
+
+            const routineName = `Rutina de ${dia} - ${trainee.nombre}`;
+            const currentRoutineId = await createRoutine(
+              db,
+              routineName,
+              dia,
+              routineExercises,
+              trainee.uid,
+              trainee.nombre,
+              trainer.uid
+            );
+            routineIds.push(currentRoutineId);
+
+            try {
+              const asignadaRef = db.collection("rutinas-asignadas").doc();
+              await asignadaRef.set({
+                id: asignadaRef.id,
+                rutinaId: currentRoutineId,
+                entrenadoId: trainee.uid,
+                entrenadorId: trainer.uid,
+                diaSemana: dia,
+                fechaAsignacion: Timestamp.now(),
+                activa: true,
+              });
+              stats.routinesAssigned++;
+            } catch (e) {
+              console.warn("⚠️ No se pudo crear rutina-asignada:", e);
+            }
+          })
+        );
+
+        allTrainerRoutines.push(...routineIds);
+
+        await Promise.all([
+          db.collection("usuarios").doc(trainee.uid).set(
+            { rutinasIds: routineIds, rutinasAsignadasIds: routineIds },
+            { merge: true }
+          ),
+          db.collection("entrenados").doc(trainee.uid).set(
+            { rutinasIds: routineIds, rutinasAsignadasIds: routineIds },
+            { merge: true }
+          ),
+        ]);
+
+        if (routineIds.length > 0) {
+          const firstDay = selectedDays[0];
+          await createMockSharedSession(
+            db,
+            trainee.uid,
+            trainee.nombre,
+            routineIds[0],
+            `Rutina de ${firstDay} - ${trainee.nombre}`
+          );
+        }
+      })
+    );
+
+    if (allTrainerRoutines.length > 0) {
+      if (!isPT || trainer.uid !== gymUid) {
+        const entrenadorRef = db.collection("entrenadores").doc(trainer.uid);
+        const snap = await entrenadorRef.get();
+        const currentRoutines = snap.data()?.["rutinasCreadasIds"] || [];
+        const trainerRoutineUpdate = {
+          rutinasCreadasIds: [...new Set([...currentRoutines, ...allTrainerRoutines])],
+        };
+        await Promise.all([
+          entrenadorRef.set(trainerRoutineUpdate, { merge: true }),
+          db.collection("usuarios").doc(trainer.uid).set(trainerRoutineUpdate, { merge: true }),
+        ]);
+      } else {
+        const ptTrainerRef = db.collection("entrenadores").doc(gymUid);
+        const snap = await ptTrainerRef.get();
+        const currentRoutines = snap.exists ? snap.data()?.["rutinasCreadasIds"] || [] : [];
+        await ptTrainerRef.set(
+          {
+            ejerciciosCreadasIds: trainerExercises,
+            rutinasCreadasIds: [...new Set([...currentRoutines, ...allTrainerRoutines])],
+          },
+          { merge: true }
+        );
+      }
+    }
+  }
+
+  return trainersToProcess;
+}
