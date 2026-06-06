@@ -301,14 +301,10 @@ export class EntrenadoService {
      * ➕ Agrega una rutina a la lista de rutinas creadas de un entrenado
      */
     async addRutinaCreada(entrenadoId: string, rutinaId: string): Promise<void> {
-        const entrenado = this.getEntrenado(entrenadoId)();
-        if (!entrenado) return;
-
-        const rutinasCreadas = [...(entrenado.rutinasCreadas || [])];
-        if (!rutinasCreadas.includes(rutinaId)) {
-            rutinasCreadas.push(rutinaId);
-            await this.save({ ...entrenado, rutinasCreadas });
-        }
+        const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenadoId);
+        await updateDoc(entrenadoRef, {
+            rutinasCreadas: arrayUnion(rutinaId)
+        });
     }
 
     /**

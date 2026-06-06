@@ -1,0 +1,113 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="cerrarModal()"
+    style="--width: 90%; --max-width: 500px; --border-radius: 0 0 24px 24px;">
+    <ng-template>
+        @if (encuentro) {
+        <ion-header class="ion-no-border shadow-sm">
+            <ion-toolbar class="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800"
+                style="--padding-top: 12px; --padding-bottom: 12px; --padding-start: 12px; --padding-end: 12px;">
+                <ion-title class="font-extrabold text-2xl tracking-tight text-gray-900 dark:text-white text-center">
+                    Encuentro
+                </ion-title>
+                <ion-buttons slot="end">
+                    <ion-button (click)="cerrarModal()" color="medium" shape="round"
+                        style="width: 44px; height: 44px; --background: rgba(128, 128, 128, 0.1); --border-radius: 100%; margin: 0;">
+                        <ion-icon name="close" style="font-size: 26px;"></ion-icon>
+                    </ion-button>
+                </ion-buttons>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding"
+            style="--background: url('assets/images/rutinas_card_bg.png') center/cover no-repeat;">
+
+            <div slot="fixed"
+                class="w-full h-full bg-linear-to-br from-white/20 via-white/10 to-transparent dark:from-black/80 dark:via-black/40 dark:to-secondary/60 pointer-events-none z-0">
+            </div>
+
+            <div class="relative z-10 px-0 py-2 animate-fade-in">
+                <div
+                    class="bg-white/60 dark:bg-white/10 backdrop-blur-md rounded-3xl border border-gray-200 dark:border-white/20 p-6 mb-6 shadow-sm dark:shadow-lg">
+                    <div class="flex items-center gap-2 mb-3">
+                        <ion-badge color="secondary"
+                            class="text-[9px] font-black rounded-full uppercase px-2 py-1 tracking-wide">
+                            Encuentro
+                        </ion-badge>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 dark:text-white mb-2 leading-tight">
+                        {{ encuentro.titulo || 'Entrenamiento en grupo' }}
+                    </h2>
+                    @if (encuentro.mensaje) {
+                    <p class="text-sm text-gray-600 dark:text-white/80 leading-relaxed font-medium m-0">
+                        {{ encuentro.mensaje }}
+                    </p>
+                    }
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div
+                        class="p-4 rounded-3xl bg-white/60 dark:bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-gray-200 dark:border-white/20 shadow-sm dark:shadow-lg text-center">
+                        <ion-icon name="calendar-outline" class="text-2xl text-secondary mb-2"></ion-icon>
+                        <span
+                            class="text-[10px] font-bold text-gray-500 dark:text-white/50 uppercase tracking-tighter mb-1">Fecha</span>
+                        <span class="text-sm font-black text-gray-900 dark:text-white leading-tight capitalize">
+                            {{ fechaFormateada }}
+                        </span>
+                    </div>
+                    <div
+                        class="p-4 rounded-3xl bg-white/60 dark:bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-gray-200 dark:border-white/20 shadow-sm dark:shadow-lg text-center">
+                        <ion-icon name="time-outline" class="text-2xl text-orange-400 mb-2"></ion-icon>
+                        <span
+                            class="text-[10px] font-bold text-gray-500 dark:text-white/50 uppercase tracking-tighter mb-1">Horario</span>
+                        <span class="text-lg font-black text-gray-900 dark:text-white leading-none">
+                            {{ encuentro.horaInicio }}<span class="text-sm font-bold text-gray-500 dark:text-white/60">
+                                - {{ encuentro.horaFin }}</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="rounded-2xl overflow-hidden border border-gray-200 dark:border-white/20 bg-white/60 dark:bg-white/5 backdrop-blur-sm shadow-sm dark:shadow-lg p-4 flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
+                            <ion-icon name="person-outline" class="text-lg text-secondary"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-white/50 uppercase tracking-tighter m-0 mb-0.5">
+                                Organiza
+                            </p>
+                            <p class="text-base font-bold text-gray-900 dark:text-white m-0">
+                                {{ encuentro.creadorNombre || 'Atleta' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 border-t border-gray-200/60 dark:border-white/10 pt-4">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center shrink-0">
+                            <ion-icon name="hand-right-outline" class="text-lg text-secondary"></ion-icon>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-white/50 uppercase tracking-tighter m-0 mb-0.5">
+                                Interesados
+                            </p>
+                            <p class="text-base font-bold text-gray-900 dark:text-white m-0">
+                                {{ encuentro.interesados?.length || 0 }}
+                                {{ (encuentro.interesados?.length || 0) === 1 ? 'atleta' : 'atletas' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ion-content>
+
+        <ion-footer class="ion-no-border bg-white dark:bg-gray-900 p-4 px-6 pb-8 shadow-lg">
+            <ion-button expand="block" class="m-0 h-14" color="secondary"
+                style="--border-radius: 16px; --box-shadow: 0 8px 16px -4px rgba(var(--ion-color-secondary-rgb), 0.5);"
+                (click)="navegarASocial()">
+                <span class="text-base font-black tracking-wide">IR A SOCIAL</span>
+                <ion-icon name="people-outline" slot="end" class="text-2xl"></ion-icon>
+            </ion-button>
+        </ion-footer>
+        }
+    </ng-template>
+</ion-modal>

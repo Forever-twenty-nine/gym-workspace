@@ -216,6 +216,25 @@ export class RutinaAsignadaService {
             });
         });
 
+        // Rutinas sin día asignado: mostrarlas hoy para que el usuario pueda ejecutarlas
+        const idsEnSemana = new Set<string>();
+        Object.values(rutinasOrganizadas).forEach(dia => {
+            dia.rutinas.forEach((r: Rutina) => idsEnSemana.add(r.id));
+        });
+
+        const sinProgramar = rutinasAsignadas.filter(r => !idsEnSemana.has(r.id));
+        if (sinProgramar.length > 0) {
+            const hoyKey = fechas[0].toISOString().split('T')[0];
+            const diaHoy = rutinasOrganizadas[hoyKey];
+            if (diaHoy) {
+                sinProgramar.forEach(rutina => {
+                    if (!diaHoy.rutinas.some((r: Rutina) => r.id === rutina.id)) {
+                        diaHoy.rutinas.push(rutina);
+                    }
+                });
+            }
+        }
+
         return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
     }
 

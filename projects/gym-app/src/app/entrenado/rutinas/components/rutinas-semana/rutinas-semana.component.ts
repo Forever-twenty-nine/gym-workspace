@@ -14,7 +14,7 @@ import {
     IonListHeader
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { fitnessOutline, timeOutline, playCircle, bedOutline, calendarOutline, lockClosedOutline } from 'ionicons/icons';
+import { fitnessOutline, timeOutline, playCircle, bedOutline, calendarOutline, lockClosedOutline, peopleOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutinas-semana',
@@ -38,6 +38,17 @@ export class RutinasSemanaComponent {
     @Input() rutinasPorDia: any[] | null = [];
     @Output() verDetalles = new EventEmitter<{ rutina: any, esFuturo: boolean }>();
     @Output() iniciarEntrenamientoDirecto = new EventEmitter<{ event: Event, rutina: any }>();
+    @Output() verEncuentro = new EventEmitter<any>();
+
+    get tieneActividadProgramada(): boolean {
+        return (this.rutinasPorDia ?? []).some(dia =>
+            (dia.rutinas?.length ?? 0) > 0 || (dia.encuentros?.length ?? 0) > 0
+        );
+    }
+
+    diaTieneActividad(dia: any): boolean {
+        return (dia.rutinas?.length ?? 0) > 0 || (dia.encuentros?.length ?? 0) > 0;
+    }
 
     constructor() {
         addIcons({
@@ -46,7 +57,8 @@ export class RutinasSemanaComponent {
             playCircle,
             bedOutline,
             calendarOutline,
-            lockClosedOutline
+            lockClosedOutline,
+            peopleOutline
         });
     }
 
@@ -56,5 +68,9 @@ export class RutinasSemanaComponent {
 
     onIniciarEntrenamientoDirecto(event: Event, rutina: any) {
         this.iniciarEntrenamientoDirecto.emit({ event, rutina });
+    }
+
+    onVerEncuentro(encuentro: any) {
+        this.verEncuentro.emit(encuentro);
     }
 }
