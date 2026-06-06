@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -13,41 +13,43 @@ import {
   IonButtons,
   IonInput,
   IonTextarea,
+  IonPopover,
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, trophyOutline, flameOutline, calendarOutline,
   helpCircleOutline, chevronDownOutline, chevronUpOutline
 } from 'ionicons/icons';
-import { DesafioService } from '../../../../../../core/services/desafio.service';
-import { AuthService } from '../../../../../../core/services/auth.service';
+import { DesafioService } from '../../../../../core/services/desafio.service';
+import { AuthService } from '../../../../../core/services/auth.service';
 import { Desafio } from 'gym-library';
 
 
 @Component({
-  selector: 'app-crear-desafio-modal',
+  selector: 'app-desafio-modal',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonIcon, IonItem,
-    IonModal, IonButtons, IonInput, IonTextarea
+    IonModal, IonButtons, IonInput, IonTextarea, IonPopover
   ],
-  templateUrl: './crear-desafio-modal.component.html'
+  templateUrl: './desafio-modal.component.html'
 })
-export class CrearDesafioModalComponent {
+export class DesafioModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private desafioService = inject(DesafioService);
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
+  @Input() item: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
-  mostrarAyuda = signal(false);
   saving = signal(false);
+  isEditing = false;
 
   form: FormGroup;
 
@@ -59,7 +61,7 @@ export class CrearDesafioModalComponent {
   }
 
   constructor() {
-    addIcons({ close, trophyOutline, flameOutline, calendarOutline, helpCircleOutline, chevronDownOutline, chevronUpOutline });
+    addIcons({ close, trophyOutline, flameOutline, calendarOutline, helpCircleOutline });
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(180)]],
       logroRelacionado: ['', [Validators.maxLength(120)]],
@@ -67,12 +69,31 @@ export class CrearDesafioModalComponent {
     });
   }
 
-  toggleAyuda() {
-    this.mostrarAyuda.update(v => !v);
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['item'] && this.item) {
+      this.loadItemForEdit();
+    }
+  }
+
+  private loadItemForEdit() {
+    if (!this.item) return;
+    this.isEditing = true;
+
+    const d = this.item;
+    const yyyy = new Date(d.fechaVencimiento).getFullYear();
+    const mm = String(new Date(d.fechaVencimiento).getMonth() + 1).padStart(2, '0');
+    const dd = String(new Date(d.fechaVencimiento).getDate()).padStart(2, '0');
+
+    this.form.patchValue({
+      titulo: d.titulo || '',
+      logroRelacionado: d.logroRelacionado || '',
+      fechaVencimiento: `${yyyy}-${mm}-${dd}`
+    });
   }
 
   closeModal() {
     this.close.emit();
+    this.isEditing = false;
     this.form.reset({ fechaVencimiento: this.defaultVencimiento });
   }
 
@@ -100,26 +121,37 @@ export class CrearDesafioModalComponent {
 
     this.saving.set(true);
     try {
-      const desafio: Desafio = {
-        id: '',
-        creadorId: user.uid,
-        creadorNombre: user.nombre || 'Atleta',
-        creadorFoto: user.photoURL || null,
-        gimnasioId: user.gimnasioId,
-        titulo: val.titulo.trim(),
-        logroRelacionado: val.logroRelacionado?.trim() || undefined,
-        fechaCreacion: new Date(),
-        fechaVencimiento,
-        activo: true
-      };
+      let desafioData: any;
 
-      await this.desafioService.save(desafio);
-      this.showToast('¡Desafío lanzado! 🏆', 'success');
+      if (this.isEditing && this.item) {
+        desafioData = {
+          ...this.item,
+          titulo: val.titulo.trim(),
+          logroRelacionado: val.logroRelacionado?.trim() || undefined,
+          fechaVencimiento,
+        };
+      } else {
+        desafioData = {
+          id: '',
+          creadorId: user.uid,
+          creadorNombre: user.nombre || 'Atleta',
+          creadorFoto: user.photoURL || null,
+          gimnasioId: user.gimnasioId,
+          titulo: val.titulo.trim(),
+          logroRelacionado: val.logroRelacionado?.trim() || undefined,
+          fechaCreacion: new Date(),
+          fechaVencimiento,
+          activo: true
+        };
+      }
+
+      await this.desafioService.save(desafioData);
+      this.showToast(this.isEditing ? 'Desafío actualizado' : '¡Desafío lanzado! 🏆', 'success');
       this.saved.emit();
       this.closeModal();
     } catch (e) {
       console.error(e);
-      this.showToast('Error al publicar el desafío', 'danger');
+      this.showToast(this.isEditing ? 'Error al actualizar el desafío' : 'Error al publicar el desafío', 'danger');
     } finally {
       this.saving.set(false);
     }

@@ -1,0 +1,51 @@
+<div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
+  <!-- Acciones unificadas (siempre visibles) -->
+  <div class="flex items-center justify-end gap-2">
+    <ion-button id="help-desafios" fill="clear">
+      <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+
+    <ion-popover trigger="help-desafios" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding" style="max-width: 220px; font-size: 12px;">
+          Lanza retos para tu gimnasio. Otros atletas pueden aceptarlos y declararlos cumplidos.
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+
+    <ion-button (click)="onCreate()" size="small" class="m-0! rounded-2xl" fill="solid">
+      <ion-icon name="add" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+
+  @if (desafios.length > 0) {
+    <ion-list lines="none" class="bg-transparent m-0! -mx-1 space-y-2">
+      @for (d of desafios; track d.id) {
+        <ion-item-sliding class="rounded-2xl overflow-hidden">
+          <ion-item class="bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden --padding-start: 4px; --padding-end: 4px;">
+            <ion-label>
+              <h2 class="font-bold text-gray-900 dark:text-white m-0">
+                {{ d.fechaVencimiento | date:'mediumDate' }}
+              </h2>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="onDelete(d.id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+          <ion-item-options side="start">
+            <ion-item-option color="primary" (click)="onEdit(d)">
+              <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  } @else {
+    <div class="text-center py-6">
+      <p class="text-xs font-medium text-gray-500 dark:text-gray-400 italic mb-1">No has lanzado desafíos aún.</p>
+      <p class="text-[10px] text-gray-400">Usa el botón "Crear" para agregar una.</p>
+    </div>
+  }
+</div>

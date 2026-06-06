@@ -88,6 +88,72 @@ export async function createMockSharedSession(
   stats.sessionsCreated++;
 }
 
+export async function seedTraineeCreations(
+  db: Firestore,
+  config: SeedConfig,
+  trainees: SeedTraineeRef[]
+) {
+  const createdExercisesByCreator: Record<string, string[]> = {};
+
+  // Crear ejercicios self-authored por trainees (premium feature "creaciones")
+  for (const exConfig of config.traineeCreatedExercises || []) {
+    const id = await createExercise(
+      db,
+      exConfig.nombre,
+      exConfig.descripcion || `Ejercicio creado por ${exConfig.creadorNombre}`,
+      exConfig.creadorId
+    );
+    if (!createdExercisesByCreator[exConfig.creadorId]) {
+      createdExercisesByCreator[exConfig.creadorId] = [];
+    }
+    createdExercisesByCreator[exConfig.creadorId].push(id);
+  }
+
+  // Actualizar perfiles de los trainees con sus ejercicios creados
+  for (const [creadorId, ids] of Object.entries(createdExercisesByCreator)) {
+    if (ids.length > 0) {
+      await Promise.all([
+        db.collection("entrenados").doc(creadorId).set({ ejerciciosCreadosIds: ids }, { merge: true }),
+        db.collection("usuarios").doc(creadorId).set({ ejerciciosCreadosIds: ids }, { merge: true }),
+      ]);
+    }
+  }
+
+  // Crear rutinas self-authored por trainees
+  for (const rutConfig of config.traineeCreatedRoutines || []) {
+    const ejerciciosForCreator = createdExercisesByCreator[rutConfig.creadorId] || [];
+    if (ejerciciosForCreator.length === 0) continue;
+
+    // Usar los ejercicios creados por él (hasta 5)
+    const routineEjIds = ejerciciosForCreator.slice(0, 5);
+
+    const trainee = trainees.find((t) => t.uid === rutConfig.creadorId);
+    const nombreUsuario = trainee ? trainee.nombre : rutConfig.creadorNombre;
+
+    const id = await createRoutine(
+      db,
+      rutConfig.nombre,
+      "Personal",
+      routineEjIds,
+      rutConfig.creadorId, // usuarioId (dueño)
+      nombreUsuario,
+      rutConfig.creadorId  // creadorId = self (trainee)
+    );
+
+    // Actualizar el perfil del entrenado/usuario con rutinasCreadas
+    await Promise.all([
+      db.collection("entrenados").doc(rutConfig.creadorId).set(
+        { rutinasCreadas: [id] },
+        { merge: true }
+      ),
+      db.collection("usuarios").doc(rutConfig.creadorId).set(
+        { rutinasCreadas: [id] },
+        { merge: true }
+      ),
+    ]);
+  }
+}
+
 export async function seedTrainerWorkouts(
   db: Firestore,
   config: SeedConfig,

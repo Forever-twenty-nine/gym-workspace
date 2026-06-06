@@ -7,33 +7,41 @@
             <ion-icon name="close" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title class="font-black text-sm tracking-tight">Lanzar Desafío 🏆</ion-title>
+        <ion-title class="font-black text-sm tracking-tight">
+          {{ isEditing ? 'Editar Desafío' : 'Lanzar Desafío 🏆' }}
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="guardar()" [disabled]="form.invalid || saving()" color="primary">
+            <ion-icon name="save-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content class="ion-padding">
       <form [formGroup]="form" class="flex flex-col gap-6 pb-10">
 
-        <!-- Ayuda contextual -->
-        <div class="bg-amber-500/10 border border-amber-500/25 rounded-2xl overflow-hidden">
-          <button type="button" (click)="toggleAyuda()"
-            class="w-full flex items-center justify-between px-4 py-3 text-left">
-            <span class="flex items-center gap-2 text-xs font-extrabold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
-              <ion-icon name="help-circle-outline" class="text-base"></ion-icon>
-              ¿Cómo funciona un desafío?
-            </span>
-            <ion-icon [name]="mostrarAyuda() ? 'chevron-up-outline' : 'chevron-down-outline'"
-              class="text-amber-500 text-sm"></ion-icon>
-          </button>
-          @if (mostrarAyuda()) {
-            <div class="px-4 pb-4 text-[11px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed flex flex-col gap-1.5">
-              <p>• Publicás un <strong>reto declarativo</strong> para tu gimnasio.</p>
-              <p>• Otros atletas pueden <strong>aceptarlo</strong> deslizando a la derecha.</p>
-              <p>• Antes de que venza, cada uno declara <strong>si lo superó o no</strong> 💪.</p>
-              <p>• El desafío vence en la fecha elegida y deja de aparecer.</p>
-            </div>
-          }
-        </div>
+        <!-- Ayuda solo en modo crear, usando ion-popover -->
+        @if (!isEditing) {
+          <div class="flex justify-end mb-2">
+            <ion-button id="help-desafio" fill="clear" size="small" class="m-0 p-0 text-amber-500">
+              <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+
+          <ion-popover trigger="help-desafio" triggerAction="click">
+            <ng-template>
+              <ion-content class="ion-padding" style="max-width: 260px; font-size: 12px;">
+                <div class="text-[11px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed flex flex-col gap-1.5">
+                  <p>• Publicás un <strong>reto declarativo</strong> para tu gimnasio.</p>
+                  <p>• Otros atletas pueden <strong>aceptarlo</strong> deslizando a la derecha.</p>
+                  <p>• Antes de que venza, cada uno declara <strong>si lo superó o no</strong> 💪.</p>
+                  <p>• El desafío vence en la fecha elegida y deja de aparecer.</p>
+                </div>
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+        }
 
         <!-- Título del desafío -->
         <div class="flex flex-col gap-2">
@@ -91,16 +99,6 @@
             Después de esta fecha el desafío deja de mostrarse y ya no se pueden declarar resultados.
           </p>
         </div>
-
-        <!-- Botón publicar -->
-        <ion-button
-          expand="block"
-          (click)="guardar()"
-          [disabled]="form.invalid || saving()"
-          class="premium-button font-black text-sm uppercase tracking-wider rounded-2xl! overflow-hidden mt-2">
-          <ion-icon name="flame-outline" slot="start"></ion-icon>
-          {{ saving() ? 'Publicando...' : 'Lanzar Desafío 🔥' }}
-        </ion-button>
 
       </form>
     </ion-content>

@@ -53,5 +53,16 @@ export interface SeedConfig {
   exercises: string[];
   desafios: DesafioConfig[];
   matches: MatchConfig[];
+  traineeCreatedExercises?: Array<{
+    nombre: string;
+    descripcion?: string;
+    creadorId: string;
+    creadorNombre: string;
+  }>;
+  traineeCreatedRoutines?: Array<{
+    nombre: string;
+    creadorId: string;
+    creadorNombre: string;
+  }>;
 }
 export { Objetivo, Plan, NivelEntrenamiento };

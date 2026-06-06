@@ -64,6 +64,26 @@ ion-tab-bar {
   border-radius: 40px 40px 0 0;
 }
 
+/* Floating glassmorphism tab bar for entrenado.
+   This lets page backgrounds (images in premium or gradients) show "behind" the tab bar
+   with a nice frosted effect, while keeping icons readable.
+   Pure transparent was making Social ("Para ti") look too mixed/blended. */
+.entrenado-main-tabs ion-tab-bar {
+  --background: transparent !important;
+  background: rgba(255, 255, 255, 0.08) !important;           /* light tint */
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+
+  /* Optional: subtle separation line at the top of the pill */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dark mode stronger tint + border */
+.dark .entrenado-main-tabs ion-tab-bar {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
 ion-tab-button {
   --color: rgb(212, 212, 212);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;

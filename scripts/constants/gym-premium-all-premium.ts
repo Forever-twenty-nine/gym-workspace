@@ -173,5 +173,46 @@ export const gymPremiumAllPremiumConfig: SeedConfig = {
       interesDestino: true,
       mutuo: true
     }
+  ],
+  // 5 ejercicios creados por Juan Perez Premium (para probar la sección "Mis Creaciones")
+  traineeCreatedExercises: [
+    {
+      nombre: "Sentadilla Búlgara",
+      descripcion: "Ejercicio unilateral para glúteos y cuádriceps, variación de Juan",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    },
+    {
+      nombre: "Remo con Barra T",
+      descripcion: "Remo para espalda media, rutina personal de Juan",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    },
+    {
+      nombre: "Zancadas con Peso",
+      descripcion: "Ejercicio de piernas con carga, creado por Juan para su entrenamiento",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    },
+    {
+      nombre: "Press Inclinado con Mancuernas",
+      descripcion: "Enfoque en pecho superior, variación personal",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    },
+    {
+      nombre: "Curl de Bíceps con Barra Z",
+      descripcion: "Aislamiento de bíceps, ejercicio propio de Juan",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    }
+  ],
+  // 1 rutina creada por Juan usando sus 5 ejercicios
+  traineeCreatedRoutines: [
+    {
+      nombre: "Rutina Full Body - Mi Versión",
+      creadorId: 'trainee_juanperezpremium',
+      creadorNombre: 'Juan Perez Premium'
+    }
   ]
 };

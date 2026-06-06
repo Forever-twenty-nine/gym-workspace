@@ -21,7 +21,7 @@ import { trophyOutline } from 'ionicons/icons';
     CommonModule,
     IonContent,
     NgOptimizedImage,
-    IonSegment, IonSegmentButton, IonLabel, IonIcon,
+    IonSegment, IonSegmentButton, IonLabel,
     ConvocatoriasComponent,
     DescubrirTabComponent,
     FeedTabComponent,

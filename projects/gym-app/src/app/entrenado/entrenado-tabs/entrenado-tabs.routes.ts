@@ -32,16 +32,6 @@ export const routes: Routes = [
           import('../progreso/progreso.page').then((m) => m.ProgresoPage),
       },
       {
-        path: 'ejercicios',
-        loadComponent: () =>
-          import('../ejercicios-premium/ejercicios-premium.page').then((m) => m.EjerciciosPremiumPage),
-      },
-      {
-        path: 'mis-rutinas',
-        loadComponent: () =>
-          import('../rutinas-premium/rutinas-premium.page').then((m) => m.RutinasPremiumPage),
-      },
-      {
         path: '',
         redirectTo: 'social',
         pathMatch: 'full',

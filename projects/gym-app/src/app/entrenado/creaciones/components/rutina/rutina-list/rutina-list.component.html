@@ -1,0 +1,56 @@
+<div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
+  <!-- Acciones unificadas (siempre visibles) -->
+  <div class="flex items-center justify-end gap-2">
+    <ion-button id="help-rutinas" fill="clear">
+      <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
+    </ion-button>
+
+    <ion-popover trigger="help-rutinas" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding" style="max-width: 220px; font-size: 12px;">
+          Crea rutinas personalizadas combinando ejercicios del catálogo (función Premium).
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+
+    <ion-button (click)="onCreate()" size="small" class="m-0! rounded-2xl" fill="solid">
+      <ion-icon name="add" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+
+  @if (isPremium) {
+    <ion-list lines="none" class="bg-transparent m-0! -mx-1 space-y-2">
+      @for (rut of rutinas; track rut.id) {
+        <ion-item-sliding class="rounded-2xl overflow-hidden">
+          <ion-item class="bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden --padding-start: 4px; --padding-end: 4px;">
+            <ion-label>
+              <h2 class="font-bold text-gray-900 dark:text-white">{{ rut.nombre }}</h2>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="onDelete(rut.id)">
+              <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+          <ion-item-options side="start">
+            <ion-item-option color="primary" (click)="onEdit(rut)">
+              <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      } @empty {
+        <div class="text-center py-6">
+          <p class="text-xs font-medium text-gray-500 dark:text-gray-400 italic">Aún no has creado rutinas.</p>
+          <p class="text-[10px] text-gray-400 mt-1">Usa el botón "Crear Rutina" para agregar una.</p>
+        </div>
+      }
+    </ion-list>
+  } @else {
+    <div class="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/25 rounded-2xl p-5 text-center flex flex-col items-center gap-2">
+      <ion-icon name="lock-closed" class="text-2xl text-amber-500"></ion-icon>
+      <h4 class="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 m-0 leading-none">Rutinas Personalizadas (🔒 Premium)</h4>
+      <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-300 leading-relaxed m-0 mb-1">Crea rutinas semanales ilimitadas con ejercicios por día.</p>
+      <ion-button (click)="onCreate()" size="small" fill="clear" class="font-black text-xs">Desbloquear Premium</ion-button>
+    </div>
+  }
+</div>

@@ -4,7 +4,7 @@ import { SeedConfig } from "../interfaces/seed-config.interface";
 import { createGym } from "./entities";
 import { seedConvocatorias, seedDesafios, seedFollowing, seedMatches } from "./social";
 import { seedUsers } from "./users";
-import { seedTrainerWorkouts } from "./workout";
+import { seedTrainerWorkouts, seedTraineeCreations } from "./workout";
 
 export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   const isPT = config.gym.isPersonalTrainer || false;
@@ -13,6 +13,8 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
 
   const { trainers, trainees } = await seedUsers(db, auth, config);
   const trainersForSocial = await seedTrainerWorkouts(db, config, isPT, config.gym.id, trainers, trainees);
+
+  await seedTraineeCreations(db, config, trainees);
 
   await seedFollowing(db, config, trainees);
   await seedDesafios(db, config, trainees);

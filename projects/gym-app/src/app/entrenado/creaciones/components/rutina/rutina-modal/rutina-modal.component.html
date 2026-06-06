@@ -1,0 +1,153 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar class="bg-transparent backdrop-blur-xl">
+        <ion-buttons slot="start">
+          <ion-button fill="clear" (click)="closeModal()" color="medium">
+            <ion-icon name="close" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title class="font-black text-sm tracking-tight">
+          {{ isEditing ? 'Editar Rutina' : 'Nueva Rutina' }}
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="guardar()" [disabled]="form.invalid || saving()" color="primary">
+            <ion-icon name="save-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <form [formGroup]="form" class="flex flex-col gap-5 pb-6">
+
+        <!-- Ayuda solo en modo crear, usando ion-popover -->
+        @if (!isEditing) {
+          <div class="flex justify-end mb-2">
+            <ion-button id="help-rutina" fill="clear" size="small" class="m-0 p-0 text-blue-500">
+              <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+
+          <ion-popover trigger="help-rutina" triggerAction="click">
+            <ng-template>
+              <ion-content class="ion-padding" style="max-width: 260px; font-size: 12px;">
+                Crea rutinas personalizadas combinando ejercicios del catálogo (función Premium).
+              </ion-content>
+            </ng-template>
+          </ion-popover>
+        }
+
+        <!-- Nombre -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
+            Nombre de la rutina *
+          </label>
+          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+            <ion-input
+              formControlName="nombre"
+              placeholder="Ej: Rutina de Empuje / Pierna"
+              class="text-sm font-semibold px-2"
+              maxlength="80">
+            </ion-input>
+          </div>
+          @if (form.get('nombre')?.touched && form.get('nombre')?.hasError('required')) {
+            <p class="text-[10px] text-red-500 font-bold px-1">El nombre es obligatorio.</p>
+          }
+          @if (form.get('nombre')?.touched && form.get('nombre')?.hasError('minlength')) {
+            <p class="text-[10px] text-red-500 font-bold px-1">Mínimo 2 caracteres.</p>
+          }
+        </div>
+
+        <!-- Descripción -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
+            Descripción <span class="normal-case font-semibold">(opcional)</span>
+          </label>
+          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+            <ion-textarea
+              formControlName="descripcion"
+              placeholder="¿Qué enfoque tiene esta rutina?"
+              [rows]="2"
+              maxlength="300"
+              class="text-sm font-semibold px-2">
+            </ion-textarea>
+          </div>
+        </div>
+
+        <!-- Días de la semana -->
+        <div class="flex flex-col gap-2">
+          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
+            Días de la semana (opcional)
+          </label>
+          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+            <ion-item lines="none" class="--background: transparent; --padding-start: 12px; --padding-end: 12px;">
+              <ion-select
+                multiple="true"
+                [value]="form.get('diasSemana')?.value || []"
+                (ionChange)="onDiasChange($event)"
+                placeholder="Selecciona los días"
+                class="text-sm">
+                <ion-select-option value="Lunes">Lunes</ion-select-option>
+                <ion-select-option value="Martes">Martes</ion-select-option>
+                <ion-select-option value="Miércoles">Miércoles</ion-select-option>
+                <ion-select-option value="Jueves">Jueves</ion-select-option>
+                <ion-select-option value="Viernes">Viernes</ion-select-option>
+                <ion-select-option value="Sábado">Sábado</ion-select-option>
+                <ion-select-option value="Domingo">Domingo</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">
+            Asigna esta rutina a días específicos de la semana.
+          </p>
+        </div>
+
+        <!-- Ejercicios -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-between px-1">
+            <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+              Ejercicios ({{ selectedIds().length }})
+            </label>
+            @if (selectedIds().length > 0) {
+              <button type="button" (click)="selectedIds.set([])"
+                class="text-[10px] font-bold text-red-500 active:opacity-70">
+                Limpiar
+              </button>
+            }
+          </div>
+
+          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+            @if (ejercicios().length > 0) {
+              <ion-list lines="none" class="max-h-65 overflow-auto ion-no-padding">
+                @for (ej of ejercicios(); track ej.id) {
+                  <ion-item button (click)="toggleEjercicio(ej.id)" class="bg-white dark:bg-neutral-900 rounded-xl --padding-start: 8px; --padding-end: 8px; --min-height: 42px;">
+                    <ion-checkbox
+                      slot="start"
+                      [checked]="isSelected(ej.id)"
+                      (ionChange)="toggleEjercicio(ej.id)"
+                      (click)="$event.stopImmediatePropagation()"
+                      class="scale-90">
+                    </ion-checkbox>
+                    <ion-label class="text-sm py-1 ms-3">
+                      <span class="font-semibold">{{ ej.nombre }}</span>
+                    </ion-label>
+                  </ion-item>
+                }
+              </ion-list>
+            } @else {
+              <div class="px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                No tienes ejercicios creados aún.
+              </div>
+            }
+          </div>
+
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 px-1">
+            Selecciona los ejercicios que formarán parte de esta rutina (máx. 5 recomendados).
+          </p>
+        </div>
+
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

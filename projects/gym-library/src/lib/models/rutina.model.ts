@@ -16,6 +16,8 @@ export interface Rutina {
     fechaCompartida?: any;
     // Plan Premium
     duracion?: number;
+    // Días de la semana (para rutinas personales del entrenado y rutinas de entrenador)
+    diasSemana?: string[];
     // Metadatos
     fechaCreacion?: Date;
     fechaModificacion?: Date;
