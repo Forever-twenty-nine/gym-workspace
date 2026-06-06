@@ -16,6 +16,55 @@
   <app-rutinas-semana [rutinasPorDia]="rutinasPorDia()" (verDetalles)="abrirDetalles($event)"
     (iniciarEntrenamientoDirecto)="iniciarEntrenamientoDirecto($event.event, $event.rutina)">
   </app-rutinas-semana>
+
+  <!-- Encuentros / Convocatorias de la semana (creados por ti o tu entrenador) -->
+  @if (encuentrosPorDia().length > 0) {
+  <ion-card class="mx-0 mt-0 mb-6 rounded-3xl shadow-xl relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10">
+    <div class="relative z-10">
+      <ion-card-header class="p-6 pb-4">
+        <ion-card-title class="text-2xl font-black text-gray-900 dark:text-white m-0 tracking-tight flex items-center gap-2">
+          <ion-icon name="people-outline"></ion-icon>
+          Encuentros esta semana
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content class="px-4 pb-6">
+        <ion-list lines="none" class="p-0 m-0" style="background: transparent;">
+          @for (dia of encuentrosPorDia(); track dia.fecha) {
+            @for (enc of dia.encuentros; track enc.id) {
+              <div class="mb-3 rounded-2xl shadow-sm border border-white/30 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden">
+                <ion-item button detail="false" class="m-0" style="--background: transparent; --padding-start: 16px;">
+                  <div slot="start" class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 shadow-sm bg-secondary/80 text-white">
+                    <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
+                    <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
+                  </div>
+
+                  <ion-label class="py-1">
+                    <div class="flex flex-row items-center gap-2">
+                      @if (dia.esHoy) {
+                        <ion-badge color="secondary" class="text-[9px] font-black rounded-full uppercase px-1.5 py-0.5">Hoy</ion-badge>
+                      }
+                      <h3 class="text-base font-bold text-gray-900 dark:text-white m-0 truncate">{{ enc.titulo || 'Encuentro de entrenamiento' }}</h3>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {{ enc.horaInicio }} - {{ enc.horaFin }} • {{ enc.creadorNombre }}
+                      @if (enc.mensaje) { · {{ enc.mensaje }} }
+                    </p>
+                  </ion-label>
+
+                  <ion-button fill="clear" slot="end" size="small" class="m-0" (click)="verConvocatoria(enc)">
+                    Ver
+                  </ion-button>
+                </ion-item>
+              </div>
+            }
+          }
+        </ion-list>
+      </ion-card-content>
+    </div>
+  </ion-card>
+  }
+
   <!-- Modal Detalles Rutina -->
   <app-rutina-detalle-modal [isOpen]="modalAbierto()" [rutina]="rutinaSeleccionada()"
     [ejercicios]="ejerciciosCompletos()" [esFuturo]="esFuturoSeleccionado()" (didDismiss)="cerrarModal()"

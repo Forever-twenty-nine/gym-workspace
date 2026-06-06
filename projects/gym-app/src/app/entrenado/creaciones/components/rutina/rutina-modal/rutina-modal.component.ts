@@ -8,6 +8,7 @@ import { RutinaService } from '../../../../../core/services/rutina.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { RutinaAsignadaService } from '../../../../../core/services/rutina-asignada.service';
 
 @Component({
   selector: 'app-rutina-modal',
@@ -41,6 +42,7 @@ export class RutinaModalComponent implements OnChanges {
   private rutinaService = inject(RutinaService);
   private entrenadoService = inject(EntrenadoService);
   private ejercicioService = inject(EjercicioService);
+  private rutinaAsignadaService = inject(RutinaAsignadaService);
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
@@ -184,6 +186,24 @@ export class RutinaModalComponent implements OnChanges {
 
       if (!this.isEditing) {
         await this.entrenadoService.addRutinaCreada(uid, rutinaData.id);
+
+        // Crear asignaciones explícitas para que aparezcan en la vista semanal
+        // y sean consistentes con el sistema de RutinaAsignada (notificaciones, etc.)
+        for (const dia of dias) {
+          try {
+            await this.rutinaAsignadaService.save({
+              id: `asig-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+              rutinaId: rutinaData.id,
+              entrenadoId: uid,
+              entrenadorId: uid, // auto-asignada por el propio usuario
+              diaSemana: dia,
+              fechaAsignacion: new Date(),
+              activa: true
+            });
+          } catch (e) {
+            console.warn('No se pudo crear asignación para día', dia, e);
+          }
+        }
       }
 
       this.showToast(this.isEditing ? 'Rutina actualizada' : 'Rutina creada con éxito', 'success');

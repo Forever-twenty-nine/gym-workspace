@@ -1,11 +1,12 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
-import { IonContent, IonCard } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonIcon, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonBadge } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline, playOutline, timeOutline, calendarOutline,
   checkmarkCircle, timerOutline, notificationsOutline, arrowBackOutline,
-  todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed
+  todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed,
+  peopleOutline
 } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
@@ -14,6 +15,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { DesafioService } from '../../core/services/desafio.service';
+import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { Router, RouterModule } from '@angular/router';
 import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
@@ -24,7 +26,7 @@ import { AlertController, ToastController } from '@ionic/angular/standalone';
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
-  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent],
+  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, RutinasSemanaComponent, IonCard, IonCardHeader, IonCardTitle, IonIcon, IonCardContent, IonList, IonItem, IonLabel, IonButton, IonBadge],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
@@ -35,6 +37,7 @@ export class RutinasPage implements OnInit {
   private injector = inject(Injector);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
   private desafioService = inject(DesafioService);
+  private convocatoriaService = inject(ConvocatoriaService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
 
@@ -59,7 +62,7 @@ export class RutinasPage implements OnInit {
     addIcons({
       fitnessOutline, playOutline, timeOutline, calendarOutline, checkmarkCircle,
       timerOutline, notificationsOutline, arrowBackOutline, todayOutline, bedOutline, playCircle,
-      repeatOutline, syncCircleOutline, lockClosed
+      repeatOutline, syncCircleOutline, lockClosed, peopleOutline
     });
   }
 
@@ -77,6 +80,64 @@ export class RutinasPage implements OnInit {
     const user = this.authService.currentUser();
     const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(user?.uid || '')();
     return this.rutinaAsignadaService.organizarRutinasSemanales(this.rutinasAsignadas(), asignaciones);
+  });
+
+  // Encuentros (Convocatorias) relevantes esta semana:
+  // - Del gimnasio del usuario
+  // - Creados por el usuario o por alguno de sus entrenadores asociados
+  readonly encuentrosPorDia = computed(() => {
+    const user = this.authService.currentUser();
+    if (!user) return [];
+
+    const entrenado = this.entrenadoService.getEntrenado(user.uid || '')();
+    const misEntrenadores = new Set<string>(entrenado?.entrenadoresId || []);
+    const gymId = user.gimnasioId;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const limite = new Date(hoy);
+    limite.setDate(hoy.getDate() + 7);
+
+    const todas = this.convocatoriaService.convocatorias();
+
+    const relevantes = todas.filter(c => {
+      if (!c.activo) return false;
+      if (gymId && c.gimnasioId !== gymId) return false;
+
+      const esMio = c.creadorId === user.uid;
+      const esDelEntrenador = misEntrenadores.has(c.creadorId);
+      if (!esMio && !esDelEntrenador) return false;
+
+      const f = c.fechaEntrenamiento instanceof Date ? c.fechaEntrenamiento : new Date(c.fechaEntrenamiento as any);
+      return f >= hoy && f <= limite;
+    });
+
+    // Agrupar por día similar a rutinas
+    const diasSemanaSinTilde = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+    const diasSemanaCorto = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+    const grupos: { [key: string]: { fecha: Date; encuentros: any[]; diaCorto: string; esHoy: boolean; } } = {};
+
+    relevantes.forEach(enc => {
+      const f = enc.fechaEntrenamiento instanceof Date ? enc.fechaEntrenamiento : new Date(enc.fechaEntrenamiento as any);
+      const fechaKey = f.toISOString().split('T')[0];
+      const diaIndex = f.getDay();
+
+      if (!grupos[fechaKey]) {
+        grupos[fechaKey] = {
+          fecha: new Date(f),
+          encuentros: [],
+          diaCorto: diasSemanaCorto[diaIndex],
+          esHoy: f.toDateString() === hoy.toDateString()
+        };
+      }
+      grupos[fechaKey].encuentros.push({
+        ...enc,
+        fecha: f
+      });
+    });
+
+    return Object.values(grupos).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
   });
 
   abrirDetalles(data: { rutina: any, esFuturo: boolean }) {
@@ -153,5 +214,32 @@ export class RutinasPage implements OnInit {
     });
 
     await confirmAlert.present();
+  }
+
+  async verConvocatoria(enc: any) {
+    const alert = await this.alertController.create({
+      header: enc.titulo || 'Encuentro de entrenamiento',
+      subHeader: `${enc.horaInicio} - ${enc.horaFin}`,
+      message: `
+        <p><strong>Creado por:</strong> ${enc.creadorNombre}</p>
+        ${enc.mensaje ? `<p>${enc.mensaje}</p>` : ''}
+        <p class="mt-2"><small>Interesados: ${enc.interesados?.length || 0}</small></p>
+      `,
+      buttons: [
+        {
+          text: 'Cerrar',
+          role: 'cancel'
+        },
+        {
+          text: 'Ir a Social',
+          handler: () => {
+            this.router.navigateByUrl('/entrenado-tabs/social').catch(console.error);
+          }
+        }
+      ],
+      cssClass: 'premium-alert'
+    });
+
+    await alert.present();
   }
 }

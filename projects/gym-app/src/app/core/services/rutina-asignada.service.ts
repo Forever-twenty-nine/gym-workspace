@@ -195,6 +195,25 @@ export class RutinaAsignadaService {
                     rutinasOrganizadas[fechaKey].rutinas.push(rutinaCompleta);
                 }
             });
+
+            // Soporte para rutinas creadas por el propio usuario que guardan sus días directamente
+            // en el documento Rutina (vía el modal de Creaciones). Esto hace que aparezcan
+            // en la vista semanal aunque no tengan un documento RutinaAsignada explícito.
+            rutinasAsignadas.forEach((rutina: any) => {
+                const diasDirectos: string[] = rutina?.diasSemana || [];
+                if (!diasDirectos.length) return;
+
+                diasDirectos.forEach((diaStr: string) => {
+                    const diaNorm = diaStr.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+                    if (diaNorm === diaSemanaNormalizado) {
+                        // Evitar duplicados si ya vino por asignación
+                        const yaExiste = rutinasOrganizadas[fechaKey].rutinas.some((r: any) => r.id === rutina.id);
+                        if (!yaExiste) {
+                            rutinasOrganizadas[fechaKey].rutinas.push(rutina);
+                        }
+                    }
+                });
+            });
         });
 
         return Object.values(rutinasOrganizadas).sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
