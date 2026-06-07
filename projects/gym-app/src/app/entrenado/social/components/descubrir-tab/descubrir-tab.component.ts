@@ -1,10 +1,10 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, IonButton, ModalController, ToastController, IonAccordionGroup, IonAccordion, IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
+import { IonIcon, IonButton, ModalController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   trophyOutline, barbellOutline, sparklesOutline,
-  close, handRight, sparkles, chatbubbles, person, peopleOutline
+  close, handRight, sparkles, chatbubbles, person
 } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../core/services/entrenado.service';
@@ -22,11 +22,6 @@ import { ChatDetailModalComponent } from '../chat/chat-detail-modal/chat-detail-
     CommonModule,
     IonIcon,
     IonButton,
-    IonAccordionGroup,
-    IonAccordion,
-    IonItem,
-    IonLabel,
-    IonNote,
     MatchCardComponent
   ]
 })
@@ -64,69 +59,6 @@ export class DescubrirTabComponent {
     if (!gimnasioId) return [];
     return this.desafioService.getDesafiosByGimnasio(gimnasioId)();
   });
-
-  gymBrosConectados = computed(() => {
-    const curr = this.currentEntrenado();
-    if (!curr) return [];
-    
-    const interactions = this.matchService.getInteractions(curr.id)();
-    const afinidadInteractions = interactions.filter(i => i.tipo === 'afinidad' && i.interesOrigen === true);
-    
-    return afinidadInteractions.map(i => {
-      const target = this.entrenadoService.getEntrenado(i.usuarioDestinoId)();
-      return {
-        id: i.usuarioDestinoId,
-        mutuo: i.mutuo,
-        objetivo: target?.objetivo,
-        nivel: target?.nivel,
-        bio: target?.bio
-      };
-    }).filter(u => u.objetivo !== undefined);
-  });
-
-  coincidenciasHorarioConectadas = computed(() => {
-    const curr = this.currentEntrenado();
-    if (!curr) return [];
-    
-    const interactions = this.matchService.getInteractions(curr.id)();
-    const horarioInteractions = interactions.filter(i => i.tipo === 'horario' && i.interesOrigen === true);
-    
-    return horarioInteractions.map(i => {
-      const target = this.entrenadoService.getEntrenado(i.usuarioDestinoId)();
-      return {
-        id: i.usuarioDestinoId,
-        mutuo: i.mutuo,
-        franjaHoraria: target?.franjaHoraria,
-        nivel: target?.nivel,
-        bio: target?.bio
-      };
-    }).filter(u => u.nivel !== undefined);
-  });
-
-  getUsuarioNombre(userId: string): string {
-    return this.userService.getUserByUid(userId)()?.nombre || 'Atleta';
-  }
-
-  getUsuarioFoto(userId: string): string | null {
-    return this.userService.getUserByUid(userId)()?.photoURL || null;
-  }
-
-  getUsuarioIniciales(userId: string): string {
-    const nombre = this.getUsuarioNombre(userId);
-    if (!nombre || nombre === 'Atleta') return 'A';
-    return nombre.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
-  }
-
-  async abrirChatCon(partnerId: string) {
-    const modal = await this.modalCtrl.create({
-      component: ChatDetailModalComponent,
-      componentProps: {
-        otherUserId: partnerId
-      },
-      cssClass: 'premium-modal'
-    });
-    await modal.present();
-  }
 
   // Mazo combinado de tarjetas (Afinidad, Horario, Desafíos)
   tarjetas = computed(() => {
@@ -190,7 +122,7 @@ export class DescubrirTabComponent {
   constructor() {
     addIcons({
       trophyOutline, barbellOutline, sparklesOutline,
-      close, handRight, sparkles, chatbubbles, person, peopleOutline
+      close, handRight, sparkles, chatbubbles, person
     });
   }
 

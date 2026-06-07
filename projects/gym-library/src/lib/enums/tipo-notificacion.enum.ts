@@ -14,5 +14,8 @@ export enum TipoNotificacion {
     // Otros
     RECORDATORIO = 'recordatorio',
     LOGRO = 'logro',
-    NUEVO_PR = 'nuevo_pr'
+    NUEVO_PR = 'nuevo_pr',
+
+    // Matching / Social
+    NUEVO_MATCH = 'nuevo_match'
 }

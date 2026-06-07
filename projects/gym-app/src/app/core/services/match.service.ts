@@ -167,21 +167,43 @@ export class MatchService {
                     fechaEnvio: new Date()
                 });
 
-                // D. Enviar notificación al otro usuario
-                const owner = this.entrenadoService.getEntrenado(usuarioOrigenId)();
-                const userName = owner?.id || 'Un atleta';
+                // D. Notificar a AMBOS usuarios con contexto claro del "por qué" del match
+                const targetUserForNotif = this.userService.getUserByUid(usuarioDestinoId)();
+                const targetName = targetUserForNotif?.nombre || 'Un atleta';
+
+                const matchReason = this.buildMatchReasonMessage(tipo, originName, targetName);
+
+                // Notificación para el que inició el último "chocar los 5"
                 await this.notificacionService.save({
-                    id: `notif-match-${interactionId}`,
-                    usuarioId: usuarioDestinoId,
-                    tipo: TipoNotificacion.INVITACION_ACEPTADA, // Reutilizar tipo existente
-                    titulo: '¡Nuevo Match Fitness!',
-                    mensaje: `¡Has conectado con un compañero deportivo para entrenar!`,
+                    id: `notif-match-${interactionId}-for-origin`,
+                    usuarioId: usuarioOrigenId,
+                    tipo: TipoNotificacion.NUEVO_MATCH,
+                    titulo: '¡Chocaste los 5! Nuevo match',
+                    mensaje: matchReason.forOrigin,
                     leida: false,
                     fechaCreacion: new Date(),
                     datos: {
                         matchId: interactionId,
                         tipoMatch: tipo,
-                        partnerId: usuarioOrigenId
+                        partnerId: usuarioDestinoId,
+                        partnerName: targetName
+                    }
+                });
+
+                // Notificación para el otro usuario
+                await this.notificacionService.save({
+                    id: `notif-match-${interactionId}-for-target`,
+                    usuarioId: usuarioDestinoId,
+                    tipo: TipoNotificacion.NUEVO_MATCH,
+                    titulo: '¡Chocaste los 5! Nuevo match',
+                    mensaje: matchReason.forTarget,
+                    leida: false,
+                    fechaCreacion: new Date(),
+                    datos: {
+                        matchId: interactionId,
+                        tipoMatch: tipo,
+                        partnerId: usuarioOrigenId,
+                        partnerName: originName
                     }
                 });
 
@@ -265,6 +287,38 @@ export class MatchService {
         const parts = timeStr.split(':');
         if (parts.length < 2) return 0;
         return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+    }
+
+    /**
+     * Genera mensajes contextuales para notificaciones de match mutuo.
+     * Explica claramente "el por qué" del match a ambos usuarios.
+     */
+    private buildMatchReasonMessage(
+        tipo: 'horario' | 'desafio' | 'afinidad',
+        originName: string,
+        targetName: string
+    ): { forOrigin: string; forTarget: string } {
+        if (tipo === 'afinidad') {
+            const msg = `¡Hay equipo! ${originName} y ${targetName} comparten el mismo objetivo de entrenamiento. ¡Chocaron los 5 y ahora pueden coordinar!`;
+            return {
+                forOrigin: `¡Match con ${targetName}! Comparten el mismo objetivo. ¡A entrenar juntos!`,
+                forTarget: `¡Match con ${originName}! Comparten el mismo objetivo. ¡A entrenar juntos!`
+            };
+        }
+
+        if (tipo === 'horario') {
+            const msg = `¡Perfecto! ${originName} y ${targetName} tienen horarios que coinciden. ¡Chocaron los 5!`;
+            return {
+                forOrigin: `¡Match con ${targetName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`,
+                forTarget: `¡Match con ${originName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`
+            };
+        }
+
+        // desafio
+        return {
+            forOrigin: `¡Reto aceptado! ${targetName} también está en el mismo desafío. ¡Chocaron los 5!`,
+            forTarget: `¡Reto aceptado! ${originName} se unió a tu desafío. ¡Chocaron los 5!`
+        };
     }
 
     private mapFromFirestore(data: any): MatchInteraction {
