@@ -3,7 +3,6 @@ import { Component, OnInit, OnDestroy, signal, inject, computed, effect } from '
 import {
   IonContent,
   IonText,
-  AlertController,
   IonCard
 } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
@@ -13,7 +12,6 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { EstadisticasEntrenadoService } from '../../core/services/estadisticas-entrenado.service';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
-import { ProgresoHistorialComponent } from './components/progreso-historial/progreso-historial.component';
 
 
 @Component({
@@ -23,9 +21,8 @@ import { ProgresoHistorialComponent } from './components/progreso-historial/prog
     IonContent,
     IonText,
     NgOptimizedImage,
-    ProgresoEstadisticasComponent,
-    ProgresoHistorialComponent
-],
+    ProgresoEstadisticasComponent
+  ],
   templateUrl: './progreso.page.html',
 })
 export class ProgresoPage implements OnInit, OnDestroy {
@@ -34,7 +31,6 @@ export class ProgresoPage implements OnInit, OnDestroy {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly sesionRutinaService = inject(SesionRutinaService);
   private readonly estadisticasService = inject(EstadisticasEntrenadoService);
-  private readonly alertController = inject(AlertController);
 
   readonly currentUserSignal = this.authService.currentUser;
   readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
@@ -118,28 +114,4 @@ export class ProgresoPage implements OnInit, OnDestroy {
     if (!uid) return null;
     return this.estadisticasService.getEstadisticas(uid)();
   });
-
-  async confirmarEliminacion(sesionId: string) {
-    const alert = await this.alertController.create({
-      header: '¿Eliminar entrenamiento?',
-      message: 'Esta acción no se puede deshacer y los datos no sumarán a tu estadística.',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'medium'
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          cssClass: 'text-red-500',
-          handler: async () => {
-            await this.sesionRutinaService.eliminarSesion(sesionId);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-  }
 }

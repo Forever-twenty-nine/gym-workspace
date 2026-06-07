@@ -1,11 +1,15 @@
 import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
-import { IonContent } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
+import {
+  IonContent, IonHeader, IonSegment, IonSegmentButton, IonLabel,
+  IonList, IonItem, IonIcon, IonButton
+} from '@ionic/angular/standalone';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline, playOutline, timeOutline, calendarOutline,
   checkmarkCircle, timerOutline, notificationsOutline, arrowBackOutline,
-  todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed
+  todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed,
+  trashOutline, checkmarkCircleOutline
 } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
@@ -13,20 +17,39 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-import { DesafioService } from '../../core/services/desafio.service';
 import { ConvocatoriaService } from '../../core/services/convocatoria.service';
+import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { Router, RouterModule } from '@angular/router';
 import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
 import { EncuentroDetalleModalComponent } from './components/encuentro-detalle-modal/encuentro-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
+import { ProgresoHistorialDetalleComponent } from '../progreso/components/progreso-historial-detalle/progreso-historial-detalle.component';
+import { AlertController } from '@ionic/angular/standalone';
 
-import { AlertController, ToastController } from '@ionic/angular/standalone';
+
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
-  imports: [IonContent, NgOptimizedImage, RouterModule, RutinaDetalleModalComponent, EncuentroDetalleModalComponent, RutinasSemanaComponent],
+  imports: [
+    CommonModule,
+    IonContent,
+    IonHeader,
+    IonSegment,
+    IonSegmentButton,
+    IonLabel,
+    IonList,
+    IonItem,
+    IonIcon,
+    IonButton,
+    NgOptimizedImage,
+    RouterModule,
+    RutinaDetalleModalComponent,
+    EncuentroDetalleModalComponent,
+    RutinasSemanaComponent,
+    ProgresoHistorialDetalleComponent
+  ],
 })
 export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
@@ -36,13 +59,15 @@ export class RutinasPage implements OnInit {
   private router = inject(Router);
   private injector = inject(Injector);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
-  private desafioService = inject(DesafioService);
   private convocatoriaService = inject(ConvocatoriaService);
+  private sesionRutinaService = inject(SesionRutinaService);
   private alertController = inject(AlertController);
-  private toastController = inject(ToastController);
 
   readonly currentUserSignal = this.authService.currentUser;
   readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+
+  selectedTab = signal<'rutinas' | 'historial'>('rutinas');
+  sesionSeleccionada = signal<any>(null);
 
   private todasLasRutinas = signal<Rutina[]>([]);
   readonly modalAbierto = signal(false);
@@ -72,7 +97,7 @@ export class RutinasPage implements OnInit {
     addIcons({
       fitnessOutline, playOutline, timeOutline, calendarOutline, checkmarkCircle,
       timerOutline, notificationsOutline, arrowBackOutline, todayOutline, bedOutline, playCircle,
-      repeatOutline, syncCircleOutline, lockClosed
+      repeatOutline, syncCircleOutline, lockClosed, trashOutline, checkmarkCircleOutline
     });
   }
 
@@ -83,6 +108,8 @@ export class RutinasPage implements OnInit {
     if (userId) {
       this.entrenadoService.getEntrenado(userId);
       this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(userId);
+      // Inicializa listener del historial de sesiones (completadas)
+      this.sesionRutinaService.getSesionesPorEntrenado(userId);
     }
   }
 
@@ -145,6 +172,59 @@ export class RutinasPage implements OnInit {
     });
   });
 
+  // Historial solo de rutinas completadas (para la pestaña Historial)
+  historialCompletadas = computed(() => {
+    const userId = this.authService.currentUser()?.uid;
+    if (!userId) return [];
+
+    const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(userId)();
+    return sesiones
+      .filter(s => s.completada === true)
+      .sort((a, b) => {
+        const da = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
+        const db = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
+        return db.getTime() - da.getTime();
+      });
+  });
+
+  segmentChanged(event: any) {
+    this.selectedTab.set(event.detail.value);
+  }
+
+  abrirDetalleSesion(sesion: any) {
+    this.sesionSeleccionada.set(sesion);
+  }
+
+  cerrarDetalleSesion() {
+    this.sesionSeleccionada.set(null);
+  }
+
+  async eliminarSesion(sesionId: string, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Eliminar registro',
+      message: '¿Eliminar este entrenamiento del historial? Esta acción no se puede deshacer.',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: async () => {
+            try {
+              await this.sesionRutinaService.eliminarSesion(sesionId);
+            } catch (e) {
+              console.error('Error eliminando sesión:', e);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   abrirDetalles(data: { rutina: any, esFuturo: boolean }) {
     this.rutinaSeleccionada.set(data.rutina);
     this.esFuturoSeleccionado.set(data.esFuturo);
@@ -169,58 +249,6 @@ export class RutinasPage implements OnInit {
     this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`).catch(console.error);
   }
 
-  async publicarComoDesafio(rutina: any) {
-    const confirmAlert = await this.alertController.create({
-      header: '¿Buscar Gymbro?',
-      message: `¿Estás seguro de que deseas publicar la rutina "${rutina.nombre}" en la sección social para encontrar un compañero hoy?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Compartir',
-          handler: async () => {
-            const user = this.currentUserSignal();
-            if (!user) return;
-
-            try {
-              const fechaVencimiento = new Date();
-              fechaVencimiento.setDate(fechaVencimiento.getDate() + 7);
-
-              await this.desafioService.save({
-                id: crypto.randomUUID(),
-                creadorId: user.uid,
-                creadorNombre: user.nombre || 'Atleta',
-                creadorFoto: user.photoURL || null,
-                gimnasioId: user.gimnasioId || '',
-                titulo: `¿Quién se suma a entrenar la rutina "${rutina.nombre}" hoy? 🏋️‍♂️💪`,
-                disciplina: 'Fuerza',
-                fechaCreacion: new Date(),
-                fechaVencimiento,
-                activo: true
-              });
-
-              const toast = await this.toastController.create({
-                message: '¡Rutina publicada en el muro social para buscar Gymbro!',
-                duration: 2500,
-                position: 'top',
-                color: 'success'
-              });
-              await toast.present();
-              this.cerrarModal();
-            } catch (e) {
-              console.error('Error al publicar desafío:', e);
-            }
-          }
-        }
-      ],
-      cssClass: 'premium-alert'
-    });
-
-    await confirmAlert.present();
-  }
-
   abrirDetallesEncuentro(enc: any) {
     this.encuentroSeleccionado.set(enc);
     this.encuentroModalAbierto.set(true);
@@ -236,5 +264,20 @@ export class RutinasPage implements OnInit {
     setTimeout(() => {
       this.router.navigateByUrl('/entrenado-tabs/social').catch(console.error);
     }, 300);
+  }
+
+  // Helpers para el historial (ion-list)
+  formatearFechaSesion(fecha: any): string {
+    if (!fecha) return 'Sin fecha';
+    const d = fecha instanceof Date ? fecha : new Date(fecha);
+    return d.toLocaleDateString('es-ES', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  redondearMinutos(segundos: number): number {
+    return Math.round((segundos || 0) / 60);
   }
 }

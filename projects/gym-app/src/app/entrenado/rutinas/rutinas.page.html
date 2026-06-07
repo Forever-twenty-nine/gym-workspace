@@ -1,3 +1,16 @@
+<!-- Tabs estilo otras páginas (glassmorphism segment) -->
+<ion-header class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
+  <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
+    class="rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
+    <ion-segment-button value="rutinas">
+      <ion-label class="font-bold text-xs uppercase tracking-wider">Rutinas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="historial">
+      <ion-label class="font-bold text-xs uppercase tracking-wider">Historial</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+</ion-header>
+
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
   @if (isPremium()) {
@@ -10,21 +23,93 @@
     class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
   </div>
   }
-  <!-- Main Content Layer -->
-  <app-rutinas-semana [rutinasPorDia]="semanaUnificada()" (verDetalles)="abrirDetalles($event)"
-    (iniciarEntrenamientoDirecto)="iniciarEntrenamientoDirecto($event.event, $event.rutina)"
-    (verEncuentro)="abrirDetallesEncuentro($event)">
-  </app-rutinas-semana>
+
+  <div class="relative z-10 px-4 pb-6 pt-2">
+    @switch (selectedTab()) {
+      @case ('rutinas') {
+        <!-- Vista actual: Esta Semana -->
+        <app-rutinas-semana [rutinasPorDia]="semanaUnificada()" (verDetalles)="abrirDetalles($event)"
+          (iniciarEntrenamientoDirecto)="iniciarEntrenamientoDirecto($event.event, $event.rutina)"
+          (verEncuentro)="abrirDetallesEncuentro($event)">
+        </app-rutinas-semana>
+      }
+
+      @case ('historial') {
+        <!-- Historial de rutinas completadas con ion-list -->
+        <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5">
+          <div class="flex items-center justify-between mb-3 px-1">
+            <div>
+              <h3 class="text-lg font-black text-gray-900 dark:text-white m-0 tracking-tight">Rutinas completadas</h3>
+              <p class="text-xs text-gray-500 dark:text-white/60 m-0">{{ historialCompletadas().length }} registros</p>
+            </div>
+          </div>
+
+          @if (historialCompletadas().length > 0) {
+            <ion-list lines="none" class="bg-transparent space-y-2 m-0 p-0">
+              @for (sesion of historialCompletadas(); track sesion.id) {
+                <ion-item button detail="false"
+                  class="rounded-2xl overflow-hidden shadow-sm border border-gray-200/60 dark:border-white/10 bg-white/60 dark:bg-white/5 backdrop-blur-sm"
+                  (click)="abrirDetalleSesion(sesion)"
+                  style="--background: transparent; --padding-start: 12px; --padding-end: 8px;">
+
+                  <!-- Indicador completado -->
+                  <div slot="start" class="w-9 h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center mr-3">
+                    <ion-icon name="checkmark-circle-outline" class="text-xl text-emerald-600 dark:text-emerald-400"></ion-icon>
+                  </div>
+
+                  <ion-label class="py-2">
+                    <div class="flex flex-col gap-0.5">
+                      <div class="font-bold text-base text-gray-900 dark:text-white truncate">
+                        {{ sesion.rutinaResumen?.nombre || 'Rutina' }}
+                      </div>
+                      <div class="text-xs text-gray-500 dark:text-white/70 flex items-center gap-2">
+                        <span>{{ formatearFechaSesion(sesion.fechaInicio) }}</span>
+                        @if (sesion.duracion) {
+                          <span class="opacity-60">•</span>
+                          <span class="font-medium text-emerald-600 dark:text-emerald-400">
+                            {{ redondearMinutos(sesion.duracion) }} min
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  </ion-label>
+
+                  <!-- Eliminar -->
+                  <ion-button fill="clear" color="danger" slot="end" class="m-0"
+                    (click)="eliminarSesion(sesion.id, $event)">
+                    <ion-icon name="trash-outline" slot="icon-only" class="text-lg opacity-70"></ion-icon>
+                  </ion-button>
+                </ion-item>
+              }
+            </ion-list>
+          } @else {
+            <div class="py-10 text-center opacity-70">
+              <ion-icon name="calendar-outline" class="text-4xl mb-2 text-gray-400"></ion-icon>
+              <p class="text-sm font-medium m-0 text-gray-600 dark:text-white/70">Aún no hay rutinas completadas</p>
+              <p class="text-xs mt-1 text-gray-500 dark:text-white/50">Cuando termines una rutina aparecerá aquí.</p>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
 
   <!-- Modal Detalles Rutina -->
   <app-rutina-detalle-modal [isOpen]="modalAbierto()" [rutina]="rutinaSeleccionada()"
     [ejercicios]="ejerciciosCompletos()" [esFuturo]="esFuturoSeleccionado()" (didDismiss)="cerrarModal()"
-    (iniciarEntrenamiento)="iniciarEntrenamiento($event)" (buscarGymbro)="publicarComoDesafio($event)">
+    (iniciarEntrenamiento)="iniciarEntrenamiento($event)">
   </app-rutina-detalle-modal>
 
   <!-- Modal Detalles Encuentro -->
   <app-encuentro-detalle-modal [isOpen]="encuentroModalAbierto()" [encuentro]="encuentroSeleccionado()"
     (didDismiss)="cerrarModalEncuentro()" (irASocial)="irASocialDesdeEncuentro()">
   </app-encuentro-detalle-modal>
+
+  <!-- Modal de detalle de sesión del historial (reutilizado) -->
+  <app-progreso-historial-detalle
+    [isOpen]="!!sesionSeleccionada()"
+    [sesionSeleccionada]="sesionSeleccionada()"
+    (didDismiss)="cerrarDetalleSesion()">
+  </app-progreso-historial-detalle>
 
 </ion-content>
