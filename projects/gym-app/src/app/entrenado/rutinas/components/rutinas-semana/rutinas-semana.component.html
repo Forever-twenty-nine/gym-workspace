@@ -10,123 +10,121 @@
 
         <ion-card-content class="px-4 pb-6">
             @if (tieneActividadProgramada) {
-            <ion-list lines="none" class="p-0 m-0"
-                style="background: transparent; --ion-background-color: transparent; --ion-item-background: transparent;">
+            <!-- Usamos ion-accordion para agrupar por día. 
+                 Cada día (con actividad o sin ella) es un acordeón.
+                 Días con múltiples rutinas/encuentros solo muestran 1 línea (el header) cuando están colapsados.
+                 El usuario puede expandir solo los días que le interesan. -->
+            <ion-accordion-group [multiple]="true">
                 @for (dia of rutinasPorDia; track dia.fecha) {
+                <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
 
-                @if (diaTieneActividad(dia)) {
-                @for (rutina of dia.rutinas; track rutina.id) {
-                <div class="mb-3 rounded-2xl shadow-sm border border-gray-200/40 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden"
-                    [class.border-l-4]="dia.esHoy" [class.border-l-primary]="dia.esHoy">
+                    <!-- HEADER del día (siempre visible, 1 línea por día) -->
+                    <ion-item slot="header" button detail="false" class="m-0"
+                        style="--background: transparent; --padding-start: 8px; --inner-padding-end: 8px;">
 
-                    <ion-item button detail="false" (click)="onVerDetalles(rutina, dia.esFuturo)" class="m-0"
-                        style="--background: transparent; --padding-start: 16px;">
-
+                        <!-- Date badge (compartido para todo el día) -->
                         <div slot="start"
-                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 shadow-sm"
-                            [class.bg-primary]="dia.esHoy" [class.text-white]="dia.esHoy"
-                            [class.bg-gray-100]="!dia.esHoy" [class.dark:bg-gray-700]="!dia.esHoy"
-                            [class.text-gray-900]="!dia.esHoy" [class.dark:text-white]="!dia.esHoy">
+                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-1 mr-3 shadow-sm flex-shrink-0"
+                            [class.bg-primary]="dia.esHoy && diaTieneActividad(dia)"
+                            [class.text-white]="dia.esHoy && diaTieneActividad(dia)"
+                            [class.bg-secondary]="false"
+                            [class.bg-gray-100]="!dia.esHoy || !diaTieneActividad(dia)"
+                            [class.dark:bg-gray-700]="!dia.esHoy || !diaTieneActividad(dia)"
+                            [class.text-gray-900]="!dia.esHoy || !diaTieneActividad(dia)"
+                            [class.dark:text-white]="!dia.esHoy || !diaTieneActividad(dia)"
+                            [class.opacity-60]="!diaTieneActividad(dia)">
+
                             <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
                             <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
                         </div>
 
                         <ion-label class="py-1">
-                            <div class="flex flex-row items-center gap-3">
-                                @if (dia.esHoy) {
-                                <ion-badge color="primary"
-                                    class="text-[9px] font-black rounded-full uppercase px-1.5 py-0.5 whitespace-nowrap">Hoy</ion-badge>
-                                }
-                                <h3 class="text-base font-bold text-gray-900 dark:text-white m-0 mr-auto truncate">{{
-                                    rutina.nombre }}</h3>
-
-                                <div
-                                    class="flex flex-row items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                                    <span class="flex items-center gap-1">
-                                        <ion-icon name="fitness-outline" color="primary"></ion-icon>
-                                        {{ rutina.ejerciciosIds?.length || 0 }}
-                                    </span>
-                                    @if (rutina.duracion) {
-                                    <span class="flex items-center gap-1">
-                                        <ion-icon name="time-outline" color="warning"></ion-icon>
-                                        {{ rutina.duracion }}'
-                                    </span>
+                            @if (diaTieneActividad(dia)) {
+                            <div class="flex flex-col gap-0.5">
+                                <div class="flex flex-row items-center gap-2">
+                                    @if (dia.esHoy) {
+                                    <ion-badge color="primary"
+                                        class="text-[9px] font-black rounded-full uppercase px-1.5 py-0.5 whitespace-nowrap">Hoy</ion-badge>
                                     }
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                        {{ getEventSummary(dia) }}
+                                    </span>
                                 </div>
-                            </div>
-                        </ion-label>
-
-                        @if (!dia.esFuturo) {
-                        <ion-button fill="clear" slot="end" class="m-0 pl-1"
-                            (click)="onIniciarEntrenamientoDirecto($event, rutina)">
-                            <ion-icon name="play-circle" slot="icon-only" class="text-3xl text-primary"></ion-icon>
-                        </ion-button>
-                        }
-                    </ion-item>
-                </div>
-                }
-
-                @for (enc of dia.encuentros; track enc.id) {
-                <div class="mb-3 rounded-2xl shadow-sm border border-gray-200/40 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden"
-                    [class.border-l-4]="dia.esHoy" [class.border-l-secondary]="dia.esHoy">
-
-                    <ion-item button detail="false" (click)="onVerEncuentro(enc)" class="m-0"
-                        style="--background: transparent; --padding-start: 16px;">
-
-                        <div slot="start"
-                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 shadow-sm"
-                            [class.bg-secondary]="dia.esHoy" [class.text-white]="dia.esHoy"
-                            [class.bg-gray-100]="!dia.esHoy" [class.dark:bg-gray-700]="!dia.esHoy"
-                            [class.text-gray-900]="!dia.esHoy" [class.dark:text-white]="!dia.esHoy">
-                            <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
-                            <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
-                        </div>
-
-                        <ion-label class="py-1">
-                            <div class="flex flex-row items-center gap-2">
-                                @if (dia.esHoy) {
-                                <ion-badge color="secondary"
-                                    class="text-[9px] font-black rounded-full uppercase px-1.5 py-0.5 whitespace-nowrap">Hoy</ion-badge>
-                                }
-                                <h3 class="text-sm font-semibold text-gray-900 dark:text-white m-0 truncate">
-                                    {{ enc.titulo || 'Encuentro' }}
-                                </h3>
-                                @if (enc.horaInicio) {
-                                <span class="text-xs text-gray-500 dark:text-gray-400 ml-auto whitespace-nowrap">
-                                    {{ enc.horaInicio }}
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">
+                                    Toca para ver detalles
                                 </span>
-                                }
                             </div>
-                        </ion-label>
-
-                        <ion-icon name="people-outline" slot="end" color="secondary" class="text-xl opacity-70"></ion-icon>
-                    </ion-item>
-                </div>
-                }
-
-                } @else {
-                <div
-                    class="mb-3 rounded-2xl shadow-sm border border-gray-200/40 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden">
-                    <ion-item lines="none" class="m-0" style="--background: transparent; --padding-start: 16px;">
-                        <div slot="start"
-                            class="flex flex-col items-center justify-center w-12 h-12 rounded-xl my-2 mr-4 opacity-60 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
-                            <span class="text-[10px] font-bold uppercase">{{ dia.diaCorto }}</span>
-                            <span class="text-lg font-black leading-none">{{ dia.fecha.getDate() }}</span>
-                        </div>
-                        <ion-label class="opacity-60 py-1">
-                            <div class="flex flex-row items-center gap-3">
+                            } @else {
+                            <div class="flex flex-row items-center gap-3 opacity-60">
                                 <h3 class="text-sm font-bold text-gray-900 dark:text-white m-0">Descanso</h3>
                                 <p class="text-xs m-0 text-gray-500 dark:text-gray-400 ml-auto flex items-center gap-1">
                                     <ion-icon name="bed-outline"></ion-icon> Libre
                                 </p>
                             </div>
+                            }
                         </ion-label>
                     </ion-item>
-                </div>
-                }
 
+                    <!-- CONTENIDO expandido: aquí sí se ven los eventos del día, pero sin repetir el badge de fecha grande -->
+                    <div slot="content" class="px-2 pb-2">
+                        @if (diaTieneActividad(dia)) {
+
+                        <!-- Rutinas: solo nombre + botón de ejecutar a la extrema derecha -->
+                        @for (rutina of dia.rutinas; track rutina.id) {
+                        <div class="mb-2 rounded-2xl shadow-sm border border-gray-200/40 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden"
+                            [class.border-l-4]="dia.esHoy" [class.border-l-primary]="dia.esHoy">
+
+                            <ion-item button detail="false" (click)="onVerDetalles(rutina, dia.esFuturo)" class="m-0"
+                                style="--background: transparent; --padding-start: 12px;">
+
+                                <ion-label class="py-1">
+                                    <h3 class="text-base font-bold text-gray-900 dark:text-white m-0 truncate">
+                                        {{ rutina.nombre }}
+                                    </h3>
+                                </ion-label>
+
+                                @if (!dia.esFuturo) {
+                                <ion-button fill="clear" slot="end" class="m-0"
+                                    (click)="onIniciarEntrenamientoDirecto($event, rutina)">
+                                    <ion-icon name="play-circle" slot="icon-only" class="text-3xl text-primary"></ion-icon>
+                                </ion-button>
+                                }
+                            </ion-item>
+                        </div>
+                        }
+
+                        <!-- Encuentros: solo nombre + botón para abrir modal a la extrema derecha -->
+                        @for (enc of dia.encuentros; track enc.id) {
+                        <div class="mb-2 rounded-2xl shadow-sm border border-gray-200/40 dark:border-white/10 bg-white/40 dark:bg-white/5 backdrop-blur-sm overflow-hidden"
+                            [class.border-l-4]="dia.esHoy" [class.border-l-secondary]="dia.esHoy">
+
+                            <ion-item button detail="false" (click)="onVerEncuentro(enc)" class="m-0"
+                                style="--background: transparent; --padding-start: 12px;">
+
+                                <ion-label class="py-1">
+                                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white m-0 truncate">
+                                        {{ enc.titulo || 'Encuentro' }}
+                                    </h3>
+                                </ion-label>
+
+                                <ion-button fill="clear" slot="end" class="m-0"
+                                    (click)="onVerEncuentro(enc); $event.stopPropagation()">
+                                    <ion-icon name="chevron-forward-outline" slot="icon-only" class="text-2xl text-secondary"></ion-icon>
+                                </ion-button>
+                            </ion-item>
+                        </div>
+                        }
+
+                        } @else {
+                        <div class="px-3 py-2 text-xs text-gray-500 dark:text-gray-400 italic">
+                            Sin rutinas ni encuentros este día.
+                        </div>
+                        }
+                    </div>
+
+                </ion-accordion>
                 }
-            </ion-list>
+            </ion-accordion-group>
             } @else {
             <div class="flex flex-col items-center justify-center py-16 text-center opacity-60">
                 <ion-icon name="calendar-outline" class="text-5xl mb-4 text-gray-400 dark:text-gray-500"></ion-icon>
