@@ -147,35 +147,36 @@ export class SesionRutinaService {
   }
 
   /**
-   * Obtiene una rutina por su ID
+   * Obtiene una rutina por su ID con reintentos limitados (evita polling largo).
+   * Prefiere la señal de lista completa; si no está, activa el listener individual.
    */
   async getRutinaById(rutinaId: string): Promise<Rutina> {
     const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const maxAttempts = 6; // ~1.1s total con backoff corto
 
-    for (let attempt = 1; attempt <= 5; attempt++) {
-      const rutinasActuales = this.rutinaService.rutinas();
-      const rutinaExistente = rutinasActuales.find(r => r.id === rutinaId);
+    // 1. Intentos rápidos contra la lista en memoria (normalmente ya precargada)
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const fromList = this.rutinaService.rutinas().find(r => r.id === rutinaId);
+      if (fromList) return fromList;
 
-      if (rutinaExistente) {
-        return rutinaExistente;
+      // En el primer fallo, activamos el listener de documento individual
+      if (attempt === 0) {
+        this.rutinaService.getRutina(rutinaId); // dispara onSnapshot si no existe
       }
-      await wait(100 * Math.pow(2, attempt - 1));
+
+      await wait(80 + attempt * 60); // backoff suave: 80, 140, 200...
     }
 
-    const rutinaSignal = this.rutinaService.getRutina(rutinaId);
-    await wait(1000);
-    const rutina = rutinaSignal();
+    // 2. Último intento contra el signal individual
+    const single = this.rutinaService.getRutina(rutinaId)();
+    if (single) return single;
 
-    if (!rutina) {
-      throw new Error(`Rutina no encontrada: ${rutinaId}`);
-    }
-
-    return rutina;
+    throw new Error(`Rutina no encontrada tras espera: ${rutinaId}`);
   }
 
   async getEjerciciosByRutinaId(rutinaId: string): Promise<Ejercicio[]> {
     const rutina = await this.getRutinaById(rutinaId);
-    if (!rutina.ejerciciosIds) return [];
+    if (!rutina.ejerciciosIds?.length) return [];
     const allEjercicios = this.ejercicioService.ejercicios();
     return allEjercicios.filter(e => rutina.ejerciciosIds!.includes(e.id));
   }
@@ -216,7 +217,7 @@ export class SesionRutinaService {
   /**
    * Actualiza el estado de compartir de una sesión consumida
    */
-  async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string, fotoProgreso?: string): Promise<void> {
+  async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string, fotoProgreso?: string, gimnasioId?: string): Promise<void> {
     return this.runInZone(async () => {
       const ref = doc(this.firestore, this.COLLECTION, id);
       const data: any = {
@@ -226,14 +227,23 @@ export class SesionRutinaService {
         fotoProgreso: fotoProgreso || null,
         fechaCompartida: compartida ? Timestamp.now() : null
       };
+      if (gimnasioId) {
+        data.gimnasioId = gimnasioId;
+      }
       await updateDoc(ref, data);
     });
   }
 
   /**
    * Obtiene todas las sesiones compartidas (Feed Social)
+   * 
+   * IMPORTANTE: Siempre traemos todas las compartidas (sin filtro por gimnasio en la query).
+   * El filtrado por gym + "siguiendo" se hace del lado del cliente en feed-tab.component.ts
+   * para mantener compatibilidad con sesiones legacy que NO tienen el campo `gimnasioId`.
+   * 
+   * No cambies esto a where('gimnasioId') sin backfill de datos legacy.
    */
-  getSesionesCompartidas(): Signal<SesionRutina[]> {
+  getSesionesCompartidas(_gimnasioId?: string): Signal<SesionRutina[]> {
     if (this._sesionesCompartidasSignal) {
       return this._sesionesCompartidasSignal;
     }

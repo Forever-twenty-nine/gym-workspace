@@ -44,7 +44,7 @@ export class DesafioModalComponent implements OnChanges {
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
-  @Input() item: any = null;
+  @Input() item: Desafio | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -121,7 +121,7 @@ export class DesafioModalComponent implements OnChanges {
 
     this.saving.set(true);
     try {
-      let desafioData: any;
+      let desafioData: Partial<Desafio>;
 
       if (this.isEditing && this.item) {
         desafioData = {
@@ -145,7 +145,7 @@ export class DesafioModalComponent implements OnChanges {
         };
       }
 
-      await this.desafioService.save(desafioData);
+      await this.desafioService.save(desafioData as any);
       this.showToast(this.isEditing ? 'Desafío actualizado' : '¡Desafío lanzado! 🏆', 'success');
       this.saved.emit();
       this.closeModal();

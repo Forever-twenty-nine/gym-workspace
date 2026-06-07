@@ -14,6 +14,7 @@ import {
     IonSelectOption
 } from '@ionic/angular/standalone';
 import { ProgresoHistorialDetalleComponent } from '../progreso-historial-detalle/progreso-historial-detalle.component';
+import { SesionRutina } from 'gym-library';
 import { addIcons } from 'ionicons';
 import { trashOutline } from 'ionicons/icons';
 
@@ -38,11 +39,11 @@ import { trashOutline } from 'ionicons/icons';
     templateUrl: './progreso-historial.component.html'
 })
 export class ProgresoHistorialComponent {
-    @Input({ required: true }) sesiones: any[] = [];
+    @Input({ required: true }) sesiones: SesionRutina[] = [];
     @Output() eliminar = new EventEmitter<string>();
 
     filtroSeleccionado = 'esta_semana';
-    sesionSeleccionada: any = null;
+    sesionSeleccionada: SesionRutina | null = null;
 
     constructor() {
         addIcons({ trashOutline });
@@ -60,7 +61,7 @@ export class ProgresoHistorialComponent {
 
 
 
-    getProgresoSesion(sesion: any): number {
+    getProgresoSesion(sesion: SesionRutina): number {
         return sesion.porcentajeCompletado || 0;
     }
 
@@ -72,11 +73,13 @@ export class ProgresoHistorialComponent {
         this.eliminar.emit(sesionId);
     }
 
-    cambiarFiltro(event: any) {
-        this.filtroSeleccionado = event.detail.value;
+    cambiarFiltro(event: { detail?: { value?: string } }) {
+        if (event?.detail?.value) {
+            this.filtroSeleccionado = event.detail.value;
+        }
     }
 
-    verDetalle(sesion: any) {
+    verDetalle(sesion: SesionRutina) {
         this.sesionSeleccionada = sesion;
     }
 

@@ -17,6 +17,7 @@ export interface SesionRutina {
     };
     // Social
     compartida?: boolean;
+    gimnasioId?: string;   // denormalized for efficient gym-scoped social feed
     nombreUsuario?: string;
     fotoUsuario?: string;
     fechaCompartida?: any;

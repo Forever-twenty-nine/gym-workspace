@@ -52,7 +52,7 @@ export class ConvocatoriaModalComponent implements OnInit, OnChanges {
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
-  @Input() item: any = null;
+  @Input() item: import('gym-library').Convocatoria | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -209,7 +209,7 @@ export class ConvocatoriaModalComponent implements OnInit, OnChanges {
     }
 
     try {
-      let convocatoriaData: any;
+      let convocatoriaData: Partial<import('gym-library').Convocatoria>;
 
       if (this.isEditing && this.item) {
         // Modo edición: mantener id, creador y datos originales
@@ -239,7 +239,7 @@ export class ConvocatoriaModalComponent implements OnInit, OnChanges {
         };
       }
 
-      await this.convocatoriaService.save(convocatoriaData);
+      await this.convocatoriaService.save(convocatoriaData as any);
       
       this.showToast(this.isEditing ? 'Convocatoria actualizada' : '¡Convocatoria publicada con éxito!', 'success');
       this.saved.emit();

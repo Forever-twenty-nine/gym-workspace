@@ -107,7 +107,8 @@ export const gymFreeMixedConfig: SeedConfig = {
       usuarioDestinoId: "trainee_claramixtopremium",
       interesOrigen: true,
       interesDestino: true,
-      mutuo: true
+      mutuo: true,
+      gimnasioId: "gym_free_mixed"
     }
   ]
 };

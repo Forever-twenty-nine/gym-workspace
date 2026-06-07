@@ -140,7 +140,8 @@ export const gymPremiumMixedConfig: SeedConfig = {
       usuarioDestinoId: "trainee_florenciaatletapremium",
       interesOrigen: true,
       interesDestino: true,
-      mutuo: true
+      mutuo: true,
+      gimnasioId: "gym_premium_mixed"
     }
   ]
 };

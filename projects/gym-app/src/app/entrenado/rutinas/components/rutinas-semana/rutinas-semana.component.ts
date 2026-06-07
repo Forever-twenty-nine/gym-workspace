@@ -15,6 +15,18 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { playCircle, bedOutline, chevronForwardOutline } from 'ionicons/icons';
+import { Rutina, Convocatoria } from 'gym-library';
+
+interface SemanaDia {
+  fecha: Date;
+  rutinas: Rutina[];
+  diaCorto: string;
+  esHoy: boolean;
+  esFuturo: boolean;
+  encuentros?: Convocatoria[];
+}
+
+type Encuentro = Convocatoria; // alias for clarity in this component
 
 @Component({
     selector: 'app-rutinas-semana',
@@ -36,10 +48,10 @@ import { playCircle, bedOutline, chevronForwardOutline } from 'ionicons/icons';
     templateUrl: './rutinas-semana.component.html'
 })
 export class RutinasSemanaComponent {
-    @Input() rutinasPorDia: any[] | null = [];
-    @Output() verDetalles = new EventEmitter<{ rutina: any, esFuturo: boolean }>();
-    @Output() iniciarEntrenamientoDirecto = new EventEmitter<{ event: Event, rutina: any }>();
-    @Output() verEncuentro = new EventEmitter<any>();
+    @Input() rutinasPorDia: SemanaDia[] | null = [];
+    @Output() verDetalles = new EventEmitter<{ rutina: Rutina, esFuturo: boolean }>();
+    @Output() iniciarEntrenamientoDirecto = new EventEmitter<{ event: Event, rutina: Rutina }>();
+    @Output() verEncuentro = new EventEmitter<Encuentro>();
 
     get tieneActividadProgramada(): boolean {
         return (this.rutinasPorDia ?? []).some(dia =>
@@ -47,19 +59,19 @@ export class RutinasSemanaComponent {
         );
     }
 
-    diaTieneActividad(dia: any): boolean {
+    diaTieneActividad(dia: SemanaDia): boolean {
         return (dia.rutinas?.length ?? 0) > 0 || (dia.encuentros?.length ?? 0) > 0;
     }
 
-    getDiaKey(dia: any): string {
+    getDiaKey(dia: SemanaDia): string {
         return dia.fecha.toISOString().split('T')[0];
     }
 
-    getEventCount(dia: any): number {
+    getEventCount(dia: SemanaDia): number {
         return (dia.rutinas?.length ?? 0) + (dia.encuentros?.length ?? 0);
     }
 
-    getEventSummary(dia: any): string {
+    getEventSummary(dia: SemanaDia): string {
         const r = dia.rutinas?.length ?? 0;
         const e = dia.encuentros?.length ?? 0;
         const parts: string[] = [];
@@ -78,15 +90,15 @@ export class RutinasSemanaComponent {
         });
     }
 
-    onVerDetalles(rutina: any, esFuturo: boolean = false) {
+    onVerDetalles(rutina: Rutina, esFuturo: boolean = false) {
         this.verDetalles.emit({ rutina, esFuturo });
     }
 
-    onIniciarEntrenamientoDirecto(event: Event, rutina: any) {
+    onIniciarEntrenamientoDirecto(event: Event, rutina: Rutina) {
         this.iniciarEntrenamientoDirecto.emit({ event, rutina });
     }
 
-    onVerEncuentro(encuentro: any) {
+    onVerEncuentro(encuentro: Encuentro) {
         this.verEncuentro.emit(encuentro);
     }
 }

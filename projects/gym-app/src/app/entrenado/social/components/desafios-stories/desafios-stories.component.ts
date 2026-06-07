@@ -8,6 +8,7 @@ import { DesafioService } from '../../../../core/services/desafio.service';
 import { UserService } from '../../../../core/services/user.service';
 import { DesafioModalComponent } from '../desafio-modal/desafio-modal.component';
 import { Desafio } from 'gym-library';
+import { closeModalWithAnimation } from '../../../../core/utils/modal.utils';
 
 @Component({
   selector: 'app-desafios-stories',
@@ -38,7 +39,7 @@ export class DesafiosStoriesComponent {
     const gimnasioId = this.currentUser()?.gimnasioId;
     if (!gimnasioId) return [];
 
-    const all = this.desafioService.getDesafiosByGimnasio(gimnasioId)();
+    const all = this.desafioService.getDesafiosForGym(gimnasioId)();
     const ocultos = this.ocultados();
 
     return all
@@ -60,8 +61,7 @@ export class DesafiosStoriesComponent {
   }
 
   closeModal() {
-    this.isModalOpen.set(false);
-    setTimeout(() => this.selectedDesafio.set(null), 280);
+    closeModalWithAnimation(this.isModalOpen, this.selectedDesafio, 280);
   }
 
   onDeleted(id: string) {

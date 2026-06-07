@@ -7,6 +7,8 @@ import {
 	deleteDoc,
 	setDoc,
 	onSnapshot,
+	query,
+	where,
 	QuerySnapshot,
 	DocumentSnapshot,
 	Timestamp
@@ -39,6 +41,24 @@ export class EjercicioService {
 	private readonly computedFilters = new Map<string, Signal<Ejercicio[]>>();
 	private isListenerInitialized = false;
 
+	/**
+	 * Devuelve los ejercicios "creados por el usuario", combinando:
+	 * - Los que tienen `creadorId` (nuevo modelo)
+	 * - Los que están en la lista legacy `ejerciciosCreadosIds` del perfil de entrenado
+	 */
+	getCreatedByUser(userId: string, legacyCreatedIds: string[] = []): Signal<Ejercicio[]> {
+		return computed(() => {
+			const all = this.ejercicios();
+			const byCreator = all.filter(e => e.creadorId === userId);
+			const legacySet = new Set(legacyCreatedIds);
+			const byLegacy = all.filter(e => legacySet.has(e.id));
+
+			const map = new Map<string, Ejercicio>();
+			[...byCreator, ...byLegacy].forEach(e => map.set(e.id, e));
+			return Array.from(map.values());
+		});
+	}
+
 	private filterByRange<T>(items: T[], getValue: (item: T) => number, min: number, max?: number): T[] {
 		return items.filter(item => {
 			const value = getValue(item);
@@ -62,14 +82,21 @@ export class EjercicioService {
 	}
 
 	/**
-	 * Inicializa el listener de Firestore de forma segura
+	 * Inicializa el listener de Firestore de forma segura.
+	 * Si se pasa gymId, filtra por gimnasio (recomendado para entrenados/creaciones).
 	 */
-	private initializeListener(): void {
+	private initializeListener(gymId?: string): void {
 		if (this.isListenerInitialized) return;
 
 		try {
 			const col = collection(this.firestore, this.COLLECTION);
-			onSnapshot(col, (snap: QuerySnapshot) => {
+			let q: any = col;
+
+			if (gymId) {
+				q = query(col, where('gimnasioId', '==', gymId));
+			}
+
+			onSnapshot(q, (snap: QuerySnapshot) => {
 				this.runInZone(() => {
 					const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
 					this._ejercicios.set(list);
@@ -87,6 +114,16 @@ export class EjercicioService {
 	get ejercicios(): Signal<Ejercicio[]> {
 		if (!this.isListenerInitialized) {
 			this.initializeListener();
+		}
+		return this._ejercicios.asReadonly();
+	}
+
+	/**
+	 * Versión gym-scoped para la sección de entrenados.
+	 */
+	getEjerciciosForGym(gymId: string): Signal<Ejercicio[]> {
+		if (!this.isListenerInitialized) {
+			this.initializeListener(gymId);
 		}
 		return this._ejercicios.asReadonly();
 	}

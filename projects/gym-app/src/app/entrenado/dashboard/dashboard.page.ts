@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   inject,
   Signal,
   computed,
@@ -15,7 +14,7 @@ import {
   NavController
 } from '@ionic/angular/standalone';
 
-import { Objetivo } from 'gym-library';
+import { Objetivo, Plan } from 'gym-library';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { UserService } from '../../core/services/user.service';
@@ -24,7 +23,7 @@ import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { Entrenado, User as LibraryUser } from 'gym-library';
 import { PlanPersonalizadoComponent } from './components/plan-personalizado/plan-personalizado.component';
-import { RutinasAsignadasComponent } from './components/rutinas-asignadas/rutinas-asignadas.component';
+import { RutinasAsignadasComponent, type DashboardRutina } from './components/rutinas-asignadas/rutinas-asignadas.component';
 
 export interface User extends LibraryUser {
   photoURL?: string;
@@ -42,7 +41,7 @@ export interface User extends LibraryUser {
     RutinasAsignadasComponent
 ],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage {
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
   private userService = inject(UserService);
@@ -53,7 +52,7 @@ export class DashboardPage implements OnInit {
 
   currentUserSignal = this.authService.currentUser as Signal<User | null>;
 
-  isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+  isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   entrenadoDataSignal = computed(() => {
     const userId = this.currentUserSignal()?.uid;
@@ -63,10 +62,13 @@ export class DashboardPage implements OnInit {
   nombreEntrenado = computed(() => this.currentUserSignal()?.nombre || 'Entrenado');
 
   tieneInvitacionesPendientes = computed(() => {
-    const userId = this.currentUserSignal()?.uid;
-    if (!userId) return false;
-    return this.invitacionService.invitaciones()
-      .some(inv => inv.entrenadoId === userId && inv.estado === 'pendiente');
+    const user = this.currentUserSignal();
+    if (!user?.uid) return false;
+    const gymId = user.gimnasioId;
+    const list = gymId 
+      ? this.invitacionService.getInvitacionesForGym(gymId)() 
+      : this.invitacionService.invitaciones();
+    return list.some(inv => inv.entrenadoId === user.uid && inv.estado === 'pendiente');
   });
 
   objetivoActual = computed(() => {
@@ -86,7 +88,7 @@ export class DashboardPage implements OnInit {
     )).size;
   });
 
-  rutinasAsignadas = computed(() => {
+  rutinasAsignadas = computed<DashboardRutina[]>(() => {
     const user = this.currentUserSignal();
     if (!user?.uid) return [];
 
@@ -106,9 +108,7 @@ export class DashboardPage implements OnInit {
 
   constructor() { }
 
-  ngOnInit() { }
-
-  verRutina(rutina: any) {
+  verRutina(rutina: { id?: string }) {
     if (rutina?.id) this.navCtrl.navigateForward(`/rutina-progreso/${rutina.id}`);
   }
 

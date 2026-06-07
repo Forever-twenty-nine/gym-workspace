@@ -7,6 +7,8 @@ import {
     deleteDoc,
     setDoc,
     onSnapshot,
+    query,
+    where,
     QuerySnapshot,
     DocumentSnapshot,
     Timestamp
@@ -35,6 +37,24 @@ export class RutinaService {
     // Inyectar EjercicioService para combinar datos
     private readonly ejercicioService = inject(EjercicioService);
 
+    /**
+     * Devuelve las rutinas "creadas por el usuario", combinando:
+     * - Las que tienen `creadorId` (nuevo modelo)
+     * - Las que están en la lista legacy `rutinasCreadas` del perfil de entrenado
+     */
+    getCreatedByUser(userId: string, legacyCreatedIds: string[] = []): Signal<Rutina[]> {
+        return computed(() => {
+            const all = this.rutinas();
+            const byCreator = all.filter(r => r.creadorId === userId);
+            const legacySet = new Set(legacyCreatedIds);
+            const byLegacy = all.filter(r => legacySet.has(r.id));
+
+            const map = new Map<string, Rutina>();
+            [...byCreator, ...byLegacy].forEach(r => map.set(r.id, r));
+            return Array.from(map.values());
+        });
+    }
+
     constructor() { }
 
     /**
@@ -48,14 +68,21 @@ export class RutinaService {
     }
 
     /**
-     * 🔄 Inicializa el listener de Firestore de forma segura
+     * 🔄 Inicializa el listener de Firestore de forma segura.
+     * Si se pasa gymId, filtra por gimnasio (recomendado para entrenados).
      */
-    private initializeListener(): void {
+    private initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            onSnapshot(col, (snap: QuerySnapshot) => {
+            let q: any = col;
+
+            if (gymId) {
+                q = query(col, where('gimnasioId', '==', gymId));
+            }
+
+            onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
                     this._rutinas.set(list);
@@ -68,11 +95,21 @@ export class RutinaService {
     }
 
     /**
-     * 📊 Signal readonly con todas las rutinas
+     * 📊 Signal readonly con todas las rutinas (o filtradas por gym si se inicializó así)
      */
     get rutinas(): Signal<Rutina[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
+        }
+        return this._rutinas.asReadonly();
+    }
+
+    /**
+     * Versión gym-scoped para la sección de entrenados.
+     */
+    getRutinasForGym(gymId: string): Signal<Rutina[]> {
+        if (!this.isListenerInitialized) {
+            this.initializeListener(gymId);
         }
         return this._rutinas.asReadonly();
     }

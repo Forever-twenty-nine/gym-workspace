@@ -1,7 +1,8 @@
-import { Component, OnInit, signal, inject, computed, effect, Injector } from '@angular/core';
+import { Component, signal, inject, computed, effect, afterNextRender } from '@angular/core';
 import {
   IonContent, IonHeader, IonSegment, IonSegmentButton, IonLabel,
-  IonList, IonItem, IonIcon, IonButton
+  IonList, IonItem, IonIcon, IonButton,
+  SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
@@ -11,7 +12,7 @@ import {
   todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed,
   trashOutline, checkmarkCircleOutline
 } from 'ionicons/icons';
-import { Rutina } from 'gym-library';
+import { Rutina, Plan, Convocatoria, SesionRutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -25,6 +26,7 @@ import { EncuentroDetalleModalComponent } from './components/encuentro-detalle-m
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
 import { ProgresoHistorialDetalleComponent } from '../progreso/components/progreso-historial-detalle/progreso-historial-detalle.component';
 import { AlertController } from '@ionic/angular/standalone';
+import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
 
 
 
@@ -51,30 +53,29 @@ import { AlertController } from '@ionic/angular/standalone';
     ProgresoHistorialDetalleComponent
   ],
 })
-export class RutinasPage implements OnInit {
+export class RutinasPage {
   private rutinaService = inject(RutinaService);
   private authService = inject(AuthService);
   private ejercicioService = inject(EjercicioService);
   private entrenadoService = inject(EntrenadoService);
   private router = inject(Router);
-  private injector = inject(Injector);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
   private convocatoriaService = inject(ConvocatoriaService);
   private sesionRutinaService = inject(SesionRutinaService);
   private alertController = inject(AlertController);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   selectedTab = signal<'rutinas' | 'historial'>('rutinas');
-  sesionSeleccionada = signal<any>(null);
+  sesionSeleccionada = signal<SesionRutina | null>(null);
 
   private todasLasRutinas = signal<Rutina[]>([]);
   readonly modalAbierto = signal(false);
-  readonly rutinaSeleccionada = signal<any>(null);
+  readonly rutinaSeleccionada = signal<Rutina | null>(null);
   readonly esFuturoSeleccionado = signal<boolean>(false);
   readonly encuentroModalAbierto = signal(false);
-  readonly encuentroSeleccionado = signal<any>(null);
+  readonly encuentroSeleccionado = signal<Convocatoria | null>(null);
 
   rutinasAsignadas = computed(() => {
     const userId = this.authService.currentUser()?.uid;
@@ -82,13 +83,17 @@ export class RutinasPage implements OnInit {
 
     const entrenado = this.entrenadoService.getEntrenado(userId)();
     const idsAsignadas = entrenado?.rutinasAsignadasIds || [];
-    const idsCreadas = entrenado?.rutinasCreadas || [];
+    const legacyCreadas = entrenado?.rutinasCreadas || [];
     const todas = this.todasLasRutinas();
 
-    // Incluir rutinas asignadas, creadas (legacy) y por creadorId (como en Creaciones)
+    // Owned (creadas por el usuario) usando helper centralizado
+    const owned = this.rutinaService.getCreatedByUser(userId, legacyCreadas)();
+    const ownedIds = new Set(owned.map(r => r.id));
+
+    // Incluir rutinas asignadas + las creadas por el usuario (nuevo + legacy)
     const map = new Map<string, Rutina>();
     todas
-      .filter(r => idsAsignadas.includes(r.id) || idsCreadas.includes(r.id) || r.creadorId === userId)
+      .filter(r => idsAsignadas.includes(r.id) || ownedIds.has(r.id))
       .forEach(r => map.set(r.id, r));
     return Array.from(map.values());
   });
@@ -99,16 +104,21 @@ export class RutinasPage implements OnInit {
       timerOutline, notificationsOutline, arrowBackOutline, todayOutline, bedOutline, playCircle,
       repeatOutline, syncCircleOutline, lockClosed, trashOutline, checkmarkCircleOutline
     });
-  }
 
-  ngOnInit() {
-    effect(() => this.todasLasRutinas.set(this.rutinaService.rutinas()), { injector: this.injector });
+    // Sync the full rutinas list into local signal, preferring gym-scoped
+    effect(() => {
+      const gymId = this.authService.currentUser()?.gimnasioId;
+      const list = gymId 
+        ? this.rutinaService.getRutinasForGym(gymId)() 
+        : this.rutinaService.rutinas();
+      this.todasLasRutinas.set(list);
+    });
 
+    // Preload user-specific listeners early (same as before, but in proper context)
     const userId = this.authService.currentUser()?.uid;
     if (userId) {
       this.entrenadoService.getEntrenado(userId);
       this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(userId);
-      // Inicializa listener del historial de sesiones (completadas)
       this.sesionRutinaService.getSesionesPorEntrenado(userId);
     }
   }
@@ -116,12 +126,15 @@ export class RutinasPage implements OnInit {
   ejerciciosCompletos = computed(() => {
     const r = this.rutinaSeleccionada();
     const todos = this.ejercicioService.ejercicios();
-    return (r?.ejerciciosIds || []).map((ej: any) => typeof ej === 'string' ? todos.find(e => e.id === ej) : ej).filter((e: any) => !!e);
+    const ids = r?.ejerciciosIds ?? [];
+    return ids
+      .map(id => typeof id === 'string' ? todos.find(e => e.id === id) : id)
+      .filter((e): e is import('gym-library').Ejercicio => !!e);
   });
 
   private readonly encuentrosPorFecha = computed(() => {
     const user = this.authService.currentUser();
-    if (!user) return new Map<string, any[]>();
+    if (!user) return new Map<string, Convocatoria[]>();
 
     const entrenado = this.entrenadoService.getEntrenado(user.uid)();
     const misEntrenadores = new Set<string>(entrenado?.entrenadoresId || []);
@@ -132,9 +145,13 @@ export class RutinasPage implements OnInit {
     const limite = new Date(hoy);
     limite.setDate(hoy.getDate() + 7);
 
-    const mapa = new Map<string, any[]>();
+    const mapa = new Map<string, Convocatoria[]>();
 
-    this.convocatoriaService.convocatorias()
+    const convos = gymId 
+      ? this.convocatoriaService.getConvocatoriasForGym(gymId)() 
+      : this.convocatoriaService.convocatorias();
+
+    convos
       .filter(c => {
         if (!c.activo) return false;
         if (gymId && c.gimnasioId !== gymId) return false;
@@ -143,11 +160,11 @@ export class RutinasPage implements OnInit {
         const esDelEntrenador = misEntrenadores.has(c.creadorId);
         if (!esMio && !esDelEntrenador) return false;
 
-        const f = c.fechaEntrenamiento instanceof Date ? c.fechaEntrenamiento : new Date(c.fechaEntrenamiento as any);
+        const f = c.fechaEntrenamiento instanceof Date ? c.fechaEntrenamiento : new Date(c.fechaEntrenamiento);
         return f >= hoy && f <= limite;
       })
       .forEach(enc => {
-        const f = enc.fechaEntrenamiento instanceof Date ? enc.fechaEntrenamiento : new Date(enc.fechaEntrenamiento as any);
+        const f = enc.fechaEntrenamiento instanceof Date ? enc.fechaEntrenamiento : new Date(enc.fechaEntrenamiento);
         const fechaKey = f.toISOString().split('T')[0];
         const lista = mapa.get(fechaKey) || [];
         lista.push(enc);
@@ -187,11 +204,12 @@ export class RutinasPage implements OnInit {
       });
   });
 
-  segmentChanged(event: any) {
-    this.selectedTab.set(event.detail.value);
+  segmentChanged(event: SegmentCustomEvent) {
+    const val = event.detail.value as 'rutinas' | 'historial' | undefined;
+    if (val) this.selectedTab.set(val);
   }
 
-  abrirDetalleSesion(sesion: any) {
+  abrirDetalleSesion(sesion: SesionRutina) {
     this.sesionSeleccionada.set(sesion);
   }
 
@@ -225,49 +243,49 @@ export class RutinasPage implements OnInit {
     await alert.present();
   }
 
-  abrirDetalles(data: { rutina: any, esFuturo: boolean }) {
+  abrirDetalles(data: { rutina: Rutina, esFuturo: boolean }) {
     this.rutinaSeleccionada.set(data.rutina);
     this.esFuturoSeleccionado.set(data.esFuturo);
     this.modalAbierto.set(true);
   }
 
   cerrarModal() {
-    this.modalAbierto.set(false);
-    setTimeout(() => this.rutinaSeleccionada.set(null), 300);
+    closeModalWithAnimation(this.modalAbierto, this.rutinaSeleccionada, 300);
   }
 
-  iniciarEntrenamiento(rutina: any) {
+  iniciarEntrenamiento(rutina: Rutina) {
     if (this.modalAbierto()) this.cerrarModal();
-    const delay = this.modalAbierto() ? 350 : 0;
-    (document.activeElement as HTMLElement)?.blur();
-    setTimeout(() => this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`).catch(console.error), delay);
+    blurActiveElement();
+    // Use afterNextRender so navigation happens after the modal close animation frame
+    afterNextRender(() => {
+      this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`).catch(console.error);
+    });
   }
 
-  iniciarEntrenamientoDirecto(event: Event, rutina: any) {
+  iniciarEntrenamientoDirecto(event: Event, rutina: Rutina) {
     event.stopPropagation();
-    (document.activeElement as HTMLElement)?.blur();
+    blurActiveElement();
     this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`).catch(console.error);
   }
 
-  abrirDetallesEncuentro(enc: any) {
+  abrirDetallesEncuentro(enc: Convocatoria) {
     this.encuentroSeleccionado.set(enc);
     this.encuentroModalAbierto.set(true);
   }
 
   cerrarModalEncuentro() {
-    this.encuentroModalAbierto.set(false);
-    setTimeout(() => this.encuentroSeleccionado.set(null), 300);
+    closeModalWithAnimation(this.encuentroModalAbierto, this.encuentroSeleccionado, 300);
   }
 
   irASocialDesdeEncuentro() {
     this.cerrarModalEncuentro();
-    setTimeout(() => {
+    afterNextRender(() => {
       this.router.navigateByUrl('/entrenado-tabs/social').catch(console.error);
-    }, 300);
+    });
   }
 
   // Helpers para el historial (ion-list)
-  formatearFechaSesion(fecha: any): string {
+  formatearFechaSesion(fecha: Date | string | number | undefined): string {
     if (!fecha) return 'Sin fecha';
     const d = fecha instanceof Date ? fecha : new Date(fecha);
     return d.toLocaleDateString('es-ES', {

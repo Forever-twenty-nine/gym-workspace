@@ -8,7 +8,8 @@ import {
   IonSegmentButton,
   IonLabel,
   ToastController,
-  AlertController
+  AlertController,
+  SegmentCustomEvent
 } from '@ionic/angular/standalone';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -17,6 +18,7 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { DesafioService } from '../../core/services/desafio.service';
+import { Plan, Convocatoria, Desafio, Rutina, Ejercicio } from 'gym-library';
 
 import { ConvocatoriaModalComponent } from './components/convocatoria/convocatoria-modal/convocatoria-modal.component';
 import { DesafioModalComponent } from './components/desafio/desafio-modal/desafio-modal.component';
@@ -27,6 +29,7 @@ import { ConvocatoriaListComponent } from './components/convocatoria/convocatori
 import { DesafioListComponent } from './components/desafio/desafio-list/desafio-list.component';
 import { RutinaListComponent } from './components/rutina/rutina-list/rutina-list.component';
 import { EjercicioListComponent } from './components/ejercicio/ejercicio-list/ejercicio-list.component';
+import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
 
 @Component({
   selector: 'app-creaciones',
@@ -63,62 +66,52 @@ export class CreacionesPage implements OnInit {
   private alertCtrl = inject(AlertController);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
   readonly userId = computed(() => this.currentUserSignal()?.uid);
 
   isConvocatoriaModalOpen = signal(false);
   isDesafioModalOpen = signal(false);
   isRutinaModalOpen = signal(false);
 
-  // Items para edición
-  convocatoriaToEdit = signal<any | null>(null);
-  desafioToEdit = signal<any | null>(null);
-  rutinaToEdit = signal<any | null>(null);
-  ejercicioToEdit = signal<any | null>(null);
+  // Items para edición (tipados)
+  convocatoriaToEdit = signal<Convocatoria | null>(null);
+  desafioToEdit = signal<Desafio | null>(null);
+  rutinaToEdit = signal<Rutina | null>(null);
+  ejercicioToEdit = signal<Ejercicio | null>(null);
 
   selectedTab = signal<'convocatorias' | 'desafios' | 'rutinas' | 'ejercicios'>('convocatorias');
 
-  // Ejercicios creados por el usuario.
-  // Combina los que tienen creadorId (creaciones nuevas) + los que están en el array del perfil (legacy).
+  // Ejercicios creados por el usuario (usa helper centralizado en el servicio)
   ejerciciosCreados = computed(() => {
     const uid = this.userId();
     if (!uid) return [];
 
-    const byCreator = this.ejercicioService.ejercicios().filter(e => e.creadorId === uid);
-
     const entrenado = this.entrenadoService.getEntrenado(uid)();
-    const ids = entrenado?.ejerciciosCreadosIds || [];
-    const byIds = this.ejercicioService.ejercicios().filter(e => ids.includes(e.id));
-
-    // Unir sin duplicados por id
-    const map = new Map<string, any>();
-    [...byCreator, ...byIds].forEach(e => map.set(e.id, e));
-    return Array.from(map.values());
+    const legacyIds = entrenado?.ejerciciosCreadosIds || [];
+    return this.ejercicioService.getCreatedByUser(uid, legacyIds)();
   });
 
-  // Rutinas creadas por el usuario.
-  // Combina los que tienen creadorId (creaciones nuevas) + los que están en el array del perfil (legacy).
+  // Rutinas creadas por el usuario (usa helper centralizado en el servicio)
   rutinasPropias = computed(() => {
     const uid = this.userId();
     if (!uid) return [];
 
-    const byCreator = this.rutinaService.rutinas().filter(r => r.creadorId === uid);
-
     const entrenado = this.entrenadoService.getEntrenado(uid)();
-    const ids = entrenado?.rutinasCreadas || [];
-    const byIds = this.rutinaService.rutinas().filter(r => ids.includes(r.id));
-
-    // Unir sin duplicados por id
-    const map = new Map<string, any>();
-    [...byCreator, ...byIds].forEach(r => map.set(r.id, r));
-    return Array.from(map.values());
+    const legacyIds = entrenado?.rutinasCreadas || [];
+    return this.rutinaService.getCreatedByUser(uid, legacyIds)();
   });
 
   // Mis Convocatorias (las que yo creé)
   misConvocatorias = computed(() => {
     const uid = this.userId();
+    const gymId = this.currentUserSignal()?.gimnasioId;
     if (!uid) return [];
-    return this.convocatoriaService.convocatorias()
+
+    const list = gymId 
+      ? this.convocatoriaService.getConvocatoriasForGym(gymId)() 
+      : this.convocatoriaService.convocatorias();
+
+    return list
       .filter(c => c.creadorId === uid)
       .sort((a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime());
   });
@@ -135,21 +128,22 @@ export class CreacionesPage implements OnInit {
   // IDs de los ejercicios que pertenecen al usuario actual (para mostrar botón de eliminar)
   misEjercicioIds = computed(() => {
     const uid = this.userId();
+    const gymId = this.currentUserSignal()?.gimnasioId;
     if (!uid) return new Set<string>();
 
-    const set = new Set<string>();
     const entrenado = this.entrenadoService.getEntrenado(uid)();
-    (entrenado?.ejerciciosCreadosIds || []).forEach((id: string) => set.add(id));
+    const legacy = entrenado?.ejerciciosCreadosIds || [];
+    const owned = this.ejercicioService.getCreatedByUser(uid, legacy)();
 
-    this.ejercicioService.ejercicios().forEach(e => {
-      if (e.creadorId === uid) set.add(e.id);
-    });
-    return set;
+    return new Set(owned.map(e => e.id));
   });
 
   // Lista ordenada para el tab: primero los "Tuyo" (creados por el usuario), luego el resto
   ejerciciosParaMostrar = computed(() => {
-    const all = this.ejercicioService.ejercicios();
+    const gymId = this.currentUserSignal()?.gimnasioId;
+    const all = gymId 
+      ? this.ejercicioService.getEjerciciosForGym(gymId)() 
+      : this.ejercicioService.ejercicios();
     const mis = this.misEjercicioIds();
     return [...all].sort((a, b) => {
       const aMine = mis.has(a.id) ? 0 : 1;
@@ -163,9 +157,15 @@ export class CreacionesPage implements OnInit {
   }
 
   ngOnInit() {
-    // Forzar inicialización de listeners para que las listas de rutinas y ejercicios se actualicen reactivamente
-    this.rutinaService.rutinas();
-    this.ejercicioService.ejercicios();
+    // Forzar inicialización de listeners gym-scoped para reducir datos cargados
+    const gymId = this.currentUserSignal()?.gimnasioId;
+    if (gymId) {
+      this.rutinaService.getRutinasForGym(gymId);
+      this.ejercicioService.getEjerciciosForGym(gymId);
+    } else {
+      this.rutinaService.rutinas();
+      this.ejercicioService.ejercicios();
+    }
     const uid = this.userId();
     if (uid) {
       this.entrenadoService.getEntrenado(uid);
@@ -177,8 +177,8 @@ export class CreacionesPage implements OnInit {
   }
 
   cerrarModalConvocatoria() {
-    this.isConvocatoriaModalOpen.set(false);
-    this.convocatoriaToEdit.set(null);
+    closeModalWithAnimation(this.isConvocatoriaModalOpen, this.convocatoriaToEdit);
+    // nota: el modal interno también puede limpiar, pero centralizamos aquí
   }
 
   onConvocatoriaSaved() {
@@ -190,8 +190,7 @@ export class CreacionesPage implements OnInit {
   }
 
   cerrarModalDesafio() {
-    this.isDesafioModalOpen.set(false);
-    this.desafioToEdit.set(null);
+    closeModalWithAnimation(this.isDesafioModalOpen, this.desafioToEdit);
   }
 
   onDesafioSaved() {
@@ -207,8 +206,7 @@ export class CreacionesPage implements OnInit {
   }
 
   cerrarModalRutina() {
-    this.isRutinaModalOpen.set(false);
-    this.rutinaToEdit.set(null);
+    closeModalWithAnimation(this.isRutinaModalOpen, this.rutinaToEdit);
   }
 
   onRutinaSaved() {
@@ -224,36 +222,44 @@ export class CreacionesPage implements OnInit {
   }
 
   cerrarModalEjercicio() {
-    this.isEjercicioModalOpen.set(false);
-    this.ejercicioToEdit.set(null);
+    closeModalWithAnimation(this.isEjercicioModalOpen, this.ejercicioToEdit);
   }
 
   onEjercicioSaved() {
     // Se actualiza reactivamente por Firestore
   }
 
-  onEditConvocatoria(item: any) {
+  onEditConvocatoria(item: Convocatoria) {
     this.convocatoriaToEdit.set(item);
     this.isConvocatoriaModalOpen.set(true);
   }
 
-  onEditDesafio(item: any) {
+  onEditDesafio(item: Desafio) {
     this.desafioToEdit.set(item);
     this.isDesafioModalOpen.set(true);
   }
 
-  onEditRutina(item: any) {
+  onEditRutina(item: Rutina) {
+    if (!this.isPremium()) {
+      this.showPremiumToast('La edición de rutinas personalizadas es una función Premium 🔒');
+      return;
+    }
     this.rutinaToEdit.set(item);
     this.isRutinaModalOpen.set(true);
   }
 
-  onEditEjercicio(item: any) {
+  onEditEjercicio(item: Ejercicio) {
+    if (!this.isPremium()) {
+      this.showPremiumToast('La edición de ejercicios personalizados es una función Premium 🔒');
+      return;
+    }
     this.ejercicioToEdit.set(item);
     this.isEjercicioModalOpen.set(true);
   }
 
-  segmentChanged(event: any) {
-    this.selectedTab.set(event.detail.value);
+  segmentChanged(event: SegmentCustomEvent) {
+    const val = event.detail.value as 'convocatorias' | 'desafios' | 'rutinas' | 'ejercicios' | undefined;
+    if (val) this.selectedTab.set(val);
   }
 
   async eliminarConvocatoria(id: string) {

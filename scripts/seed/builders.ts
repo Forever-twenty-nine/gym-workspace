@@ -299,6 +299,7 @@ export function buildMatch(input: {
   interesOrigen: boolean;
   interesDestino: boolean;
   mutuo: boolean;
+  gimnasioId?: string;
 }): MatchInteraction & Record<string, unknown> {
   const now = new Date();
   return {
@@ -311,6 +312,7 @@ export function buildMatch(input: {
     mutuo: input.mutuo,
     fechaCreacion: now,
     fechaMatch: input.mutuo ? now : undefined,
+    ...(input.gimnasioId ? { gimnasioId: input.gimnasioId } : {}),
   };
 }
 

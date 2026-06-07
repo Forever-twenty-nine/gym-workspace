@@ -15,6 +15,13 @@ import {
 } from 'firebase/firestore';
 
 import { Rutina, RutinaAsignada, Notificacion, TipoNotificacion } from 'gym-library';
+
+// Local view-model augmentation used by dashboard (extra UI fields)
+interface DashboardRutina extends Rutina {
+  esEjecutable?: boolean;
+  diaCorto?: string;
+  asignadoPor?: string;
+}
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -48,14 +55,27 @@ export class RutinaAsignadaService {
     }
 
     /**
-     * 🔄 Inicializa el listener de Firestore de forma segura
+     * 🔄 Inicializa el listener de Firestore de forma segura.
+     * Por defecto carga todo (usado por admin / vistas globales).
+     * Para la experiencia de entrenado se recomienda usar los getters por usuario/gym
+     * que filtran en cliente, o evolucionar hacia listeners gym-scoped.
      */
-    private initializeListener(): void {
+    private initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            onSnapshot(col, (snap: QuerySnapshot) => {
+            let q = query(col); // full collection by default
+
+            // TODO (medium): cuando la mayoría de documentos tengan gimnasioId,
+            // podemos hacer where('gimnasioId', '==', gymId) para reducir payload.
+            // Por ahora mantenemos full + filtro en memoria para compatibilidad legacy.
+            if (gymId) {
+                // Ejemplo futuro:
+                // q = query(col, where('gimnasioId', '==', gymId));
+            }
+
+            onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
                     this._rutinasAsignadas.set(list);
@@ -151,6 +171,7 @@ export class RutinaAsignadaService {
 
     /**
      * 🕒 Organiza las rutinas por días de la semana (próximos 7 días)
+     * (los objetos de rutina llevan propiedades extra como diaCorto, esHoy, esFuturo, encuentros)
      */
     organizarRutinasSemanales(rutinasAsignadas: Rutina[], asignaciones: RutinaAsignada[]): any[] {
         const hoy = new Date();
@@ -240,9 +261,9 @@ export class RutinaAsignadaService {
 
     /**
      * 🕒 Obtiene las próximas 3 rutinas para el dashboard de un entrenado
-     * Encapsula la lógica de búsqueda en los próximos 7 días y relleno con rutinas del entrenado.
+     * (con propiedades extra: esEjecutable, diaCorto, asignadoPor)
      */
-    getProximasRutinasDashboard(userId: string, rutinasEntrenado: any[]): Signal<any[]> {
+    getProximasRutinasDashboard(userId: string, rutinasEntrenado: Rutina[]): Signal<DashboardRutina[]> {
         return computed(() => {
             const rutinas = this.rutinaService.rutinas();
             const asignaciones = this.getRutinasAsignadasByEntrenado(userId)();
@@ -251,7 +272,7 @@ export class RutinaAsignadaService {
             if (!rutinas.length) return [];
 
             const hoy = new Date();
-            const proximas: any[] = [];
+            const proximas: DashboardRutina[] = [];
             const idsAgregados = new Set<string>();
             const nombresAgregados = new Set<string>();
 
@@ -295,7 +316,7 @@ export class RutinaAsignadaService {
                             asignadoPor: 'Entrenador',
                             diaCorto: esHoy ? 'Hoy' : diaCortoArr[diaSemanaIndex],
                             esEjecutable: esHoy
-                        });
+                        } as DashboardRutina);
                     }
                 }
             }
@@ -311,7 +332,7 @@ export class RutinaAsignadaService {
                             asignadoPor: 'Entrenador',
                             diaCorto: '',
                             esEjecutable: false
-                        });
+                        } as DashboardRutina);
                     }
                 }
             }

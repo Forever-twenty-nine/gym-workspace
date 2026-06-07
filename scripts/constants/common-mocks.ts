@@ -78,7 +78,8 @@ export const defaultMatches: MatchConfig[] = [
     usuarioDestinoId: 'trainee_mariagarcia',
     interesOrigen: true,
     interesDestino: true,
-    mutuo: true
+    mutuo: true,
+    gimnasioId: 'gym_default'
   },
   {
     id: 'match-trainee_mariagarcia-trainee_luisfernandez',
@@ -87,6 +88,7 @@ export const defaultMatches: MatchConfig[] = [
     usuarioDestinoId: 'trainee_luisfernandez',
     interesOrigen: true,
     interesDestino: false,
-    mutuo: false
+    mutuo: false,
+    gimnasioId: 'gym_default'
   }
 ];

@@ -14,9 +14,9 @@ import {
     templateUrl: './progreso-estadisticas.component.html'
 })
 export class ProgresoEstadisticasComponent {
-    @Input() stats: any = null;
-    @Input() sesiones: any[] = [];
-    @Input() dbStats: any = null;
+    @Input() stats: any = null;                 // TODO: tipar con interfaz de estadísticas generales
+    @Input() sesiones: import('gym-library').SesionRutina[] = [];
+    @Input() dbStats: import('gym-library').EstadisticasEntrenado | null = null;
 
     // Computed chart data
     readonly weeklyActivity = computed(() => this.computeWeeklyActivity());
@@ -54,7 +54,7 @@ export class ProgresoEstadisticasComponent {
 
         const map = new Map(activity.map(a => [a.dateKey, a]));
 
-        this.sesiones.forEach((s: any) => {
+        this.sesiones.forEach((s) => {
             if (!s.fechaInicio || !s.completada) return;
             const d = new Date(s.fechaInicio);
             const key = d.toISOString().slice(0, 10);
@@ -76,7 +76,7 @@ export class ProgresoEstadisticasComponent {
 
     private computeTopRutinas() {
         const counts = new Map<string, number>();
-        (this.sesiones || []).filter((s: any) => s.completada).forEach((s: any) => {
+        (this.sesiones || []).filter((s) => s.completada).forEach((s) => {
             const name = s.rutinaResumen?.nombre || 'Rutina';
             counts.set(name, (counts.get(name) || 0) + 1);
         });
@@ -90,7 +90,7 @@ export class ProgresoEstadisticasComponent {
 
     private computeCompletionRate(): number {
         if (!this.sesiones || this.sesiones.length === 0) return 0;
-        const completadas = this.sesiones.filter((s: any) => s.completada).length;
+        const completadas = this.sesiones.filter((s) => s.completada).length;
         return Math.round((completadas / this.sesiones.length) * 100);
     }
 

@@ -44,6 +44,7 @@ export interface MatchConfig {
   interesOrigen: boolean;
   interesDestino: boolean;
   mutuo: boolean;
+  gimnasioId?: string;
 }
 
 export interface SeedConfig {

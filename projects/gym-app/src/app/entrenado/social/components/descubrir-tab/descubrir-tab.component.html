@@ -3,7 +3,9 @@
     <div class="w-full max-w-md flex flex-col gap-4 relative">
       
       <!-- Contenedor de la Tarjeta con Animación de Deslizamiento -->
-      <div [class]="animacionCard()">
+      <div 
+        [class]="animacionCard()"
+        (transitionend)="onCardTransitionEnd()">
         <app-match-card 
           [tipo]="tarjetaActiva()!.tipo" 
           [data]="tarjetaActiva()!.data"

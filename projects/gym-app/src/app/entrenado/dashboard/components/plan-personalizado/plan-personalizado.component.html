@@ -1,28 +1,19 @@
-<section class="p-2">
-  <h2 class="font-heading text-lg font-semibold flex justify-between items-center mb-3 text-gray-900 dark:text-white">
-    Mi Plan Personalizado
+<section class="px-2 pt-1 pb-1">
+  <h2 class="text-base font-semibold text-gray-900 dark:text-white tracking-tight mb-1.5">
+    Mi Plan
   </h2>
-  <div class="flex flex-col gap-2 p-4 items-start bg-gray-50 border-gray-200 text-gray-800 dark:bg-white/10 dark:backdrop-blur-md rounded-2xl border dark:border-white/20">
-    <!-- nivel -->
-    <div class="w-full flex flex-row items-center gap-3 text-gray-700 dark:text-white/90">
-      <ion-icon name="accessibility-outline" class="!text-xl"></ion-icon>
-      <p class="text-base ">
-        {{ nivel || 'No definido' }}
-      </p>
+  <div class="flex flex-col gap-1 px-3 py-2.5 bg-white/70 dark:bg-white/10 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-2xl text-sm">
+    <div class="flex items-center gap-2 text-gray-700 dark:text-white/90">
+      <ion-icon name="accessibility-outline" class="text-base opacity-75"></ion-icon>
+      <span class="text-[13px]">{{ nivel || 'Nivel no definido' }}</span>
     </div>
-    <!-- objetivo -->
-    <div class="w-full flex flex-row items-center gap-3 text-gray-700 dark:text-white/90">
-      <ion-icon name="medal-outline" class="!text-xl"></ion-icon>
-      <p class="text-base ">
-        {{ objetivo }}
-      </p>
+    <div class="flex items-center gap-2 text-gray-700 dark:text-white/90">
+      <ion-icon name="medal-outline" class="text-base opacity-75"></ion-icon>
+      <span class="text-[13px] truncate">{{ objetivo }}</span>
     </div>
-    <!-- frecuencia -->
-    <div class=" w-full min-w-28 flex flex-row items-center gap-3 text-gray-700 dark:text-white/90">
-      <ion-icon name="today-outline" class="!text-xl"></ion-icon>
-      <p class="text-base ">
-        {{ frecuencia }} días por semana
-      </p>
+    <div class="flex items-center gap-2 text-gray-700 dark:text-white/90">
+      <ion-icon name="today-outline" class="text-base opacity-75"></ion-icon>
+      <span class="text-[13px]">{{ frecuencia || 0 }} días/semana</span>
     </div>
   </div>
 </section>

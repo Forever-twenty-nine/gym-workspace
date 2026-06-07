@@ -15,6 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
+import { Rutina } from 'gym-library';
 
 @Component({
   selector: 'app-rutina-list',
@@ -36,12 +37,12 @@ import { add, trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
   templateUrl: './rutina-list.component.html'
 })
 export class RutinaListComponent {
-  @Input() rutinas: any[] = [];
+  @Input() rutinas: Rutina[] = [];
   @Input() isPremium = false;
 
   @Output() create = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<any>();
+  @Output() edit = new EventEmitter<Rutina>();
 
   constructor() {
     addIcons({ add, trashOutline, lockClosed, pencilOutline });
@@ -56,7 +57,7 @@ export class RutinaListComponent {
     this.delete.emit(id);
   }
 
-  onEdit(item: any, event?: Event) {
+  onEdit(item: Rutina, event?: Event) {
     if (event) event.stopPropagation();
     this.edit.emit(item);
   }

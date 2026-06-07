@@ -1,98 +1,73 @@
-<section class="p-2 mt-3 flex justify-between items-center">
-  <h2 class="font-heading text-lg font-semibold flex justify-between items-center text-gray-900 dark:text-white">
-    Rutinas asignadas
-  </h2>
-  <ion-button fill="clear" size="small" class="text-gray-600 dark:text-white/80" (click)="verTodas.emit()">
-    Ver todas
-  </ion-button>
-</section>
+<section class="px-2 pt-1">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
+      Próximos entrenamientos
+    </h2>
+    <ion-button fill="clear" size="small" class="text-gray-600 dark:text-white/70 -mr-2" (click)="verTodas.emit()">
+      Ver todas
+    </ion-button>
+  </div>
 
 @if (rutinas.length > 0) {
-<!-- Vistazo de Rutinas -->
-<div class="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory hide-scrollbar ms-2 me-2 -mx-2 ps-2 pe-2">
+<!-- Compact vertical list - all cards visible on screen -->
+<div class="space-y-1.5">
   @for (rutina of rutinas; track rutina.id || rutina.nombre) {
-  <ion-card 
-    class="rutina-card !h-56 w-[280px] snap-center shrink-0 !m-0 relative shadow-lg !border-0 overflow-hidden active:scale-[0.98] transition-all cursor-pointer"
-    [class.opacity-50]="!rutina.esEjecutable"
-    (click)="rutina.esEjecutable ? verDetalle.emit(rutina) : null">
+  <div 
+    class="group flex items-center gap-3 rounded-2xl bg-white/70 dark:bg-white/10 backdrop-blur-md border border-white/40 dark:border-white/10 p-3 active:scale-[0.985] active:bg-white/90 dark:active:bg-white/15 transition-all cursor-pointer shadow-sm"
+    [class.opacity-60]="!rutina.esEjecutable"
+    (click)="verDetalle.emit(rutina)">
     
-    <!-- Background Gradient (different for active/inactive) -->
-    <div 
-      class="absolute inset-0 z-0 transition-opacity"
-      [className]="rutina.esEjecutable 
-        ? 'absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 dark:from-primary/80 dark:via-primary/40 dark:to-black/60 z-0' 
-        : 'absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-50 dark:from-gray-600/60 dark:to-black/80 z-0'">
+    <!-- Day / Status Badge -->
+    @if (rutina.esEjecutable) {
+      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-emerald-500 text-white text-[10px] font-extrabold tracking-widest shadow-sm">
+        HOY
+      </div>
+    } @else if (rutina.diaCorto) {
+      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-white/80 dark:bg-white/15 text-gray-700 dark:text-white/90 text-[10px] font-bold tracking-widest border border-white/50 dark:border-white/20">
+        {{ rutina.diaCorto }}
+      </div>
+    } @else {
+      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-white/70 dark:bg-white/10 text-gray-600 dark:text-white/70 text-[10px] font-bold tracking-widest border border-white/40">
+        PRÓX.
+      </div>
+    }
+
+    <!-- Name + subtle info -->
+    <div class="flex-1 min-w-0">
+      <div class="font-semibold text-[15px] leading-tight text-gray-900 dark:text-white truncate">
+        {{ rutina.nombre }}
+      </div>
+      <div class="text-[11px] text-gray-600 dark:text-white/65 flex items-center gap-1 mt-0.5">
+        <ion-icon name="barbell-outline" class="text-sm opacity-70"></ion-icon>
+        <span>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</span>
+      </div>
     </div>
-    
-    <ion-card-content class="!flex !flex-col !justify-between !h-full relative z-10 !p-5">
-      <div class="">
-        @if (rutina.esEjecutable) {
-        <span
-          class="bg-primary/90 text-white text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block shadow-sm">
-          EJECUTAR HOY
-        </span>
-        } @else if (rutina.diaCorto) {
-        <span
-          class="bg-gray-200 dark:bg-white/20 dark:backdrop-blur-md text-gray-800 dark:text-white/90 text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block border border-gray-300 dark:border-white/30">
-          {{ rutina.diaCorto }}
-        </span>
-        } @else {
-        <span
-          class="bg-gray-300 dark:bg-black/30 dark:backdrop-blur-md text-gray-800 dark:text-white/90 text-[10px] px-3 py-1 uppercase tracking-widest font-bold mb-3 rounded-full !inline-block border border-gray-400 dark:border-white/10">
-          {{ rutina.fechaAsignada }}
-        </span>
-        }
 
-        <p class="font-heading text-gray-900 dark:text-white !font-bold !text-2xl line-clamp-2 leading-tight drop-shadow-sm dark:drop-shadow-md">
-          {{ rutina.nombre }}
-        </p>
-
-        @if (rutina.descripcion) {
-        <p class="text-gray-600 dark:text-white/80 !text-sm mt-2 line-clamp-2 leading-snug">
-          {{ rutina.descripcion }}
-        </p>
-        }
-      </div>
-
-      <div class="flex gap-4 items-center mt-auto pt-3">
-        <div class="flex gap-1.5 items-center">
-          <ion-icon name="barbell-outline" class="text-gray-700 dark:text-white/90 text-lg"></ion-icon>
-          <p class="text-gray-700 dark:text-white/90 text-sm font-medium">{{ rutina.ejerciciosIds?.length || 0 }} Ejercicios</p>
-        </div>
-      </div>
-
-      <div
-        class="absolute bottom-4 right-4 bg-white shadow-md dark:bg-white/20 rounded-full p-2 dark:backdrop-blur-sm border border-gray-200 dark:border-white/30 flex items-center justify-center dark:shadow-lg transition-transform active:scale-90">
-        <ion-icon [name]="rutina.esEjecutable ? 'play-outline' : 'calendar-outline'" class="!text-gray-900 dark:!text-white !text-xl"></ion-icon>
-      </div>
-    </ion-card-content>
-  </ion-card>
+    <!-- Action icon -->
+    <div class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/80 dark:bg-white/15 border border-white/60 dark:border-white/20 group-active:scale-90 transition-transform">
+      <ion-icon 
+        [name]="rutina.esEjecutable ? 'play-outline' : 'chevron-forward-outline'" 
+        class="text-gray-700 dark:text-white text-xl">
+      </ion-icon>
+    </div>
+  </div>
   }
 </div>
 } @else {
-<!-- Rutina sin asignar -->
-<ion-card class="bg-gray-50 border-gray-200 text-gray-900 dark:bg-white/10 dark:backdrop-blur-md border dark:border-white/20 shadow-none dark:text-white p-1">
-  <ion-card-content class="ion-padding text-center">
-    <ion-icon name="barbell-outline" class="text-4xl mb-2 text-gray-400 dark:text-white dark:opacity-50"></ion-icon>
-    <p class="font-heading !font-bold !text-xl !my-2">
-      No tienes rutinas asignadas
+<!-- Compact empty state -->
+<div class="rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur border border-white/30 dark:border-white/10 p-4 text-center">
+  <div class="flex items-center justify-center gap-2 text-gray-500 dark:text-white/60">
+    <ion-icon name="barbell-outline" class="text-xl"></ion-icon>
+    <span class="text-sm font-medium">No tienes rutinas asignadas</span>
+  </div>
+  @if (entrenador) {
+    <p class="text-xs text-gray-500 dark:text-white/55 mt-1.5">
+      Tu entrenador te asignará rutinas pronto.
     </p>
-    @if (entrenador) {
-    <p class="text-gray-600 dark:text-white/70">Tu entrenador {{ entrenador.nombre || entrenador.email || 'Entrenador' }} te asignará
-      rutinas próximamente.</p>
-    <div class="mt-4 flex items-center justify-center gap-3">
-      <ion-avatar class="w-10 h-10 border border-gray-200 dark:border-white/20 relative">
-        <img [ngSrc]="entrenador.photoURL || 'assets/images/test-foto.png'" fill priority alt="Entrenador"
-             class="object-cover">
-      </ion-avatar>
-      <div class="text-left">
-        <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ entrenador.nombre || 'Entrenador' }}</p>
-        <p class="text-xs text-gray-500 dark:text-white/50">{{ entrenador.email }}</p>
-      </div>
-    </div>
-    } @else {
-    <p class="text-gray-600 dark:text-white/70">Busca un entrenador para que te asigne rutinas personalizadas.</p>
-    }
-  </ion-card-content>
-</ion-card>
+  } @else {
+    <p class="text-xs text-gray-500 dark:text-white/55 mt-1.5">
+      Busca un entrenador para recibir rutinas personalizadas.
+    </p>
+  }
+</div>
 }

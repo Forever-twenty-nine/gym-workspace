@@ -32,7 +32,7 @@ import { SesionRutinaService } from '../../../../core/services/sesion-rutina.ser
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { FirebaseStorageService } from '../../../../core/services/firebase-storage.service';
-import { Plan } from 'gym-library';
+import { Plan, SesionRutina } from 'gym-library';
 import { compressImage } from '../../../../core/utils/image-compression';
 import { IonSpinner, ToastController } from '@ionic/angular/standalone';
 
@@ -80,7 +80,7 @@ export class ProgresoHistorialDetalleComponent {
     private toastCtrl = inject(ToastController);
 
     @Input() isOpen = false;
-    @Input() sesionSeleccionada: any = null;
+    @Input() sesionSeleccionada: SesionRutina | null = null;
     @Output() didDismiss = new EventEmitter<void>();
 
     isPremium = computed(() => this.authService.currentUser()?.plan === Plan.PREMIUM);
@@ -110,34 +110,37 @@ export class ProgresoHistorialDetalleComponent {
         this.didDismiss.emit();
     }
 
-    async toggleCompartir(event: any) {
+    async toggleCompartir(event: { detail?: { checked?: boolean } }) {
         if (!this.sesionSeleccionada) return;
-        const compartida = event.detail.checked;
+        const compartida = !!event?.detail?.checked;
         const user = this.authService.currentUser();
 
         if (user) {
             // Optimistic update
             this.sesionSeleccionada.compartida = compartida;
             this.sesionSeleccionada.nombreUsuario = user.nombre || user.email || 'Usuario';
-            this.sesionSeleccionada.fotoUsuario = user.photoURL;
+            this.sesionSeleccionada.fotoUsuario = user.photoURL || undefined;
 
             await this.sesionRutinaService.setCompartida(
                 this.sesionSeleccionada.id,
                 compartida,
                 this.sesionSeleccionada.nombreUsuario,
                 this.sesionSeleccionada.fotoUsuario,
-                this.fotoProgresoUrl() || undefined
+                this.fotoProgresoUrl() || undefined,
+                user.gimnasioId
             );
         }
     }
 
     triggerPhotoInput() {
-        const input = document.getElementById('foto-progreso-input') as HTMLInputElement;
-        if (input) input.click();
+        // Consider moving to a directive or <input #photoInput hidden (change)="..."> + ViewChild for better practice
+        const input = document.getElementById('foto-progreso-input') as HTMLInputElement | null;
+        input?.click();
     }
 
-    async onPhotoSelected(event: any) {
-        const file = event.target.files[0];
+    async onPhotoSelected(event: Event) {
+        const input = event.target as HTMLInputElement | null;
+        const file = input?.files?.[0];
         if (!file || !this.sesionSeleccionada) return;
 
         if (!file.type.startsWith('image/')) {
@@ -168,7 +171,8 @@ export class ProgresoHistorialDetalleComponent {
                     true,
                     this.sesionSeleccionada.nombreUsuario,
                     this.sesionSeleccionada.fotoUsuario,
-                    downloadUrl
+                    downloadUrl,
+                    user.gimnasioId
                 );
             }
             
@@ -201,13 +205,13 @@ export class ProgresoHistorialDetalleComponent {
         });
     }
 
-    getEstadoSesion(sesion: any): string {
+    getEstadoSesion(sesion: SesionRutina): string {
         if (sesion.completada) return 'Completada';
         if (sesion.fechaInicio) return 'En progreso';
         return 'Pendiente';
     }
 
-    getColorEstado(sesion: any): string {
+    getColorEstado(sesion: SesionRutina): string {
         if (sesion.completada) return 'success';
         if (sesion.fechaInicio) return 'primary';
         return 'medium';
@@ -246,14 +250,14 @@ export class ProgresoHistorialDetalleComponent {
     }
 
     private generarTextoCompartir(): string {
-        const sesion = this.sesionSeleccionada;
+        const sesion = this.sesionSeleccionada!;
         const nombre = sesion.rutinaResumen?.nombre || 'Mi Rutina';
         const tiempo = this.redondearMinutos(sesion.duracion || 0);
 
         let ejerciciosStr = '';
         if (sesion.rutinaResumen?.ejercicios?.length) {
             ejerciciosStr = '\n\nEjercicios realizados:\n';
-            sesion.rutinaResumen.ejercicios.forEach((ej: any, i: number) => {
+            sesion.rutinaResumen.ejercicios.forEach((ej, i: number) => {
                 ejerciciosStr += `${i + 1}. ${ej.nombre || 'Ejercicio'}\n`;
             });
         }

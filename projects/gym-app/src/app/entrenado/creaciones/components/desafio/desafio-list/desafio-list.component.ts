@@ -14,6 +14,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add, trashOutline, pencilOutline } from 'ionicons/icons';
+import { Desafio } from 'gym-library';
 
 @Component({
   selector: 'app-desafio-list',
@@ -35,10 +36,10 @@ import { add, trashOutline, pencilOutline } from 'ionicons/icons';
   templateUrl: './desafio-list.component.html'
 })
 export class DesafioListComponent {
-  @Input() desafios: any[] = [];
+  @Input() desafios: Desafio[] = [];
   @Output() create = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<any>();
+  @Output() edit = new EventEmitter<Desafio>();
 
   constructor() {
     addIcons({ add, trashOutline, pencilOutline });
@@ -53,7 +54,7 @@ export class DesafioListComponent {
     this.delete.emit(id);
   }
 
-  onEdit(item: any, event?: Event) {
+  onEdit(item: Desafio, event?: Event) {
     if (event) event.stopPropagation();
     this.edit.emit(item);
   }

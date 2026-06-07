@@ -20,6 +20,7 @@ import { close, saveOutline, barbellOutline, helpCircleOutline } from 'ionicons/
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { AuthService } from '../../../../../core/services/auth.service';
+import { Plan } from 'gym-library';
 
 @Component({
   selector: 'app-ejercicio-modal',
@@ -50,7 +51,7 @@ export class EjercicioModalComponent implements OnChanges {
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
-  @Input() item: any = null;
+  @Input() item: import('gym-library').Ejercicio | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -111,11 +112,20 @@ export class EjercicioModalComponent implements OnChanges {
 
     const uid = user.uid;
 
+    if (!this.isEditing) {
+      const plan = this.authService.currentUser()?.plan;
+      if (plan !== Plan.PREMIUM) {
+        this.showToast('La creación de ejercicios personalizados es exclusiva para usuarios Premium 🔒', 'warning');
+        this.closeModal();
+        return;
+      }
+    }
+
     this.saving.set(true);
     try {
       const formValue = this.form.value;
 
-      let ejercicioData: any;
+      let ejercicioData: Partial<import('gym-library').Ejercicio>;
 
       if (this.isEditing && this.item) {
         ejercicioData = {
@@ -140,10 +150,10 @@ export class EjercicioModalComponent implements OnChanges {
         };
       }
 
-      await this.ejercicioService.save(ejercicioData);
+      await this.ejercicioService.save(ejercicioData as any);
 
       if (!this.isEditing) {
-        await this.entrenadoService.addEjercicioCreado(uid, ejercicioData.id);
+        await this.entrenadoService.addEjercicioCreado(uid, ejercicioData.id!);
       }
 
       this.showToast(this.isEditing ? 'Ejercicio actualizado' : 'Ejercicio creado con éxito', 'success');

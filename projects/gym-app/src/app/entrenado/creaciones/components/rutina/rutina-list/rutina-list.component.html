@@ -13,9 +13,11 @@
       </ng-template>
     </ion-popover>
 
+    @if (isPremium) {
     <ion-button (click)="onCreate()" size="small" class="m-0! rounded-2xl" fill="solid">
       <ion-icon name="add" slot="icon-only"></ion-icon>
     </ion-button>
+    }
   </div>
 
   @if (isPremium) {

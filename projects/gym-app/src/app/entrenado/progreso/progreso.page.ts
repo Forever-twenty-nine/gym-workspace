@@ -11,6 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { EstadisticasEntrenadoService } from '../../core/services/estadisticas-entrenado.service';
+import { Plan, SesionRutina } from 'gym-library';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 
 
@@ -33,7 +34,7 @@ export class ProgresoPage implements OnInit, OnDestroy {
   private readonly estadisticasService = inject(EstadisticasEntrenadoService);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   readonly isLoading = signal(false);
 
@@ -61,24 +62,24 @@ export class ProgresoPage implements OnInit, OnDestroy {
   }
 
   rutinasAsignadas = computed(() => {
-    const currentUser = this.authService.currentUser;
-    const userId = currentUser()?.uid;
-    const rutinas = this.rutinaService.rutinas;
-    const entrenados = this.entrenadoService.entrenados;
-    const entrenado = entrenados().find((e: any) => e.id === userId);
+    const userId = this.authService.currentUser()?.uid;
+    if (!userId) return [];
 
-    if (!userId || !rutinas().length || !entrenado?.rutinasAsignadasIds) return [];
+    const rutinas = this.rutinaService.rutinas();
+    const entrenado = this.entrenadoService.getEntrenado(userId)();
 
-    return rutinas().filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
+    if (!rutinas.length || !entrenado?.rutinasAsignadasIds) return [];
+
+    return rutinas.filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
   });
 
-  historialSesiones = computed(() => {
+  historialSesiones = computed<SesionRutina[]>(() => {
     const userId = this.authService.currentUser()?.uid;
     if (!userId) return [];
 
     const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(userId)();
 
-    return sesiones.sort((a, b) => {
+    return [...sesiones].sort((a, b) => {
       const dateA = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
       const dateB = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
       return dateB.getTime() - dateA.getTime();

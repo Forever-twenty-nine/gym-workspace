@@ -14,20 +14,21 @@
   </div>
   }
 
-  <div class="main-container ion-padding relative z-10">
-    <div
-      class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[80vh]">
+  <div class="relative z-10 px-3 pt-2 pb-20">
+    <!-- Plan Personalizado -->
+    <app-plan-personalizado 
+      [nivel]="entrenadoDataSignal()?.nivel" 
+      [objetivo]="objetivoActual()"
+      [frecuencia]="frecuenciaSemanal()">
+    </app-plan-personalizado>
 
-      <!-- Plan Personalizado Component -->
-      <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
-        [frecuencia]="frecuenciaSemanal()">
-      </app-plan-personalizado>
-
-      <!-- Rutinas Asignadas Component -->
-      <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
-        (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
-      </app-rutinas-asignadas>
-
-    </div>
+    <!-- Próximos entrenamientos (compact cards) -->
+    <app-rutinas-asignadas 
+      [rutinas]="rutinasAsignadas()" 
+      [entrenador]="entrenadorAsignado()"
+      (verDetalle)="verRutina($event)" 
+      (verTodas)="verTodasLasRutinas()">
+    </app-rutinas-asignadas>
   </div>
+
 </ion-content>

@@ -14,6 +14,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { EntrenadoService } from '../../../../core/services/entrenado.service';
 import { FormatFechaPipe } from '../../../../shared/pipes/format-fecha.pipe';
+import { SesionRutina } from 'gym-library';
 
 @Component({
   selector: 'app-social-card',
@@ -25,8 +26,8 @@ import { FormatFechaPipe } from '../../../../shared/pipes/format-fecha.pipe';
   templateUrl: './social-card.component.html'
 })
 export class SocialCardComponent {
-  private readonly _sesion = signal<any>(null);
-  @Input({ required: true }) set sesion(value: any) { this._sesion.set(value); }
+  private readonly _sesion = signal<SesionRutina>(null!);
+  @Input({ required: true }) set sesion(value: SesionRutina) { this._sesion.set(value); }
   get sesion() { return this._sesion(); }
 
   private readonly sesionService = inject(SesionRutinaService);
@@ -43,7 +44,11 @@ export class SocialCardComponent {
     const target = this._sesion()?.entrenadoId;
     return e && target ? (e.seguidos || []).includes(target) : false;
   });
-  isOwnPost = computed(() => this.currentUser() && this._sesion() ? this.currentUser()!.uid === this._sesion().entrenadoId : false);
+  isOwnPost = computed(() => {
+    const user = this.currentUser();
+    const s = this._sesion();
+    return user && s ? user.uid === s.entrenadoId : false;
+  });
   likesCount = computed(() => (this._sesion()?.likes || []).length);
 
   userProfilePhoto = computed(() => {
@@ -63,7 +68,7 @@ export class SocialCardComponent {
     if (!user || !s?.id) return;
 
     const liked = this.hasLiked();
-    const updatedLikes = liked ? s.likes.filter((id: string) => id !== user.uid) : [...(s.likes || []), user.uid];
+    const updatedLikes = liked ? (s.likes || []).filter((id: string) => id !== user.uid) : [...(s.likes || []), user.uid];
     this._sesion.set({ ...s, likes: updatedLikes });
 
     try {
@@ -88,12 +93,16 @@ export class SocialCardComponent {
     event.stopPropagation();
     if (!this.isOwnPost()) return;
 
+    const user = this.currentUser();
+    const s = this.sesion;
+    if (!s) return;
+
     const sheet = await this.actionSheetCtrl.create({
       header: 'Gestionar Actividad',
       cssClass: 'premium-action-sheet',
       buttons: [
-        { text: 'Dejar de compartir', icon: 'eye-off-outline', handler: () => this.sesionService.setCompartida(this.sesion.id, false).catch(console.error) },
-        { text: 'Eliminar actividad', role: 'destructive', icon: 'trash', handler: () => this.sesionService.eliminarSesion(this.sesion.id).catch(console.error) },
+        { text: 'Dejar de compartir', icon: 'eye-off-outline', handler: () => this.sesionService.setCompartida(s.id, false, undefined, undefined, undefined, user?.gimnasioId).catch(console.error) },
+        { text: 'Eliminar actividad', role: 'destructive', icon: 'trash', handler: () => this.sesionService.eliminarSesion(s.id).catch(console.error) },
         { text: 'Cancelar', role: 'cancel' }
       ]
     });

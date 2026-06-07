@@ -14,6 +14,7 @@ import { UserService } from '../../../../core/services/user.service';
 import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 import { Convocatoria } from 'gym-library';
 import { ConvocatoriaModalComponent } from './convocatoria-modal/convocatoria-modal.component';
+import { closeModalWithAnimation } from '../../../../core/utils/modal.utils';
 
 @Component({
   selector: 'app-convocatorias',
@@ -45,9 +46,12 @@ export class ConvocatoriasComponent {
 
   // Obtener convocatorias de Firestore filtradas y ordenadas (con vencimiento)
   convocatoriasActivas = computed(() => {
-    const list = this.convocatoriaService.convocatorias();
     const user = this.currentUserSignal();
-    if (!user || !user.gimnasioId) return [];
+    const gymId = user?.gimnasioId;
+    const list = gymId 
+      ? this.convocatoriaService.getConvocatoriasForGym(gymId)() 
+      : this.convocatoriaService.convocatorias();
+    if (!user || !gymId) return [];
 
     const now = new Date();
     const startOfToday = new Date();
@@ -99,9 +103,7 @@ export class ConvocatoriasComponent {
   }
 
   closeModal() {
-    this.isModalOpen.set(false);
-    // allow exit animation then clear
-    setTimeout(() => this.selectedConvocatoria.set(null), 280);
+    closeModalWithAnimation(this.isModalOpen, this.selectedConvocatoria, 280);
   }
 
   onModalDeleted(_id: string) {

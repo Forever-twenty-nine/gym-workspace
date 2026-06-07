@@ -39,12 +39,22 @@ export class ConvocatoriaService {
         return runInInjectionContext(this.injector, callback as any);
     }
 
-    private initializeListener(): void {
+    /**
+     * Inicializa listener.
+     * Si se pasa gymId, filtra por gimnasio (recomendado para la sección de entrenados).
+     * Mantiene compatibilidad con carga global (social amplio, admin, etc.).
+     */
+    private initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            const q = query(col, where('activo', '==', true));
+            let q = query(col, where('activo', '==', true));
+
+            if (gymId) {
+                q = query(col, where('activo', '==', true), where('gimnasioId', '==', gymId));
+            }
+
             onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
@@ -60,6 +70,19 @@ export class ConvocatoriaService {
     get convocatorias(): Signal<Convocatoria[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
+        }
+        return this._convocatorias.asReadonly();
+    }
+
+    /**
+     * Obtiene convocatorias filtradas por gimnasio (inicializa listener gym-scoped si es necesario).
+     * Recomendado para la sección de entrenados.
+     */
+    getConvocatoriasForGym(gymId: string): Signal<Convocatoria[]> {
+        // For now we still share the same backing signal (full or first init wins).
+        // In a more advanced version we could have per-gym signals.
+        if (!this.isListenerInitialized) {
+            this.initializeListener(gymId);
         }
         return this._convocatorias.asReadonly();
     }

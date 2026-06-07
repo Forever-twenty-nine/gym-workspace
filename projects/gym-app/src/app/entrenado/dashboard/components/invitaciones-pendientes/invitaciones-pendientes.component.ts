@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormatFechaPipe } from '../../../../shared/pipes/format-fecha.pipe';
+import { Invitacion } from 'gym-library';
 import { 
   IonCard, 
   IonCardContent, 
@@ -30,11 +31,11 @@ import { checkmarkCircle, closeCircleOutline, notificationsCircle, chevronUp, ch
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InvitacionesPendientesComponent {
-  @Input() invitaciones: any[] = [];
+  @Input() invitaciones: Invitacion[] = [];
   @Input() mostrar: boolean = true;
   @Output() toggle = new EventEmitter<void>();
-  @Output() aceptar = new EventEmitter<any>();
-  @Output() rechazar = new EventEmitter<any>();
+  @Output() aceptar = new EventEmitter<Invitacion>();
+  @Output() rechazar = new EventEmitter<Invitacion>();
 
   constructor() {
     addIcons({ checkmarkCircle, closeCircleOutline, notificationsCircle, chevronUp, chevronDown });

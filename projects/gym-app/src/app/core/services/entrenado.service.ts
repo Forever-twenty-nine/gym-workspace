@@ -45,14 +45,24 @@ export class EntrenadoService {
     }
 
     /**
-     * 🔄 Inicializa el listener de Firestore de forma segura
+     * 🔄 Inicializa el listener de Firestore de forma segura (carga TODOS los entrenados).
+     *
+     * Medium priority improvement: para apps con muchos gimnasios, idealmente
+     * deberíamos tener listeners por `gimnasioId` (especialmente para "Descubrir" y sugerencias).
+     * Actualmente el filtro por gym se hace en cliente en los componentes.
      */
-    initializeListener(): void {
+    initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            onSnapshot(col, (snap: QuerySnapshot) => {
+            let q: any = col;
+
+            if (gymId) {
+                q = query(col, where('gimnasioId', '==', gymId));
+            }
+
+            onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
                     this._entrenados.set(list);
@@ -70,6 +80,16 @@ export class EntrenadoService {
     get entrenados(): Signal<Entrenado[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
+        }
+        return this._entrenados.asReadonly();
+    }
+
+    /**
+     * Versión gym-scoped (para Descubrir / MatchService en entrenados).
+     */
+    getEntrenadosForGym(gymId: string): Signal<Entrenado[]> {
+        if (!this.isListenerInitialized) {
+            this.initializeListener(gymId);
         }
         return this._entrenados.asReadonly();
     }

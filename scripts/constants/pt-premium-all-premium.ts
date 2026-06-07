@@ -91,7 +91,8 @@ export const ptPremiumAllPremiumConfig: SeedConfig = {
       usuarioDestinoId: "trainee_florenciaalumnapremium",
       interesOrigen: true,
       interesDestino: true,
-      mutuo: true
+      mutuo: true,
+      gimnasioId: "pt_premium_all_premium"
     }
   ]
 };

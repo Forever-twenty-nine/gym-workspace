@@ -10,6 +10,9 @@ import { inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
+import { AuthService } from '../../core/services/auth.service';
+import { RutinaService } from '../../core/services/rutina.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
 import { addIcons } from 'ionicons';
 import {
   homeOutline,
@@ -51,6 +54,9 @@ export class EntrenadoTabsPage implements OnInit, OnDestroy {
   private router = inject(Router);
   private userService = inject(UserService); // preload users/photos as early as possible (when entering the main app tabs)
   private entrenadoService = inject(EntrenadoService); // preload athlete profiles early for discover suggestions
+  private authService = inject(AuthService);
+  private rutinaService = inject(RutinaService);
+  private ejercicioService = inject(EjercicioService);
   private routerSubscription?: Subscription;
 
   isCenterTabActive = signal(false);
@@ -60,7 +66,19 @@ export class EntrenadoTabsPage implements OnInit, OnDestroy {
     // This ensures user photos and athlete profiles are loading in background before you even navigate to the social / descubrir tab.
     // Solves the "first load of descubrir shows only initials" race condition.
     this.userService.users;
-    this.entrenadoService.entrenados; // trigger listener for profiles used in suggestions
+
+    // Preload gym-scoped entrenados (clave para sugerencias de MatchService en Descubrir)
+    // y listas de contenido (rutinas/ejercicios para creaciones y rutinas)
+    const gymId = this.authService.currentUser()?.gimnasioId;
+    if (gymId) {
+      this.entrenadoService.getEntrenadosForGym?.(gymId) ?? this.entrenadoService.entrenados;
+      this.rutinaService.getRutinasForGym(gymId);
+      this.ejercicioService.getEjerciciosForGym(gymId);
+    } else {
+      this.entrenadoService.entrenados;
+      this.rutinaService.rutinas();
+      this.ejercicioService.ejercicios();
+    }
 
     addIcons({ 
       homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, 
@@ -73,7 +91,7 @@ export class EntrenadoTabsPage implements OnInit, OnDestroy {
     this.checkIfCenterTabActive(this.router.url);
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
+      .subscribe((event: NavigationEnd) => {
         this.checkIfCenterTabActive(event.urlAfterRedirects);
       });
   }

@@ -1,14 +1,20 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { 
-  IonCard, 
-  IonCardContent, 
   IonIcon, 
-  IonButton,
-  IonAvatar
+  IonButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barbellOutline, chevronForwardOutline, playOutline, calendarOutline } from 'ionicons/icons';
+import { barbellOutline, chevronForwardOutline, playOutline } from 'ionicons/icons';
+import { Rutina } from 'gym-library';
+
+export interface DashboardRutina extends Rutina {
+  esEjecutable?: boolean;
+  diaCorto?: string;
+  asignadoPor?: string;
+}
+
+type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string };
 
 @Component({
   selector: 'app-rutinas-asignadas',
@@ -16,22 +22,18 @@ import { barbellOutline, chevronForwardOutline, playOutline, calendarOutline } f
   standalone: true,
   imports: [
     CommonModule,
-    IonCard, 
-    IonCardContent, 
     IonIcon, 
-    IonButton,
-    IonAvatar,
-    NgOptimizedImage
+    IonButton
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RutinasAsignadasComponent {
-  @Input() rutinas: any[] = [];
-  @Input() entrenador: any = null;
-  @Output() verDetalle = new EventEmitter<any>();
+  @Input() rutinas: DashboardRutina[] = [];
+  @Input() entrenador: EntrenadorInfo | null = null;
+  @Output() verDetalle = new EventEmitter<DashboardRutina>();
   @Output() verTodas = new EventEmitter<void>();
 
   constructor() {
-    addIcons({ barbellOutline, chevronForwardOutline, playOutline, calendarOutline });
+    addIcons({ barbellOutline, chevronForwardOutline, playOutline });
   }
 }

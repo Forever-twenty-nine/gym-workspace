@@ -24,10 +24,10 @@ import { add, trashOutline, pencilOutline } from 'ionicons/icons';
   templateUrl: './convocatoria-list.component.html'
 })
 export class ConvocatoriaListComponent {
-  @Input() convocatorias: any[] = [];
+  @Input() convocatorias: import('gym-library').Convocatoria[] = [];
   @Output() create = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<any>();
+  @Output() edit = new EventEmitter<import('gym-library').Convocatoria>();
 
   constructor() {
     addIcons({ add, trashOutline, pencilOutline });
@@ -42,7 +42,7 @@ export class ConvocatoriaListComponent {
     this.delete.emit(id);
   }
 
-  onEdit(item: any, event?: Event) {
+  onEdit(item: import('gym-library').Convocatoria, event?: Event) {
     if (event) event.stopPropagation();
     this.edit.emit(item);
   }

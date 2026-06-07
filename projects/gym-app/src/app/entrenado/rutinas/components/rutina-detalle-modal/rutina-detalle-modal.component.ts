@@ -59,10 +59,10 @@ import { close, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCirc
 export class RutinaDetalleModalComponent {
     @Input() isOpen = false;
     @Input() esFuturo = false;
-    @Input() rutina: any = null;
-    @Input() ejercicios: any[] = [];
+    @Input() rutina: import('gym-library').Rutina | null = null;
+    @Input() ejercicios: import('gym-library').Ejercicio[] = [];
     @Output() didDismiss = new EventEmitter<void>();
-    @Output() iniciarEntrenamiento = new EventEmitter<any>();
+    @Output() iniciarEntrenamiento = new EventEmitter<import('gym-library').Rutina>();
 
     constructor() {
         addIcons({
@@ -81,6 +81,6 @@ export class RutinaDetalleModalComponent {
     }
 
     iniciar() {
-        this.iniciarEntrenamiento.emit(this.rutina);
+        if (this.rutina) this.iniciarEntrenamiento.emit(this.rutina);
     }
 }

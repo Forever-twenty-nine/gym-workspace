@@ -66,8 +66,14 @@ function makeCreacionesPageLogic() {
   function abrirModalEjercicio() {
     if (isPremium()) isEjOpen.set(true);
   }
-  function onEditRutina(item: any) { rutToEdit.set(item); isRutOpen.set(true); }
-  function onEditEjercicio(item: any) { ejToEdit.set(item); isEjOpen.set(true); }
+  function onEditRutina(item: any) {
+    if (isPremium()) { rutToEdit.set(item); isRutOpen.set(true); }
+    else { /* would show premium toast */ }
+  }
+  function onEditEjercicio(item: any) {
+    if (isPremium()) { ejToEdit.set(item); isEjOpen.set(true); }
+    else { /* would show premium toast */ }
+  }
 
   async function eliminarRutina(id: string) {
     try {

@@ -11,7 +11,7 @@ import {
 import { MatchService } from '../../../../core/services/match.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
-import { Entrenado } from 'gym-library';
+import { Entrenado, Desafio } from 'gym-library';
 
 @Component({
   selector: 'app-match-card',
@@ -28,7 +28,7 @@ export class MatchCardComponent implements OnChanges {
   private readonly toastCtrl = inject(ToastController);
 
   @Input({ required: true }) tipo!: 'desafio' | 'afinidad' | 'horario';
-  @Input({ required: true }) data!: any; // Perfil de Entrenado o Desafio
+  @Input({ required: true }) data: any; // mixed Entrenado | Desafio shape for dynamic matching cards (type narrowed by 'tipo')
   @Input() showActions = true;
   @Input() photoURL: string | null = null; // resolved from parent for reliable first-load photos
   @Input() photoVersion: number = 0; // bumped by parent when users first load → forces re-evaluation of photo computeds

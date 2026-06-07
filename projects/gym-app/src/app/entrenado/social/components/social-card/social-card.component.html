@@ -8,14 +8,14 @@
       <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" class="w-full h-full object-cover"
         alt="Foto de perfil">
       } @else {
-      <span class="text-primary font-bold text-sm uppercase">{{ (sesion.nombreUsuario || 'U').charAt(0) }}</span>
+      <span class="text-primary font-bold text-sm uppercase">{{ (sesion!.nombreUsuario || 'U').charAt(0) }}</span>
       }
     </div>
 
     <ion-label class="mt-1">
       <div class="flex items-center gap-1.5">
         <h3 class="font-bold text-sm m-0 text-gray-900 dark:text-white truncate">
-          {{ sesion.nombreUsuario || 'Usuario' }}
+          {{ sesion!.nombreUsuario || 'Usuario' }}
         </h3>
         @if(isOwnPost()) {
         <span
@@ -23,7 +23,7 @@
         }
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400 m-0 mt-0.5 font-medium">
-        {{ sesion.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
+        {{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
       </p>
     </ion-label>
 
@@ -43,9 +43,9 @@
   </ion-item>
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
-  @if (sesion.fotoProgreso) {
+  @if (sesion!.fotoProgreso) {
   <div class="w-full aspect-[4/5] sm:aspect-square relative bg-gray-100 dark:bg-gray-900">
-    <img [src]="sesion.fotoProgreso" class="w-full h-full object-cover" alt="Foto del entrenamiento">
+    <img [src]="sesion!.fotoProgreso" class="w-full h-full object-cover" alt="Foto del entrenamiento">
   </div>
   } @else {
   <!-- Separator if no image, to make it look clean -->
@@ -74,8 +74,8 @@
 
     <!-- Routine Title and Description -->
     <div class="text-sm text-gray-900 dark:text-gray-100 leading-snug">
-      <span class="font-bold mr-1">{{ sesion.nombreUsuario || 'Usuario' }}</span>
-      <span>completó su sesión de <span class="font-semibold">{{ sesion.rutinaResumen.nombre || 'Entrenamiento'
+      <span class="font-bold mr-1">{{ sesion!.nombreUsuario || 'Usuario' }}</span>
+      <span>completó su sesión de <span class="font-semibold">{{ sesion!.rutinaResumen.nombre || 'Entrenamiento'
           }}</span>.</span>
     </div>
 
@@ -83,12 +83,12 @@
     <div class="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
       <div class="flex items-center gap-1">
         <ion-icon name="time-outline" class="text-sm"></ion-icon>
-        <span>{{ redondearMinutos(sesion.duracion || 0) }} min</span>
+        <span>{{ redondearMinutos(sesion!.duracion || 0) }} min</span>
       </div>
       <span class="opacity-50">•</span>
       <div class="flex items-center gap-1">
         <ion-icon name="barbell-outline" class="text-sm"></ion-icon>
-        <span>{{ sesion.rutinaResumen.ejercicios.length || 0 }} ejercicios</span>
+        <span>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</span>
       </div>
     </div>
   </div>

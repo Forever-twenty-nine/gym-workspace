@@ -49,12 +49,17 @@ export class InvitacionService {
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
      */
-    private initializeListener(): void {
+    private initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            const q = query(col, orderBy('fechaCreacion', 'desc'));
+            let q = query(col, orderBy('fechaCreacion', 'desc'));
+
+            if (gymId) {
+                q = query(col, where('gimnasioId', '==', gymId), orderBy('fechaCreacion', 'desc'));
+            }
+
             onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
@@ -73,6 +78,13 @@ export class InvitacionService {
     get invitaciones(): Signal<Invitacion[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
+        }
+        return this._invitaciones.asReadonly();
+    }
+
+    getInvitacionesForGym(gymId: string): Signal<Invitacion[]> {
+        if (!this.isListenerInitialized) {
+            this.initializeListener(gymId);
         }
         return this._invitaciones.asReadonly();
     }

@@ -37,12 +37,21 @@ export class DesafioService {
         return runInInjectionContext(this.injector, callback as any);
     }
 
-    private initializeListener(): void {
+    /**
+     * Inicializa listener.
+     * Si se pasa gymId, filtra por gimnasio (recomendado para entrenados/social).
+     */
+    private initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            const q = query(col, where('activo', '==', true));
+            let q = query(col, where('activo', '==', true));
+
+            if (gymId) {
+                q = query(col, where('activo', '==', true), where('gimnasioId', '==', gymId));
+            }
+
             onSnapshot(q, (snap: QuerySnapshot) => {
                 this.runInZone(() => {
                     const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
@@ -58,6 +67,14 @@ export class DesafioService {
     get desafios(): Signal<Desafio[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
+        }
+        return this._desafios.asReadonly();
+    }
+
+    /** Versión gym-scoped (mejor para sección de entrenados) */
+    getDesafiosForGym(gymId: string): Signal<Desafio[]> {
+        if (!this.isListenerInitialized) {
+            this.initializeListener(gymId);
         }
         return this._desafios.asReadonly();
     }

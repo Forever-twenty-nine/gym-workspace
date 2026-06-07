@@ -56,7 +56,7 @@ import {
 })
 export class EncuentroDetalleModalComponent {
     @Input() isOpen = false;
-    @Input() encuentro: any = null;
+    @Input() encuentro: import('gym-library').Convocatoria | null = null;
     @Output() didDismiss = new EventEmitter<void>();
     @Output() irASocial = new EventEmitter<void>();
 

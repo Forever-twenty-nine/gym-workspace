@@ -116,6 +116,7 @@ export async function seedMatches(
         interesOrigen: m.interesOrigen,
         interesDestino: m.interesDestino,
         mutuo: m.mutuo,
+        gimnasioId: m.gimnasioId ?? config.gym.id,
       });
       await db.collection("matches").doc(m.id).set(toFirestoreWrite(match));
       stats.matchesCreated++;

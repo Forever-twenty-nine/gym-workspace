@@ -106,8 +106,8 @@ export class ChatListModalComponent {
     this.modalCtrl.dismiss();
   }
 
-  onSearch(event: any) {
-    this.searchQuery.set(event.detail.value || '');
+  onSearch(event: { detail?: { value?: string | null } }) {
+    this.searchQuery.set(event.detail?.value || '');
   }
 
   formatTime(date?: Date): string {

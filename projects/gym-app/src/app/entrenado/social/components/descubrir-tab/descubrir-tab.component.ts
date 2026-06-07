@@ -37,7 +37,10 @@ export class DescubrirTabComponent {
 
   currentIndex = signal<number>(0);
   animacionCard = signal<string>('scale-100 opacity-100 translate-x-0 rotate-0');
-  matchActual = signal<any>(null); // Datos del match mutuo para popup
+
+  // Track if we are in the middle of a swipe exit so transitionend knows what to do
+  private isExiting = signal(false);
+  matchActual = signal<any>(null); // Datos del match mutuo para popup (kept any for complex union of types)
 
   currentEntrenado = computed(() => {
     const user = this.authService.currentUser();
@@ -72,7 +75,7 @@ export class DescubrirTabComponent {
   desafiosActivos = computed(() => {
     const gimnasioId = this.authService.currentUser()?.gimnasioId;
     if (!gimnasioId) return [];
-    return this.desafioService.getDesafiosByGimnasio(gimnasioId)();
+    return this.desafioService.getDesafiosForGym(gimnasioId)();
   });
 
   // Mazo combinado de tarjetas (Afinidad, Horario, Desafíos)
@@ -82,10 +85,11 @@ export class DescubrirTabComponent {
 
     // Note: the enriched sugerencias* already read users(), so this list will re-compute when users arrive.
     // Obtener interacciones existentes del usuario
-    const interactions = this.matchService.getInteractions(curr.id)();
+    const gymId = this.authService.currentUser()?.gimnasioId;
+    const interactions = this.matchService.getInteractions(curr.id, gymId)();
     const interactedIds = new Set(interactions.map(i => i.referenciaId || i.usuarioDestinoId));
 
-    const list: Array<{ id: string, tipo: 'horario' | 'desafio' | 'afinidad', data: any, photoURL?: string | null }> = [];
+    const list: Array<{ id: string, tipo: 'horario' | 'desafio' | 'afinidad', data: any, photoURL?: string | null }> = []; // data kept as any for mixed Entrenado/Desafio shapes from matching logic
 
     // 1. Sugerencias de Horario (already enriched with photoURL in the suggestion computed)
     const horario = this.sugerenciasHorario();
@@ -163,15 +167,9 @@ export class DescubrirTabComponent {
   }
 
   pasar() {
-    // Animación de deslizamiento a la izquierda
+    // Start exit animation to the left. The actual deck advance happens on transitionend.
+    this.isExiting.set(true);
     this.animacionCard.set('-translate-x-full opacity-0 scale-95 rotate-[-10deg] transition-all duration-300');
-    setTimeout(() => {
-      this.currentIndex.update(idx => idx + 1);
-      this.animacionCard.set('translate-y-4 opacity-0 scale-95 rotate-0');
-      setTimeout(() => {
-        this.animacionCard.set('scale-100 opacity-100 translate-x-0 rotate-0 transition-all duration-300');
-      }, 50);
-    }, 300);
   }
 
   async chocarLos5() {
@@ -189,7 +187,8 @@ export class DescubrirTabComponent {
       targetUserId = active.data.id;
     }
 
-    // Animación de deslizamiento a la derecha
+    // Start exit animation to the right. Deck advance is handled in onCardTransitionEnd().
+    this.isExiting.set(true);
     this.animacionCard.set('translate-x-full opacity-0 scale-95 rotate-[10deg] transition-all duration-300');
 
     try {
@@ -221,17 +220,14 @@ export class DescubrirTabComponent {
         });
       }
 
-      setTimeout(() => {
-        this.currentIndex.update(idx => idx + 1);
-        this.animacionCard.set('translate-y-4 opacity-0 scale-95 rotate-0');
-        setTimeout(() => {
-          this.animacionCard.set('scale-100 opacity-100 translate-x-0 rotate-0 transition-all duration-300');
-        }, 50);
-      }, 300);
+      // Note: we no longer advance the deck here with setTimeout.
+      // The transitionend handler will do it after the visual exit completes.
+      // If it was a match, the popup is shown independently.
 
     } catch (e) {
       console.error(e);
       // Revertir animación en caso de error
+      this.isExiting.set(false);
       this.animacionCard.set('scale-100 opacity-100 translate-x-0 rotate-0 transition-all duration-300');
     }
   }
@@ -255,6 +251,26 @@ export class DescubrirTabComponent {
 
   cerrarMatch() {
     this.matchActual.set(null);
+  }
+
+  /**
+   * Called when the card wrapper finishes its CSS transition.
+   * This replaces the previous nested setTimeout approach for swipe animations.
+   */
+  onCardTransitionEnd() {
+    if (!this.isExiting()) return;
+
+    // Exit animation finished → advance the deck
+    this.currentIndex.update(idx => idx + 1);
+
+    // Briefly set an "incoming" pose without transition
+    this.animacionCard.set('translate-y-4 opacity-0 scale-95 rotate-0 transition-none');
+
+    // Next frame: enable transitions and animate to the idle state
+    requestAnimationFrame(() => {
+      this.animacionCard.set('scale-100 opacity-100 translate-x-0 rotate-0 transition-all duration-300');
+      this.isExiting.set(false);
+    });
   }
 }
 

@@ -171,7 +171,8 @@ export const gymPremiumAllPremiumConfig: SeedConfig = {
       usuarioDestinoId: 'trainee_mariagarciapremium',
       interesOrigen: true,
       interesDestino: true,
-      mutuo: true
+      mutuo: true,
+      gimnasioId: "gym_premium_all_premium"
     }
   ],
   // 5 ejercicios creados por Juan Perez Premium (para probar la sección "Mis Creaciones")

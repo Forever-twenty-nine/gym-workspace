@@ -58,7 +58,8 @@ export const ptFreeAllFreeConfig: SeedConfig = {
       usuarioDestinoId: "trainee_mariaalumnafree",
       interesOrigen: true,
       interesDestino: true,
-      mutuo: true
+      mutuo: true,
+      gimnasioId: "pt_free_all_free"
     }
   ]
 };

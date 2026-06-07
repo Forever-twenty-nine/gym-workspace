@@ -9,4 +9,5 @@ export interface MatchInteraction {
     mutuo: boolean;
     fechaCreacion: Date;
     fechaMatch?: Date;
+    gimnasioId?: string; // Denormalizado para scoping de listeners y queries por gimnasio
 }

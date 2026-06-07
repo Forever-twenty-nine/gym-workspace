@@ -1,4 +1,4 @@
-import { Component, Input, inject, computed, signal, ViewChild, effect } from '@angular/core';
+import { Component, Input, inject, computed, signal, ViewChild, effect, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -81,9 +81,12 @@ export class ChatDetailModalComponent {
   }
 
   scrollToBottom(delay = 100) {
-    setTimeout(() => {
-      this.content?.scrollToBottom(300).catch(() => {});
-    }, delay);
+    // Use afterNextRender for post-DOM updates instead of setTimeout when possible
+    afterNextRender(() => {
+      setTimeout(() => {
+        this.content?.scrollToBottom(300).catch(() => {});
+      }, delay);
+    });
   }
 
   private async marcarMensajesComoLeidos(currentId: string, otherId: string, msgs: Mensaje[]) {
@@ -96,9 +99,9 @@ export class ChatDetailModalComponent {
     }
   }
 
-  async enviarMensaje(event?: any) {
+  async enviarMensaje(event?: Event) {
     // Si se presiona Enter pero con shift, permitir salto de línea
-    if (event && event.shiftKey) return;
+    if (event && (event as KeyboardEvent).shiftKey) return;
     if (event) event.preventDefault();
 
     const txt = this.nuevoMensaje().trim();

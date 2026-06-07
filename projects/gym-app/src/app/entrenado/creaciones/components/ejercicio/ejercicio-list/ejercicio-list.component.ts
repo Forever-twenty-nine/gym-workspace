@@ -35,7 +35,7 @@ import { add, trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
   templateUrl: './ejercicio-list.component.html'
 })
 export class EjercicioListComponent {
-  @Input() ejercicios: any[] = [];
+  @Input() ejercicios: import('gym-library').Ejercicio[] = [];
   @Input() isPremium = false;
 
   private _ownIds = new Set<string>();
@@ -50,7 +50,7 @@ export class EjercicioListComponent {
 
   @Output() create = new EventEmitter<void>();
   @Output() delete = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<any>();
+  @Output() edit = new EventEmitter<import('gym-library').Ejercicio>();
 
   constructor() {
     addIcons({ add, trashOutline, lockClosed, pencilOutline });
@@ -69,7 +69,7 @@ export class EjercicioListComponent {
     this.delete.emit(id);
   }
 
-  onEdit(item: any, event?: Event) {
+  onEdit(item: import('gym-library').Ejercicio, event?: Event) {
     if (event) event.stopPropagation();
     this.edit.emit(item);
   }

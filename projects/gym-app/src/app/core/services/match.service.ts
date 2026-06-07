@@ -12,7 +12,8 @@ import {
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot,
-    updateDoc
+    updateDoc,
+    getDocs
 } from 'firebase/firestore';
 import { MatchInteraction, Entrenado, Rol, TipoMensaje, TipoNotificacion } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -40,10 +41,11 @@ export class MatchService {
     constructor() { }
 
     /**
-     * Retorna una señal reactiva con todas las interacciones de match que involucran al usuario
+     * Retorna una señal reactiva con todas las interacciones de match que involucran al usuario.
+     * Si se pasa gymId, el listener se inicializa con filtro adicional por gimnasio (para scoping).
      */
-    getInteractions(userId: string): Signal<MatchInteraction[]> {
-        this.initializeListener(userId);
+    getInteractions(userId: string, gymId?: string): Signal<MatchInteraction[]> {
+        this.initializeListener(userId, gymId);
         return this._interactions.asReadonly();
     }
 
@@ -54,23 +56,44 @@ export class MatchService {
         return runInInjectionContext(this.injector, callback as any);
     }
 
-    private initializeListener(userId: string): void {
+    private initializeListener(userId: string, gymId?: string): void {
         if (this.isListenerInitialized) return;
 
         try {
             const col = collection(this.firestore, this.COLLECTION);
-            // Escuchar interacciones que involucran al usuario actual
-            const q = query(col, where('usuarioOrigenId', '==', userId));
-            onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._interactions.set(list);
-                });
+
+            // Construir queries con filtro por gimnasio si se provee (para scoping en entrenados)
+            let qOrigen = query(col, where('usuarioOrigenId', '==', userId));
+            let qDestino = query(col, where('usuarioDestinoId', '==', userId));
+
+            if (gymId) {
+                qOrigen = query(col, where('usuarioOrigenId', '==', userId), where('gimnasioId', '==', gymId));
+                qDestino = query(col, where('usuarioDestinoId', '==', userId), where('gimnasioId', '==', gymId));
+            }
+
+            // Escuchar interacciones donde el usuario es origen O destino
+            onSnapshot(qOrigen, (snap) => {
+                this.mergeInteractions(snap, userId);
             });
+
+            onSnapshot(qDestino, (snap) => {
+                this.mergeInteractions(snap, userId);
+            });
+
             this.isListenerInitialized = true;
         } catch (e) {
             console.warn('Error inicializando listener de matches:', e);
         }
+    }
+
+    private mergeInteractions(snap: QuerySnapshot, userId: string) {
+        this.runInZone(() => {
+            const current = this._interactions();
+            const newOnes = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+            const merged = new Map<string, MatchInteraction>();
+            [...current, ...newOnes].forEach(i => merged.set(i.id, i));
+            this._interactions.set(Array.from(merged.values()));
+        });
     }
 
     /**
@@ -88,7 +111,11 @@ export class MatchService {
         return this.runInZone(async () => {
             const matchesCol = collection(this.firestore, this.COLLECTION);
 
-            // 1. Buscar si existe interés inverso previo
+            // Obtener gimnasioId del usuario origen para denormalizarlo en el match
+            const originUserProfile = this.userService.getUserByUid(usuarioOrigenId)();
+            const gimnasioId = originUserProfile?.gimnasioId;
+
+            // 1. Buscar si existe interés inverso previo (one-time read, sin listener)
             const qInverse = query(
                 matchesCol,
                 where('usuarioOrigenId', '==', usuarioDestinoId),
@@ -96,20 +123,12 @@ export class MatchService {
                 where('tipo', '==', tipo)
             );
 
-            // Obtener documentos de coincidencia inversa
+            const inverseSnap = await getDocs(qInverse);
             let inverseMatchDoc: any = null;
-            await new Promise<void>((resolve) => {
-                onSnapshot(qInverse, (snap) => {
-                    if (!snap.empty) {
-                        const docData = snap.docs[0];
-                        inverseMatchDoc = { ...docData.data(), id: docData.id };
-                    }
-                    resolve();
-                }, (err) => {
-                    console.error(err);
-                    resolve();
-                });
-            });
+            if (!inverseSnap.empty) {
+                const docData = inverseSnap.docs[0];
+                inverseMatchDoc = { ...docData.data(), id: docData.id };
+            }
 
             // Si hay un desafío específico, validar referenciaId
             if (tipo === 'desafio' && inverseMatchDoc && inverseMatchDoc.referenciaId !== referenciaId) {
@@ -123,7 +142,8 @@ export class MatchService {
                 await updateDoc(inverseRef, {
                     interesDestino: true,
                     mutuo: true,
-                    fechaMatch: Timestamp.now()
+                    fechaMatch: Timestamp.now(),
+                    ...(gimnasioId && { gimnasioId })   // asegurar denormalización
                 });
 
                 // B. Crear la interacción de origen ya marcada como mutua
@@ -138,7 +158,8 @@ export class MatchService {
                     interesDestino: true,
                     mutuo: true,
                     fechaCreacion: new Date(),
-                    fechaMatch: new Date()
+                    fechaMatch: new Date(),
+                    gimnasioId
                 };
                 await setDoc(doc(this.firestore, this.COLLECTION, interactionId), this.mapToFirestore(newInteraction));
 
@@ -219,7 +240,8 @@ export class MatchService {
                     referenciaId,
                     interesOrigen: true,
                     mutuo: false,
-                    fechaCreacion: new Date()
+                    fechaCreacion: new Date(),
+                    gimnasioId
                 };
                 await setDoc(doc(this.firestore, this.COLLECTION, interactionId), this.mapToFirestore(newInteraction));
                 return false; // Esperando interés mutuo
@@ -332,7 +354,8 @@ export class MatchService {
             interesDestino: data.interesDestino ?? false,
             mutuo: data.mutuo ?? false,
             fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date()),
-            fechaMatch: data.fechaMatch instanceof Timestamp ? data.fechaMatch.toDate() : (data.fechaMatch ? new Date(data.fechaMatch) : undefined)
+            fechaMatch: data.fechaMatch instanceof Timestamp ? data.fechaMatch.toDate() : (data.fechaMatch ? new Date(data.fechaMatch) : undefined),
+            gimnasioId: data.gimnasioId || undefined
         };
     }
 
@@ -350,6 +373,9 @@ export class MatchService {
         if (interaction.interesDestino !== undefined) data.interesDestino = interaction.interesDestino;
         if (interaction.fechaMatch) {
             data.fechaMatch = interaction.fechaMatch instanceof Date ? Timestamp.fromDate(interaction.fechaMatch) : interaction.fechaMatch;
+        }
+        if (interaction.gimnasioId) {
+            data.gimnasioId = interaction.gimnasioId;
         }
 
         return data;

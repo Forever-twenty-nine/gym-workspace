@@ -9,6 +9,7 @@ import { EntrenadoService } from '../../../../../core/services/entrenado.service
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { RutinaAsignadaService } from '../../../../../core/services/rutina-asignada.service';
+import { Plan } from 'gym-library';
 
 @Component({
   selector: 'app-rutina-modal',
@@ -46,7 +47,7 @@ export class RutinaModalComponent implements OnChanges {
   private toastCtrl = inject(ToastController);
 
   @Input() isOpen = false;
-  @Input() item: any = null;
+  @Input() item: import('gym-library').Rutina | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -62,13 +63,8 @@ export class RutinaModalComponent implements OnChanges {
     if (!uid) return [];
 
     const entrenado = this.entrenadoService.getEntrenado(uid)();
-    const ownIds = new Set<string>(entrenado?.ejerciciosCreadosIds || []);
-
-    this.ejercicioService.ejercicios().forEach(e => {
-      if (e.creadorId === uid) ownIds.add(e.id);
-    });
-
-    return this.ejercicioService.ejercicios().filter(e => ownIds.has(e.id));
+    const legacyIds = entrenado?.ejerciciosCreadosIds || [];
+    return this.ejercicioService.getCreatedByUser(uid, legacyIds)();
   });
 
   // Semana comienza en Lunes (estándar en la mayoría de países de habla hispana)
@@ -129,7 +125,7 @@ export class RutinaModalComponent implements OnChanges {
     }
   }
 
-  onDiasChange(event: any) {
+  onDiasChange(event: { detail?: { value?: string[] } }) {
     const value: string[] = event?.detail?.value ?? [];
     this.form.get('diasSemana')?.setValue(value);
   }
@@ -152,6 +148,15 @@ export class RutinaModalComponent implements OnChanges {
 
     const uid = user.uid;
 
+    if (!this.isEditing) {
+      const plan = this.authService.currentUser()?.plan;
+      if (plan !== Plan.PREMIUM) {
+        this.showToast('La creación de rutinas personalizadas es exclusiva para usuarios Premium 🔒', 'warning');
+        this.closeModal();
+        return;
+      }
+    }
+
     this.saving.set(true);
     try {
       const formValue = this.form.value;
@@ -160,7 +165,7 @@ export class RutinaModalComponent implements OnChanges {
       const dias = (formValue.diasSemana || []).slice();
       dias.sort((a: string, b: string) => order.indexOf(a) - order.indexOf(b));
 
-      let rutinaData: any;
+      let rutinaData: Partial<import('gym-library').Rutina>;
 
       if (this.isEditing && this.item) {
         rutinaData = {
@@ -177,15 +182,14 @@ export class RutinaModalComponent implements OnChanges {
           descripcion: (formValue.descripcion || '').trim(),
           ejerciciosIds: this.selectedIds(),
           diasSemana: dias,
-          creadorId: uid,
-          asignadoIds: []
+          creadorId: uid
         };
       }
 
-      await this.rutinaService.save(rutinaData);
+      await this.rutinaService.save(rutinaData as any);
 
       if (!this.isEditing) {
-        await this.entrenadoService.addRutinaCreada(uid, rutinaData.id);
+        await this.entrenadoService.addRutinaCreada(uid, rutinaData.id as any);
 
         // Crear asignaciones explícitas para que aparezcan en la vista semanal
         // y sean consistentes con el sistema de RutinaAsignada (notificaciones, etc.)
@@ -193,7 +197,7 @@ export class RutinaModalComponent implements OnChanges {
           try {
             await this.rutinaAsignadaService.save({
               id: `asig-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-              rutinaId: rutinaData.id,
+              rutinaId: rutinaData.id!,
               entrenadoId: uid,
               entrenadorId: uid, // auto-asignada por el propio usuario
               diaSemana: dia,
