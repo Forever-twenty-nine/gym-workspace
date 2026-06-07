@@ -1,121 +1,138 @@
-<ion-card class="m-0! rounded-[32px]! overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative w-full h-[460px] flex flex-col justify-between">
+<ion-card class="m-0! rounded-[32px]! overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative w-full h-[520px] flex flex-col">
   
   @switch (tipo) {
     @case ('horario') {
-      <div class="w-full h-full flex flex-col justify-between p-6">
-        <!-- Top section: Centered Profile/Initials -->
-        <div class="flex flex-col items-center text-center gap-4">
-          <div class="w-36 h-36 rounded-full overflow-hidden bg-emerald-500/10 flex items-center justify-center border-4 border-emerald-500/20 shadow-xl relative mt-2">
-            @if (userProfilePhoto()) {
-              <img [src]="userProfilePhoto()" alt="Perfil" class="w-full h-full object-cover">
-            } @else {
-              <div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-emerald-500/30 to-teal-500/30 text-emerald-500 font-black text-5xl tracking-widest">
-                {{ userInitials() }}
-              </div>
-            }
-          </div>
-          
-          <div class="flex flex-col items-center">
-            <span class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-emerald-500 mb-1.5 flex items-center gap-1">
-              <ion-icon name="time-outline"></ion-icon> Coincidencia de Horario ⚡
-            </span>
-            <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight mb-2">
-              {{ userName() }}
-            </h3>
-            <div class="flex flex-wrap justify-center gap-1.5">
-              @if (data.nivel) {
-                <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {{ data.nivel }}
-                </span>
-              }
-              @if (data.objetivo) {
-                <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-md bg-teal-500/15 text-teal-650 dark:text-teal-400 border border-teal-500/20">
-                  {{ data.objetivo }}
-                </span>
-              }
-            </div>
-          </div>
-        </div>
+      <!-- NOMBRE ARRIBA DE LA FOTO (compacto) -->
+      <div class="px-3 pt-2.5 pb-1.5 flex-shrink-0">
+        <h3 class="text-[18px] font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">
+          {{ userName() }}
+        </h3>
+      </div>
 
-        <!-- Middle section: Rango Horario Pill -->
-        <div class="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-4 flex items-center gap-3 mx-2 my-auto">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-500 shadow-md">
-            <ion-icon name="time-outline" class="text-2xl"></ion-icon>
-          </div>
-          <div class="text-left">
-            <p class="text-[10px] uppercase tracking-wider font-extrabold text-gray-400 leading-none mb-1">Rango Horario</p>
-            <p class="text-lg font-black text-emerald-600 dark:text-emerald-400 leading-none">
-              {{ data.franjaHoraria?.inicio }} a {{ data.franjaHoraria?.fin }}
-            </p>
-          </div>
-        </div>
-
-        <!-- Bottom Action Button -->
-        @if (showActions) {
-          <div class="w-full mt-2">
-            <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full rounded-2xl! overflow-hidden font-black text-sm tracking-wide premium-button" color="success" style="--border-radius: 16px;">
-              <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'hand-right-outline'" slot="start"></ion-icon>
-              {{ matchConcretado() ? '¡Hay equipo!' : interacted() ? 'Interés Enviado' : 'Chocar los 5 🖐️' }}
-            </ion-button>
+      <!-- FOTO AÚN MÁS GRANDE -->
+      <div class="relative w-full h-[390px] flex-shrink-0 overflow-hidden bg-emerald-500/10">
+        @if (safePhoto()) {
+          <img 
+            [src]="safePhoto()" 
+            alt="Perfil" 
+            class="absolute inset-0 w-full h-full object-cover"
+            (error)="onPhotoError()">
+        } @else {
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-emerald-600/30">
+            <div class="text-emerald-500 font-black text-7xl tracking-[4px] opacity-80">{{ userInitials() }}</div>
           </div>
         }
-      </div>
-    }
-
-    @case ('desafio') {
-      <div class="w-full h-full flex flex-col justify-between p-6">
-        <!-- Top section: Challenge Badge & Header -->
-        <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-28 h-28 rounded-3xl bg-amber-500/15 flex items-center justify-center text-amber-500 border border-amber-500/25 shadow-xl mb-1 relative overflow-hidden mt-2">
-            <ion-icon name="trophy-outline" class="text-6xl animate-bounce"></ion-icon>
-          </div>
-          
-          <div class="flex flex-col items-center">
-            <span class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-amber-600 dark:text-amber-400 mb-1.5 flex items-center gap-1">
-              <ion-icon name="trophy-outline"></ion-icon> Desafío Cruzado 🔥
-            </span>
-            <h3 class="text-base font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none m-0">
-              Competencia y Retos
-            </h3>
-          </div>
+        
+        <!-- Badge mínimo (sin icono grande) -->
+        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur text-emerald-300 text-[8px] font-bold tracking-widest">
+          HORARIO
         </div>
+      </div>
 
-        <!-- Middle section: Challenge Title Box -->
-        <div class="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-5 relative overflow-hidden mx-2 my-auto flex flex-col justify-center min-h-[100px]">
-          <ion-icon name="trophy-outline" class="absolute -right-4 -bottom-4 text-7xl text-amber-500/5 pointer-events-none"></ion-icon>
-          <p class="text-base font-black text-gray-900 dark:text-white leading-snug tracking-tight text-center m-0">
-            "{{ data.titulo }}"
-          </p>
-          
-          @if (data.logroRelacionado) {
-            <div class="text-[10px] font-semibold text-gray-600 dark:text-gray-400 flex items-center justify-center gap-1.5 mt-3">
-              <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold uppercase text-[8px] tracking-wide">Récord</span>
-              {{ data.logroRelacionado }}
-            </div>
+      <!-- INFO UNIFICADA DEBAJO DE LA FOTO (menos iconos) -->
+      <div class="px-3 pt-1.5 pb-1 text-[11px] flex flex-col gap-1">
+        <!-- Datos unificados -->
+        <div class="flex items-center gap-2 flex-wrap text-emerald-700 dark:text-emerald-300">
+          @if (data.nivel) {
+            <span class="font-semibold">{{ data.nivel }}</span>
+          }
+          @if (data.objetivo) {
+            <span class="font-semibold">· {{ data.objetivo }}</span>
+          }
+          @if (data.franjaHoraria) {
+            <span class="font-black text-emerald-600 dark:text-emerald-400">
+              {{ data.franjaHoraria.inicio }} — {{ data.franjaHoraria.fin }}
+            </span>
           }
         </div>
 
-        <!-- Bottom section: Creator Profile & Action -->
-        <div class="flex flex-col gap-3">
-          <div class="flex items-center justify-center gap-2.5 border-t border-white/10 pt-4">
-            <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-200/50 flex items-center justify-center border border-white/20">
+        <!-- Descripción del usuario -->
+        @if (data.bio) {
+          <p class="text-gray-600 dark:text-gray-300 text-[11px] leading-snug line-clamp-2">
+            “{{ data.bio }}”
+          </p>
+        }
+
+        <!-- Coincidencia con el usuario actual -->
+        <div class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold mt-auto">
+          Coincide contigo en tu horario
+        </div>
+      </div>
+
+      <!-- Bottom Action (solo si showActions) -->
+      @if (showActions) {
+        <div class="px-3 pb-2">
+          <ion-button 
+            expand="block" 
+            (click)="interactuar()" 
+            [disabled]="interacted()" 
+            class="w-full rounded-3xl overflow-hidden font-extrabold text-sm tracking-wider"
+            color="success"
+            style="--border-radius: 18px; height: 46px; --padding-top: 0; --padding-bottom: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'hand-right-outline'" slot="start" style="font-size: 18px;"></ion-icon>
+            <span style="letter-spacing: 0.5px;">{{ matchConcretado() ? '¡Hay equipo!' : interacted() ? 'Interés Enviado' : 'Chocar los 5 🖐️' }}</span>
+          </ion-button>
+        </div>
+      }
+    }
+
+    @case ('desafio') {
+      <div class="w-full h-full flex flex-col justify-between p-5">
+        <!-- Icono más pequeño -->
+        <div class="flex flex-col items-center text-center gap-2 pt-2">
+          <div class="w-20 h-20 rounded-3xl bg-amber-500/15 flex items-center justify-center text-amber-500 border border-amber-500/25 shadow-xl">
+            <ion-icon name="trophy-outline" class="text-5xl"></ion-icon>
+          </div>
+          
+          <div>
+            <span class="text-[9px] uppercase tracking-[0.2em] font-extrabold text-amber-600 dark:text-amber-400 flex items-center justify-center gap-1">
+              <ion-icon name="trophy-outline"></ion-icon> DESAFÍO
+            </span>
+          </div>
+        </div>
+
+        <!-- Título del desafío - más protagonista -->
+        <div class="flex-1 flex items-center px-2">
+          <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 w-full">
+            <p class="text-base font-black text-gray-900 dark:text-white leading-snug tracking-tight text-center m-0">
+              "{{ data.titulo }}"
+            </p>
+            @if (data.logroRelacionado) {
+              <div class="text-[9px] font-semibold text-amber-700 dark:text-amber-300 flex items-center justify-center gap-1 mt-2">
+                <span class="px-1.5 py-px rounded bg-amber-500/20 text-[7px] tracking-wide">RÉCORD</span>
+                {{ data.logroRelacionado }}
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Creador pequeño + acción -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center justify-center gap-2 text-center border-t border-white/10 pt-3">
+            <div class="w-6 h-6 rounded-full overflow-hidden bg-gray-200/50 flex items-center justify-center border border-white/20">
               @if (userProfilePhoto()) {
                 <img [src]="userProfilePhoto()" alt="Creador" class="w-full h-full object-cover">
               } @else {
-                <ion-icon name="person-outline" class="text-sm text-gray-500"></ion-icon>
+                <ion-icon name="person-outline" class="text-xs text-gray-500"></ion-icon>
               }
             </div>
             <div class="text-left">
-              <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200 leading-none mb-0.5">{{ userName() }}</p>
-              <p class="text-[9px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider leading-none">Creador del Reto</p>
+              <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200 leading-none">{{ userName() }}</p>
+              <p class="text-[8px] text-gray-500 dark:text-gray-400">creador del reto</p>
             </div>
           </div>
 
           @if (showActions) {
-            <div class="w-full">
-              <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full rounded-2xl! overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'warning'" style="--border-radius: 16px;">
-                <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'flame-outline'" slot="start"></ion-icon>
-                {{ matchConcretado() ? '¡Desafío Aceptado!' : interacted() ? 'Reto Enviado' : 'Aceptar Desafío' }}
+            <div class="px-1 pb-1">
+              <ion-button 
+                expand="block" 
+                (click)="interactuar()" 
+                [disabled]="interacted()" 
+                class="w-full rounded-3xl overflow-hidden font-extrabold text-sm tracking-wider"
+                [color]="matchConcretado() ? 'success' : 'warning'"
+                style="--border-radius: 18px; height: 46px; --padding-top: 0; --padding-bottom: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'flame-outline'" slot="start" style="font-size: 18px;"></ion-icon>
+                <span style="letter-spacing: 0.5px;">{{ matchConcretado() ? '¡Desafío Aceptado!' : interacted() ? 'Reto Enviado' : 'Aceptar Desafío' }}</span>
               </ion-button>
             </div>
           }
@@ -124,71 +141,77 @@
     }
 
     @case ('afinidad') {
-      <div class="w-full h-full flex flex-col justify-between p-6">
-        <!-- Top section: Centered Profile/Initials -->
-        <div class="flex flex-col items-center text-center gap-3">
-          <div class="w-36 h-36 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center border-4 border-primary/20 shadow-xl relative mt-2">
-            @if (userProfilePhoto()) {
-              <img [src]="userProfilePhoto()" alt="Perfil" class="w-full h-full object-cover">
-            } @else {
-              <div class="w-full h-full flex items-center justify-center bg-gradient-to-tr from-primary/30 to-indigo-500/30 text-primary font-black text-5xl tracking-widest">
-                {{ userInitials() }}
-              </div>
-            }
-          </div>
-          
-          <div class="flex flex-col items-center">
-            <span class="text-[10px] uppercase tracking-[0.2em] font-extrabold text-primary mb-1.5 flex items-center gap-1">
-              <ion-icon name="people-outline"></ion-icon> Partner de Ruta 🏋️‍♂️💪
-            </span>
-            <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight mb-2">
-              {{ userName() }}
-            </h3>
-            <div class="flex flex-wrap justify-center gap-1.5">
-              @if (data.nivel) {
-                <span class="text-[9px] font-extrabold uppercase px-2.5 py-1 rounded-md bg-primary/15 text-primary border border-primary/20">
-                  {{ data.nivel }}
-                </span>
-              }
-            </div>
-          </div>
-        </div>
+      <!-- NOMBRE ARRIBA DE LA FOTO (compacto) -->
+      <div class="px-3 pt-2.5 pb-1.5 flex-shrink-0">
+        <h3 class="text-[18px] font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">
+          {{ userName() }}
+        </h3>
+      </div>
 
-        <!-- Middle section: Bio Quote -->
-        @if (data.bio) {
-          <div class="bg-gray-150/10 dark:bg-gray-900/40 border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center mx-2 my-auto">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 leading-relaxed italic text-center m-0">
-              "{{ data.bio }}"
-            </p>
+      <!-- FOTO AÚN MÁS GRANDE -->
+      <div class="relative w-full h-[390px] flex-shrink-0 overflow-hidden bg-primary/10">
+        @if (safePhoto()) {
+          <img 
+            [src]="safePhoto()" 
+            alt="Perfil" 
+            class="absolute inset-0 w-full h-full object-cover"
+            (error)="onPhotoError()">
+        } @else {
+          <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/30 via-indigo-500/20 to-primary/40">
+            <div class="text-primary font-black text-7xl tracking-[4px] opacity-80">{{ userInitials() }}</div>
           </div>
         }
+        
+        <!-- Badge mínimo (sin icono) -->
+        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur text-primary text-[8px] font-bold tracking-widest">
+          AFINIDAD
+        </div>
+      </div>
 
-        <!-- Training specifications (Objetivo, Horario) -->
-        <div class="flex flex-wrap justify-center gap-2 mb-2 px-2">
+      <!-- INFO UNIFICADA DEBAJO DE LA FOTO (menos iconos) -->
+      <div class="px-3 pt-1.5 pb-1 text-[11px] flex flex-col gap-1">
+        <!-- Datos unificados -->
+        <div class="flex items-center gap-2 flex-wrap text-primary">
+          @if (data.nivel) {
+            <span class="font-semibold">{{ data.nivel }}</span>
+          }
           @if (data.objetivo) {
-            <span class="text-[10px] font-black text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-xl flex items-center gap-1">
-              <ion-icon name="barbell-outline" class="text-xs"></ion-icon>
-              {{ data.objetivo }}
-            </span>
+            <span class="font-semibold">· {{ data.objetivo }}</span>
           }
           @if (data.franjaHoraria) {
-            <span class="text-[10px] font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-xl flex items-center gap-1">
-              <ion-icon name="time-outline" class="text-xs"></ion-icon>
-              {{ data.franjaHoraria.inicio }} - {{ data.franjaHoraria.fin }}
+            <span class="font-black text-emerald-600 dark:text-emerald-400">
+              {{ data.franjaHoraria.inicio }} — {{ data.franjaHoraria.fin }}
             </span>
           }
         </div>
 
-        <!-- Bottom Action Button -->
-        @if (showActions) {
-          <div class="w-full">
-            <ion-button expand="block" (click)="interactuar()" [disabled]="interacted()" class="w-full rounded-2xl! overflow-hidden font-black text-sm tracking-wide premium-button" [color]="matchConcretado() ? 'success' : 'primary'" style="--border-radius: 16px;">
-              <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'people-outline'" slot="start"></ion-icon>
-              {{ matchConcretado() ? '¡Hay equipo!' : interacted() ? 'Interés Enviado' : '¿Entrenamos? 🤝' }}
-            </ion-button>
-          </div>
+        <!-- Descripción del usuario -->
+        @if (data.bio) {
+          <p class="text-gray-600 dark:text-gray-300 text-[11px] leading-snug line-clamp-2">
+            “{{ data.bio }}”
+          </p>
         }
+
+        <!-- Coincidencia con el usuario actual -->
+        <div class="text-primary text-[10px] font-semibold mt-auto">
+          Coincide contigo en tu objetivo
+        </div>
       </div>
+
+      @if (showActions) {
+        <div class="px-3 pb-2">
+          <ion-button 
+            expand="block" 
+            (click)="interactuar()" 
+            [disabled]="interacted()" 
+            class="w-full rounded-3xl overflow-hidden font-extrabold text-sm tracking-wider"
+            [color]="matchConcretado() ? 'success' : 'primary'"
+            style="--border-radius: 18px; height: 46px; --padding-top: 0; --padding-bottom: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <ion-icon [name]="matchConcretado() ? 'chatbubbles-outline' : 'people-outline'" slot="start" style="font-size: 18px;"></ion-icon>
+            <span style="letter-spacing: 0.5px;">{{ matchConcretado() ? '¡Hay equipo!' : interacted() ? 'Interés Enviado' : '¿Entrenamos? 🤝' }}</span>
+          </ion-button>
+        </div>
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, Input, inject, computed, signal } from '@angular/core';
+import { Component, Input, inject, computed, signal, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
    IonCard, IonButton, IonIcon, ToastController
@@ -6,7 +6,7 @@ import {
 import { addIcons } from 'ionicons';
 import {
    barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline
+   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline, peopleOutline
  } from 'ionicons/icons';
 import { MatchService } from '../../../../core/services/match.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -21,7 +21,7 @@ import { Entrenado } from 'gym-library';
   ],
   templateUrl: './match-card.component.html'
 })
-export class MatchCardComponent {
+export class MatchCardComponent implements OnChanges {
   private readonly matchService = inject(MatchService);
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
@@ -30,12 +30,17 @@ export class MatchCardComponent {
   @Input({ required: true }) tipo!: 'desafio' | 'afinidad' | 'horario';
   @Input({ required: true }) data!: any; // Perfil de Entrenado o Desafio
   @Input() showActions = true;
+  @Input() photoURL: string | null = null; // resolved from parent for reliable first-load photos
+  @Input() photoVersion: number = 0; // bumped by parent when users first load → forces re-evaluation of photo computeds
 
   currentUser = this.authService.currentUser;
   
   // Estado local para evitar doble submit
   interacted = signal<boolean>(false);
   matchConcretado = signal<boolean>(false);
+
+  // Para manejar fallback de foto que no carga en primera render
+  photoFailed = signal<boolean>(false);
 
   userName = computed(() => {
     if (!this.data) return 'Atleta';
@@ -45,24 +50,64 @@ export class MatchCardComponent {
     return this.data.id ? this.userService.getUserByUid(this.data.id)()?.nombre || 'Atleta' : 'Atleta';
   });
 
-  userProfilePhoto = computed(() => {
-    if (!this.data) return null;
-    if (this.tipo === 'desafio') {
-      return this.data.creadorFoto || null;
-    }
-    return this.data.id ? this.userService.getUserByUid(this.data.id)()?.photoURL || null : null;
-  });
-
   userInitials = computed(() => {
     const name = this.userName();
     if (!name || name === 'Atleta') return 'A';
     return name.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
   });
 
+  // Stable lookup (created once per card instance) so updates from UserService after first render are picked up
+  private readonly resolvedUser = computed(() => {
+    const id = this.data?.id;
+    if (!id || this.tipo === 'desafio') return null;
+    return this.userService.getUserByUid(id)();
+  });
+
+  userProfilePhoto = computed(() => {
+    // Reading photoVersion here makes this computed (and safePhoto) re-run
+    // whenever the parent bumps it on first users load.
+    const _ = this.photoVersion;
+
+    if (!this.data) return null;
+
+    // Prefer explicitly passed photoURL (from parent enriched list)
+    if (this.photoURL != null) {
+      return this.photoURL || null;
+    }
+
+    // If the data object itself is enriched with photoURL (from sugerencias* in parent)
+    if (this.data.photoURL != null) {
+      return this.data.photoURL || null;
+    }
+
+    if (this.tipo === 'desafio') {
+      return this.data.creadorFoto || null;
+    }
+
+    // Live reactive lookup (the resolvedUser computed depends on the UserService signal)
+    const user = this.resolvedUser();
+    return user?.photoURL || null;
+  });
+
+  safePhoto = computed(() => {
+    if (this.photoFailed()) return null;
+    return this.userProfilePhoto();
+  });
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data'] || changes['photoVersion']) {
+      this.photoFailed.set(false);
+    }
+  }
+
+  onPhotoError(): void {
+    this.photoFailed.set(true);
+  }
+
   constructor() {
     addIcons({
       barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline
+      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline, peopleOutline
     });
   }
 

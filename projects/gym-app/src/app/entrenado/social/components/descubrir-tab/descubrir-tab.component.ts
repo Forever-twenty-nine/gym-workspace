@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon, IonButton, ModalController, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -33,6 +33,7 @@ export class DescubrirTabComponent {
   private userService = inject(UserService);
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
+  private cdr = inject(ChangeDetectorRef);
 
   currentIndex = signal<number>(0);
   animacionCard = signal<string>('scale-100 opacity-100 translate-x-0 rotate-0');
@@ -44,14 +45,28 @@ export class DescubrirTabComponent {
     return this.entrenadoService.getEntrenado(user.uid)();
   });
 
+  // Enriched with photoURL so that photos are available as soon as UserService has data.
+  // Reading userService.users() here creates the dependency so these (and downstream tarjetas) re-compute when users load.
   sugerenciasAfinidad = computed(() => {
     const curr = this.currentEntrenado();
-    return curr ? this.matchService.getSugerenciasAfinidad(curr)() : [];
+    if (!curr) return [];
+    const base = this.matchService.getSugerenciasAfinidad(curr)();
+    const _ = this.userService.users(); // dependency for reactivity on first load
+    return base.map(u => ({
+      ...u,
+      photoURL: this.userService.getUserByUid(u.id)()?.photoURL || null
+    }));
   });
 
   sugerenciasHorario = computed(() => {
     const curr = this.currentEntrenado();
-    return curr ? this.matchService.getSugerenciasHorario(curr)() : [];
+    if (!curr) return [];
+    const base = this.matchService.getSugerenciasHorario(curr)();
+    const _ = this.userService.users(); // dependency for reactivity on first load
+    return base.map(u => ({
+      ...u,
+      photoURL: this.userService.getUserByUid(u.id)()?.photoURL || null
+    }));
   });
 
   desafiosActivos = computed(() => {
@@ -65,25 +80,26 @@ export class DescubrirTabComponent {
     const curr = this.currentEntrenado();
     if (!curr) return [];
 
+    // Note: the enriched sugerencias* already read users(), so this list will re-compute when users arrive.
     // Obtener interacciones existentes del usuario
     const interactions = this.matchService.getInteractions(curr.id)();
     const interactedIds = new Set(interactions.map(i => i.referenciaId || i.usuarioDestinoId));
 
-    const list: Array<{ id: string, tipo: 'horario' | 'desafio' | 'afinidad', data: any }> = [];
+    const list: Array<{ id: string, tipo: 'horario' | 'desafio' | 'afinidad', data: any, photoURL?: string | null }> = [];
 
-    // 1. Sugerencias de Horario
+    // 1. Sugerencias de Horario (already enriched with photoURL in the suggestion computed)
     const horario = this.sugerenciasHorario();
     for (const u of horario) {
       if (!interactedIds.has(u.id)) {
-        list.push({ id: `horario-${u.id}`, tipo: 'horario', data: u });
+        list.push({ id: `horario-${u.id}`, tipo: 'horario', data: u, photoURL: u.photoURL ?? null });
       }
     }
 
-    // 2. Sugerencias de Afinidad
+    // 2. Sugerencias de Afinidad (already enriched)
     const afinidad = this.sugerenciasAfinidad();
     for (const u of afinidad) {
       if (!interactedIds.has(u.id)) {
-        list.push({ id: `afinidad-${u.id}`, tipo: 'afinidad', data: u });
+        list.push({ id: `afinidad-${u.id}`, tipo: 'afinidad', data: u, photoURL: u.photoURL ?? null });
       }
     }
 
@@ -120,6 +136,26 @@ export class DescubrirTabComponent {
   });
 
   constructor() {
+    // Ensure UserService listener starts early
+    this.userService.users;
+
+    // When users populate (first snapshot after entering the tab), aggressively refresh the current card
+    // so the photo appears even on the very first render/iteration of Descubrir.
+    effect(() => {
+      const users = this.userService.users();
+      if (users.length > 0) {
+        // Rebuild the list (the enriched sugerencias* + tarjetas depend on users())
+        this.tarjetas();
+
+        // Always poke currentIndex on first users load. This guarantees that tarjetaActiva()
+        // re-reads from the now photo-enriched list and the template binding updates the card.
+        this.currentIndex.update(i => i);
+
+        // Force view check so the card and @if react immediately.
+        this.cdr.markForCheck();
+      }
+    });
+
     addIcons({
       trophyOutline, barbellOutline, sparklesOutline,
       close, handRight, sparkles, chatbubbles, person

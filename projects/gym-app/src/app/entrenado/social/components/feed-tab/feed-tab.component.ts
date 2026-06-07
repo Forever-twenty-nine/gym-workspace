@@ -10,10 +10,8 @@ import { peopleOutline } from 'ionicons/icons';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../core/services/entrenado.service';
-import { DesafioService } from '../../../../core/services/desafio.service';
 import { UserService } from '../../../../core/services/user.service';
 import { SocialCardComponent } from '../social-card/social-card.component';
-import { DesafioFeedCardComponent } from '../desafio-feed-card/desafio-feed-card.component';
 
 @Component({
   selector: 'app-feed-tab',
@@ -24,15 +22,13 @@ import { DesafioFeedCardComponent } from '../desafio-feed-card/desafio-feed-card
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     IonIcon,
-    SocialCardComponent,
-    DesafioFeedCardComponent
+    SocialCardComponent
   ]
 })
 export class FeedTabComponent {
   private sesionRutinaService = inject(SesionRutinaService);
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
-  private desafioService = inject(DesafioService);
   private userService = inject(UserService);
 
   private readonly _tab = signal<'para-ti' | 'siguiendo'>('para-ti');
@@ -44,7 +40,6 @@ export class FeedTabComponent {
 
   feedSocial = this.sesionRutinaService.getSesionesCompartidas();
   visibleItemsCount = signal<number>(10);
-  desafiosOcultados = signal<string[]>([]);
 
   // Perfil del entrenado actual
   currentEntrenado = computed(() => {
@@ -53,64 +48,39 @@ export class FeedTabComponent {
     return this.entrenadoService.getEntrenado(user.uid)();
   });
 
-  desafiosActivos = this.desafioService.desafios;
-
-  // Feed de la comunidad completo (sin paginar) filtrado por gimnasio
+  // Feed de la comunidad completo (solo sesiones compartidas, limpio)
+  // Los desafíos y convocatorias ahora viven en las barras de stories arriba
   allGymFeed = computed<any[]>(() => {
     const feed = this.feedSocial();
     const tab = this._tab();
     const entrenado = this.currentEntrenado();
-    const activeDesafios = this.desafiosActivos();
-    const ocultados = this.desafiosOcultados();
     const currentUserGymId = this.authService.currentUser()?.gimnasioId;
 
-    let result: any[] = [];
     if (tab === 'para-ti') {
-      const currentUserId = this.authService.currentUser()?.uid;
-      
-      // Filtrar desafíos del mismo gimnasio (que no sean propios ni ocultados)
-      const filteredDesafios: any[] = activeDesafios
-        .filter(d => {
-          if (d.creadorId === currentUserId) return false;
-          if (ocultados.includes(d.id)) return false;
-          // gimnasioId ya está en el modelo; filtrar directamente
-          return d.gimnasioId === currentUserGymId;
-        })
-        .map(d => (Object.assign({}, d, { 
-          isDesafio: true, 
-          fechaOrden: d.fechaCreacion instanceof Date ? d.fechaCreacion : new Date(d.fechaCreacion)
-        }) as any));
-
-      // Sesiones compartidas de la comunidad del mismo gimnasio
-      const mappedFeed = feed
+      return feed
         .filter(s => {
           const posterProfile = this.userService.getUserByUid(s.entrenadoId)();
           return posterProfile?.gimnasioId === currentUserGymId;
         })
-        .map(s => (Object.assign({}, s, { 
-          isDesafio: false, 
-          fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date() 
-        }) as any));
-
-      // Mezclar desafíos y sesiones compartidas ordenando por fecha de creación/compartido
-      result = [...filteredDesafios, ...mappedFeed].sort((a, b) => b.fechaOrden.getTime() - a.fechaOrden.getTime());
+        .map(s => (Object.assign({}, s, {
+          fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date()
+        }) as any))
+        .sort((a, b) => b.fechaOrden.getTime() - a.fechaOrden.getTime());
     } else if (tab === 'siguiendo') {
       const seguidos = entrenado?.seguidos || [];
-      result = feed
+      return feed
         .filter(sesion => {
           if (!seguidos.includes(sesion.entrenadoId)) return false;
           const posterProfile = this.userService.getUserByUid(sesion.entrenadoId)();
           return posterProfile?.gimnasioId === currentUserGymId;
         })
         .map(s => (Object.assign({}, s, {
-          isDesafio: false,
-          fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date() 
-        }) as any));
-    } else {
-      return [];
+          fechaOrden: s.fechaCompartida ? (s.fechaCompartida.toDate ? s.fechaCompartida.toDate() : new Date(s.fechaCompartida)) : new Date()
+        }) as any))
+        .sort((a, b) => b.fechaOrden.getTime() - a.fechaOrden.getTime());
     }
 
-    return result;
+    return [];
   });
 
   // Feed filtrado y paginado según la pestaña seleccionada
@@ -137,9 +107,5 @@ export class FeedTabComponent {
     if (!this.hasMoreItems()) {
       event.target.disabled = true;
     }
-  }
-
-  dismissDesafio(id: string, action: 'accept' | 'pass') {
-    this.desafiosOcultados.update(list => [...list, id]);
   }
 }

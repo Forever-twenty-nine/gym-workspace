@@ -1,23 +1,19 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal, Input, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import {
-  IonIcon,
-  IonButton,
-  IonBadge,
-  IonLabel,
-  ToastController,
-  AlertController
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  add, close, handRightOutline, handRight, trashOutline, 
-  sparkles, timeOutline, personOutline, paperPlaneOutline, chatbubblesOutline 
+  add, closeOutline, handRightOutline, handRight, trashOutline, 
+  timeOutline, personOutline, peopleOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 import { Convocatoria } from 'gym-library';
+import { ConvocatoriaModalComponent } from './convocatoria-modal/convocatoria-modal.component';
 
 @Component({
   selector: 'app-convocatorias',
@@ -26,22 +22,28 @@ import { Convocatoria } from 'gym-library';
   imports: [
     CommonModule,
     IonIcon,
-    IonButton,
-    IonBadge,
-    IonLabel
+    ConvocatoriaModalComponent
   ]
 })
 export class ConvocatoriasComponent {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private convocatoriaService = inject(ConvocatoriaService);
-  private toastCtrl = inject(ToastController);
-  private alertCtrl = inject(AlertController);
   private router = inject(Router);
+
+  @Input() showHeader = true;
+  @Input() renderCircles = true;
+
+  @HostBinding('class.contents') 
+  get isNaked() { return !this.showHeader; }
 
   readonly currentUserSignal = this.authService.currentUser;
 
-  // Obtener convocatorias de Firestore filtradas y ordenadas
+  // Modal state (stories click → centered modal)
+  selectedConvocatoria = signal<Convocatoria | null>(null);
+  isModalOpen = signal(false);
+
+  // Obtener convocatorias de Firestore filtradas y ordenadas (con vencimiento)
   convocatoriasActivas = computed(() => {
     const list = this.convocatoriaService.convocatorias();
     const user = this.currentUserSignal();
@@ -82,8 +84,8 @@ export class ConvocatoriasComponent {
 
   constructor() {
     addIcons({ 
-      add, close, handRightOutline, handRight, trashOutline, 
-      sparkles, timeOutline, personOutline, paperPlaneOutline, chatbubblesOutline 
+      add, closeOutline, handRightOutline, handRight, trashOutline, 
+      timeOutline, personOutline, peopleOutline
     });
   }
 
@@ -91,74 +93,19 @@ export class ConvocatoriasComponent {
     this.router.navigate(['/entrenado-tabs/creaciones']);
   }
 
-  async toggleChocarLos5(convocatoria: Convocatoria) {
-    const user = this.currentUserSignal();
-    if (!user) return;
-
-    if (convocatoria.creadorId === user.uid) {
-      this.showToast('No puedes chocar los 5 en tu propia convocatoria', 'warning');
-      return;
-    }
-
-    const yaChoco = convocatoria.interesados.includes(user.uid);
-    try {
-      await this.convocatoriaService.toggleInteres(convocatoria.id, user.uid, !yaChoco);
-      
-      if (!yaChoco) {
-        this.showToast(`¡Le chocaste los 5 a ${convocatoria.creadorNombre}! ✋`, 'success');
-      } else {
-        this.showToast('Interés retirado', 'medium');
-      }
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al registrar tu interés', 'danger');
-    }
+  openModal(c: Convocatoria) {
+    this.selectedConvocatoria.set(c);
+    this.isModalOpen.set(true);
   }
 
-  async confirmarEliminacion(id: string) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar convocatoria',
-      message: '¿Estás seguro de que deseas eliminar esta publicación de entrenamiento?',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.convocatoriaService.delete(id);
-              this.showToast('Convocatoria eliminada con éxito', 'success');
-            } catch (e) {
-              console.error(e);
-              this.showToast('Error al eliminar la convocatoria', 'danger');
-            }
-          }
-        }
-      ],
-      cssClass: 'premium-alert'
-    });
-    await alert.present();
+  closeModal() {
+    this.isModalOpen.set(false);
+    // allow exit animation then clear
+    setTimeout(() => this.selectedConvocatoria.set(null), 280);
   }
 
-  formatearFechaEntrenamiento(fechaVal: any): string {
-    if (!fechaVal) return '';
-    const fecha = new Date(fechaVal);
-    const hoy = new Date();
-    const manana = new Date();
-    manana.setDate(hoy.getDate() + 1);
-
-    if (fecha.toDateString() === hoy.toDateString()) {
-      return 'Hoy';
-    } else if (fecha.toDateString() === manana.toDateString()) {
-      return 'Mañana';
-    } else {
-      const opciones: Intl.DateTimeFormatOptions = { weekday: 'long', day: 'numeric', month: 'short' };
-      const str = fecha.toLocaleDateString('es-ES', opciones);
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
+  onModalDeleted(_id: string) {
+    this.closeModal();
   }
 
   getUsuarioName(uid: string): string {
@@ -169,14 +116,25 @@ export class ConvocatoriasComponent {
     return this.userService.getUserByUid(uid)()?.photoURL || null;
   }
 
-  private async showToast(message: string, color: 'success' | 'warning' | 'danger' | 'medium') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      color,
-      position: 'bottom',
-      cssClass: 'premium-toast'
-    });
-    await toast.present();
+  // Label shown under story circle (first name, truncated)
+  getStoryLabel(c: Convocatoria): string {
+    const full = this.getUsuarioName(c.creadorId);
+    const first = full.split(' ')[0] || full;
+    return first.length > 9 ? first.substring(0, 8) + '…' : first;
+  }
+
+  // Tiny time hint inside story circle (hora or relative day)
+  getStoryTimeHint(c: Convocatoria): string {
+    const fecha = new Date(c.fechaEntrenamiento);
+    const hoy = new Date();
+    if (fecha.toDateString() === hoy.toDateString()) {
+      return c.horaInicio;
+    }
+    const manana = new Date();
+    manana.setDate(hoy.getDate() + 1);
+    if (fecha.toDateString() === manana.toDateString()) {
+      return 'mañ';
+    }
+    return fecha.toLocaleDateString('es-ES', { day: 'numeric' });
   }
 }

@@ -8,6 +8,8 @@ import {
 } from '@ionic/angular/standalone';
 import { inject, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { UserService } from '../../core/services/user.service';
+import { EntrenadoService } from '../../core/services/entrenado.service';
 import { addIcons } from 'ionicons';
 import {
   homeOutline,
@@ -47,11 +49,19 @@ import { Subscription } from 'rxjs';
 })
 export class EntrenadoTabsPage implements OnInit, OnDestroy {
   private router = inject(Router);
+  private userService = inject(UserService); // preload users/photos as early as possible (when entering the main app tabs)
+  private entrenadoService = inject(EntrenadoService); // preload athlete profiles early for discover suggestions
   private routerSubscription?: Subscription;
 
   isCenterTabActive = signal(false);
 
   constructor() {
+    // Preload services early (as soon as entering the entrenado area after login).
+    // This ensures user photos and athlete profiles are loading in background before you even navigate to the social / descubrir tab.
+    // Solves the "first load of descubrir shows only initials" race condition.
+    this.userService.users;
+    this.entrenadoService.entrenados; // trigger listener for profiles used in suggestions
+
     addIcons({ 
       homeOutline, home, calendarOutline, barbellOutline, barbell, calendar, 
       statsChartOutline, statsChart, fitnessOutline, fitness, personOutline, person, 

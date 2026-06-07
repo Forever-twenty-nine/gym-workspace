@@ -1,6 +1,6 @@
 <div class="flex flex-col items-center justify-center min-h-137.5 px-2 py-4">
   @if (tarjetaActiva()) {
-    <div class="w-full max-w-md flex flex-col gap-8 relative">
+    <div class="w-full max-w-md flex flex-col gap-4 relative">
       
       <!-- Contenedor de la Tarjeta con Animación de Deslizamiento -->
       <div [class]="animacionCard()">
@@ -11,19 +11,19 @@
         </app-match-card>
       </div>
 
-      <!-- Acciones de Decisión Binaria con Componentes Ionic -->
-      <div class="flex justify-center items-center gap-8 mt-2">
-        <!-- Botón Pasar (Descartar) - Componente Ionic -->
+      <!-- Acciones de Decisión Binaria -->
+      <div class="flex justify-center items-center gap-6 mt-2">
+        <!-- Botón Pasar (Descartar) -->
         <ion-button (click)="pasar()" 
-                    class="shadow-lg hover:brightness-110 active:scale-90 transition-all duration-200"
-                    style="--border-radius: 50%; --background: #111827; --padding-start: 0; --padding-end: 0; margin: 0; width: 60px; height: 60px; border: 1px solid rgba(255,255,255,0.15);">
-          <ion-icon name="close" class="text-2xl text-rose-500"></ion-icon>
+                    class="shadow-xl hover:brightness-110 active:scale-95 transition-all duration-150"
+                    style="--border-radius: 50%; --background: #1f2937; --padding-start: 0; --padding-end: 0; margin: 0; width: 56px; height: 56px; border: 1.5px solid rgba(255,255,255,0.2);">
+          <ion-icon name="close" class="text-2xl text-rose-400"></ion-icon>
         </ion-button>
 
-        <!-- Botón Chocar los 5 (Like / Conectar) - Componente Ionic -->
+        <!-- Botón Chocar los 5 (Like / Conectar) - principal -->
         <ion-button (click)="chocarLos5()" 
-                    class="shadow-xl shadow-primary/30 hover:brightness-110 active:scale-90 transition-all duration-200 animate-pulse"
-                    style="--border-radius: 50%; --background: #d2ff00; --padding-start: 0; --padding-end: 0; margin: 0; width: 76px; height: 76px;">
+                    class="shadow-2xl shadow-primary/40 hover:brightness-105 active:scale-95 transition-all duration-150"
+                    style="--border-radius: 50%; --background: #d2ff00; --padding-start: 0; --padding-end: 0; margin: 0; width: 72px; height: 72px; border: 2px solid rgba(0,0,0,0.15);">
           <ion-icon name="hand-right" class="text-3xl text-black"></ion-icon>
         </ion-button>
       </div>
