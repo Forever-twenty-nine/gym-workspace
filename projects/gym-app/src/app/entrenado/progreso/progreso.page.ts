@@ -22,10 +22,9 @@ import { ProgresoEstadisticasComponent } from './components/progreso-estadistica
   imports: [
     IonContent,
     IonText,
-    NgOptimizedImage,
     ProgresoEstadisticasComponent,
     PageBackgroundComponent
-  ],
+],
   templateUrl: './progreso.page.html',
 })
 export class ProgresoPage implements OnInit, OnDestroy {

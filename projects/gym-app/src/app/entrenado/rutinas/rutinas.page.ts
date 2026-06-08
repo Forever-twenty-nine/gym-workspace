@@ -46,14 +46,13 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     IonItem,
     IonIcon,
     IonButton,
-    NgOptimizedImage,
     RouterModule,
     RutinaDetalleModalComponent,
     EncuentroDetalleModalComponent,
     RutinasSemanaComponent,
     ProgresoHistorialDetalleComponent,
     PageBackgroundComponent
-  ],
+],
 })
 export class RutinasPage {
   private rutinaService = inject(RutinaService);

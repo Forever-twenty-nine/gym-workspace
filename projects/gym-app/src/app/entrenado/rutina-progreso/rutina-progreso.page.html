@@ -76,7 +76,7 @@
             @if (rutinaIniciada()) {
                 <ion-button (click)="pausarReanudar()" 
                     fill="clear"
-                    class="h-16 w-16 min-w-[4rem] rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 shadow-lg !m-0 overflow-hidden --padding-start=0 --padding-end=0">
+                    class="h-16 w-16 min-w-16 rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 shadow-lg m-0! overflow-hidden --padding-start=0 --padding-end=0">
                     <ion-icon [name]="stopwatch.isPaused() ? 'play' : 'pause'"
                         slot="icon-only"
                         class="text-3xl" [class.text-primary]="stopwatch.isPaused()"></ion-icon>
@@ -86,14 +86,14 @@
             <div class="flex-1">
                 @if (!rutinaIniciada()) {
                     <ion-button expand="block" color="primary" (click)="iniciarRutina()"
-                        class="h-16 text-lg font-black rounded-3xl shadow-xl !m-0">
+                        class="h-16 text-lg font-black rounded-3xl shadow-xl m-0!">
                         COMENZAR ENTRENAMIENTO
                     </ion-button>
                 } @else {
                     <ion-button expand="block" [color]="ejerciciosCompletados() === ejerciciosTotales() ? 'success' : 'primary'" 
                         (click)="completarRutina()"
                         [disabled]="ejerciciosCompletados() < ejerciciosTotales()"
-                        class="h-16 text-lg font-black rounded-3xl shadow-xl transition-all duration-300 !m-0">
+                        class="h-16 text-lg font-black rounded-3xl shadow-xl transition-all duration-300 m-0!">
                         FINALIZAR ENTRENAMIENTO
                     </ion-button>
                 }

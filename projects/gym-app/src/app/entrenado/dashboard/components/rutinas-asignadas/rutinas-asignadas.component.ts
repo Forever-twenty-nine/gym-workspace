@@ -27,7 +27,7 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
   selector: 'app-rutinas-asignadas',
   templateUrl: './rutinas-asignadas.component.html',
   standalone: true,
-  imports: [IonLabel, IonNote, 
+  imports: [IonLabel,
     CommonModule,
     IonCard,
     IonCardHeader,
@@ -36,8 +36,7 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
     IonItem,
     IonIcon,
     IonButton,
-    IonText
-  ],
+    IonText],
   styles: [`
     .rutina-fecha-badge {
       display: flex;

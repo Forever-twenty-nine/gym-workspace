@@ -30,7 +30,6 @@ type StoryItem =
   imports: [
     CommonModule,
     IonContent,
-    NgOptimizedImage,
     IonSegment, IonSegmentButton, IonLabel,
     IonIcon,
     ConvocatoriasComponent,
@@ -39,7 +38,7 @@ type StoryItem =
     DesafiosStoriesComponent,
     IonHeader,
     PageBackgroundComponent
-  ]
+]
 })
 export class SocialPage {
   private authService = inject(AuthService);
