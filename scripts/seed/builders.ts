@@ -223,8 +223,15 @@ export function buildSesionRutinaMock(
     fotoUsuario: undefined,
     fotoProgreso: postPhotoURL ?? undefined,
     fechaCompartida: new Date(),
-    likes: [],
-    rutinaResumen: { id: rutinaId, nombre: rutinaNombre, ejercicios: [] },
+    rutinaResumen: {
+      id: rutinaId,
+      nombre: rutinaNombre,
+      ejercicios: [
+        { id: 'ej-1', nombre: 'Sentadillas con Barra', series: 4, repeticiones: 12 },
+        { id: 'ej-2', nombre: 'Prensa de Piernas', series: 4, repeticiones: 10 },
+        { id: 'ej-3', nombre: 'Zancadas con Mancuernas', series: 3, repeticiones: 15 }
+      ]
+    },
   };
 }
 

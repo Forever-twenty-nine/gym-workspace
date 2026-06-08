@@ -1,18 +1,10 @@
 import { Component, signal, inject, computed, effect, afterNextRender } from '@angular/core';
 import {
   IonContent, IonHeader, IonSegment, IonSegmentButton, IonLabel,
-  IonList, IonItem, IonIcon, IonButton,
   SegmentCustomEvent
 } from '@ionic/angular/standalone';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { PageBackgroundComponent } from '../components/page-background/page-background.component';
-import { addIcons } from 'ionicons';
-import {
-  fitnessOutline, playOutline, timeOutline, calendarOutline,
-  checkmarkCircle, timerOutline, notificationsOutline, arrowBackOutline,
-  todayOutline, bedOutline, playCircle, repeatOutline, syncCircleOutline, lockClosed,
-  trashOutline, checkmarkCircleOutline
-} from 'ionicons/icons';
 import { Rutina, Plan, Convocatoria, SesionRutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -25,6 +17,7 @@ import { Router, RouterModule } from '@angular/router';
 import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/rutina-detalle-modal.component';
 import { EncuentroDetalleModalComponent } from './components/encuentro-detalle-modal/encuentro-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
+import { RutinasHistorialComponent } from './components/rutinas-historial/rutinas-historial.component';
 import { ProgresoHistorialDetalleComponent } from '../progreso/components/progreso-historial-detalle/progreso-historial-detalle.component';
 import { AlertController } from '@ionic/angular/standalone';
 import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
@@ -42,17 +35,14 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     IonSegment,
     IonSegmentButton,
     IonLabel,
-    IonList,
-    IonItem,
-    IonIcon,
-    IonButton,
     RouterModule,
     RutinaDetalleModalComponent,
     EncuentroDetalleModalComponent,
     RutinasSemanaComponent,
+    RutinasHistorialComponent,
     ProgresoHistorialDetalleComponent,
     PageBackgroundComponent
-],
+  ],
 })
 export class RutinasPage {
   private rutinaService = inject(RutinaService);
@@ -100,12 +90,6 @@ export class RutinasPage {
   });
 
   constructor() {
-    addIcons({
-      fitnessOutline, playOutline, timeOutline, calendarOutline, checkmarkCircle,
-      timerOutline, notificationsOutline, arrowBackOutline, todayOutline, bedOutline, playCircle,
-      repeatOutline, syncCircleOutline, lockClosed, trashOutline, checkmarkCircleOutline
-    });
-
     // Sync the full rutinas list into local signal, preferring gym-scoped
     effect(() => {
       const gymId = this.authService.currentUser()?.gimnasioId;
@@ -218,14 +202,16 @@ export class RutinasPage {
     this.sesionSeleccionada.set(null);
   }
 
-  async eliminarSesion(sesionId: string, event?: Event) {
+  async eliminarSesion(sesion: SesionRutina, event?: Event) {
     if (event) {
       event.stopPropagation();
     }
 
+    const rutinaNombre = sesion.rutinaResumen?.nombre || 'Rutina';
+
     const alert = await this.alertController.create({
-      header: 'Eliminar registro',
-      message: '¿Eliminar este entrenamiento del historial? Esta acción no se puede deshacer.',
+      header: 'Eliminar rutina del historial',
+      message: `¿Eliminar el entrenamiento de "${rutinaNombre}" del historial? Esta acción no se puede deshacer.`,
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -233,7 +219,7 @@ export class RutinasPage {
           role: 'destructive',
           handler: async () => {
             try {
-              await this.sesionRutinaService.eliminarSesion(sesionId);
+              await this.sesionRutinaService.eliminarSesion(sesion.id);
             } catch (e) {
               console.error('Error eliminando sesión:', e);
             }
@@ -283,20 +269,5 @@ export class RutinasPage {
     afterNextRender(() => {
       this.router.navigateByUrl('/entrenado-tabs/social').catch(console.error);
     });
-  }
-
-  // Helpers para el historial (ion-list)
-  formatearFechaSesion(fecha: Date | string | number | undefined): string {
-    if (!fecha) return 'Sin fecha';
-    const d = fecha instanceof Date ? fecha : new Date(fecha);
-    return d.toLocaleDateString('es-ES', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-
-  redondearMinutos(segundos: number): number {
-    return Math.round((segundos || 0) / 60);
   }
 }

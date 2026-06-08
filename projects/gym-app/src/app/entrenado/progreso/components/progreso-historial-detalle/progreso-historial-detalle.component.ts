@@ -25,7 +25,8 @@ import {
     shareSocialOutline,
     barbellOutline,
     logoWhatsapp,
-    cameraOutline
+    cameraOutline,
+    logoInstagram
 } from 'ionicons/icons';
 import { inject, signal, computed } from '@angular/core';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
@@ -58,21 +59,10 @@ import { IonSpinner, ToastController } from '@ionic/angular/standalone';
         IonSpinner
     ],
     templateUrl: './progreso-historial-detalle.component.html',
-    styles: [`
-        ion-modal {
-            align-items: flex-start;
-            --height: calc(100% - 100px);
-        }
-        ion-content::part(scroll) {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        ion-content::part(scroll)::-webkit-scrollbar {
-            display: none;
-        }
-    `]
+    
 })
 export class ProgresoHistorialDetalleComponent {
+    
     private sesionRutinaService = inject(SesionRutinaService);
     private authService = inject(AuthService);
     private userService = inject(UserService);
@@ -96,7 +86,8 @@ export class ProgresoHistorialDetalleComponent {
             shareSocialOutline,
             barbellOutline,
             logoWhatsapp,
-            cameraOutline
+            cameraOutline,
+            logoInstagram
         });
     }
 
@@ -154,13 +145,13 @@ export class ProgresoHistorialDetalleComponent {
         this.isUploading.set(true);
         try {
             // 1. Comprimir imagen
-            const compressedBlob = await compressImage(file, 1080, 1080, 0.7);
-            
+            const compressedBlob = await compressImage(file, 1080, 1080, 0.7, true);
+
             // 2. Subir a Firebase Storage
             const extension = file.name.split('.').pop() || 'jpg';
             const path = this.storageService.getProgressPhotoPath(user.uid, this.sesionSeleccionada.id, extension);
             const downloadUrl = await this.storageService.uploadFile(path, compressedBlob);
-            
+
             // 3. Actualizar localmente y en Firestore
             this.fotoProgresoUrl.set(downloadUrl);
             this.sesionSeleccionada.fotoProgreso = downloadUrl;
@@ -175,7 +166,7 @@ export class ProgresoHistorialDetalleComponent {
                     user.gimnasioId
                 );
             }
-            
+
             this.showToast('Foto de progreso cargada correctamente', 'success');
         } catch (error) {
             console.error('Error al subir foto de progreso:', error);
@@ -262,5 +253,25 @@ export class ProgresoHistorialDetalleComponent {
             });
         }
         return `¡Terminé mi entrenamiento de "${nombre}" en ${tiempo} minutos! 💪 Entrenamiento completado con la App Gym.${ejerciciosStr}`;
+    }
+
+    async compartirInstagram() {
+        if (!this.sesionSeleccionada) return;
+        const textoCompartir = this.generarTextoCompartir();
+
+        try {
+            await navigator.clipboard.writeText(textoCompartir);
+            await this.showToast('¡Texto copiado al portapapeles! Abre Instagram para compartir.', 'success');
+            window.open('instagram://', '_blank');
+            setTimeout(() => {
+                window.open('https://instagram.com', '_blank');
+            }, 1000);
+        } catch (error) {
+            console.error('Error al copiar al portapapeles:', error);
+            this.showToast('No se pudo copiar el texto automáticamente.', 'danger');
+        }
+    }
+    eliminarSesion(arg0: SesionRutina, $event: PointerEvent) {
+        throw new Error('Method not implemented.');
     }
 }

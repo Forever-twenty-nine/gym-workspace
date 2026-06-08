@@ -1,0 +1,57 @@
+<div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5">
+  <div class="flex items-center justify-between mb-3 px-1">
+    <div>
+      <h3 class="text-lg font-black text-gray-900 dark:text-white m-0 tracking-tight">Rutinas completadas</h3>
+      <p class="text-xs text-gray-500 dark:text-white/60 m-0">{{ sesiones.length }} rutinas</p>
+    </div>
+  </div>
+
+  @if (sesiones.length > 0) {
+    <ion-list lines="none" class="bg-transparent space-y-2 m-0 p-0">
+      @for (sesion of sesiones; track sesion.id) {
+        <ion-item-sliding class="rounded-2xl overflow-hidden mb-2">
+          <ion-item button detail="false"
+            class="rounded-2xl border border-gray-200/60 dark:border-white/10 shadow-sm"
+            (click)="onVerDetalle(sesion)"
+            style="--background: var(--ion-card-background, #ffffff); --padding-start: 12px; --padding-end: 8px;">
+
+            <!-- Indicador completado -->
+            <div slot="start" class="w-9 h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center mr-3">
+              <ion-icon name="checkmark-circle-outline" class="text-xl text-emerald-600 dark:text-emerald-400"></ion-icon>
+            </div>
+
+            <ion-label class="py-2">
+              <div class="flex flex-col gap-0.5">
+                <div class="font-bold text-base text-gray-900 dark:text-white truncate">
+                  {{ sesion.rutinaResumen.nombre || 'Rutina' }}
+                </div>
+                <div class="text-xs text-gray-500 dark:text-white/70 flex items-center gap-2">
+                  <span>{{ formatearFechaSesion(sesion.fechaInicio) }}</span>
+                  @if (sesion.duracion) {
+                    <span class="opacity-60">•</span>
+                    <span class="font-medium text-emerald-600 dark:text-emerald-400">
+                      {{ redondearMinutos(sesion.duracion) }} min
+                    </span>
+                  }
+                </div>
+              </div>
+            </ion-label>
+          </ion-item>
+
+          <ion-item-options side="end">
+            <ion-item-option color="danger" (click)="onEliminar(sesion, $event)"
+              style="height: calc(100% - 2px); margin: 1px 0; border-radius: 0 16px 16px 0;">
+              <ion-icon name="trash-outline" slot="icon-only" class="text-lg"></ion-icon>
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      }
+    </ion-list>
+  } @else {
+    <div class="py-10 text-center opacity-70">
+      <ion-icon name="calendar-outline" class="text-4xl mb-2 text-gray-400"></ion-icon>
+      <p class="text-sm font-medium m-0 text-gray-600 dark:text-white/70">Aún no hay rutinas completadas</p>
+      <p class="text-xs mt-1 text-gray-500 dark:text-white/50">Cuando termines una rutina aparecerá aquí.</p>
+    </div>
+  }
+</div>

@@ -10,7 +10,8 @@ export async function compressImage(
     file: File,
     maxWidth: number = 1080,
     maxHeight: number = 1080,
-    quality: number = 0.7
+    quality: number = 0.7,
+    forceSquare: boolean = false
 ): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -20,32 +21,44 @@ export async function compressImage(
             img.src = event.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-
-                // Calcular nuevas dimensiones manteniendo el ratio
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width * maxHeight) / height);
-                        height = maxHeight;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-
                 const ctx = canvas.getContext('2d');
                 if (!ctx) {
                     reject(new Error('No se pudo obtener el contexto del canvas'));
                     return;
                 }
 
-                ctx.drawImage(img, 0, 0, width, height);
+                if (forceSquare) {
+                    const minDim = Math.min(img.width, img.height);
+                    const targetDim = Math.min(maxWidth, maxHeight, minDim);
+                    const sx = (img.width - minDim) / 2;
+                    const sy = (img.height - minDim) / 2;
+
+                    canvas.width = targetDim;
+                    canvas.height = targetDim;
+
+                    ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, targetDim, targetDim);
+                } else {
+                    let width = img.width;
+                    let height = img.height;
+
+                    // Calcular nuevas dimensiones manteniendo el ratio
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    ctx.drawImage(img, 0, 0, width, height);
+                }
 
                 canvas.toBlob(
                     (blob) => {
