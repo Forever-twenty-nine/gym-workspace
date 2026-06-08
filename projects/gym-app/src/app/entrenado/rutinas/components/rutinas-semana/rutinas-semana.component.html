@@ -10,10 +10,7 @@
 
         <ion-card-content class="px-4 pb-6">
             @if (tieneActividadProgramada) {
-            <!-- Usamos ion-accordion para agrupar por día. 
-                 Cada día (con actividad o sin ella) es un acordeón.
-                 Días con múltiples rutinas/encuentros solo muestran 1 línea (el header) cuando están colapsados.
-                 El usuario puede expandir solo los días que le interesan. -->
+
             <ion-accordion-group [multiple]="true">
                 @for (dia of rutinasPorDia; track dia.fecha) {
                 <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">

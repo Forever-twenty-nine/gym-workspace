@@ -46,7 +46,8 @@ export async function createExercise(
   db: Firestore,
   nombre: string,
   descripcion: string,
-  entrenadorId?: string
+  entrenadorId?: string,
+  gimnasioId?: string
 ) {
   const ref = db.collection("ejercicios").doc();
   const id = ref.id;
@@ -58,6 +59,7 @@ export async function createExercise(
     series: rndInt(`${scopeBase}:series`, 3, 5),
     repeticiones: rndInt(`${scopeBase}:reps`, 8, 12),
     peso: rndInt(`${scopeBase}:peso`, 10, 29),
+    ...(gimnasioId ? { gimnasioId } : {}),
   };
 
   await ref.set(toFirestoreWrite(data));
@@ -72,12 +74,15 @@ export async function createRoutine(
   ejerciciosIds: string[],
   usuarioId: string,
   nombreUsuario: string,
-  entrenadorId?: string
+  entrenadorId?: string,
+  gimnasioId?: string
 ) {
   const docRef = db.collection("rutinas").doc();
   const id = docRef.id;
   const data = buildRutina(id, nombre, ejerciciosIds, usuarioId, nombreUsuario, entrenadorId);
   (data as any).descripcion = `Rutina ${nombre} - dia ${dia}`;
+  (data as any).diasSemana = [dia];
+  if (gimnasioId) (data as any).gimnasioId = gimnasioId;
   await docRef.set(toFirestoreWrite(data));
   stats.routinesCreated++;
   return id;
@@ -175,7 +180,7 @@ export async function seedTrainerWorkouts(
 
     const trainerExercises = await Promise.all(
       exerciseNames.map((exName) =>
-        createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid)
+        createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid, gymUid)
       )
     );
 
@@ -217,7 +222,8 @@ export async function seedTrainerWorkouts(
               routineExercises,
               trainee.uid,
               trainee.nombre,
-              trainer.uid
+              trainer.uid,
+              gymUid
             );
             routineIds.push(currentRoutineId);
 

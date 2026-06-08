@@ -38,19 +38,7 @@ import { close, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCirc
         IonBadge
     ],
     templateUrl: './rutina-detalle-modal.component.html',
-    styles: [`
-        ion-modal {
-            align-items: flex-start;
-            --height: calc(100% - 100px);
-        }
-        ion-content::part(scroll) {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        ion-content::part(scroll)::-webkit-scrollbar {
-            display: none;
-        }
-    `]
+    
 })
 export class RutinaDetalleModalComponent {
     @Input() isOpen = false;

@@ -14,43 +14,34 @@
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
   <app-page-background />
-
+  <!-- Content Layer -->
   <div class="relative z-10 px-4 pb-6 pt-2">
     @switch (selectedTab()) {
-      @case ('rutinas') {
-        <!-- Vista actual: Esta Semana -->
-        <app-rutinas-semana [rutinasPorDia]="semanaUnificada()" (verDetalles)="abrirDetalles($event)"
-          (iniciarEntrenamientoDirecto)="iniciarEntrenamientoDirecto($event.event, $event.rutina)"
-          (verEncuentro)="abrirDetallesEncuentro($event)">
-        </app-rutinas-semana>
-      }
-     
-      @case ('historial') {
-        <app-rutinas-historial
-          [sesiones]="historialCompletadas()"
-          (verDetalle)="abrirDetalleSesion($event)"
-          (eliminar)="eliminarSesion($event.sesion, $event.event)">
-        </app-rutinas-historial>
-      }
+    @case ('rutinas') {
+    <!-- Vista actual: Esta Semana -->
+    <app-rutinas-semana [rutinasPorDia]="semanaUnificada()" (verDetalles)="abrirDetalles($event)"
+      (iniciarEntrenamientoDirecto)="iniciarEntrenamientoDirecto($event.event, $event.rutina)"
+      (verEncuentro)="abrirDetallesEncuentro($event)">
+    </app-rutinas-semana>
+    }
+    @case ('historial') {
+    <app-rutinas-historial [sesiones]="historialCompletadas()" (verDetalle)="abrirDetalleSesion($event)"
+      (eliminar)="eliminarSesion($event.sesion, $event.event)">
+    </app-rutinas-historial>
+    }
     }
   </div>
-
   <!-- Modal Detalles Rutina -->
   <app-rutina-detalle-modal [isOpen]="modalAbierto()" [rutina]="rutinaSeleccionada()"
     [ejercicios]="ejerciciosCompletos()" [esFuturo]="esFuturoSeleccionado()" (didDismiss)="cerrarModal()"
     (iniciarEntrenamiento)="iniciarEntrenamiento($event)">
   </app-rutina-detalle-modal>
-
   <!-- Modal Detalles Encuentro -->
   <app-encuentro-detalle-modal [isOpen]="encuentroModalAbierto()" [encuentro]="encuentroSeleccionado()"
     (didDismiss)="cerrarModalEncuentro()" (irASocial)="irASocialDesdeEncuentro()">
   </app-encuentro-detalle-modal>
-
   <!-- Modal de detalle de sesión del historial (reutilizado) -->
-  <app-progreso-historial-detalle
-    [isOpen]="!!sesionSeleccionada()"
-    [sesionSeleccionada]="sesionSeleccionada()"
+  <app-progreso-historial-detalle [isOpen]="!!sesionSeleccionada()" [sesionSeleccionada]="sesionSeleccionada()"
     (didDismiss)="cerrarDetalleSesion()">
   </app-progreso-historial-detalle>
-
 </ion-content>

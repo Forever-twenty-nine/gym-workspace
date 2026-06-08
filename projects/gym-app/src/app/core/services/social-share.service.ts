@@ -5,6 +5,7 @@ import { EntrenadoService } from './entrenado.service';
 import { UserService } from './user.service';
 import { SesionRutinaService } from './sesion-rutina.service';
 import { SesionRutina } from 'gym-library';
+import { ToastController } from '@ionic/angular/standalone';
 
 export interface ShareProgressOptions {
   includeStats?: boolean;
@@ -32,6 +33,7 @@ export class SocialShareService {
   private readonly entrenadoService = inject(EntrenadoService);
   private readonly userService = inject(UserService);
   private readonly sesionRutinaService = inject(SesionRutinaService);
+  private readonly toastCtrl = inject(ToastController);
 
   private readonly defaultWatermarkText = 'Exportá tu progreso completo en PDF — desbloqueá con Premium';
 
@@ -464,6 +466,12 @@ export class SocialShareService {
    * @param platform Plataforma de red social
    * @param options Opciones de personalización
    */
+  /**
+   * Genera una imagen de progreso y la comparte directamente
+   * @param entrenadoId ID del entrenado
+   * @param platform Plataforma de red social
+   * @param options Opciones de personalización
+   */
   async generateAndShare(
     entrenadoId: string,
     platform: 'instagram' | 'facebook' | 'twitter' | 'whatsapp',
@@ -475,6 +483,250 @@ export class SocialShareService {
     } catch (error) {
       // Propagar sin loguear
       throw error;
+    }
+  }
+
+  /**
+   * Carga una imagen de forma segura con timeout y cache-buster para evitar problemas de CORS
+   */
+  private cargarImagenUrl(url: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      const timeout = setTimeout(() => {
+        img.src = ''; // Cancelar carga
+        reject(new Error('Timeout cargando imagen de progreso'));
+      }, 4000);
+
+      img.onload = () => {
+        clearTimeout(timeout);
+        resolve(img);
+      };
+
+      img.onerror = (e) => {
+        clearTimeout(timeout);
+        reject(new Error('Error cargando imagen de progreso'));
+      };
+
+      // Agregar cache-buster para evitar problemas con CORS y caché en navegadores
+      const separator = url.includes('?') ? '&' : '?';
+      img.src = `${url}${separator}t=${Date.now()}`;
+    });
+  }
+
+  private dibujarFotoFondo(ctx: CanvasRenderingContext2D, img: HTMLImageElement, size: number): void {
+    const imgRatio = img.width / img.height;
+    let drawWidth = size;
+    let drawHeight = size;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (imgRatio > 1) {
+      drawWidth = size * imgRatio;
+      offsetX = -(drawWidth - size) / 2;
+    } else {
+      drawHeight = size / imgRatio;
+      offsetY = -(drawHeight - size) / 2;
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  }
+
+  private dibujarFondoGradiente(ctx: CanvasRenderingContext2D, size: number): void {
+    const grad = ctx.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0, '#0f1923');
+    grad.addColorStop(0.4, '#1a2e4a');
+    grad.addColorStop(0.7, '#0d3355');
+    grad.addColorStop(1, '#0a1628');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    // Círculo decorativo sutil
+    const circleGrad = ctx.createRadialGradient(size * 0.75, size * 0.25, 0, size * 0.75, size * 0.25, size * 0.5);
+    circleGrad.addColorStop(0, 'rgba(99,179,237,0.15)');
+    circleGrad.addColorStop(1, 'rgba(99,179,237,0)');
+    ctx.fillStyle = circleGrad;
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  private formatearFechaLocal(fecha?: Date | string): string {
+    if (!fecha) return 'Sin fecha';
+    const date = fecha instanceof Date ? fecha : new Date(fecha);
+    return date.toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  private redondearMinutosLocal(segundos: number): number {
+    return Math.round((segundos || 0) / 60);
+  }
+
+  private dibujarResumenSesion(ctx: CanvasRenderingContext2D, sesion: SesionRutina, size: number): void {
+    const tiempo = this.redondearMinutosLocal(sesion.duracion || 0);
+    const fecha = this.formatearFechaLocal(sesion.fechaInicio);
+    const exercises = sesion.rutinaResumen?.ejercicios || [];
+    const pad = 56;
+
+    // ── FILA SUPERIOR ──────────────────────────────────────────
+    const topY = 74;
+
+    // Fecha
+    ctx.font = `${size * 0.032}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.92)';
+    ctx.textAlign = 'left';
+    ctx.fillText(`📅 ${fecha}`, pad, topY);
+
+    // "¡Completado! 🔥"
+    ctx.font = `bold ${size * 0.032}px Arial`;
+    ctx.fillStyle = '#fbbf24';
+    ctx.textAlign = 'right';
+    ctx.fillText('¡Completado! 🔥', size - pad, topY);
+    ctx.textAlign = 'left';
+
+    // ── SECCIÓN INFERIOR ─────────────────
+    let y = size * 0.72;
+
+    // Duración
+    ctx.font = `bold ${size * 0.052}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fillText(`⏱ ${tiempo} min`, pad, y);
+    y += size * 0.072;
+
+    // Lista de ejercicios
+    if (exercises.length) {
+      const maxEjs = Math.min(exercises.length, 6);
+      for (let i = 0; i < maxEjs; i++) {
+        const ej = exercises[i];
+        ctx.font = `${size * 0.034}px Arial`;
+        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        const ejNombre = `${i + 1}. ${ej.nombre || 'Ejercicio'}`;
+        const ejTruncado = ejNombre.length > 32 ? ejNombre.substring(0, 32) + '...' : ejNombre;
+        ctx.fillText(ejTruncado, pad, y);
+        y += size * 0.054;
+        if (y > size * 0.93) break;
+      }
+
+      if (exercises.length > 6) {
+        ctx.font = `italic ${size * 0.027}px Arial`;
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillText(`+${exercises.length - 6} más...`, pad, y);
+      }
+    }
+  }
+
+  private dibujarWatermarkSimple(ctx: CanvasRenderingContext2D, size: number): void {
+    ctx.font = `${size * 0.025}px Arial`;
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.textAlign = 'right';
+    ctx.fillText('Gym App', size - 40, size - 40);
+    ctx.textAlign = 'left';
+  }
+
+  /**
+   * Genera la imagen para compartir una sesión de rutina
+   */
+  async generarImagenSesionRutina(sesion: SesionRutina): Promise<Blob> {
+    const SIZE = 1080;
+    const canvas = document.createElement('canvas');
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('No se pudo obtener el contexto 2D del canvas');
+    }
+
+    if (sesion.fotoProgreso) {
+      try {
+        const img = await this.cargarImagenUrl(sesion.fotoProgreso);
+        this.dibujarFotoFondo(ctx, img, SIZE);
+      } catch (e) {
+        console.warn('[SocialShareService] Error al cargar la foto de progreso para el canvas, usando degradado:', e);
+        this.dibujarFondoGradiente(ctx, SIZE);
+      }
+    } else {
+      this.dibujarFondoGradiente(ctx, SIZE);
+    }
+
+    // Overlay oscuro inferior
+    const overlayGrad = ctx.createLinearGradient(0, SIZE * 0.35, 0, SIZE);
+    overlayGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    overlayGrad.addColorStop(0.4, 'rgba(0,0,0,0.75)');
+    overlayGrad.addColorStop(1, 'rgba(0,0,0,0.92)');
+    ctx.fillStyle = overlayGrad;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    // Overlay oscuro superior
+    const topGrad = ctx.createLinearGradient(0, 0, 0, SIZE * 0.22);
+    topGrad.addColorStop(0, 'rgba(0,0,0,0.7)');
+    topGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = topGrad;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    this.dibujarResumenSesion(ctx, sesion, SIZE);
+    this.dibujarWatermarkSimple(ctx, SIZE);
+
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(blob => {
+        blob ? resolve(blob) : reject(new Error('Canvas vacío'));
+      }, 'image/png');
+    });
+  }
+
+  /**
+   * Comparte una sesión de rutina (por WhatsApp o menú nativo según soporte)
+   */
+  async compartirSesionRutina(sesion: SesionRutina, textoCompartir: string, onReadyToShare?: () => void): Promise<void> {
+    try {
+      const imageBlob = await Promise.race([
+        this.generarImagenSesionRutina(sesion),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout maestro generación imagen')), 5000))
+      ]);
+      const imageFile = new File([imageBlob], 'gym-app-entrenamiento.png', { type: 'image/png' });
+
+      if (onReadyToShare) {
+        onReadyToShare();
+      }
+
+      if (navigator.share && navigator.canShare?.({ files: [imageFile] })) {
+        try {
+          await navigator.share({ files: [imageFile], text: textoCompartir });
+          return;
+        } catch (err: unknown) {
+          if (err instanceof Error && (err.name === 'AbortError' || err.name === 'NotAllowedError')) {
+            return;
+          }
+        }
+      }
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Gym App', text: textoCompartir });
+          return;
+        } catch { /* continuar */ }
+      }
+
+      this.downloadImage(imageBlob, 'gym-app-entrenamiento.png');
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(textoCompartir)}`;
+      window.open(waUrl, '_blank');
+
+      const toast = await this.toastCtrl.create({
+        message: 'Imagen guardada. Abriendo WhatsApp...',
+        duration: 2000,
+        color: 'success',
+        position: 'bottom'
+      });
+      toast.present();
+
+    } catch (error) {
+      console.error('[SocialShareService] Error al compartir sesión:', error);
+      if (onReadyToShare) {
+        onReadyToShare();
+      }
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(textoCompartir)}`;
+      window.open(waUrl, '_blank');
     }
   }
 }

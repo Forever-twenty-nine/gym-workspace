@@ -69,12 +69,8 @@
                 <div
                     class="bg-white/60 dark:bg-white/10 backdrop-blur-md rounded-2xl border border-gray-200 dark:border-white/20 mx-1 mb-6 p-2 shadow-sm dark:shadow-lg">
                     <ion-item lines="none" class="bg-transparent" style="--background: transparent;">
-                        <ion-icon name="share-social-outline" slot="start" class="text-primary text-xl"></ion-icon>
                         <ion-label>
-                            <h3 class="text-sm font-bold text-gray-900 dark:text-white">Compartir en comunidad</h3>
-                            <p
-                                class="text-[10px] font-medium text-gray-500 dark:text-white/50 uppercase tracking-tighter">
-                                Hacer visible en el feed</p>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white">Compartir en comunidad</h3>
                         </ion-label>
                         <ion-toggle slot="end" [checked]="sesionSeleccionada.compartida"
                             (ionChange)="toggleCompartir($event)"
@@ -148,25 +144,16 @@
 
         <ion-footer class="ion-no-border bg-white dark:bg-gray-900 p-6 shadow-lg">
             <div class="flex flex-row items-center w-full justify-center gap-3">
-                <!-- Botón de compartir en WhatsApp -->
-                <ion-button expand="block" color="success"
+                <ion-button expand="block" color="primary"
                     class="font-bold tracking-wide rounded-xl shadow-lg h-12 flex-1 m-0 text-sm"
+                    [disabled]="isSharing() || isUploading()"
                     (click)="compartirWhatsApp()">
-                    <ion-icon name="logo-whatsapp" slot="start" class="text-xl"></ion-icon>
-
-                </ion-button>
-                <!-- Botón de compartir en Instagram -->
-                <ion-button expand="block" color="secondary"
-                    class="font-bold tracking-wide rounded-xl shadow-lg h-12 flex-1 m-0 text-sm"
-                    (click)="compartirInstagram()">
-                    <ion-icon name="logo-instagram" slot="start" class="text-xl"></ion-icon>
-
-                </ion-button>
-                <!-- Botón de compartir en otras plataformas -->
-                <ion-button expand="block" fill="solid"
-                    class="font-bold tracking-wide rounded-xl h-12 flex-1 m-0 text-sm" (click)="compartirSesion()">
-                    <ion-icon name="share-social-outline" slot="start" class="text-xl"></ion-icon>
-
+                    @if (isSharing()) {
+                        <ion-spinner name="crescent" slot="start" style="--color: white; width: 20px; height: 20px;"></ion-spinner>
+                    } @else {
+                        <ion-icon name="share-social-outline" slot="start" class="text-xl"></ion-icon>
+                    }
+                    Compartir
                 </ion-button>
                 <!-- Botón de eliminar sesión -->
                 <ion-button expand="block" fill="outline" color="danger"

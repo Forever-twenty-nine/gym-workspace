@@ -24,9 +24,7 @@ import {
     closeOutline,
     shareSocialOutline,
     barbellOutline,
-    logoWhatsapp,
-    cameraOutline,
-    logoInstagram
+    cameraOutline
 } from 'ionicons/icons';
 import { inject, signal, computed } from '@angular/core';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
@@ -36,6 +34,7 @@ import { FirebaseStorageService } from '../../../../core/services/firebase-stora
 import { Plan, SesionRutina } from 'gym-library';
 import { compressImage } from '../../../../core/utils/image-compression';
 import { IonSpinner, ToastController } from '@ionic/angular/standalone';
+import { SocialShareService } from '../../../../core/services/social-share.service';
 
 @Component({
     selector: 'app-progreso-historial-detalle',
@@ -68,6 +67,7 @@ export class ProgresoHistorialDetalleComponent {
     private userService = inject(UserService);
     private storageService = inject(FirebaseStorageService);
     private toastCtrl = inject(ToastController);
+    private socialShareService = inject(SocialShareService);
 
     @Input() isOpen = false;
     @Input() sesionSeleccionada: SesionRutina | null = null;
@@ -75,6 +75,7 @@ export class ProgresoHistorialDetalleComponent {
 
     isPremium = computed(() => this.authService.currentUser()?.plan === Plan.PREMIUM);
     isUploading = signal(false);
+    isSharing = signal(false);
     fotoProgresoUrl = signal<string | null>(null);
 
     constructor() {
@@ -85,9 +86,7 @@ export class ProgresoHistorialDetalleComponent {
             closeOutline,
             shareSocialOutline,
             barbellOutline,
-            logoWhatsapp,
-            cameraOutline,
-            logoInstagram
+            cameraOutline
         });
     }
 
@@ -212,32 +211,22 @@ export class ProgresoHistorialDetalleComponent {
         return Math.round((segundos || 0) / 60);
     }
 
-    async compartirSesion() {
+    async compartirWhatsApp() {
         if (!this.sesionSeleccionada) return;
-        const textoCompartir = this.generarTextoCompartir();
 
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Entrenamiento Completado',
-                    text: textoCompartir,
-                });
-            } catch (error) {
-                console.log('Error compartiendo:', error);
-            }
-        } else {
-            // Fallback si no está soportado (Copia al portapapeles)
-            navigator.clipboard.writeText(textoCompartir).then(() => {
-                alert('¡Texto de tu entrenamiento copiado al portapapeles para compartir!');
-            });
+        const textoCompartir = this.generarTextoCompartir();
+        this.isSharing.set(true);
+
+        try {
+            await this.socialShareService.compartirSesionRutina(
+                this.sesionSeleccionada,
+                textoCompartir,
+                () => this.isSharing.set(false)
+            );
+        } catch (error) {
+            console.error('Error al compartir:', error);
+            this.isSharing.set(false);
         }
-    }
-
-    compartirWhatsApp() {
-        if (!this.sesionSeleccionada) return;
-        const textoCompartir = this.generarTextoCompartir();
-        const url = `https://wa.me/?text=${encodeURIComponent(textoCompartir)}`;
-        window.open(url, '_blank');
     }
 
     private generarTextoCompartir(): string {
@@ -252,25 +241,9 @@ export class ProgresoHistorialDetalleComponent {
                 ejerciciosStr += `${i + 1}. ${ej.nombre || 'Ejercicio'}\n`;
             });
         }
-        return `¡Terminé mi entrenamiento de "${nombre}" en ${tiempo} minutos! 💪 Entrenamiento completado con la App Gym.${ejerciciosStr}`;
+        return `¡Terminé mi entrenamiento de "${nombre}" en ${tiempo} minutos! 💪 Entrenamiento completado con Gym App.${ejerciciosStr}`;
     }
 
-    async compartirInstagram() {
-        if (!this.sesionSeleccionada) return;
-        const textoCompartir = this.generarTextoCompartir();
-
-        try {
-            await navigator.clipboard.writeText(textoCompartir);
-            await this.showToast('¡Texto copiado al portapapeles! Abre Instagram para compartir.', 'success');
-            window.open('instagram://', '_blank');
-            setTimeout(() => {
-                window.open('https://instagram.com', '_blank');
-            }, 1000);
-        } catch (error) {
-            console.error('Error al copiar al portapapeles:', error);
-            this.showToast('No se pudo copiar el texto automáticamente.', 'danger');
-        }
-    }
     eliminarSesion(arg0: SesionRutina, $event: PointerEvent) {
         throw new Error('Method not implemented.');
     }

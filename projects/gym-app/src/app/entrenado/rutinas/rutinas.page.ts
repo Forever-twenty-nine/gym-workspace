@@ -1,4 +1,4 @@
-import { Component, signal, inject, computed, effect, afterNextRender } from '@angular/core';
+import { Component, signal, inject, computed, effect } from '@angular/core';
 import {
   IonContent, IonHeader, IonSegment, IonSegmentButton, IonLabel,
   SegmentCustomEvent
@@ -18,7 +18,7 @@ import { RutinaDetalleModalComponent } from './components/rutina-detalle-modal/r
 import { EncuentroDetalleModalComponent } from './components/encuentro-detalle-modal/encuentro-detalle-modal.component';
 import { RutinasSemanaComponent } from './components/rutinas-semana/rutinas-semana.component';
 import { RutinasHistorialComponent } from './components/rutinas-historial/rutinas-historial.component';
-import { ProgresoHistorialDetalleComponent } from '../progreso/components/progreso-historial-detalle/progreso-historial-detalle.component';
+import { ProgresoHistorialDetalleComponent } from './components/progreso-historial-detalle/progreso-historial-detalle.component';
 import { AlertController } from '@ionic/angular/standalone';
 import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
 
@@ -243,10 +243,10 @@ export class RutinasPage {
   iniciarEntrenamiento(rutina: Rutina) {
     if (this.modalAbierto()) this.cerrarModal();
     blurActiveElement();
-    // Use afterNextRender so navigation happens after the modal close animation frame
-    afterNextRender(() => {
+    // Defer navigation one tick so the modal close animation can start
+    setTimeout(() => {
       this.router.navigateByUrl(`/rutina-progreso/${rutina.id}`).catch(console.error);
-    });
+    }, 0);
   }
 
   iniciarEntrenamientoDirecto(event: Event, rutina: Rutina) {
@@ -266,8 +266,8 @@ export class RutinasPage {
 
   irASocialDesdeEncuentro() {
     this.cerrarModalEncuentro();
-    afterNextRender(() => {
+    setTimeout(() => {
       this.router.navigateByUrl('/entrenado-tabs/social').catch(console.error);
-    });
+    }, 0);
   }
 }
