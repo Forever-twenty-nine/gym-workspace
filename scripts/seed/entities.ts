@@ -117,18 +117,17 @@ export async function createGym(
   traineesIds: string[]
 ) {
   const gymUid = gymConfig.id;
-  const isPT = gymConfig.isPersonalTrainer || false;
-  const roleType = isPT ? "personal_trainer" : "gimnasio";
+  const roleType = "gimnasio";
   const photoURL = await resolveProfilePhoto(gymUid, gymConfig.nombre, roleType, gymConfig.plan);
 
   const gimnasioDoc = buildGymDoc(
-    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, isPersonalTrainer: isPT, photoURL },
-    isPT ? [gymUid] : trainersIds,
+    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, photoURL },
+    trainersIds,
     traineesIds
   );
 
   const gymUserData = buildGymUser(
-    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, isPersonalTrainer: isPT, photoURL }
+    { id: gymUid, nombre: gymConfig.nombre, email: gymConfig.email, direccion: gymConfig.direccion, plan: gymConfig.plan, photoURL }
   );
 
   const dbPromises: Promise<unknown>[] = [
@@ -137,28 +136,11 @@ export async function createGym(
     ensureAuthUser(auth, gymUid, gymConfig.email, "admin123", gymConfig.nombre, undefined, photoURL),
   ];
 
-  if (isPT) {
+  for (const trainerId of trainersIds) {
     dbPromises.push(
-      db.collection("entrenadores").doc(gymUid).set(
-        {
-          id: gymUid,
-          gimnasioId: gymUid,
-          fechaRegistro: Timestamp.now(),
-          entrenadosAsignadosIds: traineesIds,
-          entrenadosPremiumIds: gymConfig.plan === Plan.PREMIUM ? traineesIds : [],
-          ...(photoURL ? { photoURL } : {}),
-        },
-        { merge: true }
-      ),
-      db.collection("usuarios").doc(gymUid).set({ entrenadosAsignadosIds: traineesIds }, { merge: true })
+      db.collection("entrenadores").doc(trainerId).set({ gimnasioId: gymUid }, { merge: true }),
+      db.collection("usuarios").doc(trainerId).set({ gimnasioId: gymUid }, { merge: true })
     );
-  } else {
-    for (const trainerId of trainersIds) {
-      dbPromises.push(
-        db.collection("entrenadores").doc(trainerId).set({ gimnasioId: gymUid }, { merge: true }),
-        db.collection("usuarios").doc(trainerId).set({ gimnasioId: gymUid }, { merge: true })
-      );
-    }
   }
 
   for (const traineeId of traineesIds) {

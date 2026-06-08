@@ -10,7 +10,7 @@ function getLocalImageName(name: string, role: string, plan: Plan): string {
     return isPremium ? "gym_premium.png" : "gym_free.png";
   }
 
-  if (role === "entrenador" || role === "personal_trainer") {
+  if (role === "entrenador") {
     const isFemale =
       normalized.includes("ana") ||
       normalized.includes("maria") ||

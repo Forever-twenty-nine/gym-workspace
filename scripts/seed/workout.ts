@@ -163,13 +163,6 @@ export async function seedTrainerWorkouts(
   trainees: SeedTraineeRef[]
 ) {
   const trainersToProcess: SeedTrainerRef[] = [...trainers];
-  if (isPT && trainersToProcess.length === 0) {
-    trainersToProcess.push({
-      uid: gymUid,
-      nombre: config.gym.nombre,
-      plan: config.gym.plan,
-    });
-  }
 
   for (const trainer of trainersToProcess) {
     // console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
@@ -185,12 +178,10 @@ export async function seedTrainerWorkouts(
     );
 
     const trainerDocUpdate = { ejerciciosCreadasIds: trainerExercises };
-    if (!isPT || trainer.uid !== gymUid) {
-      await Promise.all([
-        db.collection("entrenadores").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
-        db.collection("usuarios").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
-      ]);
-    }
+    await Promise.all([
+      db.collection("entrenadores").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
+      db.collection("usuarios").doc(trainer.uid).set(trainerDocUpdate, { merge: true }),
+    ]);
 
     const trainerTrainees = trainees.filter((t) => t.trainerUid === trainer.uid);
     const allTrainerRoutines: string[] = [];

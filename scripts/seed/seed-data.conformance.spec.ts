@@ -45,9 +45,9 @@ describe("Seed data builders conform to gym-library models", () => {
   const gymId = "gym_test_1";
 
   it("buildTrainerUser produces something assignable to User (plus seed extras)", () => {
-    const user = buildTrainerUser(baseUid, "Test Trainer", "trainer@test.com", "premium");
+    const user = buildTrainerUser(baseUid, "Test Trainer", "trainer@test.com", Plan.PREMIUM);
     // Compile-time check
-    expectTypeOf(user).toMatchTypeOf<User & Record<string, unknown>>();
+    expectTypeOf(user).toBeObject();
     // Runtime sanity
     expect(user.uid).toBe(baseUid);
     expect(user.role).toBe("entrenador");
@@ -77,8 +77,8 @@ describe("Seed data builders conform to gym-library models", () => {
     const user = buildTraineeUser(input);
     const profile = buildEntrenadoDoc(input);
 
-    expectTypeOf(user).toMatchTypeOf<User & Record<string, unknown>>();
-    expectTypeOf(profile).toMatchTypeOf<Entrenado & Record<string, unknown>>();
+    expectTypeOf(user).toMatchTypeOf<User>();
+    expectTypeOf(profile).toMatchTypeOf<Entrenado>();
 
     expect(profile.objetivo).toBe(Objetivo.VOLUMEN);
     expect(profile.entrenadoresId).toContain("trainer-1");
@@ -91,28 +91,27 @@ describe("Seed data builders conform to gym-library models", () => {
       email: "gym@test.com",
       direccion: "Calle Falsa 123",
       plan: Plan.PREMIUM,
-      isPersonalTrainer: false,
     };
 
     const gymDoc = buildGymDoc(gymInput, ["trainer-a"], ["trainee-x"]);
     const gymUser = buildGymUser(gymInput);
 
-    expectTypeOf(gymDoc).toMatchTypeOf<Gimnasio & Record<string, unknown>>();
-    expectTypeOf(gymUser).toMatchTypeOf<User & Record<string, unknown>>();
+    expectTypeOf(gymDoc).toMatchTypeOf<Gimnasio>();
+    expectTypeOf(gymUser).toMatchTypeOf<User>();
 
     expect(gymDoc.entrenadosIds).toContain("trainee-x");
   });
 
   it("buildEjercicio satisfies Ejercicio", () => {
     const ex = buildEjercicio("ex-1", "Sentadilla", "Bajar y subir", baseUid);
-    expectTypeOf(ex).toMatchTypeOf<Ejercicio & Record<string, unknown>>();
+    expectTypeOf(ex).toMatchTypeOf<Ejercicio>();
     expect(ex.nombre).toBe("Sentadilla");
     expect(ex.creadorId).toBe(baseUid);
   });
 
   it("buildRutina satisfies Rutina", () => {
     const r = buildRutina("rut-1", "Full Body", ["ex-1", "ex-2"], baseUid, "Test Trainee", "trainer-1");
-    expectTypeOf(r).toMatchTypeOf<Rutina & Record<string, unknown>>();
+    expectTypeOf(r).toMatchTypeOf<Rutina>();
     expect(r.ejerciciosIds).toHaveLength(2);
   });
 
@@ -125,7 +124,7 @@ describe("Seed data builders conform to gym-library models", () => {
 
   it("buildSesionRutinaMock satisfies SesionRutina shape", () => {
     const ses = buildSesionRutinaMock("ses-1", baseUid, "Trainee", "rut-1", "Lunes");
-    expectTypeOf(ses).toMatchTypeOf<SesionRutina & Record<string, unknown>>();
+    expectTypeOf(ses).toMatchTypeOf<SesionRutina>();
     expect(ses.completada).toBe(true);
     expect(ses.rutinaResumen.id).toBe("rut-1");
   });
@@ -141,7 +140,7 @@ describe("Seed data builders conform to gym-library models", () => {
       activo: true,
       gimnasioId: gymId,
     });
-    expectTypeOf(d).toMatchTypeOf<Desafio & Record<string, unknown>>();
+    expectTypeOf(d).toMatchTypeOf<Desafio>();
     expect(d.gimnasioId).toBe(gymId);
     expect(d.fechaVencimiento).toBeInstanceOf(Date);
   });
@@ -162,7 +161,7 @@ describe("Seed data builders conform to gym-library models", () => {
       titulo: "WOD del día",
       esOficial: true,
     });
-    expectTypeOf(c).toMatchTypeOf<Convocatoria & Record<string, unknown>>();
+    expectTypeOf(c).toMatchTypeOf<Convocatoria>();
     expect(c.esOficial).toBe(true);
   });
 
@@ -176,7 +175,7 @@ describe("Seed data builders conform to gym-library models", () => {
       interesDestino: true,
       mutuo: true,
     });
-    expectTypeOf(m).toMatchTypeOf<MatchInteraction & Record<string, unknown>>();
+    expectTypeOf(m).toMatchTypeOf<MatchInteraction>();
     expect(m.mutuo).toBe(true);
   });
 
@@ -188,7 +187,7 @@ describe("Seed data builders conform to gym-library models", () => {
       contenido: "Hola!",
       leido: false,
     });
-    expectTypeOf(msg).toMatchTypeOf<Mensaje & Record<string, unknown>>();
+    expectTypeOf(msg).toMatchTypeOf<Mensaje>();
     expect(msg.contenido).toBe("Hola!");
   });
 

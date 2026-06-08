@@ -7,12 +7,11 @@ import { seedUsers } from "./users";
 import { seedTrainerWorkouts, seedTraineeCreations } from "./workout";
 
 export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
-  const isPT = config.gym.isPersonalTrainer || false;
   // minimal log only on error path; for quiet run, no per-config noise
-  // console.log(`Seeding ${isPT ? 'PT' : 'Gym'}: ${config.gym.nombre}`);
+  // console.log(`Seeding Gym: ${config.gym.nombre}`);
 
   const { trainers, trainees } = await seedUsers(db, auth, config);
-  const trainersForSocial = await seedTrainerWorkouts(db, config, isPT, config.gym.id, trainers, trainees);
+  const trainersForSocial = await seedTrainerWorkouts(db, config, false, config.gym.id, trainers, trainees);
 
   await seedTraineeCreations(db, config, trainees);
 

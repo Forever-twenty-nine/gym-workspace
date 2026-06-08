@@ -12,9 +12,6 @@ export async function seedUsers(
   auth: Auth,
   config: SeedConfig
 ): Promise<{ trainers: SeedTrainerRef[]; trainees: SeedTraineeRef[] }> {
-  const isPT = config.gym.isPersonalTrainer || false;
-  const gymUid = config.gym.id;
-
   const createdTrainers = await Promise.all(
     config.trainers.map((t) => createTrainer(db, auth, t))
   );
@@ -62,21 +59,6 @@ export async function seedUsers(
           ),
         ]);
       })
-    );
-  } else if (isPT) {
-    // console.log(`   Asignando ${config.trainees.length} alumnos directamente al Personal Trainer...`);
-
-    const createdTrainees = await Promise.all(
-      config.trainees.map((traineeConf, i) => createTrainee(db, auth, traineeConf, gymUid, i))
-    );
-    trainees.push(
-      ...createdTrainees.map((t) => ({
-        uid: t.uid,
-        nombre: t.nombre!,
-        plan: t.plan!,
-        trainerUid: t.trainerUid,
-        photoURL: t.photoURL ?? undefined,
-      }))
     );
   }
 

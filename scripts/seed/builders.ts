@@ -53,7 +53,6 @@ export interface GymSeedInput {
   email: string;
   direccion: string;
   plan: Plan;
-  isPersonalTrainer?: boolean;
   photoURL?: string;
 }
 
@@ -122,27 +121,25 @@ export function buildEntrenadoDoc(input: TraineeSeedInput): Entrenado & Record<s
 }
 
 export function buildGymDoc(input: GymSeedInput, trainersIds: string[], traineesIds: string[]): Gimnasio & Record<string, unknown> {
-  const isPT = !!input.isPersonalTrainer;
   return {
     id: input.id,
     nombre: input.nombre,
     direccion: input.direccion,
     activo: true,
-    isPersonalTrainer: isPT,
+    isPersonalTrainer: false,
     plan: input.plan as any,
-    entrenadoresIds: isPT ? [input.id] : trainersIds,
+    entrenadoresIds: trainersIds,
     entrenadosIds: traineesIds,
     ...(input.photoURL ? { photoURL: input.photoURL } : {}),
   };
 }
 
 export function buildGymUser(input: GymSeedInput): User & Record<string, unknown> {
-  const isPT = !!input.isPersonalTrainer;
   return {
     uid: input.id,
     nombre: input.nombre,
     email: input.email,
-    role: isPT ? Rol.PERSONAL_TRAINER : Rol.GIMNASIO,
+    role: Rol.GIMNASIO,
     onboarded: true,
     plan: input.plan as any,
     fechaCreacion: new Date(),

@@ -99,9 +99,6 @@ export async function clearSeedProfile(db: Firestore, auth: Auth, config: SeedCo
     ...trainerUids.map((uid) => db.collection("entrenadores").doc(uid)),
     ...traineeUids.map((uid) => db.collection("entrenados").doc(uid)),
   ];
-  if (config.gym.isPersonalTrainer) {
-    coreRefs.push(db.collection("entrenadores").doc(gymUid));
-  }
   await deleteDocumentRefs(db, coreRefs);
 
   await clearAuthUsers(auth, [config]);
