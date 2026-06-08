@@ -14,8 +14,18 @@ import {
   buildSesionRutinaMock,
   toFirestoreWrite,
 } from "./builders";
+import { uploadPostImage } from "./storage";
 
 const DIAS_SEMANA = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+/** Número exacto de ejercicios que crea cada entrenador */
+const EXERCISES_PER_TRAINER = 9;
+/** Número exacto de rutinas por entrenado (en días distintos) */
+const ROUTINES_PER_TRAINEE = 3;
+/** Número exacto de ejercicios por rutina */
+const EXERCISES_PER_ROUTINE = 3;
+/** Número de publicaciones (sesiones compartidas) por entrenado */
+const SESSIONS_PER_TRAINEE = 2;
 
 export interface SeedTrainerRef {
   uid: string;
@@ -42,7 +52,6 @@ export async function createExercise(
   const id = ref.id;
   const scopeBase = `exercise:${entrenadorId ?? "global"}:${nombre}`;
 
-  // Note: we still use random here for variety in seed; the builder is used as base shape
   const base = buildEjercicio(id, nombre, descripcion, entrenadorId);
   const data = {
     ...base,
@@ -68,7 +77,6 @@ export async function createRoutine(
   const docRef = db.collection("rutinas").doc();
   const id = docRef.id;
   const data = buildRutina(id, nombre, ejerciciosIds, usuarioId, nombreUsuario, entrenadorId);
-  // override description for day info
   (data as any).descripcion = `Rutina ${nombre} - dia ${dia}`;
   await docRef.set(toFirestoreWrite(data));
   stats.routinesCreated++;
@@ -80,10 +88,12 @@ export async function createMockSharedSession(
   traineeId: string,
   traineeName: string,
   routineId: string,
-  routineName: string
+  routineName: string,
+  sessionIndex: number,
+  postPhotoURL?: string
 ) {
-  const sesionId = `session_${traineeId}_${sessionIdSuffix(traineeId, routineId)}`;
-  const sesion = buildSesionRutinaMock(sesionId, traineeId, traineeName, routineId, routineName);
+  const sesionId = `session_${traineeId}_${sessionIndex}_${sessionIdSuffix(traineeId, `${routineId}_${sessionIndex}`)}`;
+  const sesion = buildSesionRutinaMock(sesionId, traineeId, traineeName, routineId, routineName, postPhotoURL);
   await db.collection("sesiones-rutina").doc(sesionId).set(toFirestoreWrite(sesion));
   stats.sessionsCreated++;
 }
@@ -95,7 +105,6 @@ export async function seedTraineeCreations(
 ) {
   const createdExercisesByCreator: Record<string, string[]> = {};
 
-  // Crear ejercicios self-authored por trainees (premium feature "creaciones")
   for (const exConfig of config.traineeCreatedExercises || []) {
     const id = await createExercise(
       db,
@@ -109,7 +118,6 @@ export async function seedTraineeCreations(
     createdExercisesByCreator[exConfig.creadorId].push(id);
   }
 
-  // Actualizar perfiles de los trainees con sus ejercicios creados
   for (const [creadorId, ids] of Object.entries(createdExercisesByCreator)) {
     if (ids.length > 0) {
       await Promise.all([
@@ -119,12 +127,10 @@ export async function seedTraineeCreations(
     }
   }
 
-  // Crear rutinas self-authored por trainees
   for (const rutConfig of config.traineeCreatedRoutines || []) {
     const ejerciciosForCreator = createdExercisesByCreator[rutConfig.creadorId] || [];
     if (ejerciciosForCreator.length === 0) continue;
 
-    // Usar los ejercicios creados por él (hasta 5)
     const routineEjIds = ejerciciosForCreator.slice(0, 5);
 
     const trainee = trainees.find((t) => t.uid === rutConfig.creadorId);
@@ -135,12 +141,11 @@ export async function seedTraineeCreations(
       rutConfig.nombre,
       "Personal",
       routineEjIds,
-      rutConfig.creadorId, // usuarioId (dueño)
+      rutConfig.creadorId,
       nombreUsuario,
-      rutConfig.creadorId  // creadorId = self (trainee)
+      rutConfig.creadorId
     );
 
-    // Actualizar el perfil del entrenado/usuario con rutinasCreadas
     await Promise.all([
       db.collection("entrenados").doc(rutConfig.creadorId).set(
         { rutinasCreadas: [id] },
@@ -165,14 +170,11 @@ export async function seedTrainerWorkouts(
   const trainersToProcess: SeedTrainerRef[] = [...trainers];
 
   for (const trainer of trainersToProcess) {
-    // console.log(`   Creando ejercicios y rutinas para: ${trainer.nombre}`);
-
-
-    const limitExercises = trainer.plan === Plan.FREE || config.gym.plan === Plan.FREE;
-    const exercisesToCreate = limitExercises ? config.exercises.slice(0, 10) : config.exercises;
+    // Tomar exactamente los primeros EXERCISES_PER_TRAINER ejercicios del config
+    const exerciseNames = config.exercises.slice(0, EXERCISES_PER_TRAINER);
 
     const trainerExercises = await Promise.all(
-      exercisesToCreate.map((exName) =>
+      exerciseNames.map((exName) =>
         createExercise(db, exName, `Descripción detallada de ${exName}`, trainer.uid)
       )
     );
@@ -186,25 +188,26 @@ export async function seedTrainerWorkouts(
     const trainerTrainees = trainees.filter((t) => t.trainerUid === trainer.uid);
     const allTrainerRoutines: string[] = [];
 
+    // Elegir ROUTINES_PER_TRAINEE días distintos para TODOS los trainees de este entrenador
+    const baseDays = shuffleScoped(
+      DIAS_SEMANA,
+      `rutinas-dias:${config.gym.id}:${trainer.uid}`
+    ).slice(0, ROUTINES_PER_TRAINEE);
+
     await Promise.all(
-      trainerTrainees.map(async (trainee) => {
-        const numRutinas = trainee.plan === Plan.FREE
-          ? 1
-          : rndInt(`rutinas-count:${config.gym.id}:${trainer.uid}:${trainee.uid}`, 1, 3);
-
-        const selectedDays = shuffleScoped(
-          DIAS_SEMANA,
-          `rutinas-dias:${config.gym.id}:${trainer.uid}:${trainee.uid}`
-        ).slice(0, numRutinas);
-
+      trainerTrainees.map(async (trainee, traineeIdx) => {
         const routineIds: string[] = [];
 
+        // Crear exactamente ROUTINES_PER_TRAINEE rutinas en días distintos
         await Promise.all(
-          selectedDays.map(async (dia) => {
-            const routineExercises = shuffleScoped(
-              trainerExercises,
-              `rutina-ejercicios:${config.gym.id}:${trainer.uid}:${trainee.uid}:${dia}`
-            ).slice(0, Math.min(5, trainerExercises.length));
+          baseDays.map(async (dia, diaIdx) => {
+            // Tomar exactamente EXERCISES_PER_ROUTINE ejercicios del pool del entrenador
+            // Rotados por índice de día para que cada rutina tenga diferentes ejercicios
+            const startIdx = (diaIdx * EXERCISES_PER_ROUTINE) % trainerExercises.length;
+            const routineExercises = [
+              ...trainerExercises.slice(startIdx, startIdx + EXERCISES_PER_ROUTINE),
+              ...trainerExercises.slice(0, Math.max(0, EXERCISES_PER_ROUTINE - (trainerExercises.length - startIdx)))
+            ].slice(0, EXERCISES_PER_ROUTINE);
 
             const routineName = `Rutina de ${dia} - ${trainee.nombre}`;
             const currentRoutineId = await createRoutine(
@@ -242,14 +245,27 @@ export async function seedTrainerWorkouts(
           ),
         ]);
 
-        if (routineIds.length > 0) {
-          const firstDay = selectedDays[0];
+        // Crear exactamente SESSIONS_PER_TRAINEE publicaciones de entrenamientos completados.
+        // Ambas sesiones usan fotos de entrenamiento (no fotos de perfil) para evitar
+        // conflictos de género en los posts del feed.
+        //   • Sesión 0 → post_workout_1 (índice 0)
+        //   • Sesión 1 → post_workout_2 (índice 1)
+        const postPhotoURLs = await Promise.all([
+          uploadPostImage(trainee.uid, 0),
+          uploadPostImage(trainee.uid, 1),
+        ]);
+
+        for (let sessionIdx = 0; sessionIdx < SESSIONS_PER_TRAINEE; sessionIdx++) {
+          const routineForSession = routineIds[sessionIdx % routineIds.length];
+          const diaForSession = baseDays[sessionIdx % baseDays.length];
           await createMockSharedSession(
             db,
             trainee.uid,
             trainee.nombre,
-            routineIds[0],
-            `Rutina de ${firstDay} - ${trainee.nombre}`
+            routineForSession,
+            `Rutina de ${diaForSession} - ${trainee.nombre}`,
+            sessionIdx,
+            postPhotoURLs[sessionIdx]
           );
         }
       })

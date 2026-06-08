@@ -21,9 +21,6 @@ export async function seedFollowing(
   config: SeedConfig,
   trainees: SeedTraineeRef[]
 ) {
-  // quiet mode: no per-phase log
-  // console.log("   Estableciendo relaciones de seguimiento...");
-
   const seguidosMap = new Map<string, Set<string>>();
   const seguidoresMap = new Map<string, Set<string>>();
 
@@ -64,29 +61,58 @@ export async function seedDesafios(
   config: SeedConfig,
   trainees: SeedTraineeRef[]
 ) {
-  // console.log("   Creando desafíos...");
+  // Un desafío por cada entrenado (generado dinámicamente)
+  const desafioPromises = trainees.map(async (trainee, idx) => {
+    const desafiosDisciplinas = [
+      { disciplina: "Running", titulo: `¡Completé 5km en menos de 25 min! ¿Quién se anima? 🏃‍♂️` },
+      { disciplina: "Powerlifting", titulo: `Sentadilla 100kg x 5 reps. ¿Quién me sigue el ritmo? 🏋️` },
+      { disciplina: "Calistenia", titulo: `50 flexiones en serie. Reto para valientes 💪` },
+      { disciplina: "Crossfit", titulo: `AMRAP 10 min: 10 burpees + 10 pull-ups. ¿Te sumás? 🔥` },
+      { disciplina: "Musculación", titulo: `Press de banca 80kg x 3. ¡Nuevo record personal! 💥` },
+      { disciplina: "Running", titulo: `10km bajo los 50 minutos. El cardio no miente 🎯` },
+    ];
+    const { disciplina, titulo } = desafiosDisciplinas[idx % desafiosDisciplinas.length];
+    const desafioId = `desafio_${config.gym.id}_${trainee.uid}`;
+    const desafio = buildDesafio({
+      id: desafioId,
+      creadorId: trainee.uid,
+      creadorNombre: trainee.nombre,
+      titulo,
+      logroRelacionado: `${disciplina} - ${trainee.nombre}`,
+      disciplina,
+      activo: true,
+      gimnasioId: config.gym.id,
+    });
+    await db.collection("desafios").doc(desafioId).set(toFirestoreWrite(desafio));
+    stats.challengesCreated++;
+  });
 
-  await Promise.all(
-    config.desafios.map(async (d) => {
-      const matchTrainee = trainees.find(
-        (t) => slugifyName(t.nombre) === d.creadorId.replace("trainee_", "")
-      );
-      const creadorIdFinal = matchTrainee ? matchTrainee.uid : d.creadorId;
-      const creadorNombreFinal = matchTrainee ? matchTrainee.nombre : d.creadorNombre;
-      const desafio = buildDesafio({
-        id: d.id,
-        creadorId: creadorIdFinal,
-        creadorNombre: creadorNombreFinal,
-        titulo: d.titulo,
-        logroRelacionado: d.logroRelacionado,
-        disciplina: d.disciplina,
-        activo: d.activo,
-        gimnasioId: config.gym.id,
-      });
+  // También sembrar los desafíos estáticos del config (para retrocompatibilidad)
+  const staticDesafioPromises = (config.desafios || []).map(async (d) => {
+    const matchTrainee = trainees.find(
+      (t) => slugifyName(t.nombre) === d.creadorId.replace("trainee_", "")
+    );
+    const creadorIdFinal = matchTrainee ? matchTrainee.uid : d.creadorId;
+    const creadorNombreFinal = matchTrainee ? matchTrainee.nombre : d.creadorNombre;
+    const desafio = buildDesafio({
+      id: d.id,
+      creadorId: creadorIdFinal,
+      creadorNombre: creadorNombreFinal,
+      titulo: d.titulo,
+      logroRelacionado: d.logroRelacionado,
+      disciplina: d.disciplina,
+      activo: d.activo,
+      gimnasioId: config.gym.id,
+    });
+    // Solo crear si no existe ya uno dinámico con el mismo creador
+    const exists = trainees.some((t) => t.uid === creadorIdFinal);
+    if (!exists) {
       await db.collection("desafios").doc(d.id).set(toFirestoreWrite(desafio));
       stats.challengesCreated++;
-    })
-  );
+    }
+  });
+
+  await Promise.all([...desafioPromises, ...staticDesafioPromises]);
 }
 
 export async function seedMatches(
@@ -94,8 +120,6 @@ export async function seedMatches(
   config: SeedConfig,
   trainees: SeedTraineeRef[]
 ) {
-  // console.log("   Creando matches fitness y mensajes asociados...");
-
   await Promise.all(
     config.matches.map(async (m) => {
       const sourceTrainee = trainees.find(
@@ -148,108 +172,113 @@ export async function seedMatches(
   );
 }
 
+/**
+ * Crea convocatorias para el gimnasio:
+ * - 2 convocatorias oficiales de entrenadores (una por entrenador)
+ * - 1 convocatoria por cada entrenado
+ */
 export async function seedConvocatorias(
   db: Firestore,
   gymUid: string,
   trainees: SeedTraineeRef[],
   trainers: SeedTrainerRef[]
 ) {
-  // console.log("   Creando convocatorias fitness...");
-
-  if (trainees.length < 2) return;
-
   const hoy = new Date();
-  const manana = new Date();
-  manana.setDate(hoy.getDate() + 1);
+  const convPromises: Promise<unknown>[] = [];
 
-  const [t1, t2] = trainees;
-  const convPromises: Promise<unknown>[] = [
-    db.collection("convocatorias").doc(`conv-${t1.uid}-1`).set(
-      toFirestoreWrite(
-        buildConvocatoria({
-          id: `conv-${t1.uid}-1`,
-          creadorId: t1.uid,
-          creadorNombre: t1.nombre,
-          creadorFoto: t1.photoURL || null,
-          gimnasioId: gymUid,
-          fechaEntrenamiento: hoy,
-          horaInicio: "19:00",
-          horaFin: "20:30",
-          mensaje: "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
-          interesados: [],
-          activo: true,
-          creadorRol: 'entrenado',
-          esOficial: false,
-        })
-      )
-    ),
-    db.collection("convocatorias").doc(`conv-${t2.uid}-2`).set(
-      toFirestoreWrite(
-        buildConvocatoria({
-          id: `conv-${t2.uid}-2`,
-          creadorId: t2.uid,
-          creadorNombre: t2.nombre,
-          creadorFoto: t2.photoURL || null,
-          gimnasioId: gymUid,
-          fechaEntrenamiento: manana,
-          horaInicio: "08:00",
-          horaFin: "09:30",
-          mensaje: "Pecho y bíceps mañana temprano. ¿Quién se une para ayudarnos a sacar las últimas reps al fallo? 🔥",
-          interesados: [],
-          activo: true,
-          creadorRol: 'entrenado',
-          esOficial: false,
-        })
-      )
-    ),
+  // ─── Convocatorias de ENTRENADORES (2 por gimnasio, una por entrenador) ───
+  const horasEntrenadores = [
+    { horaInicio: "07:00", horaFin: "08:30" },
+    { horaInicio: "18:00", horaFin: "19:30" },
   ];
-  stats.convocatoriasCreated += 2;
+  const mensajesEntrenador = [
+    "💪 WOD del día: AMRAP 20 min - 5 Pull-ups, 10 Push-ups, 15 Squats. Vengan a dar el 100%.",
+    "🏋️ Clase de fuerza: Powerlifting enfocado en sentadilla y peso muerto. ¡Técnica y carga máxima!",
+  ];
+  const titulosEntrenador = [
+    "WOD del Día: Acondicionamiento Total",
+    "Clase Especial: Fuerza y Técnica",
+  ];
 
-  if (trainers.length > 0) {
-    const trainer = trainers[0];
+  for (let i = 0; i < Math.min(trainers.length, 2); i++) {
+    const trainer = trainers[i];
+    const daysAhead = i + 1;
+    const fechaEntrenamiento = new Date(hoy);
+    fechaEntrenamiento.setDate(hoy.getDate() + daysAhead);
+
+    const convId = `conv-trainer-${trainer.uid}-${gymUid}`;
     convPromises.push(
-      db.collection("convocatorias").doc(`conv-${trainer.uid}-wod`).set(
+      db.collection("convocatorias").doc(convId).set(
         toFirestoreWrite(
           buildConvocatoria({
-            id: `conv-${trainer.uid}-wod`,
+            id: convId,
             creadorId: trainer.uid,
             creadorNombre: trainer.nombre,
             creadorFoto: trainer.photoURL || null,
             gimnasioId: gymUid,
-            fechaEntrenamiento: hoy,
-            horaInicio: "08:00",
-            horaFin: "09:30",
-            mensaje: "Calentamiento: 5 min movilidad. WOD: AMRAP 20 min de: 5 Pull-ups, 10 Push-ups, 15 Squats. ¡A darlo todo! 🏋️‍♂️🔥",
-            interesados: [t1.uid],
+            fechaEntrenamiento,
+            horaInicio: horasEntrenadores[i].horaInicio,
+            horaFin: horasEntrenadores[i].horaFin,
+            mensaje: mensajesEntrenador[i],
+            interesados: trainees.length > 0 ? [trainees[0].uid] : [],
             activo: true,
             creadorRol: "entrenador",
-            titulo: "WOD del Día: Resistencia Acondicionamiento",
-            esOficial: true,
-          })
-        )
-      ),
-      db.collection("convocatorias").doc(`conv-${trainer.uid}-wod2`).set(
-        toFirestoreWrite(
-          buildConvocatoria({
-            id: `conv-${trainer.uid}-wod2`,
-            creadorId: trainer.uid,
-            creadorNombre: trainer.nombre,
-            creadorFoto: trainer.photoURL || null,
-            gimnasioId: gymUid,
-            fechaEntrenamiento: manana,
-            horaInicio: "18:00",
-            horaFin: "19:30",
-            mensaje: "Entrenamiento de fuerza enfocado en Powerlifting (Peso Muerto y Sentadilla). Técnica y series pesadas.",
-            interesados: [],
-            activo: true,
-            creadorRol: "entrenador",
-            titulo: "Clase Especial: Fuerza y Técnica",
+            titulo: titulosEntrenador[i],
             esOficial: true,
           })
         )
       )
     );
-    stats.convocatoriasCreated += 2;
+    stats.convocatoriasCreated++;
+  }
+
+  // ─── Convocatorias de ENTRENADOS (1 por entrenado) ───
+  const mensajesEntrenado = [
+    "¡Hoy toca rutina de tren superior! ¿Alguien me acompaña en la zona de peso libre? 💪🏋️‍♀️",
+    "Pecho y bíceps mañana temprano. ¿Quién se une para las últimas reps al fallo? 🔥",
+    "Piernas intensas esta tarde. Sentadilla y prensa hasta quemar. ¿Alguien? 🦵",
+    "Cardio HIIT de 30 min. Más divertido en grupo. ¡Sumense! 🏃‍♂️💨",
+    "Espalda y hombros. Dominadas + remo. Necesito compañía para rendir más 💪",
+    "Funcional completo + core. Vengan a sudar juntos 🤸‍♂️",
+  ];
+  const horasEntrenado = [
+    { horaInicio: "19:00", horaFin: "20:30" },
+    { horaInicio: "08:00", horaFin: "09:30" },
+    { horaInicio: "17:30", horaFin: "19:00" },
+    { horaInicio: "06:30", horaFin: "08:00" },
+    { horaInicio: "20:00", horaFin: "21:30" },
+    { horaInicio: "10:00", horaFin: "11:30" },
+  ];
+
+  for (let i = 0; i < trainees.length; i++) {
+    const trainee = trainees[i];
+    const daysAhead = (i % 5) + 1;
+    const fechaEntrenamiento = new Date(hoy);
+    fechaEntrenamiento.setDate(hoy.getDate() + daysAhead);
+
+    const convId = `conv-trainee-${trainee.uid}`;
+    convPromises.push(
+      db.collection("convocatorias").doc(convId).set(
+        toFirestoreWrite(
+          buildConvocatoria({
+            id: convId,
+            creadorId: trainee.uid,
+            creadorNombre: trainee.nombre,
+            creadorFoto: trainee.photoURL || null,
+            gimnasioId: gymUid,
+            fechaEntrenamiento,
+            horaInicio: horasEntrenado[i % horasEntrenado.length].horaInicio,
+            horaFin: horasEntrenado[i % horasEntrenado.length].horaFin,
+            mensaje: mensajesEntrenado[i % mensajesEntrenado.length],
+            interesados: [],
+            activo: true,
+            creadorRol: "entrenado",
+            esOficial: false,
+          })
+        )
+      )
+    );
+    stats.convocatoriasCreated++;
   }
 
   await Promise.all(convPromises);

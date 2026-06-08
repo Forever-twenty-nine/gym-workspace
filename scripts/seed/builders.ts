@@ -206,7 +206,8 @@ export function buildSesionRutinaMock(
   entrenadoId: string,
   nombreUsuario: string,
   rutinaId: string,
-  rutinaNombre: string
+  rutinaNombre: string,
+  postPhotoURL?: string
 ): SesionRutina & Record<string, unknown> {
   const now = Date.now();
   return {
@@ -220,6 +221,7 @@ export function buildSesionRutinaMock(
     compartida: true,
     nombreUsuario,
     fotoUsuario: undefined,
+    fotoProgreso: postPhotoURL ?? undefined,
     fechaCompartida: new Date(),
     likes: [],
     rutinaResumen: { id: rutinaId, nombre: rutinaNombre, ejercicios: [] },

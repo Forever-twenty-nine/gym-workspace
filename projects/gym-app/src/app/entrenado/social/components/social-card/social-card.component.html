@@ -44,8 +44,11 @@
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion!.fotoProgreso) {
-  <div class="w-full aspect-[4/5] sm:aspect-square relative bg-gray-100 dark:bg-gray-900">
-    <img [src]="sesion!.fotoProgreso" class="w-full h-full object-cover" alt="Foto del entrenamiento">
+  <div class="w-full aspect-[4/5] sm:aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-900">
+    <img [src]="sesion!.fotoProgreso"
+      class="absolute inset-0 w-full h-full object-cover"
+      alt="Foto del entrenamiento"
+      (error)="$any($event.target).style.display='none'">
   </div>
   } @else {
   <!-- Separator if no image, to make it look clean -->
