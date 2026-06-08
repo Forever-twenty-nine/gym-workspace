@@ -1,19 +1,19 @@
 <ion-header class="ion-no-border z-50">
     <ion-toolbar class="bg-transparent px-4">
         <ion-buttons slot="start">
-            <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline" color="dark" class="bg-white/20 backdrop-blur-md rounded-full"></ion-back-button>
+            <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline"  ></ion-back-button>
         </ion-buttons>
         <ion-title class="font-bold text-slate-800 dark:text-white text-right pr-0">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
     </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" style="--background: transparent;">
+<ion-content [fullscreen]="true" >
     <!-- Background differentiated by plan (consistent with other entrenado pages) -->
     @if (isPremium()) {
       <!-- Premium workout background image -->
       <div class="fixed inset-0 z-0 bg-cover bg-center pointer-events-none opacity-40 dark:opacity-30"
         style="background-image: url('assets/images/cardio-progreso-bg.png');">
-        <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-gray-50/10 dark:from-black/40 dark:to-black/60"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-white/20 to-gray-50/10 dark:from-black/40 dark:to-black/60"></div>
       </div>
     } @else {
       <!-- Free users: standard app gradient (no photo background) -->
@@ -101,4 +101,4 @@
         </div>
     </div>
 </ion-footer>
-}
+}

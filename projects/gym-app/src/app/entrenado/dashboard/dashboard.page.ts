@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { NgOptimizedImage } from '@angular/common';
+
 import {
   IonContent,
   IonCard,
@@ -24,6 +24,7 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { Entrenado, User as LibraryUser } from 'gym-library';
 import { PlanPersonalizadoComponent } from './components/plan-personalizado/plan-personalizado.component';
 import { RutinasAsignadasComponent, type DashboardRutina } from './components/rutinas-asignadas/rutinas-asignadas.component';
+import { PageBackgroundComponent } from '../components/page-background/page-background.component';
 
 export interface User extends LibraryUser {
   photoURL?: string;
@@ -36,10 +37,10 @@ export interface User extends LibraryUser {
   imports: [
     IonContent,
     FormsModule,
-    NgOptimizedImage,
     PlanPersonalizadoComponent,
-    RutinasAsignadasComponent
-],
+    RutinasAsignadasComponent,
+    PageBackgroundComponent
+  ],
 })
 export class DashboardPage {
   private entrenadoService = inject(EntrenadoService);
@@ -51,8 +52,6 @@ export class DashboardPage {
   private navCtrl = inject(NavController);
 
   currentUserSignal = this.authService.currentUser as Signal<User | null>;
-
-  isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   entrenadoDataSignal = computed(() => {
     const userId = this.currentUserSignal()?.uid;
@@ -99,6 +98,9 @@ export class DashboardPage {
 
     return this.rutinaAsignadaService.getProximasRutinasDashboard(user.uid, rutinasDelEntrenado)();
   });
+
+  photoURL = computed(() => this.currentUserSignal()?.photoURL);
+
 
   entrenadorAsignado = computed(() => {
     const entrenadoresId = this.entrenadoDataSignal()?.entrenadoresId;

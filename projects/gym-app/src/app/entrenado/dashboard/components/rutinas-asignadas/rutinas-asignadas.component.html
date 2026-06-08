@@ -1,73 +1,65 @@
-<section class="px-2 pt-1">
-  <div class="flex items-center justify-between mb-2">
-    <h2 class="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
-      Próximos entrenamientos
-    </h2>
-    <ion-button fill="clear" size="small" class="text-gray-600 dark:text-white/70 -mr-2" (click)="verTodas.emit()">
+<ion-card>
+  
+  <ion-card-header>
+    <ion-button  fill="clear" (click)="verTodas.emit()">
       Ver todas
     </ion-button>
-  </div>
+  </ion-card-header>
 
-@if (rutinas.length > 0) {
-<!-- Compact vertical list - all cards visible on screen -->
-<div class="space-y-1.5">
-  @for (rutina of rutinas; track rutina.id || rutina.nombre) {
-  <div 
-    class="group flex items-center gap-3 rounded-2xl bg-white/70 dark:bg-white/10 backdrop-blur-md border border-white/40 dark:border-white/10 p-3 active:scale-[0.985] active:bg-white/90 dark:active:bg-white/15 transition-all cursor-pointer shadow-sm"
-    [class.opacity-60]="!rutina.esEjecutable"
-    (click)="verDetalle.emit(rutina)">
-    
-    <!-- Day / Status Badge -->
-    @if (rutina.esEjecutable) {
-      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-emerald-500 text-white text-[10px] font-extrabold tracking-widest shadow-sm">
-        HOY
-      </div>
-    } @else if (rutina.diaCorto) {
-      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-white/80 dark:bg-white/15 text-gray-700 dark:text-white/90 text-[10px] font-bold tracking-widest border border-white/50 dark:border-white/20">
-        {{ rutina.diaCorto }}
-      </div>
+  <ion-card-content class="ion-no-padding">
+
+    @if (rutinas.length > 0) {
+    <ion-list lines="full">
+      @for (rutina of rutinas; track rutina.id || rutina.nombre) {
+      <ion-item button [detail]="false" [disabled]="!rutina.esEjecutable" (click)="verDetalle.emit(rutina)">
+
+        <!-- Contenedor programático de fecha con ícono y diseño de calendario -->
+        <div slot="start" class="rutina-fecha-badge" [class.es-hoy]="rutina.esEjecutable">
+          <div class="badge-header">
+            <span>{{ getDiaNombre(rutina) }}</span>
+          </div>
+          <div class="badge-body">
+            @if (getDiaNumero(rutina)) {
+              <span class="dia-numero">{{ getDiaNumero(rutina) }}</span>
+              <span class="mes-nombre">{{ getMesNombre(rutina) }}</span>
+            } @else {
+              <span class="dia-numero-large">-</span>
+            }
+          </div>
+        </div>
+
+        <!-- Nombre -->
+        <ion-label >
+          <h2>{{ rutina.nombre }}</h2>
+        </ion-label>
+
+        <!-- Ícono de acción -->
+        <ion-icon slot="end" [name]="rutina.esEjecutable ? 'play-outline' : 'chevron-forward-outline'">
+        </ion-icon>
+
+      </ion-item>
+      }
+    </ion-list>
     } @else {
-      <div class="shrink-0 px-2.5 py-0.5 rounded-xl bg-white/70 dark:bg-white/10 text-gray-600 dark:text-white/70 text-[10px] font-bold tracking-widest border border-white/40">
-        PRÓX.
-      </div>
+    <!-- Estado vacío -->
+    <div class="ion-padding ion-text-center">
+      <ion-icon name="barbell-outline" size="large" color="medium"></ion-icon>
+      <p>
+        <ion-text color="medium">
+          <strong>No tienes rutinas asignadas</strong>
+        </ion-text>
+      </p>
+      <p>
+        <ion-text color="medium">
+          @if (entrenador) {
+          Tu entrenador te asignará rutinas pronto.
+          } @else {
+          Busca un entrenador para recibir rutinas personalizadas.
+          }
+        </ion-text>
+      </p>
+    </div>
     }
 
-    <!-- Name + subtle info -->
-    <div class="flex-1 min-w-0">
-      <div class="font-semibold text-[15px] leading-tight text-gray-900 dark:text-white truncate">
-        {{ rutina.nombre }}
-      </div>
-      <div class="text-[11px] text-gray-600 dark:text-white/65 flex items-center gap-1 mt-0.5">
-        <ion-icon name="barbell-outline" class="text-sm opacity-70"></ion-icon>
-        <span>{{ rutina.ejerciciosIds?.length || 0 }} ejercicios</span>
-      </div>
-    </div>
-
-    <!-- Action icon -->
-    <div class="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/80 dark:bg-white/15 border border-white/60 dark:border-white/20 group-active:scale-90 transition-transform">
-      <ion-icon 
-        [name]="rutina.esEjecutable ? 'play-outline' : 'chevron-forward-outline'" 
-        class="text-gray-700 dark:text-white text-xl">
-      </ion-icon>
-    </div>
-  </div>
-  }
-</div>
-} @else {
-<!-- Compact empty state -->
-<div class="rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur border border-white/30 dark:border-white/10 p-4 text-center">
-  <div class="flex items-center justify-center gap-2 text-gray-500 dark:text-white/60">
-    <ion-icon name="barbell-outline" class="text-xl"></ion-icon>
-    <span class="text-sm font-medium">No tienes rutinas asignadas</span>
-  </div>
-  @if (entrenador) {
-    <p class="text-xs text-gray-500 dark:text-white/55 mt-1.5">
-      Tu entrenador te asignará rutinas pronto.
-    </p>
-  } @else {
-    <p class="text-xs text-gray-500 dark:text-white/55 mt-1.5">
-      Busca un entrenador para recibir rutinas personalizadas.
-    </p>
-  }
-</div>
-}
+  </ion-card-content>
+</ion-card>

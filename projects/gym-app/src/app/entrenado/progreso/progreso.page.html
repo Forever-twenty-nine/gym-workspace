@@ -2,16 +2,7 @@
 
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
-  @if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-  }@else {
-  <div
-    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
-  </div>
-  }
+  <app-page-background />
 
   <div class="main-container ion-padding relative z-10">
     <div

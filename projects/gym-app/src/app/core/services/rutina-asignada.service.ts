@@ -21,6 +21,7 @@ interface DashboardRutina extends Rutina {
   esEjecutable?: boolean;
   diaCorto?: string;
   asignadoPor?: string;
+  fecha?: Date;
 }
 import { NotificacionService } from './notificacion.service';
 import { RutinaService } from './rutina.service';
@@ -315,7 +316,8 @@ export class RutinaAsignadaService {
                             ...rutinaOriginal,
                             asignadoPor: 'Entrenador',
                             diaCorto: esHoy ? 'Hoy' : diaCortoArr[diaSemanaIndex],
-                            esEjecutable: esHoy
+                            esEjecutable: esHoy,
+                            fecha: fechaBucle
                         } as DashboardRutina);
                     }
                 }

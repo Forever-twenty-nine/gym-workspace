@@ -1,8 +1,8 @@
 import { Component, inject, signal, computed, ViewChild } from '@angular/core';
 import { IonContent, IonSegment, IonSegmentButton, IonLabel, IonHeader, SegmentCustomEvent } from '@ionic/angular/standalone';
 import { blurActiveElement } from '../../core/utils/modal.utils';
-import { NgOptimizedImage } from '@angular/common';
-import { CommonModule } from '@angular/common';
+import { NgOptimizedImage, CommonModule } from '@angular/common';
+import { PageBackgroundComponent } from '../components/page-background/page-background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 
@@ -37,8 +37,9 @@ type StoryItem =
     DescubrirTabComponent,
     FeedTabComponent,
     DesafiosStoriesComponent,
-    IonHeader
-]
+    IonHeader,
+    PageBackgroundComponent
+  ]
 })
 export class SocialPage {
   private authService = inject(AuthService);

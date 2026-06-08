@@ -6,6 +6,7 @@ import {
   IonCard
 } from '@ionic/angular/standalone';
 import { NgOptimizedImage } from '@angular/common';
+import { PageBackgroundComponent } from '../components/page-background/page-background.component';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -22,7 +23,8 @@ import { ProgresoEstadisticasComponent } from './components/progreso-estadistica
     IonContent,
     IonText,
     NgOptimizedImage,
-    ProgresoEstadisticasComponent
+    ProgresoEstadisticasComponent,
+    PageBackgroundComponent
   ],
   templateUrl: './progreso.page.html',
 })

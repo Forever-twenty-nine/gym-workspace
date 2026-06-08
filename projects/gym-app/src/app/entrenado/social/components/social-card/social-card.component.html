@@ -1,5 +1,5 @@
 <ion-card
-  class="ion-no-margin m-0! overflow-hidden rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#121212]">
+  class="ion-no-margin m-0! overflow-hidden rounded-4xl shadow-xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#121212]">
   <!-- Header: Perfil de Usuario -->
   <ion-item lines="none" class="ion-no-padding px-4 py-3 bg-transparent">
     <div slot="start"
@@ -44,7 +44,7 @@
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion!.fotoProgreso) {
-  <div class="w-full aspect-[4/5] sm:aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-900">
+  <div class="w-full aspect-4/5 sm:aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-900">
     <img [src]="sesion!.fotoProgreso"
       class="absolute inset-0 w-full h-full object-cover"
       alt="Foto del entrenamiento"

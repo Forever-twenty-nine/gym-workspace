@@ -5,6 +5,7 @@ import {
   SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { PageBackgroundComponent } from '../components/page-background/page-background.component';
 import { addIcons } from 'ionicons';
 import {
   fitnessOutline, playOutline, timeOutline, calendarOutline,
@@ -50,7 +51,8 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     RutinaDetalleModalComponent,
     EncuentroDetalleModalComponent,
     RutinasSemanaComponent,
-    ProgresoHistorialDetalleComponent
+    ProgresoHistorialDetalleComponent,
+    PageBackgroundComponent
   ],
 })
 export class RutinasPage {
