@@ -21,101 +21,29 @@
   <div class="relative z-10 px-4 pb-6 pt-2">
     <!-- Renderizado condicional por componente -->
     @switch (selectedTab()) {
-      @case ('descubrir') {
-        <app-descubrir-tab></app-descubrir-tab>
-      }
-      @case ('para-ti') {
-        <!-- Hosts for modals only (no circles) -->
-        <app-convocatorias [showHeader]="false" [renderCircles]="false"></app-convocatorias>
-        <app-desafios-stories [showHeader]="false" [renderCircles]="false"></app-desafios-stories>
+    @case ('descubrir') {
+    <app-descubrir-tab></app-descubrir-tab>
+    }
+    @case ('para-ti') {
+    <!-- Historias unificadas en una sola fila presentadas por app-stories -->
+    <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
 
-        <!-- Historias unificadas en una sola fila, ordenadas por proximidad temporal (más cercanas primero) -->
-        @if (hasActiveStories()) {
-          <div class="mb-3">
-            <div class="flex flex-nowrap gap-3.5 overflow-x-auto pb-2 -mx-0.5 px-0.5 snap-x snap-mandatory scrollbar-hide items-start">
-              @for (story of combinedStories(); track getStoryTrack(story)) {
-                @if (story.type === 'convocatoria') {
-                  <!-- Convocatoria circle -->
-                  <button
-                    type="button"
-                    (click)="openStory(story)"
-                    class="flex flex-col items-center gap-1.5 min-w-16 shrink-0 active:scale-[0.96] transition-transform focus:outline-none"
-                  >
-                    <div class="relative">
-                      <div class="w-15.5 h-15.5 rounded-full p-[2.5px] bg-linear-to-br from-primary via-violet-500 to-primary shadow-md">
-                        <div class="w-full h-full rounded-full overflow-hidden border-[2.75px] border-white dark:border-[#0a0a0a] bg-slate-200 dark:bg-slate-800 ring-1 ring-white/60 dark:ring-white/10">
-                          @if (getUserPhotoForStory(story)) {
-                            <img [src]="getUserPhotoForStory(story)" class="w-full h-full object-cover" alt="Creador">
-                          } @else {
-                            <div class="w-full h-full flex items-center justify-center text-slate-400">
-                              <ion-icon name="person-outline" class="text-3xl"></ion-icon>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                      <div class="absolute -bottom-px -right-px bg-white dark:bg-[#111] text-[8px] font-black px-1.5 rounded-full border border-white/80 dark:border-white/15 shadow-sm leading-none py-px text-primary dark:text-primary">
-                        {{ getStoryTimeHint(story) }}
-                      </div>
-                      @if (story.data.esOficial) {
-                        <div class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-primary rounded-full border-[1.5px] border-white dark:border-[#111] flex items-center justify-center">
-                          <span class="text-[7px] leading-none">🛡️</span>
-                        </div>
-                      } @else if (story.data.esSemanal) {
-                        <div class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-amber-500 rounded-full border-[1.5px] border-white dark:border-[#111] flex items-center justify-center">
-                          <span class="text-[7px] leading-none">🔁</span>
-                        </div>
-                      }
-                    </div>
-                    <span class="text-[10px] font-extrabold text-gray-700 dark:text-gray-300 truncate w-16 text-center leading-tight">
-                      {{ getStoryLabel(story) }}
-                    </span>
-                  </button>
-                } @else {
-                  <!-- Desafío circle -->
-                  <button
-                    type="button"
-                    (click)="openStory(story)"
-                    class="flex flex-col items-center gap-1.5 min-w-16 shrink-0 active:scale-[0.96] transition-transform focus:outline-none"
-                  >
-                    <div class="relative">
-                      <div class="w-15.5 h-15.5 rounded-full p-[2.5px] bg-linear-to-br from-amber-500 via-orange-500 to-amber-600 shadow-md">
-                        <div class="w-full h-full rounded-full overflow-hidden border-[2.75px] border-white dark:border-[#0a0a0a] bg-slate-200 dark:bg-slate-800 ring-1 ring-white/60 dark:ring-white/10">
-                          @if (getUserPhotoForStory(story)) {
-                            <img [src]="getUserPhotoForStory(story)" class="w-full h-full object-cover" alt="">
-                          } @else {
-                            <div class="w-full h-full flex items-center justify-center text-amber-400">
-                              <ion-icon name="trophy-outline" class="text-3xl"></ion-icon>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                      <div class="absolute -bottom-px -right-px bg-white dark:bg-[#111] text-[8px] font-black px-1.5 rounded-full border border-white/80 dark:border-white/15 shadow-sm leading-none py-px text-amber-600">
-                        {{ getStoryTimeHint(story) }}
-                      </div>
-                      @if (story.data.creadorId === currentUserSignal()?.uid) {
-                        <div class="absolute -top-0.5 -left-0.5 w-4 h-4 bg-amber-500 rounded-full border-[1.5px] border-white dark:border-[#111] flex items-center justify-center">
-                          <span class="text-[8px] leading-none">👑</span>
-                        </div>
-                      }
-                    </div>
-                    <span class="text-[10px] font-extrabold text-gray-700 dark:text-gray-300 truncate w-16 text-center leading-tight">
-                      {{ getStoryLabel(story) }}
-                    </span>
-                  </button>
-                }
-              }
-            </div>
-          </div>
-        }
+    <!-- Centered detail modals directly controlled by SocialPage -->
+    <app-convocatoria-modal-stories [isOpen]="isConvoModalOpen()" [convocatoria]="selectedConvocatoria()"
+      (close)="closeConvoModal()"></app-convocatoria-modal-stories>
 
-        <!-- Feed limpio de entrenamientos compartidos -->
-        <div class="flex flex-col gap-4">
-          <app-feed-tab tab="para-ti" class="block"></app-feed-tab>
-        </div>
-      }
-      @case ('siguiendo') {
-        <app-feed-tab tab="siguiendo"></app-feed-tab>
-      }
+    <app-desafio-modal-stories [isOpen]="isDesafioModalOpen()" [desafio]="selectedDesafio()"
+      (close)="closeDesafioModal()" (deleted)="onDesafioDeleted($event)"
+      (pasar)="onDesafioPasar($event)"></app-desafio-modal-stories>
+
+    <!-- Feed limpio de entrenamientos compartidos -->
+    <div class="flex flex-col gap-4">
+      <app-feed-tab tab="para-ti" class="block"></app-feed-tab>
+    </div>
+    }
+    @case ('siguiendo') {
+    <app-feed-tab tab="siguiendo"></app-feed-tab>
+    }
     }
   </div>
 </ion-content>

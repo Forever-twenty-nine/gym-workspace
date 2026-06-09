@@ -1,53 +1,96 @@
 import {
-  Component, Input, inject, signal, computed, OnInit, OnChanges, SimpleChanges
+  Component, Input, Output, EventEmitter, inject, signal, computed, OnChanges, SimpleChanges
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonCard, IonIcon, IonButton, IonBadge, ToastController } from '@ionic/angular/standalone';
+import {
+  IonModal,
+  IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonAvatar,
+  IonBadge,
+  IonChip,
+  IonFooter,
+  IonButton,
+  IonLabel,
+  IonGrid,
+  IonRow,
+  IonCol,
+  ToastController
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-  trophyOutline, flameOutline, personOutline, checkmarkCircle,
-  closeCircle, timerOutline, checkmarkOutline, closeOutline,
-  ribbonOutline, sadOutline, trashOutline, peopleOutline
+  trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
+  sadOutline, peopleOutline, timerOutline, trashOutline, personOutline
 } from 'ionicons/icons';
+import { Desafio, DesafioParticipacion } from 'gym-library';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { DesafioParticipacionService } from '../../../../core/services/desafio-participacion.service';
 import { DesafioService } from '../../../../core/services/desafio.service';
-import { Desafio, DesafioParticipacion } from 'gym-library';
 
 @Component({
-  selector: 'app-desafio-feed-card',
+  selector: 'app-desafio-modal-stories',
   standalone: true,
-  imports: [CommonModule, IonCard, IonIcon, IonButton, IonBadge],
-  templateUrl: './desafio-feed-card.component.html'
+  imports: [
+    CommonModule,
+    IonModal,
+    IonIcon,
+    IonHeader,
+    IonToolbar,
+    IonAvatar,
+    IonBadge,
+    IonChip,
+    IonFooter,
+    IonButton,
+    IonLabel,
+    IonGrid,
+    IonRow,
+    IonCol
+  ],
+  templateUrl: './desafio-modal-stories.component.html',
+  styles: [`
+    ion-modal {
+      --border-radius: 28px;
+      --width: min(94%, 460px);
+      --height: auto;
+      --max-height: 88vh;
+    }
+    .desafio-modal-card {
+      border-radius: 28px;
+      overflow: hidden;
+    }
+  `]
 })
-export class DesafioFeedCardComponent implements OnChanges {
+export class DesafioModalStoriesComponent implements OnChanges {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly participacionService = inject(DesafioParticipacionService);
   private readonly desafioService = inject(DesafioService);
   private readonly toastCtrl = inject(ToastController);
 
-  @Input({ required: true }) desafio!: Desafio;
+  @Input() isOpen = false;
+  @Input() desafio: Desafio | null = null;
+
+  @Output() close = new EventEmitter<void>();
+  @Output() deleted = new EventEmitter<string>();
+  @Output() pasar = new EventEmitter<string>();
 
   currentUser = this.authService.currentUser;
   loading = signal(false);
 
-  // Participaciones reactivas del desafío
   participaciones = computed<DesafioParticipacion[]>(() => {
     if (!this.desafio?.id) return [];
     return this.participacionService.getParticipacionesByDesafio(this.desafio.id)();
   });
 
-  // Mi participación en este desafío
   miParticipacion = computed<DesafioParticipacion | undefined>(() => {
     const uid = this.currentUser()?.uid;
     if (!uid || !this.desafio?.id) return undefined;
     return this.participacionService.getMisParticipaciones(uid)()
-      .find(p => p.desafioId === this.desafio.id);
+      .find(p => p.desafioId === this.desafio!.id);
   });
 
-  // Estado de la tarjeta
   esCreador = computed(() => this.currentUser()?.uid === this.desafio?.creadorId);
 
   yaAcepto = computed(() => !!this.miParticipacion());
@@ -59,7 +102,11 @@ export class DesafioFeedCardComponent implements OnChanges {
 
   loSupero = computed(() => this.miParticipacion()?.estado === 'superado');
 
-  // Countdown hasta vencimiento
+  vencio = computed(() => {
+    if (!this.desafio?.fechaVencimiento) return false;
+    return new Date(this.desafio.fechaVencimiento) <= new Date();
+  });
+
   tiempoRestante = computed(() => {
     if (!this.desafio?.fechaVencimiento) return '';
     const diff = new Date(this.desafio.fechaVencimiento).getTime() - Date.now();
@@ -70,20 +117,13 @@ export class DesafioFeedCardComponent implements OnChanges {
     return `${hours}h`;
   });
 
-  vencio = computed(() => {
-    if (!this.desafio?.fechaVencimiento) return false;
-    return new Date(this.desafio.fechaVencimiento) <= new Date();
-  });
-
-  // Stats
   totalAceptaron = computed(() => this.participaciones().length);
   totalSuperaron = computed(() => this.participaciones().filter(p => p.estado === 'superado').length);
   totalNoSuperaron = computed(() => this.participaciones().filter(p => p.estado === 'no_superado').length);
 
   creatorName = computed(() => {
     if (!this.desafio) return 'Atleta';
-    return this.userService.getUserByUid(this.desafio.creadorId)()?.nombre
-      || this.desafio.creadorNombre;
+    return this.userService.getUserByUid(this.desafio.creadorId)()?.nombre || this.desafio.creadorNombre;
   });
 
   creatorPhoto = computed(() => {
@@ -93,31 +133,30 @@ export class DesafioFeedCardComponent implements OnChanges {
 
   constructor() {
     addIcons({
-      trophyOutline, flameOutline, personOutline, checkmarkCircle,
-      closeCircle, timerOutline, checkmarkOutline, closeOutline,
-      ribbonOutline, sadOutline, trashOutline, peopleOutline
+      trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
+      sadOutline, peopleOutline, timerOutline, trashOutline, personOutline
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // Inicializar listeners reactivos cuando llega el desafio
     if (changes['desafio']?.currentValue?.id) {
       const uid = this.currentUser()?.uid;
       if (uid) {
         this.participacionService.getMisParticipaciones(uid);
       }
-      this.participacionService.getParticipacionesByDesafio(this.desafio.id);
+      this.participacionService.getParticipacionesByDesafio(this.desafio!.id);
     }
   }
 
   async aceptarDesafio() {
     const user = this.currentUser();
-    if (!user || !this.desafio || this.loading()) return;
+    const d = this.desafio;
+    if (!user || !d || this.loading() || this.vencio()) return;
 
     this.loading.set(true);
     try {
       await this.participacionService.aceptarDesafio(
-        this.desafio.id,
+        d.id,
         user.uid,
         user.nombre || 'Atleta',
         user.photoURL
@@ -151,21 +190,42 @@ export class DesafioFeedCardComponent implements OnChanges {
   }
 
   async eliminarDesafio() {
-    if (!this.desafio || this.loading()) return;
+    const d = this.desafio;
+    if (!d || this.loading()) return;
+
     this.loading.set(true);
     try {
-      await this.desafioService.delete(this.desafio.id);
+      await this.desafioService.delete(d.id);
       await this.showToast('Desafío eliminado', 'medium');
+      this.deleted.emit(d.id);
+      this.close.emit();
     } catch (e) {
       console.error(e);
+      await this.showToast('Error al eliminar', 'danger');
     } finally {
       this.loading.set(false);
     }
   }
 
+  pasarYcerrar() {
+    const id = this.desafio?.id;
+    if (id) {
+      this.pasar.emit(id);
+    }
+    this.close.emit();
+  }
+
+  onDidDismiss() {
+    this.close.emit();
+  }
+
   private async showToast(message: string, color: 'success' | 'warning' | 'danger' | 'medium') {
     const toast = await this.toastCtrl.create({
-      message, duration: 2500, color, position: 'bottom', cssClass: 'premium-toast'
+      message,
+      duration: 2400,
+      color,
+      position: 'bottom',
+      cssClass: 'premium-toast'
     });
     await toast.present();
   }

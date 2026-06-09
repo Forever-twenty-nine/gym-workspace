@@ -2,9 +2,15 @@ import { Component, Input, Output, EventEmitter, inject, computed } from '@angul
 import { CommonModule } from '@angular/common';
 import {
   IonModal,
-  IonButton,
   IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonAvatar,
   IonBadge,
+  IonChip,
+  IonFooter,
+  IonButton,
+  IonLabel,
   ToastController,
   AlertController
 } from '@ionic/angular/standalone';
@@ -14,35 +20,41 @@ import {
   timeOutline, personOutline, peopleOutline, checkmark
 } from 'ionicons/icons';
 import { Convocatoria } from 'gym-library';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { UserService } from '../../../../../core/services/user.service';
-import { ConvocatoriaService } from '../../../../../core/services/convocatoria.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
+import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 
 @Component({
-  selector: 'app-convocatoria-modal',
+  selector: 'app-convocatoria-modal-stories',
   standalone: true,
   imports: [
     CommonModule,
     IonModal,
-    IonButton,
     IonIcon,
-    IonBadge
+    IonHeader,
+    IonToolbar,
+    IonAvatar,
+    IonBadge,
+    IonChip,
+    IonFooter,
+    IonButton,
+    IonLabel
   ],
-  templateUrl: './convocatoria-modal.component.html',
+  templateUrl: './convocatoria-modal-stories.component.html',
   styles: [`
     ion-modal {
-      --border-radius: 24px;
-      --width: min(94%, 420px);
+      --border-radius: 28px;
+      --width: min(94%, 460px);
       --height: auto;
-      --max-height: 82vh;
+      --max-height: 85vh;
     }
     .convocatoria-modal-card {
-      border-radius: 24px;
+      border-radius: 28px;
       overflow: hidden;
     }
   `]
 })
-export class ConvocatoriaModalComponent {
+export class ConvocatoriaModalStoriesComponent {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private convocatoriaService = inject(ConvocatoriaService);
@@ -120,7 +132,6 @@ export class ConvocatoriaModalComponent {
       } else {
         this.showToast('Interés retirado', 'medium');
       }
-      // No need to close; parent signals will update the data reactively
     } catch (e) {
       console.error(e);
       this.showToast('Error al actualizar tu interés', 'danger');
