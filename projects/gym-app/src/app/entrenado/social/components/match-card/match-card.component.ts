@@ -1,92 +1,75 @@
-import { Component, Input, inject, computed, signal, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, inject, computed, signal, input, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-   IonCard, IonButton, IonIcon, ToastController
- } from '@ionic/angular/standalone';
+import { IonCard, IonIcon, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonChip, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import {
-   barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-   chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline, peopleOutline
- } from 'ionicons/icons';
-import { MatchService } from '../../../../core/services/match.service';
+import { person } from 'ionicons/icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
-import { Entrenado, Desafio } from 'gym-library';
 
 @Component({
   selector: 'app-match-card',
   standalone: true,
-  imports: [
-    CommonModule, IonCard, IonButton, IonIcon
+  imports: [IonCardSubtitle, 
+    CommonModule, IonCard, IonIcon,
+    IonCardHeader, IonCardContent, IonCardTitle, IonChip, IonLabel
   ],
   templateUrl: './match-card.component.html'
 })
-export class MatchCardComponent implements OnChanges {
-  private readonly matchService = inject(MatchService);
+export class MatchCardComponent {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
-  private readonly toastCtrl = inject(ToastController);
 
-  @Input({ required: true }) tipo!: 'desafio' | 'afinidad' | 'horario';
-  @Input({ required: true }) data: any; // mixed Entrenado | Desafio shape for dynamic matching cards (type narrowed by 'tipo')
-  @Input() showActions = true;
-  @Input() photoURL: string | null = null; // resolved from parent for reliable first-load photos
-  @Input() photoVersion: number = 0; // bumped by parent when users first load → forces re-evaluation of photo computeds
+  tipo = input.required<'afinidad' | 'horario'>();
+  data = input.required<any>();
+  photoURL = input<string | null>(null); 
+  photoVersion = input<number>(0); 
 
   currentUser = this.authService.currentUser;
   
-  // Estado local para evitar doble submit
-  interacted = signal<boolean>(false);
-  matchConcretado = signal<boolean>(false);
-
-  // Para manejar fallback de foto que no carga en primera render
   photoFailed = signal<boolean>(false);
 
   userName = computed(() => {
-    if (!this.data) return 'Atleta';
-    if (this.tipo === 'desafio') {
-      return this.data.creadorNombre || '';
-    }
-    return this.data.id ? this.userService.getUserByUid(this.data.id)()?.nombre || 'Atleta' : 'Atleta';
+    const data = this.data();
+    if (!data) return 'Atleta';
+    return data.id ? this.userService.getUserByUid(data.id)()?.nombre || 'Atleta' : 'Atleta';
   });
 
-  userInitials = computed(() => {
-    const name = this.userName();
-    if (!name || name === 'Atleta') return 'A';
-    return name.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
-  });
-
-  // Stable lookup (created once per card instance) so updates from UserService after first render are picked up
   private readonly resolvedUser = computed(() => {
-    const id = this.data?.id;
-    if (!id || this.tipo === 'desafio') return null;
+    const id = this.data()?.id;
+    if (!id) return null;
     return this.userService.getUserByUid(id)();
   });
 
   userProfilePhoto = computed(() => {
-    // Reading photoVersion here makes this computed (and safePhoto) re-run
-    // whenever the parent bumps it on first users load.
-    const _ = this.photoVersion;
+    const data = this.data();
+    const inputUrl = this.photoURL();
+    const version = this.photoVersion();
 
-    if (!this.data) return null;
+    if (!data) return null;
 
-    // Prefer explicitly passed photoURL (from parent enriched list)
-    if (this.photoURL != null) {
-      return this.photoURL || null;
+    let url: string | null = null;
+    
+    // Prioridad 1: URL pasada por input directo
+    if (inputUrl !== null) {
+      url = inputUrl || null;
+    } 
+    // Prioridad 2: URL dentro del objeto data
+    else if (data.photoURL != null) {
+      url = data.photoURL || null;
+    } 
+    // Prioridad 3: URL resuelta desde el servicio de usuario
+    else {
+      const user = this.resolvedUser();
+      url = user?.photoURL || null;
     }
 
-    // If the data object itself is enriched with photoURL (from sugerencias* in parent)
-    if (this.data.photoURL != null) {
-      return this.data.photoURL || null;
+    // Bust cache if version is provided and > 0
+    if (url && version > 0) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}v=${version}`;
     }
 
-    if (this.tipo === 'desafio') {
-      return this.data.creadorFoto || null;
-    }
-
-    // Live reactive lookup (the resolvedUser computed depends on the UserService signal)
-    const user = this.resolvedUser();
-    return user?.photoURL || null;
+    return url;
   });
 
   safePhoto = computed(() => {
@@ -94,73 +77,26 @@ export class MatchCardComponent implements OnChanges {
     return this.userProfilePhoto();
   });
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['data'] || changes['photoVersion']) {
-      this.photoFailed.set(false);
-    }
-  }
+  matchReasons = computed(() => {
+    const data = this.data();
+    const external = data?.matchReasons;
+    if (external && Array.isArray(external) && external.length) return external;
+
+    if (this.tipo() === 'horario') return ['Coincide contigo en tu horario'];
+    return ['Coincide contigo en tu objetivo'];
+  });
 
   onPhotoError(): void {
     this.photoFailed.set(true);
   }
 
   constructor() {
-    addIcons({
-      barbellOutline, trophyOutline, flameOutline, sparklesOutline,
-      chatbubblesOutline, checkmarkCircleOutline, heartOutline, personOutline, timeOutline, peopleOutline
+    addIcons({ person });
+
+    // Rerestablecer el estado de error de la foto cuando cambie la fuente
+    effect(() => {
+      this.userProfilePhoto();
+      untracked(() => this.photoFailed.set(false));
     });
-  }
-
-
-  async interactuar() {
-    const user = this.currentUser();
-    if (!user) return;
-
-    this.interacted.set(true);
-    let targetUserId = '';
-    let referenciaId: string | undefined = undefined;
-
-    if (this.tipo === 'desafio') {
-      targetUserId = this.data.creadorId;
-      referenciaId = this.data.id;
-    } else {
-      targetUserId = this.data.id;
-    }
-
-    try {
-      const isMatch = await this.matchService.registrarInteres(
-        user.uid,
-        targetUserId,
-        this.tipo,
-        referenciaId
-      );
-
-      if (isMatch) {
-        this.matchConcretado.set(true);
-        if (this.tipo === 'afinidad') {
-          this.showToast('¡Hay equipo! Encontramos a tu partner ideal para esta semana.');
-        } else if (this.tipo === 'desafio') {
-          this.showToast(`“A vos y a ${this.userName()} les gusta el mismo ritmo. ¿Por qué no arman un grupo?”`);
-        } else {
-          this.showToast('¡HAY MATCH MUTUO! Se ha abierto un chat para coordinar.');
-        }
-      } else {
-        this.showToast('Interés enviado. Esperando respuesta del compañero.');
-      }
-    } catch (error) {
-      console.error(error);
-      this.interacted.set(false);
-      this.showToast('No se pudo registrar tu interés. Intenta nuevamente.');
-    }
-  }
-
-  private async showToast(message: string) {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 3000,
-      position: 'bottom',
-      cssClass: 'premium-toast'
-    });
-    await toast.present();
   }
 }

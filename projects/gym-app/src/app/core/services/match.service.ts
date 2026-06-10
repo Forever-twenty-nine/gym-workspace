@@ -22,6 +22,8 @@ import { EntrenadoService } from './entrenado.service';
 import { MensajeService } from './mensaje.service';
 import { NotificacionService } from './notificacion.service';
 import { UserService } from './user.service';
+import { DesafioService } from './desafio.service';
+import { TarjetaDescubrir } from '../../entrenado/social/descubrir.types';
 
 @Injectable({ providedIn: 'root' })
 export class MatchService {
@@ -34,6 +36,7 @@ export class MatchService {
     private readonly mensajeService = inject(MensajeService);
     private readonly notificacionService = inject(NotificacionService);
     private readonly userService = inject(UserService);
+    private readonly desafioService = inject(DesafioService);
 
     private readonly _interactions: WritableSignal<MatchInteraction[]> = signal<MatchInteraction[]>([]);
     private isListenerInitialized = false;
@@ -103,7 +106,7 @@ export class MatchService {
     async registrarInteres(
         usuarioOrigenId: string,
         usuarioDestinoId: string,
-        tipo: 'horario' | 'desafio' | 'afinidad',
+        tipo: 'horario' | 'afinidad',
         referenciaId?: string
     ): Promise<boolean> {
         this.initializeListener(usuarioOrigenId);
@@ -128,11 +131,6 @@ export class MatchService {
             if (!inverseSnap.empty) {
                 const docData = inverseSnap.docs[0];
                 inverseMatchDoc = { ...docData.data(), id: docData.id };
-            }
-
-            // Si hay un desafío específico, validar referenciaId
-            if (tipo === 'desafio' && inverseMatchDoc && inverseMatchDoc.referenciaId !== referenciaId) {
-                inverseMatchDoc = null; // No corresponde al mismo desafío
             }
 
             if (inverseMatchDoc && inverseMatchDoc.interesOrigen === true) {
@@ -169,9 +167,7 @@ export class MatchService {
                 const originName = originUser?.nombre || 'Un atleta';
                 
                 let contenido = `¡Conexión establecida! Nos interesa entrenar a la misma hora o compartir el mismo estilo de vida. ¡Empecemos a coordinar!`;
-                if (tipo === 'desafio') {
-                    contenido = `“A vos y a ${originName} les gusta el mismo ritmo. ¿Por qué no arman un grupo?”`;
-                } else if (tipo === 'afinidad') {
+                if (tipo === 'afinidad') {
                     contenido = `¡Hay equipo! Encontramos a tu partner ideal para esta semana. ¡Vamos a entrenar!`;
                 }
 
@@ -312,11 +308,100 @@ export class MatchService {
     }
 
     /**
+     * Construye el mazo completo de tarjetas para el tab Descubrir:
+     * sugerencias por horario, por afinidad y desafíos activos del gimnasio,
+     * filtrando las tarjetas con las que el usuario ya interactuó.
+     *
+     * Centralizado aquí para mantener toda la lógica de matching en el servicio.
+     */
+    getTarjetasDescubrir(entrenado: Entrenado, gymId: string): Signal<TarjetaDescubrir[]> {
+        return computed(() => {
+            const all = this.entrenadoService.entrenados();
+            const interactions = this.getInteractions(entrenado.id, gymId)();
+            const _ = this.userService.users(); // dependencia reactiva: re-computa cuando llegan los usuarios
+
+            const interactedIds = new Set(
+                interactions.map(i => i.referenciaId || i.usuarioDestinoId)
+            );
+
+            const currentUserProfile = this.userService.getUserByUid(entrenado.id)();
+            const currentUserGymId = currentUserProfile?.gimnasioId;
+
+            const list: TarjetaDescubrir[] = [];
+
+            // 1. Sugerencias por coincidencia horaria
+            if (entrenado.franjaHoraria) {
+                const currentStart = this.parseTimeToMinutes(entrenado.franjaHoraria.inicio);
+                const currentEnd   = this.parseTimeToMinutes(entrenado.franjaHoraria.fin);
+
+                for (const u of all) {
+                    if (u.id === entrenado.id || u.visibleDescubrir === false) continue;
+                    if (interactedIds.has(u.id)) continue;
+                    if (!u.franjaHoraria) continue;
+
+                    const targetProfile = this.userService.getUserByUid(u.id)();
+                    if (targetProfile?.gimnasioId !== currentUserGymId) continue;
+
+                    const targetStart = this.parseTimeToMinutes(u.franjaHoraria.inicio);
+                    const targetEnd   = this.parseTimeToMinutes(u.franjaHoraria.fin);
+
+                    if (currentStart < targetEnd && currentEnd > targetStart) {
+                        list.push({
+                            id: `horario-${u.id}`,
+                            tipo: 'horario',
+                            data: u,
+                            photoURL: targetProfile?.photoURL ?? null
+                        });
+                    }
+                }
+            }
+
+            // 2. Sugerencias por afinidad de objetivo
+            if (entrenado.objetivo) {
+                for (const u of all) {
+                    if (u.id === entrenado.id || u.visibleDescubrir === false) continue;
+                    if (interactedIds.has(u.id)) continue;
+                    if (u.objetivo !== entrenado.objetivo) continue;
+                    // Evitar duplicar con horario
+                    if (list.some(t => t.id === `horario-${u.id}`)) continue;
+
+                    const targetProfile = this.userService.getUserByUid(u.id)();
+                    if (targetProfile?.gimnasioId !== currentUserGymId) continue;
+
+                    list.push({
+                        id: `afinidad-${u.id}`,
+                        tipo: 'afinidad',
+                        data: u,
+                        photoURL: targetProfile?.photoURL ?? null
+                    });
+                }
+            }
+
+            return list;
+        });
+    }
+
+    /**
+     * Construye el mensaje contextual que se muestra en el popup de match mutuo.
+     * Centralizado en el servicio para mantener la lógica de negocio fuera de los componentes.
+     */
+    buildMatchPopupMessage(
+        tipo: 'horario' | 'afinidad',
+        active: TarjetaDescubrir,
+        partnerName: string
+    ): string {
+        if (tipo === 'horario') {
+            return `¡Hay equipo para el turno tarde! A ambos les queda bien entrenar en el rango de ${active.data.franjaHoraria?.inicio} a ${active.data.franjaHoraria?.fin}.`;
+        }
+        return `¡Hay equipo! Encontramos a tu partner ideal para esta semana. ¿Vamos a entrenar?`;
+    }
+
+    /**
      * Genera mensajes contextuales para notificaciones de match mutuo.
      * Explica claramente "el por qué" del match a ambos usuarios.
      */
     private buildMatchReasonMessage(
-        tipo: 'horario' | 'desafio' | 'afinidad',
+        tipo: 'horario' | 'afinidad',
         originName: string,
         targetName: string
     ): { forOrigin: string; forTarget: string } {
@@ -328,18 +413,9 @@ export class MatchService {
             };
         }
 
-        if (tipo === 'horario') {
-            const msg = `¡Perfecto! ${originName} y ${targetName} tienen horarios que coinciden. ¡Chocaron los 5!`;
-            return {
-                forOrigin: `¡Match con ${targetName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`,
-                forTarget: `¡Match con ${originName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`
-            };
-        }
-
-        // desafio
         return {
-            forOrigin: `¡Reto aceptado! ${targetName} también está en el mismo desafío. ¡Chocaron los 5!`,
-            forTarget: `¡Reto aceptado! ${originName} se unió a tu desafío. ¡Chocaron los 5!`
+            forOrigin: `¡Match con ${targetName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`,
+            forTarget: `¡Match con ${originName}! Sus horarios de entrenamiento coinciden. ¡Buen momento para entrenar en equipo!`
         };
     }
 

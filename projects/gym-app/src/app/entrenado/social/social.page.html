@@ -15,14 +15,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
-  <!-- Background Image Layer (Fixed) - inside ion-content like all other tab pages so it extends properly under the tab bar -->
+
   <app-page-background />
 
   <div class="relative z-10 px-4 pb-6 pt-2">
     <!-- Renderizado condicional por componente -->
     @switch (selectedTab()) {
     @case ('descubrir') {
-    <app-descubrir-tab></app-descubrir-tab>
+    <app-descubrir-tab
+      [tarjetaActiva]="tarjetaActiva()"
+      [matchActual]="matchActual()"
+      [currentUserPhoto]="currentUserPhoto()"
+      (pasar)="pasarTarjeta()"
+      (chocarLos5)="chocarLos5()"
+      (iniciarChat)="iniciarChatPrivado()"
+      (cerrarMatch)="cerrarMatch()"
+      (cardTransitionEnd)="onCardTransitionEnd()"
+    ></app-descubrir-tab>
     }
     @case ('para-ti') {
     <!-- Historias unificadas en una sola fila presentadas por app-stories -->
