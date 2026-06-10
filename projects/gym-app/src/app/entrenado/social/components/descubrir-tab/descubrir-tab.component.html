@@ -1,123 +1,38 @@
 <div class="flex flex-col items-center justify-center min-h-137.5 px-2 py-4">
   @if (tarjetaActiva) {
-    <div class="w-full max-w-md flex flex-col gap-4 relative">
-      
-      <!-- Contenedor de la Tarjeta con Animación de Deslizamiento -->
-      <div 
-        [class]="animacionCard()"
-        (transitionend)="onCardTransitionEnd()">
-        <app-match-card 
-          [tipo]="tarjetaActiva.tipo === 'horario' ? 'horario' : 'afinidad'" 
-          [data]="tarjetaActiva.data"
-          >
-        </app-match-card>
-      </div>
+  <div class="w-full max-w-md flex flex-col gap-4 relative">
 
-      <!-- Acciones de Decisión Binaria -->
-      <div class="flex justify-center items-center gap-6 mt-2">
-        <!-- Botón Pasar (Descartar) -->
-        <ion-button (click)="onPasar()" 
-                    class="shadow-xl hover:brightness-110 active:scale-95 transition-all duration-150"
-                    style="--border-radius: 50%; --background: #1f2937; --padding-start: 0; --padding-end: 0; margin: 0; width: 56px; height: 56px; border: 1.5px solid rgba(255,255,255,0.2);">
-          <ion-icon name="close" class="text-2xl text-rose-400"></ion-icon>
-        </ion-button>
-
-        <!-- Botón Chocar los 5 (Like / Conectar) - principal -->
-        <ion-button (click)="onChocarLos5()" 
-                    class="shadow-2xl shadow-primary/40 hover:brightness-105 active:scale-95 transition-all duration-150"
-                    style="--border-radius: 50%; --background: #d2ff00; --padding-start: 0; --padding-end: 0; margin: 0; width: 72px; height: 72px; border: 2px solid rgba(0,0,0,0.15);">
-          <ion-icon name="hand-right" class="text-3xl text-black"></ion-icon>
-        </ion-button>
-      </div>
-
+    <!-- Contenedor de la Tarjeta con Animación de Deslizamiento -->
+    <div [class]="animacionCard()" (transitionend)="onCardTransitionEnd()">
+      <app-match-card [tipo]="tarjetaActiva.tipo" [data]="tarjetaActiva.data">
+      </app-match-card>
     </div>
+
+    <div class="flex justify-center items-center gap-6 mt-2">
+      <!-- Botón Pasar (Descartar) -->
+      <ion-button (click)="onPasar()" color="secondary" fill="outline">
+        <ion-icon name="close" class="text-2xl "></ion-icon>
+      </ion-button>
+
+      <ion-button (click)="onChocarLos5()" color="primary" fill="solid">
+        <ion-icon name="hand-right" class="text-3xl "></ion-icon>
+      </ion-button>
+    </div>
+
+  </div>
   } @else {
-    <!-- Estado Vacío del Mazo -->
-    <div class="flex flex-col items-center justify-center text-center p-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-4xl border border-white/20 dark:border-white/10 max-w-md w-full my-6">
-      <div class="w-16 h-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center mb-5 text-primary">
-        <ion-icon name="sparkles-outline" class="text-3xl"></ion-icon>
-      </div>
-      <h3 class="text-base font-black text-gray-900 dark:text-white mb-2 tracking-tight">¡Eso es todo por hoy!</h3>
-      <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 leading-relaxed m-0">
-        Has completado tu mazo de sugerencias. Vuelve más tarde para ver nuevos compañeros o desafíos disponibles en tu gimnasio.
-      </p>
+  <!-- Estado Vacío del Mazo -->
+  <div
+    class="flex flex-col items-center justify-center text-center p-8 bg-white/40 dark:bg-black/40 backdrop-blur-xl rounded-4xl border border-white/20 dark:border-white/10 max-w-md w-full my-6">
+    <div
+      class="w-16 h-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center mb-5 text-primary">
+      <ion-icon name="sparkles-outline" class="text-3xl"></ion-icon>
     </div>
+    <h3 class="text-base font-black text-gray-900 dark:text-white mb-2 tracking-tight">¡Eso es todo por hoy!</h3>
+    <p class="text-xs font-semibold text-gray-600 dark:text-gray-400 px-4 leading-relaxed m-0">
+      Has completado tu mazo de sugerencias. Vuelve más tarde para ver nuevos compañeros o desafíos disponibles en tu
+      gimnasio.
+    </p>
+  </div>
   }
 </div>
-
-<!-- Superposición de Match Mutuo (Popup Premium) -->
-@if (matchActual) {
-  <div class="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
-    <div class="w-full max-w-sm bg-linear-to-b from-slate-900 to-black border border-white/10 rounded-4xl p-6 text-center shadow-2xl relative overflow-hidden flex flex-col items-center gap-5">
-      
-      <!-- Brillo de Fondo -->
-      <div class="absolute -top-20 -left-20 w-40 h-40 bg-primary/15 rounded-full blur-3xl"></div>
-      <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-emerald-500/15 rounded-full blur-3xl"></div>
-      
-      <!-- Estrella de match -->
-      <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 animate-bounce">
-        <ion-icon name="sparkles" class="text-2xl"></ion-icon>
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <h2 class="text-xl font-black text-transparent bg-clip-text bg-linear-to-r from-primary to-emerald-450 tracking-tight uppercase m-0 leading-none">¡Chocaste esos 5! ✋</h2>
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mt-1">Nueva Conexión Deportiva</p>
-      </div>
-
-      <!-- Avatares Enlazados -->
-      <div class="flex items-center justify-center gap-1.5 py-2 relative">
-        <!-- Mi Foto -->
-        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-slate-900 ring-2 ring-white/10 shadow-lg bg-slate-800 flex items-center justify-center z-10">
-          @if (currentUserPhoto) {
-            <img [src]="currentUserPhoto" class="w-full h-full object-cover">
-          } @else {
-            <ion-icon name="person" class="text-xl text-gray-400"></ion-icon>
-          }
-        </div>
-
-        <!-- Mano de Match -->
-        <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center border-2 border-slate-900 z-20 shadow-md">
-          <ion-icon name="hand-right" class="text-sm"></ion-icon>
-        </div>
-
-        <!-- Foto de Partner -->
-        <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-slate-900 ring-2 ring-white/10 shadow-lg bg-slate-800 flex items-center justify-center z-10 animate-pulse">
-          @if (partnerPhoto) {
-            <img [src]="partnerPhoto" class="w-full h-full object-cover">
-          } @else {
-            <ion-icon name="person" class="text-xl text-gray-400"></ion-icon>
-          }
-        </div>
-      </div>
-
-      <!-- Mensaje Contextual -->
-      <div class="bg-white/5 border border-white/10 rounded-2xl p-4 w-full text-left">
-        <p class="text-xs font-semibold text-gray-250 leading-relaxed m-0 text-center">
-          "{{ matchMessage }}"
-        </p>
-      </div>
-
-      <!-- Acciones de Match con Componentes Ionic -->
-      <div class="flex flex-col gap-2.5 w-full mt-2">
-        <ion-button (click)="onIniciarChat()" 
-                    expand="block"
-                    color="success"
-                    class="font-black text-xs uppercase tracking-wider h-12 shadow-lg shadow-emerald-500/10"
-                    style="--border-radius: 14px; margin: 0;">
-          <ion-icon name="chatbubbles" slot="start" class="text-base"></ion-icon>
-          Coordinar por Chat
-        </ion-button>
-        
-        <ion-button (click)="onCerrarMatch()" 
-                    expand="block"
-                    fill="clear"
-                    color="medium"
-                    class="font-bold text-[10px] uppercase tracking-widest h-10"
-                    style="margin: 0;">
-          Seguir Buscando
-        </ion-button>
-      </div>
-
-    </div>
-  </div>
-}

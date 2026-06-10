@@ -4,7 +4,7 @@
  */
 export interface TarjetaDescubrir {
   id: string;
-  tipo: 'horario' | 'afinidad';
+  tipo: 'horario' | 'afinidad' | 'general';
   data: any;
   photoURL?: string | null;
 }
@@ -16,6 +16,6 @@ export interface MatchActual {
   partnerId: string;
   partnerName: string;
   partnerPhoto: string | null;
-  tipo: 'horario' | 'afinidad';
+  tipo: 'horario' | 'afinidad' | 'general';
   mensaje: string;
 }

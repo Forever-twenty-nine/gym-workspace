@@ -1,7 +1,6 @@
 <!-- Tabs de Segmento con Glassmorphism (Fijo fuera de ion-content) -->
 <ion-header class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
-  <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
-    class="rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg">
+  <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)">
     <ion-segment-button value="para-ti">
       <ion-label class="font-bold text-xs uppercase tracking-wider">Para ti</ion-label>
     </ion-segment-button>
@@ -22,37 +21,21 @@
     <!-- Renderizado condicional por componente -->
     @switch (selectedTab()) {
     @case ('descubrir') {
-    <app-descubrir-tab
-      [tarjetaActiva]="tarjetaActiva()"
-      [matchActual]="matchActual()"
-      [currentUserPhoto]="currentUserPhoto()"
-      (pasar)="pasarTarjeta()"
-      (chocarLos5)="chocarLos5()"
-      (iniciarChat)="iniciarChatPrivado()"
-      (cerrarMatch)="cerrarMatch()"
-      (cardTransitionEnd)="onCardTransitionEnd()"
-    ></app-descubrir-tab>
+    <app-descubrir-tab [tarjetaActiva]="tarjetaActiva()" (pasar)="pasarTarjeta()" (chocarLos5)="chocarLos5()"
+      (cardTransitionEnd)="onCardTransitionEnd()"></app-descubrir-tab>
     }
     @case ('para-ti') {
-    <!-- Historias unificadas en una sola fila presentadas por app-stories -->
-    <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
-
-    <!-- Centered detail modals directly controlled by SocialPage -->
-    <app-convocatoria-modal-stories [isOpen]="isConvoModalOpen()" [convocatoria]="selectedConvocatoria()"
-      (close)="closeConvoModal()"></app-convocatoria-modal-stories>
-
-    <app-desafio-modal-stories [isOpen]="isDesafioModalOpen()" [desafio]="selectedDesafio()"
-      (close)="closeDesafioModal()" (deleted)="onDesafioDeleted($event)"
-      (pasar)="onDesafioPasar($event)"></app-desafio-modal-stories>
-
-    <!-- Feed limpio de entrenamientos compartidos -->
-    <div class="flex flex-col gap-4">
-      <app-feed-tab tab="para-ti" class="block"></app-feed-tab>
-    </div>
+    <app-para-ti-tab></app-para-ti-tab>
     }
     @case ('siguiendo') {
     <app-feed-tab tab="siguiendo"></app-feed-tab>
     }
     }
   </div>
+
+  <!-- Superposición de Match Mutuo (Popup Global a Nivel de Página) -->
+  @if (matchActual()) {
+  <app-mutual-match-overlay [matchActual]="matchActual()!" [currentUserPhoto]="currentUserPhoto()"
+    (iniciarChat)="iniciarChatPrivado()" (cerrarMatch)="cerrarMatch()"></app-mutual-match-overlay>
+  }
 </ion-content>

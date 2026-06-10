@@ -1,6 +1,6 @@
 export interface MatchInteraction {
     id: string;
-    tipo: 'horario' | 'desafio' | 'afinidad';
+    tipo: 'horario' | 'desafio' | 'afinidad' | 'general';
     usuarioOrigenId: string;
     usuarioDestinoId: string;
     referenciaId?: string; // ID del desafío, si aplica

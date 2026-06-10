@@ -11,7 +11,7 @@ import { SesionRutinaService } from '../../../../core/services/sesion-rutina.ser
 import { AuthService } from '../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../core/services/entrenado.service';
 import { UserService } from '../../../../core/services/user.service';
-import { SocialCardComponent } from '../social-card/social-card.component';
+import { SocialCardComponent } from './social-card/social-card.component';
 import { SesionRutina } from 'gym-library';
 
 @Component({

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { IonCard, IonIcon, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonChip, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
+import { AuthService } from '../../../../../core/services/auth.service';
+import { UserService } from '../../../../../core/services/user.service';
 
 @Component({
   selector: 'app-match-card',
@@ -19,7 +19,7 @@ export class MatchCardComponent {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
 
-  tipo = input.required<'afinidad' | 'horario'>();
+  tipo = input.required<'afinidad' | 'horario' | 'general'>();
   data = input.required<any>();
   photoURL = input<string | null>(null); 
   photoVersion = input<number>(0); 
@@ -83,7 +83,8 @@ export class MatchCardComponent {
     if (external && Array.isArray(external) && external.length) return external;
 
     if (this.tipo() === 'horario') return ['Coincide contigo en tu horario'];
-    return ['Coincide contigo en tu objetivo'];
+    if (this.tipo() === 'afinidad') return ['Coincide contigo en tu objetivo'];
+    return [];
   });
 
   onPhotoError(): void {

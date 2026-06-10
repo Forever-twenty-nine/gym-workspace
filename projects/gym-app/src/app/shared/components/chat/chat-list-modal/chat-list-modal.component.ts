@@ -7,9 +7,9 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, searchOutline, personOutline, chatbubblesOutline } from 'ionicons/icons';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { UserService } from '../../../../../core/services/user.service';
-import { MensajeService } from '../../../../../core/services/mensaje.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { UserService } from '../../../../core/services/user.service';
+import { MensajeService } from '../../../../core/services/mensaje.service';
 import { ChatDetailModalComponent } from '../chat-detail-modal/chat-detail-modal.component';
 import { Mensaje } from 'gym-library';
 

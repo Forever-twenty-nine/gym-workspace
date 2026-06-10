@@ -8,7 +8,7 @@ import { MensajesGlobalesService } from '../../../../../core/services/mensajes-g
 import { InvitacionService } from '../../../../../core/services/invitacion.service';
 import { MensajeService } from '../../../../../core/services/mensaje.service';
 import { MensajeGlobalModalComponent } from './mensaje-global-modal/mensaje-global-modal.component';
-import { ChatListModalComponent } from '../../../../../entrenado/social/components/chat/chat-list-modal/chat-list-modal.component';
+import { ChatListModalComponent } from '../../../chat/chat-list-modal/chat-list-modal.component';
 import { Rol } from 'gym-library';
 
 @Component({

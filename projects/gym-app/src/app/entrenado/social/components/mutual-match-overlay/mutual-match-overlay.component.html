@@ -1,0 +1,55 @@
+<ion-modal [isOpen]="true" (ionModalDidDismiss)="onDidDismiss()">
+  <ng-template>
+    <ion-card class="m-0 bg-slate-900 border border-white/10 text-center flex flex-col items-center gap-4 p-6">
+
+      <ion-card-header class="p-0 flex flex-col gap-1 items-center">
+        <ion-card-title class="text-xl font-bold text-white">¡Conexión Realizada!</ion-card-title>
+        <ion-card-subtitle class="text-xs text-gray-400">Nueva coincidencia para entrenar</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content class="w-full p-0 flex flex-col items-center gap-4">
+        <!-- Avatares Simples -->
+        <div class="flex items-center justify-center gap-4 py-2">
+          <!-- Mi Foto -->
+          <ion-avatar
+            class="w-16 h-16 border-2 border-slate-650 flex items-center justify-center bg-slate-800 overflow-hidden">
+            @if (currentUserPhoto) {
+            <img [src]="currentUserPhoto" alt="Mi Foto" class="w-full h-full object-cover">
+            } @else {
+            <span class="text-[10px] text-gray-400 font-bold uppercase">Tú</span>
+            }
+          </ion-avatar>
+
+          <div class="text-white font-bold text-sm">Y</div>
+
+          <!-- Foto de Partner -->
+          <ion-avatar
+            class="w-16 h-16 border-2 border-slate-650 flex items-center justify-center bg-slate-800 overflow-hidden">
+            @if (partnerPhoto) {
+            <img [src]="partnerPhoto" [alt]="matchActual.partnerName" class="w-full h-full object-cover">
+            } @else {
+            <span class="text-[10px] text-gray-400 font-bold uppercase">Socio</span>
+            }
+          </ion-avatar>
+        </div>
+        <!-- Mensaje Contextual -->
+        @if (matchMessage) {
+        <ion-label>
+          "{{ matchMessage }}"
+        </ion-label>
+        }
+      </ion-card-content>
+
+      <ion-item lines="none" class="w-full flex flex-col gap-2 m-2">
+        <ion-button (click)="onIniciarChat()" fill="outline" color="primary">
+          Coordinar por Chat
+        </ion-button>
+
+        <ion-button (click)="onCerrarMatch()" fill="outline" color="secondary">
+          Seguir Buscando
+        </ion-button>
+      </ion-item>
+
+    </ion-card>
+  </ng-template>
+</ion-modal>

@@ -7,20 +7,17 @@ import { CommonModule } from '@angular/common';
 import { PageBackgroundComponent } from '../components/page-background/page-background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { ConvocatoriaService } from '../../core/services/convocatoria.service';
-import { DesafioService } from '../../core/services/desafio.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { MatchService } from '../../core/services/match.service';
 
 import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.component';
+import { MutualMatchOverlayComponent } from './components/mutual-match-overlay/mutual-match-overlay.component';
 import { FeedTabComponent } from './components/feed-tab/feed-tab.component';
-import { StoriesComponent, StoryDisplayItem } from './components/stories/stories.component';
-import { ConvocatoriaModalStoriesComponent } from './components/convocatoria-modal-stories/convocatoria-modal-stories.component';
-import { DesafioModalStoriesComponent } from './components/desafio-modal-stories/desafio-modal-stories.component';
-import { ChatDetailModalComponent } from './components/chat/chat-detail-modal/chat-detail-modal.component';
+import { ParaTiTabComponent } from './components/para-ti-tab/para-ti-tab.component';
+import { ChatDetailModalComponent } from '../../shared/components/chat/chat-detail-modal/chat-detail-modal.component';
 
-import { Plan, Convocatoria, Desafio } from 'gym-library';
-import { MatchActual } from './descubrir.types';
+import { Plan } from 'gym-library';
+import { MatchActual } from '../../core/types/descubrir.types';
 
 @Component({
   selector: 'app-social',
@@ -31,10 +28,9 @@ import { MatchActual } from './descubrir.types';
     IonContent,
     IonSegment, IonSegmentButton, IonLabel,
     DescubrirTabComponent,
+    MutualMatchOverlayComponent,
     FeedTabComponent,
-    StoriesComponent,
-    ConvocatoriaModalStoriesComponent,
-    DesafioModalStoriesComponent,
+    ParaTiTabComponent,
     IonHeader,
     PageBackgroundComponent
   ]
@@ -42,8 +38,6 @@ import { MatchActual } from './descubrir.types';
 export class SocialPage {
   private authService      = inject(AuthService);
   private userService      = inject(UserService);
-  private convocatoriaService = inject(ConvocatoriaService);
-  private desafioService   = inject(DesafioService);
   private entrenadoService = inject(EntrenadoService);
   private matchService     = inject(MatchService);
   private modalCtrl        = inject(ModalController);
@@ -74,14 +68,22 @@ export class SocialPage {
     return this.matchService.getTarjetasDescubrir(curr, gymId)();
   });
 
-  /** Índice de la tarjeta visible actualmente en el mazo. */
+  /** Índice local para avanzar visualmente antes de que llegue la actualización de Firestore */
   currentIndex = signal<number>(0);
+
+  /** IDs de tarjetas que ya hemos interactuado en esta sesión localmente */
+  localSwipedIds = signal<Set<string>>(new Set());
 
   /** Tarjeta actualmente en pantalla (o null si el mazo está agotado). */
   readonly tarjetaActiva = computed(() => {
     const list = this.tarjetas();
-    const idx  = this.currentIndex();
-    return idx < list.length ? list[idx] : null;
+    const localSwipes = this.localSwipedIds();
+    
+    // Filtrar localmente las tarjetas que ya pasamos/chocamos en esta sesión
+    const filteredList = list.filter(t => !localSwipes.has(t.data.id));
+    
+    // Como siempre filtramos localmente, la siguiente tarjeta siempre es la 0
+    return filteredList.length > 0 ? filteredList[0] : null;
   });
 
   /** Foto de perfil del usuario autenticado. */
@@ -94,8 +96,24 @@ export class SocialPage {
 
   // ─── Acciones Descubrir ─────────────────────────────────────────────────────
 
-  /** El usuario descartó la tarjeta. El hijo ya inició la animación; aquí no se hace nada extra. */
-  pasarTarjeta(): void { /* La animación y el avance de índice son responsabilidad del hijo */ }
+  /** El usuario descartó la tarjeta. Registra el pass en DB. */
+  pasarTarjeta(): void { 
+    const user   = this.currentUserSignal();
+    const active = this.tarjetaActiva();
+    if (!user || !active) return;
+    
+    const targetUserId = active.data.id;
+    
+    // Añadimos al filtro local inmediatamente para avanzar a la siguiente tarjeta sin saltos
+    const currentSet = new Set(this.localSwipedIds());
+    currentSet.add(targetUserId);
+    this.localSwipedIds.set(currentSet);
+
+    // Guardar en base de datos como no-interés (esInteres: false)
+    this.matchService.registrarInteres(user.uid, targetUserId, active.tipo, false).catch(e => {
+        console.error('Error al registrar rechazo:', e);
+    });
+  }
 
   /** El usuario presionó "Chocar los 5": registra el interés y, si hay match, muestra el popup. */
   async chocarLos5(): Promise<void> {
@@ -108,11 +126,17 @@ export class SocialPage {
 
     targetUserId = active.data.id;
 
+    // Añadimos al filtro local inmediatamente para avanzar a la siguiente tarjeta sin saltos
+    const currentSet = new Set(this.localSwipedIds());
+    currentSet.add(targetUserId);
+    this.localSwipedIds.set(currentSet);
+
     try {
       const isMatch = await this.matchService.registrarInteres(
         user.uid,
         targetUserId,
         active.tipo,
+        true, // esInteres
         referenciaId
       );
 
@@ -164,136 +188,8 @@ export class SocialPage {
 
   /** Avanza al siguiente elemento del mazo una vez que la animación CSS termina. */
   onCardTransitionEnd(): void {
-    this.currentIndex.update(idx => idx + 1);
-  }
-
-  // ─── Modales stories (tab Para Ti) ─────────────────────────────────────────
-
-  isConvoModalOpen    = signal(false);
-  selectedConvocatoria = signal<Convocatoria | null>(null);
-
-  isDesafioModalOpen  = signal(false);
-  selectedDesafio     = signal<Desafio | null>(null);
-  ocultadosDesafios   = signal<string[]>([]);
-
-  readonly storiesList = computed<StoryDisplayItem[]>(() => {
-    const gymId = this.currentUserSignal()?.gimnasioId;
-    if (!gymId) return [];
-
-    const now            = new Date();
-    const startOfToday   = new Date(); startOfToday.setHours(0, 0, 0, 0);
-    const endOfNextWeek  = new Date(startOfToday.getTime() + 7 * 24 * 60 * 60 * 1000);
-    endOfNextWeek.setHours(23, 59, 59, 999);
-
-    const convos = this.convocatoriaService.getConvocatoriasForGym(gymId)()
-      .filter(c => {
-        if (c.gimnasioId !== gymId || !c.activo) return false;
-        const d = new Date(c.fechaEntrenamiento);
-        if (c.esOficial) return d >= startOfToday && d <= endOfNextWeek;
-
-        const end = new Date(c.fechaEntrenamiento);
-        const [h, m] = c.horaFin.split(':').map(Number);
-        end.setHours(h, m, 0, 0);
-        return now < new Date(end.getTime() + 2 * 60 * 60 * 1000);
-      })
-      .map(c => {
-        const t = new Date(c.fechaEntrenamiento);
-        if (c.horaInicio) {
-          const [hh, mm] = c.horaInicio.split(':').map(n => parseInt(n, 10));
-          t.setHours(hh || 0, mm || 0, 0, 0);
-        }
-        return { type: 'convocatoria' as const, data: c, time: t };
-      });
-
-    const ocultos = this.ocultadosDesafios();
-    const des = this.desafioService.getDesafiosForGym(gymId)()
-      .filter(d => d.activo && new Date(d.fechaVencimiento) > now && !ocultos.includes(d.id))
-      .map(d => ({ type: 'desafio' as const, data: d, time: new Date(d.fechaVencimiento) }));
-
-    const items = [...convos, ...des];
-    items.sort((a, b) => a.time.getTime() - b.time.getTime());
-
-    return items.map(item => {
-      const uid = item.data?.creadorId;
-      let photoUrl: string | null = null;
-      if (uid) {
-        photoUrl = this.userService.getUserByUid(uid)()?.photoURL ?? null;
-      }
-      if (!photoUrl && item.data) {
-        const extra = item.data as { creadorFoto?: string | null };
-        photoUrl = extra?.creadorFoto ?? null;
-      }
-
-      let timeHint = '';
-      if (item.type === 'convocatoria') {
-        const c     = item.data as Convocatoria;
-        const fecha = new Date(c.fechaEntrenamiento);
-        if (fecha.toDateString() === now.toDateString()) {
-          timeHint = c.horaInicio || '';
-        } else {
-          const manana = new Date();
-          manana.setDate(now.getDate() + 1);
-          if (fecha.toDateString() === manana.toDateString()) {
-            timeHint = 'mañ';
-          } else {
-            timeHint = fecha.toLocaleDateString('es-ES', { day: 'numeric' });
-          }
-        }
-      } else {
-        const d = item.data as Desafio;
-        if (d.fechaVencimiento) {
-          const diff = new Date(d.fechaVencimiento).getTime() - Date.now();
-          if (diff <= 0) {
-            timeHint = 'fin';
-          } else {
-            const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            timeHint = days > 0 ? `${days}d` : `${hours}h`;
-          }
-        }
-      }
-
-      return {
-        id:        `${item.type}-${item.data?.id ?? ''}`,
-        type:      item.type,
-        label:     '',
-        photoUrl,
-        timeHint,
-        esOficial: item.type === 'convocatoria' ? (item.data as Convocatoria).esOficial    : undefined,
-        esSemanal: item.type === 'convocatoria' ? (item.data as Convocatoria).esSemanal    : undefined,
-        esCreador: item.type === 'desafio'      ? (item.data as Desafio).creadorId === this.currentUserSignal()?.uid : undefined,
-        rawStory:  item.data
-      };
-    });
-  });
-
-  handleStoryClick(story: StoryDisplayItem) {
-    if (story.type === 'convocatoria') {
-      this.selectedConvocatoria.set(story.rawStory);
-      this.isConvoModalOpen.set(true);
-    } else {
-      this.selectedDesafio.set(story.rawStory);
-      this.isDesafioModalOpen.set(true);
-    }
-  }
-
-  closeConvoModal() {
-    this.isConvoModalOpen.set(false);
-    this.selectedConvocatoria.set(null);
-  }
-
-  closeDesafioModal() {
-    this.isDesafioModalOpen.set(false);
-    this.selectedDesafio.set(null);
-  }
-
-  onDesafioDeleted(_id: string) {
-    this.closeDesafioModal();
-  }
-
-  onDesafioPasar(id: string) {
-    this.ocultadosDesafios.update(list => [...list, id]);
-    this.closeDesafioModal();
+    // La tarjeta ya fue removida del array visual mediante localSwipedIds inmediatamente al hacer click.
+    // No necesitamos hacer nada aquí.
   }
 
   segmentChanged(event: SegmentCustomEvent) {
