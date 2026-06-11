@@ -33,7 +33,7 @@
     "seed:test": "vitest run -c scripts/vitest.config.ts",
     "seed:typecheck": "tsc -p scripts/tsconfig.json --noEmit",
     "deploy": "npm run library:build && npm run gym-admin:build && npm run gym-app:build && firebase deploy",
-    "install:all": "npm install && cd projects/gym-admin && npm install && cd ../gym-app && npm install && cd ../gym-library && npm install"
+    "install:all": "npm install --force && cd projects/gym-admin && npm install --force && cd ../gym-app && npm install --force && cd ../gym-library && npm install --force"
   },
   "prettier": {
     "overrides": [
