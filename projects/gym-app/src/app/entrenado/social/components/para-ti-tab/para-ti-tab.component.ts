@@ -5,9 +5,9 @@ import { UserService } from '../../../../core/services/user.service';
 import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 import { DesafioService } from '../../../../core/services/desafio.service';
 import { StoriesComponent, StoryDisplayItem } from '../stories/stories.component';
-import { ConvocatoriaModalStoriesComponent } from '../convocatoria-modal-stories/convocatoria-modal-stories.component';
-import { DesafioModalStoriesComponent } from '../desafio-modal-stories/desafio-modal-stories.component';
-import { FeedTabComponent } from '../feed-tab/feed-tab.component';
+import { ConvocatoriaModalStoriesComponent } from './convocatoria-modal-stories/convocatoria-modal-stories.component';
+import { DesafioModalStoriesComponent } from './desafio-modal-stories/desafio-modal-stories.component';
+import { FeedTabComponent } from './feed-tab/feed-tab.component';
 import { Convocatoria, Desafio } from 'gym-library';
 
 @Component({

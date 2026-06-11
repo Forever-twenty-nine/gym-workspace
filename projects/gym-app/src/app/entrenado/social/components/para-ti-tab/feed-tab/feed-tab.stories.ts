@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig, componentWrapperDecorator } from '@storybook/angular';
 import { FeedTabComponent } from './feed-tab.component';
-import { mockProviders } from '../../testing-mocks';
+import { mockProviders } from '../../../testing-mocks';
 
 const meta: Meta<FeedTabComponent> = {
   title: 'Social/FeedTab/FeedTab',

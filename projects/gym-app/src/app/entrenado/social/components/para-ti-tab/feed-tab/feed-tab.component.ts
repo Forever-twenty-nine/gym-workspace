@@ -7,10 +7,10 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline } from 'ionicons/icons';
-import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
-import { AuthService } from '../../../../core/services/auth.service';
-import { EntrenadoService } from '../../../../core/services/entrenado.service';
-import { UserService } from '../../../../core/services/user.service';
+import { SesionRutinaService } from '../../../../../core/services/sesion-rutina.service';
+import { AuthService } from '../../../../../core/services/auth.service';
+import { EntrenadoService } from '../../../../../core/services/entrenado.service';
+import { UserService } from '../../../../../core/services/user.service';
 import { SocialCardComponent } from './social-card/social-card.component';
 import { SesionRutina } from 'gym-library';
 

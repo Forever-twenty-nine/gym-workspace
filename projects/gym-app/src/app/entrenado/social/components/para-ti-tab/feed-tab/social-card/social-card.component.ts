@@ -9,11 +9,11 @@ import {
   personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline
 } from 'ionicons/icons';
 
-import { SesionRutinaService } from '../../../../../core/services/sesion-rutina.service';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { UserService } from '../../../../../core/services/user.service';
-import { EntrenadoService } from '../../../../../core/services/entrenado.service';
-import { FormatFechaPipe } from '../../../../../shared/pipes/format-fecha.pipe';
+import { SesionRutinaService } from '../../../../../../core/services/sesion-rutina.service';
+import { AuthService } from '../../../../../../core/services/auth.service';
+import { UserService } from '../../../../../../core/services/user.service';
+import { EntrenadoService } from '../../../../../../core/services/entrenado.service';
+import { FormatFechaPipe } from '../../../../../../shared/pipes/format-fecha.pipe';
 import { SesionRutina } from 'gym-library';
 
 @Component({

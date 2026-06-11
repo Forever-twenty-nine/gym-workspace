@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { DesafioModalStoriesComponent } from './desafio-modal-stories.component';
-import { mockProviders, mockDesafios } from '../../testing-mocks';
+import { mockProviders, mockDesafios } from '../../../testing-mocks';
 
 const meta: Meta<DesafioModalStoriesComponent> = {
   title: 'Social/DesafioModalStories',

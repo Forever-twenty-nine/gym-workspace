@@ -20,9 +20,9 @@ import {
   timeOutline, personOutline, peopleOutline, checkmark
 } from 'ionicons/icons';
 import { Convocatoria } from 'gym-library';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
-import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
+import { AuthService } from '../../../../../core/services/auth.service';
+import { UserService } from '../../../../../core/services/user.service';
+import { ConvocatoriaService } from '../../../../../core/services/convocatoria.service';
 
 @Component({
   selector: 'app-convocatoria-modal-stories',

@@ -9,25 +9,23 @@ import {
   IonToolbar,
   IonAvatar,
   IonBadge,
-  IonChip,
   IonFooter,
   IonButton,
   IonLabel,
   IonGrid,
   IonRow,
   IonCol,
-  ToastController
-} from '@ionic/angular/standalone';
+  ToastController, IonTitle, IonText, IonButtons } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
   sadOutline, peopleOutline, timerOutline, trashOutline, personOutline
 } from 'ionicons/icons';
 import { Desafio, DesafioParticipacion } from 'gym-library';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
-import { DesafioParticipacionService } from '../../../../core/services/desafio-participacion.service';
-import { DesafioService } from '../../../../core/services/desafio.service';
+import { AuthService } from '../../../../../core/services/auth.service';
+import { UserService } from '../../../../../core/services/user.service';
+import { DesafioParticipacionService } from '../../../../../core/services/desafio-participacion.service';
+import { DesafioService } from '../../../../../core/services/desafio.service';
 
 @Component({
   selector: 'app-desafio-modal-stories',
@@ -40,14 +38,14 @@ import { DesafioService } from '../../../../core/services/desafio.service';
     IonToolbar,
     IonAvatar,
     IonBadge,
-    IonChip,
     IonFooter,
     IonButton,
     IonLabel,
     IonGrid,
     IonRow,
-    IonCol
-  ],
+    IonCol,
+    IonButtons
+],
   templateUrl: './desafio-modal-stories.component.html',
   styles: [`
     ion-modal {
