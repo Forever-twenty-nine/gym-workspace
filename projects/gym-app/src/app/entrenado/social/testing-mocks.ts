@@ -134,6 +134,37 @@ export const mockDesafios: Desafio[] = [
     fechaVencimiento: new Date(Date.now() + 2 * 24 * 3600 * 1000),
     activo: true
   }
+  ,
+  {
+    id: 'des-3',
+    creadorId: 'user-3',
+    creadorNombre: 'María Gómez',
+    gimnasioId: 'gym-123',
+    titulo: 'Correr 5km en menos de 25 min',
+    fechaCreacion: new Date(),
+    fechaVencimiento: new Date(Date.now() + 7 * 24 * 3600 * 1000),
+    activo: true
+  },
+  {
+    id: 'des-4',
+    creadorId: 'user-partner',
+    creadorNombre: 'Juan Pérez',
+    gimnasioId: 'gym-123',
+    titulo: 'Plancha abdominal 5 minutos',
+    fechaCreacion: new Date(),
+    fechaVencimiento: new Date(Date.now() + 10 * 24 * 3600 * 1000),
+    activo: true
+  },
+  {
+    id: 'des-5',
+    creadorId: 'user-3',
+    creadorNombre: 'María Gómez',
+    gimnasioId: 'gym-123',
+    titulo: 'Burpees x 50 en 3 min',
+    fechaCreacion: new Date(),
+    fechaVencimiento: new Date(Date.now() + 4 * 24 * 3600 * 1000),
+    activo: true
+  }
 ];
 
 export const mockParticipaciones: DesafioParticipacion[] = [
@@ -152,6 +183,25 @@ export const mockParticipaciones: DesafioParticipacion[] = [
     participanteId: 'user-partner',
     participanteNombre: 'Juan Pérez',
     participanteFoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    estado: 'superado',
+    fechaAceptacion: new Date(),
+    fechaRespuesta: new Date()
+  },
+  {
+    id: 'part-3',
+    desafioId: 'des-3',
+    participanteId: 'user-current',
+    participanteNombre: 'Mi Perfil',
+    participanteFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    estado: 'aceptado',
+    fechaAceptacion: new Date()
+  },
+  {
+    id: 'part-5',
+    desafioId: 'des-5',
+    participanteId: 'user-current',
+    participanteNombre: 'Mi Perfil',
+    participanteFoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
     estado: 'superado',
     fechaAceptacion: new Date(),
     fechaRespuesta: new Date()
