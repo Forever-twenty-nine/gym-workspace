@@ -13,6 +13,7 @@
     "gym-app:serve": "cd projects/gym-app && ionic serve",
     "gym-app:build": "cd projects/gym-app && ionic build",
     "gym-app:storybook": "cd projects/gym-app && npm run storybook",
+    "storybook": "npm run gym-app:storybook",
     "gym-app:build-storybook": "cd projects/gym-app && npm run build-storybook",
     "gym-app:android": "cd projects/gym-app && ionic cap run android",
     "gym-app:sync": "cd projects/gym-app && ionic cap sync",

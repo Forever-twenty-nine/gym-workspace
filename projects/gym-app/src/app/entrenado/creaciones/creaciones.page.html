@@ -18,13 +18,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
-  <!-- 
-    Background layers.
-    We use fixed for the image (full viewport) and absolute for the gradient.
-    The key to make them BOTH appear *behind* the bottom tab bar is that the tab bar
-    itself must be transparent (see .entrenado-main-tabs ion-tab-bar in ionic-components.css).
-    Previously the tab bar had a solid --background that was covering the lower part of any fixed/absolute backgrounds.
-  -->
+
   @if (isPremium()) {
   <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
     <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"

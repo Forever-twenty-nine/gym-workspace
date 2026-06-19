@@ -1,6 +1,6 @@
 <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 p-5 flex flex-col gap-4">
   <!-- Acciones unificadas (siempre visibles) -->
-  <div class="flex items-center justify-end gap-2">
+  <ion-card class="flex items-center justify-end gap-2">
     <ion-button id="help-rutinas" fill="clear">
       <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
     </ion-button>
@@ -17,11 +17,16 @@
     <ion-button (click)="onCreate()" size="small" class="m-0! rounded-2xl" fill="solid">
       <ion-icon name="add" slot="icon-only"></ion-icon>
     </ion-button>
+    } @else {
+      
+
+
     }
-  </div>
+
+  </ion-card>
 
   @if (isPremium) {
-    <ion-list lines="none" class="bg-transparent m-0! -mx-1 space-y-2">
+    <ion-list lines="none" class=" m-0! -mx-1 space-y-2">
       @for (rut of rutinas; track rut.id) {
         <ion-item-sliding class="rounded-2xl overflow-hidden">
           <ion-item class="bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden --padding-start: 4px; --padding-end: 4px;">
