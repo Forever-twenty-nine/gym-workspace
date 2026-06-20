@@ -27,9 +27,9 @@ export const routes: Routes = [
           import('../creaciones/creaciones.page').then((m) => m.CreacionesPage),
       },
       {
-        path: 'progreso',
+        path: 'perfil',
         loadComponent: () =>
-          import('../progreso/progreso.page').then((m) => m.ProgresoPage),
+          import('../perfil/perfil.page').then((m) => m.PerfilPage),
       },
       {
         path: '',

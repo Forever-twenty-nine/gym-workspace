@@ -7,7 +7,7 @@ import { MatchActual } from '../../../../core/types/descubrir.types';
   selector: 'app-mutual-match-overlay',
   templateUrl: './mutual-match-overlay.component.html',
   standalone: true,
-  imports: [IonLabel, IonItem,
+  imports: [IonLabel,
     CommonModule,
     IonButton,
     IonCard,

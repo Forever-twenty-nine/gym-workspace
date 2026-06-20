@@ -27,8 +27,6 @@ import { Rutina } from 'gym-library';
     IonLabel,
     IonButton,
     IonIcon,
-    IonPopover,
-    IonContent,
     IonItemSliding,
     IonItemOptions,
     IonItemOption

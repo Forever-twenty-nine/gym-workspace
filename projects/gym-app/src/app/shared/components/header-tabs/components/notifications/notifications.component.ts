@@ -1,8 +1,8 @@
-import { Component, inject, computed, OnInit } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonMenu, IonList, IonItem, IonLabel, ModalController, IonIcon, IonButton, IonItemDivider, IonNote, ToastController, IonBadge, MenuController } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonList, IonItem, IonLabel, ModalController, IonIcon, IonButton, IonItemDivider, IonNote, ToastController, IonBadge } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { mailOutline, personAddOutline, fitnessOutline, informationCircleOutline, chatbubblesOutline } from 'ionicons/icons';
+import { mailOutline, personAddOutline, fitnessOutline, informationCircleOutline, chatbubblesOutline, closeOutline } from 'ionicons/icons';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { MensajesGlobalesService } from '../../../../../core/services/mensajes-globales.service';
 import { InvitacionService } from '../../../../../core/services/invitacion.service';
@@ -15,30 +15,28 @@ import { Rol } from 'gym-library';
   selector: 'app-notifications',
   standalone: true,
   imports: [
-    CommonModule, 
-    IonHeader, 
-    IonToolbar, 
-    IonTitle, 
-    IonContent, 
-    IonMenu,
-    IonList, 
-    IonItem, 
-    IonLabel, 
-    IonIcon, 
-    IonButton, 
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonIcon,
+    IonButton,
     IonItemDivider,
     IonBadge
-  ],
+],
   templateUrl: './notifications.component.html'
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent {
   private authService = inject(AuthService);
   private mensajesGlobalesService = inject(MensajesGlobalesService);
   private invitacionService = inject(InvitacionService);
   private mensajeService = inject(MensajeService);
   private modalCtrl = inject(ModalController);
   private toastCtrl = inject(ToastController);
-  private menuCtrl = inject(MenuController);
 
   currentUser = this.authService.currentUser;
 
@@ -68,12 +66,11 @@ export class NotificationsComponent implements OnInit {
   });
 
   constructor() {
-    addIcons({ mailOutline, personAddOutline, fitnessOutline, informationCircleOutline, chatbubblesOutline });
+    addIcons({ mailOutline, personAddOutline, fitnessOutline, informationCircleOutline, chatbubblesOutline, closeOutline });
   }
 
-  ngOnInit() {
-    // Aseguramos que el gesto de swipe esté habilitado (además del atributo en el template)
-    this.menuCtrl.enable(true, 'notifications-menu');
+  closeModal() {
+    this.modalCtrl.dismiss();
   }
 
   async openMensaje(mensaje: any) {
