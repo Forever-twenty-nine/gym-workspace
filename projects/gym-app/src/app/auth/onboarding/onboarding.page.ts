@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
@@ -63,6 +63,18 @@ const ONBOARDING_CONFIG = {
   ]
 })
 export class OnboardingPage {
+  @Input() set step(value: number) {
+    if (value) {
+      this.currentStep.set(value);
+    }
+  }
+
+  @Input() set initialData(value: Partial<{ nombre: string; role: 'entrenado' | 'entrenador' | 'gimnasio' | 'personal_trainer'; objetivo: keyof typeof Objetivo | '' }>) {
+    if (value) {
+      this.formData.update(current => ({ ...current, ...value }));
+    }
+  }
+
   // Signals para mejor reactividad
   currentStep = signal<number>(ONBOARDING_CONFIG.STEPS.DATOS_PERSONALES);
   totalSteps = signal<number>(ONBOARDING_CONFIG.MAX_STEPS.ENTRENADO);

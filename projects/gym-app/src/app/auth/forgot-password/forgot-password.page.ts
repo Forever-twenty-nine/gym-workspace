@@ -16,8 +16,6 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-forgot-password',
   templateUrl: 'forgot-password.page.html',
-  styleUrls: ['forgot-password.page.css'],
-  standalone: true,
   imports: [
     IonContent,
     IonInput,
@@ -30,7 +28,6 @@ import { AuthService } from '../../core/services/auth.service';
 export class ForgotPasswordPage {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
   readonly email = signal('');
   readonly emailError = signal('');
   readonly successMessage = signal('');

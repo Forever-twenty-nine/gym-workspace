@@ -4,7 +4,7 @@ import { DesafioModalStoriesComponent } from './desafio-modal-stories.component'
 import { mockProviders, mockDesafios } from '../../../testing-mocks';
 
 const meta: Meta<DesafioModalStoriesComponent> = {
-  title: 'Social/DesafioModalStories',
+  title: 'Pages/entrenado/social/components/DesafioModalStories',
   component: DesafioModalStoriesComponent,
   tags: ['autodocs'],
   decorators: [

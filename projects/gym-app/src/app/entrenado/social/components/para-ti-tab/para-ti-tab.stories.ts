@@ -8,7 +8,7 @@ import { DesafioService } from '../../../../core/services/desafio.service';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 
 const meta: Meta<ParaTiTabComponent> = {
-  title: 'Social/ParaTiTab',
+  title: 'Pages/entrenado/social/components/ParaTiTab',
   component: ParaTiTabComponent,
   tags: ['autodocs'],
   decorators: [

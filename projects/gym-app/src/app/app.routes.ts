@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { entrenadoGuard, entrenadorGuard, gimnasioGuard } from './guards/role.guard';
+import { entrenadoGuard, entrenadorGuard, gimnasioGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {

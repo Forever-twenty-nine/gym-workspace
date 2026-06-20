@@ -330,6 +330,7 @@ export const mockMatchService = {
 
 export const mockSesionRutinaService = {
   getSesionesCompartidas: () => signal(mockSesionesCompartidas),
+  getSesionesPorEntrenado: () => signal([]),
   addLike: () => Promise.resolve(),
   removeLike: () => Promise.resolve(),
   setCompartida: () => Promise.resolve(),
@@ -371,6 +372,42 @@ export const mockActionSheetController = {
   })
 };
 
+export const mockRutinaService = {
+  rutinas: () => signal([]),
+  getCreatedByUser: () => signal([]),
+  getRutinasForGym: () => signal([]),
+  save: () => Promise.resolve()
+};
+
+export const mockEjercicioService = {
+  ejercicios: () => signal([]),
+  getCreatedByUser: () => signal([]),
+  save: () => Promise.resolve()
+};
+
+export const mockRutinaAsignadaService = {
+  getRutinasAsignadasByEntrenado: () => signal([]),
+  getProximasRutinasDashboard: () => signal([]),
+  organizarRutinasSemanales: () => [],
+  save: () => Promise.resolve()
+};
+
+export const mockInvitacionService = {
+  getInvitacionesForGym: () => signal([]),
+  invitaciones: () => signal([])
+};
+
+export const mockNavController = {
+  navigateRoot: () => {},
+  navigateForward: () => {},
+  navigateBack: () => {}
+};
+
+export const mockRouter = {
+  navigate: () => {},
+  events: signal(null)
+};
+
 // Helper array to supply all providers in a single decorator
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
@@ -381,7 +418,12 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
 import { MatchService } from '../../core/services/match.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { DesafioParticipacionService } from '../../core/services/desafio-participacion.service';
-import { ModalController, ToastController, AlertController, ActionSheetController } from '@ionic/angular/standalone';
+import { RutinaService } from '../../core/services/rutina.service';
+import { EjercicioService } from '../../core/services/ejercicio.service';
+import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
+import { InvitacionService } from '../../core/services/invitacion.service';
+import { NavController, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 
 export const mockProviders = [
   { provide: AuthService, useValue: mockAuthService },
@@ -393,8 +435,15 @@ export const mockProviders = [
   { provide: MatchService, useValue: mockMatchService },
   { provide: SesionRutinaService, useValue: mockSesionRutinaService },
   { provide: DesafioParticipacionService, useValue: mockDesafioParticipacionService },
+  { provide: RutinaService, useValue: mockRutinaService },
+  { provide: EjercicioService, useValue: mockEjercicioService },
+  { provide: RutinaAsignadaService, useValue: mockRutinaAsignadaService },
+  { provide: InvitacionService, useValue: mockInvitacionService },
+  { provide: NavController, useValue: mockNavController },
+  { provide: Router, useValue: mockRouter },
   { provide: ModalController, useValue: mockModalController },
   { provide: ToastController, useValue: mockToastController },
   { provide: AlertController, useValue: mockAlertController },
   { provide: ActionSheetController, useValue: mockActionSheetController }
 ];
+

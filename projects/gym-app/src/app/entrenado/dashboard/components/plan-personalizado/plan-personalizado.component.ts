@@ -1,26 +1,25 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import {
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
-  IonIcon, IonAvatar, IonListHeader } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { accessibilityOutline, medalOutline, todayOutline } from 'ionicons/icons';
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonAvatar,
+  IonLabel
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-plan-personalizado',
   templateUrl: './plan-personalizado.component.html',
   standalone: true,
-  imports: [IonListHeader, IonAvatar,
+  imports: [
     IonCard,
-    IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel],
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonAvatar,
+    IonLabel
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlanPersonalizadoComponent {
@@ -31,7 +30,4 @@ export class PlanPersonalizadoComponent {
   @Input() photoURL: string | undefined = '';
   @Input() entrenadorAsignado: string | undefined = '';
 
-  constructor() {
-    addIcons({ accessibilityOutline, medalOutline, todayOutline });
-  }
 }

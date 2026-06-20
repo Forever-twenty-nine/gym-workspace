@@ -4,7 +4,7 @@ import { MatchCardComponent } from './match-card.component';
 import { mockProviders, mockTarjetasDescubrirList } from '../../../testing-mocks';
 
 const meta: Meta<MatchCardComponent> = {
-  title: 'Social/DescubrirTab/MatchCard',
+  title: 'Pages/entrenado/social/components/DescubrirTab/MatchCard',
   component: MatchCardComponent,
   tags: ['autodocs'],
   decorators: [

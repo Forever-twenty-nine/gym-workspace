@@ -4,7 +4,7 @@ import { DescubrirTabComponent } from './descubrir-tab.component';
 import { mockProviders, mockTarjetasDescubrirList } from '../../testing-mocks';
 
 const meta: Meta<DescubrirTabComponent> = {
-  title: 'Social/DescubrirTab/DescubrirTab',
+  title: 'Pages/entrenado/social/components/DescubrirTab',
   component: DescubrirTabComponent,
   tags: ['autodocs'],
   argTypes: {

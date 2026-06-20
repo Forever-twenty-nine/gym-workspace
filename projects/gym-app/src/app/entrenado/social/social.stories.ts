@@ -4,7 +4,7 @@ import { SocialPage } from './social.page';
 import { mockProviders } from './testing-mocks';
 
 const meta: Meta<SocialPage> = {
-  title: 'Social/SocialPage',
+  title: 'Pages/entrenado/social',
   component: SocialPage,
   tags: ['autodocs'],
   decorators: [

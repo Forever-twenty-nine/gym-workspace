@@ -1,37 +1,42 @@
-<ion-card>
+<ion-card class="mx-0 mt-0 mb-4 rounded-3xl shadow-xl relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10">
+  <ion-grid class="p-4">
+    <!-- Fila superior: Avatar y texto principal -->
+    <ion-row class="ion-align-items-center mb-3">
+      <ion-col size="auto" class="p-0">
+        <ion-avatar class="w-10 h-10 mr-3">
+          <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
+        </ion-avatar>
+      </ion-col>
+      <ion-col class="p-0">
+        <ion-label>
+          <h2 class="text-lg font-black text-gray-900 dark:text-white m-0 tracking-tight">Plan Personalizado</h2>
+          @if (entrenadorAsignado) {
+            <p class="text-xs text-gray-500 dark:text-gray-400 m-0 mt-0.5">{{ entrenadorAsignado }}</p>
+          }
+        </ion-label>
+      </ion-col>
+    </ion-row>
 
-  <ion-avatar slot="end">
-    <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
-  </ion-avatar>
-  <ion-card-content class="ion-no-padding">
-    <ion-list lines="none">
-
-      <ion-list-header class="ion-padding-start">
-        <ion-label >Plan Personalizado</ion-label>
-      </ion-list-header>
-
-      @if(entrenadorAsignado){
-        <ion-item>
-          <ion-label slot="start">Entrenador</ion-label>
-          <ion-label slot="end">{{ entrenadorAsignado }}</ion-label>
-        </ion-item>
-      }
-      
-      <ion-item >
-        <ion-label slot="start">Nivel </ion-label>
-        <ion-label slot="end">{{ nivel || 'Nivel no definido' }}</ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label slot="start">Objetivo</ion-label>
-        <ion-label slot="end">{{ objetivo }}</ion-label>
-      </ion-item>
-
-      <ion-item>
-        <ion-label slot="start">Frecuencia</ion-label>
-        <ion-label slot="end">{{ frecuencia || 0 }} días/semana</ion-label>
-      </ion-item>
-
-    </ion-list>
-  </ion-card-content>
+    <!-- Fila inferior: Datos en columnas -->
+    <ion-row class="pt-3 border-t border-gray-200/40 dark:border-white/10">
+      <ion-col size="4" class="text-center p-0">
+        <ion-label>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Nivel</p>
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1">{{ nivel || 'No definido' }}</h3>
+        </ion-label>
+      </ion-col>
+      <ion-col size="4" class="text-center p-0">
+        <ion-label>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Objetivo</p>
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1 truncate" [title]="objetivo">{{ objetivo }}</h3>
+        </ion-label>
+      </ion-col>
+      <ion-col size="4" class="text-center p-0">
+        <ion-label>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Frecuencia</p>
+          <h3 class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1">{{ frecuencia || 0 }} d/sem</h3>
+        </ion-label>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-card>
