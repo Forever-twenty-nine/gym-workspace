@@ -1,21 +1,6 @@
 import { Component, input, output, signal, inject, ChangeDetectionStrategy } from '@angular/core';
-import { SocialShareService, ShareProgressOptions } from '../../core/services/social-share.service';
+import { SocialShareService, ShareProgressOptions } from '../../../core/services/social-share.service';
 
-/**
- * Componente de botón para compartir progreso en redes sociales
- * 
- * @example
- * ```html
- * <lib-social-share-button
- *   [entrenadoId]="entrenadoId()"
- *   platform="instagram"
- *   [disabled]="loading()"
- *   (shareComplete)="onShareComplete()"
- *   (shareError)="onShareError($event)">
- *   Compartir en Instagram
- * </lib-social-share-button>
- * ```
- */
 @Component({
   selector: 'lib-social-share-button',
   standalone: true,
