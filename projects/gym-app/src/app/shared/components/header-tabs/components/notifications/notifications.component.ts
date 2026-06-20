@@ -26,7 +26,8 @@ import { Rol } from 'gym-library';
     IonIcon,
     IonButton,
     IonItemDivider,
-    IonBadge
+    IonBadge,
+    IonButtons
 ],
   templateUrl: './notifications.component.html'
 })
