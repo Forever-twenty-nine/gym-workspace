@@ -1,20 +1,17 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
 import {
   IonContent,
   IonInput,
   IonButton,
   IonIcon,
   IonCheckbox,
-  NavController
-} from '@ionic/angular/standalone';
+  NavController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
 import { Rol } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
-import { UserService } from '../../core/services/user.service';
 import { StorageService } from '../../core/services/storage.service';
 
 @Component({
@@ -27,12 +24,10 @@ import { StorageService } from '../../core/services/storage.service';
     IonButton,
     IonIcon,
     IonCheckbox,
-    FormsModule
-  ]
+    FormsModule]
 })
 export class LoginPage implements OnInit {
   private readonly authService = inject(AuthService);
-  private readonly userService = inject(UserService);
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
@@ -122,9 +117,6 @@ export class LoginPage implements OnInit {
     }
   }
 
-  /**
-   * Redirige al usuario según su rol
-   */
   private redirectToRolePage(role?: string): void {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();

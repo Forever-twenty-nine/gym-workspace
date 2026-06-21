@@ -1,4 +1,4 @@
-<!-- Button float -->
+
 <ion-button slot="start" fill="clear" class="fixed top-4 left-2 z-10 text-white" (click)="goToWelcome()">
   <ion-icon name="arrow-back-outline"></ion-icon>
 </ion-button>
@@ -33,20 +33,20 @@
 
 
       <form>
-        <!-- email -->
-        <ion-input label="Email" label-placement="floating" type="email" name="email" [ngModel]="email()"
-          (ngModelChange)="email.set($event)" placeholder="Ingresa tu email" class="mb-2 text-white">
-          <ion-icon name="person-outline" slot="start" aria-hidden="true" class="mr-2 text-white/60">
-          </ion-icon>
-        </ion-input>
+        <div class="mb-6">
+          <!-- email -->
+          <ion-input label="Email" label-placement="floating" type="email" name="email" [ngModel]="email()"
+            (ngModelChange)="email.set($event)" placeholder="Ingresa tu email" class="mb-2 text-white">
 
-        <!-- password -->
-        <ion-input label="Contraseña" label-placement="floating" type="password" name="password" [ngModel]="password()"
-          (ngModelChange)="password.set($event)" placeholder="Ingresa tu contraseña" class="mb-2 text-white">
-          <ion-icon name="lock-closed-outline" slot="start" aria-hidden="true" class="mr-2 text-white/60">
-          </ion-icon>
-        </ion-input>
+          </ion-input>
 
+          <!-- password -->
+          <ion-input label="Contraseña" label-placement="floating" type="password" name="password"
+            [ngModel]="password()" (ngModelChange)="password.set($event)" placeholder="Ingresa tu contraseña"
+            class="mb-2 text-white">
+
+          </ion-input>
+        </div>
         <div class="flex items-center mb-2 px-1">
           <ion-checkbox [checked]="rememberMe()" (ionChange)="toggleRememberMe($event.detail.checked)"
             label-placement="end" justify="start" class="text-white text-sm">
@@ -72,8 +72,6 @@
       <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="login()" class="">
         Iniciar Sesión
       </ion-button>
-
-
 
     </div>
   </div>

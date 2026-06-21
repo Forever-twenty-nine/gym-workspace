@@ -222,3 +222,7 @@ android/app/src/main/assets/public/
 # Playwright E2E Tests
 playwright-report/
 test-results/
+
+# Firebase Service Account Key
+scripts/serviceAccountKey.json
+
