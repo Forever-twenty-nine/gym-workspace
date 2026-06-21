@@ -19,6 +19,9 @@ import { GimnasioService } from '../../core/services/gimnasio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { InvitacionModalComponent } from '../../entrenador/entrenados/components/invitacion-modal/invitacion-modal.component';
+import { EntrenadorListComponent } from "./components/entrenador-list/entrenador-list.component";
+import { InvitacionesPendientesListComponent } from "./components/invitaciones-pendientes-list/invitaciones-pendientes-list.component";
+import { GymBackgroundComponent } from "../../shared/components/gym-background/gym-background.component";
 
 @Component({
   selector: 'app-gimnasio-entrenadores',
@@ -31,7 +34,10 @@ import { InvitacionModalComponent } from '../../entrenador/entrenados/components
     IonButton,
     IonIcon,
     IonSearchbar,
-    InvitacionModalComponent
+    InvitacionModalComponent,
+    EntrenadorListComponent,
+    InvitacionesPendientesListComponent,
+    GymBackgroundComponent
 ],
 })
 export class GimnasioEntrenadoresPage implements OnInit {

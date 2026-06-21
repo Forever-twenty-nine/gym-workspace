@@ -8,27 +8,21 @@ import {
   IonGrid, 
   IonRow, 
   IonCol,
-  IonText,
-  IonItem,
-  IonLabel
-} from '@ionic/angular/standalone';
+  IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-gym-trainer-stats',
   standalone: true,
   imports: [
-    CommonModule, 
-    IonCard, 
-    IonCardHeader, 
-    IonCardTitle, 
-    IonCardContent, 
-    IonGrid, 
-    IonRow, 
+    CommonModule,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonGrid,
+    IonRow,
     IonCol,
-    IonText,
-    IonItem,
-    IonLabel
-  ],
+    IonText],
   templateUrl: './gym-trainer-stats.component.html',
   styles: [`
     ion-col {

@@ -1,57 +1,83 @@
-<ion-card class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl ion-no-margin mb-5 fade-in shadow-none">
-  <ion-card-header class="pb-2 border-b border-white/5 mb-3 ion-no-padding p-4">
-    <ion-card-title class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">
+<ion-card>
+  <ion-card-header class="p-4 text-center">
+    <ion-card-title>
       Entrenadores
     </ion-card-title>
   </ion-card-header>
-  
+
   <ion-card-content class="p-4 ion-no-padding">
     <ion-grid class="ion-no-padding">
       <ion-row class="gap-y-3">
         <!-- Total Entrenadores -->
-        <ion-col size="6" class="ion-padding-horizontal-xs">
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <ion-text class="text-xl font-extrabold text-white">{{ totalTrainers() }}</ion-text>
-            <ion-text class="text-[9px] text-white/50 uppercase tracking-wider mt-1">Registrados</ion-text>
-          </div>
+        <ion-col size="6" class="">
+          <ion-card>
+            <ion-card-header class="p-2 flex items-center justify-center">
+              <ion-text class="text-xl font-extrabold">{{ totalTrainers() }}</ion-text>
+            </ion-card-header>
+            <ion-card-content class="p-2 text-center">
+              <ion-text class="text-[9px] uppercase tracking-wider">Total Registrados</ion-text>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
 
         <!-- Entrenadores Activos -->
-        <ion-col size="6" class="ion-padding-horizontal-xs">
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <ion-text class="text-xl font-extrabold text-white">{{ activeTrainers() }}</ion-text>
-            <ion-text class="text-[9px] text-white/50 uppercase tracking-wider mt-1">Activos</ion-text>
-          </div>
+        <ion-col size="6" class="">
+          <ion-card>
+            <ion-card-header class="p-2 flex items-center justify-center">
+              <ion-text class="text-xl font-extrabold">{{ activeTrainers() }}</ion-text>
+            </ion-card-header>
+            <ion-card-content class="p-2 text-center">
+              <ion-text class="text-[9px] uppercase tracking-wider">Activos</ion-text>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
 
         <!-- Promedio Clientes/Entrenador -->
-        <ion-col size="6" class="ion-padding-horizontal-xs">
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <ion-text class="text-xl font-extrabold text-white">{{ avgTraineesPerTrainer() }}</ion-text>
-            <ion-text class="text-[9px] text-white/50 uppercase tracking-wider mt-1">Clientes / Coach</ion-text>
-          </div>
+        <ion-col size="6">
+          <ion-card>
+            <ion-card-header class="p-2 flex items-center justify-center">
+              <ion-text class="text-xl font-extrabold">{{ avgTraineesPerTrainer() }}</ion-text>
+            </ion-card-header>
+            <ion-card-content class="p-2 text-center">
+              <ion-text class="text-[9px]  uppercase tracking-wider">Clientes / Coach</ion-text>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
 
         <!-- Rutinas Creadas -->
-        <ion-col size="6" class="ion-padding-horizontal-xs">
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <ion-text class="text-xl font-extrabold text-white">{{ routinesCreatedByTrainers() }}</ion-text>
-            <ion-text class="text-[9px] text-white/50 uppercase tracking-wider mt-1">Rutinas Creadas</ion-text>
-          </div>
+        <ion-col size="6">
+          <ion-card>
+            <ion-card-header class="p-2 flex items-center justify-center">
+              <ion-text class="text-xl font-extrabold">{{ routinesCreatedByTrainers() }}</ion-text>
+            </ion-card-header>
+            <ion-card-content class="p-2 text-center">
+              <ion-text class="text-[9px]  uppercase tracking-wider">Rutinas Creadas</ion-text>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
 
         <!-- Invitaciones Pendientes -->
+        @if(pendingInvitations() > 0) {
         <ion-col size="12" class="mt-2">
-          <ion-item lines="none" class="--background: rgba(255, 255, 255, 0.05); --border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
-            <ion-label class="m-0">
-              <ion-text class="text-xs font-bold text-white block">Invitaciones Pendientes</ion-text>
-              <ion-text class="text-[9px] text-white/40 block">Esperando registro</ion-text>
-            </ion-label>
-            <ion-text slot="end" class="text-xl font-extrabold text-(--ion-color-danger) px-2">
-              {{ pendingInvitations() }}
-            </ion-text>
-          </ion-item>
+          <ion-card class="">
+            <ion-card-header class="p-2 flex items-center justify-center">
+              <ion-card-title class="ml-2 text-lg font-bold">Invitaciones Pendientes</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content class="p-2 flex items-center justify-between">
+              <div class="flex items-center gap-x-2">
+                <ion-text class="m-0">
+                  <ion-text class="text-[9px] block">Esperando registro</ion-text>
+                </ion-text>
+                <ion-text slot="end" class="text-xl font-extrabold text-(--ion-color-danger) px-2">
+                  {{ pendingInvitations() }}
+                </ion-text>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </ion-col>
+        }
+
       </ion-row>
     </ion-grid>
   </ion-card-content>
