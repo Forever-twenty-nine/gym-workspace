@@ -35,7 +35,7 @@ const mockRouter = {
 };
 
 const meta: Meta<OnboardingPage> = {
-  title: 'Pages/auth/onboarding',
+  title: 'Secciones/auth/onboarding',
   component: OnboardingPage,
   tags: ['autodocs'],
   decorators: [
@@ -68,6 +68,7 @@ export const PasoDos: Story = {
     }
   }
 };
+
 
 
 

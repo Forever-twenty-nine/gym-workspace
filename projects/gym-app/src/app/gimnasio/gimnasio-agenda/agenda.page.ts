@@ -2,11 +2,9 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonIcon,
   IonLabel,
   IonSegment,
-  IonSegmentButton,
-  IonPopover
+  IonSegmentButton
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -16,6 +14,9 @@ import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { Convocatoria } from 'gym-library';
+import { ConvocatoriaListComponent } from './components/convocatoria-list/convocatoria-list.component';
+import { AgendaHelpPopoverComponent } from './components/agenda-help-popover/agenda-help-popover.component';
+import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
 
 
 @Component({
@@ -25,11 +26,12 @@ import { Convocatoria } from 'gym-library';
   imports: [
     CommonModule,
     IonContent,
-    IonIcon,
     IonLabel,
     IonSegment,
     IonSegmentButton,
-    IonPopover
+    ConvocatoriaListComponent,
+    AgendaHelpPopoverComponent,
+    GymBackgroundComponent
   ]
 })
 export class AgendaPage implements OnInit {
@@ -82,6 +84,27 @@ export class AgendaPage implements OnInit {
   convocatoriasAtletas = computed(() => {
     return this.convocatoriasGimnasio().filter(c => !c.esOficial);
   });
+
+  readonly mappedConvocatoriasOficiales = computed(() => {
+    return this.convocatoriasOficiales().map(c => this.mapConvocatoriaToListItem(c));
+  });
+
+  readonly mappedConvocatoriasAtletas = computed(() => {
+    return this.convocatoriasAtletas().map(c => this.mapConvocatoriaToListItem(c));
+  });
+
+  private mapConvocatoriaToListItem(c: Convocatoria) {
+    return {
+      convocatoria: c,
+      creadorName: this.getUsuarioName(c.creadorId),
+      creadorPhoto: this.getUsuarioPhoto(c.creadorId),
+      fechaFormateada: this.formatearFechaEntrenamiento(c.fechaEntrenamiento),
+      asistentes: c.interesados.map(intId => ({
+        name: this.getUsuarioName(intId),
+        photo: this.getUsuarioPhoto(intId)
+      }))
+    };
+  }
 
   constructor() {
     addIcons({ 

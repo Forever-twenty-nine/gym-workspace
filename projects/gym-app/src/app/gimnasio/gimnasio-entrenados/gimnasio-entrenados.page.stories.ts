@@ -4,7 +4,7 @@ import { GimnasioEntrenadosPage } from './gimnasio-entrenados.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<GimnasioEntrenadosPage> = {
-  title: 'Pages/gimnasio/gimnasio-entrenados',
+  title: 'Secciones/gimnasio/gimnasio-entrenados',
   component: GimnasioEntrenadosPage,
   tags: ['autodocs'],
   decorators: [

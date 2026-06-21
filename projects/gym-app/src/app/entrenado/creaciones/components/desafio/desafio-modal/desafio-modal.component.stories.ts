@@ -4,7 +4,7 @@ import { DesafioModalComponent } from './desafio-modal.component';
 import { mockProviders } from '../../../../social/testing-mocks';
 
 const meta: Meta<DesafioModalComponent> = {
-  title: 'Pages/entrenado/creaciones/desafio/desafio-modal',
+  title: 'Secciones/entrenado/creaciones/desafio/desafio-modal',
   component: DesafioModalComponent,
   tags: ['autodocs'],
   decorators: [
@@ -22,4 +22,5 @@ export const Default: Story = {
   args: {
   },
 };
+
 

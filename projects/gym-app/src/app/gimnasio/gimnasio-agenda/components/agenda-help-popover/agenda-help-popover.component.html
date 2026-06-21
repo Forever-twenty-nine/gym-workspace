@@ -1,0 +1,21 @@
+<ion-popover [trigger]="triggerId()" triggerAction="click"
+             style="--width: 290px; --max-width: 290px; --background: transparent; --box-shadow: none; --border-radius: 16px;">
+  <ng-template>
+    <div class="p-4 bg-white/95 dark:bg-slate-900/95 text-gray-800 dark:text-gray-200 backdrop-blur-md rounded-2xl flex flex-col gap-3 shadow-2xl border border-white/20 dark:border-white/10">
+      <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800/80 pb-2">
+        <span class="material-symbols-outlined text-(--ion-color-primary) text-lg">info</span>
+        <span class="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">Visualizador de Actividad</span>
+      </div>
+      <p class="text-[11px] leading-relaxed m-0 font-semibold text-gray-700 dark:text-gray-300">
+        Revisa la agenda oficial y las convocatorias de tu gimnasio para la semana en curso:
+      </p>
+      <ul class="text-[10px] leading-relaxed m-0 pl-4 flex flex-col gap-1.5 font-semibold text-gray-600 dark:text-gray-400 list-disc">
+        <li><strong class="text-gray-800 dark:text-gray-200">Agenda Oficial (WODs):</strong> Entrenamientos planificados por el gimnasio o entrenadores.</li>
+        <li><strong class="text-gray-800 dark:text-gray-200">Propuestas de Atletas:</strong> Convocatorias y entrenamientos creados por los propios alumnos.</li>
+      </ul>
+      <p class="text-[9px] text-gray-400 dark:text-gray-500 italic mt-1 text-center">
+        ¡Haz clic en cualquier clase para ver más detalles!
+      </p>
+    </div>
+  </ng-template>
+</ion-popover>

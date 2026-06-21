@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { DesafioListComponent } from './desafio-list.component';
 
 const meta: Meta<DesafioListComponent> = {
-  title: 'Pages/entrenado/creaciones/desafio/desafio-list',
+  title: 'Secciones/entrenado/creaciones/desafio/desafio-list',
   component: DesafioListComponent,
 };
 
@@ -13,3 +13,4 @@ export const Default: Story = {
   args: {
   },
 };
+

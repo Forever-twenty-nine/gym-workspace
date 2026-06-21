@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { PlanPersonalizadoComponent } from './plan-personalizado.component';
 
 const meta: Meta<PlanPersonalizadoComponent> = {
-  title: 'Pages/entrenado/dashboard/components/PlanPersonalizado',
+  title: 'Secciones/entrenado/dashboard/components/PlanPersonalizado',
   component: PlanPersonalizadoComponent,
   tags: ['autodocs'],
   decorators: [
@@ -33,3 +33,4 @@ export const SinEntrenador: Story = {
     photoURL: undefined
   }
 };
+

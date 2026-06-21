@@ -4,7 +4,7 @@ import { EntrenadosPage } from './entrenados.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<EntrenadosPage> = {
-  title: 'Pages/entrenador/entrenados',
+  title: 'Secciones/entrenador/entrenados',
   component: EntrenadosPage,
   tags: ['autodocs'],
   decorators: [
@@ -22,4 +22,5 @@ export const Default: Story = {
   args: {
   },
 };
+
 

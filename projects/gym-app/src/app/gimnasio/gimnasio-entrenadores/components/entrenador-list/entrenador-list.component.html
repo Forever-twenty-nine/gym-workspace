@@ -1,0 +1,25 @@
+<ion-list style="background: transparent;" class="ion-no-padding ion-margin-top">
+  @for (user of entrenadores(); track user.uid) {
+    <ion-item lines="none"
+      class="--background: transparent; mb-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 active:scale-[0.99] transition-all">
+      <ion-avatar slot="start" class="w-10 h-10 border border-white/10">
+        <img [src]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
+      </ion-avatar>
+      <ion-label class="m-2">
+        <h2 class="font-bold text-sm text-white">{{ user.nombre || 'Usuario sin nombre' }}</h2>
+      </ion-label>
+      <div slot="end">
+        <ion-button fill="clear" color="danger" class="h-8 w-8 m-0 hover:bg-white/5 rounded-xl transition-all"
+          (click)="desvincular.emit(user)">
+          <ion-icon slot="icon-only" name="person-remove" class="text-lg"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+  } @empty {
+    <div class="text-center py-8">
+      <ion-text class="text-white/40 text-xs">
+        No se encontraron entrenadores vinculados a tu gimnasio.
+      </ion-text>
+    </div>
+  }
+</ion-list>

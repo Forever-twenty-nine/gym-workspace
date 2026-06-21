@@ -3,7 +3,7 @@ import { RutinaListComponent } from './rutina-list.component';
 import { Rutina } from 'gym-library';
 
 const meta: Meta<RutinaListComponent> = {
-  title: 'Pages/entrenado/creaciones/rutina/rutina-list',
+  title: 'Secciones/entrenado/creaciones/rutina/rutina-list',
   component: RutinaListComponent,
 };
 
@@ -52,3 +52,4 @@ export const empty: Story = {
     isPremium: false,
   },
 };
+

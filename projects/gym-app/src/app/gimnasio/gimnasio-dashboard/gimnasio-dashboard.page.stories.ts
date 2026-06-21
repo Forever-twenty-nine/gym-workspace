@@ -4,7 +4,7 @@ import { GimnasioDashboardPage } from './gimnasio-dashboard.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<GimnasioDashboardPage> = {
-  title: 'Pages/gimnasio/gimnasio-dashboard',
+  title: 'Secciones/gimnasio/gimnasio-dashboard',
   component: GimnasioDashboardPage,
   tags: ['autodocs'],
   decorators: [

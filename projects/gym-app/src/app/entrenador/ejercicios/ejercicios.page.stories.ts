@@ -4,7 +4,7 @@ import { EjerciciosPage } from './ejercicios.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<EjerciciosPage> = {
-  title: 'Pages/entrenador/ejercicios',
+  title: 'Secciones/entrenador/ejercicios',
   component: EjerciciosPage,
   tags: ['autodocs'],
   decorators: [
@@ -22,4 +22,5 @@ export const Default: Story = {
   args: {
   },
 };
+
 

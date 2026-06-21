@@ -4,7 +4,7 @@ import { SocialCardComponent } from './social-card.component';
 import { mockProviders, mockSesionesCompartidas } from '../../../../testing-mocks';
 
 const meta: Meta<SocialCardComponent> = {
-  title: 'Pages/entrenado/social/components/FeedTab/SocialCard',
+  title: 'Secciones/entrenado/social/components/FeedTab/SocialCard',
   component: SocialCardComponent,
   tags: ['autodocs'],
   decorators: [
@@ -28,3 +28,4 @@ export const AnotherPost: Story = {
     sesion: mockSesionesCompartidas[1]
   }
 };
+

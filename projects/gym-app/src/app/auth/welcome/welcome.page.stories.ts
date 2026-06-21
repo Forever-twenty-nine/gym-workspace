@@ -14,7 +14,7 @@ const mockNavController = {
 };
 
 const meta: Meta<WelcomePage> = {
-  title: 'Pages/auth/welcome',
+  title: 'Secciones/auth/welcome',
   component: WelcomePage,
   tags: ['autodocs'],
   decorators: [
@@ -32,3 +32,4 @@ export default meta;
 type Story = StoryObj<WelcomePage>;
 
 export const Default: Story = {};
+

@@ -15,7 +15,7 @@ const mockRouter = {
 };
 
 const meta: Meta<ForgotPasswordPage> = {
-  title: 'Pages/auth/forgot-password',
+  title: 'Secciones/auth/forgot-password',
   component: ForgotPasswordPage,
   tags: ['autodocs'],
   decorators: [
@@ -33,3 +33,4 @@ export default meta;
 type Story = StoryObj<ForgotPasswordPage>;
 
 export const Default: Story = {};
+

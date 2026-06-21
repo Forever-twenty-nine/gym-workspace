@@ -3,18 +3,13 @@ import { CommonModule } from '@angular/common';
 
 import { 
   IonContent,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonLabel,
-  IonSearchbar,
-  IonListHeader
+  IonSearchbar
 } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
+import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-
+import { EntrenadosGroupedListComponent } from './components/entrenados-grouped-list/entrenados-grouped-list.component';
 
 @Component({
   selector: 'app-gimnasio-entrenados',
@@ -23,13 +18,9 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
   imports: [
     CommonModule,
     IonContent,
-    IonList,
-    IonItem,
-    IonAvatar,
-    IonLabel,
     IonSearchbar,
-    IonListHeader,
-    NgOptimizedImage
+    EntrenadosGroupedListComponent,
+    GymBackgroundComponent
   ],
 })
 export class GimnasioEntrenadosPage implements OnInit {

@@ -4,7 +4,7 @@ import { AgendaPage } from './agenda.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<AgendaPage> = {
-  title: 'Pages/entrenador/agenda',
+  title: 'Secciones/entrenador/agenda',
   component: AgendaPage,
   tags: ['autodocs'],
   decorators: [
@@ -22,4 +22,5 @@ export const Default: Story = {
   args: {
   },
 };
+
 

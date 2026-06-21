@@ -4,7 +4,7 @@ import { DescubrirTabComponent } from './descubrir-tab.component';
 import { mockProviders, mockTarjetasDescubrirList } from '../../testing-mocks';
 
 const meta: Meta<DescubrirTabComponent> = {
-  title: 'Pages/entrenado/social/components/DescubrirTab',
+  title: 'Secciones/entrenado/social/components/DescubrirTab',
   component: DescubrirTabComponent,
   tags: ['autodocs'],
   argTypes: {
@@ -45,3 +45,4 @@ export const EmptyState: Story = {
     tarjetaActiva: null
   }
 };
+

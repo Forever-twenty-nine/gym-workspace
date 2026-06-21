@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinasAsignadasComponent } from './rutinas-asignadas.component';
 
 const meta: Meta<RutinasAsignadasComponent> = {
-  title: 'Pages/entrenado/dashboard/components/RutinasAsignadas',
+  title: 'Secciones/entrenado/dashboard/components/RutinasAsignadas',
   component: RutinasAsignadasComponent,
   tags: ['autodocs'],
   decorators: [
@@ -55,3 +55,4 @@ export const SinRutinas: Story = {
     rutinas: []
   }
 };
+

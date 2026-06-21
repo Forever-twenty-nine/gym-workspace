@@ -4,7 +4,7 @@ import { ConvocatoriaModalStoriesComponent } from './convocatoria-modal-stories.
 import { mockProviders, mockConvocatorias } from '../../../testing-mocks';
 
 const meta: Meta<ConvocatoriaModalStoriesComponent> = {
-  title: 'Pages/entrenado/social/components/ConvocatoriaModalStories',
+  title: 'Secciones/entrenado/social/components/ConvocatoriaModalStories',
   component: ConvocatoriaModalStoriesComponent,
   tags: ['autodocs'],
   decorators: [
@@ -44,3 +44,4 @@ export const CreatedByMe: Story = {
     convocatoria: mockConvocatorias[1]
   }
 };
+

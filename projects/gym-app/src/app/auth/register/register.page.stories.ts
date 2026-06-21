@@ -23,7 +23,7 @@ const mockRouter = {
 };
 
 const meta: Meta<RegisterPage> = {
-  title: 'Pages/auth/register',
+  title: 'Secciones/auth/register',
   component: RegisterPage,
   tags: ['autodocs'],
   decorators: [
@@ -43,3 +43,4 @@ export default meta;
 type Story = StoryObj<RegisterPage>;
 
 export const Default: Story = {};
+

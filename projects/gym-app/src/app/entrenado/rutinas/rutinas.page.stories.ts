@@ -4,7 +4,7 @@ import { RutinasPage } from './rutinas.page';
 import { mockProviders } from '../social/testing-mocks';
 
 const meta: Meta<RutinasPage> = {
-  title: 'Pages/entrenado/rutinas',
+  title: 'Secciones/entrenado/rutinas',
   component: RutinasPage,
   tags: ['autodocs'],
   decorators: [
@@ -22,4 +22,5 @@ export const Default: Story = {
   args: {
   },
 };
+
 

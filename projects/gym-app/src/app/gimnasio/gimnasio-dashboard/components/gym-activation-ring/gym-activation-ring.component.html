@@ -1,0 +1,11 @@
+<ion-text class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
+  <svg class="w-full h-full transform -rotate-90">
+    <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.06)" stroke-width="3" fill="transparent" />
+    <circle cx="24" cy="24" r="20" stroke="var(--ion-color-primary)" stroke-width="3" fill="transparent"
+            stroke-dasharray="125.66"
+            [attr.stroke-dashoffset]="125.66 * (1 - (rate() / 100))"
+            stroke-linecap="round"
+            class="transition-all duration-700 ease-out" />
+  </svg>
+  <span class="absolute text-[9px] font-black text-white">{{ rate() }}%</span>
+</ion-text>

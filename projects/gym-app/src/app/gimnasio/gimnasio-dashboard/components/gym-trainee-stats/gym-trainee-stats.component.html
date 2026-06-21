@@ -1,0 +1,39 @@
+<ion-grid class="ion-no-padding mb-4">
+  <ion-row class="gap-y-2">
+    <!-- Total Entrenados -->
+    <ion-col size="4" class="px-1">
+      <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
+        <ion-text class="block text-lg font-extrabold text-white">
+          {{ totalTrainees() }}
+        </ion-text>
+        <ion-text class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">
+          Registrados
+        </ion-text>
+      </div>
+    </ion-col>
+
+    <!-- Entrenados Activos -->
+    <ion-col size="4" class="px-1">
+      <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
+        <ion-text class="block text-lg font-extrabold text-(--ion-color-success)">
+          {{ activeTrainees() }}
+        </ion-text>
+        <ion-text class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">
+          Activos
+        </ion-text>
+      </div>
+    </ion-col>
+
+    <!-- Sin Entrenador -->
+    <ion-col size="4" class="px-1">
+      <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
+        <ion-text class="block text-lg font-extrabold text-(--ion-color-warning)">
+          {{ traineesWithoutTrainer() }}
+        </ion-text>
+        <ion-text class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">
+          Sin Coach
+        </ion-text>
+      </div>
+    </ion-col>
+  </ion-row>
+</ion-grid>

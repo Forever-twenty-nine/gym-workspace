@@ -5,17 +5,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 import { 
   IonContent,
-  IonList,
-  IonItem,
-  IonAvatar,
-  IonLabel,
   IonButton,
   IonIcon,
   IonSearchbar,
   ToastController,
   AlertController
 } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { personOutline, createOutline, trashOutline, mailOutline, closeCircleOutline, personRemove } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -23,7 +18,6 @@ import { UserService } from '../../core/services/user.service';
 import { GimnasioService } from '../../core/services/gimnasio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
-
 import { InvitacionModalComponent } from '../../entrenador/entrenados/components/invitacion-modal/invitacion-modal.component';
 
 @Component({
@@ -34,16 +28,11 @@ import { InvitacionModalComponent } from '../../entrenador/entrenados/components
     CommonModule,
     ReactiveFormsModule,
     IonContent,
-    IonList,
-    IonItem,
-    IonAvatar,
-    IonLabel,
     IonButton,
     IonIcon,
     IonSearchbar,
-    NgOptimizedImage,
     InvitacionModalComponent
-  ],
+],
 })
 export class GimnasioEntrenadoresPage implements OnInit {
   private authService = inject(AuthService);

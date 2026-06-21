@@ -1,0 +1,27 @@
+<ion-card class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 text-center shadow-2xl fade-in mt-2 relative overflow-hidden ion-no-margin">
+  <!-- Fondo resplandeciente dorado sutil -->
+  <div class="absolute -right-8 -top-8 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl pointer-events-none"></div>
+  <div class="absolute -left-8 -bottom-8 w-24 h-24 bg-yellow-500/5 rounded-full blur-xl pointer-events-none"></div>
+
+  <!-- Candado Premium SVG -->
+  <div class="flex justify-center mb-4">
+    <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500/20 to-amber-500/10 flex items-center justify-center border border-yellow-500/30 shadow-inner animate-pulse">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-yellow-400">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+      </svg>
+    </div>
+  </div>
+
+  <ion-text class="block text-base font-black text-white mb-2 tracking-tight">
+    <h3>Estadísticas Premium</h3>
+  </ion-text>
+  <ion-text class="block text-[11px] text-white/70 leading-relaxed mb-6 px-2">
+    <p class="m-0">
+      Para ver el rendimiento y las métricas detalladas de tus entrenadores y entrenados, te recomendamos cambiar tu plan a Premium. ¡Lleva el control de tu gimnasio al siguiente nivel!
+    </p>
+  </ion-text>
+
+  <ion-button expand="block" (click)="upgrade.emit()" class="premium-button font-black text-xs uppercase tracking-widest transition-all">
+    Pasar a Plan Premium
+  </ion-button>
+</ion-card>

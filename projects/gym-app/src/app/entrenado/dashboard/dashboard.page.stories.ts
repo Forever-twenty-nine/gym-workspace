@@ -4,7 +4,7 @@ import { DashboardPage } from './dashboard.page';
 import { mockProviders } from '../social/testing-mocks';
 
 const meta: Meta<DashboardPage> = {
-  title: 'Pages/entrenado/dashboard',
+  title: 'Secciones/entrenado/dashboard',
   component: DashboardPage,
   tags: ['autodocs'],
   decorators: [
@@ -23,4 +23,5 @@ export const Default: Story = {
     
   },
 };
+
 

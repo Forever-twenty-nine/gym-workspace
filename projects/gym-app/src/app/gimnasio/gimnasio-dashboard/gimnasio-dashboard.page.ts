@@ -10,14 +10,27 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
-
+import { GymActivationRingComponent } from './components/gym-activation-ring/gym-activation-ring.component';
+import { GymTrainerStatsComponent } from './components/gym-trainer-stats/gym-trainer-stats.component';
+import { GymTraineeStatsComponent } from './components/gym-trainee-stats/gym-trainee-stats.component';
+import { LevelDistributionChartComponent } from './components/level-distribution-chart/level-distribution-chart.component';
+import { ObjectiveDistributionChartComponent } from './components/objective-distribution-chart/objective-distribution-chart.component';
+import { PremiumUpgradeBannerComponent } from './components/premium-upgrade-banner/premium-upgrade-banner.component';
+import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
 
 @Component({
   selector: 'app-gimnasio-dashboard',
   templateUrl: 'gimnasio-dashboard.page.html',
   standalone: true,
   imports: [
-    IonContent
+    IonContent,
+    GymActivationRingComponent,
+    GymTrainerStatsComponent,
+    GymTraineeStatsComponent,
+    LevelDistributionChartComponent,
+    ObjectiveDistributionChartComponent,
+    PremiumUpgradeBannerComponent,
+    GymBackgroundComponent
   ],
 })
 export class GimnasioDashboardPage implements OnInit {

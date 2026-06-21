@@ -4,7 +4,7 @@ import { AgendaPage } from './agenda.page';
 import { mockProviders } from '../../entrenado/social/testing-mocks';
 
 const meta: Meta<AgendaPage> = {
-  title: 'Pages/gimnasio/gimnasio-agenda',
+  title: 'Secciones/gimnasio/gimnasio-agenda',
   component: AgendaPage,
   tags: ['autodocs'],
   decorators: [

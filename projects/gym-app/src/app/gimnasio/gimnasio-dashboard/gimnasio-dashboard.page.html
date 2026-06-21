@@ -1,9 +1,6 @@
-
-
-<ion-content [fullscreen]="true"
-             [style.--background]="isPremium() 
-               ? 'linear-gradient(rgba(17, 24, 39, 0.85), rgba(17, 24, 39, 0.85)), url(assets/images/gym-social-bg.png) no-repeat center center / cover fixed' 
-               : 'linear-gradient(135deg, #1e3a8a 0%, #111827 50%, #1e3a8a 100%) no-repeat center center / cover fixed'">
+<ion-content [fullscreen]="true" style="--background: transparent;">
+  <!-- Background Layer -->
+  <app-gym-background [isPremium]="isPremium()"></app-gym-background>
   <!-- CONTENIDO DE ESTADÍSTICAS DETALLADAS (GLASSMORPHIC) -->
   <div class="relative z-10 p-4 max-w-lg mx-auto mb-16 fade-in">
 
@@ -16,248 +13,74 @@
       
       <!-- Mini Anillo de Activación SVG -->
       @if (isPremium()) {
-        <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
-          <svg class="w-full h-full transform -rotate-90">
-            <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.06)" stroke-width="3" fill="transparent" />
-            <circle cx="24" cy="24" r="20" stroke="var(--ion-color-primary)" stroke-width="3" fill="transparent"
-                    stroke-dasharray="125.66"
-                    [attr.stroke-dashoffset]="125.66 * (1 - (stats().activationRate / 100))"
-                    stroke-linecap="round"
-                    class="transition-all duration-700 ease-out" />
-          </svg>
-          <span class="absolute text-[9px] font-black text-white">{{ stats().activationRate }}%</span>
-        </div>
+        <app-gym-activation-ring [rate]="stats().activationRate"></app-gym-activation-ring>
       }
     </div>
 
     @if (isPremium()) {
       <!-- Selector de Segmento Pill (Estilo App Móvil) -->
       <div class="flex bg-white/5 border border-white/10 rounded-xl p-1 mb-4">
-      <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
-              [class.bg-white/10]="selectedSegment() === 'entrenadores'"
-              [class.text-white]="selectedSegment() === 'entrenadores'"
-              [class.text-white/40]="selectedSegment() !== 'entrenadores'"
-              (click)="selectedSegment.set('entrenadores')">
-        Entrenadores
-      </button>
-      <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
-              [class.bg-white/10]="selectedSegment() === 'entrenados'"
-              [class.text-white]="selectedSegment() === 'entrenados'"
-              [class.text-white/40]="selectedSegment() !== 'entrenados'"
-              (click)="selectedSegment.set('entrenados')">
-        Entrenados
-      </button>
-    </div>
-
-    <!-- 2. Sección: Entrenadores -->
-    @if (selectedSegment() === 'entrenadores') {
-      <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-5 fade-in">
-        <div class="pb-2 border-b border-white/5 mb-3">
-          <h3 class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">Entrenadores</h3>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-3">
-          <!-- Total Entrenadores -->
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <span class="block text-xl font-extrabold text-white">{{ stats().totalTrainers }}</span>
-            <span class="text-[9px] text-white/50 uppercase tracking-wider block mt-1">Registrados</span>
-          </div>
-
-          <!-- Entrenadores Activos -->
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <span class="block text-xl font-extrabold text-white">{{ stats().activeTrainers }}</span>
-            <span class="text-[9px] text-white/50 uppercase tracking-wider block mt-1">Activos</span>
-          </div>
-
-          <!-- Promedio Clientes/Entrenador -->
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <span class="block text-xl font-extrabold text-white">{{ stats().avgTraineesPerTrainer }}</span>
-            <span class="text-[9px] text-white/50 uppercase tracking-wider block mt-1">Clientes / Coach</span>
-          </div>
-
-          <!-- Rutinas Creadas -->
-          <div class="flex flex-col p-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all">
-            <span class="block text-xl font-extrabold text-white">{{ stats().routinesCreatedByTrainers }}</span>
-            <span class="text-[9px] text-white/50 uppercase tracking-wider block mt-1">Rutinas Creadas</span>
-          </div>
-
-          <!-- Invitaciones Pendientes -->
-          <div class="col-span-2 flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
-            <div>
-              <span class="text-xs font-bold text-white block">Invitaciones Pendientes</span>
-              <span class="text-[9px] text-white/40 block">Esperando registro</span>
-            </div>
-            <span class="text-xl font-extrabold text-(--ion-color-danger) px-2">{{ stats().pendingInvitations }}</span>
-          </div>
-        </div>
+        <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
+                [class.bg-white/10]="selectedSegment() === 'entrenadores'"
+                [class.text-white]="selectedSegment() === 'entrenadores'"
+                [class.text-white/40]="selectedSegment() !== 'entrenadores'"
+                (click)="selectedSegment.set('entrenadores')">
+          Entrenadores
+        </button>
+        <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
+                [class.bg-white/10]="selectedSegment() === 'entrenados'"
+                [class.text-white]="selectedSegment() === 'entrenados'"
+                [class.text-white/40]="selectedSegment() !== 'entrenados'"
+                (click)="selectedSegment.set('entrenados')">
+          Entrenados
+        </button>
       </div>
+
+      <!-- 2. Sección: Entrenadores -->
+      @if (selectedSegment() === 'entrenadores') {
+        <app-gym-trainer-stats
+          [totalTrainers]="stats().totalTrainers"
+          [activeTrainers]="stats().activeTrainers"
+          [avgTraineesPerTrainer]="stats().avgTraineesPerTrainer"
+          [routinesCreatedByTrainers]="stats().routinesCreatedByTrainers"
+          [pendingInvitations]="stats().pendingInvitations">
+        </app-gym-trainer-stats>
+      }
+
+      <!-- 3. Sección: Entrenados -->
+      @if (selectedSegment() === 'entrenados') {
+        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-5 fade-in">
+          <div class="pb-2 border-b border-white/5 mb-3">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">Entrenados</h3>
+          </div>
+
+          <app-gym-trainee-stats
+            [totalTrainees]="stats().totalTrainees"
+            [activeTrainees]="stats().activeTrainees"
+            [traineesWithoutTrainer]="stats().traineesWithoutTrainer">
+          </app-gym-trainee-stats>
+
+          <!-- Gráfico de Columnas Verticales para Distribución de Nivel -->
+          <app-level-distribution-chart
+            [total]="stats().totalTrainees"
+            [novato]="stats().levelNovatoPrincipiante"
+            [intermedio]="stats().levelIntermedio"
+            [avanzado]="stats().levelAvanzadoExperto">
+          </app-level-distribution-chart>
+
+          <!-- Gráfico de Barra Segmentada Acumulativa para Objetivos -->
+          <app-objective-distribution-chart
+            [total]="stats().totalTrainees"
+            [salud]="stats().objSalud"
+            [volumen]="stats().objVolumen"
+            [definicion]="stats().objDefinicion"
+            [fuerza]="stats().objFuerza">
+          </app-objective-distribution-chart>
+        </div>
+      }
+    } @else {
+      <app-premium-upgrade-banner (upgrade)="mejorarPlan()"></app-premium-upgrade-banner>
     }
-
-    <!-- 3. Sección: Entrenados -->
-    @if (selectedSegment() === 'entrenados') {
-      <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-5 fade-in">
-        <div class="pb-2 border-b border-white/5 mb-3">
-          <h3 class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">Entrenados</h3>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 mb-4">
-          <!-- Total Entrenados -->
-          <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-            <span class="block text-lg font-extrabold text-white">{{ stats().totalTrainees }}</span>
-            <span class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">Registrados</span>
-          </div>
-
-          <!-- Entrenados Activos -->
-          <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-            <span class="block text-lg font-extrabold text-(--ion-color-success)">{{ stats().activeTrainees }}</span>
-            <span class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">Activos</span>
-          </div>
-
-          <!-- Sin Entrenador -->
-          <div class="flex flex-col p-2.5 rounded-xl bg-white/5 border border-white/5 text-center">
-            <span class="block text-lg font-extrabold text-(--ion-color-warning)">{{ stats().traineesWithoutTrainer }}</span>
-            <span class="text-[8px] text-white/50 uppercase tracking-wider block mt-1">Sin Coach</span>
-          </div>
-        </div>
-
-        <!-- Gráfico de Columnas Verticales para Distribución de Nivel -->
-        <div class="mb-5">
-          <span class="text-[9px] text-white/60 uppercase tracking-widest font-extrabold block mb-3">Distribución por Nivel</span>
-          
-          <div class="flex items-end justify-around h-24 pt-4 mb-1 bg-white/5 rounded-xl border border-white/5 px-2 relative">
-            <!-- Líneas de cuadrícula de fondo -->
-            <div class="absolute inset-x-0 top-1/3 border-b border-white/5 pointer-events-none"></div>
-            <div class="absolute inset-x-0 top-2/3 border-b border-white/5 pointer-events-none"></div>
-
-            <!-- Columna Novato / Principiante -->
-            <div class="flex flex-col items-center w-14 z-10">
-              <div class="w-7 bg-gradient-to-t from-[rgba(45,211,111,0.2)] to-[rgba(45,211,111,1)] rounded-t-md transition-all duration-500 relative flex items-end justify-center"
-                   [style.height.px]="stats().totalTrainees ? (stats().levelNovatoPrincipiante / stats().totalTrainees) * 60 : 0">
-                <span class="absolute -top-4 text-[9px] font-bold text-white">
-                  {{ stats().levelNovatoPrincipiante }}
-                </span>
-              </div>
-              <span class="text-[8px] text-white/50 uppercase mt-1 block tracking-tight">Principiante</span>
-            </div>
-            
-            <!-- Columna Intermedio -->
-            <div class="flex flex-col items-center w-14 z-10">
-              <div class="w-7 bg-gradient-to-t from-[rgba(255,196,9,0.2)] to-[rgba(255,196,9,1)] rounded-t-md transition-all duration-500 relative flex items-end justify-center"
-                   [style.height.px]="stats().totalTrainees ? (stats().levelIntermedio / stats().totalTrainees) * 60 : 0">
-                <span class="absolute -top-4 text-[9px] font-bold text-white">
-                  {{ stats().levelIntermedio }}
-                </span>
-              </div>
-              <span class="text-[8px] text-white/50 uppercase mt-1 block tracking-tight">Intermedio</span>
-            </div>
-
-            <!-- Columna Avanzado / Experto -->
-            <div class="flex flex-col items-center w-14 z-10">
-              <div class="w-7 bg-gradient-to-t from-[rgba(187,228,10,0.2)] to-[rgba(187,228,10,1)] rounded-t-md transition-all duration-500 relative flex items-end justify-center"
-                   [style.height.px]="stats().totalTrainees ? (stats().levelAvanzadoExperto / stats().totalTrainees) * 60 : 0">
-                <span class="absolute -top-4 text-[9px] font-bold text-white">
-                  {{ stats().levelAvanzadoExperto }}
-                </span>
-              </div>
-              <span class="text-[8px] text-white/50 uppercase mt-1 block tracking-tight">Avanzado</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gráfico de Barra Segmentada Acumulativa para Objetivos -->
-        <div>
-          <span class="text-[9px] text-white/60 uppercase tracking-widest font-extrabold block mb-2">Distribución por Objetivo</span>
-          
-          <!-- Barra acumulativa -->
-          <div class="w-full h-3 bg-white/10 rounded-full flex overflow-hidden my-3">
-            <div class="bg-[rgba(45,211,111,1)] h-full transition-all duration-500" 
-                 [style.width.%]="stats().totalTrainees ? (stats().objSalud / stats().totalTrainees)*100 : 0"></div>
-            <div class="bg-[rgba(187,228,10,1)] h-full transition-all duration-500" 
-                 [style.width.%]="stats().totalTrainees ? (stats().objVolumen / stats().totalTrainees)*100 : 0"></div>
-            <div class="bg-[rgba(255,196,9,1)] h-full transition-all duration-500" 
-                 [style.width.%]="stats().totalTrainees ? (stats().objDefinicion / stats().totalTrainees)*100 : 0"></div>
-            <div class="bg-[rgba(235,68,90,1)] h-full transition-all duration-500" 
-                 [style.width.%]="stats().totalTrainees ? (stats().objFuerza / stats().totalTrainees)*100 : 0"></div>
-          </div>
-
-          <!-- Leyenda / Tabla con porcentajes calculados -->
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <!-- Salud -->
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span class="text-white/70 flex items-center text-[10px]">
-                <span class="w-2 h-2 rounded-full bg-[rgba(45,211,111,1)] mr-2 block"></span>
-                Salud
-              </span>
-              <span class="font-extrabold text-white text-[10px]">
-                {{ stats().objSalud }} 
-                <span class="text-[8px] text-white/40 font-normal">({{ stats().totalTrainees ? Math.round((stats().objSalud / stats().totalTrainees)*100) : 0 }}%)</span>
-              </span>
-            </div>
-            <!-- Volumen -->
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span class="text-white/70 flex items-center text-[10px]">
-                <span class="w-2 h-2 rounded-full bg-[rgba(187,228,10,1)] mr-2 block"></span>
-                Volumen
-              </span>
-              <span class="font-extrabold text-white text-[10px]">
-                {{ stats().objVolumen }} 
-                <span class="text-[8px] text-white/40 font-normal">({{ stats().totalTrainees ? Math.round((stats().objVolumen / stats().totalTrainees)*100) : 0 }}%)</span>
-              </span>
-            </div>
-            <!-- Definición -->
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span class="text-white/70 flex items-center text-[10px]">
-                <span class="w-2 h-2 rounded-full bg-[rgba(255,196,9,1)] mr-2 block"></span>
-                Definición
-              </span>
-              <span class="font-extrabold text-white text-[10px]">
-                {{ stats().objDefinicion }} 
-                <span class="text-[8px] text-white/40 font-normal">({{ stats().totalTrainees ? Math.round((stats().objDefinicion / stats().totalTrainees)*100) : 0 }}%)</span>
-              </span>
-            </div>
-            <!-- Fuerza -->
-            <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
-              <span class="text-white/70 flex items-center text-[10px]">
-                <span class="w-2 h-2 rounded-full bg-[rgba(235,68,90,1)] mr-2 block"></span>
-                Fuerza
-              </span>
-              <span class="font-extrabold text-white text-[10px]">
-                {{ stats().objFuerza }} 
-                <span class="text-[8px] text-white/40 font-normal">({{ stats().totalTrainees ? Math.round((stats().objFuerza / stats().totalTrainees)*100) : 0 }}%)</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
-  } @else {
-    <!-- Cartel de Actualización a Premium (Glassmorphism & Gold Theme) -->
-    <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 text-center shadow-2xl fade-in mt-2 relative overflow-hidden">
-      <!-- Fondo resplandeciente dorado sutil -->
-      <div class="absolute -right-8 -top-8 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl pointer-events-none"></div>
-      <div class="absolute -left-8 -bottom-8 w-24 h-24 bg-yellow-500/5 rounded-full blur-xl pointer-events-none"></div>
-
-      <!-- Candado Premium SVG -->
-      <div class="flex justify-center mb-4">
-        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-yellow-500/20 to-amber-500/10 flex items-center justify-center border border-yellow-500/30 shadow-inner animate-pulse">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-yellow-400">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
-        </div>
-      </div>
-
-      <h3 class="text-base font-black text-white mb-2 tracking-tight">Estadísticas Premium</h3>
-      <p class="text-[11px] text-white/70 leading-relaxed mb-6 px-2">
-        Para ver el rendimiento y las métricas detalladas de tus entrenadores y entrenados, te recomendamos cambiar tu plan a Premium. ¡Lleva el control de tu gimnasio al siguiente nivel!
-      </p>
-
-      <button (click)="mejorarPlan()" 
-              class="w-full py-3 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95 duration-200">
-        Pasar a Plan Premium
-      </button>
-    </div>
-  }
 
   </div>
-
 </ion-content>

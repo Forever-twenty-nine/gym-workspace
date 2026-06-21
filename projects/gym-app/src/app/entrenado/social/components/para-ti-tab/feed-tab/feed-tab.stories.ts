@@ -4,7 +4,7 @@ import { FeedTabComponent } from './feed-tab.component';
 import { mockProviders } from '../../../testing-mocks';
 
 const meta: Meta<FeedTabComponent> = {
-  title: 'Pages/entrenado/social/components/FeedTab/FeedTab',
+  title: 'Secciones/entrenado/social/components/FeedTab/FeedTab',
   component: FeedTabComponent,
   tags: ['autodocs'],
   decorators: [
@@ -29,3 +29,4 @@ export const Siguiendo: Story = {
     tab: 'siguiendo'
   }
 };
+

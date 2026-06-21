@@ -1,0 +1,78 @@
+<div>
+  <ion-text class="text-[9px] text-white/60 uppercase tracking-widest font-extrabold block mb-2">
+    Distribución por Objetivo
+  </ion-text>
+  
+  <!-- Barra acumulativa -->
+  <div class="w-full h-3 bg-white/10 rounded-full flex overflow-hidden my-3">
+    <div class="bg-[rgba(45,211,111,1)] h-full transition-all duration-500" 
+         [style.width.%]="getPercentage(salud())"></div>
+    <div class="bg-[rgba(187,228,10,1)] h-full transition-all duration-500" 
+         [style.width.%]="getPercentage(volumen())"></div>
+    <div class="bg-[rgba(255,196,9,1)] h-full transition-all duration-500" 
+         [style.width.%]="getPercentage(definicion())"></div>
+    <div class="bg-[rgba(235,68,90,1)] h-full transition-all duration-500" 
+         [style.width.%]="getPercentage(fuerza())"></div>
+  </div>
+
+  <!-- Leyenda / Tabla con porcentajes calculados -->
+  <ion-grid class="ion-no-padding">
+    <ion-row class="gap-y-2">
+      <!-- Salud -->
+      <ion-col size="6" class="px-1">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+          <span class="text-white/70 flex items-center text-[10px]">
+            <span class="w-2 h-2 rounded-full bg-[rgba(45,211,111,1)] mr-2 block"></span>
+            Salud
+          </span>
+          <ion-text class="font-extrabold text-white text-[10px]">
+            {{ salud() }} 
+            <span class="text-[8px] text-white/40 font-normal">({{ getPercentage(salud()) }}%)</span>
+          </ion-text>
+        </div>
+      </ion-col>
+      
+      <!-- Volumen -->
+      <ion-col size="6" class="px-1">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+          <span class="text-white/70 flex items-center text-[10px]">
+            <span class="w-2 h-2 rounded-full bg-[rgba(187,228,10,1)] mr-2 block"></span>
+            Volumen
+          </span>
+          <ion-text class="font-extrabold text-white text-[10px]">
+            {{ volumen() }} 
+            <span class="text-[8px] text-white/40 font-normal">({{ getPercentage(volumen()) }}%)</span>
+          </ion-text>
+        </div>
+      </ion-col>
+
+      <!-- Definición -->
+      <ion-col size="6" class="px-1">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+          <span class="text-white/70 flex items-center text-[10px]">
+            <span class="w-2 h-2 rounded-full bg-[rgba(255,196,9,1)] mr-2 block"></span>
+            Definición
+          </span>
+          <ion-text class="font-extrabold text-white text-[10px]">
+            {{ definicion() }} 
+            <span class="text-[8px] text-white/40 font-normal">({{ getPercentage(definicion()) }}%)</span>
+          </ion-text>
+        </div>
+      </ion-col>
+
+      <!-- Fuerza -->
+      <ion-col size="6" class="px-1">
+        <div class="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5">
+          <span class="text-white/70 flex items-center text-[10px]">
+            <span class="w-2 h-2 rounded-full bg-[rgba(235,68,90,1)] mr-2 block"></span>
+            Fuerza
+          </span>
+          <ion-text class="font-extrabold text-white text-[10px]">
+            {{ fuerza() }} 
+            <span class="text-[8px] text-white/40 font-normal">({{ getPercentage(fuerza()) }}%)</span>
+          </ion-text>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</div>

@@ -1,17 +1,6 @@
-
-
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
-  @if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/gym-social-bg.png" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-  }@else {
-  <div
-    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
-  </div>
-  }
+  <app-gym-background [isPremium]="isPremium()"></app-gym-background>
 
   <!-- Buscador Reactivo -->
   <ion-searchbar placeholder="Buscar entrenadores..." class="ion-margin-bottom"
@@ -24,59 +13,16 @@
   </ion-button>
 
   <!-- Listado de Entrenadores -->
-  <ion-list style="background: transparent;" class="ion-no-padding ion-margin-top">
-    @for (user of filteredUsers(); track user.uid) {
-    <ion-item lines="none"
-      class="--background: transparent; mb-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 active:scale-[0.99] transition-all">
-      <ion-avatar slot="start" class="w-10 h-10 border border-white/10">
-        <img [src]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
-      </ion-avatar>
-      <ion-label class="m-2">
-        <h2 class="font-bold text-sm text-white">{{ user.nombre || 'Usuario sin nombre' }}</h2>
-      </ion-label>
-      <div slot="end">
-        <ion-button fill="clear" color="danger" class="h-8 w-8 m-0 hover:bg-white/5 rounded-xl transition-all"
-          (click)="desvincularEntrenador(user)">
-          <ion-icon slot="icon-only" name="person-remove" class="text-lg"></ion-icon>
-        </ion-button>
-      </div>
-    </ion-item>
-    } @empty {
-    <div class="text-center py-8 text-white/40 text-xs">
-      No se encontraron entrenadores vinculados a tu gimnasio.
-    </div>
-    }
-  </ion-list>
+  <app-entrenador-list 
+    [entrenadores]="filteredUsers()" 
+    (desvincular)="desvincularEntrenador($event)">
+  </app-entrenador-list>
 
   <!-- Listado de Invitaciones Pendientes -->
-  @if (invitacionesPendientes().length > 0) {
-  <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mt-6 p-4">
-    <div class="py-2 border-b border-white/5 mb-3">
-      <h3 class="text-center text-xs font-bold uppercase tracking-widest text-white/70 m-0">Invitaciones Pendientes
-      </h3>
-    </div>
-    <ion-list style="background: transparent;" class="p-0 m-0">
-      @for (invitacion of invitacionesPendientes(); track invitacion.id) {
-      <ion-item class="--background: transparent; mb-1" lines="none">
-        <ion-avatar slot="start" class="w-8 h-8 border border-white/10">
-          <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + invitacion.id" />
-        </ion-avatar>
-        <ion-label>
-          <h3 class="font-bold text-white text-xs">{{ invitacion.entrenadoNombre || invitacion.emailEntrenado }}
-          </h3>
-          <p class="text-white/60 text-[10px]">{{ invitacion.emailEntrenado }}</p>
-          <p class="text-[9px] text-white/40">
-            Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
-          </p>
-        </ion-label>
-        <ion-button slot="end" fill="clear" color="danger" (click)="cancelarInvitacion(invitacion.id)">
-          <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>
-        </ion-button>
-      </ion-item>
-      }
-    </ion-list>
-  </div>
-  }
+  <app-invitaciones-pendientes-list 
+    [invitaciones]="invitacionesPendientes()" 
+    (cancelar)="cancelarInvitacion($event)">
+  </app-invitaciones-pendientes-list>
 
   <!-- Modal de Invitación reutilizable -->
   <app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"
