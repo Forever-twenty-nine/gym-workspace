@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { componentWrapperDecorator } from '@storybook/angular';
 import { PlanPersonalizadoComponent } from './plan-personalizado.component';
+import { Objetivo } from 'gym-library';
 
 const meta: Meta<PlanPersonalizadoComponent> = {
   title: 'Secciones/entrenado/dashboard/components/PlanPersonalizado',
@@ -17,7 +18,7 @@ type Story = StoryObj<PlanPersonalizadoComponent>;
 export const Default: Story = {
   args: {
     nivel: 'Intermedio',
-    objetivo: 'Hipertrofia / Ganancia Muscular',
+    objetivo: Objetivo.VOLUMEN,
     frecuencia: 4,
     entrenadorAsignado: 'Carlos Trainer',
     photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'
@@ -27,7 +28,7 @@ export const Default: Story = {
 export const SinEntrenador: Story = {
   args: {
     nivel: 'Principiante',
-    objetivo: 'Pérdida de Peso',
+    objetivo: Objetivo.DEFINICION,
     frecuencia: 3,
     entrenadorAsignado: undefined,
     photoURL: undefined

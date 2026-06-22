@@ -388,6 +388,8 @@ export const mockEjercicioService = {
 export const mockRutinaAsignadaService = {
   getRutinasAsignadasByEntrenado: () => signal([]),
   getProximasRutinasDashboard: () => signal([]),
+  getRutinasAsignadasByEntrenador: () => signal([]),
+  getRutinasAsignadas: () => signal([]),
   organizarRutinasSemanales: () => [],
   save: () => Promise.resolve()
 };
@@ -408,6 +410,30 @@ export const mockRouter = {
   events: signal(null)
 };
 
+export const mockEntrenadorService = {
+  getEntrenadorById: () => signal({
+    uid: 'coach-123',
+    nombre: 'Entrenador de Prueba',
+    gimnasioId: 'gym-123',
+    rutinasCreadasIds: [],
+    ejerciciosCreadasIds: [],
+    entrenadosAsignadosIds: []
+  }),
+  initializeListener: () => {},
+  getEjerciciosByEntrenador: () => signal([]),
+  getLimits: () => ({
+    maxClients: 5,
+    maxExercises: 10,
+    maxWorkouts: 5
+  }),
+  addEjercicioCreado: () => Promise.resolve()
+};
+
+export const mockNotificacionService = {
+  notificaciones: () => signal([]),
+  initializeListener: () => {}
+};
+
 // Helper array to supply all providers in a single decorator
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
@@ -422,6 +448,8 @@ import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
+import { EntrenadorService } from '../../core/services/entrenador.service';
+import { NotificacionService } from '../../core/services/notificacion.service';
 import { NavController, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
@@ -439,6 +467,8 @@ export const mockProviders = [
   { provide: EjercicioService, useValue: mockEjercicioService },
   { provide: RutinaAsignadaService, useValue: mockRutinaAsignadaService },
   { provide: InvitacionService, useValue: mockInvitacionService },
+  { provide: EntrenadorService, useValue: mockEntrenadorService },
+  { provide: NotificacionService, useValue: mockNotificacionService },
   { provide: NavController, useValue: mockNavController },
   { provide: Router, useValue: mockRouter },
   { provide: ModalController, useValue: mockModalController },

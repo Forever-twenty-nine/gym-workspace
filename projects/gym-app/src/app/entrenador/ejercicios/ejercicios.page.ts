@@ -1,15 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardContent,
-  IonButton,
-  IonIcon,
-  ToastController, IonText } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
+import { IonContent, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -17,20 +7,21 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { UserService } from '../../core/services/user.service';
 
-import { EjerciciosListComponent } from '../components/ejercicios-list/ejercicios-list.component';
-import { EjercicioModalComponent } from '../components/ejercicio-modal/ejercicio-modal.component';
+import { EjerciciosListComponent } from './components/ejercicios-list/ejercicios-list.component';
+import { EjercicioModalComponent } from './components/ejercicio-modal/ejercicio-modal.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { AccionesEjercicioComponent } from './components/acciones-ejercicio/acciones-ejercicio.component';
 
 @Component({
   selector: 'app-ejercicios',
   templateUrl: './ejercicios.page.html',
   standalone: true,
-  imports: [IonText,
+  imports: [
     IonContent,
-    IonButton,
-    IonIcon,
-    NgOptimizedImage,
     EjerciciosListComponent,
-    EjercicioModalComponent]
+    EjercicioModalComponent,
+    TrainerBackgroundComponent,
+    AccionesEjercicioComponent]
 })
 export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);

@@ -1,15 +1,10 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
     IonIcon,
-    IonButton,
     IonAvatar,
     IonNote,
     IonItemOptions,
@@ -25,17 +20,17 @@ import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ion
     templateUrl: './mis-entrenados.component.html',
     standalone: true,
     imports: [
-    CommonModule,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonAvatar,
-    IonNote,
-    IonItemOptions,
-    IonItemOption,
-    IonItemSliding
-]
+        CommonModule,
+        IonList,
+        IonItem,
+        IonLabel,
+        IonIcon,
+        IonAvatar,
+        IonNote,
+        IonItemOptions,
+        IonItemOption,
+        IonItemSliding
+    ]
 })
 export class MisEntrenadosComponent {
 

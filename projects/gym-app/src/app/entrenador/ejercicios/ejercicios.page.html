@@ -1,35 +1,13 @@
-
-
 <ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
-  @if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-  }@else {
-  <div
-    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
-  </div>
-  }
+  
+  <app-trainer-background [isPremium]="isPremium()"></app-trainer-background>
+
   <!-- Acciones -->
-  <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden mb-6 p-4 text-center">
-    <ion-button expand="block" fill="solid" color="primary" (click)="crearEjercicio()" [disabled]="hasReachedEjercicioLimit()">
-      <ion-icon name="barbell-outline" slot="start"></ion-icon>
-      Crear Nuevo Ejercicio
-      @if (hasReachedEjercicioLimit()) {
-      <ion-icon name="lock-closed" slot="end"></ion-icon>
-      }
-    </ion-button>
-    <div class="mt-3">
-      <ion-text [color]="hasReachedEjercicioLimit() ? 'warning' : 'medium'" class="text-sm">
-        {{ ejercicioLimitMessage() }}
-        @if (hasReachedEjercicioLimit()) {
-        <p class="text-xs mt-1 mb-0">Límite alcanzado. Actualiza para crear más.</p>
-        }
-      </ion-text>
-    </div>
-  </div>
+  <app-acciones-ejercicio 
+    [hasReachedLimit]="hasReachedEjercicioLimit()" 
+    [limitMessage]="ejercicioLimitMessage()"
+    (crearEjercicio)="crearEjercicio()">
+  </app-acciones-ejercicio>
 
   <app-ejercicios-list 
     [ejercicios]="ejerciciosCreados()"

@@ -5,14 +5,14 @@ import {
   IonRow,
   IonCol,
   IonAvatar,
-  IonLabel
-} from '@ionic/angular/standalone';
+  IonLabel, IonCardHeader, IonCardContent } from '@ionic/angular/standalone';
+  import { Objetivo } from 'gym-library';
 
 @Component({
   selector: 'app-plan-personalizado',
   templateUrl: './plan-personalizado.component.html',
   standalone: true,
-  imports: [
+  imports: [IonCardContent, IonCardHeader, 
     IonCard,
     IonGrid,
     IonRow,
@@ -25,7 +25,7 @@ import {
 export class PlanPersonalizadoComponent {
 
   @Input() nivel: string | undefined = '';
-  @Input() objetivo: string = '';
+  @Input() objetivo: Objetivo | string | undefined = undefined;
   @Input() frecuencia: number = 0;
   @Input() photoURL: string | undefined = '';
   @Input() entrenadorAsignado: string | undefined = '';

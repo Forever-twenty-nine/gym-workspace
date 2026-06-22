@@ -1,17 +1,8 @@
 
 
 <ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
-  @if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/trainer-bg.png" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-  }@else {
-  <div
-    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
-  </div>
-  }
+  
+  <app-trainer-background [isPremium]="isPremium()"></app-trainer-background>
   <!-- Acciones y Límite de Plan -->
   <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
     (crearRutina)="crearRutina()">

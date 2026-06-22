@@ -2,15 +2,7 @@ import { Component, OnInit, inject, computed, Signal, signal } from '@angular/co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {
-  IonContent,
-  ToastController,
-  IonCard,
-  IonButton,
-  IonIcon,
-  IonText
-} from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
+import { IonContent, ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
@@ -29,6 +21,8 @@ import { InvitacionesPendientesComponent } from './components/invitaciones-pendi
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
 import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
 import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal/gestion-rutinas-modal.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { AccionesEntrenadosComponent } from './components/acciones-entrenados/acciones-entrenados.component';
 
 @Component({
   selector: 'app-entrenados',
@@ -38,16 +32,14 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     CommonModule,
     ReactiveFormsModule,
     IonContent,
-    IonButton,
-    IonIcon,
-    IonText,
-    NgOptimizedImage,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,
     InvitacionModalComponent,
-    GestionRutinasModalComponent
-],
+    GestionRutinasModalComponent,
+    TrainerBackgroundComponent,
+    AccionesEntrenadosComponent
+  ],
   styles: []
 })
 export class EntrenadosPage implements OnInit {

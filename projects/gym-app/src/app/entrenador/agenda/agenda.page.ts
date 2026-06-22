@@ -22,6 +22,8 @@ import { UserService } from '../../core/services/user.service';
 import { Convocatoria, Rol } from 'gym-library';
 
 import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear-agenda-modal.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { ConvocatoriaListComponent } from './components/convocatoria-list/convocatoria-list.component';
 
 @Component({
   selector: 'app-agenda',
@@ -35,7 +37,9 @@ import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear
     IonLabel,
     IonSegment,
     IonSegmentButton,
-    CrearAgendaModalComponent
+    CrearAgendaModalComponent,
+    TrainerBackgroundComponent,
+    ConvocatoriaListComponent
   ]
 })
 export class AgendaPage implements OnInit {
@@ -99,6 +103,34 @@ export class AgendaPage implements OnInit {
   // Convocatorias propuestas por atletas
   convocatoriasAtletas = computed(() => {
     return this.convocatoriasGimnasio().filter(c => !c.esOficial);
+  });
+
+  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
+
+  mappedConvocatoriasOficiales = computed(() => {
+    return this.convocatoriasOficiales().map(c => ({
+      convocatoria: c,
+      creadorName: c.titulo || 'Sesión de Entrenamiento',
+      creadorPhoto: null,
+      fechaFormateada: this.formatearFechaEntrenamiento(c.fechaEntrenamiento),
+      asistentes: c.interesados.map(uid => ({
+        name: this.getUsuarioName(uid),
+        photo: this.getUsuarioPhoto(uid)
+      }))
+    }));
+  });
+
+  mappedConvocatoriasAtletas = computed(() => {
+    return this.convocatoriasAtletas().map(c => ({
+      convocatoria: c,
+      creadorName: this.getUsuarioName(c.creadorId),
+      creadorPhoto: this.getUsuarioPhoto(c.creadorId),
+      fechaFormateada: this.formatearFechaEntrenamiento(c.fechaEntrenamiento),
+      asistentes: c.interesados.map(uid => ({
+        name: this.getUsuarioName(uid),
+        photo: this.getUsuarioPhoto(uid)
+      }))
+    }));
   });
 
   constructor() {

@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, computed, Signal } from '@angular/core';
 import { IonContent } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -12,6 +11,7 @@ import { Entrenado } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { EstadisticasCardsComponent } from './components/estadisticas-cards/estadisticas-cards.component';
 import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,9 +19,9 @@ import { ProximosEntrenadosComponent } from './components/proximos-entrenados/pr
   standalone: true,
   imports: [
     IonContent,
-    NgOptimizedImage,
     EstadisticasCardsComponent,
-    ProximosEntrenadosComponent
+    ProximosEntrenadosComponent,
+    TrainerBackgroundComponent
   ],
 })
 export class DashboardPage implements OnInit {

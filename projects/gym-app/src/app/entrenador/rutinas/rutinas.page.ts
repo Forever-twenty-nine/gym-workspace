@@ -15,6 +15,7 @@ import { EntrenadorService } from '../../core/services/entrenador.service';
 import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
 import { AccionesRutinaComponent } from './components/acciones-rutina/acciones-rutina.component';
 import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
 
 @Component({
   selector: 'app-rutinas',
@@ -24,7 +25,8 @@ import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.com
     IonContent,
     ListaRutinasComponent,
     AccionesRutinaComponent,
-    RutinaModalComponent
+    RutinaModalComponent,
+    TrainerBackgroundComponent
   ],
   styles: []
 })
