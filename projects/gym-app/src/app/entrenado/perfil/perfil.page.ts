@@ -37,7 +37,7 @@ import { MensajeService } from '../../core/services/mensaje.service';
 import { MensajesGlobalesService } from '../../core/services/mensajes-globales.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 
-import { PageBackgroundComponent } from '../components/page-background/page-background.component';
+import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { EditProfileModalComponent } from '../../shared/components/header-tabs/components/profile/components/edit-profile-modal/edit-profile-modal.component';
 import { PremiumRequestModalComponent } from '../../shared/components/header-tabs/components/profile/components/premium-request-modal/premium-request-modal.component';

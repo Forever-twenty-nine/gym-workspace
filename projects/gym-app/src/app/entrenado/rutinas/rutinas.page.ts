@@ -4,7 +4,7 @@ import {
   SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { PageBackgroundComponent } from '../components/page-background/page-background.component';
+import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
 import { Rutina, Plan, Convocatoria, SesionRutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { RutinaService } from '../../core/services/rutina.service';

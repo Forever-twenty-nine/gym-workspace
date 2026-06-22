@@ -4,7 +4,7 @@ import {
   SegmentCustomEvent, ModalController, ToastController
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { PageBackgroundComponent } from '../components/page-background/page-background.component';
+import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
