@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { componentWrapperDecorator } from '@storybook/angular';
-import { MisEntrenadosComponent } from './mis-entrenados.component';
-import { Entrenado, Objetivo } from 'gym-library';
+import { MisEntrenadosComponent, EntrenadoViewModel } from './mis-entrenados.component';
+import { Objetivo } from 'gym-library';
 
 const meta: Meta<MisEntrenadosComponent> = {
   title: 'Secciones/entrenador/entrenados/Componentes/mis-entrenados',
@@ -15,37 +15,47 @@ const meta: Meta<MisEntrenadosComponent> = {
 export default meta;
 type Story = StoryObj<MisEntrenadosComponent>;
 
-const mockEntrenados: Entrenado[] = [
+const mockEntrenadosVM: EntrenadoViewModel[] = [
   {
     id: 'user-1',
-    entrenadoresId: ['coach-123'],
-    rutinasAsignadasIds: ['r-1'],
+    nombre: 'Juan Pérez',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=juan',
     objetivo: Objetivo.DEFINICION,
-    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=juan'
+    estaEntrenando: true,
+    rutinasCount: 2,
+    entrenado: {
+      id: 'user-1',
+      entrenadoresId: ['coach-123'],
+      rutinasAsignadasIds: ['r-1', 'r-2'],
+      objetivo: Objetivo.DEFINICION,
+      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=juan'
+    }
   },
   {
     id: 'user-2',
-    entrenadoresId: ['coach-123'],
-    rutinasAsignadasIds: [],
+    nombre: 'María Gómez',
+    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maria',
     objetivo: Objetivo.VOLUMEN,
-    photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maria'
+    estaEntrenando: false,
+    rutinasCount: 0,
+    entrenado: {
+      id: 'user-2',
+      entrenadoresId: ['coach-123'],
+      rutinasAsignadasIds: [],
+      objetivo: Objetivo.VOLUMEN,
+      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maria'
+    }
   }
 ];
 
 export const Default: Story = {
   args: {
-    entrenados: mockEntrenados,
-    getUserName: (id: string) => id === 'user-1' ? 'Juan Pérez' : 'María Gómez',
-    estaEntrenando: (id: string) => id === 'user-1',
-    getRutinasCount: (id: string) => id === 'user-1' ? 2 : 0
+    entrenados: mockEntrenadosVM
   }
 };
 
 export const Empty: Story = {
   args: {
-    entrenados: [],
-    getUserName: (id: string) => 'Atleta',
-    estaEntrenando: (id: string) => false,
-    getRutinasCount: (id: string) => 0
+    entrenados: []
   }
 };

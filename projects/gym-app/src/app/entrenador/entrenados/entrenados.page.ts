@@ -16,7 +16,7 @@ import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 
-import { MisEntrenadosComponent } from './components/mis-entrenados/mis-entrenados.component';
+import { MisEntrenadosComponent, EntrenadoViewModel } from './components/mis-entrenados/mis-entrenados.component';
 import { InvitacionesPendientesComponent } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
 import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
@@ -171,6 +171,30 @@ export class EntrenadosPage implements OnInit {
   entrenadosAsociados: Signal<Entrenado[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
+  });
+
+  readonly entrenadosViewModel = computed<EntrenadoViewModel[]>(() => {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return [];
+
+    const asociados = this.entrenadosAsociados();
+    const todosLosUsuarios = this.userService.users();
+    
+    return asociados.map(entrenado => {
+      const user = todosLosUsuarios.find(u => u.uid === entrenado.id);
+      const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(entrenado.id)();
+      const estaEntrenando = sesiones.some(s => s.status === SesionRutinaStatus.EN_PROGRESO);
+      
+      return {
+        id: entrenado.id,
+        nombre: user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado',
+        photoURL: entrenado.photoURL || user?.photoURL || undefined,
+        objetivo: entrenado.objetivo || '',
+        estaEntrenando,
+        rutinasCount: entrenado.rutinasAsignadasIds?.length || 0,
+        entrenado
+      };
+    });
   });
 
   invitacionesPendientes: Signal<any[]> = computed(() => {

@@ -34,9 +34,6 @@ export class EntrenadoService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
     private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
         if (this.zoneRunner) {
             return this.zoneRunner.run(callback);
@@ -44,13 +41,6 @@ export class EntrenadoService {
         return runInInjectionContext(this.injector, callback as any);
     }
 
-    /**
-     * 🔄 Inicializa el listener de Firestore de forma segura (carga TODOS los entrenados).
-     *
-     * Medium priority improvement: para apps con muchos gimnasios, idealmente
-     * deberíamos tener listeners por `gimnasioId` (especialmente para "Descubrir" y sugerencias).
-     * Actualmente el filtro por gym se hace en cliente en los componentes.
-     */
     initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
 
@@ -74,9 +64,6 @@ export class EntrenadoService {
         }
     }
 
-    /**
-     * 📊 Signal readonly con la lista de entrenados
-     */
     get entrenados(): Signal<Entrenado[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener();
@@ -84,9 +71,6 @@ export class EntrenadoService {
         return this._entrenados.asReadonly();
     }
 
-    /**
-     * Versión gym-scoped (para Descubrir / MatchService en entrenados).
-     */
     getEntrenadosForGym(gymId: string): Signal<Entrenado[]> {
         if (!this.isListenerInitialized) {
             this.initializeListener(gymId);
@@ -94,9 +78,6 @@ export class EntrenadoService {
         return this._entrenados.asReadonly();
     }
 
-    /**
-     * 📊 Obtiene un entrenado específico por ID
-     */
     getEntrenado(id: string): Signal<Entrenado | null> {
         if (!this.entrenadoSignals.has(id)) {
             const entrenadoSignal = signal<Entrenado | null>(null);
@@ -116,9 +97,6 @@ export class EntrenadoService {
         return this.entrenadoSignals.get(id)!.asReadonly();
     }
 
-    /**
-     * 💾 Guarda o actualiza un entrenado (upsert si tiene id)
-     */
     async save(entrenado: Entrenado): Promise<void> {
         return this.runInZone(async () => {
             const dataToSave = this.mapToFirestore(entrenado);
@@ -133,9 +111,6 @@ export class EntrenadoService {
         });
     }
 
-    /**
-     * 🗑️ Elimina un entrenado por ID
-     */
     async delete(id: string): Promise<void> {
         return this.runInZone(async () => {
             const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
@@ -143,9 +118,6 @@ export class EntrenadoService {
         });
     }
 
-    /**
-     * 👥 Sigue a un usuario
-     */
     async followUser(currentUserId: string, targetUserId: string): Promise<void> {
         return this.runInZone(async () => {
             const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
@@ -163,9 +135,6 @@ export class EntrenadoService {
         });
     }
 
-    /**
-     * 👥 Deja de seguir a un usuario
-     */
     async unfollowUser(currentUserId: string, targetUserId: string): Promise<void> {
         return this.runInZone(async () => {
             const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
@@ -183,18 +152,12 @@ export class EntrenadoService {
         });
     }
 
-    /**
-     * 🔍 Busca entrenados por ID
-     */
     getEntrenadoById(id: string): Signal<Entrenado | null> {
         return computed(() =>
             this._entrenados().find(entrenado => entrenado.id === id) || null
         );
     }
 
-    /**
-     * 🔍 Busca entrenados por objetivo
-     */
     getEntrenadosByObjetivo(objetivo: string): Signal<Entrenado[]> {
         return computed(() =>
             this._entrenados().filter(entrenado =>
@@ -203,9 +166,6 @@ export class EntrenadoService {
         );
     }
 
-    /**
-     * 🔍 Busca entrenados por entrenador
-     */
     getEntrenadosByEntrenador(entrenadorId: string): Signal<Entrenado[]> {
         return computed(() =>
             this._entrenados().filter(entrenado =>
@@ -214,16 +174,11 @@ export class EntrenadoService {
         );
     }
 
-    /**
-     * 🔍 Busca entrenados que tienen una rutina asignada específica
-     * NOTA: Este método ahora usa RutinaAsignadaService. Implementar cuando esté disponible.
-     */
+
     getEntrenadosByRutinaAsignada(rutinaId: string): Signal<Entrenado[]> {
-        // TODO: Implementar usando RutinaAsignadaService
+
         return computed(() => []);
-    }    /**
-     * 🔍 Busca entrenados que han creado una rutina específica
-     */
+    }
     getEntrenadosByRutinaCreada(rutinaId: string): Signal<Entrenado[]> {
         return computed(() =>
             this._entrenados().filter(entrenado =>
@@ -232,25 +187,16 @@ export class EntrenadoService {
         );
     }
 
-    /**
-     * 📊 Obtiene entrenados activos
-     */
     getEntrenadosActivos(): Signal<Entrenado[]> {
         return computed(() =>
             this._entrenados()
         );
     }
 
-    /**
-     * 📊 Obtiene el conteo total de entrenados
-     */
     get entrenadoCount(): Signal<number> {
         return computed(() => this._entrenados().length);
     }
 
-    /**
-     * 📊 Obtiene el conteo de entrenados activos
-     */
     get entrenadoActivoCount(): Signal<number> {
         return computed(() => this._entrenados().length);
     }
@@ -272,7 +218,7 @@ export class EntrenadoService {
             visibleDescubrir: data.visibleDescubrir ?? true
         };
     }
- 
+
     private mapToFirestore(entrenado: Entrenado): any {
         const data: any = {};
         if (entrenado.objetivo !== undefined) data.objetivo = entrenado.objetivo;
@@ -292,9 +238,6 @@ export class EntrenadoService {
         return data;
     }
 
-    /**
-     * ➕ Agrega un ejercicio a la lista de ejercicios creados de un entrenado
-     */
     async addEjercicioCreado(entrenadoId: string, ejercicioId: string): Promise<void> {
         const entrenado = this.getEntrenado(entrenadoId)();
         if (!entrenado) return;
@@ -306,9 +249,6 @@ export class EntrenadoService {
         }
     }
 
-    /**
-     * ➖ Quita un ejercicio de la lista de ejercicios creados de un entrenado
-     */
     async removeEjercicioCreado(entrenadoId: string, ejercicioId: string): Promise<void> {
         const entrenado = this.getEntrenado(entrenadoId)();
         if (entrenado) {
@@ -317,9 +257,6 @@ export class EntrenadoService {
         }
     }
 
-    /**
-     * ➕ Agrega una rutina a la lista de rutinas creadas de un entrenado
-     */
     async addRutinaCreada(entrenadoId: string, rutinaId: string): Promise<void> {
         const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenadoId);
         await updateDoc(entrenadoRef, {
@@ -327,9 +264,6 @@ export class EntrenadoService {
         });
     }
 
-    /**
-     * ➖ Quita una rutina de la lista de rutinas creadas de un entrenado
-     */
     async removeRutinaCreada(entrenadoId: string, rutinaId: string): Promise<void> {
         const entrenado = this.getEntrenado(entrenadoId)();
         if (entrenado) {

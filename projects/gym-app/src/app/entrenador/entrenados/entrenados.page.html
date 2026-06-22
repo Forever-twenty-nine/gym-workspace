@@ -8,8 +8,7 @@
   </app-acciones-entrenados>
 
   <!-- Listado de Entrenados -->
-  <app-mis-entrenados [entrenados]="entrenadosAsociados()" [getUserName]="getUserName.bind(this)"
-    [estaEntrenando]="estaEntrenando.bind(this)" [getRutinasCount]="getRutinasAsignadasCount.bind(this)"
+  <app-mis-entrenados [entrenados]="entrenadosViewModel()"
     (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)">
   </app-mis-entrenados>
 

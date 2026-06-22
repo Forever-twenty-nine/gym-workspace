@@ -1,14 +1,16 @@
-<div class="">
+@if(entrenados()) {
+<ion-card class="bg-transparent border-0">
     <ion-list class="p-2 m-2" style="background: none;">
         @for (entrenado of entrenados(); track entrenado.id) {
         <ion-item-sliding class="gym-sliding-item" #slidingItem>
             <!-- Item principal que muestra el nombre del entrenado y su objetivo -->
             <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
                 <ion-avatar slot="start">
-                    <img [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+                    <img
+                        [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
                 </ion-avatar>
                 <ion-label slot="start" class="mx-2">
-                    <h3 class="font-bold text-white">{{ getUserName()(entrenado.id) }}</h3>
+                    <h3 class="font-bold text-white">{{ entrenado.nombre }}</h3>
                 </ion-label>
                 <ion-note slot="end" class="mx-2 text-white/50 text-xs">
                     {{ entrenado.objetivo }}
@@ -16,11 +18,11 @@
             </ion-item>
             <!-- Opciones al deslizar el item -->
             <ion-item-options side="end">
-                <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado)">
+                <ion-item-option color="secondary" (click)="openRutinasModal.emit(entrenado.entrenado)">
                     <ion-icon slot="start" name="barbell-outline"></ion-icon>
 
                 </ion-item-option>
-                <ion-item-option color="primary" (click)="verCliente.emit(entrenado)">
+                <ion-item-option color="primary" (click)="verCliente.emit(entrenado.entrenado)">
                     <ion-icon slot="start" name="eye-outline"></ion-icon>
 
                 </ion-item-option>
@@ -29,4 +31,14 @@
         </ion-item-sliding>
         }
     </ion-list>
-</div>
+</ion-card>
+} @else {
+<ion-card class="">
+    <ion-card-header class="bg-transparent border-0">
+        <ion-card-title class="text-center text-white/50">¡Aún no tienes entrenados!</ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="text-center text-white/50">
+        No tienes entrenados asignados.
+    </ion-card-content>
+</ion-card>
+}

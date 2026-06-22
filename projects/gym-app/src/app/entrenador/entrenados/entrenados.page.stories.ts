@@ -20,6 +20,12 @@ type Story = StoryObj<EntrenadosPage>;
 
 export const Default: Story = {
   args: {
+    
+  },
+};
+
+export const SinEntrenados: Story = {
+  args: {
   },
 };
 

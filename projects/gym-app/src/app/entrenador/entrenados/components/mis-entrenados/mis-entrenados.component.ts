@@ -1,6 +1,26 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
+import { IonList, IonItem, IonLabel, IonIcon, IonAvatar, IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard, IonCardContent, IonCardTitle, IonCardHeader } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { Entrenado } from 'gym-library';
+import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ionicons/icons';
+
+export interface EntrenadoViewModel {
+    id: string;
+    nombre: string;
+    photoURL?: string;
+    objetivo: string;
+    estaEntrenando: boolean;
+    rutinasCount: number;
+    entrenado: Entrenado;
+}
+
+@Component({
+    selector: 'app-mis-entrenados',
+    templateUrl: './mis-entrenados.component.html',
+    standalone: true,
+    imports: [IonCardHeader, IonCardTitle, IonCardContent, 
+    CommonModule,
     IonList,
     IonItem,
     IonLabel,
@@ -9,28 +29,9 @@ import {
     IonNote,
     IonItemOptions,
     IonItemOption,
-    IonItemSliding
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { Entrenado } from 'gym-library';
-import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ionicons/icons';
-
-@Component({
-    selector: 'app-mis-entrenados',
-    templateUrl: './mis-entrenados.component.html',
-    standalone: true,
-    imports: [
-        CommonModule,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonIcon,
-        IonAvatar,
-        IonNote,
-        IonItemOptions,
-        IonItemOption,
-        IonItemSliding
-    ]
+    IonItemSliding,
+    IonCard
+]
 })
 export class MisEntrenadosComponent {
 
@@ -42,10 +43,7 @@ export class MisEntrenadosComponent {
             'chevron-back-outline': chevronBackOutline,
         });
     }
-    entrenados = input.required<Entrenado[]>();
-    getUserName = input.required<(id: string) => string>();
-    estaEntrenando = input.required<(id: string) => boolean>();
-    getRutinasCount = input.required<(id: string) => number>();
+    entrenados = input.required<EntrenadoViewModel[]>();
 
     verCliente = output<Entrenado>();
     openRutinasModal = output<Entrenado>();
