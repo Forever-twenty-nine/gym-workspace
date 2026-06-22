@@ -1,18 +1,18 @@
 @if (invitaciones().length > 0) {
-<div class="mt-6 p-2">
+<div class="mt-6">
     <div class="py-2 mb-3">
         <h3 class="text-center text-xs font-bold uppercase tracking-widest text-white/70 m-0">Invitaciones Pendientes</h3>
     </div>
-    <ion-list style="background: none;" class="p-0 m-0">
+    <ion-list style="background: none;" class="p-2 m-2">
         @for (invitacion of invitaciones(); track invitacion.id) {
         <ion-item-sliding class="gym-sliding-item" #slidingItem>
             <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
-                <ion-avatar slot="start" class="flex items-center justify-center">
-                    <ion-icon name="mail-outline" class="text-white" style="font-size: 1.5rem;"></ion-icon>
+                <ion-avatar slot="start" class="flex items-center justify-center bg-white/10 rounded-full border border-white/5">
+                    <ion-icon name="mail-outline" class="text-white/80" style="font-size: 1.2rem;"></ion-icon>
                 </ion-avatar>
                 <ion-label slot="start" class="mx-2">
-                    <h3 class="font-bold text-white">{{ invitacion.entrenadoNombre }}</h3>
-                    <p class="text-white/60 text-xs truncate max-w-xs">{{ invitacion.emailEntrenado }}</p>
+                    <h3 class="font-bold text-white">{{ invitacion.nombre }}</h3>
+                    <p class="text-white/60 text-xs truncate max-w-xs">{{ invitacion.email }}</p>
                 </ion-label>
                 <ion-note slot="end" class="mx-2 text-white/50 text-xs">
                     {{ invitacion.fechaCreacion | date:'dd/MM/yyyy' }}

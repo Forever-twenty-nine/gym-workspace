@@ -5,7 +5,6 @@ import {
     IonItem,
     IonLabel,
     IonIcon,
-    IonButton,
     IonAvatar,
     IonNote,
     IonItemSliding,
@@ -15,26 +14,33 @@ import {
 import { addIcons } from 'ionicons';
 import { mailOutline, closeCircleOutline } from 'ionicons/icons';
 
+export interface InvitacionViewModel {
+    id: string;
+    nombre: string;
+    email: string;
+    fechaCreacion: Date;
+}
+
 @Component({
     selector: 'app-invitaciones-pendientes',
     templateUrl: './invitaciones-pendientes.component.html',
     standalone: true,
     imports: [
-    CommonModule,
-    DatePipe,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonItemSliding,
-    IonAvatar,
-    IonNote,
-    IonItemOptions,
-    IonItemOption
-]
+        CommonModule,
+        DatePipe,
+        IonList,
+        IonItem,
+        IonLabel,
+        IonIcon,
+        IonItemSliding,
+        IonAvatar,
+        IonNote,
+        IonItemOptions,
+        IonItemOption
+    ]
 })
 export class InvitacionesPendientesComponent {
-    invitaciones = input.required<any[]>();
+    invitaciones = input.required<InvitacionViewModel[]>();
     onCancelar = output<string>();
 
     constructor() {

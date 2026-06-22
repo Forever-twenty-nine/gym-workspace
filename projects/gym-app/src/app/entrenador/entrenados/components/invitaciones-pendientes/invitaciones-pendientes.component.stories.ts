@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { componentWrapperDecorator } from '@storybook/angular';
-import { InvitacionesPendientesComponent } from './invitaciones-pendientes.component';
+import { InvitacionesPendientesComponent, InvitacionViewModel } from './invitaciones-pendientes.component';
 
 const meta: Meta<InvitacionesPendientesComponent> = {
   title: 'Secciones/entrenador/entrenados/Componentes/invitaciones-pendientes',
@@ -14,24 +14,24 @@ const meta: Meta<InvitacionesPendientesComponent> = {
 export default meta;
 type Story = StoryObj<InvitacionesPendientesComponent>;
 
-const mockInvitaciones = [
+const mockInvitacionesVM: InvitacionViewModel[] = [
   {
     id: 'inv-1',
-    emailDestinatario: 'alumno1@gmail.com',
-    fechaEnvio: new Date(Date.now() - 3600000 * 24),
-    estado: 'pendiente'
+    nombre: 'Alumno Uno',
+    email: 'alumno1@gmail.com',
+    fechaCreacion: new Date(Date.now() - 3600000 * 24)
   },
   {
     id: 'inv-2',
-    emailDestinatario: 'alumno2@gmail.com',
-    fechaEnvio: new Date(Date.now() - 3600000 * 48),
-    estado: 'pendiente'
+    nombre: 'Alumno Dos',
+    email: 'alumno2@gmail.com',
+    fechaCreacion: new Date(Date.now() - 3600000 * 48)
   }
 ];
 
 export const Default: Story = {
   args: {
-    invitaciones: mockInvitaciones
+    invitaciones: mockInvitacionesVM
   }
 };
 

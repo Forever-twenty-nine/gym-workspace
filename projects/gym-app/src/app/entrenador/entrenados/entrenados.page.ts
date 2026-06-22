@@ -17,7 +17,7 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 
 import { MisEntrenadosComponent, EntrenadoViewModel } from './components/mis-entrenados/mis-entrenados.component';
-import { InvitacionesPendientesComponent } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
+import { InvitacionesPendientesComponent, InvitacionViewModel } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
 import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
 import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal/gestion-rutinas-modal.component';
@@ -200,6 +200,29 @@ export class EntrenadosPage implements OnInit {
   invitacionesPendientes: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.invitacionService.getInvitacionesPendientesPorEntrenador(entrenadorId)() : [];
+  });
+
+  readonly invitacionesViewModel = computed<InvitacionViewModel[]>(() => {
+    const raw = this.invitacionesPendientes();
+    return raw.map(inv => {
+      let fechaEnvio: Date;
+      if (inv.fechaCreacion) {
+        if (typeof inv.fechaCreacion.toDate === 'function') {
+          fechaEnvio = inv.fechaCreacion.toDate();
+        } else {
+          fechaEnvio = new Date(inv.fechaCreacion);
+        }
+      } else {
+        fechaEnvio = new Date();
+      }
+
+      return {
+        id: inv.id,
+        nombre: inv.entrenadoNombre || 'Usuario',
+        email: inv.emailEntrenado || '',
+        fechaCreacion: fechaEnvio
+      };
+    });
   });
 
   /** Calcula la antigüedad en días desde la fecha de registro */
