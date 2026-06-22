@@ -27,6 +27,11 @@ export const routes: Routes = [
           import('../gimnasio-entrenados/gimnasio-entrenados.page').then((m) => m.GimnasioEntrenadosPage),
       },
       {
+        path: 'perfil',
+        loadComponent: () =>
+          import('../../entrenado/perfil/perfil.page').then((m) => m.PerfilPage),
+      },
+      {
         path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full',

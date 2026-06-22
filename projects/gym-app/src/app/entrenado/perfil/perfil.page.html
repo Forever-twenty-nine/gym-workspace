@@ -1,6 +1,12 @@
 <ion-content [fullscreen]="true">
   <!-- Background Image Layer (Fixed) -->
-  <app-page-background />
+  @if (currentUser().role === 'entrenador') {
+    <app-trainer-background [isPremium]="isPremium()" />
+  } @else if (currentUser().role === 'gimnasio') {
+    <app-gym-background [isPremium]="isPremium()" />
+  } @else {
+    <app-page-background />
+  }
 
   <!-- Header Section inside Content (for overlay / glassmorphism styling) -->
   <div class="main-container ion-padding relative z-10">
@@ -19,16 +25,18 @@
     </div>
 
     <!-- Sub-tab Navigation (Segment) -->
-    <div class="mb-4">
-      <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios" class="w-full bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-2xl p-0.5">
-        <ion-segment-button value="perfil" class="rounded-xl font-semibold">
-          <ion-label>Perfil</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="plan" class="rounded-xl font-semibold">
-          <ion-label>Plan</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
+    @if (currentUser().role === 'entrenado') {
+      <div class="mb-4">
+        <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios" class="w-full bg-white/20 dark:bg-black/30 backdrop-blur-md rounded-2xl p-0.5">
+          <ion-segment-button value="perfil" class="rounded-xl font-semibold">
+            <ion-label>Perfil</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="plan" class="rounded-xl font-semibold">
+            <ion-label>Plan</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+    }
 
     <!-- Tab Contents Container -->
     <div class="dashboard-main-card m-0! rounded-4xl! overflow-hidden shadow-xl dark:shadow-2xl bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 px-4 py-6 min-h-[60vh] flex flex-col">
@@ -86,33 +94,35 @@
               }
 
               <!-- CONDITIONAL STATISTICS (PREMIUM ONLY) -->
-              @if (isPremium()) {
-                <div class="w-full">
-                  @if (estadisticasGenerales(); as stats) {
-                    <app-progreso-estadisticas 
-                      [stats]="stats" 
-                      [sesiones]="historialSesiones()" 
-                      [dbStats]="dbEstadisticas()">
-                    </app-progreso-estadisticas>
-                  } @else {
-                    <div class="flex justify-center items-center py-10">
-                      <ion-spinner name="crescent" color="primary"></ion-spinner>
-                      <span class="ml-2 text-sm text-medium">Cargando estadísticas...</span>
-                    </div>
-                  }
-                </div>
-              } @else {
-                <!-- Stats Premium Teaser Card -->
-                <div class="rounded-3xl border border-warning/20 bg-warning/5 dark:bg-warning/10 p-5 text-center shadow-sm mb-6">
-                  <ion-icon name="trophy-outline" class="text-warning text-4xl mb-2"></ion-icon>
-                  <h3 class="text-lg font-bold text-warning my-0">Estadísticas Avanzadas</h3>
-                  <p class="text-xs text-gray-600 dark:text-white/70 mt-2 mb-4 leading-relaxed">
-                    Registrá tus entrenamientos y desbloqueá el gráfico semanal de actividad, el historial detallado de sesiones y las rachas de entrenamiento con una cuenta Premium.
-                  </p>
-                  <ion-button (click)="currentSegment.set('plan')" color="warning" fill="solid" size="small" class="font-bold uppercase tracking-wider rounded-xl">
-                    Ver Planes
-                  </ion-button>
-                </div>
+              @if (user.role === 'entrenado') {
+                @if (isPremium()) {
+                  <div class="w-full">
+                    @if (estadisticasGenerales(); as stats) {
+                      <app-progreso-estadisticas 
+                        [stats]="stats" 
+                        [sesiones]="historialSesiones()" 
+                        [dbStats]="dbEstadisticas()">
+                      </app-progreso-estadisticas>
+                    } @else {
+                      <div class="flex justify-center items-center py-10">
+                        <ion-spinner name="crescent" color="primary"></ion-spinner>
+                        <span class="ml-2 text-sm text-medium">Cargando estadísticas...</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <!-- Stats Premium Teaser Card -->
+                  <div class="rounded-3xl border border-warning/20 bg-warning/5 dark:bg-warning/10 p-5 text-center shadow-sm mb-6">
+                    <ion-icon name="trophy-outline" class="text-warning text-4xl mb-2"></ion-icon>
+                    <h3 class="text-lg font-bold text-warning my-0">Estadísticas Avanzadas</h3>
+                    <p class="text-xs text-gray-600 dark:text-white/70 mt-2 mb-4 leading-relaxed">
+                      Registrá tus entrenamientos y desbloqueá el gráfico semanal de actividad, el historial detallado de sesiones y las rachas de entrenamiento con una cuenta Premium.
+                    </p>
+                    <ion-button (click)="currentSegment.set('plan')" color="warning" fill="solid" size="small" class="font-bold uppercase tracking-wider rounded-xl">
+                      Ver Planes
+                    </ion-button>
+                  </div>
+                }
               }
             </div>
 

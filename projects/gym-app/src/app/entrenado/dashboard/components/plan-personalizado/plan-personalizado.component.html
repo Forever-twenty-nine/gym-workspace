@@ -1,47 +1,41 @@
-<ion-card
-  class="mx-0 mt-0 mb-4 rounded-3xl shadow-xl relative overflow-hidden bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10">
-  <ion-grid class="p-4">
-    <!-- Fila superior: Avatar y texto principal -->
-    <ion-row class="ion-align-items-center mb-3">
-      <ion-col size="auto" class="p-0">
-        <ion-avatar class="w-10 h-10 mr-3">
-          <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
-        </ion-avatar>
-      </ion-col>
-      <ion-col class="p-0">
-        <ion-label>
-          <h2 class="text-lg font-black text-gray-900 dark:text-white m-0 tracking-tight">Plan Personalizado</h2>
-          @if (entrenadorAsignado) {
-          <p class="text-xs text-gray-500 dark:text-gray-400 m-0 mt-0.5">{{ entrenadorAsignado }}</p>
-          }
-        </ion-label>
-      </ion-col>
-    </ion-row>
-    <!-- Fila inferior: Datos en columnas -->
-    <ion-row class="pt-3 border-t border-gray-200/40 dark:border-white/10">
-      <ion-col size="4" class="text-center p-0">
+<ion-card>
+  <ion-grid class="p-2">
+    <!-- Fila superior: Datos en columnas -->
+    <ion-row class="p-2">
+      <ion-col size="4" class="text-center p-2">
         <ion-card>
-          <ion-card-header
-            class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Nivel</ion-card-header>
-          <ion-card-content class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1">{{ nivel || 'No definido' }}</ion-card-content>
+          <ion-card-header color="primary">Nivel</ion-card-header>
+          <ion-card-content color="secondary">{{ nivel || 'No definido'
+            }}</ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size="4" class="text-center p-0">
+      <ion-col size="4" class="text-center p-2">
         <ion-card>
-          <ion-card-header
-            class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Objetivo</ion-card-header>
-          <ion-card-content class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1 truncate" [title]="objetivo">{{ objetivo
+          <ion-card-header color="primary">Objetivo</ion-card-header>
+          <ion-card-content color="secondary" [title]="objetivo">{{ objetivo
             || 'No definido' }}</ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size="4" class="text-center p-0">
+      <ion-col size="4" class="text-center p-2">
         <ion-card>
-          <ion-card-header
-            class="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 m-0">Frecuencia</ion-card-header>
-          <ion-card-content class="text-sm font-bold text-gray-900 dark:text-white m-0 mt-1">{{ frecuencia || 'No definido' }} d/sem</ion-card-content>
+          <ion-card-header color="primary">Frecuencia</ion-card-header>
+          <ion-card-content color="secondary">{{ frecuencia || 'No definido' }} d/sem</ion-card-content>
         </ion-card>
       </ion-col>
     </ion-row>
-
   </ion-grid>
+  <!-- Fila inferioir: Avatar y texto principal -->
+  @if(entrenadorAsignado) {
+  <ion-card>
+    <ion-item>
+      <ion-avatar slot="start" class="m-2">
+        <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
+      </ion-avatar>
+      <ion-label>
+        <p>{{ entrenadorAsignado }}</p>
+      </ion-label>
+      <ion-label slot="end">Entrenador asignado</ion-label>
+    </ion-item>
+  </ion-card>
+  }
 </ion-card>

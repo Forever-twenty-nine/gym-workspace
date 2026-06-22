@@ -38,6 +38,8 @@ import { MensajesGlobalesService } from '../../core/services/mensajes-globales.s
 import { InvitacionService } from '../../core/services/invitacion.service';
 
 import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
+import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { EditProfileModalComponent } from '../../shared/components/header-tabs/components/profile/components/edit-profile-modal/edit-profile-modal.component';
 import { PremiumRequestModalComponent } from '../../shared/components/header-tabs/components/profile/components/premium-request-modal/premium-request-modal.component';
@@ -60,6 +62,8 @@ import { ModalController, ToastController, LoadingController } from '@ionic/angu
     IonLabel,
     IonSpinner,
     PageBackgroundComponent,
+    TrainerBackgroundComponent,
+    GymBackgroundComponent,
     ProgresoEstadisticasComponent,
     EditProfileModalComponent,
     PremiumRequestModalComponent
@@ -136,14 +140,14 @@ export class PerfilPage implements OnInit, OnDestroy {
 
     effect(() => {
       const user = this.currentUser();
-      if (user && user.role !== 'gimnasio') {
+      if (user && user.role === 'entrenado') {
         this.iniciarListenerSolicitudes(user.uid);
       }
     });
 
     effect(() => {
       const user = this.currentUser();
-      if (user?.uid && !this.userListenerInitialized) {
+      if (user?.uid && user.role === 'entrenado' && !this.userListenerInitialized) {
         this.estadisticasService.initializeListener(user.uid);
         this.userListenerInitialized = true;
       }
@@ -159,7 +163,8 @@ export class PerfilPage implements OnInit, OnDestroy {
       this.solicitudesUnsubscribe();
     }
     const uid = this.currentUser()?.uid;
-    if (uid) {
+    const isEntrenado = this.currentUser()?.role === 'entrenado';
+    if (uid && isEntrenado && this.userListenerInitialized) {
       this.estadisticasService.stopListener(uid);
     }
   }
