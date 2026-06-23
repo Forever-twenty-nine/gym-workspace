@@ -13,32 +13,41 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonBadge
-} from '@ionic/angular/standalone';
+    IonCard,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonNote,
+    IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCircleOutline, lockClosed } from 'ionicons/icons';
+import { closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCircleOutline, lockClosed, barbellOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutina-detalle-modal',
     standalone: true,
-    imports: [
-        CommonModule,
-        IonModal,
-        IonHeader,
-        IonToolbar,
-        IonButtons,
-        IonButton,
-        IonIcon,
-        IonTitle,
-        IonContent,
-        IonFooter,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonBadge
-    ],
+    imports: [IonCardTitle, IonCardHeader,
+    CommonModule,
+    IonModal,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonTitle,
+    IonContent,
+    IonFooter,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonCard,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonNote],
     templateUrl: './rutina-detalle-modal.component.html',
-    
+   
 })
 export class RutinaDetalleModalComponent {
     @Input() isOpen = false;
@@ -50,13 +59,14 @@ export class RutinaDetalleModalComponent {
 
     constructor() {
         addIcons({
-            close,
+            closeOutline,
             fitnessOutline,
             timeOutline,
             repeatOutline,
             playCircle,
             syncCircleOutline,
-            lockClosed
+            lockClosed,
+            barbellOutline
         });
     }
 

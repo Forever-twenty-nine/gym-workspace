@@ -1,12 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/angular';
-import { componentWrapperDecorator } from '@storybook/angular';
+import { componentWrapperDecorator, moduleMetadata } from '@storybook/angular';
 import { RutinaDetalleModalComponent } from './rutina-detalle-modal.component';
+import { FirebaseStorageService } from '../../../../core/services/firebase-storage.service';
 
 const meta: Meta<RutinaDetalleModalComponent> = {
   title: 'Secciones/entrenado/rutinas/Componentes/rutina-detalle-modal',
   component: RutinaDetalleModalComponent,
   tags: ['autodocs'],
   decorators: [
+    moduleMetadata({
+      providers: [
+        { provide: FirebaseStorageService, useValue: {} }
+      ]
+    }),
     componentWrapperDecorator((story) => `<ion-app>${story}</ion-app>`)
   ]
 };

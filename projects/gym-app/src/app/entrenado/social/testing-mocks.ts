@@ -212,13 +212,13 @@ export const mockParticipaciones: DesafioParticipacion[] = [
 export const mockSesionesCompartidas: any[] = [
   {
     id: 'sesion-1',
-    entrenadoId: 'user-partner',
-    nombreUsuario: 'Juan Pérez',
-    fotoUsuario: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+    entrenadoId: 'user-current',
+    nombreUsuario: 'Mi Perfil',
+    fotoUsuario: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
     fechaInicio: new Date(Date.now() - 3600000 * 4),
     duracion: 3600,
     completada: true,
-    likes: ['user-current'],
+    likes: ['user-partner'],
     fechaCompartida: new Date(Date.now() - 3600000 * 4),
     fotoProgreso: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&q=80&w=600',
     rutinaResumen: {
@@ -226,28 +226,46 @@ export const mockSesionesCompartidas: any[] = [
       nombre: 'Hipertrofia de Pecho',
       ejercicios: [
         { id: 'ej-1', nombre: 'Press de Banca', series: 4, repeticiones: 12 },
-        { id: 'ej-2', nombre: 'Aperturas con Mancuernas', series: 4, repeticiones: 12 },
-        { id: 'ej-3', nombre: 'Fondos de Pecho', series: 3, repeticiones: 15 }
+        { id: 'ej-2', nombre: 'Aperturas con Mancuernas', series: 4, repeticiones: 12 }
       ]
     }
   },
   {
     id: 'sesion-2',
-    entrenadoId: 'user-3',
-    nombreUsuario: 'María Gómez',
-    fotoUsuario: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
-    fechaInicio: new Date(Date.now() - 3600000 * 20),
-    duracion: 1200,
+    entrenadoId: 'user-current',
+    nombreUsuario: 'Mi Perfil',
+    fotoUsuario: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    fechaInicio: new Date(Date.now() - 3600000 * 24 * 2), // hace 2 días
+    duracion: 2400,
     completada: true,
-    likes: ['user-partner', 'user-current'],
-    fechaCompartida: new Date(Date.now() - 3600000 * 20),
-    fotoProgreso: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&q=80&w=600',
+    likes: [],
+    fechaCompartida: new Date(Date.now() - 3600000 * 24 * 2),
     rutinaResumen: {
       id: 'rut-2',
-      nombre: 'Cardio HIIT 20m',
+      nombre: 'Día de Piernas Pesado',
       ejercicios: [
-        { id: 'ej-4', nombre: 'Burpees', series: 3, repeticiones: 10 },
-        { id: 'ej-5', nombre: 'Jump squats', series: 3, repeticiones: 15 }
+        { id: 'ej-3', nombre: 'Sentadillas', series: 4, repeticiones: 8 },
+        { id: 'ej-4', nombre: 'Prensa', series: 3, repeticiones: 12 }
+      ]
+    }
+  },
+  {
+    id: 'sesion-3',
+    entrenadoId: 'user-current',
+    nombreUsuario: 'Mi Perfil',
+    fotoUsuario: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+    fechaInicio: new Date(Date.now() - 3600000 * 24 * 5), // hace 5 días
+    duracion: 1800,
+    completada: true,
+    likes: ['user-3'],
+    fechaCompartida: new Date(Date.now() - 3600000 * 24 * 5),
+    fotoProgreso: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&q=80&w=600',
+    rutinaResumen: {
+      id: 'rut-3',
+      nombre: 'Cardio y Abs',
+      ejercicios: [
+        { id: 'ej-5', nombre: 'Cinta', series: 1, repeticiones: 20 },
+        { id: 'ej-6', nombre: 'Plancha', series: 3, repeticiones: 60 }
       ]
     }
   }
@@ -331,7 +349,7 @@ export const mockMatchService = {
 
 export const mockSesionRutinaService = {
   getSesionesCompartidas: () => signal(mockSesionesCompartidas),
-  getSesionesPorEntrenado: () => signal([]),
+  getSesionesPorEntrenado: () => signal(mockSesionesCompartidas),
   addLike: () => Promise.resolve(),
   removeLike: () => Promise.resolve(),
   setCompartida: () => Promise.resolve(),
@@ -374,25 +392,74 @@ export const mockActionSheetController = {
 };
 
 export const mockRutinaService = {
-  rutinas: () => signal([]),
+  rutinas: () => signal([
+    { id: 'rut-1', nombre: 'Hipertrofia Pecho', ejerciciosIds: ['ej-1', 'ej-2'] },
+    { id: 'rut-2', nombre: 'Día de Piernas Pesado', ejerciciosIds: ['ej-3', 'ej-4'] },
+    { id: 'rut-3', nombre: 'Cardio y Abs', ejerciciosIds: ['ej-5', 'ej-6'] },
+    { id: 'rut-4', nombre: 'Espalda y Bíceps', ejerciciosIds: ['ej-7', 'ej-8'] }
+  ]),
   getCreatedByUser: () => signal([]),
-  getRutinasForGym: () => signal([]),
+  getRutinasForGym: () => signal([
+    { id: 'rut-1', nombre: 'Hipertrofia Pecho', ejerciciosIds: ['ej-1', 'ej-2'] },
+    { id: 'rut-2', nombre: 'Día de Piernas Pesado', ejerciciosIds: ['ej-3', 'ej-4'] },
+    { id: 'rut-3', nombre: 'Cardio y Abs', ejerciciosIds: ['ej-5', 'ej-6'] },
+    { id: 'rut-4', nombre: 'Espalda y Bíceps', ejerciciosIds: ['ej-7', 'ej-8'] }
+  ]),
   save: () => Promise.resolve()
 };
 
 export const mockEjercicioService = {
-  ejercicios: () => signal([]),
+  ejercicios: () => signal([
+    { id: 'ej-1', nombre: 'Press Banca', descripcion: 'Pecho' },
+    { id: 'ej-2', nombre: 'Aperturas', descripcion: 'Pecho' },
+    { id: 'ej-3', nombre: 'Sentadillas', descripcion: 'Piernas' },
+    { id: 'ej-4', nombre: 'Prensa', descripcion: 'Piernas' },
+    { id: 'ej-5', nombre: 'Cinta', descripcion: 'Cardio' },
+    { id: 'ej-6', nombre: 'Plancha', descripcion: 'Abs' },
+    { id: 'ej-7', nombre: 'Dominadas', descripcion: 'Espalda' },
+    { id: 'ej-8', nombre: 'Curl Bíceps', descripcion: 'Brazos' }
+  ]),
   getCreatedByUser: () => signal([]),
-  getEjerciciosForGym: () => signal([]),
+  getEjerciciosForGym: () => signal([
+    { id: 'ej-1', nombre: 'Press Banca', descripcion: 'Pecho' },
+    { id: 'ej-2', nombre: 'Aperturas', descripcion: 'Pecho' },
+    { id: 'ej-3', nombre: 'Sentadillas', descripcion: 'Piernas' },
+    { id: 'ej-4', nombre: 'Prensa', descripcion: 'Piernas' },
+    { id: 'ej-5', nombre: 'Cinta', descripcion: 'Cardio' },
+    { id: 'ej-6', nombre: 'Plancha', descripcion: 'Abs' },
+    { id: 'ej-7', nombre: 'Dominadas', descripcion: 'Espalda' },
+    { id: 'ej-8', nombre: 'Curl Bíceps', descripcion: 'Brazos' }
+  ]),
   save: () => Promise.resolve()
 };
 
 export const mockRutinaAsignadaService = {
-  getRutinasAsignadasByEntrenado: () => signal([]),
+  getRutinasAsignadasByEntrenado: () => signal([
+    { id: 'asig-1', rutinaId: 'rut-1', diaSemana: 1 },
+    { id: 'asig-2', rutinaId: 'rut-2', diaSemana: 3 },
+    { id: 'asig-3', rutinaId: 'rut-3', diaSemana: 5 },
+    { id: 'asig-4', rutinaId: 'rut-4', diaSemana: 0 } // Domingo
+  ]),
   getProximasRutinasDashboard: () => signal([]),
   getRutinasAsignadasByEntrenador: () => signal([]),
   getRutinasAsignadas: () => signal([]),
-  organizarRutinasSemanales: () => [],
+  organizarRutinasSemanales: () => {
+    const base = new Date();
+    base.setHours(0,0,0,0);
+    const day = base.getDay() === 0 ? 6 : base.getDay() - 1; // Ajuste si la semana empieza el lunes
+    const startOfWeek = new Date(base);
+    startOfWeek.setDate(base.getDate() - day);
+    
+    return [
+      { fecha: new Date(startOfWeek.getTime() + 0*24*3600*1000), rutinas: [{ id: 'rut-1', nombre: 'Hipertrofia Pecho', ejerciciosIds: ['ej-1'] }] },
+      { fecha: new Date(startOfWeek.getTime() + 1*24*3600*1000), rutinas: [] },
+      { fecha: new Date(startOfWeek.getTime() + 2*24*3600*1000), rutinas: [{ id: 'rut-2', nombre: 'Día de Piernas Pesado', ejerciciosIds: ['ej-3'] }] },
+      { fecha: new Date(startOfWeek.getTime() + 3*24*3600*1000), rutinas: [] },
+      { fecha: new Date(startOfWeek.getTime() + 4*24*3600*1000), rutinas: [{ id: 'rut-3', nombre: 'Cardio y Abs', ejerciciosIds: ['ej-5'] }] },
+      { fecha: new Date(startOfWeek.getTime() + 5*24*3600*1000), rutinas: [] },
+      { fecha: new Date(startOfWeek.getTime() + 6*24*3600*1000), rutinas: [{ id: 'rut-4', nombre: 'Espalda y Bíceps', ejerciciosIds: ['ej-7'] }] }
+    ];
+  },
   save: () => Promise.resolve()
 };
 
@@ -452,8 +519,29 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { InvitacionService } from '../../core/services/invitacion.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
+import { EstadisticasEntrenadoService } from '../../core/services/estadisticas-entrenado.service';
+import { ProgresoService } from '../../core/services/progreso.service';
+import { SocialShareService } from '../../core/services/social-share.service';
+import { FirebaseStorageService } from '../../core/services/firebase-storage.service';
 import { NavController, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+
+export const mockEstadisticasEntrenadoService = {
+  getEstadisticas: (uid: string) => signal({
+    totalRutinasCompletadas: 42,
+    rachaActual: 5,
+    mejorRacha: 12,
+    ultimaFechaEntrenamiento: new Date(),
+    nivel: 5,
+    experiencia: 450,
+    experienciaProximoNivel: 500
+  }),
+  loading: signal(false),
+  error: signal(null),
+  initializeListener: () => {},
+  stopListener: () => {},
+  crearEstadisticasIniciales: () => ({})
+};
 
 export const mockProviders = [
   { provide: AuthService, useValue: mockAuthService },
@@ -471,6 +559,10 @@ export const mockProviders = [
   { provide: InvitacionService, useValue: mockInvitacionService },
   { provide: EntrenadorService, useValue: mockEntrenadorService },
   { provide: NotificacionService, useValue: mockNotificacionService },
+  { provide: EstadisticasEntrenadoService, useValue: mockEstadisticasEntrenadoService },
+  { provide: ProgresoService, useValue: {} },
+  { provide: SocialShareService, useValue: {} },
+  { provide: FirebaseStorageService, useValue: {} },
   { provide: NavController, useValue: mockNavController },
   { provide: Router, useValue: mockRouter },
   { provide: ModalController, useValue: mockModalController },

@@ -1,7 +1,7 @@
 import { Component, signal, inject, computed, effect } from '@angular/core';
 import {
   IonContent, IonHeader, IonSegment, IonSegmentButton, IonLabel,
-  SegmentCustomEvent
+  IonToolbar, SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
@@ -32,6 +32,7 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     CommonModule,
     IonContent,
     IonHeader,
+    IonToolbar,
     IonSegment,
     IonSegmentButton,
     IonLabel,
