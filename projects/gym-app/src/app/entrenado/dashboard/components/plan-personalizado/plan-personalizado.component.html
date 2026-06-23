@@ -1,7 +1,7 @@
 <ion-card>
   <ion-grid class="p-2">
     <!-- Fila superior: Datos en columnas -->
-    <ion-row class="p-2">
+    <ion-row class="p-0">
       <ion-col size="4" class="text-center p-2">
         <ion-card>
           <ion-card-header color="primary">Nivel</ion-card-header>
@@ -12,8 +12,9 @@
       <ion-col size="4" class="text-center p-2">
         <ion-card>
           <ion-card-header color="primary">Objetivo</ion-card-header>
-          <ion-card-content color="secondary" [title]="objetivo">{{ objetivo
-            || 'No definido' }}</ion-card-content>
+          <ion-card-content color="secondary" [title]="objetivo">
+            <ion-badge color="secondary">{{ objetivo || 'No definido' }}</ion-badge>
+          </ion-card-content>
         </ion-card>
       </ion-col>
       <ion-col size="4" class="text-center p-2">

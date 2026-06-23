@@ -1,6 +1,7 @@
 import { signal } from '@angular/core';
 import { Rol, TipoMensaje, Plan, Convocatoria, Desafio, DesafioParticipacion, SesionRutina } from 'gym-library';
 import { TarjetaDescubrir } from '../../core/types/descubrir.types';
+import { Subject } from 'rxjs';
 
 // --- MOCK DATA ---
 
@@ -382,6 +383,7 @@ export const mockRutinaService = {
 export const mockEjercicioService = {
   ejercicios: () => signal([]),
   getCreatedByUser: () => signal([]),
+  getEjerciciosForGym: () => signal([]),
   save: () => Promise.resolve()
 };
 
@@ -407,7 +409,7 @@ export const mockNavController = {
 
 export const mockRouter = {
   navigate: () => {},
-  events: signal(null)
+  events: new Subject<any>()
 };
 
 export const mockEntrenadorService = {

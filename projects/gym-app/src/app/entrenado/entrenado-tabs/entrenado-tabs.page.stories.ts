@@ -18,4 +18,6 @@ const meta: Meta<EntrenadoTabsPage> = {
 export default meta;
 type Story = StoryObj<EntrenadoTabsPage>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  
+};
