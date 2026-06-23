@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinaEjercicioDetalleModalComponent } from './rutina-ejercicio-detalle-modal.component';
 
 const meta: Meta<RutinaEjercicioDetalleModalComponent> = {
-  title: 'Secciones/entrenado/rutina-progreso/components/rutina-ejercicio-detalle-modal',
+  title: 'Secciones/entrenado/rutina-progreso/Componentes/rutina-ejercicio-detalle-modal',
   component: RutinaEjercicioDetalleModalComponent,
   tags: ['autodocs'],
   decorators: [

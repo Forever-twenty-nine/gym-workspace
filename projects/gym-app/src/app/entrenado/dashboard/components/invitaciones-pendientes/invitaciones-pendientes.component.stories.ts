@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { InvitacionesPendientesComponent } from './invitaciones-pendientes.component';
 
 const meta: Meta<InvitacionesPendientesComponent> = {
-  title: 'Secciones/entrenado/dashboard/components/InvitacionesPendientes',
+  title: 'Secciones/entrenado/dashboard/Componentes/invitaciones-pendientes',
   component: InvitacionesPendientesComponent,
   tags: ['autodocs'],
   decorators: [

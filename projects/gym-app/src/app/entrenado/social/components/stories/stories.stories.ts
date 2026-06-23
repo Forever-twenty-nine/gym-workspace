@@ -43,7 +43,7 @@ const mockStoryItems: StoryDisplayItem[] = [
 ];
 
 const meta: Meta<StoriesComponent> = {
-  title: 'Secciones/entrenado/social/components/Stories',
+  title: 'Secciones/entrenado/social/Componentes/stories',
   component: StoriesComponent,
   tags: ['autodocs'],
   argTypes: {

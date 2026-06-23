@@ -1,42 +1,43 @@
 <ion-card>
-  <ion-grid class="p-2">
-    <!-- Fila superior: Datos en columnas -->
-    <ion-row class="p-0">
-      <ion-col size="4" class="text-center p-2">
-        <ion-card>
-          <ion-card-header color="primary">Nivel</ion-card-header>
-          <ion-card-content color="secondary">{{ nivel || 'No definido'
-            }}</ion-card-content>
-        </ion-card>
+  <ion-grid class="ion-no-padding">
+    <ion-row class="ion-text-center">
+      
+      <!-- Nivel -->
+      <ion-col size="4" class="ion-padding-vertical">
+        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Nivel</div>
+        <ion-badge color="secondary" class="w-full max-w-[90%] truncate">
+          {{ nivel || 'No definido' }}
+        </ion-badge>
       </ion-col>
-      <ion-col size="4" class="text-center p-2">
-        <ion-card>
-          <ion-card-header color="primary">Objetivo</ion-card-header>
-          <ion-card-content color="secondary" [title]="objetivo">
-            <ion-badge color="secondary">{{ objetivo || 'No definido' }}</ion-badge>
-          </ion-card-content>
-        </ion-card>
+
+      <!-- Objetivo -->
+      <ion-col size="4" class="ion-padding-vertical">
+        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Objetivo</div>
+        <ion-badge color="secondary" class="w-full max-w-[90%] truncate" [title]="objetivo">
+          {{ objetivo || 'No definido' }}
+        </ion-badge>
       </ion-col>
-      <ion-col size="4" class="text-center p-2">
-        <ion-card>
-          <ion-card-header color="primary">Frecuencia</ion-card-header>
-          <ion-card-content color="secondary">{{ frecuencia || 'No definido' }} d/sem</ion-card-content>
-        </ion-card>
+
+      <!-- Frecuencia -->
+      <ion-col size="4" class="ion-padding-vertical">
+        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Frecuencia</div>
+        <ion-badge color="secondary" class="w-full max-w-[90%] truncate">
+          {{ frecuencia || '0' }} d/sem
+        </ion-badge>
       </ion-col>
+
     </ion-row>
   </ion-grid>
-  <!-- Fila inferioir: Avatar y texto principal -->
+
   @if(entrenadorAsignado) {
-  <ion-card>
-    <ion-item>
-      <ion-avatar slot="start" class="m-2">
+    <ion-item lines="none">
+      <ion-avatar slot="start" class="mr-3">
         <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
       </ion-avatar>
       <ion-label>
         <p>{{ entrenadorAsignado }}</p>
       </ion-label>
-      <ion-label slot="end">Entrenador asignado</ion-label>
+      <ion-note slot="end">Entrenador</ion-note>
     </ion-item>
-  </ion-card>
   }
 </ion-card>

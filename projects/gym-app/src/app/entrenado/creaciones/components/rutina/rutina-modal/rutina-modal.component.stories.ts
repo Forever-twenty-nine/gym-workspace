@@ -4,7 +4,7 @@ import { RutinaModalComponent } from './rutina-modal.component';
 import { mockProviders } from '../../../../social/testing-mocks';
 
 const meta: Meta<RutinaModalComponent> = {
-  title: 'Secciones/entrenado/creaciones/rutina/rutina-modal',
+  title: 'Secciones/entrenado/creaciones/Componentes/rutina/rutina-modal',
   component: RutinaModalComponent,
   tags: ['autodocs'],
   decorators: [

@@ -2,23 +2,22 @@
   <!-- Background Image Layer (Fixed) -->
   <app-page-background />
 
-  <div class="relative z-10 p-4 ">
-    <!-- Plan Personalizado -->
-    <app-plan-personalizado 
-      [nivel]="entrenadoDataSignal()?.nivel" 
-      [objetivo]="objetivoActual()"
-      [entrenadorAsignado]="entrenadorAsignado()?.nombre || ''"
-      [photoURL]="photoURL()"
-      [frecuencia]="frecuenciaSemanal()">
-    </app-plan-personalizado>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="8" size-lg="6" class="py-2">
+        <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
+          [entrenadorAsignado]="entrenadorAsignado()?.nombre || ''" [photoURL]="photoURL()"
+          [frecuencia]="frecuenciaSemanal()">
+        </app-plan-personalizado>
+      </ion-col>
+    </ion-row>
 
-    <!-- Próximos entrenamientos (compact cards) -->
-    <app-rutinas-asignadas 
-      [rutinas]="rutinasAsignadas()" 
-      [entrenador]="entrenadorAsignado()"
-      (verDetalle)="verRutina($event)" 
-      (verTodas)="verTodasLasRutinas()">
-    </app-rutinas-asignadas>
-  </div>
-
-</ion-content>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size="12" size-md="8" size-lg="6" class="py-2">
+        <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
+          (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
+        </app-rutinas-asignadas>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

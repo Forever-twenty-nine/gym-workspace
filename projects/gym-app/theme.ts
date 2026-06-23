@@ -6,4 +6,5 @@ export function applyInitialTheme() {
 
   const enableDark = stored !== null ? stored === 'true' : prefers;
   document.documentElement.classList.toggle('dark', enableDark);
+  document.documentElement.classList.toggle('ion-palette-dark', enableDark);
 }

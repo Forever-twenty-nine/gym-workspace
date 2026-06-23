@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinaOverlayComponent } from './rutina-overlay.component';
 
 const meta: Meta<RutinaOverlayComponent> = {
-  title: 'Secciones/entrenado/rutina-progreso/components/rutina-overlay',
+  title: 'Secciones/entrenado/rutina-progreso/Componentes/rutina-overlay',
   component: RutinaOverlayComponent,
   tags: ['autodocs'],
   decorators: [

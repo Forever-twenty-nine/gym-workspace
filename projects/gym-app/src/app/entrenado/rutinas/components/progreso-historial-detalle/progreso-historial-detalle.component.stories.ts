@@ -18,7 +18,7 @@ const mockSocialShareService = {
 };
 
 const meta: Meta<ProgresoHistorialDetalleComponent> = {
-  title: 'Secciones/entrenado/rutinas/components/progreso-historial-detalle',
+  title: 'Secciones/entrenado/rutinas/Componentes/progreso-historial-detalle',
   component: ProgresoHistorialDetalleComponent,
   tags: ['autodocs'],
   decorators: [

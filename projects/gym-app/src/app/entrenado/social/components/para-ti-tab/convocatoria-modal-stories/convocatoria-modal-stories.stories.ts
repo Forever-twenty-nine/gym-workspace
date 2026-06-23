@@ -4,7 +4,7 @@ import { ConvocatoriaModalStoriesComponent } from './convocatoria-modal-stories.
 import { mockProviders, mockConvocatorias } from '../../../testing-mocks';
 
 const meta: Meta<ConvocatoriaModalStoriesComponent> = {
-  title: 'Secciones/entrenado/social/components/ConvocatoriaModalStories',
+  title: 'Secciones/entrenado/social/Componentes/para-ti-tab/convocatoria-modal-stories',
   component: ConvocatoriaModalStoriesComponent,
   tags: ['autodocs'],
   decorators: [

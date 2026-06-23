@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinasHistorialComponent } from './rutinas-historial.component';
 
 const meta: Meta<RutinasHistorialComponent> = {
-  title: 'Secciones/entrenado/rutinas/components/rutinas-historial',
+  title: 'Secciones/entrenado/rutinas/Componentes/rutinas-historial',
   component: RutinasHistorialComponent,
   tags: ['autodocs'],
   decorators: [

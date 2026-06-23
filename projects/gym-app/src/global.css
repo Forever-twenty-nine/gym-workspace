@@ -46,7 +46,7 @@
 
  /* 3) Ionic - Angular .dark class
  * ---------------------------------------------------------------------------- */
- @import '@ionic/angular/css/palettes/dark.system.css';
+ @import '@ionic/angular/css/palettes/dark.class.css';
 
 
  /* 4) Variables del proyecto que reemplan las de Ionic
@@ -57,7 +57,7 @@
 
  /* 5) Ionic Components
  * ---------------------------------------------------------------------------- */
-@import "./theme/ionic-components.css";
+ /* Removido ionic-components.css */
 
 
  /* 6) Tailwind Styles (no pisa los estilos de ionic a no ser que se use "!"antes de la clase)
@@ -71,118 +71,4 @@
 
  /* 7) Custom Styles
  * ---------------------------------------------------------------------------- */
- @import "./theme/custom.css";
-
- ion-menu::part(container) {
-   width: 85% !important;
-   max-width: 400px !important;
-   /* Dark glass background to match the aesthetic of the main screens and cards */
-   background-color: rgba(10, 10, 12, 0.95);
-   backdrop-filter: blur(20px);
-   box-shadow: 2px 0 16px rgba(0, 0, 0, 0.35);
- }
-
- ion-menu::part(backdrop) {
-   backdrop-filter: blur(8px);
-   background-color: rgba(0, 0, 0, 0.4);
-   opacity: 1 !important;
- }
-
-/* ============================================================================
- * RUTINAS ASIGNADAS COMPONENT STYLES
- * ============================================================================ */
-.rutina-fecha-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 64px;
-  border-radius: 12px;
-  background: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.06);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.12);
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
-  margin-right: 12px;
-}
-
-.rutina-fecha-badge.es-hoy {
-  background: linear-gradient(135deg, rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.18) 0%, rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.08) 100%);
-  border: 1px solid rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.35);
-  box-shadow: 0 4px 15px rgba(var(--ion-text-color-rgb, 255, 255, 255), 0.08);
-}
-
-.badge-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 100%;
-  padding: 3px 0;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--ion-text-color);
-  opacity: 0.6;
-  border-bottom: 1px dashed rgba(var(--ion-text-color-rgb, 142, 142, 147), 0.15);
-}
-
-.rutina-fecha-badge.es-hoy .badge-header {
-  opacity: 1;
-  border-bottom-color: rgba(var(--ion-text-color-rgb, 142, 142, 147), 0.25);
-}
-
-.badge-header ion-icon {
-  font-size: 11px;
-}
-
-.badge-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  width: 100%;
-  padding-bottom: 2px;
-}
-
-.dia-numero {
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--ion-text-color);
-}
-
-.rutina-fecha-badge.es-hoy .dia-numero {
-  /* color inherits var(--ion-text-color) */
-}
-
-.mes-nombre {
-  font-size: 8px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--ion-text-color);
-  opacity: 0.5;
-}
-
-.rutina-fecha-badge.es-hoy .mes-nombre {
-  opacity: 1;
-}
-
-.dia-numero-large {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ion-text-color);
-  opacity: 0.4;
-}
-
-.rutina-fecha-badge.es-hoy .dia-numero-large {
-  opacity: 1;
-}
-
-app-rutinas-asignadas ion-item[disabled] {
-  opacity: 0.65 !important;
-}
+ /* Removido custom.css */

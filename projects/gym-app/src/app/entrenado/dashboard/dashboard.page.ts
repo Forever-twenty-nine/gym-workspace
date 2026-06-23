@@ -11,8 +11,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonCard,
-  NavController
-} from '@ionic/angular/standalone';
+  NavController, IonGrid, IonCol, IonRow } from '@ionic/angular/standalone';
 
 import { Objetivo, Plan } from 'gym-library';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -34,7 +33,7 @@ export interface User extends LibraryUser {
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
-  imports: [
+  imports: [IonRow, IonCol, IonGrid, 
     IonContent,
     FormsModule,
     PlanPersonalizadoComponent,

@@ -7,10 +7,11 @@ import {
   IonItem,
   IonIcon,
   IonButton,
-  IonLabel } from '@ionic/angular/standalone';
+  IonLabel, IonCardHeader } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, chevronForward, playCircle, calendarOutline, flameOutline, calendarClearOutline } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
+import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 
 export interface DashboardRutina extends Rutina {
   esEjecutable?: boolean;
@@ -25,7 +26,7 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
   selector: 'app-rutinas-asignadas',
   templateUrl: './rutinas-asignadas.component.html',
   standalone: true,
-  imports: [
+  imports: [IonCardHeader, 
     IonLabel,
     CommonModule,
     IonCard,
@@ -33,9 +34,16 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
     IonList,
     IonItem,
     IonIcon,
-    IonButton
+    IonButton,
+    DateBadgeComponent
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+  `]
 })
 export class RutinasAsignadasComponent {
   @Input() rutinas: DashboardRutina[] = [];
@@ -45,34 +53,6 @@ export class RutinasAsignadasComponent {
 
   constructor() {
     addIcons({ barbellOutline, chevronForward, playCircle, calendarOutline, flameOutline, calendarClearOutline });
-  }
-
-  getDiaNombre(rutina: DashboardRutina): string {
-    if (rutina.esEjecutable) {
-      return 'HOY';
-    }
-    if (rutina.fecha) {
-      const fechaObj = new Date(rutina.fecha);
-      const opciones: Intl.DateTimeFormatOptions = { weekday: 'short' };
-      return fechaObj.toLocaleDateString('es-ES', opciones).toUpperCase().replace('.', '');
-    }
-    return rutina.diaCorto || 'PRÓX';
-  }
-
-  getDiaNumero(rutina: DashboardRutina): string {
-    if (rutina.fecha) {
-      return new Date(rutina.fecha).getDate().toString();
-    }
-    return '';
-  }
-
-  getMesNombre(rutina: DashboardRutina): string {
-    if (rutina.fecha) {
-      const fechaObj = new Date(rutina.fecha);
-      const opciones: Intl.DateTimeFormatOptions = { month: 'short' };
-      return fechaObj.toLocaleDateString('es-ES', opciones).toUpperCase().replace('.', '');
-    }
-    return '';
   }
 
   getIcono(rutina: DashboardRutina): string {

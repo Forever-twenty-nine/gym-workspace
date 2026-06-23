@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { EncuentroDetalleModalComponent } from './encuentro-detalle-modal.component';
 
 const meta: Meta<EncuentroDetalleModalComponent> = {
-  title: 'Secciones/entrenado/rutinas/components/encuentro-detalle-modal',
+  title: 'Secciones/entrenado/rutinas/Componentes/encuentro-detalle-modal',
   component: EncuentroDetalleModalComponent,
   tags: ['autodocs'],
   decorators: [

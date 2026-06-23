@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinaProgresoHeaderComponent } from './rutina-progreso-header.component';
 
 const meta: Meta<RutinaProgresoHeaderComponent> = {
-  title: 'Secciones/entrenado/rutina-progreso/components/rutina-progreso-header',
+  title: 'Secciones/entrenado/rutina-progreso/Componentes/rutina-progreso-header',
   component: RutinaProgresoHeaderComponent,
   tags: ['autodocs'],
   decorators: [

@@ -1,19 +1,25 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { IonCard, IonGrid, IonRow, IonCol, IonAvatar, IonLabel, IonCardHeader, IonCardContent, IonItem, IonNote, IonBadge } from '@ionic/angular/standalone';
+import { IonCard, IonGrid, IonRow, IonCol, IonAvatar, IonLabel, IonItem, IonBadge, IonNote } from '@ionic/angular/standalone';
   import { Objetivo } from 'gym-library';
 
 @Component({
   selector: 'app-plan-personalizado',
   templateUrl: './plan-personalizado.component.html',
   standalone: true,
-  imports: [IonNote, IonItem, IonCardContent, IonCardHeader,
+  imports: [IonNote, IonItem,
     IonCard,
     IonGrid,
     IonRow,
     IonCol,
     IonAvatar,
     IonLabel, IonBadge],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+  `]
 })
 export class PlanPersonalizadoComponent {
 

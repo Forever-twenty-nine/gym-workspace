@@ -4,7 +4,7 @@ import { PlanPersonalizadoComponent } from './plan-personalizado.component';
 import { Objetivo } from 'gym-library';
 
 const meta: Meta<PlanPersonalizadoComponent> = {
-  title: 'Secciones/entrenado/dashboard/components/PlanPersonalizado',
+  title: 'Secciones/entrenado/dashboard/Componentes/plan-personalizado',
   component: PlanPersonalizadoComponent,
   tags: ['autodocs'],
   decorators: [

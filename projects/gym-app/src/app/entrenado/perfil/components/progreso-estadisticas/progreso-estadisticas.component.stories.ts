@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { ProgresoEstadisticasComponent } from './progreso-estadisticas.component';
 
 const meta: Meta<ProgresoEstadisticasComponent> = {
-  title: 'Secciones/entrenado/perfil/components/progreso-estadisticas',
+  title: 'Secciones/entrenado/perfil/Componentes/progreso-estadisticas',
   component: ProgresoEstadisticasComponent,
   tags: ['autodocs'],
   decorators: [

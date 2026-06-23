@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { EjercicioListComponent } from './ejercicio-list.component';
 
 const meta: Meta<EjercicioListComponent> = {
-  title: 'Secciones/entrenado/creaciones/ejercicio/ejercicio-list',
+  title: 'Secciones/entrenado/creaciones/Componentes/ejercicio/ejercicio-list',
   component: EjercicioListComponent,
 };
 

@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { RutinasSemanaComponent } from './rutinas-semana.component';
 
 const meta: Meta<RutinasSemanaComponent> = {
-  title: 'Secciones/entrenado/rutinas/components/rutinas-semana',
+  title: 'Secciones/entrenado/rutinas/Componentes/rutinas-semana',
   component: RutinasSemanaComponent,
   tags: ['autodocs'],
   decorators: [

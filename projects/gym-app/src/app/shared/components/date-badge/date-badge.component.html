@@ -1,0 +1,18 @@
+<div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl border border-solid text-center bg-white dark:bg-transparent"
+     style="border-color: var(--ion-color-step-250, #d7d8da);"
+     [class.border-primary]="esEjecutable()"
+     [class.text-primary]="esEjecutable()">
+  <div class="w-full py-0.5 text-[9px] font-bold uppercase tracking-wider border-b border-solid opacity-70"
+       style="border-bottom-color: var(--ion-color-step-250, #d7d8da);"
+       [class.border-primary]="esEjecutable()">
+    <span>{{ diaNombre() }}</span>
+  </div>
+  <div class="flex flex-col items-center justify-center flex-1 w-full pb-0.5">
+    @if (diaNumero()) {
+      <span class="text-base font-black leading-none">{{ diaNumero() }}</span>
+      <span class="text-[8px] font-bold uppercase opacity-60 mt-0.5">{{ mesNombre() }}</span>
+    } @else {
+      <span class="text-lg font-bold opacity-50">-</span>
+    }
+  </div>
+</div>

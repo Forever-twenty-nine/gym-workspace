@@ -3,7 +3,7 @@ import { RutinaListComponent } from './rutina-list.component';
 import { Rutina } from 'gym-library';
 
 const meta: Meta<RutinaListComponent> = {
-  title: 'Secciones/entrenado/creaciones/rutina/rutina-list',
+  title: 'Secciones/entrenado/creaciones/Componentes/rutina/rutina-list',
   component: RutinaListComponent,
 };
 

@@ -4,7 +4,7 @@ import { EjercicioModalComponent } from './ejercicio-modal.component';
 import { mockProviders } from '../../../../social/testing-mocks';
 
 const meta: Meta<EjercicioModalComponent> = {
-  title: 'Secciones/entrenado/creaciones/ejercicio/ejercicio-modal',
+  title: 'Secciones/entrenado/creaciones/Componentes/ejercicio/ejercicio-modal',
   component: EjercicioModalComponent,
   tags: ['autodocs'],
   decorators: [
