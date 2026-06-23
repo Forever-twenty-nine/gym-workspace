@@ -76,3 +76,39 @@
  html {
    font-size: 18px;
  }
+
+ /* 8) Estilos globales para listas (ion-list)
+ * ---------------------------------------------------------------------------- */
+ ion-list {
+   background: transparent !important;
+   padding-top: 0 !important;
+   padding-bottom: 0 !important;
+ }
+
+ /* Leve separación entre los elementos directos de la lista */
+ ion-list > ion-item,
+ ion-list > ion-item-sliding,
+ ion-list > ion-item-group {
+   margin-bottom: 8px !important;
+   border-radius: 12px;
+   overflow: hidden;
+ }
+
+ ion-list > ion-item:last-child,
+ ion-list > ion-item-sliding:last-child,
+ ion-list > ion-item-group:last-child {
+   margin-bottom: 0 !important;
+ }
+
+ /* Ajustes adicionales para ion-item cuando está dentro de una lista */
+ ion-list ion-item {
+   --border-radius: 12px;
+   --border-style: none !important;
+   --inner-border-width: 0 !important;
+   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+ }
+
+ /* Evitar fondos en los contenedores deslizables */
+ ion-item-sliding {
+   background: transparent !important;
+ }
