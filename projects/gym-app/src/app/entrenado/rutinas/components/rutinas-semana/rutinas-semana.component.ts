@@ -11,11 +11,13 @@ import {
     IonBadge,
     IonButton,
     IonAccordionGroup,
-    IonAccordion
+    IonAccordion,
+    IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { playCircle, bedOutline, chevronForwardOutline } from 'ionicons/icons';
+import { playCircle, bedOutline, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
 import { Rutina, Convocatoria } from 'gym-library';
+import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 
 interface SemanaDia {
   fecha: Date;
@@ -44,8 +46,16 @@ type Encuentro = Convocatoria; // alias for clarity in this component
         IonButton,
         IonAccordionGroup,
         IonAccordion,
+        IonList,
+        DateBadgeComponent,
     ],
-    templateUrl: './rutinas-semana.component.html'
+    templateUrl: './rutinas-semana.component.html',
+    styles: [`
+        ::ng-deep ion-accordion[disabled] .ion-accordion-toggle-icon,
+        ::ng-deep ion-accordion.accordion-disabled .ion-accordion-toggle-icon {
+            display: none !important;
+        }
+    `]
 })
 export class RutinasSemanaComponent {
     @Input() rutinasPorDia: SemanaDia[] | null = [];
@@ -86,7 +96,8 @@ export class RutinasSemanaComponent {
         addIcons({
             playCircle,
             bedOutline,
-            chevronForwardOutline
+            chevronForwardOutline,
+            calendarOutline
         });
     }
 

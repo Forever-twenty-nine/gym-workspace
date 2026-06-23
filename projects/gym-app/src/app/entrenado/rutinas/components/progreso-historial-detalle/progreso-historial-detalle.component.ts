@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     IonModal,
@@ -14,8 +14,14 @@ import {
     IonItem,
     IonLabel,
     IonToggle,
-    IonFooter
-} from '@ionic/angular/standalone';
+    IonFooter,
+    IonCard,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonNote,
+    IonText, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
     calendarOutline,
@@ -23,13 +29,12 @@ import {
     checkmarkCircleOutline,
     closeOutline,
     shareSocialOutline,
-    barbellOutline,
-    cameraOutline
+    cameraOutline,
+    trashOutline
 } from 'ionicons/icons';
 import { inject, signal, computed } from '@angular/core';
 import { SesionRutinaService } from '../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
 import { FirebaseStorageService } from '../../../../core/services/firebase-storage.service';
 import { Plan, SesionRutina } from 'gym-library';
 import { compressImage } from '../../../../core/utils/image-compression';
@@ -39,32 +44,36 @@ import { SocialShareService } from '../../../../core/services/social-share.servi
 @Component({
     selector: 'app-progreso-historial-detalle',
     standalone: true,
-    imports: [
-        CommonModule,
-        IonModal,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
-        IonButtons,
-        IonButton,
-        IonIcon,
-        IonContent,
-        IonBadge,
-        IonList,
-        IonItem,
-        IonLabel,
-        IonToggle,
-        IonFooter,
-        IonSpinner
-    ],
+    imports: [IonCardTitle, IonCardHeader,
+    CommonModule,
+    IonModal,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonButtons,
+    IonButton,
+    IonIcon,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonToggle,
+    IonFooter,
+    IonSpinner,
+    IonCard,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonNote,
+    IonText],
     templateUrl: './progreso-historial-detalle.component.html',
     
 })
-export class ProgresoHistorialDetalleComponent {
+export class ProgresoHistorialDetalleComponent implements OnChanges {
     
     private sesionRutinaService = inject(SesionRutinaService);
     private authService = inject(AuthService);
-    private userService = inject(UserService);
     private storageService = inject(FirebaseStorageService);
     private toastCtrl = inject(ToastController);
     private socialShareService = inject(SocialShareService);
@@ -85,8 +94,8 @@ export class ProgresoHistorialDetalleComponent {
             checkmarkCircleOutline,
             closeOutline,
             shareSocialOutline,
-            barbellOutline,
-            cameraOutline
+            cameraOutline,
+            trashOutline
         });
     }
 
@@ -244,7 +253,9 @@ export class ProgresoHistorialDetalleComponent {
         return `¡Terminé mi entrenamiento de "${nombre}" en ${tiempo} minutos! 💪 Entrenamiento completado con Gym App.${ejerciciosStr}`;
     }
 
-    eliminarSesion(arg0: SesionRutina, $event: PointerEvent) {
-        throw new Error('Method not implemented.');
+    eliminarSesion(sesion: SesionRutina | null, event: Event) {
+        if (!sesion) return;
+        // Method not implemented.
+        console.warn('eliminarSesion no implementado para:', sesion.id);
     }
 }

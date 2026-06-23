@@ -7,16 +7,17 @@ import {
   IonLabel,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption } from '@ionic/angular/standalone';
+  IonItemOption, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { checkmarkCircleOutline, trashOutline, calendarOutline } from 'ionicons/icons';
+import { trashOutline, calendarOutline } from 'ionicons/icons';
 import { SesionRutina } from 'gym-library';
+import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 
 @Component({
   selector: 'app-rutinas-historial',
   templateUrl: './rutinas-historial.component.html',
   standalone: true,
-  imports: [
+  imports: [IonCardContent, IonCardHeader, IonCard, IonCardTitle, IonCardSubtitle,
     CommonModule,
     IonList,
     IonItem,
@@ -24,7 +25,8 @@ import { SesionRutina } from 'gym-library';
     IonLabel,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    DateBadgeComponent
   ]
 })
 export class RutinasHistorialComponent {
@@ -34,7 +36,6 @@ export class RutinasHistorialComponent {
 
   constructor() {
     addIcons({
-      checkmarkCircleOutline,
       trashOutline,
       calendarOutline
     });
@@ -48,15 +49,6 @@ export class RutinasHistorialComponent {
     this.eliminar.emit({ sesion, event });
   }
 
-  formatearFechaSesion(fecha: Date | string | number | undefined): string {
-    if (!fecha) return 'Sin fecha';
-    const d = fecha instanceof Date ? fecha : new Date(fecha);
-    return d.toLocaleDateString('es-ES', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
 
   redondearMinutos(segundos: number): number {
     return Math.round((segundos || 0) / 60);
