@@ -3,6 +3,7 @@ import { applicationConfig, componentWrapperDecorator } from '@storybook/angular
 import { Router } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { signal } from '@angular/core';
+import { ToastController } from '@ionic/angular/standalone';
 
 import { RegisterPage } from './register.page';
 import { AuthService } from '../../core/services/auth.service';
@@ -11,7 +12,8 @@ import { UserService } from '../../core/services/user.service';
 const mockAuthService = {
   registerWithEmail: () => Promise.resolve(true),
   loginWithGoogle: () => Promise.resolve(true),
-  error: signal(null)
+  error: signal(null),
+  isLoading: signal(false)
 };
 
 const mockUserService = {
@@ -20,6 +22,10 @@ const mockUserService = {
 
 const mockRouter = {
   navigate: () => {}
+};
+
+const mockToastCtrl = {
+  create: () => Promise.resolve({ present: () => Promise.resolve() })
 };
 
 const meta: Meta<RegisterPage> = {
@@ -32,7 +38,8 @@ const meta: Meta<RegisterPage> = {
         FormBuilder,
         { provide: AuthService, useValue: mockAuthService },
         { provide: UserService, useValue: mockUserService },
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: ToastController, useValue: mockToastCtrl }
       ]
     }),
     componentWrapperDecorator((story) => `<ion-app>${story}</ion-app>`)
@@ -43,4 +50,3 @@ export default meta;
 type Story = StoryObj<RegisterPage>;
 
 export const Default: Story = {};
-

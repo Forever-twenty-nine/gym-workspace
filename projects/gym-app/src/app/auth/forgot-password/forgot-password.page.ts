@@ -1,88 +1,93 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, inject, computed, Signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonInput,
   IonButton,
   IonIcon,
-  IonSpinner
+  IonSpinner,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, arrowBackOutline } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
+import { AuthBackgroundComponent } from '../../shared/components/auth-background/auth-background.component';
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: 'forgot-password.page.html',
+  standalone: true,
   imports: [
     IonContent,
     IonInput,
     IonButton,
     IonIcon,
-    IonSpinner,
-    FormsModule
-  ]
+    ReactiveFormsModule,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    AuthBackgroundComponent,
+    IonCardContent,
+    IonHeader,
+    IonToolbar,
+    IonButtons
+]
 })
 export class ForgotPasswordPage {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  readonly email = signal('');
-  readonly emailError = signal('');
-  readonly successMessage = signal('');
-  readonly isLoading = signal(false);
+  private readonly formBuilder = inject(FormBuilder);
+
+  readonly forgotForm: FormGroup;
+  private formStatus!: Signal<string | undefined>;
+
+  readonly isSubmitDisabled = computed(() => {
+    const status = this.formStatus ? this.formStatus() : 'INVALID';
+    return status === 'INVALID' || this.authService.isLoading();
+  });
 
   constructor() {
     addIcons({ arrowBackOutline, mailOutline });
+
+    this.forgotForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.formStatus = toSignal(this.forgotForm.statusChanges, {
+      initialValue: this.forgotForm.status
+    });
   }
 
-  /**
-   * Navega de vuelta a la página de login
-   */
+  get emailError(): string {
+    const control = this.forgotForm.get('email');
+    if (control?.hasError('required')) return 'El email es requerido';
+    if (control?.hasError('email')) return 'Formato de email inválido';
+    return 'Dato inválido';
+  }
+
   goToLogin() {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Valida el formato del email
-   */
-  validateEmail() {
-    this.emailError.set('');
-    this.successMessage.set('');
-
-    if (this.email() && !this.isValidEmail(this.email())) {
-      this.emailError.set('Por favor, ingresa un email válido');
-    }
-  }
-
-  /**
-   * Verifica si el email tiene un formato válido
-   */
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  /**
-   * Verifica si el email es válido y no está vacío
-   */
-  isEmailValid(): boolean {
-    return this.email().length > 0 && this.isValidEmail(this.email()) && !this.emailError();
-  }
-
-  /**
-   * Verifica si el email es inválido
-   */
-  isEmailInvalid(): boolean {
-    return this.email().length > 0 && (!this.isValidEmail(this.email()) || !!this.emailError());
-  }
-
-  /**
-   * Envía el enlace de recuperación de contraseña
-   */
   async resetPassword() {
-    //solo de mock
-    this.successMessage.set('Se ha enviado un enlace de recuperación a tu email');
+    if (this.forgotForm.invalid) return;
+
+    const { email } = this.forgotForm.value;
+    
+    // AuthService will show the success or error toast automatically
+    const success = await this.authService.sendPasswordResetEmail(email);
+    if (success) {
+      setTimeout(() => {
+        this.goToLogin();
+      }, 2000);
+    }
   }
 }

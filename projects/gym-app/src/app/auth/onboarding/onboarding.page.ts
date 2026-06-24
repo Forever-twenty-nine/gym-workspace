@@ -1,19 +1,7 @@
 import { Component, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent,
-  IonCard,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  IonText,
-  IonIcon,
-  IonSelect,
-  IonSelectOption,
-  IonProgressBar
-} from '@ionic/angular/standalone';
+import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -30,6 +18,7 @@ import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { GimnasioService } from '../../core/services/gimnasio.service';
+import { AuthBackgroundComponent } from "../../shared/components/auth-background/auth-background.component";
 
 // Configuración del onboarding
 const ONBOARDING_CONFIG = {
@@ -47,10 +36,9 @@ const ONBOARDING_CONFIG = {
   selector: 'app-onboarding',
   templateUrl: 'onboarding.page.html',
   standalone: true,
-  imports: [
+  imports: [IonToolbar, IonHeader, IonCardSubtitle, IonCardHeader, IonCardTitle, IonCardContent,
     IonContent,
     IonCard,
-    IonItem,
     IonLabel,
     IonInput,
     IonButton,
@@ -59,8 +47,8 @@ const ONBOARDING_CONFIG = {
     IonSelect,
     IonSelectOption,
     IonProgressBar,
-    FormsModule
-  ]
+    FormsModule,
+    AuthBackgroundComponent]
 })
 export class OnboardingPage {
   @Input() set step(value: number) {
@@ -107,7 +95,8 @@ export class OnboardingPage {
     private entrenadoService: EntrenadoService,
     private entrenadorService: EntrenadorService,
     private gimnasioService: GimnasioService,
-    private router: Router
+    private router: Router,
+    private toastCtrl: ToastController
   ) {
     addIcons({
       personOutline,
@@ -188,6 +177,16 @@ export class OnboardingPage {
     return null;
   }
 
+  async showToast(message: string, color: 'success' | 'danger' = 'danger') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+
   /**
    * Valida el primer paso (nombre y rol)
    */
@@ -196,17 +195,16 @@ export class OnboardingPage {
     
     const nombreError = this.validateField('nombre', data.nombre);
     if (nombreError) {
-      this.errorMessage.set(nombreError);
+      this.showToast(nombreError);
       return false;
     }
 
     const roleError = this.validateField('role', data.role);
     if (roleError) {
-      this.errorMessage.set(roleError);
+      this.showToast(roleError);
       return false;
     }
 
-    this.errorMessage.set('');
     return true;
   }
 
@@ -218,11 +216,10 @@ export class OnboardingPage {
     
     const objetivoError = this.validateField('objetivo', data.objetivo, data.role);
     if (objetivoError) {
-      this.errorMessage.set(objetivoError);
+      this.showToast(objetivoError);
       return false;
     }
 
-    this.errorMessage.set('');
     return true;
   }
 
@@ -258,7 +255,9 @@ export class OnboardingPage {
       const userUpdateData: any = {
         nombre: formData.nombre,
         role: this.mapRoleToEnum(formData.role),
-        onboarded: true
+        onboarded: true,
+        email: currentUser.email || '',
+        photoURL: currentUser.photoURL || null
       };
 
       await this.userService.updateUser(uid, userUpdateData);
@@ -271,7 +270,7 @@ export class OnboardingPage {
 
     } catch (error: any) {
       console.error('Error en onboarding:', error);
-      this.errorMessage.set(error.message || 'Error al completar el registro. Inténtalo de nuevo.');
+      this.showToast(error.message || 'Error al completar el registro. Inténtalo de nuevo.');
     } finally {
       this.isLoading.set(false);
     }

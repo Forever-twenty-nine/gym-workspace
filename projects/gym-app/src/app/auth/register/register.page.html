@@ -1,82 +1,71 @@
-<!-- Button float -->
-<ion-button slot="start" fill="clear" class="fixed top-4 left-2 z-10 text-white" (click)="goToWelcome()">
-  <ion-icon name="arrow-back-outline"></ion-icon>
-</ion-button>
-
-<ion-content [fullscreen]="true" class="ion-padding"
-  style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
-
-  <!-- bg gradient & blur -->
-  <div class="fixed inset-0 z-0">
-    <div class="w-full h-full bg-[url('/assets/images/bg.jpg')] bg-cover bg-center blur-xs"></div>
-    <div class="absolute inset-0 bg-linear-to-b from-transparent via-black/70 to-black pointer-events-none"></div>
-  </div>
-
-
-  <!-- content -->
-  <div class="z-10 p-2 relative flex items-start justify-center ">
-
-    <div class="mt-24 w-full">
-      <h1 class="text-white font-semibold font-heading text-4xl mb-8">
-        Regístrate
-      </h1>
-      <p class="mb-2 text-white/80">
-        A través de:
-      </p>
-      <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
-        class="normal-case mb-6 mt-0!" (click)="loginWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google" />
-        <span class="pl-3 text-base">Cuenta de Google</span>
+<ion-header class="ion-no-border absolute top-0 left-0 w-full z-10">
+  <ion-toolbar style="--background: transparent; --border-width: 0;">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="goToWelcome()">
+        <ion-icon name="arrow-back-outline" class="text-3xl"></ion-icon>
       </ion-button>
-      <p class="mb-2 text-white/80">
-        O continua con:
-      </p>
-      <form [formGroup]="registerForm">
-        <!-- email -->
-        <ion-input label="Email" label-placement="floating" type="email" formControlName="email"
-          placeholder="Ingresa tu email" class="mb-4 text-white" [class.item-valid]="isFieldValid('email')"
-          [class.item-invalid]="isFieldInvalid('email')">
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" class="ion-padding">
 
-        </ion-input>
+  <app-auth-background [showBlur]="true"></app-auth-background>
 
-        <!-- password -->
-        <ion-input label="Contraseña" label-placement="floating" type="password" formControlName="password"
-          placeholder="Ingresa una contraseña" class="mb-4 text-white" [class.item-valid]="isFieldValid('password')"
-          [class.item-invalid]="isFieldInvalid('password')">
+  <div class="absolute bottom-0 left-0 right-0 w-full pb-8">
+    <ion-card class="z-10 p-2 relative w-full" style="background: transparent; --box-shadow: none;">
+      <ion-card-header class="px-0">
+        <ion-card-title style="text-align: center;" class="font-semibold font-heading text-4xl mb-4">
+          Regístrate
+        </ion-card-title>
+      </ion-card-header>
 
-        </ion-input>
+      <ion-card-content class="px-0">
+        <form [formGroup]="registerForm">
+          <!-- email -->
+          <ion-input label="Email" label-placement="floating" type="email" formControlName="email"
+            placeholder="Ingresa tu email" class="mb-4" [errorText]="emailError">
+          </ion-input>
 
-        <!-- confirma password  -->
-        <ion-input label="Confirmar Contraseña" label-placement="floating" type="password"
-          formControlName="confirmPassword" placeholder="Repite tu contraseña" class="mb-4 text-white"
-          [class.item-valid]="isFieldValid('confirmPassword')" [class.item-invalid]="isFieldInvalid('confirmPassword')">
+          <!-- password -->
+          <ion-input label="Contraseña" label-placement="floating" type="password" formControlName="password"
+            placeholder="Ingresa una contraseña" class="mb-4" [errorText]="passwordError">
+          </ion-input>
 
-        </ion-input>
-      </form>
+          <!-- confirma password  -->
+          <ion-input label="Confirmar Contraseña" label-placement="floating" type="password"
+            formControlName="confirmPassword" placeholder="Repite tu contraseña" class="mb-4"
+            [errorText]="confirmPasswordError">
+          </ion-input>
+        </form>
+        <div class="flex flex-col gap-2">
+          <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="register()"
+            class="mt-8!" [disabled]="isSubmitDisabled()">
+            Crear Cuenta
+          </ion-button>
 
-      <!-- Mensaje de Error -->
-      @if (errorMessage()) {
-      <ion-text color="danger">
-        <p class="text-center my-4 mx-0 text-sm text-(--ion-color-danger)">{{ errorMessage() }}</p>
-      </ion-text>
-      }
+          <ion-text color="medium" class="text-center mt-4 mb-2">
+            <p>O regístrate con</p>
+          </ion-text>
 
-      <!-- Mensaje de Éxito -->
-      @if (successMessage()) {
-      <ion-text color="success">
-        <p class="text-center my-4 mx-0 text-sm flex items-center justify-center gap-2 text-(--ion-color-success)">
-          <ion-icon name="checkmark-circle-outline"></ion-icon>
-          {{ successMessage() }}
-        </p>
-      </ion-text>
-      }
+          <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
+            class="normal-case mb-6 mt-0!" (click)="loginWithGoogle()">
+            <ion-icon src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" slot="start"
+              class="w-5 h-5"></ion-icon>
+            <p class="px-1">oogle</p>
+          </ion-button>
+        </div>
 
-      <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="register()"
-        class="mt-8!" [disabled]="isSubmitDisabled()">
-        Crear Cuenta
-      </ion-button>
+        <div class="flex gap-2 items-center justify-center mt-6">
+          <p class="text-center text-sm">
+            ¿Ya tienes una cuenta?
+          </p>
+          <ion-button fill="clear" size="small" color="primary" (click)="goToLogin()" class="m-0 p-0 font-bold">
+            Inicia Sesión
+          </ion-button>
+        </div>
 
-    </div>
+      </ion-card-content>
+    </ion-card>
   </div>
 
 </ion-content>

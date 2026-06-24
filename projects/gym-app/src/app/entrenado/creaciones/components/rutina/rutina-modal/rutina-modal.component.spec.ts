@@ -8,7 +8,7 @@ function makeRutinaLogic() {
   const form = fb.group({
     nombre: ['', [Validators.required, Validators.minLength(2)]],
     descripcion: ['', [Validators.maxLength(300)]],
-    diasSemana: [[]],
+    diasSemana: [[] as string[]],
   });
 
   let isEditing = false;

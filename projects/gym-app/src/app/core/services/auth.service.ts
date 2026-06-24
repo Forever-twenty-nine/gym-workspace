@@ -12,6 +12,7 @@ import {
 import { Firestore, doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
 import { User, Rol } from 'gym-library';
 import { AUTH, FIRESTORE } from '../firebase.tokens';
+import { ToastController } from '@ionic/angular/standalone';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ import { AUTH, FIRESTORE } from '../firebase.tokens';
 export class AuthService {
   private readonly auth = inject(AUTH);
   private readonly firestore = inject(FIRESTORE);
+  private readonly toastCtrl = inject(ToastController);
 
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isAuthenticated = signal<boolean>(false);
@@ -110,6 +112,16 @@ export class AuthService {
     return this._error.asReadonly();
   }
 
+  private async showToast(message: string, color: 'success' | 'danger') {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 3000,
+      color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+
   async loginWithEmail(email: string, password: string): Promise<boolean> {
     this._isLoading.set(true);
     this._error.set(null);
@@ -121,14 +133,17 @@ export class AuthService {
         this._currentUser.set(user);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
+        this.showToast('Bienvenido', 'success');
         return true;
       }
       this._isLoading.set(false);
       return false;
     } catch (error: any) {
       if (isDevMode()) console.error('Error en login con email:', error);
-      this._error.set(this.getErrorMessage(error));
+      const errorMsg = this.getErrorMessage(error);
+      this._error.set(errorMsg);
       this._isLoading.set(false);
+      this.showToast(errorMsg, 'danger');
       return false;
     }
   }
@@ -141,18 +156,21 @@ export class AuthService {
       const cred = await signInWithPopup(this.auth, provider);
       if (cred.user) {
         // Obtenemos o creamos los datos en Firestore
-        const user = await this.getUserData(cred.user, true);
+        const user = await this.getUserData(cred.user, false);
         this._currentUser.set(user);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
+        this.showToast('Autenticado con Google exitosamente', 'success');
         return true;
       }
       this._isLoading.set(false);
       return false;
     } catch (error: any) {
       if (isDevMode()) console.error('🛡️ Auth: Error en login con Google:', error);
-      this._error.set(this.getErrorMessage(error));
+      const errorMsg = this.getErrorMessage(error);
+      this._error.set(errorMsg);
       this._isLoading.set(false);
+      this.showToast(errorMsg, 'danger');
       return false;
     }
   }
@@ -163,26 +181,50 @@ export class AuthService {
     try {
       const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
       if (userCredential.user) {
-        // Forzamos la creación del documento en Firestore inmediatamente
-        const newUser = await this.getUserData(userCredential.user, true);
+        // Obtenemos los datos iniciales SIN crear el documento aún
+        const newUser = await this.getUserData(userCredential.user, false);
         this._currentUser.set(newUser);
         this._isAuthenticated.set(true);
         this._isLoading.set(false);
+        this.showToast('Cuenta creada exitosamente', 'success');
         return true;
       }
       this._isLoading.set(false);
       return false;
     } catch (error: any) {
       if (isDevMode()) console.error('🛡️ Auth: Error en registro:', error);
-      this._error.set(this.getRegistrationErrorMessage(error));
+      const errorMsg = this.getRegistrationErrorMessage(error);
+      this._error.set(errorMsg);
       this._isLoading.set(false);
+      this.showToast(errorMsg, 'danger');
       return false;
     }
   }
 
   async logout(): Promise<void> {
-
     await signOut(this.auth);
+    this.showToast('Sesión cerrada', 'success');
+  }
+
+  async sendPasswordResetEmail(email: string): Promise<boolean> {
+    this._isLoading.set(true);
+    this._error.set(null);
+    try {
+      // NOTE: Firebase "sendPasswordResetEmail" requires importing from firebase/auth
+      // We will do a generic import or use auth directly:
+      const { sendPasswordResetEmail } = await import('firebase/auth');
+      await sendPasswordResetEmail(this.auth, email);
+      this._isLoading.set(false);
+      this.showToast('Se ha enviado un enlace de recuperación a tu email', 'success');
+      return true;
+    } catch (error: any) {
+      if (isDevMode()) console.error('Error al enviar correo de recuperación:', error);
+      const errorMsg = 'Error al enviar el correo de recuperación. Verifica el email.';
+      this._error.set(errorMsg);
+      this._isLoading.set(false);
+      this.showToast(errorMsg, 'danger');
+      return false;
+    }
   }
 
   private async getUserData(firebaseUser: FirebaseUser, createIfMissing = false): Promise<User> {

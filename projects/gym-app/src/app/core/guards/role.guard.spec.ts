@@ -37,7 +37,7 @@ function createEntrenadorGuardLogic(role: Rol | undefined, navigate: (path: any[
 }
 
 describe('role.guard — lógica de autorización', () => {
-  let navigateMock: ReturnType<typeof vi.fn>;
+  let navigateMock: any;
 
   beforeEach(() => {
     navigateMock = vi.fn();
@@ -191,24 +191,24 @@ describe('role.guard — lógica de autorización', () => {
       }
 
       // GIMNASIO solo tiene acceso al guard de gimnasio
-      expect(results[Rol.GIMNASIO].gimnasio).toBe(true);
-      expect(results[Rol.GIMNASIO].entrenado).toBe(false);
-      expect(results[Rol.GIMNASIO].entrenador).toBe(false);
+      expect(results[Rol.GIMNASIO]['gimnasio']).toBe(true);
+      expect(results[Rol.GIMNASIO]['entrenado']).toBe(false);
+      expect(results[Rol.GIMNASIO]['entrenador']).toBe(false);
 
       // ENTRENADO solo tiene acceso al guard de entrenado
-      expect(results[Rol.ENTRENADO].entrenado).toBe(true);
-      expect(results[Rol.ENTRENADO].gimnasio).toBe(false);
-      expect(results[Rol.ENTRENADO].entrenador).toBe(false);
+      expect(results[Rol.ENTRENADO]['entrenado']).toBe(true);
+      expect(results[Rol.ENTRENADO]['gimnasio']).toBe(false);
+      expect(results[Rol.ENTRENADO]['entrenador']).toBe(false);
 
       // ENTRENADOR tiene acceso al guard de entrenador
-      expect(results[Rol.ENTRENADOR].entrenador).toBe(true);
-      expect(results[Rol.ENTRENADOR].gimnasio).toBe(false);
-      expect(results[Rol.ENTRENADOR].entrenado).toBe(false);
+      expect(results[Rol.ENTRENADOR]['entrenador']).toBe(true);
+      expect(results[Rol.ENTRENADOR]['gimnasio']).toBe(false);
+      expect(results[Rol.ENTRENADOR]['entrenado']).toBe(false);
 
       // PERSONAL_TRAINER también tiene acceso al guard de entrenador
-      expect(results[Rol.PERSONAL_TRAINER].entrenador).toBe(true);
-      expect(results[Rol.PERSONAL_TRAINER].gimnasio).toBe(false);
-      expect(results[Rol.PERSONAL_TRAINER].entrenado).toBe(false);
+      expect(results[Rol.PERSONAL_TRAINER]['entrenador']).toBe(true);
+      expect(results[Rol.PERSONAL_TRAINER]['gimnasio']).toBe(false);
+      expect(results[Rol.PERSONAL_TRAINER]['entrenado']).toBe(false);
     });
   });
 });

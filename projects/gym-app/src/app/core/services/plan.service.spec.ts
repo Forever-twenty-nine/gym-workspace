@@ -149,7 +149,7 @@ describe('PlanService', () => {
 
     it('llama al callback con array vacío si el snapshot está vacío', () => {
       let capturedCallbacks: any;
-      mockOnSnapshot.mockImplementation((_q: any, cbs: any) => {
+      (mockOnSnapshot as any).mockImplementation((_q: any, cbs: any) => {
         capturedCallbacks = cbs;
         return vi.fn();
       });
@@ -161,7 +161,7 @@ describe('PlanService', () => {
 
     it('llama al callback con solicitudes mapeadas', () => {
       let capturedCallbacks: any;
-      mockOnSnapshot.mockImplementation((_q: any, cbs: any) => {
+      (mockOnSnapshot as any).mockImplementation((_q: any, cbs: any) => {
         capturedCallbacks = cbs;
         return vi.fn();
       });
@@ -180,7 +180,7 @@ describe('PlanService', () => {
 
     it('llama al callback con array vacío si hay error', () => {
       let capturedCallbacks: any;
-      mockOnSnapshot.mockImplementation((_q: any, cbs: any) => {
+      (mockOnSnapshot as any).mockImplementation((_q: any, cbs: any) => {
         capturedCallbacks = cbs;
         return vi.fn();
       });

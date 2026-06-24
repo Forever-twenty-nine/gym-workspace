@@ -1,44 +1,100 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, computed, Signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   IonContent,
   IonInput,
   IonButton,
   IonIcon,
   IonCheckbox,
-  NavController } from '@ionic/angular/standalone';
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  NavController, IonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
 import { Rol } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { StorageService } from '../../core/services/storage.service';
+import { AuthBackgroundComponent } from '../../shared/components/auth-background/auth-background.component';
 
 @Component({
   selector: 'app-login',
   templateUrl: 'login.page.html',
   standalone: true,
-  imports: [
+  imports: [IonText, 
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
     IonContent,
     IonInput,
     IonButton,
     IonIcon,
     IonCheckbox,
-    FormsModule]
+    ReactiveFormsModule,
+    AuthBackgroundComponent
+  ]
 })
 export class LoginPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
   private readonly navCtrl = inject(NavController);
+  private readonly formBuilder = inject(FormBuilder);
 
-  readonly email = signal('');
-  readonly password = signal('');
-  readonly rememberMe = signal(false);
-  readonly errorMessage = signal('');
+  readonly loginForm: FormGroup;
+  private formStatus!: Signal<string | undefined>;
+
+  readonly isSubmitDisabled = computed(() => {
+    const status = this.formStatus ? this.formStatus() : 'INVALID';
+    return status === 'INVALID' || this.authService.isLoading();
+  });
 
   constructor() {
     addIcons({ arrowBackOutline, personOutline, lockClosedOutline });
+
+    this.loginForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      rememberMe: [false]
+    });
+
+    this.formStatus = toSignal(this.loginForm.statusChanges, {
+      initialValue: this.loginForm.status
+    });
+  }
+
+  get emailError(): string {
+    const control = this.loginForm.get('email');
+    if (control?.hasError('required')) return 'El email es requerido';
+    if (control?.hasError('email')) return 'Formato de email inválido';
+    return 'Dato inválido';
+  }
+
+  get passwordError(): string {
+    const control = this.loginForm.get('password');
+    if (control?.hasError('required')) return 'La contraseña es requerida';
+    return 'Dato inválido';
+  }
+
+  async ngOnInit() {
+    const saved = await this.storageService.get('remembered_credentials') as any;
+    if (saved) {
+      this.loginForm.patchValue({
+        email: saved.email,
+        password: saved.password,
+        rememberMe: true
+      });
+    }
   }
 
   goToWelcome() {
@@ -48,54 +104,35 @@ export class LoginPage implements OnInit {
     this.navCtrl.navigateBack('/welcome');
   }
 
-  async ngOnInit() {
-    const saved = await this.storageService.get('remembered_credentials') as any;
-    if (saved) {
-      this.email.set(saved.email);
-      this.password.set(saved.password);
-      this.rememberMe.set(true);
-    }
-  }
-
-  toggleRememberMe(checked: boolean) {
-    this.rememberMe.set(checked);
-  }
-
   goToRegister() {
     this.router.navigate(['/register']);
   }
+
   goToForgotPassword() {
     this.router.navigate(['/forgot-password']);
   }
 
-
   async login() {
-    this.errorMessage.set('');
-    if (!this.email() || !this.password()) {
-      this.errorMessage.set('Por favor, ingresa email y contraseña');
-      return;
-    }
+    if (this.loginForm.invalid) return;
+
     try {
-      const success = await this.authService.loginWithEmail(this.email(), this.password());
+      const { email, password, rememberMe } = this.loginForm.value;
+      const success = await this.authService.loginWithEmail(email, password);
+      
       if (success) {
-        if (this.rememberMe()) {
-          await this.storageService.set('remembered_credentials', {
-            email: this.email(),
-            password: this.password()
-          });
+        if (rememberMe) {
+          await this.storageService.set('remembered_credentials', { email, password });
         } else {
           await this.storageService.remove('remembered_credentials');
         }
 
         const user = this.authService.currentUser();
         if (user) {
-          this.redirectToRolePage(user.role);
+          this.redirectToRolePage(user);
         }
-      } else {
-        this.errorMessage.set('Email o contraseña incorrectos');
       }
     } catch (error) {
-      this.errorMessage.set('Error al iniciar sesión');
+      console.error('Error al iniciar sesión', error);
     }
   }
 
@@ -105,24 +142,25 @@ export class LoginPage implements OnInit {
       if (success) {
         const user = this.authService.currentUser();
         if (user) {
-          this.redirectToRolePage(user.role);
+          this.redirectToRolePage(user);
         }
-      } else {
-        const error = this.authService.error();
-        this.errorMessage.set(error || 'Error al autenticar con Google');
       }
     } catch (error: any) {
-      this.errorMessage.set(error?.message || 'Error inesperado');
       console.error('Google login error:', error);
     }
   }
 
-  private redirectToRolePage(role?: string): void {
+  private redirectToRolePage(user: any): void {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
 
-    switch (role) {
+    if (!user.onboarded) {
+      this.navCtrl.navigateRoot('/onboarding');
+      return;
+    }
+
+    switch (user.role) {
       case Rol.ENTRENADO:
         this.navCtrl.navigateRoot('/entrenado-tabs');
         break;
@@ -134,7 +172,6 @@ export class LoginPage implements OnInit {
         this.navCtrl.navigateRoot('/gimnasio-tabs');
         break;
       default:
-        // Si no tiene rol definido, enviar a onboarding
         this.navCtrl.navigateRoot('/onboarding');
     }
   }

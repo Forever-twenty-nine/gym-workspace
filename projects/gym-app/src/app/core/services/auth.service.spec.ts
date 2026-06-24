@@ -45,25 +45,9 @@ vi.mock('firebase/firestore', () => ({
   orderBy: vi.fn(),
 }));
 
-vi.mock('../firebase.tokens', () => ({
-  AUTH: Symbol('AUTH'),
-  FIRESTORE: Symbol('FIRESTORE'),
-}));
 
-vi.mock('@angular/core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@angular/core')>();
-  return {
-    ...actual,
-    inject: vi.fn((token) => {
-      // Devolver stubs según el token
-      return token === Symbol('AUTH')
-        ? { currentUser: null }
-        : {};
-    }),
-    isDevMode: vi.fn(() => false),
-    runInInjectionContext: vi.fn((injector: any, fn: any) => fn()),
-  };
-});
+
+
 
 // ─── Importar después de los mocks ───────────────────────────────────────────
 // Usamos una función factory para crear instancias limpias del servicio

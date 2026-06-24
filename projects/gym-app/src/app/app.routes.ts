@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { entrenadoGuard, entrenadorGuard, gimnasioGuard } from './core/guards/role.guard';
+import { entrenadoGuard, entrenadorGuard, gimnasioGuard, publicGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -9,19 +9,23 @@ export const routes: Routes = [
   },
   {
     path: 'welcome',
-    loadComponent: () => import('./auth/welcome/welcome.page').then(m => m.WelcomePage)
+    loadComponent: () => import('./auth/welcome/welcome.page').then(m => m.WelcomePage),
+    canActivate: [publicGuard]
   },
   {
     path: 'login',
-    loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage)
+    loadComponent: () => import('./auth/login/login.page').then(m => m.LoginPage),
+    canActivate: [publicGuard]
   },
   {
     path: 'register',
-    loadComponent: () => import('./auth/register/register.page').then(m => m.RegisterPage)
+    loadComponent: () => import('./auth/register/register.page').then(m => m.RegisterPage),
+    canActivate: [publicGuard]
   },
   {
     path: 'forgot-password',
-    loadComponent: () => import('./auth/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage)
+    loadComponent: () => import('./auth/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPage),
+    canActivate: [publicGuard]
   },
   {
     path: 'onboarding',

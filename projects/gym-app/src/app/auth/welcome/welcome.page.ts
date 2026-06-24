@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import {
   IonContent,
   IonButton,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
   NavController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -13,21 +17,28 @@ import {
   fitnessOutline,
   arrowForwardOutline
 } from 'ionicons/icons';
+import { AuthBackgroundComponent } from '../../shared/components/auth-background/auth-background.component';
 
 @Component({
   selector: 'app-welcome',
   templateUrl: 'welcome.page.html',
   standalone: true,
   imports: [
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
     IonContent,
-    IonButton
-]
+    IonButton,
+    AuthBackgroundComponent
+  ]
 })
 export class WelcomePage {
-  private navCtrl = inject(NavController);
+  private readonly navCtrl = inject(NavController);
+  private readonly router = inject(Router);
 
-  constructor(private router: Router) {
-    addIcons({fitnessOutline,personAddOutline,arrowForwardOutline,logInOutline});
+  constructor() {
+    addIcons({ fitnessOutline, personAddOutline, arrowForwardOutline, logInOutline });
   }
 
   goToRegister() {

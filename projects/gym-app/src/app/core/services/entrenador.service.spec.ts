@@ -36,7 +36,7 @@ class PlanLimitError extends Error {
 function getLimitsForUser(userId: string, usersSignal: ReturnType<typeof signal<any[]>>) {
   const user = usersSignal().find((u: any) => u.uid === userId);
   const plan = user?.plan || Plan.FREE;
-  return ROL_PLAN_LIMITS[Rol.ENTRENADOR][plan];
+  return ROL_PLAN_LIMITS[Rol.ENTRENADOR][plan as Plan];
 }
 
 // ─── validateLimit — lógica pura ─────────────────────────────────────────────

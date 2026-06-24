@@ -9,7 +9,7 @@ export default defineConfig({
         replacement: path.resolve(__dirname, 'node_modules/@ionic/core/components/index.js'),
       },
       {
-        find: '@ionic/core/components/',
+        find: /@ionic\/core\/components\/(.*)/,
         replacement: path.resolve(__dirname, 'node_modules/@ionic/core/components/index.js'),
       },
       {

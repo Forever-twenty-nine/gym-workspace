@@ -1,79 +1,85 @@
+<ion-header class="absolute top-0 z-50 w-full" style="background: transparent;">
+  <ion-toolbar style="--background: transparent; --border-width: 0;">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="goToWelcome()">
+        <ion-icon name="arrow-back-outline" class="text-3xl"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-<ion-button slot="start" fill="clear" class="fixed top-4 left-2 z-10 text-white" (click)="goToWelcome()">
-  <ion-icon name="arrow-back-outline"></ion-icon>
-</ion-button>
-
-<ion-content [fullscreen]="true" class="ion-padding"
-  style="--background: url('/assets/images/bg.jpg') no-repeat center center / cover;">
-
-  <!-- bg gradient & blur -->
-  <div class="fixed inset-0 z-0">
-    <div class="w-full h-full bg-[url('/assets/images/bg.jpg')] bg-cover bg-center blur-xs"></div>
-    <div class="absolute inset-0 bg-linear-to-b from-transparent via-black/70 to-black pointer-events-none"></div>
-  </div>
+<ion-content [fullscreen]="true">
+  <app-auth-background [showBlur]="true"></app-auth-background>
 
   <!-- content -->
-  <div class="z-10 p-2 relative flex items-start justify-center ">
+  <div class="absolute bottom-0 left-0 right-0 w-full pb-8">
+    <ion-card class="z-10 p-2 relative w-full" style="background: transparent; --box-shadow: none;">
+      <ion-card-header class="px-0">
+        <ion-card-title class="font-semibold font-heading text-3xl mb-2 text-center">
+          Bienvenido a GymApp
+        </ion-card-title>
+      </ion-card-header>
 
-    <div class="mt-12 w-full">
-      <h1 class="text-white font-semibold font-heading text-3xl mb-4">
-        Bienvenido a GymApp
-      </h1>
-      <p class="mb-2 text-white/80">
-        Inicia sesión con:
-      </p>
-      <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
-        class="normal-case mb-4 mt-0! " (click)="loginWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google" />
-        <span class="pl-3 text-base">Cuenta de Google</span>
-      </ion-button>
-      <p class="mb-2 text-white/80">
-        O continua con:
-      </p>
+      <ion-card-content class="px-0 ">
 
+        <form [formGroup]="loginForm">
+          <div class="mb-4">
+            <!-- email -->
+            <ion-input label="Email" label-placement="floating" type="email" formControlName="email"
+              placeholder="Ingresa tu email" class="mb-4" [errorText]="emailError">
+            </ion-input>
 
-      <form>
-        <div class="mb-6">
-          <!-- email -->
-          <ion-input label="Email" label-placement="floating" type="email" name="email" [ngModel]="email()"
-            (ngModelChange)="email.set($event)" placeholder="Ingresa tu email" class="mb-2 text-white">
+            <!-- password -->
+            <ion-input label="Contraseña" label-placement="floating" type="password" formControlName="password"
+              placeholder="Ingresa tu contraseña" class="mb-4" [errorText]="passwordError">
+            </ion-input>
+          </div>
 
-          </ion-input>
+          <div class="flex items-center mb-2 px-1">
+            <ion-checkbox formControlName="rememberMe" label-placement="end" justify="start" class="text-sm">
+              Recordar mi contraseña
+            </ion-checkbox>
+          </div>
 
-          <!-- password -->
-          <ion-input label="Contraseña" label-placement="floating" type="password" name="password"
-            [ngModel]="password()" (ngModelChange)="password.set($event)" placeholder="Ingresa tu contraseña"
-            class="mb-2 text-white">
+          <div class="gap-2 mt-4">
+            <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="login()"
+              [disabled]="isSubmitDisabled()">
+              Iniciar Sesión
+            </ion-button>
+          </div>
 
-          </ion-input>
-        </div>
-        <div class="flex items-center mb-2 px-1">
-          <ion-checkbox [checked]="rememberMe()" (ionChange)="toggleRememberMe($event.detail.checked)"
-            label-placement="end" justify="start" class="text-white text-sm">
-            Recordar mi contraseña
-          </ion-checkbox>
-        </div>
+          <div class="flex flex-col gap-4 mt-4">
+            
+            <ion-text class="text-center">
+              o inicia sesión con:
+            </ion-text>
 
-        <div class="flex gap-2 items-center justify-center mb-4">
-          <ion-button expand="block" fill="clean" size="default" shape="round" color="primary"
-            (click)="goToForgotPassword()" class="mt-0!">
-            ¿Olvidaste tu contraseña?
-          </ion-button>
-        </div>
-      </form>
+            <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
+              class="normal-case mb-4" (click)="loginWithGoogle()">
+              <ion-icon src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" slot="start"
+                class="w-5 h-5"></ion-icon>
+              <span class="px-1">oogle</span>
+            </ion-button>
+          </div>
+          <div class="flex gap-2 items-center justify-center mt-4">
+            <p class="text-center text-sm">
+              ¿No tienes una cuenta?
+            </p>
+            <ion-button fill="clear" size="small" color="primary" (click)="goToRegister()" class="m-0 p-0 font-bold">
+              Regístrate
+            </ion-button>
+          </div>
+          <div class="flex gap-2 items-center justify-center ">
+            <p class="text-center text-sm">
+              ¿Olvidaste tu contraseña?
+            </p>
+            <ion-button fill="clear" size="small" color="primary" (click)="goToForgotPassword()" class="m-0 p-0 font-bold">
+              Recuperar
+            </ion-button>
+          </div>
 
-      <!-- Error message -->
-      @if (errorMessage()) {
-      <div class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
-        <p class="text-red-200 text-sm">{{ errorMessage() }}</p>
-      </div>
-      }
-
-      <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="login()" class="">
-        Iniciar Sesión
-      </ion-button>
-
-    </div>
+        </form>
+      </ion-card-content>
+    </ion-card>
   </div>
-
 </ion-content>

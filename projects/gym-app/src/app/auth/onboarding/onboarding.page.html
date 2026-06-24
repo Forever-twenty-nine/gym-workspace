@@ -1,178 +1,119 @@
-<ion-content
-  [fullscreen]="true"
-  class="ion-padding bg-[var(--brand-light-color)]">
-
-  <div class="p-2">
-    <!-- Progress Bar -->
-    <div class="p-4 pb-0 mb-10">
-      <ion-text color="medium">
-        <p
-          class="text-sm text-[var(--brand-secondary-color)] text-center mb-2 ">
+<ion-header class="ion-no-border absolute top-0 left-0 w-full z-50" style="background: transparent;">
+  <ion-toolbar style="--background: transparent; --border-width: 0;">
+    <div class="px-4 pt-4 pb-2">
+      <ion-text color="primary">
+        <p class="text-sm text-center mb-2 opacity-80">
           Paso {{ currentStep() }} de {{ totalSteps() }}
         </p>
       </ion-text>
-      <ion-progress-bar
-        [value]="progress() / 100"
-        color="primary">
-      </ion-progress-bar>
+      <ion-progress-bar [value]="progress() / 100" color="primary"></ion-progress-bar>
     </div>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-auth-background />
+
+  <div class="p-2">
     <!-- Titulo -->
-    <h1
-      class="text-3xl font-heading font-semibold text-center mb-8">
+    <h1 class="text-3xl font-heading font-semibold text-center mt-20 mb-8">
       ¡Bienvenido a <br>GymApp!
     </h1>
 
-    <h2
-      class="text-[var(--brand-primary-color)] text-3xl font-semibold font-heading text-center">
-        @if (currentStep() === 1) {
-          <span>Datos Personales</span>
-        }
-        @if (currentStep() === 2) {
-          <span>Tu Objetivo</span>
-        }
-    </h2>
-
-    <p
-      class="text-[var(--brand-secondary-color)] text-center text-lg mb-8">
-      @if (currentStep() === 1) {
-        <span>Completaremos tu perfil</span>
-      }
-      @if (currentStep() === 2) {
-        <span>¿Qué quieres lograr?</span>
-      }
-    </p>
-
-
     <!-- Paso 1 -->
     @if (currentStep() === 1) {
-      <div>
-        <!-- Campo Nombre -->
-        <ion-item
-          class="mb-4 rounded-lg">
-          <ion-icon
-            name="person-outline"
-            slot="start"
-            size="default"
-            aria-hidden="true"
-            class="mr-3 pt-6">
-          </ion-icon>
-          <ion-label
-            position="stacked">
-            Nombre Completo *
-          </ion-label>
-          <ion-input
-            type="text"
-            [ngModel]="formData().nombre"
-            (ngModelChange)="updateFormField('nombre', $event)"
-            placeholder="Ingresa tu nombre completo"
-            maxlength="50">
-          </ion-input>
-        </ion-item>
-        <ion-item
-          class="mb-4 rounded-lg">
-          <ion-icon
-            name="people-outline"
-            slot="start"
-            size="default"
-            aria-hidden="true"
-            class="mr-3 pt-6">
-          </ion-icon>
-          <ion-label
-            position="stacked">
-            Tipo de Usuario *
-          </ion-label>
-          <ion-select
-              [ngModel]="formData().role"
-              (ngModelChange)="updateFormField('role', $event)"
-              placeholder="Selecciona tu rol"
-              style="--placeholder-color: var(--ion-color-medium);">
-            <ion-select-option value="entrenado">Entrenado</ion-select-option>
-            <ion-select-option value="entrenador">Entrenador</ion-select-option>
-            <ion-select-option value="gimnasio">Gimnasio</ion-select-option>
-            <ion-select-option value="personal_trainer">Personal Trainer</ion-select-option>
-          </ion-select>
-        </ion-item>
-        <!-- Descripción del rol -->
-        @if (formData().role) {
-          <ion-card
-            color="warning"
-            class="!mx-0">
-            <p
-              class="text-center my-4 mx-0 p-3 text-base">
-              <ion-icon name="fitness-outline"></ion-icon>
-              <span class="block">{{ getRoleDescription(formData().role) }}</span>
-            </p>
-          </ion-card>
-        }
-      </div>
+    <ion-card color="light" class="p-4 shadow-md"  >
+      <ion-card-header class="p-0">
+        <ion-card-title class="text-lg font-semibold text-center mb-4">
+          Datos Personales
+        </ion-card-title>
+        <ion-card-subtitle class="text-center text-sm text-(--brand-secondary-color)">
+          Completaremos tu perfil
+        </ion-card-subtitle>
+      </ion-card-header>
+
+
+      <ion-card-content class="m-4">
+
+        <ion-label position="stacked">
+          Nombre Completo *
+        </ion-label>
+
+        <ion-input type="text" [ngModel]="formData().nombre" (ngModelChange)="updateFormField('nombre', $event)"
+          placeholder="Ingresa tu nombre completo" maxlength="50">
+        </ion-input>
+
+
+        <ion-label position="stacked">
+          Tipo de Usuario *
+        </ion-label>
+        <ion-select [ngModel]="formData().role" (ngModelChange)="updateFormField('role', $event)"
+          placeholder="Selecciona tu rol" style="--placeholder-color: var(--ion-color-medium);">
+          <ion-select-option value="entrenado">Entrenado</ion-select-option>
+          <ion-select-option value="entrenador">Entrenador</ion-select-option>
+          <ion-select-option value="gimnasio">Gimnasio</ion-select-option>
+          <ion-select-option value="personal_trainer">Personal Trainer</ion-select-option>
+        </ion-select>
+
+
+      </ion-card-content>
+    </ion-card>
+    @if (formData().role) {
+    <ion-card color="warning" class="my-2">
+      <p class="text-center my-4 mx-0 p-3 text-base">
+        <span class="block">{{ getRoleDescription(formData().role) }}</span>
+      </p>
+    </ion-card>
+    }
     }
 
     <!-- Paso 2: Objetivo (solo para entrenados) -->
     @if (showStep2()) {
-      <div>
-        <!-- Campo Objetivo -->
-        <ion-item class="mb-4 rounded-lg">
-          <ion-icon
-            name="bookmark-outline"
-            slot="start"
-            size="default"
-            aria-hidden="true"
-            class="mr-3 pt-6">
-          </ion-icon>
-          <ion-label position="stacked">
-            Objetivo Principal *
-          </ion-label>
-          <ion-select
-            [ngModel]="formData().objetivo"
-            (ngModelChange)="updateFormField('objetivo', $event)"
-            placeholder="¿Cuál es tu meta?">
-            <ion-select-option value="VOLUMEN">{{ objetivos.VOLUMEN }}</ion-select-option>
-            <ion-select-option value="DEFINICION">{{ objetivos.DEFINICION }}</ion-select-option>
-            <ion-select-option value="FUERZA">{{ objetivos.FUERZA }}</ion-select-option>
-            <ion-select-option value="SALUD">{{ objetivos.SALUD }}</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <!-- Descripción del objetivo -->
-        @if (formData().objetivo) {
-          <ion-card color="warning" class="!mx-0">
-            <p class="text-center my-4 mx-0 p-3 text-base">
-              <ion-icon name="rocket-outline"></ion-icon>
-              <span class="block">{{ getObjetivoDescription(formData().objetivo) }}</span>
-            </p>
-          </ion-card>
-        }
-      </div>
+    <ion-card class="p-4 shadow-md">
+      <ion-card-header class="p-0">
+        <ion-card-title class="text-lg font-semibold text-center mb-4">
+          Objetivo Principal
+        </ion-card-title>
+        <ion-card-subtitle class="text-center text-sm text-(--brand-secondary-color)">
+          Selecciona tu meta principal
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content class="m-4">
+        <ion-label position="stacked">
+          Objetivo Principal *
+        </ion-label>
+        <ion-select [ngModel]="formData().objetivo" (ngModelChange)="updateFormField('objetivo', $event)"
+          placeholder="¿Cuál es tu meta?">
+          <ion-select-option value="VOLUMEN">{{ objetivos.VOLUMEN }}</ion-select-option>
+          <ion-select-option value="DEFINICION">{{ objetivos.DEFINICION }}</ion-select-option>
+          <ion-select-option value="FUERZA">{{ objetivos.FUERZA }}</ion-select-option>
+          <ion-select-option value="SALUD">{{ objetivos.SALUD }}</ion-select-option>
+        </ion-select>
+      </ion-card-content>
+    </ion-card>
+    <!-- Descripción del objetivo -->
+    @if (formData().objetivo) {
+    <ion-card color="warning" class="my-2">
+      <p class="text-center my-4 mx-0 p-3 text-base">
+        <ion-icon name="rocket-outline"></ion-icon>
+        <span class="block">{{ getObjetivoDescription(formData().objetivo) }}</span>
+      </p>
+    </ion-card>
+    }
     }
 
-    <!-- Mensaje de Error -->
-        @if (errorMessage()) {
-          <ion-text color="danger">
-            <p class="text-center text-[var(--ion-color-danger)] my-4 mx-0 text-sm">{{ errorMessage() }}</p>
-          </ion-text>
-        }
+    <!-- Botón Continuar/Finalizar -->
+    <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="nextStep()"
+      class="mt-8!" [disabled]="isLoading()">
+      @if (isLoading()) {
+      <span>Configurando...</span>
+      } @else if (currentStep() < totalSteps()) { <span>Continuar</span>
+        <ion-icon name="arrow-forward-outline" slot="end" size="small" class="ml-1"></ion-icon>
+        } @else {
+        <span>Finalizar</span>
 
-        <!-- Botón Continuar/Finalizar -->
-        <ion-button
-          expand="block"
-          fill="solid"
-          size="large"
-          shape="round"
-          color="primary"
-          (click)="nextStep()"
-          class="!mt-8"
-          [disabled]="isLoading()">
-          @if (isLoading()) {
-            <span>Configurando...</span>
-          } @else if (currentStep() < totalSteps()) {
-            <span>Continuar</span>
-            <ion-icon name="arrow-forward-outline" slot="end" size="small" class="ml-1"></ion-icon>
-          } @else {
-            <span>Finalizar</span>
-            <ion-icon name="checkmark-circle-outline" slot="end" size="small" class="ml-1"></ion-icon>
-          }
-        </ion-button>
+        }
+    </ion-button>
 
   </div>
 
