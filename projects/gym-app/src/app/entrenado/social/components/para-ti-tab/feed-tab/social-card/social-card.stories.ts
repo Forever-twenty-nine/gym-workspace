@@ -4,7 +4,7 @@ import { SocialCardComponent } from './social-card.component';
 import { mockProviders, mockSesionesCompartidas } from '../../../../testing-mocks';
 
 const meta: Meta<SocialCardComponent> = {
-  title: 'Secciones/entrenado/social/Componentes/para-ti-tab/feed-tab/social-card',
+  title: 'Secciones/entrenado/social/Componentes/para-ti-tab/feed-tab/social-card/SocialCard',
   component: SocialCardComponent,
   tags: ['autodocs'],
   decorators: [

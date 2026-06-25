@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { MutualMatchOverlayComponent } from './mutual-match-overlay.component';
 
 const meta: Meta<MutualMatchOverlayComponent> = {
-  title: 'Secciones/entrenado/social/Componentes/mutual-match-overlay',
+  title: 'Secciones/entrenado/social/Componentes/mutual-match-overlay/MutualMatchOverlay',
   component: MutualMatchOverlayComponent,
   tags: ['autodocs'],
   argTypes: {
