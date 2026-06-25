@@ -1,21 +1,3 @@
-<!-- Historias unificadas en una sola fila presentadas por app-stories -->
-<app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
-
-<!-- Modales de detalle controlados localmente -->
-<app-convocatoria-modal-stories 
-  [isOpen]="isConvoModalOpen()" 
-  [convocatoria]="selectedConvocatoria()"
-  (close)="closeConvoModal()">
-</app-convocatoria-modal-stories>
-
-<app-desafio-modal-stories 
-  [isOpen]="isDesafioModalOpen()" 
-  [desafio]="selectedDesafio()"
-  (close)="closeDesafioModal()" 
-  (deleted)="onDesafioDeleted($event)"
-  (pasar)="onDesafioPasar($event)">
-</app-desafio-modal-stories>
-
 <!-- Feed de entrenamientos compartidos -->
 <div class="flex flex-col gap-4">
   <app-feed-tab tab="para-ti" class="block"></app-feed-tab>

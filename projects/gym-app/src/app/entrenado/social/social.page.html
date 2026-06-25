@@ -1,16 +1,27 @@
 <!-- Tabs de Segmento con Glassmorphism (Fijo fuera de ion-content) -->
-<ion-header class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
-  <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)">
-    <ion-segment-button value="para-ti">
-      <ion-label class="font-bold text-xs uppercase tracking-wider">Para ti</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="siguiendo">
-      <ion-label class="font-bold text-xs uppercase tracking-wider">Siguiendo</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="descubrir">
-      <ion-label class="font-bold text-xs uppercase tracking-wider">Descubrir</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+<ion-header class="ion-no-border">
+  <ion-toolbar
+    style="--background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.85); backdrop-filter: blur(10px);">
+    <div style="display: flex; justify-content: center; width: 100%;">
+      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" style="width: 100%; max-width: 400px;">
+        <ion-segment-button value="para-ti">
+          <ion-label class="text-xs uppercase tracking-wider">Para ti</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="siguiendo">
+          <ion-label class="text-xs uppercase tracking-wider">Siguiendo</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="descubrir">
+          <ion-label class="text-xs uppercase tracking-wider">Descubrir</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+  </ion-toolbar>
+
+  @if (selectedTab() === 'para-ti' && storiesList().length > 0) {
+  <ion-toolbar>
+    <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
+  </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
@@ -22,13 +33,13 @@
     @switch (selectedTab()) {
     @case ('descubrir') {
     <app-descubrir-tab [tarjetaActiva]="tarjetaActiva()" (pasar)="pasarTarjeta()" (chocarLos5)="chocarLos5()"
-      (cardTransitionEnd)="onCardTransitionEnd()"></app-descubrir-tab>
+      (cardTransitionEnd)="onCardTransitionEnd()" />
     }
     @case ('para-ti') {
-    <app-para-ti-tab></app-para-ti-tab>
+    <app-para-ti-tab />
     }
     @case ('siguiendo') {
-    <app-feed-tab tab="siguiendo"></app-feed-tab>
+    <app-feed-tab tab="siguiendo" />
     }
     }
   </div>
@@ -38,4 +49,13 @@
   <app-mutual-match-overlay [matchActual]="matchActual()!" [currentUserPhoto]="currentUserPhoto()"
     (iniciarChat)="iniciarChatPrivado()" (cerrarMatch)="cerrarMatch()"></app-mutual-match-overlay>
   }
+
+  <!-- Modales de Stories -->
+  <app-convocatoria-modal-stories [isOpen]="isConvoModalOpen()" [convocatoria]="selectedConvocatoria()"
+    (close)="closeConvoModal()">
+  </app-convocatoria-modal-stories>
+
+  <app-desafio-modal-stories [isOpen]="isDesafioModalOpen()" [desafio]="selectedDesafio()" (close)="closeDesafioModal()"
+    (deleted)="onDesafioDeleted($event)" (pasar)="onDesafioPasar($event)">
+  </app-desafio-modal-stories>
 </ion-content>

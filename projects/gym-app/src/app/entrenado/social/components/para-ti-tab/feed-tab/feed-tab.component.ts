@@ -39,9 +39,6 @@ export class FeedTabComponent {
   }
   get tab() { return this._tab(); }
 
-  // No pasamos gymId aquí: el servicio trae TODAS las sesiones compartidas
-  // (incluyendo legacy sin gimnasioId). El filtrado por gym y "siguiendo"
-  // se hace client-side en allGymFeed() para no perder datos antiguos.
   feedSocial = this.sesionRutinaService.getSesionesCompartidas();
   visibleItemsCount = signal<number>(10);
 
@@ -52,12 +49,6 @@ export class FeedTabComponent {
     return this.entrenadoService.getEntrenado(user.uid)();
   });
 
-  // Feed de la comunidad completo (solo sesiones compartidas, limpio)
-  // Los desafíos y convocatorias ahora viven en las barras de stories arriba
-  //
-  // Filtrado por gimnasio + exclusión de propias en "Para ti" se hace aquí (client-side).
-  // Esto permite ver publicaciones legacy (sin gimnasioId en el doc) mientras que
-  // las nuevas guardan gimnasioId al compartirse.
   allGymFeed = computed<(SesionRutina & { fechaOrden: Date })[]>(() => {
     const feed = this.feedSocial();
     const tab = this._tab();

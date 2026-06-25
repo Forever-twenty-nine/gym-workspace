@@ -157,8 +157,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       // Redirigir al login
       await this.router.navigate(['/login'], { replaceUrl: true });
-
-      this.showToast('Sesión cerrada correctamente', 'success');
     } catch (error) {
       console.error('🛡️ Profile: Error en logout:', error);
       // Fallback: Si el router se queda bloqueado, forzamos recarga

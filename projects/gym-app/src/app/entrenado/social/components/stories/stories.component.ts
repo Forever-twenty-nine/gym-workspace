@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon, IonAvatar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { trophyOutline, personOutline } from 'ionicons/icons';
 
@@ -22,7 +22,8 @@ export interface StoryDisplayItem {
   standalone: true,
   imports: [
     CommonModule,
-    IonIcon
+    IonIcon,
+    IonAvatar
   ]
 })
 export class StoriesComponent {

@@ -1,5 +1,10 @@
 <ion-header class="ion-no-border absolute top-0 left-0 w-full z-50" style="background: transparent;">
   <ion-toolbar style="--background: transparent; --border-width: 0;">
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelarOnboarding()" color="medium">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <div class="px-4 pt-4 pb-2">
       <ion-text color="primary">
         <p class="text-sm text-center mb-2 opacity-80">

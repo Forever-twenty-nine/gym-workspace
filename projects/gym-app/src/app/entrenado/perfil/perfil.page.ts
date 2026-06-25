@@ -227,8 +227,6 @@ export class PerfilPage implements OnInit, OnDestroy {
 
       // Redirigir al login
       await this.router.navigate(['/login'], { replaceUrl: true });
-
-      this.showToast('Sesión cerrada correctamente', 'success');
     } catch (error) {
       console.error('🛡️ Perfil: Error en logout:', error);
       window.location.href = '/login';

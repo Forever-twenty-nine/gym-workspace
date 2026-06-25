@@ -1,7 +1,7 @@
 import { Component, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonButtons, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -10,7 +10,8 @@ import {
   checkmarkCircleOutline,
   arrowForwardOutline,
   fitnessOutline,
-  rocketOutline
+  rocketOutline,
+  closeOutline
 } from 'ionicons/icons';
 import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
@@ -48,6 +49,7 @@ const ONBOARDING_CONFIG = {
     IonSelectOption,
     IonProgressBar,
     FormsModule,
+    IonButtons,
     AuthBackgroundComponent]
 })
 export class OnboardingPage {
@@ -105,7 +107,8 @@ export class OnboardingPage {
       checkmarkCircleOutline,
       arrowForwardOutline,
       fitnessOutline,
-      rocketOutline
+      rocketOutline,
+      closeOutline
     });
 
     // Para testing: simular usuario autenticado si no hay uno
@@ -142,6 +145,22 @@ export class OnboardingPage {
         return;
       }
       this.completeOnboarding();
+    }
+  }
+
+  /**
+   * Cancela el proceso de onboarding y cierra sesión
+   */
+  async cancelarOnboarding() {
+    this.isLoading.set(true);
+    try {
+      await this.authService.logout();
+      this.router.navigate(['/welcome']);
+    } catch (error) {
+      console.error('Error al cancelar onboarding', error);
+      this.showToast('Error al intentar cancelar. Por favor, intenta de nuevo.');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 
