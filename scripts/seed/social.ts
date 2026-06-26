@@ -36,7 +36,7 @@ export async function seedFollowing(
     const toFollow = shuffleScoped(
       otherTrainees,
       `seguidos:${config.gym.id}:${currentTrainee.uid}`
-    ).slice(0, Math.min(2, otherTrainees.length));
+    ).slice(0, Math.min(4, otherTrainees.length));
 
     for (const target of toFollow) {
       seguidosMap.get(currentTrainee.uid)!.add(target.uid);
@@ -282,4 +282,115 @@ export async function seedConvocatorias(
   }
 
   await Promise.all(convPromises);
+}
+
+export async function seedComentariosYLikes(
+  db: Firestore,
+  trainees: SeedTraineeRef[]
+) {
+  if (trainees.length === 0) return;
+
+  // 1. Obtener la lista de seguidores de cada entrenado desde Firestore
+  const entrenadosSnap = await db.collection("entrenados")
+    .where("__name__", "in", trainees.map(t => t.uid))
+    .get();
+
+  const entrenadosData = new Map<string, any>();
+  entrenadosSnap.forEach(docSnap => {
+    entrenadosData.set(docSnap.id, docSnap.data());
+  });
+
+  // 2. Obtener todas las publicaciones (sesiones compartidas) de los entrenados del gym
+  const sesionesSnap = await db.collection("sesiones-rutina")
+    .where("entrenadoId", "in", trainees.map(t => t.uid))
+    .where("compartida", "==", true)
+    .get();
+
+  const comentariosTemplates = [
+    "Buen entrenamiento, sigue asi.",
+    "Excelente rutina, me inspira a entrenar.",
+    "Gran esfuerzo hoy.",
+    "Que buen ritmo llevas.",
+    "Impresionante la constancia.",
+    "Manana entrenamos juntos sin falta.",
+    "Se nota el progreso en cada sesion.",
+    "Esa rutina es muy exigente, felicidades."
+  ];
+
+  const respuestasTemplates = [
+    "Muchas gracias por el apoyo.",
+    "Gracias, costo bastante terminar hoy.",
+    "Dale, manana nos vemos en el gimnasio.",
+    "Si, la verdad que se siente la diferencia.",
+    "Gracias, sigamos entrenando duro."
+  ];
+
+  const promises: Promise<any>[] = [];
+
+  for (const docSesion of sesionesSnap.docs) {
+    const sesion = docSesion.data();
+    const creadorId = sesion.entrenadoId;
+    const seguidores = entrenadosData.get(creadorId)?.seguidores || [];
+
+    if (seguidores.length === 0) continue;
+
+    // A. Sembrar Likes a la sesión
+    // Elegimos de forma aleatoria de 1 a todos los seguidores para dar Like
+    const likesCount = Math.floor(Math.random() * seguidores.length) + 1;
+    const likers = seguidores.slice(0, likesCount);
+    promises.push(
+      db.collection("sesiones-rutina").doc(docSesion.id).update({
+        likes: likers
+      })
+    );
+
+    // B. Sembrar Comentarios y Respuestas
+    // Generar de 1 a 2 comentarios
+    const numComentarios = Math.floor(Math.random() * Math.min(seguidores.length, 2)) + 1;
+    for (let i = 0; i < numComentarios; i++) {
+      const comentadorId = seguidores[i];
+      const comentadorInfo = trainees.find(t => t.uid === comentadorId);
+      if (!comentadorInfo) continue;
+
+      const comentarioId = `comentario_seed_${docSesion.id}_${comentadorId}_${i}`;
+      const comentarioContenido = comentariosTemplates[Math.floor(Math.random() * comentariosTemplates.length)];
+
+      const comentarioDoc: any = {
+        id: comentarioId,
+        sesionId: docSesion.id,
+        entrenadoId: comentadorId,
+        nombreUsuario: comentadorInfo.nombre || "Usuario",
+        fotoUsuario: comentadorInfo.photoURL || null,
+        contenido: comentarioContenido,
+        fecha: Timestamp.now(),
+        likes: []
+      };
+
+      // A veces otros seguidores le dan like al comentario
+      const otrosSeguidores = seguidores.filter((uid: string) => uid !== comentadorId);
+      if (otrosSeguidores.length > 0 && Math.random() > 0.3) {
+        const likesComentarioCount = Math.floor(Math.random() * otrosSeguidores.length) + 1;
+        comentarioDoc.likes = otrosSeguidores.slice(0, likesComentarioCount);
+      }
+
+      // A veces el creador de la publicación responde al comentario
+      if (Math.random() > 0.4) {
+        const creadorInfo = trainees.find(t => t.uid === creadorId);
+        comentarioDoc.respuesta = {
+          id: `respuesta_seed_${comentarioId}`,
+          entrenadoId: creadorId,
+          nombreUsuario: creadorInfo?.nombre || "Creador",
+          fotoUsuario: creadorInfo?.photoURL || null,
+          contenido: respuestasTemplates[Math.floor(Math.random() * respuestasTemplates.length)],
+          fecha: Timestamp.now()
+        };
+      }
+
+      promises.push(
+        db.collection("comentarios-social").doc(comentarioId).set(comentarioDoc)
+      );
+    }
+  }
+
+  await Promise.all(promises);
 }

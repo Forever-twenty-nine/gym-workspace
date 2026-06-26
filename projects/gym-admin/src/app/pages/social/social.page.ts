@@ -10,6 +10,7 @@ import { SchemaService } from '../../core/schema.service';
 import { MatchInteraction, Desafio, Mensaje } from 'gym-library';
 import { MensajeService } from '../../services/mensaje.service';
 import { TabsComponent, TabItem } from '../../components/shared/tabs/tabs.component';
+import { ComentarioAdminService } from '../../services/comentario-admin.service';
 
 @Component({
     selector: 'app-social-page',
@@ -25,9 +26,10 @@ export class SocialPage {
     private readonly pageTitleService = inject(PageTitleService);
     private readonly schemaService = inject(SchemaService);
     private readonly mensajeService = inject(MensajeService);
+    private readonly comentarioAdminService = inject(ComentarioAdminService);
 
-    // Pestaña activa: 'matches' | 'desafios' | 'mensajes'
-    activeTab = signal<'matches' | 'desafios' | 'mensajes'>('matches');
+    // Pestaña activa: 'matches' | 'desafios' | 'mensajes' | 'comentarios'
+    activeTab = signal<'matches' | 'desafios' | 'mensajes' | 'comentarios'>('matches');
 
     // Matches cargados
     rawMatches = this.matchAdminService.matches;
@@ -105,11 +107,26 @@ export class SocialPage {
     mensajeColumns = this.schemaService.getColumns('mensaje');
     mensajeFields = this.schemaService.getFields('mensaje');
 
+    // Comentarios cargados y enriquecidos
+    comentarios = this.comentarioAdminService.comentarios;
+    comentariosEnriquecidos = computed(() => {
+        const list = this.comentarios();
+        return list.map(c => ({
+            ...c,
+            tieneRespuesta: c.respuesta ? true : false,
+            respuestaContenido: c.respuesta?.contenido || ''
+        }));
+    });
+
+    comentarioColumns = this.schemaService.getColumns('comentario');
+    comentarioFields = this.schemaService.getFields('comentario');
+
     // Tabs definition for unified compact tabs component (live counts)
     tabs = computed<TabItem[]>(() => [
       { id: 'matches', label: 'Matches & Conexiones', count: this.mappedMatches().length, accent: 'blue' },
       { id: 'desafios', label: 'Desafíos Comunitarios', count: this.desafios().length, accent: 'amber' },
-      { id: 'mensajes', label: 'Mensajes Personales', count: this.mensajesEnriquecidos().length, accent: 'purple' }
+      { id: 'mensajes', label: 'Mensajes Personales', count: this.mensajesEnriquecidos().length, accent: 'purple' },
+      { id: 'comentarios', label: 'Comentarios Publicaciones', count: this.comentarios().length, accent: 'green' }
     ]);
 
     constructor() {
@@ -117,10 +134,11 @@ export class SocialPage {
         // Inicializar listeners
         const u = this.userService.users();
         this.mensajeService.mensajes; // init listener for personal messages
+        this.comentarioAdminService.comentarios; // init listener for social comments
     }
 
     setTab(tab: string) {
-        this.activeTab.set(tab as 'matches' | 'desafios' | 'mensajes');
+        this.activeTab.set(tab as 'matches' | 'desafios' | 'mensajes' | 'comentarios');
         this.updatePageTitle();
     }
 
@@ -133,6 +151,8 @@ export class SocialPage {
             title = 'Desafíos Comunitarios';
         } else if (tab === 'mensajes') {
             title = 'Mensajes Personales';
+        } else if (tab === 'comentarios') {
+            title = 'Comentarios de Publicaciones';
         }
         this.pageTitleService.setTitle(title);
     }
@@ -168,6 +188,19 @@ export class SocialPage {
                     console.error(error);
                     this.toastService.show('Error al eliminar el desafío.', 'error');
                 }
+            }
+        }
+    }
+
+    async eliminarComentario(event: string | any) {
+        const id = typeof event === 'string' ? event : event.id;
+        if (confirm('¿Estás seguro de eliminar de forma permanente este comentario?')) {
+            try {
+                await this.comentarioAdminService.eliminarComentario(id);
+                this.toastService.show('Comentario eliminado correctamente.', 'success');
+            } catch (error) {
+                console.error(error);
+                this.toastService.show('Error al eliminar el comentario.', 'error');
             }
         }
     }

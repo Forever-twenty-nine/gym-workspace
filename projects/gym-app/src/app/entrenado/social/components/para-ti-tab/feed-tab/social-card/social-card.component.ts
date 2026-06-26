@@ -1,29 +1,53 @@
-import { Component, Input, inject, computed, signal } from '@angular/core';
+import { Component, Input, inject, computed, signal, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton, IonAvatar, IonCardContent, IonBadge, IonNote, IonCardTitle } from '@ionic/angular/standalone';
+import {
+  IonIcon,
+  ActionSheetController,
+  IonCard,
+  IonItem,
+  IonLabel,
+  IonButtons,
+  IonButton,
+  IonAvatar,
+  IonCardContent,
+  IonBadge
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
-  personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person
+  personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person,
+  chatbubbleOutline
 } from 'ionicons/icons';
 
 import { SesionRutinaService } from '../../../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { UserService } from '../../../../../../core/services/user.service';
 import { EntrenadoService } from '../../../../../../core/services/entrenado.service';
+import { ComentarioSocialService } from '../../../../../../core/services/comentario-social.service';
 import { FormatFechaPipe } from '../../../../../../shared/pipes/format-fecha.pipe';
-import { SesionRutina } from 'gym-library';
+import { SesionRutina, Comentario } from 'gym-library';
+import { SocialCommentsModalComponent } from './social-comments-modal/social-comments-modal.component';
 
 @Component({
   selector: 'app-social-card',
   standalone: true,
-  imports: [IonAvatar,
-    CommonModule, IonIcon, FormatFechaPipe,
-    IonCard, IonItem, IonLabel, IonButtons, IonButton,
-    IonCardContent, IonBadge],
+  imports: [
+    IonAvatar,
+    CommonModule,
+    IonIcon,
+    FormatFechaPipe,
+    IonCard,
+    IonItem,
+    IonLabel,
+    IonButtons,
+    IonButton,
+    IonCardContent,
+    IonBadge,
+    SocialCommentsModalComponent
+  ],
   templateUrl: './social-card.component.html'
 })
-export class SocialCardComponent {
+export class SocialCardComponent implements OnInit, OnDestroy {
   private readonly _sesion = signal<SesionRutina>(null!);
   @Input({ required: true }) set sesion(value: SesionRutina) { this._sesion.set(value); }
   get sesion() { return this._sesion(); }
@@ -32,21 +56,25 @@ export class SocialCardComponent {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly entrenadoService = inject(EntrenadoService);
+  private readonly comentarioSocialService = inject(ComentarioSocialService);
   private readonly actionSheetCtrl = inject(ActionSheetController);
 
   currentUser = this.authService.currentUser;
   hasLiked = computed(() => this.currentUser() ? (this._sesion()?.likes || []).includes(this.currentUser()!.uid) : false);
   currentEntrenado = computed(() => this.currentUser() ? this.entrenadoService.getEntrenado(this.currentUser()!.uid)() : null);
+  
   isFollowing = computed(() => {
     const e = this.currentEntrenado();
     const target = this._sesion()?.entrenadoId;
     return e && target ? (e.seguidos || []).includes(target) : false;
   });
+
   isOwnPost = computed(() => {
     const user = this.currentUser();
     const s = this._sesion();
     return user && s ? user.uid === s.entrenadoId : false;
   });
+
   likesCount = computed(() => (this._sesion()?.likes || []).length);
 
   userProfilePhoto = computed(() => {
@@ -56,8 +84,30 @@ export class SocialCardComponent {
     return s.entrenadoId ? this.userService.getUserByUid(s.entrenadoId)()?.photoURL || null : null;
   });
 
+  // Comentarios y respuestas
+  isCommentsEnabled = computed(() => this.isFollowing() || this.isOwnPost());
+  comentarios = signal<Comentario[]>([]);
+  private unsubscribeComentarios?: () => void;
+
   constructor() {
-    addIcons({ barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal, personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person });
+    addIcons({
+      barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
+      personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person,
+      chatbubbleOutline
+    });
+  }
+
+  ngOnInit() {
+    const s = this._sesion();
+    if (s?.id && this.isCommentsEnabled()) {
+      this.unsubscribeComentarios = this.comentarioSocialService.getComentarios(s.id, (list) => {
+        this.comentarios.set(list);
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    this.cerrarSuscripcionComentarios();
   }
 
   async toggleLike() {
@@ -107,6 +157,13 @@ export class SocialCardComponent {
     await sheet.present();
   }
 
-  getLikeUserPhoto(uid: string) { return this.userService.getUserByUid(uid)()?.photoURL || null; }
+  // Métodos de Comentarios
+  cerrarSuscripcionComentarios() {
+    if (this.unsubscribeComentarios) {
+      this.unsubscribeComentarios();
+      this.unsubscribeComentarios = undefined;
+    }
+  }
+
   redondearMinutos(segundos: number) { return Math.round((segundos || 0) / 60); }
 }

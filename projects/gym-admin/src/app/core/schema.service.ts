@@ -13,6 +13,7 @@ import { GIMNASIO_SCHEMA, GIMNASIO_COLUMNS } from './schemas/gimnasio.schema';
 import { DESAFIO_SCHEMA, DESAFIO_COLUMNS } from './schemas/desafio.schema';
 import { MATCH_SCHEMA, MATCH_COLUMNS } from './schemas/match.schema';
 import { MENSAJE_SCHEMA, MENSAJE_COLUMNS } from './schemas/mensaje.schema';
+import { COMENTARIO_SCHEMA, COMENTARIO_COLUMNS } from './schemas/comentario.schema';
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +32,8 @@ export class SchemaService {
         'gimnasio': GIMNASIO_SCHEMA,
         'desafio': DESAFIO_SCHEMA,
         'match': MATCH_SCHEMA,
-        'mensaje': MENSAJE_SCHEMA
+        'mensaje': MENSAJE_SCHEMA,
+        'comentario': COMENTARIO_SCHEMA
     };
 
     private columns: Record<string, ColumnConfig[]> = {
@@ -47,7 +49,8 @@ export class SchemaService {
         'gimnasio': GIMNASIO_COLUMNS,
         'desafio': DESAFIO_COLUMNS,
         'match': MATCH_COLUMNS,
-        'mensaje': MENSAJE_COLUMNS
+        'mensaje': MENSAJE_COLUMNS,
+        'comentario': COMENTARIO_COLUMNS
     };
 
     getFields(name: string): FieldConfig[] {

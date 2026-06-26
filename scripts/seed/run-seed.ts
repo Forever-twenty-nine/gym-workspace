@@ -2,7 +2,7 @@ import { Auth } from "firebase-admin/auth";
 import { Firestore } from "firebase-admin/firestore";
 import { SeedConfig } from "../interfaces/seed-config.interface";
 import { createGym } from "./entities";
-import { seedConvocatorias, seedDesafios, seedFollowing, seedMatches } from "./social";
+import { seedConvocatorias, seedDesafios, seedFollowing, seedMatches, seedComentariosYLikes } from "./social";
 import { seedUsers } from "./users";
 import { seedTrainerWorkouts, seedTraineeCreations } from "./workout";
 
@@ -19,6 +19,7 @@ export async function runSeed(db: Firestore, auth: Auth, config: SeedConfig) {
   await seedDesafios(db, config, trainees);
   await seedMatches(db, config, trainees);
   await seedConvocatorias(db, config.gym.id, trainees, trainersForSocial);
+  await seedComentariosYLikes(db, trainees);
 
   await createGym(
     db,

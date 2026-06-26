@@ -523,6 +523,7 @@ import { EstadisticasEntrenadoService } from '../../core/services/estadisticas-e
 import { ProgresoService } from '../../core/services/progreso.service';
 import { SocialShareService } from '../../core/services/social-share.service';
 import { FirebaseStorageService } from '../../core/services/firebase-storage.service';
+import { ComentarioSocialService } from '../../core/services/comentario-social.service';
 import { NavController, ToastController, AlertController, ActionSheetController, ModalController } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 
@@ -543,6 +544,47 @@ export const mockEstadisticasEntrenadoService = {
   crearEstadisticasIniciales: () => ({})
 };
 
+export const mockComentarioSocialService = {
+  getComentarios: (sesionId: string, callback: (comentarios: any[]) => void) => {
+    callback([
+      {
+        id: 'com-1',
+        sesionId,
+        entrenadoId: 'user-partner',
+        nombreUsuario: 'Juan Pérez',
+        fotoUsuario: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+        contenido: 'Buen entrenamiento. Sigue asi.',
+        fecha: new Date(),
+        likes: ['user-3']
+      },
+      {
+        id: 'com-2',
+        sesionId,
+        entrenadoId: 'user-3',
+        nombreUsuario: 'María Gómez',
+        fotoUsuario: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=200',
+        contenido: 'Excelente constancia, te felicito.',
+        fecha: new Date(),
+        likes: [],
+        respuesta: {
+          id: 'resp-1',
+          entrenadoId: 'user-current',
+          nombreUsuario: 'Mi Perfil',
+          fotoUsuario: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+          contenido: 'Muchas gracias, costo terminar hoy.',
+          fecha: new Date()
+        }
+      }
+    ]);
+    return () => {};
+  },
+  agregarComentario: async () => {},
+  responderComentario: async () => {},
+  addLike: async () => {},
+  removeLike: async () => {},
+  eliminarComentario: async () => {}
+};
+
 export const mockProviders = [
   { provide: AuthService, useValue: mockAuthService },
   { provide: UserService, useValue: mockUserService },
@@ -560,6 +602,7 @@ export const mockProviders = [
   { provide: EntrenadorService, useValue: mockEntrenadorService },
   { provide: NotificacionService, useValue: mockNotificacionService },
   { provide: EstadisticasEntrenadoService, useValue: mockEstadisticasEntrenadoService },
+  { provide: ComentarioSocialService, useValue: mockComentarioSocialService },
   { provide: ProgresoService, useValue: {} },
   { provide: SocialShareService, useValue: {} },
   { provide: FirebaseStorageService, useValue: {} },

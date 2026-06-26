@@ -1,0 +1,161 @@
+<!-- Modal para mostrar y gestionar los comentarios de la publicación -->
+<ion-modal #modal [trigger]="triggerId()" (willPresent)="iniciarSuscripcionComentarios()" (didDismiss)="cerrarSuscripcionComentarios()">
+  <ng-template>
+    <div class="ion-page">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Comentarios</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarSuscripcionComentarios(); modal.dismiss()" role="cancel">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding" style="--background: transparent;">
+        <app-page-background />
+        @if (comentarios().length === 0) {
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ion-color-medium); text-align: center; padding: 20px;">
+            <p style="font-size: 1rem; margin-top: 10px;">Aun no hay comentarios.</p>
+            <p style="font-size: 0.85rem;">Se el primero en comentar esta publicacion.</p>
+          </div>
+        } @else {
+          <ion-list lines="none">
+            @for (com of comentarios(); track com.id) {
+              <!-- Comentario principal -->
+              <ion-item style="--padding-start: 0; --inner-padding-end: 0; margin-bottom: 12px; align-items: flex-start;">
+                <ion-avatar slot="start" style="width: 36px; height: 36px; margin-top: 4px; margin-right: 12px; flex-shrink: 0;">
+                  <img [src]="com.fotoUsuario || 'assets/images/test-foto.png'" alt="Foto de perfil">
+                </ion-avatar>
+                <ion-label style="margin: 0;">
+                  <div style="display: flex; align-items: baseline; gap: 8px;">
+                    <span style="font-weight: bold; font-size: 0.9rem; color: var(--ion-text-color);">{{ com.nombreUsuario }}</span>
+                    <span style="font-size: 0.75rem; color: var(--ion-color-medium);">
+                      {{ com.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
+                    </span>
+                  </div>
+                  <p style="font-size: 0.875rem; color: var(--ion-text-color); white-space: normal; margin-top: 4px; margin-bottom: 4px; line-height: 1.25;" [style.opacity]="comentarioEnEdicion()?.id === com.id ? 0.5 : 1">
+                    {{ com.contenido }}
+                  </p>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                    <!-- Grupo Izquierda: Like y Responder -->
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                      <!-- Like a comentario -->
+                      <ion-button fill="clear" size="small" [color]="hasLikedComentario(com) ? 'danger' : 'medium'" (click)="toggleLikeComentario(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem;">
+                        <ion-icon slot="start" [name]="hasLikedComentario(com) ? 'heart' : 'heart-outline'"></ion-icon>
+                        @if ((com.likes || []).length > 0) {
+                          <span>{{ (com.likes || []).length }}</span>
+                        }
+                      </ion-button>
+
+                      <!-- Responder (solo para el creador del post) -->
+                      @if (isOwnPost() && !com.respuesta && comentarioEnEdicion()?.id !== com.id) {
+                        <ion-button fill="clear" size="small" color="primary" (click)="seleccionarParaResponder(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem; font-weight: bold;">
+                          Responder
+                        </ion-button>
+                      }
+                    </div>
+
+                    <!-- Grupo Derecha: Editar y Eliminar -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <!-- Editar comentario (solo creador del comentario) -->
+                      @if (com.entrenadoId === currentUser()?.uid && comentarioEnEdicion()?.id !== com.id) {
+                        <ion-button fill="clear" size="small" color="primary" (click)="iniciarEdicionComentario(com)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
+                          <ion-icon slot="icon-only" name="create-outline" style="font-size: 1.05rem;"></ion-icon>
+                        </ion-button>
+                      }
+                      <!-- Eliminar comentario (solo creador del comentario) -->
+                      @if (com.entrenadoId === currentUser()?.uid && comentarioEnEdicion()?.id !== com.id) {
+                        <ion-button fill="clear" size="small" color="danger" (click)="eliminarComentario(com.id)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
+                          <ion-icon slot="icon-only" name="trash-outline" style="font-size: 1.05rem;"></ion-icon>
+                        </ion-button>
+                      }
+                    </div>
+                  </div>
+                </ion-label>
+              </ion-item>
+
+              <!-- Respuesta del creador -->
+              @if (com.respuesta) {
+                <div style="display: flex; align-items: flex-start; margin-left: 0; margin-bottom: 16px; margin-top: 4px;">
+                  <ion-icon name="return-down-forward-outline" color="medium" style="font-size: 1.3rem; margin-top: 6px; margin-right: 6px; flex-shrink: 0;"></ion-icon>
+                  <ion-item style="flex: 1; --padding-start: 0; --inner-padding-end: 0; margin: 0; align-items: flex-start;">
+                    <ion-avatar slot="start" style="width: 36px; height: 36px; margin-top: 4px; margin-right: 12px; flex-shrink: 0; border: 2px solid var(--ion-color-primary); padding: 2px; border-radius: 50%;">
+                      <img [src]="com.respuesta.fotoUsuario || 'assets/images/test-foto.png'" alt="Foto de perfil del creador" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;">
+                    </ion-avatar>
+                    <ion-label style="margin: 0;">
+                      <div style="display: flex; align-items: baseline; gap: 8px;">
+                        <span style="font-weight: bold; font-size: 0.9rem; color: var(--ion-text-color);">
+                          {{ com.respuesta.nombreUsuario }}
+                        </span>
+                        <span style="font-size: 0.75rem; color: var(--ion-color-medium);">
+                          {{ com.respuesta.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
+                        </span>
+                      </div>
+                      <p style="font-size: 0.875rem; color: var(--ion-text-color); white-space: normal; margin-top: 4px; line-height: 1.25;" [style.opacity]="respuestaEnEdicion()?.id === com.id ? 0.5 : 1">
+                        {{ com.respuesta.contenido }}
+                      </p>
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                        <!-- Grupo Izquierda: Like a respuesta -->
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                          <ion-button fill="clear" size="small" [color]="hasLikedRespuesta(com) ? 'danger' : 'medium'" (click)="toggleLikeRespuesta(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem;">
+                            <ion-icon slot="start" [name]="hasLikedRespuesta(com) ? 'heart' : 'heart-outline'"></ion-icon>
+                            @if (getReplyLikesCount(com) > 0) {
+                              <span>{{ getReplyLikesCount(com) }}</span>
+                            }
+                          </ion-button>
+                        </div>
+
+                        <!-- Grupo Derecha: Editar y Eliminar respuesta -->
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                          <!-- Editar respuesta (solo creador de la respuesta) -->
+                          @if (isOwnPost() && respuestaEnEdicion()?.id !== com.id) {
+                            <ion-button fill="clear" size="small" color="primary" (click)="iniciarEdicionRespuesta(com)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
+                              <ion-icon slot="icon-only" name="create-outline" style="font-size: 1.05rem;"></ion-icon>
+                            </ion-button>
+                          }
+                          <!-- Eliminar respuesta (solo el creador de la respuesta, es decir, el autor del post) -->
+                          @if (isOwnPost() && respuestaEnEdicion()?.id !== com.id) {
+                            <ion-button fill="clear" size="small" color="danger" (click)="eliminarRespuesta(com.id)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
+                              <ion-icon slot="icon-only" name="trash-outline" style="font-size: 1.05rem;"></ion-icon>
+                            </ion-button>
+                          }
+                        </div>
+                      </div>
+                    </ion-label>
+                  </ion-item>
+                </div>
+              }
+            }
+          </ion-list>
+        }
+      </ion-content>
+
+      <!-- Footer con Input para escribir -->
+      <ion-footer>
+        @if (comentarioAResponder()) {
+          <div style="background: var(--ion-color-light); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--ion-color-medium);">
+            <span>Respondiendo a <b>{{ comentarioAResponder()!.nombreUsuario }}</b></span>
+            <ion-button fill="clear" size="small" color="danger" (click)="cancelarRespuesta()" style="margin: 0; font-weight: bold; font-size: 0.8rem; height: auto;">Cancelar</ion-button>
+          </div>
+        }
+        @if (comentarioEnEdicion() || respuestaEnEdicion()) {
+          <div style="background: var(--ion-color-light); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--ion-color-medium);">
+            <span>Editando comentario...</span>
+            <ion-button fill="clear" size="small" color="danger" (click)="cancelarEdicion()" style="margin: 0; font-weight: bold; font-size: 0.8rem; height: auto;">Cancelar</ion-button>
+          </div>
+        }
+        <div style="display: flex; align-items: center; padding: 8px 12px; gap: 8px;">
+          <ion-input [(ngModel)]="nuevoComentarioTexto" 
+                     [placeholder]="(comentarioEnEdicion() || respuestaEnEdicion()) ? 'Editar comentario...' : 'Escribe un comentario...'" 
+                     fill="solid" 
+                     maxlength="250" 
+                     style="--border-radius: 20px; --padding-start: 16px; font-size: 0.9rem;" 
+                     (keyup.enter)="enviarComentario()">
+          </ion-input>
+          <ion-button fill="clear" color="primary" (click)="enviarComentario()" style="margin: 0; --padding-start: 4px; --padding-end: 4px;">
+            <ion-icon slot="icon-only" [name]="(comentarioEnEdicion() || respuestaEnEdicion()) ? 'checkmark-outline' : 'send-outline'"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-footer>
+    </div>
+  </ng-template>
+</ion-modal>

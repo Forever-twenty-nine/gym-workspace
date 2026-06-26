@@ -46,7 +46,7 @@
   <!-- Body: Contenido de la rutina y acciones -->
   <ion-card-content>
     <!-- Action buttons (Like, Comment, etc) -->
-    <div style="margin-left: -16px; margin-top: -8px; margin-bottom: 8px;">
+    <div style="margin-left: -16px; margin-top: -8px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
       <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
         [color]="hasLiked() ? 'danger' : 'medium'">
         <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
@@ -54,6 +54,17 @@
           <span style="font-weight: bold; margin-left: 6px;">{{ likesCount() }}</span>
         }
       </ion-button>
+
+      @if (isCommentsEnabled()) {
+        <ion-button fill="clear" color="medium" id="open-comments-{{ sesion.id }}">
+          <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
+          @if (comentarios().length > 0) {
+            <span style="font-weight: bold; margin-left: 6px;">{{ comentarios().length }}</span>
+          } @else {
+            <span>Comentar</span>
+          }
+        </ion-button>
+      }
     </div>
 
     <!-- Routine Title and Description -->
@@ -79,5 +90,10 @@
       <span>{{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}</span>
     </div>
   </ion-card-content>
+
+  <!-- Modal de Comentarios -->
+  @if (isCommentsEnabled()) {
+    <app-social-comments-modal [sesion]="sesion" [triggerId]="'open-comments-' + sesion.id"></app-social-comments-modal>
+  }
 
 </ion-card>
