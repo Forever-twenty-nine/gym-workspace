@@ -1,8 +1,6 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton
-} from '@ionic/angular/standalone';
+import { IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton, IonFooter, IonAvatar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
@@ -19,10 +17,11 @@ import { SesionRutina } from 'gym-library';
 @Component({
   selector: 'app-social-card',
   standalone: true,
-  imports: [
+  imports: [IonAvatar, 
     CommonModule, IonIcon, FormatFechaPipe,
-    IonCard, IonItem, IonLabel, IonButtons, IonButton
-  ],
+    IonCard, IonItem, IonLabel, IonButtons, IonButton,
+    IonFooter
+],
   templateUrl: './social-card.component.html'
 })
 export class SocialCardComponent {

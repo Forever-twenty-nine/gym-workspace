@@ -1,9 +1,7 @@
-<ion-card
-  class="ion-no-margin m-0! overflow-hidden rounded-4xl shadow-xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#121212]">
+<ion-card class="bg-transparent">
   <!-- Header: Perfil de Usuario -->
   <ion-item lines="none" class="ion-no-padding px-4 py-3 bg-transparent">
-    <div slot="start"
-      class="relative w-10 h-10 rounded-full overflow-hidden mr-3 bg-gray-100 dark:bg-gray-800 border border-black/10 dark:border-white/10 flex items-center justify-center">
+    <div slot="start" class="relative w-10 h-10 rounded-full overflow-hidden mr-3  flex items-center justify-center">
       @if (userProfilePhoto()) {
       <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" class="w-full h-full object-cover"
         alt="Foto de perfil">
@@ -14,7 +12,7 @@
 
     <ion-label class="mt-1">
       <div class="flex items-center gap-1.5">
-        <h3 class="font-bold text-sm m-0 text-gray-900 dark:text-white truncate">
+        <h3 class="font-bold text-sm m-0 ">
           {{ sesion!.nombreUsuario || 'Usuario' }}
         </h3>
         @if(isOwnPost()) {
@@ -22,7 +20,7 @@
           class="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Tú</span>
         }
       </div>
-      <p class="text-xs text-gray-500 dark:text-gray-400 m-0 mt-0.5 font-medium">
+      <p class="text-xs ">
         {{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
       </p>
     </ion-label>
@@ -44,19 +42,17 @@
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion!.fotoProgreso) {
-  <div class="w-full aspect-4/5 sm:aspect-square relative overflow-hidden bg-gray-100 dark:bg-gray-900">
-    <img [src]="sesion!.fotoProgreso"
-      class="absolute inset-0 w-full h-full object-cover"
-      alt="Foto del entrenamiento"
+  <div class="w-full aspect-4/5 sm:aspect-square relative overflow-hidden">
+    <img [src]="sesion!.fotoProgreso" class="absolute inset-0 w-full h-full object-cover" alt="Foto del entrenamiento"
       (error)="$any($event.target).style.display='none'">
   </div>
   } @else {
   <!-- Separator if no image, to make it look clean -->
-  <div class="h-px w-full bg-black/5 dark:bg-white/5"></div>
+  <div class="h-px w-full "></div>
   }
 
   <!-- Body: Contenido de la rutina y acciones -->
-  <div class="px-4 py-3">
+  <ion-footer class="px-4 py-3">
     <!-- Action buttons (Like, Comment, etc) -->
     <div class="flex items-center justify-between mb-2 -mx-2 mt-1">
       <div class="flex items-center">
@@ -70,20 +66,20 @@
 
     <!-- Likes count -->
     @if (likesCount() > 0) {
-    <div class="font-bold text-sm mb-1.5 text-gray-900 dark:text-white">
+    <div class="font-bold text-sm mb-1.5">
       {{ likesCount() }} Me gusta
     </div>
     }
 
     <!-- Routine Title and Description -->
-    <div class="text-sm text-gray-900 dark:text-gray-100 leading-snug">
+    <div class="text-sm leading-snug">
       <span class="font-bold mr-1">{{ sesion!.nombreUsuario || 'Usuario' }}</span>
       <span>completó su sesión de <span class="font-semibold">{{ sesion!.rutinaResumen.nombre || 'Entrenamiento'
           }}</span>.</span>
     </div>
 
     <!-- Secondary stats inline -->
-    <div class="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
+    <div class="flex items-center gap-3 mt-2 text-xs ">
       <div class="flex items-center gap-1">
         <ion-icon name="time-outline" class="text-sm"></ion-icon>
         <span>{{ redondearMinutos(sesion!.duracion || 0) }} min</span>
@@ -94,5 +90,6 @@
         <span>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</span>
       </div>
     </div>
-  </div>
+  </ion-footer>
+
 </ion-card>
