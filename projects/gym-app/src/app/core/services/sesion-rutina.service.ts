@@ -33,6 +33,7 @@ export class SesionRutinaService {
 
   private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
   private _sesionesCompartidasSignal?: Signal<SesionRutina[]>;
+  public readonly isLoadingCompartidas = signal(true);
 
   // inyección de servicios
   private readonly rutinaService: RutinaService = inject(RutinaService);
@@ -264,6 +265,7 @@ export class SesionRutinaService {
         });
 
         sesionesSignal.set(sesiones);
+        this.isLoadingCompartidas.set(false);
       });
     });
 

@@ -1,21 +1,27 @@
-<!-- VACÍO O FEED COMPLETO -->
-@if (filteredFeed().length === 0) {
-  <div class="flex flex-col items-center justify-center py-24 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
-    <div class="w-24 h-24 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-      <ion-icon name="people-outline" class="text-4xl text-gray-500 dark:text-gray-400"></ion-icon>
-    </div>
-    <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-      {{ tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
-    </h3>
-    <p class="text-sm font-medium text-gray-600 dark:text-white/70 px-10">
-      {{ tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
-    </p>
+@if (isLoading()) {
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 0;">
+    <ion-spinner name="crescent" color="primary" style="transform: scale(1.5); margin-bottom: 16px;"></ion-spinner>
+    <p style="color: var(--ion-color-medium); font-size: 0.875rem; font-weight: 500;">Cargando actividad...</p>
   </div>
+} @else if (filteredFeed().length === 0) {
+  <ion-card style="margin: 16px; text-align: center; --background: var(--ion-color-step-50, #f5f5f5); box-shadow: none;">
+    <ion-card-header>
+      <ion-card-title style="font-size: 1.25rem; font-weight: bold; color: var(--ion-color-dark);">
+        {{ tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
+      </ion-card-title>
+      <ion-card-subtitle style="color: var(--ion-color-medium); font-size: 0.875rem;">
+        {{ tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-img src="assets/images/empty-feed.png" alt="Cero actividad"></ion-img>
+    </ion-card-content>
+  </ion-card>
 }
 
 <!-- FEED ACTIVO -->
 @else {
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-2">
     @for (item of filteredFeed(); track item.id) {
       <app-social-card [sesion]="item"></app-social-card>
     }

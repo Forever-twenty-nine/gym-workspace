@@ -14,8 +14,7 @@ import {
   IonInput,
   IonTextarea,
   IonPopover,
-  ToastController
-} from '@ionic/angular/standalone';
+  ToastController, IonNote, IonList } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, trophyOutline, flameOutline, calendarOutline,
   helpCircleOutline, chevronDownOutline, chevronUpOutline
@@ -33,8 +32,7 @@ import { Desafio } from 'gym-library';
     ReactiveFormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonIcon, IonItem,
-    IonModal, IonButtons, IonInput, IonTextarea, IonPopover
-  ],
+    IonModal, IonButtons, IonInput, IonTextarea, IonPopover],
   templateUrl: './desafio-modal.component.html'
 })
 export class DesafioModalComponent implements OnChanges {

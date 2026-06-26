@@ -16,17 +16,16 @@
       </ion-segment>
     </div>
   </ion-toolbar>
-
-  @if (selectedTab() === 'para-ti' && storiesList().length > 0) {
-  <ion-toolbar>
-    <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
-  </ion-toolbar>
-  }
 </ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">
 
   <app-page-background />
+  @if (selectedTab() === 'para-ti' && storiesList().length > 0) {
+  <div class="sticky top-0 z-50" style="background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.85); backdrop-filter: blur(10px);">
+    <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
+  </div>
+  }
 
   <div class="relative z-10 px-4 pb-6 pt-2">
     <!-- Renderizado condicional por componente -->

@@ -1,5 +1,6 @@
 import {
-  Component, Input, Output, EventEmitter, inject, signal, computed, OnChanges, SimpleChanges
+  Component, Input, Output, EventEmitter, inject, signal, computed, OnChanges, SimpleChanges,
+  input
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -12,14 +13,11 @@ import {
   IonFooter,
   IonButton,
   IonLabel,
-  IonGrid,
-  IonRow,
-  IonCol,
-  ToastController, IonTitle, IonText, IonButtons } from '@ionic/angular/standalone';
+  ToastController, IonTitle, IonText, IonButtons, IonContent, IonItem, IonCard, IonCardTitle, IonCardSubtitle, IonNote, IonListHeader, IonCardContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
-  sadOutline, peopleOutline, timerOutline, trashOutline, personOutline
+  sadOutline, peopleOutline, timerOutline, trashOutline, personOutline, timeOutline
 } from 'ionicons/icons';
 import { Desafio, DesafioParticipacion } from 'gym-library';
 import { AuthService } from '../../../../../core/services/auth.service';
@@ -30,7 +28,7 @@ import { DesafioService } from '../../../../../core/services/desafio.service';
 @Component({
   selector: 'app-desafio-modal-stories',
   standalone: true,
-  imports: [
+  imports: [IonCardContent, IonNote, IonCard, IonItem, IonContent,
     CommonModule,
     IonModal,
     IonIcon,
@@ -41,24 +39,8 @@ import { DesafioService } from '../../../../../core/services/desafio.service';
     IonFooter,
     IonButton,
     IonLabel,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonButtons
-],
-  templateUrl: './desafio-modal-stories.component.html',
-  styles: [`
-    ion-modal {
-      --border-radius: 28px;
-      --width: min(94%, 460px);
-      --height: auto;
-      --max-height: 88vh;
-    }
-    .desafio-modal-card {
-      border-radius: 28px;
-      overflow: hidden;
-    }
-  `]
+    IonText, IonTitle],
+  templateUrl: './desafio-modal-stories.component.html'
 })
 export class DesafioModalStoriesComponent implements OnChanges {
   private readonly authService = inject(AuthService);
@@ -67,7 +49,7 @@ export class DesafioModalStoriesComponent implements OnChanges {
   private readonly desafioService = inject(DesafioService);
   private readonly toastCtrl = inject(ToastController);
 
-  @Input() isOpen = false;
+  readonly isOpen = input(false);
   @Input() desafio: Desafio | null = null;
 
   @Output() close = new EventEmitter<void>();
@@ -132,7 +114,7 @@ export class DesafioModalStoriesComponent implements OnChanges {
   constructor() {
     addIcons({
       trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
-      sadOutline, peopleOutline, timerOutline, trashOutline, personOutline
+      sadOutline, peopleOutline, timerOutline, trashOutline, personOutline, timeOutline
     });
   }
 
@@ -159,7 +141,7 @@ export class DesafioModalStoriesComponent implements OnChanges {
         user.nombre || 'Atleta',
         user.photoURL
       );
-      await this.showToast('¡Desafío aceptado! Ahora declaralo cuando lo hayas completado 💪', 'success');
+      await this.showToast('¡Desafío aceptado! Decláralo cuando lo hayas completado', 'success');
     } catch (e) {
       console.error(e);
       await this.showToast('Error al aceptar el desafío', 'danger');
@@ -176,8 +158,8 @@ export class DesafioModalStoriesComponent implements OnChanges {
     try {
       await this.participacionService.declararResultado(participacion.id, superado);
       const msg = superado
-        ? '¡Increíble! Declaraste que lo superaste 🏆'
-        : 'Próxima vez será, ya lo tenés en la mira 💪';
+        ? 'Declaraste que superaste el desafío'
+        : 'Registraste que no superaste el desafío';
       await this.showToast(msg, superado ? 'success' : 'medium');
     } catch (e) {
       console.error(e);
@@ -222,8 +204,7 @@ export class DesafioModalStoriesComponent implements OnChanges {
       message,
       duration: 2400,
       color,
-      position: 'bottom',
-      cssClass: 'premium-toast'
+      position: 'bottom'
     });
     await toast.present();
   }

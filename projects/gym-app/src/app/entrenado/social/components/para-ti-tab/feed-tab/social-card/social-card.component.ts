@@ -1,10 +1,10 @@
 import { Component, Input, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton, IonFooter, IonAvatar } from '@ionic/angular/standalone';
+import { IonIcon, ActionSheetController, IonCard, IonItem, IonLabel, IonButtons, IonButton, IonAvatar, IonCardContent, IonBadge, IonNote, IonCardTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
-  personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline
+  personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person
 } from 'ionicons/icons';
 
 import { SesionRutinaService } from '../../../../../../core/services/sesion-rutina.service';
@@ -17,11 +17,10 @@ import { SesionRutina } from 'gym-library';
 @Component({
   selector: 'app-social-card',
   standalone: true,
-  imports: [IonAvatar, 
+  imports: [IonAvatar,
     CommonModule, IonIcon, FormatFechaPipe,
     IonCard, IonItem, IonLabel, IonButtons, IonButton,
-    IonFooter
-],
+    IonCardContent, IonBadge],
   templateUrl: './social-card.component.html'
 })
 export class SocialCardComponent {
@@ -58,7 +57,7 @@ export class SocialCardComponent {
   });
 
   constructor() {
-    addIcons({ barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal, personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline });
+    addIcons({ barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal, personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person });
   }
 
   async toggleLike() {

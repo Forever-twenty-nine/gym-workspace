@@ -1,37 +1,33 @@
-<!-- Historias unificadas en una sola fila, ordenadas por proximidad temporal (más cercanas primero) -->
 @if (stories.length > 0) {
-<div style="overflow-x: auto; overflow-y: hidden; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none; width: 100%;">
+<div
+  class="overflow-x-auto overflow-y-hidden whitespace-nowrap w-full scrollbar-none bg-transparent" >
   <!-- Ocultar scrollbar estándar -->
-  <style>
-    div::-webkit-scrollbar {
-      display: none;
-    }
-  </style>
-  <div style="display: flex; gap: 14px; padding: 6px 8px; width: max-content;">
+  <div class="flex gap-2 py-1 px-4 w-max">
     @for (story of stories; track story.id) {
     @if (story.type === 'convocatoria') {
     <!-- Convocatoria circle -->
-    <div (click)="storyClick.emit(story)" style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 64px;">
-      <ion-avatar style="width: 62px; height: 62px; border: 3px solid var(--ion-color-primary); padding: 2px; background: var(--ion-background-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+    <div (click)="storyClick.emit(story)"
+      class="relative flex flex-col items-center cursor-pointer min-w-16">
+      <ion-avatar
+        class="w-15.5 h-15.5 border-[3px] border-(--ion-color-primary) p-0.5 bg-(--ion-background-color) shadow-md">
         @if (story.photoUrl) {
-          <img [src]="story.photoUrl" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;" alt="Creador">
+        <img [src]="story.photoUrl" class="rounded-full w-full h-full object-cover"
+          alt="Creador">
         } @else {
-          <div style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--ion-color-step-150, #eee); color: var(--ion-color-medium);">
-            <ion-icon name="person-outline" style="font-size: 30px;"></ion-icon>
-          </div>
+        <ion-icon name="person-outline" color="primary" class="w-full h-full rounded-full flex items-center justify-center"></ion-icon>
         }
       </ion-avatar>
     </div>
     } @else {
     <!-- Desafío circle -->
-    <div (click)="storyClick.emit(story)" style="position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; min-width: 64px;">
-      <ion-avatar style="width: 62px; height: 62px; border: 3px solid var(--ion-color-warning); padding: 2px; background: var(--ion-background-color); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+    <div (click)="storyClick.emit(story)"
+      class="relative flex flex-col items-center cursor-pointer min-w-16">
+      <ion-avatar
+        class="w-15.5 h-15.5 border-[3px] border-(--ion-color-warning) p-0.5 bg-(--ion-background-color) shadow-md">
         @if (story.photoUrl) {
-          <img [src]="story.photoUrl" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;" alt="">
+        <img [src]="story.photoUrl" class="rounded-full w-full h-full object-cover" alt="">
         } @else {
-          <div style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--ion-color-step-150, #eee); color: var(--ion-color-warning);">
-            <ion-icon name="trophy-outline" style="font-size: 30px;"></ion-icon>
-          </div>
+        <ion-icon name="trophy-outline" color="primary" class="w-full h-full rounded-full flex items-center justify-center"></ion-icon>
         }
       </ion-avatar>
     </div>

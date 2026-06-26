@@ -17,15 +17,38 @@ const meta: Meta<SocialCardComponent> = {
 export default meta;
 type Story = StoryObj<SocialCardComponent>;
 
-export const Default: Story = {
+export const MiPublicacion: Story = {
   args: {
-    sesion: mockSesionesCompartidas[0]
+    // user-current es el usuario actual en los mocks
+    sesion: {
+      ...mockSesionesCompartidas[0],
+      entrenadoId: 'user-current',
+      nombreUsuario: 'Mi Perfil'
+    }
   }
 };
 
-export const AnotherPost: Story = {
+export const UsuarioSeguido: Story = {
   args: {
-    sesion: mockSesionesCompartidas[1]
+    // user-partner es un usuario seguido según mockEntrenadoProfile
+    sesion: {
+      ...mockSesionesCompartidas[0],
+      id: 'sesion-followed',
+      entrenadoId: 'user-partner',
+      nombreUsuario: 'Juan Pérez'
+    }
+  }
+};
+
+export const UsuarioNoSeguido: Story = {
+  args: {
+    // user-4 no está en la lista de seguidos de mockEntrenadoProfile
+    sesion: {
+      ...mockSesionesCompartidas[0],
+      id: 'sesion-unfollowed',
+      entrenadoId: 'user-4',
+      nombreUsuario: 'Carlos López'
+    }
   }
 };
 

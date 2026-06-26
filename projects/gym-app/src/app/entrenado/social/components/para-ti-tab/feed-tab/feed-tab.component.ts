@@ -3,7 +3,13 @@ import { CommonModule } from '@angular/common';
 import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonIcon
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent, 
+  IonCardSubtitle, 
+  IonImg,
+  IonSpinner 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline } from 'ionicons/icons';
@@ -18,13 +24,18 @@ import { SesionRutina } from 'gym-library';
   selector: 'app-feed-tab',
   templateUrl: './feed-tab.component.html',
   standalone: true,
-  imports: [
+  imports: [IonImg, IonCardSubtitle,
     CommonModule,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
-    IonIcon,
-    SocialCardComponent
-  ]
+    SocialCardComponent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonImg,
+    IonSpinner]
 })
 export class FeedTabComponent {
   private sesionRutinaService = inject(SesionRutinaService);
@@ -41,6 +52,12 @@ export class FeedTabComponent {
 
   feedSocial = this.sesionRutinaService.getSesionesCompartidas();
   visibleItemsCount = signal<number>(10);
+
+  isLoading = computed(() => {
+    return this.sesionRutinaService.isLoadingCompartidas() || 
+           !this.currentEntrenado() || 
+           this.userService.users().length === 0;
+  });
 
   // Perfil del entrenado actual
   currentEntrenado = computed(() => {
@@ -108,5 +125,9 @@ export class FeedTabComponent {
     if (!this.hasMoreItems()) {
       if (event.target) (event.target as any).disabled = true;
     }
+  }
+  async navigateToRutina(rutinaId: string) {
+    // Aquí puedes implementar la navegación a la página de detalles de la rutina
+    console.log('Navegar a rutina con ID:', rutinaId);
   }
 }

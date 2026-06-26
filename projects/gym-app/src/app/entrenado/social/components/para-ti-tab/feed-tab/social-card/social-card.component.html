@@ -1,40 +1,34 @@
 <ion-card class="bg-transparent">
   <!-- Header: Perfil de Usuario -->
-  <ion-item lines="none" class="ion-no-padding px-4 py-3 bg-transparent">
-    <div slot="start" class="relative w-10 h-10 rounded-full overflow-hidden mr-3  flex items-center justify-center">
-      @if (userProfilePhoto()) {
-      <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" class="w-full h-full object-cover"
-        alt="Foto de perfil">
-      } @else {
-      <span class="text-primary font-bold text-sm uppercase">{{ (sesion!.nombreUsuario || 'U').charAt(0) }}</span>
-      }
-    </div>
+  <ion-item lines="none" style="--background: transparent;">
+    @if (userProfilePhoto()) {
+    <ion-avatar slot="start">
+      <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" alt="Foto de perfil">
+    </ion-avatar>
+    } @else {
+    <ion-icon aria-hidden="true" name="person" slot="start" color="medium"></ion-icon>
+    }
 
-    <ion-label class="mt-1">
-      <div class="flex items-center gap-1.5">
-        <h3 class="font-bold text-sm m-0 ">
-          {{ sesion!.nombreUsuario || 'Usuario' }}
-        </h3>
+    <ion-label class="ml-2">
+      <p>
         @if(isOwnPost()) {
-        <span
-          class="text-[9px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">Tú</span>
-        }
-      </div>
-      <p class="text-xs ">
-        {{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
+        <ion-badge color="primary">Tú</ion-badge>
+        } @else {
+      <p>{{ sesion!.nombreUsuario || 'Usuario' }}</p>
+      }
       </p>
     </ion-label>
 
+
     <ion-buttons slot="end">
       @if (!isOwnPost()) {
-      <ion-button (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear"
-        size="small" class="font-bold text-xs">
-        {{ isFollowing() ? 'Siguiendo' : 'Seguir' }}
+      <ion-button  (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear">
+        <ion-icon slot="icon-only" [name]="isFollowing() ? 'person-remove' : 'person-add'"></ion-icon>
       </ion-button>
       }
       @if (isOwnPost()) {
       <ion-button (click)="presentOptions($event)" color="medium">
-        <ion-icon slot="icon-only" name="ellipsis-horizontal" class="text-sm"></ion-icon>
+        <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
       </ion-button>
       }
     </ion-buttons>
@@ -42,54 +36,48 @@
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion!.fotoProgreso) {
-  <div class="w-full aspect-4/5 sm:aspect-square relative overflow-hidden">
-    <img [src]="sesion!.fotoProgreso" class="absolute inset-0 w-full h-full object-cover" alt="Foto del entrenamiento"
-      (error)="$any($event.target).style.display='none'">
-  </div>
+  <img [src]="sesion!.fotoProgreso" alt="Foto del entrenamiento" (error)="$any($event.target).style.display='none'"
+    style="width: 100%; aspect-ratio: 4/5; object-fit: cover;">
   } @else {
   <!-- Separator if no image, to make it look clean -->
-  <div class="h-px w-full "></div>
+  <div style="height: 1px; background: var(--ion-color-step-150, #e0e0e0); width: 100%;"></div>
   }
 
   <!-- Body: Contenido de la rutina y acciones -->
-  <ion-footer class="px-4 py-3">
+  <ion-card-content>
     <!-- Action buttons (Like, Comment, etc) -->
-    <div class="flex items-center justify-between mb-2 -mx-2 mt-1">
-      <div class="flex items-center">
-        <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
-          [color]="hasLiked() ? 'danger' : 'light'" class="ion-no-margin h-9 w-9">
-          <ion-icon slot="icon-only" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
-        </ion-button>
-        <!-- Future: Comment/Share icons could go here -->
-      </div>
+    <div style="margin-left: -16px; margin-top: -8px; margin-bottom: 8px;">
+      <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
+        [color]="hasLiked() ? 'danger' : 'medium'">
+        <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
+        @if (likesCount() > 0) {
+          <span style="font-weight: bold; margin-left: 6px;">{{ likesCount() }}</span>
+        }
+      </ion-button>
     </div>
-
-    <!-- Likes count -->
-    @if (likesCount() > 0) {
-    <div class="font-bold text-sm mb-1.5">
-      {{ likesCount() }} Me gusta
-    </div>
-    }
 
     <!-- Routine Title and Description -->
-    <div class="text-sm leading-snug">
-      <span class="font-bold mr-1">{{ sesion!.nombreUsuario || 'Usuario' }}</span>
-      <span>completó su sesión de <span class="font-semibold">{{ sesion!.rutinaResumen.nombre || 'Entrenamiento'
-          }}</span>.</span>
-    </div>
+    <p style="color: var(--ion-text-color);">
+      <b>{{ sesion!.nombreUsuario || 'Usuario' }}</b>
+      completó su sesión de <b>{{ sesion!.rutinaResumen.nombre || 'Entrenamiento' }}</b>.
+    </p>
 
     <!-- Secondary stats inline -->
-    <div class="flex items-center gap-3 mt-2 text-xs ">
-      <div class="flex items-center gap-1">
-        <ion-icon name="time-outline" class="text-sm"></ion-icon>
+    <div
+      style="display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--ion-color-medium);">
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <ion-icon name="time-outline"></ion-icon>
         <span>{{ redondearMinutos(sesion!.duracion || 0) }} min</span>
       </div>
-      <span class="opacity-50">•</span>
-      <div class="flex items-center gap-1">
-        <ion-icon name="barbell-outline" class="text-sm"></ion-icon>
+      <span style="opacity: 0.5;">•</span>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <ion-icon name="barbell-outline"></ion-icon>
         <span>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</span>
       </div>
+      <span style="opacity: 0.5;">•</span>
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>{{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}</span>
     </div>
-  </ion-footer>
+  </ion-card-content>
 
 </ion-card>

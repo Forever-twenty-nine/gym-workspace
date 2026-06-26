@@ -7,13 +7,11 @@ import {
   IonToolbar,
   IonAvatar,
   IonBadge,
-  IonChip,
   IonFooter,
   IonButton,
   IonLabel,
   ToastController,
-  AlertController
-} from '@ionic/angular/standalone';
+  AlertController, IonNote, IonButtons, IonContent, IonText, IonCard, IonCardContent, IonList, IonListHeader, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   closeOutline, handRightOutline, handRight, trashOutline,
@@ -27,7 +25,7 @@ import { ConvocatoriaService } from '../../../../../core/services/convocatoria.s
 @Component({
   selector: 'app-convocatoria-modal-stories',
   standalone: true,
-  imports: [
+  imports: [IonItem, IonCardContent, IonCard, IonText, IonContent, IonButtons, IonNote,
     CommonModule,
     IonModal,
     IonIcon,
@@ -35,24 +33,10 @@ import { ConvocatoriaService } from '../../../../../core/services/convocatoria.s
     IonToolbar,
     IonAvatar,
     IonBadge,
-    IonChip,
     IonFooter,
     IonButton,
-    IonLabel
-  ],
-  templateUrl: './convocatoria-modal-stories.component.html',
-  styles: [`
-    ion-modal {
-      --border-radius: 28px;
-      --width: min(94%, 460px);
-      --height: auto;
-      --max-height: 85vh;
-    }
-    .convocatoria-modal-card {
-      border-radius: 28px;
-      overflow: hidden;
-    }
-  `]
+    IonLabel],
+  templateUrl: './convocatoria-modal-stories.component.html'
 })
 export class ConvocatoriaModalStoriesComponent {
   private authService = inject(AuthService);
@@ -128,7 +112,7 @@ export class ConvocatoriaModalStoriesComponent {
     try {
       await this.convocatoriaService.toggleInteres(c.id, user.uid, !ya);
       if (!ya) {
-        this.showToast('¡Chocaste los 5! Estás dentro ✋', 'success');
+        this.showToast('Te has sumado a la convocatoria', 'success');
       } else {
         this.showToast('Interés retirado', 'medium');
       }
@@ -162,8 +146,7 @@ export class ConvocatoriaModalStoriesComponent {
             }
           }
         }
-      ],
-      cssClass: 'premium-alert'
+      ]
     });
     await alert.present();
   }
@@ -177,8 +160,7 @@ export class ConvocatoriaModalStoriesComponent {
       message,
       duration: 2200,
       color,
-      position: 'bottom',
-      cssClass: 'premium-toast'
+      position: 'bottom'
     });
     await toast.present();
   }
