@@ -1,7 +1,12 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PerfilPlanStatusComponent } from '../components/perfil-plan-status/perfil-plan-status.component';
-import { PerfilPlanActionsComponent } from '../components/perfil-plan-actions/perfil-plan-actions.component';
+import { PerfilPlanStatusComponent } from './components/perfil-plan-status/perfil-plan-status.component';
+import { PerfilPlanActionsComponent } from './components/perfil-plan-actions/perfil-plan-actions.component';
+import { User as LibraryUser, SolicitudPlan, Plan } from 'gym-library';
+
+export interface User extends LibraryUser {
+  photoURL?: string;
+}
 
 @Component({
   selector: 'app-perfil-tab-plan',
@@ -15,9 +20,10 @@ import { PerfilPlanActionsComponent } from '../components/perfil-plan-actions/pe
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerfilTabPlanComponent {
-  user = input.required<any>();
-  isPremium = input.required<boolean>();
-  ultimaSolicitud = input<any>();
+  user = input.required<User>();
+  ultimaSolicitud = input<SolicitudPlan | null>();
+
+  isPremium = computed(() => this.user().plan === Plan.PREMIUM);
 
   openPremiumModal = output<void>();
 }

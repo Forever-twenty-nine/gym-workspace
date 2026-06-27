@@ -1,0 +1,20 @@
+@if (user().role === 'entrenado') {
+  @if (isPremium()) {
+    <div class="w-full">
+      @if (estadisticasGenerales(); as stats) {
+        <app-progreso-estadisticas 
+          [stats]="stats" 
+          [sesiones]="historialSesiones()" 
+          [dbStats]="dbEstadisticas()">
+        </app-progreso-estadisticas>
+      } @else {
+        <div class="flex justify-center items-center py-10">
+          <ion-spinner name="crescent" color="primary"></ion-spinner>
+          <span class="ml-2 text-sm text-medium">Cargando estadísticas...</span>
+        </div>
+      }
+    </div>
+  } @else {
+    <app-perfil-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-perfil-stats-teaser>
+  }
+}

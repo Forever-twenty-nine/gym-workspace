@@ -4,7 +4,7 @@ import { PerfilUserHeaderComponent } from './perfil-user-header.component';
 import { fn } from '@storybook/test';
 
 const meta: Meta<PerfilUserHeaderComponent> = {
-  title: 'Secciones/entrenado/perfil/componentes/user-header',
+  title: 'Secciones/entrenado/perfil/tabs/info/componentes/user-header',
   component: PerfilUserHeaderComponent,
   tags: ['autodocs'],
   decorators: [
@@ -25,6 +25,10 @@ export const Default: Story = {
       role: 'entrenado',
       photoURL: 'https://ionicframework.com/docs/img/demos/avatar.svg'
     },
+    entrenado: {
+      objetivo: 'Bajar de peso',
+      nivel: 'Intermedio'
+    },
     initials: 'JP',
     roleDisplayName: 'Entrenado'
   }
@@ -35,6 +39,10 @@ export const WithoutPhoto: Story = {
     user: {
       nombre: 'Ana García',
       role: 'entrenado'
+    },
+    entrenado: {
+      objetivo: 'Ganar masa muscular',
+      nivel: 'Avanzado'
     },
     initials: 'AG',
     roleDisplayName: 'Entrenado'

@@ -1,0 +1,42 @@
+<ion-item lines="none" class="ion-no-padding">
+    <ion-avatar slot="start">
+        @if (user().photoURL) {
+        <img [ngSrc]="user().photoURL!" width="64" height="64" alt="Foto de perfil" />
+        } @else {
+        <div class="initials-container">
+            {{ initials() }}
+        </div>
+        }
+    </ion-avatar>
+    <ion-label>
+        <h2>{{ user().nombre || '' }}</h2>
+    </ion-label>
+    <ion-button slot="end" color="primary" (click)="editClick.emit()">
+        <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+    </ion-button>
+</ion-item>
+
+@if (user().role === 'entrenado' && entrenado()) {
+<ion-grid class="ion-no-padding" style="margin-top: 16px;">
+  <ion-row>
+    <ion-col size="6">
+      <ion-card class="ion-no-margin" style="margin-right: 4px;">
+        <ion-card-content class="ion-text-center">
+          <ion-icon name="flag-outline" color="primary" style="font-size: 1.5rem;"></ion-icon>
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; margin-top: 4px;">Objetivo</div>
+          <div style="font-weight: bold; font-size: 1rem;">{{ entrenado()!.objetivo || 'Sin definir' }}</div>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+    <ion-col size="6">
+      <ion-card class="ion-no-margin" style="margin-left: 4px;">
+        <ion-card-content class="ion-text-center">
+          <ion-icon name="bar-chart-outline" color="primary" style="font-size: 1.5rem;"></ion-icon>
+          <div style="font-size: 0.75rem; text-transform: uppercase; font-weight: bold; margin-top: 4px;">Nivel</div>
+          <div style="font-weight: bold; font-size: 1rem;">{{ entrenado()!.nivel || 'Sin definir' }}</div>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+}

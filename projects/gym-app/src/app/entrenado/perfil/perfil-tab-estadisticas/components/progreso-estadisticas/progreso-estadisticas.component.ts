@@ -1,7 +1,19 @@
 import { Component, Input, computed } from '@angular/core';
 import {
     IonCard,
-    IonCardContent
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonItem,
+    IonLabel,
+    IonNote,
+    IonProgressBar,
+    IonText,
+    IonList
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -9,7 +21,19 @@ import {
     standalone: true,
     imports: [
         IonCard,
-        IonCardContent
+        IonCardHeader,
+        IonCardTitle,
+        IonCardSubtitle,
+        IonCardContent,
+        IonGrid,
+        IonRow,
+        IonCol,
+        IonItem,
+        IonLabel,
+        IonNote,
+        IonProgressBar,
+        IonText,
+        IonList
     ],
     templateUrl: './progreso-estadisticas.component.html'
 })

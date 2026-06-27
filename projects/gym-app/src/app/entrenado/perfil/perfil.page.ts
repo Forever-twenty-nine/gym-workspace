@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, inject, computed, effect } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import {
@@ -39,16 +39,17 @@ import { InvitacionService } from '../../core/services/invitacion.service';
 import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
 import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
 import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
-import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
-import { EditProfileModalComponent } from '../../shared/components/header-tabs/components/profile/components/edit-profile-modal/edit-profile-modal.component';
-import { PremiumRequestModalComponent } from '../../shared/components/header-tabs/components/profile/components/premium-request-modal/premium-request-modal.component';
+import { ProgresoEstadisticasComponent } from './perfil-tab-estadisticas/components/progreso-estadisticas/progreso-estadisticas.component';
+import { EditProfileModalComponent } from './components/edit-profile-modal/edit-profile-modal.component';
+import { PremiumRequestModalComponent } from './components/premium-request-modal/premium-request-modal.component';
 import { NotificationsComponent } from '../../shared/components/header-tabs/components/notifications/notifications.component';
 import { ModalController, ToastController, LoadingController } from '@ionic/angular/standalone';
 
-type PerfilSegment = 'perfil' | 'plan';
+type PerfilSegment = 'perfil' | 'plan' | 'estadisticas';
 
 import { PerfilTabInfoComponent } from './perfil-tab-info/perfil-tab-info.component';
 import { PerfilTabPlanComponent } from './perfil-tab-plan/perfil-tab-plan.component';
+import { PerfilTabEstadisticasComponent } from './perfil-tab-estadisticas/perfil-tab-estadisticas.component';
 
 @Component({
   selector: 'app-perfil',
@@ -72,9 +73,10 @@ import { PerfilTabPlanComponent } from './perfil-tab-plan/perfil-tab-plan.compon
     EditProfileModalComponent,
     PremiumRequestModalComponent,
     PerfilTabInfoComponent,
-    PerfilTabPlanComponent]
+    PerfilTabPlanComponent,
+    PerfilTabEstadisticasComponent]
 })
-export class PerfilPage implements OnInit, OnDestroy {
+export class PerfilPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
   private readonly rutinaService = inject(RutinaService);
@@ -106,9 +108,6 @@ export class PerfilPage implements OnInit, OnDestroy {
   readonly isEditModalOpen = signal<boolean>(false);
   readonly isPremiumModalOpen = signal<boolean>(false);
   readonly isLoggingOut = signal(false);
-
-  private solicitudesUnsubscribe?: Unsubscribe;
-  private userListenerInitialized = false;
 
   // Contador de notificaciones no leídas
   readonly unreadChatsCount = computed(() => {
@@ -143,18 +142,21 @@ export class PerfilPage implements OnInit, OnDestroy {
       flagOutline, barChartOutline
     });
 
-    effect(() => {
+    effect((onCleanup) => {
       const user = this.currentUser();
       if (user && user.role === 'entrenado') {
-        this.iniciarListenerSolicitudes(user.uid);
+        const unsubscribe = this.planService.getSolicitudesUsuarioListener(user.uid, (solicitudes: SolicitudPlan[]) => {
+          this.ultimasolicitud.set(solicitudes && solicitudes.length > 0 ? solicitudes[0] : null);
+        });
+        onCleanup(() => unsubscribe());
       }
     });
 
-    effect(() => {
+    effect((onCleanup) => {
       const user = this.currentUser();
-      if (user?.uid && user.role === 'entrenado' && !this.userListenerInitialized) {
+      if (user?.uid && user.role === 'entrenado') {
         this.estadisticasService.initializeListener(user.uid);
-        this.userListenerInitialized = true;
+        onCleanup(() => this.estadisticasService.stopListener(user.uid));
       }
     });
   }
@@ -163,22 +165,11 @@ export class PerfilPage implements OnInit, OnDestroy {
     this.rutinas.set(this.rutinaService.rutinas());
   }
 
-  ngOnDestroy() {
-    if (this.solicitudesUnsubscribe) {
-      this.solicitudesUnsubscribe();
-    }
-    const uid = this.currentUser()?.uid;
-    const isEntrenado = this.currentUser()?.role === 'entrenado';
-    if (uid && isEntrenado && this.userListenerInitialized) {
-      this.estadisticasService.stopListener(uid);
-    }
-  }
-
   segmentChanged(event: Event) {
     const customEvent = event as CustomEvent<{ value?: PerfilSegment }>;
     const value = customEvent.detail?.value;
 
-    if (value === 'perfil' || value === 'plan') {
+    if (value === 'perfil' || value === 'plan' || value === 'estadisticas') {
       this.currentSegment.set(value);
     }
   }
@@ -205,13 +196,6 @@ export class PerfilPage implements OnInit, OnDestroy {
       cssClass: 'premium-modal'
     });
     await modal.present();
-  }
-
-  private iniciarListenerSolicitudes(userId: string) {
-    if (this.solicitudesUnsubscribe) this.solicitudesUnsubscribe();
-    this.solicitudesUnsubscribe = this.planService.getSolicitudesUsuarioListener(userId, (solicitudes: SolicitudPlan[]) => {
-      this.ultimasolicitud.set(solicitudes && solicitudes.length > 0 ? solicitudes[0] : null);
-    });
   }
 
   private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
@@ -246,61 +230,7 @@ export class PerfilPage implements OnInit, OnDestroy {
     }
   }
 
-  // Métodos para estadísticas
-  readonly rutinasAsignadas = computed(() => {
-    const userId = this.currentUser()?.uid;
-    if (!userId) return [];
-
-    const rutinas = this.rutinaService.rutinas();
-    const entrenado = this.entrenadoService.getEntrenado(userId)();
-
-    if (!rutinas.length || !entrenado?.rutinasAsignadasIds) return [];
-
-    return rutinas.filter(rutina => entrenado.rutinasAsignadasIds!.includes(rutina.id));
-  });
-
-  readonly historialSesiones = computed<SesionRutina[]>(() => {
-    const userId = this.currentUser()?.uid;
-    if (!userId) return [];
-
-    const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(userId)();
-
-    return [...sesiones].sort((a, b) => {
-      const dateA = a.fechaInicio instanceof Date ? a.fechaInicio : new Date(a.fechaInicio);
-      const dateB = b.fechaInicio instanceof Date ? b.fechaInicio : new Date(b.fechaInicio);
-      return dateB.getTime() - dateA.getTime();
-    });
-  });
-
-  readonly estadisticasGenerales = computed(() => {
-    const sesiones = this.historialSesiones();
-    const rutinasAsignadas = this.rutinasAsignadas();
-
-    const sesionesCompletadas = sesiones.filter(s => s.completada).length;
-    const sesionesEnProgreso = sesiones.filter(s => !s.completada).length;
-
-    const tiempoTotalSegundos = sesiones.reduce((total: number, sesion) => {
-      return total + (sesion.duracion || 0);
-    }, 0);
-
-    const tiempoTotal = Math.round(tiempoTotalSegundos / 60);
-
-    const totalEntrenamientosRealizados = sesiones.length;
-
-    return {
-      rutinasAsignadas: rutinasAsignadas.length,
-      sesionesTotales: totalEntrenamientosRealizados,
-      completadas: sesionesCompletadas,
-      enProgreso: sesionesEnProgreso,
-      tiempoTotal
-    };
-  });
-
-  readonly dbEstadisticas = computed(() => {
-    const uid = this.currentUser()?.uid;
-    if (!uid) return null;
-    return this.estadisticasService.getEstadisticas(uid)();
-  });
+  // (Estadisticas movidas a PerfilTabEstadisticasComponent)
 
   getRoleDisplayName(role?: string): string {
     switch (role) {

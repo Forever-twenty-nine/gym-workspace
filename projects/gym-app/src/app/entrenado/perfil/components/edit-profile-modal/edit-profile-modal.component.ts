@@ -16,10 +16,10 @@ export interface User extends LibraryUser {
   photoURL?: string;
 }
 
-import { UserService } from '../../../../../../../core/services/user.service';
-import { EntrenadoService } from '../../../../../../../core/services/entrenado.service';
-import { NotificacionService } from '../../../../../../../core/services/notificacion.service';
-import { FirebaseStorageService } from '../../../../../../../core/services/firebase-storage.service';
+import { UserService } from '../../../../core/services/user.service';
+import { EntrenadoService } from '../../../../core/services/entrenado.service';
+import { NotificacionService } from '../../../../core/services/notificacion.service';
+import { FirebaseStorageService } from '../../../../core/services/firebase-storage.service';
 
 @Component({
   selector: 'app-edit-profile-modal',
@@ -155,7 +155,7 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
 
       this.showToast('Perfil actualizado correctamente', 'success');
       this.close();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating profile:', error);
       this.showToast('Error al actualizar el perfil', 'danger');
     } finally {
@@ -189,7 +189,7 @@ export class EditProfileModalComponent implements OnInit, OnChanges {
       }
 
       this.showToast('Foto de perfil actualizada', 'success');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading photo:', error);
       this.showToast('Error al subir la foto', 'danger');
     } finally {

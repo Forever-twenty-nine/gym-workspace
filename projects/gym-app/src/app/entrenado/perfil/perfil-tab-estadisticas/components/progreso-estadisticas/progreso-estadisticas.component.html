@@ -1,0 +1,95 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-subtitle>Nivel {{ getNivel() }}</ion-card-subtitle>
+    <ion-card-title color="primary">{{ getExperiencia() }} / {{ getExperienciaProximo() }} XP</ion-card-title>
+    <ion-progress-bar color="primary" [value]="getXpPercent() / 100"></ion-progress-bar>
+  </ion-card-header>
+
+  <ion-card-content>
+    
+    <!-- Rachas -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6" class="ion-text-center">
+          <ion-text color="medium"><h5>Racha actual</h5></ion-text>
+          <ion-text color="dark"><h2>{{ getRacha() }} días</h2></ion-text>
+        </ion-col>
+        <ion-col size="6" class="ion-text-center">
+          <ion-text color="medium"><h5>Mejor racha</h5></ion-text>
+          <ion-text color="dark"><h2>{{ getMejorRacha() }} días</h2></ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Métricas clave -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4" class="ion-text-center">
+          <ion-text color="dark"><h3>{{ stats?.completadas || 0 }}</h3></ion-text>
+          <ion-text color="medium"><p>Completadas</p></ion-text>
+        </ion-col>
+        <ion-col size="4" class="ion-text-center">
+          <ion-text color="dark"><h3>{{ formatearTiempo(stats?.tiempoTotal || 0) }}</h3></ion-text>
+          <ion-text color="medium"><p>Tiempo</p></ion-text>
+        </ion-col>
+        <ion-col size="4" class="ion-text-center">
+          <ion-text color="dark"><h3>{{ stats?.sesionesTotales || 0 }}</h3></ion-text>
+          <ion-text color="medium"><p>Totales</p></ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Gráfico de actividad semanal -->
+    <ion-list lines="none">
+      <ion-item>
+        <ion-label color="medium">Actividad últimos 7 días</ion-label>
+        <ion-note slot="end">sesiones</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-grid>
+          <ion-row class="ion-align-items-end">
+            @for (day of weeklyActivity(); track $index) {
+              <ion-col class="ion-text-center">
+                <!-- Keep a tiny tailwind class for height since Ionic doesn't have vertical progress bars, but use ion-color variables -->
+                <div style="width: 100%; min-height: 4px; background: var(--ion-color-primary); border-radius: 4px 4px 0 0;"
+                     [style.height.px]="day.value > 0 ? (day.value / (maxWeeklyValue() || 1) * 50) : 4">
+                </div>
+                <ion-text color="medium"><p style="font-size: 10px;">{{ day.label }}</p></ion-text>
+              </ion-col>
+            }
+          </ion-row>
+        </ion-grid>
+      </ion-item>
+    </ion-list>
+
+    <!-- Rutinas con más actividad -->
+    @if (topRutinas().length > 0) {
+      <ion-list>
+        <ion-item>
+          <ion-label color="medium">Rutinas más entrenadas</ion-label>
+        </ion-item>
+        @for (r of topRutinas(); track r.name) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ r.name }}</h3>
+              <ion-progress-bar color="success" [value]="r.percent / 100"></ion-progress-bar>
+            </ion-label>
+            <ion-note slot="end" color="dark">{{ r.count }}</ion-note>
+          </ion-item>
+        }
+      </ion-list>
+    }
+
+    <!-- Tasa de completado -->
+    <ion-list lines="none">
+      <ion-item>
+        <ion-label color="medium">Tasa de completado</ion-label>
+        <ion-note slot="end" color="dark">{{ completionRate() }}%</ion-note>
+      </ion-item>
+      <ion-item>
+        <ion-progress-bar color="success" [value]="completionRate() / 100"></ion-progress-bar>
+      </ion-item>
+    </ion-list>
+
+  </ion-card-content>
+</ion-card>

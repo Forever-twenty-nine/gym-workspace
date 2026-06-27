@@ -4,7 +4,7 @@ import { PerfilStatsTeaserComponent } from './perfil-stats-teaser.component';
 import { fn } from '@storybook/test';
 
 const meta: Meta<PerfilStatsTeaserComponent> = {
-  title: 'Secciones/entrenado/perfil/componentes/stats-teaser',
+  title: 'Secciones/entrenado/perfil/tabs/estadisticas/componentes/stats-teaser',
   component: PerfilStatsTeaserComponent,
   tags: ['autodocs'],
   decorators: [

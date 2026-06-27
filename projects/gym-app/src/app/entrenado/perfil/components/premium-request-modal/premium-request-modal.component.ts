@@ -6,7 +6,7 @@ import { User as LibraryUser } from 'gym-library';
 export interface User extends LibraryUser {
   photoURL?: string;
 }
-import { PlanService } from '../../../../../../../core/services/plan.service';
+import { PlanService } from '../../../../core/services/plan.service';
 import { addIcons } from 'ionicons';
 import { starOutline, checkmarkCircleOutline } from 'ionicons/icons';
 

@@ -11,6 +11,9 @@
           <ion-segment-button value="plan">
             <ion-label>Plan</ion-label>
           </ion-segment-button>
+          <ion-segment-button value="estadisticas">
+            <ion-label>Estadísticas</ion-label>
+          </ion-segment-button>
         </ion-segment>
       </div>
 
@@ -51,35 +54,36 @@
   }
   }
 
-  <!-- Header Section inside Content (for overlay / glassmorphism styling) -->
   <div class="main-container ion-padding relative z-10">
-
-    <!-- Tab Contents Container -->
-
 
     @if (currentUser(); as user) {
 
     <!-- ================= TAB: PERFIL ================= -->
     @if (currentSegment() === 'perfil') {
-    <app-perfil-tab-info [user]="user" [initials]="getIniciales(user.nombre)"
-      [roleDisplayName]="getRoleDisplayName(user.role)" [currentEntrenado]="currentEntrenado()"
-      [isPremium]="isPremium()" [estadisticasGenerales]="estadisticasGenerales()"
-      [historialSesiones]="historialSesiones()" [dbEstadisticas]="dbEstadisticas()" (editClick)="openEditModal()"
-      (viewPlansClick)="currentSegment.set('plan')" (logoutClick)="logout()">
+    <app-perfil-tab-info [user]="user" [currentEntrenado]="currentEntrenado()"
+      (editClick)="openEditModal()"
+      (logoutClick)="logout()">
     </app-perfil-tab-info>
     }
 
     <!-- ================= TAB: PLAN ================= -->
     @if (currentSegment() === 'plan') {
-    <app-perfil-tab-plan [user]="user" [isPremium]="isPremium()" [ultimaSolicitud]="ultimasolicitud()"
+    <app-perfil-tab-plan [user]="user" [ultimaSolicitud]="ultimasolicitud()"
       (openPremiumModal)="openPremiumModal()">
     </app-perfil-tab-plan>
     }
 
-    @} @else if (!isLoggingOut()) {
+    <!-- ================= TAB: ESTADÍSTICAS ================= -->
+    @if (currentSegment() === 'estadisticas') {
+    <app-perfil-tab-estadisticas 
+      [user]="user" 
+      (viewPlansClick)="currentSegment.set('plan')">
+    </app-perfil-tab-estadisticas>
+    }
+
+    } @else if (!isLoggingOut()) {
     <div class="flex flex-col items-center justify-center p-12 h-full flex-1">
       <ion-spinner name="crescent" color="primary"></ion-spinner>
-      <p class="mt-4 text-gray-500 dark:text-white font-medium">Cargando información del usuario...</p>
     </div>
     }
 

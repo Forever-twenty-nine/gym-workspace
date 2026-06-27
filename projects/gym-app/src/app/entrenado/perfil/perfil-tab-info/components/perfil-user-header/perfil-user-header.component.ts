@@ -1,11 +1,11 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { IonButton, IonIcon, IonAvatar, IonLabel, IonItem } from '@ionic/angular/standalone';
+import { IonButton, IonIcon, IonAvatar, IonLabel, IonItem, IonGrid, IonRow, IonCol, IonCard, IonCardContent } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-perfil-user-header',
   standalone: true,
-  imports: [CommonModule, NgOptimizedImage, IonButton, IonIcon, IonAvatar, IonLabel, IonItem],
+  imports: [CommonModule, NgOptimizedImage, IonButton, IonIcon, IonAvatar, IonLabel, IonItem, IonGrid, IonRow, IonCol, IonCard, IonCardContent],
   templateUrl: './perfil-user-header.component.html',
   styles: [`
     .initials-container {
@@ -28,6 +28,11 @@ export class PerfilUserHeaderComponent {
     role?: string;
     photoURL?: string;
   }>();
+
+  entrenado = input<{
+    objetivo?: string;
+    nivel?: string;
+  } | null | undefined>(undefined);
 
   initials = input.required<string>();
   roleDisplayName = input.required<string>();

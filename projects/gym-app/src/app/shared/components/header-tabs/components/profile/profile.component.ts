@@ -29,8 +29,8 @@ import { EntrenadoService } from '../../../../../core/services/entrenado.service
 import { PlanService } from '../../../../../core/services/plan.service';
 import { NotificacionService } from '../../../../../core/services/notificacion.service';
 
-import { EditProfileModalComponent } from './components/edit-profile-modal/edit-profile-modal.component';
-import { PremiumRequestModalComponent } from './components/premium-request-modal/premium-request-modal.component';
+import { EditProfileModalComponent } from '../../../../../entrenado/perfil/components/edit-profile-modal/edit-profile-modal.component';
+import { PremiumRequestModalComponent } from '../../../../../entrenado/perfil/components/premium-request-modal/premium-request-modal.component';
 
 @Component({
   selector: 'app-profile',

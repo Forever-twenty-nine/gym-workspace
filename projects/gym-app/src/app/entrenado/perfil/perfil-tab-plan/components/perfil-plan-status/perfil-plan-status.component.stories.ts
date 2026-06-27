@@ -3,7 +3,7 @@ import { componentWrapperDecorator } from '@storybook/angular';
 import { PerfilPlanStatusComponent } from './perfil-plan-status.component';
 
 const meta: Meta<PerfilPlanStatusComponent> = {
-  title: 'Secciones/entrenado/perfil/componentes/plan-status',
+  title: 'Secciones/entrenado/perfil/tabs/plan/componentes/plan-status',
   component: PerfilPlanStatusComponent,
   tags: ['autodocs'],
   decorators: [

@@ -1,24 +1,22 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
-import { PerfilUserHeaderComponent } from '../components/perfil-user-header/perfil-user-header.component';
-import { PerfilGoalsComponent } from '../components/perfil-goals/perfil-goals.component';
-import { PerfilStatsTeaserComponent } from '../components/perfil-stats-teaser/perfil-stats-teaser.component';
-import { ProgresoEstadisticasComponent } from '../components/progreso-estadisticas/progreso-estadisticas.component';
+import { PerfilUserHeaderComponent } from './components/perfil-user-header/perfil-user-header.component';
+import { User as LibraryUser, Entrenado, Plan } from 'gym-library';
+
+export interface User extends LibraryUser {
+  photoURL?: string;
+}
 
 @Component({
   selector: 'app-perfil-tab-info',
   standalone: true,
   imports: [
-    CommonModule, 
-    IonButton, 
-    IonIcon, 
-    IonSpinner,
-    PerfilUserHeaderComponent,
-    PerfilGoalsComponent,
-    PerfilStatsTeaserComponent,
-    ProgresoEstadisticasComponent
-  ],
+    CommonModule,
+    IonButton,
+    IonIcon,
+    PerfilUserHeaderComponent
+],
   templateUrl: './perfil-tab-info.component.html',
   styles: [`
     .initials-container {
@@ -36,16 +34,28 @@ import { ProgresoEstadisticasComponent } from '../components/progreso-estadistic
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerfilTabInfoComponent {
-  user = input.required<any>();
-  initials = input.required<string>();
-  roleDisplayName = input.required<string>();
-  currentEntrenado = input<any>();
-  isPremium = input.required<boolean>();
-  estadisticasGenerales = input<any>();
-  historialSesiones = input<any[]>([]);
-  dbEstadisticas = input<any>();
+  user = input.required<User>();
+  currentEntrenado = input<Entrenado | null>();
+
+  initials = computed(() => {
+    const nombre = this.user().nombre;
+    if (!nombre) return 'U';
+    return nombre.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
+  });
+
+  roleDisplayName = computed(() => {
+    const role = this.user().role as string;
+    switch (role) {
+      case 'gimnasio': return 'Gimnasio';
+      case 'entrenado': return 'Entrenado';
+      case 'entrenador': return 'Entrenador';
+      case 'user': return 'Usuario';
+      default: return 'Usuario';
+    }
+  });
+
+  isPremium = computed(() => this.user().plan === Plan.PREMIUM);
 
   editClick = output<void>();
-  viewPlansClick = output<void>();
   logoutClick = output<void>();
 }

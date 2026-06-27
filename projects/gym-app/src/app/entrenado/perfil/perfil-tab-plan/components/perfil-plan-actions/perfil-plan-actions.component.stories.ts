@@ -4,7 +4,7 @@ import { PerfilPlanActionsComponent } from './perfil-plan-actions.component';
 import { fn } from '@storybook/test';
 
 const meta: Meta<PerfilPlanActionsComponent> = {
-  title: 'Secciones/entrenado/perfil/componentes/plan-actions',
+  title: 'Secciones/entrenado/perfil/tabs/plan/componentes/plan-actions',
   component: PerfilPlanActionsComponent,
   tags: ['autodocs'],
   decorators: [
@@ -29,7 +29,8 @@ export const pendingRequest: Story = {
   args: {
     isPremium: false,
     ultimaSolicitud: {
-      estado: 'pestaña'
+      estado: 'PENDIENTE',
+      fechaCreacion: new Date().toISOString()
     }
   }
 };

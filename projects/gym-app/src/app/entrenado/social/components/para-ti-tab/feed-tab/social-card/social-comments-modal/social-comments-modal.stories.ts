@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { SocialCommentsModalComponent } from './social-comments-modal.component';
-import { mockProviders, mockSesionesCompartidas } from '../../../../testing-mocks';
+import { mockProviders, mockSesionesCompartidas } from '../../../../../testing-mocks';
 
 const meta: Meta<SocialCommentsModalComponent> = {
   title: 'Secciones/entrenado/social/Componentes/para-ti-tab/feed-tab/social-card/social-comments-modal/SocialCommentsModal',
