@@ -1,0 +1,43 @@
+<div class="flex-1 flex flex-col justify-between">
+  <div>
+    <app-perfil-user-header 
+      [user]="user()" 
+      [initials]="initials()"
+      [roleDisplayName]="roleDisplayName()" 
+      (editClick)="editClick.emit()">
+    </app-perfil-user-header>
+
+    @if (user().role === 'entrenado' && currentEntrenado(); as entrenado) {
+      <app-perfil-goals [entrenado]="entrenado"></app-perfil-goals>
+    }
+
+    @if (user().role === 'entrenado') {
+      @if (isPremium()) {
+        <div class="w-full">
+          @if (estadisticasGenerales(); as stats) {
+            <app-progreso-estadisticas 
+              [stats]="stats" 
+              [sesiones]="historialSesiones()" 
+              [dbStats]="dbEstadisticas()">
+            </app-progreso-estadisticas>
+          } @else {
+            <div class="flex justify-center items-center py-10">
+              <ion-spinner name="crescent" color="primary"></ion-spinner>
+              <span class="ml-2 text-sm text-medium">Cargando estadísticas...</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <app-perfil-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-perfil-stats-teaser>
+      }
+    }
+  </div>
+
+  <div class="mt-8">
+    <ion-button expand="block" color="danger" fill="outline" class="font-semibold h-12 rounded-2xl"
+      (click)="logoutClick.emit()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
+  </div>
+</div>

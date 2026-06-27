@@ -1,0 +1,56 @@
+<ion-card class="ion-no-margin">
+  <ion-card-header>
+    <ion-card-title style="font-size: 1.125rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+      <ion-icon name="star-outline" color="primary"></ion-icon>
+      Cambio de Plan
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p style="font-size: 0.875rem; line-height: 1.4; margin-bottom: 16px;">
+      @if (isPremium()) {
+      Tu membresía Premium está activa. Si deseas cancelarla o modificar la suscripción, por favor contactate
+      con el soporte del gimnasio.
+      } @else {
+      Al pasarte al plan Premium desbloquearás estadísticas avanzadas, comparativas de progreso, visualización
+      gráfica semanal y acceso directo a entrenadores especializados para tus rutinas.
+      }
+    </p>
+
+    @if (!isPremium()) {
+    @if (ultimaSolicitud()?.estado === 'pendiente') {
+    <div style="background: var(--ion-color-warning-tint); color: var(--ion-color-warning-shade); padding: 12px; border-radius: 8px; text-align: center;">
+      <div style="font-weight: bold; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <ion-icon name="time-outline"></ion-icon>
+        Solicitud de Premium pendiente
+      </div>
+      <p style="font-size: 0.7rem; margin-top: 4px;">
+        Tu entrenador o el gimnasio está evaluando tu solicitud. Te notificaremos pronto.
+      </p>
+    </div>
+    } @else if (ultimaSolicitud()?.estado === 'rechazada') {
+    <div style="background: var(--ion-color-danger-tint); color: var(--ion-color-danger-shade); padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 16px;">
+      <div style="font-weight: bold; font-size: 0.875rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        Solicitud Premium rechazada
+      </div>
+      <p style="font-size: 0.7rem; margin-top: 4px;">
+        Tu solicitud anterior fue rechazada. Podés volver a intentarlo o consultar con la administración.
+      </p>
+    </div>
+    <ion-button expand="block" color="danger" (click)="openPremiumModal.emit()">
+      Reintentar Premium
+    </ion-button>
+    } @else {
+    <ion-button expand="block" color="primary" (click)="openPremiumModal.emit()">
+      <ion-icon name="trophy-outline" slot="start"></ion-icon>
+      Solicitar Plan Premium
+    </ion-button>
+    }
+    } @else {
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--ion-color-success); font-weight: bold;">
+      <ion-icon name="checkmark-circle-outline" style="font-size: 1.5rem;"></ion-icon>
+      <span>Premium activo</span>
+    </div>
+    }
+  </ion-card-content>
+</ion-card>

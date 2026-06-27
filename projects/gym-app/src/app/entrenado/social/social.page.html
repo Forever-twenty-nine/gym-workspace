@@ -1,17 +1,16 @@
-<!-- Tabs de Segmento con Glassmorphism (Fijo fuera de ion-content) -->
 <ion-header class="ion-no-border">
-  <ion-toolbar
-    style="--background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.85); backdrop-filter: blur(10px);">
-    <div style="display: flex; justify-content: center; width: 100%;">
-      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" style="width: 100%; max-width: 400px;">
+  <ion-toolbar>
+    <div style="display: flex; justify-content: center; width: 100%; padding: 0 12px;">
+      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios"
+        style="width: 100%; max-width: 420px;">
         <ion-segment-button value="para-ti">
-          <ion-label class="text-xs uppercase tracking-wider">Para ti</ion-label>
+          <ion-label>Para ti</ion-label>
         </ion-segment-button>
         <ion-segment-button value="siguiendo">
-          <ion-label class="text-xs uppercase tracking-wider">Siguiendo</ion-label>
+          <ion-label>Siguiendo</ion-label>
         </ion-segment-button>
         <ion-segment-button value="descubrir">
-          <ion-label class="text-xs uppercase tracking-wider">Descubrir</ion-label>
+          <ion-label>Descubrir</ion-label>
         </ion-segment-button>
       </ion-segment>
     </div>

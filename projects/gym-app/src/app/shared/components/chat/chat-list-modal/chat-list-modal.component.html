@@ -49,7 +49,7 @@
               <!-- Foto de Perfil -->
               <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs shrink-0">
                 @if (chat.otherUser?.photoURL) {
-                  <img [src]="chat.otherUser?.photoURL" alt="Avatar" class="w-full h-full object-cover">
+                  <img [src]="chat.otherUser.photoURL" alt="Avatar" class="w-full h-full object-cover">
                 } @else {
                   <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
                 }

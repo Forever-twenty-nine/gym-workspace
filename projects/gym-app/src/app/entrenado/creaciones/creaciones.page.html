@@ -1,20 +1,23 @@
-<!-- Segment header (like social page) -->
-<ion-header class="relative z-20 px-4 pt-1 pb-2 bg-transparent">
-  <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)"
-    class="rounded-2xl overflow-hidden border border-white/40 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-lg text-[10px]">
-    <ion-segment-button value="convocatorias">
-      <ion-label class="font-bold text-[10px] uppercase tracking-wider">Convocatorias</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="desafios">
-      <ion-label class="font-bold text-[10px] uppercase tracking-wider">Desafíos</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="rutinas">
-      <ion-label class="font-bold text-[10px] uppercase tracking-wider">Rutinas</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="ejercicios">
-      <ion-label class="font-bold text-[10px] uppercase tracking-wider">Ejercicios</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <div style="display: flex; justify-content: center; width: 100%; padding: 0 12px;">
+      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios"
+        style="width: 100%; max-width: 520px;">
+        <ion-segment-button value="convocatorias">
+          <ion-label>Convocatorias</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="desafios">
+          <ion-label>Desafíos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="rutinas">
+          <ion-label>Rutinas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="ejercicios">
+          <ion-label>Ejercicios</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" style="--background: transparent;">

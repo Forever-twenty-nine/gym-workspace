@@ -1,0 +1,17 @@
+<ion-card class="ion-no-margin ion-text-center">
+  <ion-card-header>
+    <ion-card-subtitle style="letter-spacing: 2px;">Tu Plan Actual</ion-card-subtitle>
+    <ion-card-title [color]="isPremium() ? 'success' : 'dark'" style="font-size: 2rem; font-weight: 900;">
+      {{ plan() ? (plan()! | uppercase) : 'FREE' }}
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <p style="font-size: 0.75rem;">
+      @if (isPremium()) {
+      Tenés acceso ilimitado a todas las herramientas, estadísticas de entrenamiento y rutinas exclusivas.
+      } @else {
+      Tenés una cuenta gratuita con acceso básico a entrenamientos.
+      }
+    </p>
+  </ion-card-content>
+</ion-card>

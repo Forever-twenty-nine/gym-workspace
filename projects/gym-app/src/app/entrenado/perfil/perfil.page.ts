@@ -9,8 +9,7 @@ import {
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonSpinner
-} from '@ionic/angular/standalone';
+  IonSpinner, IonHeader, IonToolbar, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import {
@@ -46,13 +45,17 @@ import { PremiumRequestModalComponent } from '../../shared/components/header-tab
 import { NotificationsComponent } from '../../shared/components/header-tabs/components/notifications/notifications.component';
 import { ModalController, ToastController, LoadingController } from '@ionic/angular/standalone';
 
+type PerfilSegment = 'perfil' | 'plan';
+
+import { PerfilTabInfoComponent } from './perfil-tab-info/perfil-tab-info.component';
+import { PerfilTabPlanComponent } from './perfil-tab-plan/perfil-tab-plan.component';
+
 @Component({
   selector: 'app-perfil',
   templateUrl: './perfil.page.html',
   standalone: true,
   imports: [
     CommonModule,
-    NgOptimizedImage,
     IonContent,
     IonButton,
     IonIcon,
@@ -61,13 +64,15 @@ import { ModalController, ToastController, LoadingController } from '@ionic/angu
     IonSegmentButton,
     IonLabel,
     IonSpinner,
+    IonHeader,
+    IonToolbar,
     PageBackgroundComponent,
     TrainerBackgroundComponent,
     GymBackgroundComponent,
-    ProgresoEstadisticasComponent,
     EditProfileModalComponent,
-    PremiumRequestModalComponent
-  ]
+    PremiumRequestModalComponent,
+    PerfilTabInfoComponent,
+    PerfilTabPlanComponent]
 })
 export class PerfilPage implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
@@ -86,7 +91,7 @@ export class PerfilPage implements OnInit, OnDestroy {
   private readonly toastCtrl = inject(ToastController);
   private readonly loadingCtrl = inject(LoadingController);
 
-  readonly currentSegment = signal<'perfil' | 'plan'>('perfil');
+  readonly currentSegment = signal<PerfilSegment>('perfil');
   readonly currentUser = computed(() => this.authService.currentUser() as User);
   readonly isPremium = computed(() => this.currentUser()?.plan === Plan.PREMIUM);
   
@@ -169,8 +174,13 @@ export class PerfilPage implements OnInit, OnDestroy {
     }
   }
 
-  segmentChanged(event: any) {
-    this.currentSegment.set(event.detail.value);
+  segmentChanged(event: Event) {
+    const customEvent = event as CustomEvent<{ value?: PerfilSegment }>;
+    const value = customEvent.detail?.value;
+
+    if (value === 'perfil' || value === 'plan') {
+      this.currentSegment.set(value);
+    }
   }
 
   openEditModal() {

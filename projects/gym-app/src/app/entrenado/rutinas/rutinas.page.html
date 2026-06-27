@@ -1,13 +1,16 @@
-<ion-header>
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)">
-      <ion-segment-button value="rutinas">
-        <ion-label>Rutinas</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="historial">
-        <ion-label>Historial</ion-label>
-      </ion-segment-button>
-    </ion-segment>
+    <div style="display: flex; justify-content: center; width: 100%; padding: 0 12px;">
+      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios"
+        style="width: 100%; max-width: 420px;">
+        <ion-segment-button value="rutinas">
+          <ion-label>Rutinas</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="historial">
+          <ion-label>Historial</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
   </ion-toolbar>
 </ion-header>
 
