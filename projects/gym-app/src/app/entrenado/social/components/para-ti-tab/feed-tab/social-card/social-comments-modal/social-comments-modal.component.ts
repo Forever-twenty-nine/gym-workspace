@@ -155,7 +155,8 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
           user.uid,
           this.nombreUsuarioActual(),
           this.fotoUsuarioActual(),
-          texto
+          texto,
+          responderA.entrenadoId
         );
         this.comentarioAResponder.set(null);
         this.nuevoComentarioTexto = '';
@@ -165,7 +166,8 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
           user.uid,
           this.nombreUsuarioActual(),
           this.fotoUsuarioActual(),
-          texto
+          texto,
+          s.entrenadoId
         );
         this.nuevoComentarioTexto = '';
       }
@@ -185,7 +187,7 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
       if (hasLiked) {
         await this.comentarioSocialService.removeLike(comentario.id, user.uid);
       } else {
-        await this.comentarioSocialService.addLike(comentario.id, user.uid);
+        await this.comentarioSocialService.addLike(comentario.id, user.uid, this.nombreUsuarioActual(), comentario.entrenadoId);
       }
     } catch (e) {
       console.error('Error al alternar like en comentario:', e);
@@ -208,7 +210,7 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
       if (hasLiked) {
         await this.comentarioSocialService.removeLikeRespuesta(comentario.id, user.uid);
       } else {
-        await this.comentarioSocialService.addLikeRespuesta(comentario.id, user.uid);
+        await this.comentarioSocialService.addLikeRespuesta(comentario.id, user.uid, this.nombreUsuarioActual(), comentario.respuesta.entrenadoId);
       }
     } catch (e) {
       console.error('Error al alternar like en respuesta:', e);

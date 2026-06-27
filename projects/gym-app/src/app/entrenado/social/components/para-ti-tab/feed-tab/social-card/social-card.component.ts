@@ -120,7 +120,12 @@ export class SocialCardComponent implements OnInit, OnDestroy {
     this._sesion.set({ ...s, likes: updatedLikes });
 
     try {
-      liked ? await this.sesionService.removeLike(s.id, user.uid) : await this.sesionService.addLike(s.id, user.uid);
+      if (liked) {
+        await this.sesionService.removeLike(s.id, user.uid);
+      } else {
+        const likerNombre = this.userService.getUserByUid(user.uid)()?.nombre || 'Alguien';
+        await this.sesionService.addLike(s.id, user.uid, likerNombre, s.entrenadoId);
+      }
     } catch (e) {
       console.error(e);
       this._sesion.set(s);

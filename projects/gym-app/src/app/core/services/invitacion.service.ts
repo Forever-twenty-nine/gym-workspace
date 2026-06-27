@@ -14,6 +14,7 @@ import {
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot,
+    arrayUnion
 } from 'firebase/firestore';
 import { EntrenadoService } from './entrenado.service';
 import { EntrenadorService, PlanLimitError } from './entrenador.service';
@@ -252,50 +253,22 @@ export class InvitacionService {
 
                 // Actualizar perfil Entrenador: agregar gimnasioId
                 const entrenadorService = this.injector.get(EntrenadorService);
-                const entrenador = entrenadorService.getEntrenadorById(entrenadorIdAsociado)();
-                if (entrenador) {
-                    await entrenadorService.update(entrenadorIdAsociado, { gimnasioId });
-                }
+                const entrenadorDoc = doc(this.firestore, 'entrenadores', entrenadorIdAsociado);
+                await updateDoc(entrenadorDoc, { gimnasioId }).catch(e => console.warn(e));
 
                 // Actualizar perfil Gimnasio: agregar entrenador a entrenadoresIds
                 const gimnasioService = this.injector.get(GimnasioService);
-                const gimnasio = gimnasioService.getGimnasioById(gimnasioId)();
-                if (gimnasio) {
-                    const entrenadoresIds = [...(gimnasio.entrenadoresIds || [])];
-                    if (!entrenadoresIds.includes(entrenadorIdAsociado)) {
-                        entrenadoresIds.push(entrenadorIdAsociado);
-                        await gimnasioService.save({ ...gimnasio, entrenadoresIds });
-                    }
-                }
+                const gimnasioDoc = doc(this.firestore, 'gimnasios', gimnasioId);
+                await updateDoc(gimnasioDoc, { entrenadoresIds: arrayUnion(entrenadorIdAsociado) }).catch(e => console.warn(e));
+
             } else {
                 // 2) Actualizar entrenado: agregar entrenadorId a entrenadoresId
-                const entrenadoService = this.injector.get(EntrenadoService);
-                const entrenadoSignal = entrenadoService.getEntrenadoById(entrenadoId)();
-                const entrenado = entrenadoSignal || entrenadoService.entrenados().find((e: any) => e.id === entrenadoId) || null;
-                if (entrenado) {
-                    const entrenadoresId = [...(entrenado.entrenadoresId || [])];
-                    if (!entrenadoresId.includes(entrenadorId)) {
-                        entrenadoresId.push(entrenadorId);
-                        const entrenadoActualizado = { ...entrenado, entrenadoresId } as any;
-                        await entrenadoService.save(entrenadoActualizado);
-                    }
-                }
+                const entrenadoDoc = doc(this.firestore, 'entrenados', entrenadoId);
+                await updateDoc(entrenadoDoc, { entrenadoresId: arrayUnion(entrenadorId) }).catch(e => console.warn(e));
 
                 // 3) Actualizar entrenador: agregar entrenadoId a entrenadosAsignadosIds
-                const entrenadorService = this.injector.get(EntrenadorService);
-                const entrenador = entrenadorService.getEntrenadorById(entrenadorId)();
-                if (entrenador) {
-                    const entrenadosAsignadosIds = [...(entrenador.entrenadosAsignadosIds || [])];
-                    if (!entrenadosAsignadosIds.includes(entrenadoId)) {
-                        // Check limit before adding
-                        const limits = entrenadorService.getLimits(entrenadorId);
-                        if (entrenadosAsignadosIds.length >= limits.maxClients) {
-                            throw new PlanLimitError('Has alcanzado el límite de clientes para tu plan. Actualiza para conectar más.');
-                        }
-                        entrenadosAsignadosIds.push(entrenadoId);
-                        await entrenadorService.update(entrenadorId, { entrenadosAsignadosIds });
-                    }
-                }
+                const entrenadorDoc = doc(this.firestore, 'entrenadores', entrenadorId);
+                await updateDoc(entrenadorDoc, { entrenadosAsignadosIds: arrayUnion(entrenadoId) }).catch(e => console.warn(e));
             }
 
             // 4) Actualizar la notificación asociada a la invitación

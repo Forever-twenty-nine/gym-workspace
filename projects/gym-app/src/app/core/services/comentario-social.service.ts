@@ -13,12 +13,14 @@ import {
   arrayUnion,
   arrayRemove
 } from 'firebase/firestore';
-import { Comentario } from 'gym-library';
+import { Comentario, TipoNotificacion, Notificacion } from 'gym-library';
 import { FIRESTORE } from '../firebase.tokens';
+import { NotificacionService } from './notificacion.service';
 
 @Injectable({ providedIn: 'root' })
 export class ComentarioSocialService {
   private readonly firestore = inject(FIRESTORE);
+  private readonly notificacionService = inject(NotificacionService);
   private readonly COLLECTION = 'comentarios-social';
 
   constructor() {}
@@ -50,7 +52,8 @@ export class ComentarioSocialService {
     entrenadoId: string,
     nombreUsuario: string,
     fotoUsuario: string | null,
-    contenido: string
+    contenido: string,
+    ownerId?: string
   ): Promise<void> {
     const id = crypto.randomUUID();
     const ref = doc(this.firestore, this.COLLECTION, id);
@@ -65,6 +68,26 @@ export class ComentarioSocialService {
       likes: []
     };
     await setDoc(ref, comentario);
+
+    // Enviar notificación si el autor del comentario no es el dueño del post
+    if (ownerId && entrenadoId !== ownerId) {
+      const notificacion: Notificacion = {
+        id: crypto.randomUUID(),
+        usuarioId: ownerId,
+        tipo: TipoNotificacion.NUEVO_COMENTARIO,
+        titulo: 'Nuevo Comentario',
+        mensaje: `${nombreUsuario} comentó tu publicación`,
+        leida: false,
+        fechaCreacion: new Date(),
+        datos: {
+          sesionId,
+          comentarioId: id,
+          autorId: entrenadoId,
+          autorNombre: nombreUsuario
+        }
+      };
+      await this.notificacionService.save(notificacion);
+    }
   }
 
   async responderComentario(
@@ -72,7 +95,8 @@ export class ComentarioSocialService {
     entrenadoId: string,
     nombreUsuario: string,
     fotoUsuario: string | null,
-    contenido: string
+    contenido: string,
+    ownerId?: string
   ): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, comentarioId);
     const respuesta = {
@@ -85,13 +109,51 @@ export class ComentarioSocialService {
       likes: []
     };
     await updateDoc(ref, { respuesta });
+
+    // Enviar notificación si el creador que responde no es el autor del comentario original
+    if (ownerId && entrenadoId !== ownerId) {
+      const notificacion: Notificacion = {
+        id: crypto.randomUUID(),
+        usuarioId: ownerId,
+        tipo: TipoNotificacion.NUEVA_RESPUESTA,
+        titulo: 'Nueva Respuesta',
+        mensaje: `${nombreUsuario} respondió a tu comentario`,
+        leida: false,
+        fechaCreacion: new Date(),
+        datos: {
+          comentarioId,
+          autorId: entrenadoId,
+          autorNombre: nombreUsuario
+        }
+      };
+      await this.notificacionService.save(notificacion);
+    }
   }
 
-  async addLike(comentarioId: string, userId: string): Promise<void> {
+  async addLike(comentarioId: string, userId: string, likerNombre?: string, ownerId?: string): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, comentarioId);
     await updateDoc(ref, {
       likes: arrayUnion(userId)
     });
+
+    // Enviar notificación si el usuario que da like no es el dueño del comentario
+    if (ownerId && userId !== ownerId) {
+      const notificacion: Notificacion = {
+        id: crypto.randomUUID(),
+        usuarioId: ownerId,
+        tipo: TipoNotificacion.LIKE_COMENTARIO,
+        titulo: 'Nuevo Me Gusta',
+        mensaje: `${likerNombre || 'Alguien'} le dio me gusta a tu comentario`,
+        leida: false,
+        fechaCreacion: new Date(),
+        datos: {
+          comentarioId,
+          likerId: userId,
+          likerNombre: likerNombre || ''
+        }
+      };
+      await this.notificacionService.save(notificacion);
+    }
   }
 
   async removeLike(comentarioId: string, userId: string): Promise<void> {
@@ -101,11 +163,30 @@ export class ComentarioSocialService {
     });
   }
 
-  async addLikeRespuesta(comentarioId: string, userId: string): Promise<void> {
+  async addLikeRespuesta(comentarioId: string, userId: string, likerNombre?: string, ownerId?: string): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, comentarioId);
     await updateDoc(ref, {
       'respuesta.likes': arrayUnion(userId)
     });
+
+    // Enviar notificación si el usuario que da like no es el dueño de la respuesta
+    if (ownerId && userId !== ownerId) {
+      const notificacion: Notificacion = {
+        id: crypto.randomUUID(),
+        usuarioId: ownerId,
+        tipo: TipoNotificacion.LIKE_COMENTARIO,
+        titulo: 'Nuevo Me Gusta',
+        mensaje: `${likerNombre || 'Alguien'} le dio me gusta a tu respuesta`,
+        leida: false,
+        fechaCreacion: new Date(),
+        datos: {
+          comentarioId,
+          likerId: userId,
+          likerNombre: likerNombre || ''
+        }
+      };
+      await this.notificacionService.save(notificacion);
+    }
   }
 
   async removeLikeRespuesta(comentarioId: string, userId: string): Promise<void> {

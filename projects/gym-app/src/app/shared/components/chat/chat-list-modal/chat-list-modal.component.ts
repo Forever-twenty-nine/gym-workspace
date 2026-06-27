@@ -11,6 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
 import { MensajeService } from '../../../../core/services/mensaje.service';
 import { ChatDetailModalComponent } from '../chat-detail-modal/chat-detail-modal.component';
+import { PageBackgroundComponent } from '../../page-background/page-background.component';
 import { Mensaje } from 'gym-library';
 
 @Component({
@@ -19,7 +20,8 @@ import { Mensaje } from 'gym-library';
   imports: [
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonButtons, IonButton, IonIcon,
-    IonContent, IonSearchbar, IonBadge, IonTitle
+    IonContent, IonSearchbar, IonBadge, IonTitle,
+    PageBackgroundComponent
   ],
   templateUrl: './chat-list-modal.component.html'
 })

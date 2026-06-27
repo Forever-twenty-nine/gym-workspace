@@ -116,23 +116,23 @@ export function printSummaryTable() {
   ];
 
   // Manual box table (no (index) column, clean headers Coleccion | Creados | Limpia)
-  function drawTable(headers, data) {
-    const colWidths = headers.map((h, i) =>
-      Math.max(h.length, ...data.map(row => String(row[i]).length))
+  function drawTable(headers: string[], data: any[][]) {
+    const colWidths = headers.map((h: string, i: number) =>
+      Math.max(h.length, ...data.map((row: any[]) => String(row[i]).length))
     );
 
-    const top = '┌' + colWidths.map(w => '─'.repeat(w + 2)).join('┬') + '┐';
-    const sep = '├' + colWidths.map(w => '─'.repeat(w + 2)).join('┼') + '┤';
-    const bot = '└' + colWidths.map(w => '─'.repeat(w + 2)).join('┴') + '┘';
+    const top = '┌' + colWidths.map((w: number) => '─'.repeat(w + 2)).join('┬') + '┐';
+    const sep = '├' + colWidths.map((w: number) => '─'.repeat(w + 2)).join('┼') + '┤';
+    const bot = '└' + colWidths.map((w: number) => '─'.repeat(w + 2)).join('┴') + '┘';
 
-    const headerRow = '│ ' + headers.map((h, i) => h.padEnd(colWidths[i])).join(' │ ') + ' │';
+    const headerRow = '│ ' + headers.map((h: string, i: number) => h.padEnd(colWidths[i])).join(' │ ') + ' │';
 
     console.log(top);
     console.log(headerRow);
     console.log(sep);
 
     for (const row of data) {
-      const line = '│ ' + row.map((cell, i) => String(cell).padEnd(colWidths[i])).join(' │ ') + ' │';
+      const line = '│ ' + row.map((cell: any, i: number) => String(cell).padEnd(colWidths[i])).join(' │ ') + ' │';
       console.log(line);
     }
 

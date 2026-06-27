@@ -17,5 +17,9 @@ export enum TipoNotificacion {
     NUEVO_PR = 'nuevo_pr',
 
     // Matching / Social
-    NUEVO_MATCH = 'nuevo_match'
+    NUEVO_MATCH = 'nuevo_match',
+    LIKE_PUBLICACION = 'like_publicacion',
+    NUEVO_COMENTARIO = 'nuevo_comentario',
+    LIKE_COMENTARIO = 'like_comentario',
+    NUEVA_RESPUESTA = 'nueva_respuesta'
 }

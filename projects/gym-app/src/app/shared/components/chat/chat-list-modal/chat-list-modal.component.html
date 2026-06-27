@@ -1,28 +1,28 @@
 <!-- Cabecera de la Bandeja de Entrada -->
-<ion-header class="ion-no-border">
-  <ion-toolbar class="bg-linear-to-r from-slate-900 to-black text-white px-2 py-1">
-    <ion-title class="text-sm font-black uppercase tracking-widest text-white text-center">Bandeja de Mensajes</ion-title>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bandeja de Mensajes</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="cerrar()" color="light">
+      <ion-button (click)="cerrar()">
         <ion-icon slot="icon-only" name="close-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
   
   <!-- Buscador Premium -->
-  <ion-toolbar class="bg-slate-900 px-2 pb-2">
+  <ion-toolbar class="px-2 pb-2">
     <ion-searchbar 
       placeholder="Buscar conversación..." 
       [value]="searchQuery()"
       (ionInput)="onSearch($event)"
-      style="--background: rgba(255,255,255,0.06); --color: white; --placeholder-color: #94a3b8; --icon-color: #94a3b8; --border-radius: 16px;">
+      style="--border-radius: 16px;">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <!-- Contenido Principal -->
-<ion-content class="bg-slate-950" style="--background: #090d16;">
-  <div class="absolute inset-0 pointer-events-none bg-radial-gradient from-primary/5 via-transparent to-transparent"></div>
+<ion-content style="--background: transparent;">
+  <app-page-background />
 
   <div class="relative z-10 p-4">
     

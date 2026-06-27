@@ -11,7 +11,10 @@ import {
     Timestamp,
     QuerySnapshot,
     DocumentSnapshot,
-    deleteField
+    deleteField,
+    getDoc,
+    arrayUnion,
+    arrayRemove
 } from 'firebase/firestore';
 import { Entrenado } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -105,9 +108,44 @@ export class EntrenadoService {
 
                 if (entrenado.id) {
                     const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
+
+                    // --- Sincronización bidireccional ---
+                    let oldEntrenadoresIds: string[] = [];
+                    let newEntrenadoresIds: string[] | undefined = undefined;
+                    if (entrenado.entrenadoresId !== undefined && entrenado.entrenadoresId !== null) {
+                        const snap = await getDoc(entrenadoRef);
+                        if (snap.exists()) {
+                            oldEntrenadoresIds = snap.data()['entrenadoresId'] || [];
+                            newEntrenadoresIds = entrenado.entrenadoresId;
+                        }
+                    }
+
                     await setDoc(entrenadoRef, dataToSave, { merge: true });
+
+                    // Actualizar asociaciones en entrenadores si hubo cambios
+                    if (newEntrenadoresIds !== undefined) {
+                        const added = newEntrenadoresIds.filter(x => !oldEntrenadoresIds.includes(x));
+                        const removed = oldEntrenadoresIds.filter(x => !newEntrenadoresIds!.includes(x));
+
+                        for (const tId of added) {
+                            const tDoc = doc(this.firestore, 'entrenadores', tId);
+                            await updateDoc(tDoc, { entrenadosAsignadosIds: arrayUnion(entrenado.id) }).catch(e => console.warn(e));
+                        }
+                        for (const tId of removed) {
+                            const tDoc = doc(this.firestore, 'entrenadores', tId);
+                            await updateDoc(tDoc, { entrenadosAsignadosIds: arrayRemove(entrenado.id) }).catch(e => console.warn(e));
+                        }
+                    }
                 } else {
-                    await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+                    const docRef = await addDoc(collection(this.firestore, this.COLLECTION), dataToSave);
+                    entrenado.id = docRef.id;
+
+                    if (entrenado.entrenadoresId && entrenado.entrenadoresId.length > 0) {
+                        for (const tId of entrenado.entrenadoresId) {
+                            const tDoc = doc(this.firestore, 'entrenadores', tId);
+                            await updateDoc(tDoc, { entrenadosAsignadosIds: arrayUnion(docRef.id) }).catch(e => console.warn(e));
+                        }
+                    }
                 }
             });
 

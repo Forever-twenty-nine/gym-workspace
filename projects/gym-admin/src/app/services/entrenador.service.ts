@@ -10,7 +10,10 @@ import {
   query,
   orderBy,
   setDoc,
-  Timestamp
+  Timestamp,
+  getDoc,
+  arrayUnion,
+  arrayRemove
 } from 'firebase/firestore';
 import { Entrenador, Plan, Rol, PlanLimits, ROL_PLAN_LIMITS } from 'gym-library';
 import { RutinaService } from './rutina.service';
@@ -256,11 +259,38 @@ export class EntrenadorService {
     try {
       await this.runInZone(async () => {
         const entrenadorDoc = doc(this.firestore, this.collectionName, id);
+
+        // --- Sincronización bidireccional ---
+        let oldEntrenadosIds: string[] = [];
+        let newEntrenadosIds: string[] | undefined = undefined;
+        if (entrenadorData.entrenadosAsignadosIds !== undefined) {
+          const snap = await getDoc(entrenadorDoc);
+          if (snap.exists()) {
+            oldEntrenadosIds = snap.data()['entrenadosAsignadosIds'] || [];
+            newEntrenadosIds = entrenadorData.entrenadosAsignadosIds;
+          }
+        }
+
         const data: any = { ...entrenadorData };
         if (entrenadorData.fechaRegistro) {
           data.fechaRegistro = Timestamp.fromDate(entrenadorData.fechaRegistro);
         }
         await updateDoc(entrenadorDoc, data);
+
+        // Actualizar asociaciones en entrenados si hubo cambios
+        if (newEntrenadosIds !== undefined) {
+          const added = newEntrenadosIds.filter(x => !oldEntrenadosIds.includes(x));
+          const removed = oldEntrenadosIds.filter(x => !newEntrenadosIds!.includes(x));
+
+          for (const tId of added) {
+             const tDoc = doc(this.firestore, 'entrenados', tId);
+             await updateDoc(tDoc, { entrenadoresId: arrayUnion(id) }).catch(e => console.warn(e));
+          }
+          for (const tId of removed) {
+             const tDoc = doc(this.firestore, 'entrenados', tId);
+             await updateDoc(tDoc, { entrenadoresId: arrayRemove(id) }).catch(e => console.warn(e));
+          }
+        }
       });
     } catch (error) {
       console.error('❌ Error al actualizar entrenador:', error);

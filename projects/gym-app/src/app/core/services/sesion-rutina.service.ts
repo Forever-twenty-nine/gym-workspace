@@ -15,11 +15,12 @@ import {
   QuerySnapshot,
   DocumentSnapshot
 } from 'firebase/firestore';
-import { SesionRutina, SesionRutinaStatus, Rutina, Ejercicio } from 'gym-library';
+import { SesionRutina, SesionRutinaStatus, Rutina, Ejercicio, TipoNotificacion, Notificacion } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
+import { NotificacionService } from './notificacion.service';
 
 /**
  * Servicio para gestionar sesiones de rutina como documentos independientes en Firestore
@@ -38,6 +39,7 @@ export class SesionRutinaService {
   // inyección de servicios
   private readonly rutinaService: RutinaService = inject(RutinaService);
   private readonly ejercicioService: EjercicioService = inject(EjercicioService);
+  private readonly notificacionService = inject(NotificacionService);
 
   constructor() { }
 
@@ -284,15 +286,35 @@ export class SesionRutinaService {
     return 0;
   }
 
+
+
   /**
-   * Agrega un like a una sesión compartida
+   * Agrega un like a una sesión compartida y envía una notificación
    */
-  async addLike(sesionId: string, userId: string): Promise<void> {
+  async addLike(sesionId: string, userId: string, likerNombre?: string, ownerId?: string): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, sesionId);
     return this.runInZone(async () => {
       await updateDoc(ref, {
         likes: arrayUnion(userId)
       });
+      // Enviar notificación si el usuario que da like no es el dueño de la publicación
+      if (ownerId && userId !== ownerId) {
+        const notificacion: Notificacion = {
+          id: this.generarIdUnico(),
+          usuarioId: ownerId,
+          tipo: TipoNotificacion.LIKE_PUBLICACION,
+          titulo: 'Nuevo Me Gusta',
+          mensaje: `${likerNombre || 'Alguien'} le dio me gusta a tu publicación`,
+          leida: false,
+          fechaCreacion: new Date(),
+          datos: {
+            sesionId: sesionId,
+            likerId: userId,
+            likerNombre: likerNombre || ''
+          }
+        };
+        await this.notificacionService.save(notificacion);
+      }
     });
   }
 
