@@ -10,7 +10,7 @@ const meta: Meta<PageBackgroundComponent> = {
   component: PageBackgroundComponent,
   tags: ['autodocs'],
   decorators: [
-    componentWrapperDecorator((story) => `<ion-app class="relative h-[400px] overflow-hidden">${story}</ion-app>`)
+    componentWrapperDecorator((story) => `<ion-app class="relative h-100 overflow-hidden">${story}</ion-app>`)
   ]
 };
 
