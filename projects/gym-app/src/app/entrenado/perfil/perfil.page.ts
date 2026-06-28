@@ -1,15 +1,7 @@
 import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import {
-  IonContent,
-  IonButton,
-  IonIcon,
-  IonBadge,
-  IonSegment,
-  IonSegmentButton,
-  IonLabel,
-  IonSpinner, IonHeader, IonToolbar, IonButtons, IonBackButton } from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonIcon, IonBadge, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonHeader, IonToolbar, IonButtons, IonBackButton, IonFooter } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
 import {
@@ -22,6 +14,7 @@ import {
 
 import { User as LibraryUser, Rutina, Plan, SolicitudPlan, SesionRutina, Rol } from 'gym-library';
 export interface User extends LibraryUser {
+  id: string;
   photoURL?: string;
 }
 
@@ -74,7 +67,9 @@ import { PerfilTabEstadisticasComponent } from './perfil-tab-estadisticas/perfil
     PremiumRequestModalComponent,
     PerfilTabInfoComponent,
     PerfilTabPlanComponent,
-    PerfilTabEstadisticasComponent]
+    PerfilTabEstadisticasComponent,
+    IonFooter
+]
 })
 export class PerfilPage implements OnInit {
   private readonly authService = inject(AuthService);
@@ -161,49 +156,48 @@ export class PerfilPage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.rutinas.set(this.rutinaService.rutinas());
   }
 
-  segmentChanged(event: Event) {
-    const customEvent = event as CustomEvent<{ value?: PerfilSegment }>;
-    const value = customEvent.detail?.value;
-
+  segmentChanged(event: any): void {
+    const value = event.detail?.value;
     if (value === 'perfil' || value === 'plan' || value === 'estadisticas') {
       this.currentSegment.set(value);
     }
   }
 
-  openEditModal() {
+  openEditModal(): void {
     this.isEditModalOpen.set(true);
   }
 
-  closeEditModal() {
+  closeEditModal(): void {
     this.isEditModalOpen.set(false);
   }
 
-  openPremiumModal() {
+  openPremiumModal(): void {
     this.isPremiumModalOpen.set(true);
   }
 
-  closePremiumModal() {
+  closePremiumModal(): void {
     this.isPremiumModalOpen.set(false);
   }
 
-  async openNotifications() {
+  async openNotifications(): Promise<void> {
     const modal = await this.modalCtrl.create({
       component: NotificationsComponent,
+      componentProps: {
+        unreadChatsCount: this.unreadChatsCount(),
+        mensajesNoLeidos: this.mensajesNoLeidos(),
+        invitacionesPendientes: this.invitacionesPendientes(),
+      },
       cssClass: 'premium-modal'
     });
     await modal.present();
   }
 
-  private async showToast(message: string, color: 'success' | 'danger' | 'warning') {
-    const toast = await this.toastCtrl.create({ message, duration: 2000, color, position: 'bottom' });
-    toast.present();
-  }
-
-  async logout() {
+  async logout(): Promise<void> {
+    this.isLoggingOut.set(true);
     const loading = await this.loadingCtrl.create({
       message: 'Cerrando sesión...',
       spinner: 'crescent'
@@ -211,26 +205,16 @@ export class PerfilPage implements OnInit {
     await loading.present();
 
     try {
-      this.isLoggingOut.set(true);
-
-      // Cerramos sesión en Firebase
       await this.authService.logout();
-
-      // Limpiar caché local
-      localStorage.removeItem('gym_auth_user');
-
-      // Redirigir al login
-      await this.router.navigate(['/login'], { replaceUrl: true });
+      this.router.navigate(['/login'], { replaceUrl: true });
     } catch (error) {
       console.error('🛡️ Perfil: Error en logout:', error);
-      window.location.href = '/login';
+      // El servicio ya muestra un toast de error, no es necesario duplicarlo.
     } finally {
-      this.isLoggingOut.set(false);
       await loading.dismiss();
+      this.isLoggingOut.set(false);
     }
   }
-
-  // (Estadisticas movidas a PerfilTabEstadisticasComponent)
 
   getRoleDisplayName(role?: string): string {
     switch (role) {
@@ -247,3 +231,4 @@ export class PerfilPage implements OnInit {
     return nombre.split(' ').map((n: string) => n.charAt(0).toUpperCase()).join('').substring(0, 2);
   }
 }
+

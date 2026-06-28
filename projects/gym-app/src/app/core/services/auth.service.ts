@@ -202,8 +202,25 @@ export class AuthService {
   }
 
   async logout(): Promise<void> {
-    await signOut(this.auth);
-    this.showToast('Sesión cerrada', 'success');
+    this._isLoading.set(true);
+    try {
+      if (this.userSnapshotUnsubscribe) {
+        this.userSnapshotUnsubscribe();
+      }
+      await signOut(this.auth);
+      
+      // Los estados se actualizarán por onAuthStateChanged, pero forzamos limpieza
+      localStorage.removeItem('gym_auth_user');
+      this._currentUser.set(null);
+      this._isAuthenticated.set(false);
+      
+      this.showToast('Has cerrado sesión', 'success');
+    } catch (error) {
+      console.error('🛡️ Auth: Error en logout:', error);
+      this.showToast('Error al cerrar sesión', 'danger');
+    } finally {
+      this._isLoading.set(false);
+    }
   }
 
   async sendPasswordResetEmail(email: string): Promise<boolean> {

@@ -8,6 +8,7 @@ export * from './lib/enums/gimnasio-tabs.enum';
 export * from './lib/enums/entrenado-tabs.enum';
 export * from './lib/enums/tipo-notificacion.enum';
 export * from './lib/enums/tipo-mensaje.enum';
+export { NivelEntrenamiento } from './lib/enums/nivel-entrenamiento.enum';
 export { SesionRutinaStatus } from './lib/enums/sesion-rutina-status.enum';
 export { Plan } from './lib/enums/plan.enum';
 /**

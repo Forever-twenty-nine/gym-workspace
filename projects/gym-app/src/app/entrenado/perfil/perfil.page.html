@@ -88,8 +88,6 @@
     }
 
   </div>
-
-
   <!-- Modals -->
   @if (currentUser()) {
   <app-edit-profile-modal [isOpen]="isEditModalOpen()" [user]="currentUser()" [entrenadoData]="currentEntrenado()"
@@ -100,3 +98,10 @@
   </app-premium-request-modal>
   }
 </ion-content>
+
+<ion-footer class="ion-no-border p-4">
+  <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
+    <ion-icon name="log-out-outline" slot="start"></ion-icon>
+    Cerrar sesión
+  </ion-button>
+</ion-footer>
