@@ -60,7 +60,7 @@
 
     <!-- ================= TAB: PERFIL ================= -->
     @if (currentSegment() === 'perfil') {
-    <app-perfil-tab-info [user]="user" [currentEntrenado]="currentEntrenado()"
+    <app-perfil-tab-info [user]="user" 
       (editClick)="openEditModal()"
       (logoutClick)="logout()">
     </app-perfil-tab-info>

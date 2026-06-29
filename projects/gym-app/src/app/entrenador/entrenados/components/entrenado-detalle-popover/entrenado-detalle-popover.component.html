@@ -40,15 +40,6 @@
                 </ion-item>
                 }
 
-                @if (entrenado()!.fechaRegistro) {
-                <ion-item>
-                    <span slot="start" class="material-symbols-outlined" style="color: var(--ion-color-secondary); font-size: 24px; margin-inline-end: 16px;">calendar_today</span>
-                    <ion-label>
-                        <h3>Fecha de Registro</h3>
-                        <p>{{ entrenado()!.fechaRegistro | date:'dd/MM/yyyy' }}</p>
-                    </ion-label>
-                </ion-item>
-                }
             </ion-list>
 
             <!-- Estadísticas de Progreso -->

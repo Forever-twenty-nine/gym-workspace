@@ -9,7 +9,6 @@ import {
   onSnapshot,
   QuerySnapshot,
   DocumentSnapshot,
-  Timestamp,
   query,
   where,
   updateDoc
@@ -397,25 +396,27 @@ export class EntrenadorService {
 
   private mapToFirestore(entrenador: Omit<Entrenador, 'id'> | Entrenador): any {
     const data = { ...entrenador } as any;
-    if (entrenador.fechaRegistro) {
-      data.fechaRegistro = Timestamp.fromDate(entrenador.fechaRegistro);
-    }
+    delete data.id;
     return data;
   }
 
   private mapFromFirestore(data: any): Entrenador {
-    const entrenador = { ...data };
-    if (data.fechaRegistro && data.fechaRegistro instanceof Timestamp) {
-      entrenador.fechaRegistro = data.fechaRegistro.toDate();
-    }
-    return entrenador as Entrenador;
+    return {
+      id: data.id,
+      gimnasioId: data.gimnasioId || [],
+      descripcion: data.descripcion || '',
+      entrenadosIds: data.entrenadosIds || [],
+      ejerciciosCreadasIds: data.ejerciciosCreadasIds || [],
+      entrenadosAsignadosIds: data.entrenadosAsignadosIds || [],
+      rutinasCreadasIds: data.rutinasCreadasIds || []
+    };
   }
 
   private mapPartialToFirestore(entrenador: Partial<Entrenador>): any {
     const data: any = {};
-    if (entrenador.fechaRegistro !== undefined) {
-      data.fechaRegistro = entrenador.fechaRegistro ? Timestamp.fromDate(entrenador.fechaRegistro) : null;
-    }
+    if (entrenador.gimnasioId !== undefined) data.gimnasioId = entrenador.gimnasioId;
+    if (entrenador.descripcion !== undefined) data.descripcion = entrenador.descripcion;
+    if (entrenador.entrenadosIds !== undefined) data.entrenadosIds = entrenador.entrenadosIds;
     if (entrenador.ejerciciosCreadasIds !== undefined) data.ejerciciosCreadasIds = entrenador.ejerciciosCreadasIds;
     if (entrenador.entrenadosAsignadosIds !== undefined) data.entrenadosAsignadosIds = entrenador.entrenadosAsignadosIds;
     if (entrenador.rutinasCreadasIds !== undefined) data.rutinasCreadasIds = entrenador.rutinasCreadasIds;

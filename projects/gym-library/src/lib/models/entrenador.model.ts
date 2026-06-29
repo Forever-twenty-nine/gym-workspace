@@ -1,13 +1,11 @@
 export interface Entrenador {
     id: string;
-    gimnasioId?: string;
-    // plan free
-    fechaRegistro?: Date;
-    //asociaciones
+    // Profile body
+    gimnasioId?: string[];
+    descripcion?: string;
+    entrenadosIds: string[];
+    // Asociaciones
     ejerciciosCreadasIds: string[];
     entrenadosAsignadosIds: string[];
     rutinasCreadasIds: string[];
-    // plan premium
-    entrenadosPremiumIds: string[];
-    photoURL?: string;
 }

@@ -1,26 +1,16 @@
 import { Objetivo } from '../enums/objetivo.enum';
 import { NivelEntrenamiento } from '../enums/nivel-entrenamiento.enum';
-
-export interface ConfigNotificacion {
-    recordatoriosEntrenamiento: boolean;
-    horaRecordatorio?: string; // Formato "HH:mm"
-    diasRecordatorio?: number[]; // [0, 1, 2, 3, 4, 5, 6] (0 = Domingo)
-}
-
-export interface FranjaHoraria {
-    inicio: string; // Formato "HH:mm"
-    fin: string;    // Formato "HH:mm"
-}
+import { ConfigNotificacion } from './config-notificacion.model';
+import { FranjaHoraria } from './franja-horaria.model';
 
 export interface Entrenado {
     id: string;
-    gimnasioId?: string;
-    // plan free
-    fechaRegistro?: Date;
-    objetivo?: Objetivo;
-    entrenadoresId?: string[];
+    // Profile body
+    gimnasioId?: string[];
+    objetivo?: Objetivo; 
+    entrenadoresId?: string[];// Asociacion con entrenadores
     rutinasAsignadasIds?: string[];
-    // social 
+    // Social 
     seguidores?: string[];
     seguidos?: string[];
     configNotificaciones?: ConfigNotificacion;
@@ -28,10 +18,9 @@ export interface Entrenado {
     rutinasCreadas?: string[];
     ejerciciosCreadosIds?: string[];
     nivel?: NivelEntrenamiento;
-
     // Campos de Matching
     bio?: string;
     franjaHoraria?: FranjaHoraria;
     visibleDescubrir?: boolean;
-    photoURL?: string;
+    photoSocialURL?: string; // Foto para social
 }

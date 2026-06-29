@@ -9,7 +9,6 @@ import {
     onSnapshot,
     QuerySnapshot,
     DocumentSnapshot,
-    Timestamp,
     query,
     where
 } from 'firebase/firestore';
@@ -131,9 +130,7 @@ export class GimnasioService {
      * 🔍 Busca gimnasios activos
      */
     getGimnasiosActivos(): Signal<Gimnasio[]> {
-        return computed(() =>
-            this._gimnasios().filter(gimnasio => gimnasio.activo)
-        );
+        return this._gimnasios.asReadonly();
     }
 
     /**
@@ -158,9 +155,7 @@ export class GimnasioService {
      * 📊 Obtiene el conteo de gimnasios activos
      */
     get gimnasioActivoCount(): Signal<number> {
-        return computed(() =>
-            this._gimnasios().filter(gimnasio => gimnasio.activo).length
-        );
+        return computed(() => this._gimnasios().length);
     }
 
     private mapToFirestore(gimnasio: Gimnasio): any {

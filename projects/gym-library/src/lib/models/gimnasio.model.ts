@@ -1,15 +1,11 @@
-/**
- * Contiene los datos específicos del gimnasio.
- */
-import { Plan } from '../enums/plan.enum';
-
 export interface Gimnasio {
   id: string;
-  nombre: string;
+  // Profile body
   direccion: string;
-  activo: boolean;
-  plan?: Plan;
   isPersonalTrainer?: boolean;
+  // Premium
+  cobraMensualidad?: boolean;
+  // Asociaciones
   entrenadoresIds?: string[];
   entrenadosIds?: string[];
 }

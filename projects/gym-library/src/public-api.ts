@@ -26,6 +26,7 @@ export * from './lib/models/ejercicio.model';
 export * from './lib/models/rutina.model';
 export * from './lib/models/rutina-asignada.model';
 export * from './lib/models/notificacion.model';
+export * from './lib/models/config-notificacion.model';
 export * from './lib/models/mensaje.model';
 export * from './lib/models/mensaje-global.model';
 export * from './lib/models/invitacion.model';

@@ -1,6 +1,5 @@
-import { Injectable, signal, Signal, inject, Injector, runInInjectionContext, isDevMode } from '@angular/core';
+import { Injectable, signal, Signal, inject, isDevMode } from '@angular/core';
 import {
-  Auth,
   GoogleAuthProvider,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -9,7 +8,7 @@ import {
   User as FirebaseUser,
   createUserWithEmailAndPassword
 } from 'firebase/auth';
-import { Firestore, doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot as onFirestoreSnapshot, Unsubscribe, setDoc } from 'firebase/firestore';
 import { User, Rol } from 'gym-library';
 import { AUTH, FIRESTORE } from '../firebase.tokens';
 import { ToastController } from '@ionic/angular/standalone';
@@ -263,7 +262,8 @@ export class AuthService {
         email: firebaseUser.email || '',
         photoURL: firebaseUser.photoURL || null,
         role: Rol.ENTRENADO,
-        onboarded: false
+        onboarded: false,
+        fechaCreacion: new Date()
       };
 
       // Si se nos pide crear el documento (en registro o primer login con Google)

@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
     IonHeader,
     IonToolbar,
@@ -23,7 +23,6 @@ import { Entrenado } from 'gym-library';
     standalone: true,
     imports: [
     CommonModule,
-    DatePipe,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -45,7 +44,7 @@ export class EntrenadoDetallePopoverComponent {
     // Callbacks
     getUserName = input.required<(id: string) => string>();
     formatearTiempo = input.required<(segundos: number) => string>();
-    getAntiguedadDias = input.required<(entrenado: Entrenado) => number | null>();
+    getAntiguedadDias = input.required<(userId: string) => number | null>();
 
     close = output<void>();
 
@@ -55,7 +54,7 @@ export class EntrenadoDetallePopoverComponent {
         const entr = this.entrenado();
         if (!stats) return [];
 
-        const antiguedad = entr ? this.getAntiguedadDias()(entr) : null;
+        const antiguedad = entr ? this.getAntiguedadDias()(entr.id) : null;
 
         return [
             {

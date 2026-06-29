@@ -13,7 +13,7 @@ import {
   rocketOutline,
   closeOutline
 } from 'ionicons/icons';
-import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio, Plan } from 'gym-library';
+import { Objetivo, Rol, Entrenado, Entrenador, Gimnasio } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -276,7 +276,8 @@ export class OnboardingPage {
         role: this.mapRoleToEnum(formData.role),
         onboarded: true,
         email: currentUser.email || '',
-        photoURL: currentUser.photoURL || null
+        photoURL: currentUser.photoURL || null,
+        fechaCreacion: new Date()
       };
 
       await this.userService.updateUser(uid, userUpdateData);
@@ -323,7 +324,6 @@ export class OnboardingPage {
       case 'entrenado':
         const clienteData: Entrenado = {
           id: uid,
-          fechaRegistro: new Date(),
           objetivo: this.mapObjetivoToEnum(formData.objetivo)
         };
         
@@ -332,11 +332,10 @@ export class OnboardingPage {
 
       case 'entrenador':
         const entrenadorData: Omit<Entrenador, 'id'> = {
-          fechaRegistro: new Date(),
           ejerciciosCreadasIds: [],
           entrenadosAsignadosIds: [],
           rutinasCreadasIds: [],
-          entrenadosPremiumIds: []
+          entrenadosIds: []
         };
         await this.entrenadorService.createWithId(uid, entrenadorData);
         break;
@@ -344,10 +343,8 @@ export class OnboardingPage {
       case 'gimnasio':
         const gimnasioData: Gimnasio = {
           id: uid,
-          nombre: formData.nombre || 'Gimnasio',
           direccion: '',
-          activo: true,
-          plan: Plan.FREE
+          isPersonalTrainer: false
         };
         await this.gimnasioService.save(gimnasioData);
         break;
@@ -355,21 +352,17 @@ export class OnboardingPage {
       case 'personal_trainer':
         const gimnasioPTData: Gimnasio = {
           id: uid,
-          nombre: `Gimnasio - PT ${formData.nombre || ''}`,
           direccion: '',
-          activo: true,
-          isPersonalTrainer: true,
-          plan: Plan.FREE
+          isPersonalTrainer: true
         };
         await this.gimnasioService.save(gimnasioPTData);
 
         const entrenadorPTData: Omit<Entrenador, 'id'> = {
-          gimnasioId: uid,
-          fechaRegistro: new Date(),
+          gimnasioId: [uid],
           ejerciciosCreadasIds: [],
           entrenadosAsignadosIds: [],
           rutinasCreadasIds: [],
-          entrenadosPremiumIds: []
+          entrenadosIds: []
         };
         await this.entrenadorService.createWithId(uid, entrenadorPTData);
         break;

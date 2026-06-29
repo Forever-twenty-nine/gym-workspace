@@ -225,7 +225,7 @@ export class NotificacionService {
 
             const [hours, minutes] = config.horaRecordatorio.split(':').map(Number);
 
-            const notifications = config.diasRecordatorio.map(dia => ({
+            const notifications = config.diasRecordatorio.map((dia: number) => ({
                 title: '¡Hora de entrenar!',
                 body: 'Tienes una rutina esperándote. ¡No faltes!',
                 id: 100 + dia, // IDs únicos por día de la semana

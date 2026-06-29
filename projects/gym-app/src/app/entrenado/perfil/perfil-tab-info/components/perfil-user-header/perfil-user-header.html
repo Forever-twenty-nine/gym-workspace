@@ -1,14 +1,15 @@
 <ion-item lines="none" class="ion-no-padding">
     <ion-thumbnail slot="start">
-        @if (photoURL()) {
-        <img src="{{ photoURL() }}" width="64" height="64" alt="Foto de perfil" />
+        @if (user().photoURL) {
+        <img src="{{ user().photoURL }}" width="64" height="64" alt="Foto de perfil" />
         } @else {
         <ion-icon name="person-outline"></ion-icon>
         }
     </ion-thumbnail>
     <ion-label class="p-2">
-        <h2>{{ username() || '' }}</h2>
+        <h2>{{ user().username || '' }}</h2>
     </ion-label>
+    <ion-note>{{ user().userRole || '' }}</ion-note>
     <ion-buttons>
         <ion-button slot="end" color="primary" (click)="editClick.emit()">
             <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>

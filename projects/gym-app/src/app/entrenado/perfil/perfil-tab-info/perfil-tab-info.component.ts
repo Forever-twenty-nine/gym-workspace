@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { PerfilUserHeaderComponent } from './components/perfil-user-header/perfil-user-header';
 import { User, Entrenado } from 'gym-library';
+import {ProfileHead} from '../../../core/interfaces/profile-head.interface';
+import {ProfileBody} from '../../../core/interfaces/profile-body.interface';
 import { Plan } from 'gym-library';
 import { PerfilUserBodyComponent } from "./components/perfil-user-body/perfil-user-body";
 
@@ -14,20 +16,16 @@ export class PerfilTabInfoComponent {
 
   user = input.required<User>();
 
-  currentEntrenado = input<Entrenado | null>();
 
-  userName = computed(() => {
-    const nombre = this.user().nombre;
-    if (!nombre) return 'U';
-    return nombre.split(' ').map(n => n[0]).join('').toUpperCase();
+  // header data
+  userProfileHead = computed<ProfileHead>(() => {
+    const username = this.user().nombre || 'usuario sin nombre';
+    const photoURL = this.user().photoURL || null;
+    const userRole = this.user().role as string || 'usuario sin rol'; 
+    return { username, photoURL, userRole };
   });
 
-  photoURL = computed(() => {
-    const photoURL = this.user().photoURL;
-    if (!photoURL) return null;
-    return photoURL;
-  });
-
+  // body data
   roleDisplayName = computed(() => {
     const role = this.user().role as string;
     switch (role) {

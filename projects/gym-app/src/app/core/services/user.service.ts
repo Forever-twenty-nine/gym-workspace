@@ -10,7 +10,8 @@ import {
   QuerySnapshot,
   getDocs,
   query,
-  where
+  where,
+  Timestamp
 } from 'firebase/firestore';
 import { User } from 'gym-library';
 import { ZoneRunnerService } from './zone-runner.service';
@@ -167,7 +168,11 @@ export class UserService {
     try {
       await this.runInZone(async () => {
         const userDoc = doc(this.firestore, this.COLLECTION, uid);
-        await setDoc(userDoc, userData, { merge: true });
+        const dataToSave: Partial<User> = {
+          ...userData,
+          fechaActualizacion: new Date()
+        };
+        await setDoc(userDoc, this.mapToFirestore(dataToSave), { merge: true });
       });
     } catch (error: any) {
       console.error('🔄 UserService: Error al actualizar usuario:', error);
@@ -287,23 +292,30 @@ export class UserService {
       entrenadoId: data.entrenadoId || null,
       onboarded: data.onboarded ?? false,
       plan: data.plan || null,
-      photoURL: data.photoURL || null
+      photoURL: data.photoURL || null,
+      fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ?? null),
+      fechaActualizacion: data.fechaActualizacion instanceof Timestamp ? data.fechaActualizacion.toDate() : (data.fechaActualizacion ?? null)
     };
   }
 
-  private mapToFirestore(user: User): any {
-    const data: any = {
-      nombre: user.nombre || null,
-      email: user.email || null,
-      emailVerified: user.emailVerified ?? false,
-      role: user.role || null,
-      entrenadorId: user.entrenadorId || null,
-      gimnasioId: user.gimnasioId || null,
-      entrenadoId: user.entrenadoId || null,
-      onboarded: user.onboarded ?? false,
-      plan: user.plan || null,
-      photoURL: user.photoURL || null
-    };
+  private mapToFirestore(user: Partial<User>): any {
+    const data: any = {};
+    if (user.nombre !== undefined) data.nombre = user.nombre || null;
+    if (user.email !== undefined) data.email = user.email || null;
+    if (user.emailVerified !== undefined) data.emailVerified = user.emailVerified ?? false;
+    if (user.role !== undefined) data.role = user.role || null;
+    if (user.entrenadorId !== undefined) data.entrenadorId = user.entrenadorId || null;
+    if (user.gimnasioId !== undefined) data.gimnasioId = user.gimnasioId || null;
+    if (user.entrenadoId !== undefined) data.entrenadoId = user.entrenadoId || null;
+    if (user.onboarded !== undefined) data.onboarded = user.onboarded ?? false;
+    if (user.plan !== undefined) data.plan = user.plan || null;
+    if (user.photoURL !== undefined) data.photoURL = user.photoURL || null;
+    if (user.fechaCreacion !== undefined) {
+      data.fechaCreacion = user.fechaCreacion instanceof Date ? Timestamp.fromDate(user.fechaCreacion) : user.fechaCreacion;
+    }
+    if (user.fechaActualizacion !== undefined) {
+      data.fechaActualizacion = user.fechaActualizacion instanceof Date ? Timestamp.fromDate(user.fechaActualizacion as Date) : user.fechaActualizacion;
+    }
     return data;
   }
 }

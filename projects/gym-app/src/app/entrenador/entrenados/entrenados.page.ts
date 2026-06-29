@@ -188,7 +188,7 @@ export class EntrenadosPage implements OnInit {
       return {
         id: entrenado.id,
         nombre: user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado',
-        photoURL: entrenado.photoURL || user?.photoURL || undefined,
+        photoURL: entrenado.photoSocialURL || user?.photoURL || undefined,
         objetivo: entrenado.objetivo || '',
         estaEntrenando,
         rutinasCount: entrenado.rutinasAsignadasIds?.length || 0,
@@ -225,10 +225,11 @@ export class EntrenadosPage implements OnInit {
     });
   });
 
-  /** Calcula la antigüedad en días desde la fecha de registro */
-  getAntiguedadDias(entrenado: Entrenado): number | null {
-    if (!entrenado.fechaRegistro) return null;
-    const fecha = new Date(entrenado.fechaRegistro);
+  /** Calcula la antigüedad en días desde la fecha de creación del usuario */
+  getAntiguedadDias(userId: string): number | null {
+    const user = this.userService.getUserByUid(userId)();
+    if (!user?.fechaCreacion) return null;
+    const fecha = new Date(user.fechaCreacion);
     const hoy = new Date();
     const diffMs = hoy.getTime() - fecha.getTime();
     return Math.floor(diffMs / (1000 * 60 * 60 * 24));

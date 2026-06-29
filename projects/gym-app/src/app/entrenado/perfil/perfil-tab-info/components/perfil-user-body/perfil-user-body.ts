@@ -1,16 +1,15 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
-import { User, Entrenado, Plan } from 'gym-library';
-import { IonCard, IonGrid, IonRow, IonCol, IonCardContent, IonIcon } from "@ionic/angular/standalone";
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { ProfileHead } from '../../../../../core/interfaces/profile-head.interface';
+import { IonCard, IonList, IonItem, IonLabel } from "@ionic/angular/standalone";
 
 @Component({
     selector: 'perfil-user-body',
-    imports: [IonCard],
+    imports: [IonCard, IonList, IonItem, IonLabel],
     templateUrl: './perfil-user-body.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PerfilUserBodyComponent {
 
-    user = input.required<User>();
-
+    user = input.required<ProfileHead>();
 
 }

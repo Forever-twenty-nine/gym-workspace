@@ -9,7 +9,6 @@ import {
     onSnapshot,
     QuerySnapshot,
     DocumentSnapshot,
-    Timestamp,
     query,
     where,
     updateDoc,
@@ -204,7 +203,7 @@ export class EntrenadoService {
     private mapFromFirestore(data: any): Entrenado {
         return {
             id: data.id,
-            fechaRegistro: data.fechaRegistro instanceof Timestamp ? data.fechaRegistro.toDate() : (data.fechaRegistro instanceof Date ? data.fechaRegistro : new Date()),
+            gimnasioId: data.gimnasioId || [],
             objetivo: data.objetivo || null,
             entrenadoresId: data.entrenadoresId || [],
             rutinasAsignadasIds: data.rutinasAsignadasIds || [],
@@ -215,16 +214,15 @@ export class EntrenadoService {
             seguidos: data.seguidos || [],
             bio: data.bio || '',
             franjaHoraria: data.franjaHoraria || null,
-            visibleDescubrir: data.visibleDescubrir ?? true
+            visibleDescubrir: data.visibleDescubrir ?? true,
+            photoSocialURL: data.photoSocialURL || null
         };
     }
 
     private mapToFirestore(entrenado: Entrenado): any {
         const data: any = {};
+        if (entrenado.gimnasioId !== undefined) data.gimnasioId = entrenado.gimnasioId;
         if (entrenado.objetivo !== undefined) data.objetivo = entrenado.objetivo;
-        if (entrenado.fechaRegistro) {
-            data.fechaRegistro = entrenado.fechaRegistro instanceof Date ? Timestamp.fromDate(entrenado.fechaRegistro) : entrenado.fechaRegistro;
-        }
         if (entrenado.entrenadoresId) data.entrenadoresId = entrenado.entrenadoresId;
         if (entrenado.rutinasAsignadasIds) data.rutinasAsignadasIds = entrenado.rutinasAsignadasIds;
         if (entrenado.rutinasCreadas) data.rutinasCreadas = entrenado.rutinasCreadas;
@@ -235,6 +233,7 @@ export class EntrenadoService {
         if (entrenado.bio !== undefined) data.bio = entrenado.bio;
         if (entrenado.franjaHoraria !== undefined) data.franjaHoraria = entrenado.franjaHoraria;
         if (entrenado.visibleDescubrir !== undefined) data.visibleDescubrir = entrenado.visibleDescubrir;
+        if (entrenado.photoSocialURL !== undefined) data.photoSocialURL = entrenado.photoSocialURL;
         return data;
     }
 

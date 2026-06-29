@@ -1,3 +1,3 @@
-<app-perfil-user-header [username]="userName()" [photoURL]="photoURL()" (editClick)="editClick.emit()" />
+<app-perfil-user-header [user]="userProfileHead()" (editClick)="editClick.emit()" />
 
-<perfil-user-body [user]="user()" />
+<perfil-user-body [user]="userProfileHead()" />
