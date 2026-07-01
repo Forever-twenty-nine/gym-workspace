@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -18,7 +18,6 @@ import {
     getDocs
 } from 'firebase/firestore';
 import { Notificacion, TipoNotificacion, ConfigNotificacion } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Platform } from '@ionic/angular';
@@ -26,8 +25,6 @@ import { Platform } from '@ionic/angular';
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly platform = inject(Platform);
     private readonly COLLECTION = 'notificaciones';
 
@@ -37,15 +34,6 @@ export class NotificacionService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
@@ -62,10 +50,8 @@ export class NotificacionService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._notificaciones.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._notificaciones.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -100,13 +86,11 @@ export class NotificacionService {
 
             const notificacionRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(notificacionRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        notificacionSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        notificacionSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    notificacionSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    notificacionSignal.set(null);
+                }
             });
         }
         return this.notificacionSignals.get(id)!.asReadonly();
@@ -116,55 +100,41 @@ export class NotificacionService {
      * 💾 Guarda o actualiza una notificación
      */
     async save(notificacion: Notificacion): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(notificacion);
-            if (notificacion.id) {
-                const notificacionRef = doc(this.firestore, this.COLLECTION, notificacion.id);
-                await setDoc(notificacionRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                await addDoc(col, dataToSave);
-            }
-        });
+        const dataToSave = this.mapToFirestore(notificacion);
+        if (notificacion.id) {
+            const notificacionRef = doc(this.firestore, this.COLLECTION, notificacion.id);
+            await setDoc(notificacionRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            await addDoc(col, dataToSave);
+        }
     }
 
     /**
      * 🗑️ Elimina una notificación por ID
      */
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const notificacionRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(notificacionRef);
-        });
+        const notificacionRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(notificacionRef);
     }
 
     /**
      * ✅ Marca una notificación como leída
      */
     async marcarComoLeida(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const notificacionRef = doc(this.firestore, this.COLLECTION, id);
-            await updateDoc(notificacionRef, {
-                leida: true,
-                fechaLeida: Timestamp.now()
-            });
-        });
+        const notificacionRef = doc(this.firestore, this.COLLECTION, id);
+        await updateDoc(notificacionRef, { leida: true, fechaLeida: Timestamp.now() });
     }
 
     /**
      * ✅ Marca todas las notificaciones de un usuario como leídas
      */
     async marcarTodasComoLeidas(usuarioId: string): Promise<void> {
-        return this.runInZone(async () => {
-            const col = collection(this.firestore, this.COLLECTION);
-            const q = query(col, where('usuarioId', '==', usuarioId), where('leida', '==', false));
-            const snap = await getDocs(q);
-            const updates = snap.docs.map(d => updateDoc(d.ref, {
-                leida: true,
-                fechaLeida: Timestamp.now()
-            }));
-            await Promise.all(updates);
-        });
+        const col = collection(this.firestore, this.COLLECTION);
+        const q = query(col, where('usuarioId', '==', usuarioId), where('leida', '==', false));
+        const snap = await getDocs(q);
+        const updates = snap.docs.map(d => updateDoc(d.ref, { leida: true, fechaLeida: Timestamp.now() }));
+        await Promise.all(updates);
     }
 
     /**

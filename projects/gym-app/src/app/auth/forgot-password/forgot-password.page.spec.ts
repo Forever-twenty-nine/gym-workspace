@@ -1,31 +1,30 @@
 import { vi } from 'vitest';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { ForgotPasswordPage } from './forgot-password.page';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
 describe('ForgotPasswordPage', () => {
   let component: ForgotPasswordPage;
-  let fixture: ComponentFixture<ForgotPasswordPage>;
   let authServiceSpy: any;
   let routerSpy: any;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     authServiceSpy = { sendPasswordResetEmail: vi.fn(), isLoading: vi.fn(() => false), error: vi.fn(() => null) };
     routerSpy = { navigate: vi.fn() };
 
-    await TestBed.configureTestingModule({
-      imports: [ForgotPasswordPage, ReactiveFormsModule],
+    TestBed.configureTestingModule({
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        FormBuilder
       ]
-    }).compileComponents();
+    });
 
-    fixture = TestBed.createComponent(ForgotPasswordPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.runInInjectionContext(() => {
+      component = new ForgotPasswordPage();
+    });
   });
 
   it('should create', () => {

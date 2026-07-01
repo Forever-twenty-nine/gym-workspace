@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -13,14 +13,11 @@ import {
     where
 } from 'firebase/firestore';
 import { Gimnasio } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class GimnasioService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'gimnasios';
 
     private readonly _gimnasios: WritableSignal<Gimnasio[]> = signal<Gimnasio[]>([]);
@@ -29,15 +26,6 @@ export class GimnasioService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * 🔄 Inicializa el listener de gimnasios
@@ -48,10 +36,8 @@ export class GimnasioService {
         try {
             const col = collection(this.firestore, this.COLLECTION);
             onSnapshot(col, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._gimnasios.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._gimnasios.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -79,13 +65,11 @@ export class GimnasioService {
 
             const gimnasioRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(gimnasioRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        gimnasioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        gimnasioSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    gimnasioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    gimnasioSignal.set(null);
+                }
             });
         }
         return this.gimnasioSignals.get(id)!.asReadonly();
@@ -95,26 +79,22 @@ export class GimnasioService {
      * 💾 Guarda o actualiza un gimnasio (upsert si tiene id)
      */
     async save(gimnasio: Gimnasio): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(gimnasio);
-            if (gimnasio.id) {
-                const gimnasioRef = doc(this.firestore, this.COLLECTION, gimnasio.id);
-                await setDoc(gimnasioRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                await addDoc(col, dataToSave);
-            }
-        });
+        const dataToSave = this.mapToFirestore(gimnasio);
+        if (gimnasio.id) {
+            const gimnasioRef = doc(this.firestore, this.COLLECTION, gimnasio.id);
+            await setDoc(gimnasioRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            await addDoc(col, dataToSave);
+        }
     }
 
     /**
      * 🗑️ Elimina un gimnasio por ID
      */
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const gimnasioRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(gimnasioRef);
-        });
+        const gimnasioRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(gimnasioRef);
     }
 
     /**

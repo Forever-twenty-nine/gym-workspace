@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -15,7 +15,6 @@ import {
 } from 'firebase/firestore';
 import { Rutina } from 'gym-library';
 import { EjercicioService } from './ejercicio.service';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 export interface RutinaConEjercicios extends Rutina {
@@ -25,8 +24,6 @@ export interface RutinaConEjercicios extends Rutina {
 @Injectable({ providedIn: 'root' })
 export class RutinaService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'rutinas';
 
     // Señal interna con todas las rutinas
@@ -57,15 +54,6 @@ export class RutinaService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura.
@@ -83,10 +71,8 @@ export class RutinaService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._rutinas.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._rutinas.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -124,13 +110,11 @@ export class RutinaService {
 
             const rutinaRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(rutinaRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        rutinaSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        rutinaSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    rutinaSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    rutinaSignal.set(null);
+                }
             });
         }
         return this.rutinaSignals.get(id)!.asReadonly();
@@ -154,27 +138,23 @@ export class RutinaService {
      * 💾 Guarda o actualiza una rutina (upsert si tiene id)
      */
     async save(rutina: Rutina): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(rutina);
-            if (rutina.id) {
-                const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
-                await setDoc(rutinaRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                const docRef = await addDoc(col, dataToSave);
-                rutina.id = docRef.id;
-            }
-        });
+        const dataToSave = this.mapToFirestore(rutina);
+        if (rutina.id) {
+            const rutinaRef = doc(this.firestore, this.COLLECTION, rutina.id);
+            await setDoc(rutinaRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            const docRef = await addDoc(col, dataToSave);
+            rutina.id = docRef.id;
+        }
     }
 
     /**
      * 🗑️ Elimina una rutina por ID
      */
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const rutinaRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(rutinaRef);
-        });
+        const rutinaRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(rutinaRef);
     }
 
     /**

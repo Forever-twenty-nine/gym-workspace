@@ -1,31 +1,30 @@
 import { vi } from 'vitest';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { RegisterPage } from './register.page';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 
 describe('RegisterPage', () => {
   let component: RegisterPage;
-  let fixture: ComponentFixture<RegisterPage>;
   let authServiceSpy: any;
   let routerSpy: any;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     authServiceSpy = { registerWithEmail: vi.fn(), loginWithGoogle: vi.fn(), isLoading: vi.fn(() => false), error: vi.fn(() => null), currentUser: vi.fn(() => null) };
     routerSpy = { navigate: vi.fn() };
 
-    await TestBed.configureTestingModule({
-      imports: [RegisterPage, ReactiveFormsModule],
+    TestBed.configureTestingModule({
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        FormBuilder
       ]
-    }).compileComponents();
+    });
 
-    fixture = TestBed.createComponent(RegisterPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.runInInjectionContext(() => {
+      component = new RegisterPage();
+    });
   });
 
   it('should create', () => {
@@ -80,8 +79,7 @@ describe('RegisterPage', () => {
     component.registerForm.controls['password'].setValue('password123');
     component.registerForm.controls['confirmPassword'].setValue('password123');
 
-    component.register();
-    await new Promise(r => setTimeout(r, 0));
+    await component.register();
 
     expect(authServiceSpy.registerWithEmail).toHaveBeenCalledWith('test@test.com', 'password123');
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/onboarding']);

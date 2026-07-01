@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -16,14 +16,11 @@ import {
     arrayRemove
 } from 'firebase/firestore';
 import { Entrenado } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class EntrenadoService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'entrenados';
 
     // Señal que contiene la lista de entrenados (reactiva)
@@ -33,12 +30,6 @@ export class EntrenadoService {
 
     constructor() { }
 
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     initializeListener(gymId?: string): void {
         if (this.isListenerInitialized) return;
@@ -52,10 +43,8 @@ export class EntrenadoService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._entrenados.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._entrenados.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -84,71 +73,45 @@ export class EntrenadoService {
 
             const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(entrenadoRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        entrenadoSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        entrenadoSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    entrenadoSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    entrenadoSignal.set(null);
+                }
             });
         }
         return this.entrenadoSignals.get(id)!.asReadonly();
     }
 
     async save(entrenado: Entrenado): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(entrenado);
-            if (entrenado.id) {
-                const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
-                await setDoc(entrenadoRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                const docRef = await addDoc(col, dataToSave);
-                entrenado.id = docRef.id;
-            }
-        });
+        const dataToSave = this.mapToFirestore(entrenado);
+        if (entrenado.id) {
+            const entrenadoRef = doc(this.firestore, this.COLLECTION, entrenado.id);
+            await setDoc(entrenadoRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            const docRef = await addDoc(col, dataToSave);
+            entrenado.id = docRef.id;
+        }
     }
 
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(entrenadoRef);
-        });
+        const entrenadoRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(entrenadoRef);
     }
 
     async followUser(currentUserId: string, targetUserId: string): Promise<void> {
-        return this.runInZone(async () => {
-            const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
-            const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
-
-            // Añadir al target a mis seguidos
-            await updateDoc(currentUserRef, {
-                seguidos: arrayUnion(targetUserId)
-            });
-
-            // Añadirme a los seguidores del target
-            await updateDoc(targetUserRef, {
-                seguidores: arrayUnion(currentUserId)
-            });
-        });
+        const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
+        const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
+        await updateDoc(currentUserRef, { seguidos: arrayUnion(targetUserId) });
+        await updateDoc(targetUserRef, { seguidores: arrayUnion(currentUserId) });
     }
 
     async unfollowUser(currentUserId: string, targetUserId: string): Promise<void> {
-        return this.runInZone(async () => {
-            const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
-            const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
-
-            // Quitar al target de mis seguidos
-            await updateDoc(currentUserRef, {
-                seguidos: arrayRemove(targetUserId)
-            });
-
-            // Quitarme de los seguidores del target
-            await updateDoc(targetUserRef, {
-                seguidores: arrayRemove(currentUserId)
-            });
-        });
+        const currentUserRef = doc(this.firestore, this.COLLECTION, currentUserId);
+        const targetUserRef = doc(this.firestore, this.COLLECTION, targetUserId);
+        await updateDoc(currentUserRef, { seguidos: arrayRemove(targetUserId) });
+        await updateDoc(targetUserRef, { seguidores: arrayRemove(currentUserId) });
     }
 
     getEntrenadoById(id: string): Signal<Entrenado | null> {

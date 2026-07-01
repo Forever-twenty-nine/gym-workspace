@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -18,7 +18,6 @@ import {
 import { SesionRutina, SesionRutinaStatus, Rutina, Ejercicio, TipoNotificacion, Notificacion } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 import { NotificacionService } from './notificacion.service';
 
@@ -28,8 +27,6 @@ import { NotificacionService } from './notificacion.service';
 @Injectable({ providedIn: 'root' })
 export class SesionRutinaService {
   private readonly firestore = inject(FIRESTORE);
-  private readonly injector = inject(Injector);
-  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'sesiones-rutina';
 
   private readonly _sesionesPorEntrenado = new Map<string, WritableSignal<SesionRutina[]>>();
@@ -43,15 +40,6 @@ export class SesionRutinaService {
 
   constructor() { }
 
-  /**
-   * Ejecuta el callback en el contexto correcto (zona o inyección)
-   */
-  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-    if (this.zoneRunner) {
-      return this.zoneRunner.run(callback);
-    }
-    return runInInjectionContext(this.injector, callback as any);
-  }
 
   /**
    * Normaliza y limpia la sesión antes de guardar
@@ -102,10 +90,8 @@ export class SesionRutinaService {
 
       const q = query(collection(this.firestore, this.COLLECTION), where('entrenadoId', '==', entrenadoId));
       onSnapshot(q, (snapshot: QuerySnapshot) => {
-        this.runInZone(() => {
-          const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
-          sesionesSignal.set(sesiones);
-        });
+        const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        sesionesSignal.set(sesiones);
       });
     }
     return this._sesionesPorEntrenado.get(entrenadoId)!.asReadonly();
@@ -141,12 +127,10 @@ export class SesionRutinaService {
    * Crea una nueva sesión de rutina
    */
   async crearSesion(sesion: SesionRutina): Promise<void> {
-    return this.runInZone(async () => {
-      const normalizedSesion = this.normalizeSesionRutina(sesion);
-      const dataToSave = this.mapToFirestore(normalizedSesion);
-      const ref = doc(this.firestore, this.COLLECTION, sesion.id);
-      await setDoc(ref, dataToSave);
-    });
+    const normalizedSesion = this.normalizeSesionRutina(sesion);
+    const dataToSave = this.mapToFirestore(normalizedSesion);
+    const ref = doc(this.firestore, this.COLLECTION, sesion.id);
+    await setDoc(ref, dataToSave);
   }
 
   /**
@@ -188,12 +172,10 @@ export class SesionRutinaService {
    * Actualiza una sesión existente
    */
   async actualizarSesion(sesion: SesionRutina): Promise<void> {
-    return this.runInZone(async () => {
-      const normalizedSesion = this.normalizeSesionRutina(sesion);
-      const dataToSave = this.mapToFirestore(normalizedSesion);
-      const ref = doc(this.firestore, this.COLLECTION, sesion.id);
-      await updateDoc(ref, dataToSave);
-    });
+    const normalizedSesion = this.normalizeSesionRutina(sesion);
+    const dataToSave = this.mapToFirestore(normalizedSesion);
+    const ref = doc(this.firestore, this.COLLECTION, sesion.id);
+    await updateDoc(ref, dataToSave);
   }
 
   /**
@@ -211,30 +193,26 @@ export class SesionRutinaService {
    * Elimina una sesión
    */
   async eliminarSesion(id: string): Promise<void> {
-    return this.runInZone(async () => {
-      const ref = doc(this.firestore, this.COLLECTION, id);
-      await deleteDoc(ref);
-    });
+    const ref = doc(this.firestore, this.COLLECTION, id);
+    await deleteDoc(ref);
   }
 
   /**
    * Actualiza el estado de compartir de una sesión consumida
    */
   async setCompartida(id: string, compartida: boolean, userName?: string, userPhoto?: string, fotoProgreso?: string, gimnasioId?: string): Promise<void> {
-    return this.runInZone(async () => {
-      const ref = doc(this.firestore, this.COLLECTION, id);
-      const data: any = {
-        compartida,
-        nombreUsuario: userName || 'Usuario',
-        fotoUsuario: userPhoto || null, // Asegurar null en lugar de undefined
-        fotoProgreso: fotoProgreso || null,
-        fechaCompartida: compartida ? Timestamp.now() : null
-      };
-      if (gimnasioId) {
-        data.gimnasioId = gimnasioId;
-      }
-      await updateDoc(ref, data);
-    });
+    const ref = doc(this.firestore, this.COLLECTION, id);
+    const data: any = {
+      compartida,
+      nombreUsuario: userName || 'Usuario',
+      fotoUsuario: userPhoto || null,
+      fotoProgreso: fotoProgreso || null,
+      fechaCompartida: compartida ? Timestamp.now() : null
+    };
+    if (gimnasioId) {
+      data.gimnasioId = gimnasioId;
+    }
+    await updateDoc(ref, data);
   }
 
   /**
@@ -256,19 +234,17 @@ export class SesionRutinaService {
     const q = query(col, where('compartida', '==', true));
 
     onSnapshot(q, (snapshot: QuerySnapshot) => {
-      this.runInZone(() => {
-        const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
+      const sesiones = snapshot.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }));
 
-        // Ordenar por fecha de compartida descendente
-        sesiones.sort((a, b) => {
-          const timeA = this.getSafeTime(a.fechaCompartida) || this.getSafeTime(a.fechaInicio) || 0;
-          const timeB = this.getSafeTime(b.fechaCompartida) || this.getSafeTime(b.fechaInicio) || 0;
-          return timeB - timeA;
-        });
-
-        sesionesSignal.set(sesiones);
-        this.isLoadingCompartidas.set(false);
+      // Ordenar por fecha de compartida descendente
+      sesiones.sort((a, b) => {
+        const timeA = this.getSafeTime(a.fechaCompartida) || this.getSafeTime(a.fechaInicio) || 0;
+        const timeB = this.getSafeTime(b.fechaCompartida) || this.getSafeTime(b.fechaInicio) || 0;
+        return timeB - timeA;
       });
+
+      sesionesSignal.set(sesiones);
+      this.isLoadingCompartidas.set(false);
     });
 
     this._sesionesCompartidasSignal = sesionesSignal.asReadonly();
@@ -293,29 +269,27 @@ export class SesionRutinaService {
    */
   async addLike(sesionId: string, userId: string, likerNombre?: string, ownerId?: string): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, sesionId);
-    return this.runInZone(async () => {
-      await updateDoc(ref, {
-        likes: arrayUnion(userId)
-      });
-      // Enviar notificación si el usuario que da like no es el dueño de la publicación
-      if (ownerId && userId !== ownerId) {
-        const notificacion: Notificacion = {
-          id: this.generarIdUnico(),
-          usuarioId: ownerId,
-          tipo: TipoNotificacion.LIKE_PUBLICACION,
-          titulo: 'Nuevo Me Gusta',
-          mensaje: `${likerNombre || 'Alguien'} le dio me gusta a tu publicación`,
-          leida: false,
-          fechaCreacion: new Date(),
-          datos: {
-            sesionId: sesionId,
-            likerId: userId,
-            likerNombre: likerNombre || ''
-          }
-        };
-        await this.notificacionService.save(notificacion);
-      }
+    await updateDoc(ref, {
+      likes: arrayUnion(userId)
     });
+    // Enviar notificación si el usuario que da like no es el dueño de la publicación
+    if (ownerId && userId !== ownerId) {
+      const notificacion: Notificacion = {
+        id: this.generarIdUnico(),
+        usuarioId: ownerId,
+        tipo: TipoNotificacion.LIKE_PUBLICACION,
+        titulo: 'Nuevo Me Gusta',
+        mensaje: `${likerNombre || 'Alguien'} le dio me gusta a tu publicación`,
+        leida: false,
+        fechaCreacion: new Date(),
+        datos: {
+          sesionId: sesionId,
+          likerId: userId,
+          likerNombre: likerNombre || ''
+        }
+      };
+      await this.notificacionService.save(notificacion);
+    }
   }
 
   /**
@@ -323,10 +297,8 @@ export class SesionRutinaService {
    */
   async removeLike(sesionId: string, userId: string): Promise<void> {
     const ref = doc(this.firestore, this.COLLECTION, sesionId);
-    return this.runInZone(async () => {
-      await updateDoc(ref, {
-        likes: arrayRemove(userId)
-      });
+    await updateDoc(ref, {
+      likes: arrayRemove(userId)
     });
   }
 

@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -16,7 +16,6 @@ import {
     getDocs
 } from 'firebase/firestore';
 import { MatchInteraction, Entrenado, Rol, TipoMensaje, TipoNotificacion } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 import { EntrenadoService } from './entrenado.service';
 import { MensajeService } from './mensaje.service';
@@ -29,7 +28,6 @@ import { TarjetaDescubrir } from '../types/descubrir.types';
 export class MatchService {
     private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'matches';
 
     private readonly entrenadoService = inject(EntrenadoService);
@@ -52,12 +50,6 @@ export class MatchService {
         return this._interactions.asReadonly();
     }
 
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     private initializeListener(userId: string, gymId?: string): void {
         if (this.isListenerInitialized) return;
@@ -90,13 +82,11 @@ export class MatchService {
     }
 
     private mergeInteractions(snap: QuerySnapshot, userId: string) {
-        this.runInZone(() => {
-            const current = this._interactions();
-            const newOnes = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-            const merged = new Map<string, MatchInteraction>();
-            [...current, ...newOnes].forEach(i => merged.set(i.id, i));
-            this._interactions.set(Array.from(merged.values()));
-        });
+        const current = this._interactions();
+        const newOnes = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        const merged = new Map<string, MatchInteraction>();
+        [...current, ...newOnes].forEach(i => merged.set(i.id, i));
+        this._interactions.set(Array.from(merged.values()));
     }
 
     /**
@@ -112,7 +102,6 @@ export class MatchService {
     ): Promise<boolean> {
         this.initializeListener(usuarioOrigenId);
 
-        return this.runInZone(async () => {
             const matchesCol = collection(this.firestore, this.COLLECTION);
 
             // Obtener gimnasioId del usuario origen para denormalizarlo en el match
@@ -245,7 +234,6 @@ export class MatchService {
                 await setDoc(doc(this.firestore, this.COLLECTION, interactionId), this.mapToFirestore(newInteraction));
                 return false; // Esperando interés mutuo
             }
-        });
     }
 
     /**

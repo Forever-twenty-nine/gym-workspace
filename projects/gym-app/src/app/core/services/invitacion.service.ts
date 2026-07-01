@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -21,14 +21,12 @@ import { EntrenadorService, PlanLimitError } from './entrenador.service';
 import { GimnasioService } from './gimnasio.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class InvitacionService {
     private readonly firestore = inject(FIRESTORE);
     private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'invitaciones';
 
     private readonly _invitaciones: WritableSignal<Invitacion[]> = signal<Invitacion[]>([]);
@@ -37,15 +35,6 @@ export class InvitacionService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
@@ -62,10 +51,8 @@ export class InvitacionService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._invitaciones.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._invitaciones.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -100,13 +87,11 @@ export class InvitacionService {
 
             const invitacionRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(invitacionRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        invitacionSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        invitacionSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    invitacionSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    invitacionSignal.set(null);
+                }
             });
         }
         return this.invitacionSignals.get(id)!.asReadonly();
@@ -116,38 +101,32 @@ export class InvitacionService {
      * 💾 Guarda o actualiza una invitación
      */
     async save(invitacion: Invitacion): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(invitacion);
-            if (invitacion.id) {
-                const invitacionRef = doc(this.firestore, this.COLLECTION, invitacion.id);
-                await setDoc(invitacionRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                await addDoc(col, dataToSave);
-            }
-        });
+        const dataToSave = this.mapToFirestore(invitacion);
+        if (invitacion.id) {
+            const invitacionRef = doc(this.firestore, this.COLLECTION, invitacion.id);
+            await setDoc(invitacionRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            await addDoc(col, dataToSave);
+        }
     }
 
     /**
      * 🗑️ Elimina una invitación por ID
      */
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const invitacionRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(invitacionRef);
-        });
+        const invitacionRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(invitacionRef);
     }
 
     /**
      * 🔄 Actualiza el estado de una invitación
      */
     async updateEstado(id: string, estado: 'pendiente' | 'aceptada' | 'rechazada'): Promise<void> {
-        return this.runInZone(async () => {
-            const invitacionRef = doc(this.firestore, this.COLLECTION, id);
-            await updateDoc(invitacionRef, {
-                estado,
-                fechaRespuesta: estado !== 'pendiente' ? Timestamp.now() : null
-            });
+        const invitacionRef = doc(this.firestore, this.COLLECTION, id);
+        await updateDoc(invitacionRef, {
+            estado,
+            fechaRespuesta: estado !== 'pendiente' ? Timestamp.now() : null
         });
     }
 

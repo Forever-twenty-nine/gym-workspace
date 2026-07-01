@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -17,14 +17,11 @@ import {
     limit
 } from 'firebase/firestore';
 import { Mensaje } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class MensajeService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'mensajes';
 
     private readonly _mensajes: WritableSignal<Mensaje[]> = signal<Mensaje[]>([]);
@@ -33,15 +30,6 @@ export class MensajeService {
 
     constructor() { }
 
-    /**
-     * Ejecuta el callback en el contexto correcto (zona o inyección)
-     */
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * 🔄 Inicializa el listener de Firestore de forma segura
@@ -53,10 +41,8 @@ export class MensajeService {
             const col = collection(this.firestore, this.COLLECTION);
             const q = query(col, orderBy('fechaEnvio', 'desc'));
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._mensajes.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._mensajes.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -84,13 +70,11 @@ export class MensajeService {
 
             const mensajeRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(mensajeRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        mensajeSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        mensajeSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    mensajeSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    mensajeSignal.set(null);
+                }
             });
         }
         return this.mensajeSignals.get(id)!.asReadonly();
@@ -100,51 +84,38 @@ export class MensajeService {
      * 💾 Guarda o actualiza un mensaje
      */
     async save(mensaje: Mensaje): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(mensaje);
-            if (mensaje.id) {
-                const mensajeRef = doc(this.firestore, this.COLLECTION, mensaje.id);
-                await setDoc(mensajeRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                await addDoc(col, dataToSave);
-            }
-        });
+        const dataToSave = this.mapToFirestore(mensaje);
+        if (mensaje.id) {
+            const mensajeRef = doc(this.firestore, this.COLLECTION, mensaje.id);
+            await setDoc(mensajeRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            await addDoc(col, dataToSave);
+        }
     }
 
     /**
      * 🗑️ Elimina un mensaje por ID
      */
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(mensajeRef);
-        });
+        const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(mensajeRef);
     }
 
     /**
      * ✅ Marca un mensaje como leído
      */
     async marcarComoLeido(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
-            await updateDoc(mensajeRef, {
-                leido: true,
-                fechaLeido: Timestamp.now()
-            });
-        });
+        const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+        await updateDoc(mensajeRef, { leido: true, fechaLeido: Timestamp.now() });
     }
 
     /**
      * 📩 Marca un mensaje como entregado
      */
     async marcarComoEntregado(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const mensajeRef = doc(this.firestore, this.COLLECTION, id);
-            await updateDoc(mensajeRef, {
-                entregado: true
-            });
-        });
+        const mensajeRef = doc(this.firestore, this.COLLECTION, id);
+        await updateDoc(mensajeRef, { entregado: true });
     }
 
     /**

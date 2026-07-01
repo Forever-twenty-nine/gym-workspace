@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -17,14 +17,11 @@ import {
     arrayRemove
 } from 'firebase/firestore';
 import { Convocatoria, Rol } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class ConvocatoriaService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'convocatorias';
 
     private readonly _convocatorias: WritableSignal<Convocatoria[]> = signal<Convocatoria[]>([]);
@@ -32,12 +29,6 @@ export class ConvocatoriaService {
 
     constructor() { }
 
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * Inicializa listener.
@@ -56,10 +47,8 @@ export class ConvocatoriaService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._convocatorias.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._convocatorias.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -88,39 +77,33 @@ export class ConvocatoriaService {
     }
 
     async save(convocatoria: Convocatoria): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(convocatoria);
-            if (convocatoria.id) {
-                const docRef = doc(this.firestore, this.COLLECTION, convocatoria.id);
-                await setDoc(docRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                const docRef = await addDoc(col, dataToSave);
-                convocatoria.id = docRef.id;
-            }
-        });
+        const dataToSave = this.mapToFirestore(convocatoria);
+        if (convocatoria.id) {
+            const docRef = doc(this.firestore, this.COLLECTION, convocatoria.id);
+            await setDoc(docRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            const docRef = await addDoc(col, dataToSave);
+            convocatoria.id = docRef.id;
+        }
     }
 
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const docRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(docRef);
-        });
+        const docRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(docRef);
     }
 
     async toggleInteres(convocatoriaId: string, userId: string, unirse: boolean): Promise<void> {
-        return this.runInZone(async () => {
-            const docRef = doc(this.firestore, this.COLLECTION, convocatoriaId);
-            if (unirse) {
-                await updateDoc(docRef, {
-                    interesados: arrayUnion(userId)
-                });
-            } else {
-                await updateDoc(docRef, {
-                    interesados: arrayRemove(userId)
-                });
-            }
-        });
+        const docRef = doc(this.firestore, this.COLLECTION, convocatoriaId);
+        if (unirse) {
+            await updateDoc(docRef, {
+                interesados: arrayUnion(userId)
+            });
+        } else {
+            await updateDoc(docRef, {
+                interesados: arrayRemove(userId)
+            });
+        }
     }
 
     private mapFromFirestore(data: any): Convocatoria {

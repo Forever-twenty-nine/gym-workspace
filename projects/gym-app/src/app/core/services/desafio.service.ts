@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -14,14 +14,11 @@ import {
     DocumentSnapshot
 } from 'firebase/firestore';
 import { Desafio } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class DesafioService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'desafios';
 
     private readonly _desafios: WritableSignal<Desafio[]> = signal<Desafio[]>([]);
@@ -30,12 +27,6 @@ export class DesafioService {
 
     constructor() { }
 
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /**
      * Inicializa listener.
@@ -53,10 +44,8 @@ export class DesafioService {
             }
 
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-                    this._desafios.set(list);
-                });
+                const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+                this._desafios.set(list);
             });
             this.isListenerInitialized = true;
         } catch (e) {
@@ -86,37 +75,31 @@ export class DesafioService {
 
             const desafioRef = doc(this.firestore, this.COLLECTION, id);
             onSnapshot(desafioRef, (docSnap: DocumentSnapshot) => {
-                this.runInZone(() => {
-                    if (docSnap.exists()) {
-                        desafioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-                    } else {
-                        desafioSignal.set(null);
-                    }
-                });
+                if (docSnap.exists()) {
+                    desafioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+                } else {
+                    desafioSignal.set(null);
+                }
             });
         }
         return this.desafioSignals.get(id)!.asReadonly();
     }
 
     async save(desafio: Desafio): Promise<void> {
-        return this.runInZone(async () => {
-            const dataToSave = this.mapToFirestore(desafio);
-            if (desafio.id) {
-                const desafioRef = doc(this.firestore, this.COLLECTION, desafio.id);
-                await setDoc(desafioRef, dataToSave, { merge: true });
-            } else {
-                const col = collection(this.firestore, this.COLLECTION);
-                const docRef = await addDoc(col, dataToSave);
-                desafio.id = docRef.id;
-            }
-        });
+        const dataToSave = this.mapToFirestore(desafio);
+        if (desafio.id) {
+            const desafioRef = doc(this.firestore, this.COLLECTION, desafio.id);
+            await setDoc(desafioRef, dataToSave, { merge: true });
+        } else {
+            const col = collection(this.firestore, this.COLLECTION);
+            const docRef = await addDoc(col, dataToSave);
+            desafio.id = docRef.id;
+        }
     }
 
     async delete(id: string): Promise<void> {
-        return this.runInZone(async () => {
-            const desafioRef = doc(this.firestore, this.COLLECTION, id);
-            await deleteDoc(desafioRef);
-        });
+        const desafioRef = doc(this.firestore, this.COLLECTION, id);
+        await deleteDoc(desafioRef);
     }
 
     getDesafiosByGimnasio(gimnasioId: string): Signal<Desafio[]> {

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -21,7 +21,6 @@ import { UserService } from './user.service';
 import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 // Clase de error personalizada para límites
@@ -40,8 +39,6 @@ export class PlanLimitError extends Error {
 })
 export class EntrenadorService {
   private readonly firestore = inject(FIRESTORE);
-  private readonly injector = inject(Injector);
-  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'entrenadores';
 
   private rutinaService = inject(RutinaService);
@@ -69,15 +66,6 @@ export class EntrenadorService {
 
   constructor() { }
 
-  /**
-   * Ejecuta el callback en el contexto correcto (zona o inyección)
-   */
-  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-    if (this.zoneRunner) {
-      return this.zoneRunner.run(callback);
-    }
-    return runInInjectionContext(this.injector, callback as any);
-  }
 
   // Métodos para límites de plan
   getLimits(entrenadorId: string): PlanLimits {
@@ -132,18 +120,14 @@ export class EntrenadorService {
     try {
       const col = collection(this.firestore, this.COLLECTION);
       onSnapshot(col, (snap: QuerySnapshot) => {
-        this.runInZone(() => {
-          const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-          this._entrenadores.set(list);
-          this._loading.set(false);
-          this._error.set(null);
-        });
+        const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+        this._entrenadores.set(list);
+        this._loading.set(false);
+        this._error.set(null);
       }, (error) => {
-        this.runInZone(() => {
-          console.error('❌ Error en listener de entrenadores:', error);
-          this._error.set('Error al cargar entrenadores');
-          this._loading.set(false);
-        });
+        console.error('❌ Error en listener de entrenadores:', error);
+        this._error.set('Error al cargar entrenadores');
+        this._loading.set(false);
       });
       this.isListenerInitialized = true;
     } catch (error) {
@@ -160,10 +144,8 @@ export class EntrenadorService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      return await this.runInZone(async () => {
-        const docRef = await addDoc(collection(this.firestore, this.COLLECTION), this.mapToFirestore(entrenadorData));
-        return docRef.id;
-      });
+      const docRef = await addDoc(collection(this.firestore, this.COLLECTION), this.mapToFirestore(entrenadorData));
+      return docRef.id;
     } catch (error) {
       console.error('❌ Error al crear entrenador:', error);
       this._error.set('Error al crear entrenador');
@@ -180,9 +162,7 @@ export class EntrenadorService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      await this.runInZone(async () => {
-        await setDoc(doc(this.firestore, this.COLLECTION, id), this.mapToFirestore(entrenadorData));
-      });
+      await setDoc(doc(this.firestore, this.COLLECTION, id), this.mapToFirestore(entrenadorData));
     } catch (error) {
       this._error.set('Error al crear entrenador');
       throw error;
@@ -198,10 +178,8 @@ export class EntrenadorService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      await this.runInZone(async () => {
-        const dataToUpdate = this.mapPartialToFirestore(entrenadorData);
-        await updateDoc(doc(this.firestore, this.COLLECTION, id), dataToUpdate);
-      });
+      const dataToUpdate = this.mapPartialToFirestore(entrenadorData);
+      await updateDoc(doc(this.firestore, this.COLLECTION, id), dataToUpdate);
     } catch (error) {
       console.error('❌ Error al actualizar entrenador:', error);
       this._error.set('Error al actualizar entrenador');
@@ -218,9 +196,7 @@ export class EntrenadorService {
     this._loading.set(true);
     this._error.set(null);
     try {
-      await this.runInZone(async () => {
-        await deleteDoc(doc(this.firestore, this.COLLECTION, id));
-      });
+      await deleteDoc(doc(this.firestore, this.COLLECTION, id));
     } catch (error) {
       console.error('❌ Error al eliminar entrenador:', error);
       this._error.set('Error al eliminar entrenador');

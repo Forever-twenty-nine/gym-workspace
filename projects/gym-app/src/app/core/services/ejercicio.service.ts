@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
 	Firestore,
 	collection,
@@ -14,7 +14,6 @@ import {
 	Timestamp
 } from 'firebase/firestore';
 import { Ejercicio, Rol } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 /**
@@ -30,9 +29,6 @@ export class EjercicioValidationError extends Error {
 @Injectable({ providedIn: 'root' })
 export class EjercicioService {
 	private readonly firestore = inject(FIRESTORE);
-
-	private readonly injector = inject(Injector);
-	private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
 	private readonly COLLECTION = 'ejercicios';
 
 	private readonly _ejercicios: WritableSignal<Ejercicio[]> = signal<Ejercicio[]>([]);
@@ -71,15 +67,6 @@ export class EjercicioService {
 
 	constructor() { }
 
-	/**
-	 * Ejecuta el callback en el contexto correcto (zona o inyección)
-	 */
-	private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-		if (this.zoneRunner) {
-			return this.zoneRunner.run(callback);
-		}
-		return runInInjectionContext(this.injector, callback as any);
-	}
 
 	/**
 	 * Inicializa el listener de Firestore de forma segura.
@@ -97,10 +84,8 @@ export class EjercicioService {
 			}
 
 			onSnapshot(q, (snap: QuerySnapshot) => {
-				this.runInZone(() => {
-					const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
-					this._ejercicios.set(list);
-				});
+				const list = snap.docs.map((d) => this.mapFromFirestore({ ...d.data(), id: d.id }));
+				this._ejercicios.set(list);
 			});
 			this.isListenerInitialized = true;
 		} catch (e) {
@@ -139,14 +124,12 @@ export class EjercicioService {
 
 			const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
 			onSnapshot(ejercicioRef, (docSnap: DocumentSnapshot) => {
-				this.runInZone(() => {
-					if (docSnap.exists()) {
-						ejercicioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-					} else {
-						ejercicioSignal.set(null);
-					}
-					this.isSubscribed.set(id, true);
-				});
+				if (docSnap.exists()) {
+					ejercicioSignal.set(this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+				} else {
+					ejercicioSignal.set(null);
+				}
+				this.isSubscribed.set(id, true);
 			});
 		}
 		return this.ejercicioSignals.get(id)!.asReadonly();
@@ -211,26 +194,22 @@ export class EjercicioService {
 		const normalizedEjercicio = this.normalizeEjercicio(ejercicio);
 		this.validateEjercicio(normalizedEjercicio);
 
-		return this.runInZone(async () => {
-			const dataToSave = this.mapToFirestore(normalizedEjercicio);
-			if (normalizedEjercicio.id) {
-				const ejercicioRef = doc(this.firestore, this.COLLECTION, normalizedEjercicio.id);
-				await setDoc(ejercicioRef, dataToSave, { merge: true });
-			} else {
-				const col = collection(this.firestore, this.COLLECTION);
-				await addDoc(col, dataToSave);
-			}
-		});
+		const dataToSave = this.mapToFirestore(normalizedEjercicio);
+		if (normalizedEjercicio.id) {
+			const ejercicioRef = doc(this.firestore, this.COLLECTION, normalizedEjercicio.id);
+			await setDoc(ejercicioRef, dataToSave, { merge: true });
+		} else {
+			const col = collection(this.firestore, this.COLLECTION);
+			await addDoc(col, dataToSave);
+		}
 	}
 
 	/**
 	 * Elimina un ejercicio por ID
 	 */
 	async delete(id: string): Promise<void> {
-		return this.runInZone(async () => {
-			const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
-			await deleteDoc(ejercicioRef);
-		});
+		const ejercicioRef = doc(this.firestore, this.COLLECTION, id);
+		await deleteDoc(ejercicioRef);
 	}
 
 	/**

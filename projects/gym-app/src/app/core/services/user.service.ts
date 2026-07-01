@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, computed, inject } from '@angular/core';
 import {
   Firestore,
   collection,
@@ -14,15 +14,11 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { User } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly firestore = inject(FIRESTORE);
-
-  private readonly injector = inject(Injector);
-  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'usuarios';
 
   // 🔄 Signals privadas
@@ -35,15 +31,6 @@ export class UserService {
 
   constructor() { }
 
-  /**
-   * Ejecuta el callback en el contexto correcto (zona o inyección)
-   */
-  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-    if (this.zoneRunner) {
-      return this.zoneRunner.run(callback);
-    }
-    return runInInjectionContext(this.injector, callback as any);
-  }
 
   /**
    * Inicializa el listener de Firestore para usuarios
@@ -54,18 +41,14 @@ export class UserService {
     try {
       const usersCol = collection(this.firestore, this.COLLECTION);
       onSnapshot(usersCol, (snapshot: QuerySnapshot) => {
-        this.runInZone(() => {
-          const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
-            ...docSnap.data(),
-            uid: docSnap.id
-          }));
-          this._users.set(usersList);
-        });
+        const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
+          ...docSnap.data(),
+          uid: docSnap.id
+        }));
+        this._users.set(usersList);
       }, (error) => {
-        this.runInZone(() => {
-          console.error('🔄 UserService: Error en listener:', error);
-          this._error.set(error.message);
-        });
+        console.error('🔄 UserService: Error en listener:', error);
+        this._error.set(error.message);
       });
 
       this.isListenerInitialized = true;
@@ -117,16 +100,14 @@ export class UserService {
     this._error.set(null);
 
     try {
-      return await this.runInZone(async () => {
-        const usersCol = collection(this.firestore, this.COLLECTION);
-        const snapshot = await getDocs(usersCol);
-        const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
-          ...docSnap.data(),
-          uid: docSnap.id
-        }));
-        this._users.set(usersList);
-        return usersList;
-      });
+      const usersCol = collection(this.firestore, this.COLLECTION);
+      const snapshot = await getDocs(usersCol);
+      const usersList = snapshot.docs.map(docSnap => this.mapFromFirestore({
+        ...docSnap.data(),
+        uid: docSnap.id
+      }));
+      this._users.set(usersList);
+      return usersList;
     } catch (error: any) {
       console.error('🔄 UserService: Error al obtener usuarios:', error);
       this._error.set(error.message);
@@ -144,11 +125,9 @@ export class UserService {
     this._error.set(null);
 
     try {
-      return await this.runInZone(async () => {
-        const usersCol = collection(this.firestore, this.COLLECTION);
-        const docRef = await addDoc(usersCol, this.mapToFirestore(user as User));
-        return docRef.id;
-      });
+      const usersCol = collection(this.firestore, this.COLLECTION);
+      const docRef = await addDoc(usersCol, this.mapToFirestore(user as User));
+      return docRef.id;
     } catch (error: any) {
       console.error('🔄 UserService: Error al agregar usuario:', error);
       this._error.set(error.message);
@@ -166,14 +145,12 @@ export class UserService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const userDoc = doc(this.firestore, this.COLLECTION, uid);
-        const dataToSave: Partial<User> = {
-          ...userData,
-          fechaActualizacion: new Date()
-        };
-        await setDoc(userDoc, this.mapToFirestore(dataToSave), { merge: true });
-      });
+      const userDoc = doc(this.firestore, this.COLLECTION, uid);
+      const dataToSave: Partial<User> = {
+        ...userData,
+        fechaActualizacion: new Date()
+      };
+      await setDoc(userDoc, this.mapToFirestore(dataToSave), { merge: true });
     } catch (error: any) {
       console.error('🔄 UserService: Error al actualizar usuario:', error);
       this._error.set(error.message);
@@ -191,10 +168,8 @@ export class UserService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const userDoc = doc(this.firestore, this.COLLECTION, uid);
-        await deleteDoc(userDoc);
-      });
+      const userDoc = doc(this.firestore, this.COLLECTION, uid);
+      await deleteDoc(userDoc);
     } catch (error: any) {
       console.error('🔄 UserService: Error al eliminar usuario:', error);
       this._error.set(error.message);
@@ -219,34 +194,32 @@ export class UserService {
    */
   async getUserByEmailAsync(email: string): Promise<User | null> {
     try {
-      return await this.runInZone(async () => {
-        const usersCol = collection(this.firestore, this.COLLECTION);
-        // Intentamos búsqueda exacta
-        const q = query(usersCol, where('email', '==', email));
-        const snapshot = await getDocs(q);
+      const usersCol = collection(this.firestore, this.COLLECTION);
+      // Intentamos búsqueda exacta
+      const q = query(usersCol, where('email', '==', email));
+      const snapshot = await getDocs(q);
 
-        if (!snapshot.empty) {
-          const docSnap = snapshot.docs[0];
-          return this.mapFromFirestore({
-            ...docSnap.data(),
-            uid: docSnap.id
-          });
-        }
+      if (!snapshot.empty) {
+        const docSnap = snapshot.docs[0];
+        return this.mapFromFirestore({
+          ...docSnap.data(),
+          uid: docSnap.id
+        });
+      }
 
-        // Si no se encuentra, intentamos con minúsculas (por si acaso)
-        const qLower = query(usersCol, where('email', '==', email.toLowerCase()));
-        const snapshotLower = await getDocs(qLower);
+      // Si no se encuentra, intentamos con minúsculas (por si acaso)
+      const qLower = query(usersCol, where('email', '==', email.toLowerCase()));
+      const snapshotLower = await getDocs(qLower);
 
-        if (!snapshotLower.empty) {
-          const docSnap = snapshotLower.docs[0];
-          return this.mapFromFirestore({
-            ...docSnap.data(),
-            uid: docSnap.id
-          });
-        }
+      if (!snapshotLower.empty) {
+        const docSnap = snapshotLower.docs[0];
+        return this.mapFromFirestore({
+          ...docSnap.data(),
+          uid: docSnap.id
+        });
+      }
 
-        return null;
-      });
+      return null;
     } catch (error) {
       console.error('🔄 UserService: Error al buscar usuario por email:', error);
       return null;

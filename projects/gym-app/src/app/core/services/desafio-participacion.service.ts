@@ -1,4 +1,4 @@
-import { Injectable, signal, WritableSignal, Signal, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, WritableSignal, Signal, inject } from '@angular/core';
 import {
     Firestore,
     collection,
@@ -12,14 +12,11 @@ import {
     QuerySnapshot
 } from 'firebase/firestore';
 import { DesafioParticipacion, DesafioEstado } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 @Injectable({ providedIn: 'root' })
 export class DesafioParticipacionService {
     private readonly firestore = inject(FIRESTORE);
-    private readonly injector = inject(Injector);
-    private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
     private readonly COLLECTION = 'desafio_participaciones';
 
     // Cache por desafioId → Signal<DesafioParticipacion[]>
@@ -30,12 +27,6 @@ export class DesafioParticipacionService {
 
     constructor() { }
 
-    private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-        if (this.zoneRunner) {
-            return this.zoneRunner.run(callback);
-        }
-        return runInInjectionContext(this.injector, callback as any);
-    }
 
     /** Retorna todas las participaciones de un desafío (para mostrar el conteo en la card) */
     getParticipacionesByDesafio(desafioId: string): Signal<DesafioParticipacion[]> {
@@ -46,9 +37,7 @@ export class DesafioParticipacionService {
             const col = collection(this.firestore, this.COLLECTION);
             const q = query(col, where('desafioId', '==', desafioId));
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    s.set(snap.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id })));
-                });
+                s.set(snap.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id })));
             });
         }
         return this.participacionesCache.get(desafioId)!.asReadonly();
@@ -61,11 +50,9 @@ export class DesafioParticipacionService {
             const col = collection(this.firestore, this.COLLECTION);
             const q = query(col, where('participanteId', '==', userId));
             onSnapshot(q, (snap: QuerySnapshot) => {
-                this.runInZone(() => {
-                    this.misParticipaciones.set(
-                        snap.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }))
-                    );
-                });
+                this.misParticipaciones.set(
+                    snap.docs.map(d => this.mapFromFirestore({ ...d.data(), id: d.id }))
+                );
             });
         }
         return this.misParticipaciones.asReadonly();
@@ -78,28 +65,24 @@ export class DesafioParticipacionService {
         userNombre: string,
         userFoto?: string | null
     ): Promise<void> {
-        return this.runInZone(async () => {
-            const col = collection(this.firestore, this.COLLECTION);
-            const data = {
-                desafioId,
-                participanteId: userId,
-                participanteNombre: userNombre,
-                participanteFoto: userFoto || null,
-                estado: 'aceptado' as DesafioEstado,
-                fechaAceptacion: Timestamp.now()
-            };
-            await addDoc(col, data);
-        });
+        const col = collection(this.firestore, this.COLLECTION);
+        const data = {
+            desafioId,
+            participanteId: userId,
+            participanteNombre: userNombre,
+            participanteFoto: userFoto || null,
+            estado: 'aceptado' as DesafioEstado,
+            fechaAceptacion: Timestamp.now()
+        };
+        await addDoc(col, data);
     }
 
     /** Declara si el usuario superó o no el desafío */
     async declararResultado(participacionId: string, superado: boolean): Promise<void> {
-        return this.runInZone(async () => {
-            const docRef = doc(this.firestore, this.COLLECTION, participacionId);
-            await updateDoc(docRef, {
-                estado: (superado ? 'superado' : 'no_superado') as DesafioEstado,
-                fechaRespuesta: Timestamp.now()
-            });
+        const docRef = doc(this.firestore, this.COLLECTION, participacionId);
+        await updateDoc(docRef, {
+            estado: (superado ? 'superado' : 'no_superado') as DesafioEstado,
+            fechaRespuesta: Timestamp.now()
         });
     }
 

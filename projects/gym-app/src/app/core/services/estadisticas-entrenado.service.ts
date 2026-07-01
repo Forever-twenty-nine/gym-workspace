@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, Injector, runInInjectionContext } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import {
 
   Firestore,
@@ -16,7 +16,6 @@ import {
   updateDoc
 } from 'firebase/firestore';
 import { EstadisticasEntrenado } from 'gym-library';
-import { ZoneRunnerService } from './zone-runner.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 /**
@@ -28,8 +27,6 @@ import { FIRESTORE } from '../firebase.tokens';
 })
 export class EstadisticasEntrenadoService {
   private readonly firestore = inject(FIRESTORE);
-  private readonly injector = inject(Injector);
-  private readonly zoneRunner = inject(ZoneRunnerService, { optional: true });
   private readonly COLLECTION = 'estadisticas-entrenado';
 
   // 📊 Signals para el estado de las estadísticas
@@ -45,15 +42,6 @@ export class EstadisticasEntrenadoService {
 
   constructor() { }
 
-  /**
-   * Ejecuta el callback en el contexto correcto (zona o inyección)
-   */
-  private runInZone<T>(callback: () => T | Promise<T>): T | Promise<T> {
-    if (this.zoneRunner) {
-      return this.zoneRunner.run(callback);
-    }
-    return runInInjectionContext(this.injector, callback as any);
-  }
 
   /**
    * Obtiene las estadísticas de un entrenado específico
@@ -79,18 +67,16 @@ export class EstadisticasEntrenadoService {
     try {
       const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
       const unsubscribe = onSnapshot(estadisticasRef, (docSnap: DocumentSnapshot) => {
-        this.runInZone(() => {
-          const current = this._estadisticas();
-          const updated = new Map(current);
-          if (docSnap.exists()) {
-            updated.set(entrenadoId, this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
-          } else {
-            updated.delete(entrenadoId);
-          }
-          this._estadisticas.set(updated);
-          this._loading.set(false);
-          this._error.set(null);
-        });
+        const current = this._estadisticas();
+        const updated = new Map(current);
+        if (docSnap.exists()) {
+          updated.set(entrenadoId, this.mapFromFirestore({ ...docSnap.data(), id: docSnap.id }));
+        } else {
+          updated.delete(entrenadoId);
+        }
+        this._estadisticas.set(updated);
+        this._loading.set(false);
+        this._error.set(null);
       }, (error) => {
         console.error('❌ Error en listener de estadísticas:', error);
         this._error.set('Error al cargar estadísticas');
@@ -127,11 +113,9 @@ export class EstadisticasEntrenadoService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const dataToSave = this.mapToFirestore(estadisticas);
-        const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
-        await setDoc(estadisticasRef, dataToSave);
-      });
+      const dataToSave = this.mapToFirestore(estadisticas);
+      const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
+      await setDoc(estadisticasRef, dataToSave);
     } catch (error) {
       console.error('❌ Error al crear estadísticas:', error);
       this._error.set('Error al crear estadísticas');
@@ -151,11 +135,9 @@ export class EstadisticasEntrenadoService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const dataToSave = this.mapToFirestore(estadisticas);
-        const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
-        await updateDoc(estadisticasRef, dataToSave);
-      });
+      const dataToSave = this.mapToFirestore(estadisticas);
+      const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
+      await updateDoc(estadisticasRef, dataToSave);
     } catch (error) {
       console.error('❌ Error al actualizar estadísticas:', error);
       this._error.set('Error al actualizar estadísticas');
@@ -174,15 +156,13 @@ export class EstadisticasEntrenadoService {
     this._error.set(null);
 
     try {
-      await this.runInZone(async () => {
-        const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
-        await deleteDoc(estadisticasRef);
-        // Remover del estado local
-        const current = this._estadisticas();
-        const updated = new Map(current);
-        updated.delete(entrenadoId);
-        this._estadisticas.set(updated);
-      });
+      const estadisticasRef = doc(this.firestore, this.COLLECTION, entrenadoId);
+      await deleteDoc(estadisticasRef);
+      // Remover del estado local
+      const current = this._estadisticas();
+      const updated = new Map(current);
+      updated.delete(entrenadoId);
+      this._estadisticas.set(updated);
     } catch (error) {
       console.error('❌ Error al eliminar estadísticas:', error);
       this._error.set('Error al eliminar estadísticas');
