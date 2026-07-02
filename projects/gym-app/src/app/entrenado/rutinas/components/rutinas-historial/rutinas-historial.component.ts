@@ -7,7 +7,14 @@ import {
   IonLabel,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption, IonCard, IonCardHeader, IonCardContent, IonCardTitle, IonCardSubtitle } from '@ionic/angular/standalone';
+  IonItemOption,
+  IonCard,
+  IonCardHeader,
+  IonCardContent,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonText
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { trashOutline, calendarOutline } from 'ionicons/icons';
 import { SesionRutina } from 'gym-library';
@@ -17,7 +24,7 @@ import { DateBadgeComponent } from '../../../../shared/components/date-badge/dat
   selector: 'app-rutinas-historial',
   templateUrl: './rutinas-historial.component.html',
   standalone: true,
-  imports: [IonCardContent, IonCardHeader, IonCard, IonCardTitle, IonCardSubtitle,
+  imports: [
     CommonModule,
     IonList,
     IonItem,
@@ -26,6 +33,12 @@ import { DateBadgeComponent } from '../../../../shared/components/date-badge/dat
     IonItemSliding,
     IonItemOptions,
     IonItemOption,
+    IonCard,
+    IonCardHeader,
+    IonCardContent,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonText,
     DateBadgeComponent
   ]
 })

@@ -100,15 +100,21 @@
    margin-bottom: 0 !important;
  }
 
- /* Ajustes adicionales para ion-item cuando está dentro de una lista */
- ion-list ion-item {
-   --border-radius: 12px;
-   --border-style: none !important;
-   --inner-border-width: 0 !important;
-   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
- }
+/* Ajustes adicionales para ion-item cuando está dentro de una lista */
+ion-list ion-item {
+  --border-radius: 12px;
+  --border-style: none !important;
+  --inner-border-width: 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
 
- /* Evitar fondos en los contenedores deslizables */
- ion-item-sliding {
-   background: transparent !important;
- }
+/* Card que contiene listas — la hacemos transparente para que el fondo de página se vea */
+ion-card:has(> ion-card-content > ion-list) {
+  --background: transparent;
+  box-shadow: none;
+}
+
+/* Evitar fondos en los contenedores deslizables */
+ion-item-sliding {
+  background: transparent !important;
+}

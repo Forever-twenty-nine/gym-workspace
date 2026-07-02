@@ -12,7 +12,8 @@ import {
     IonButton,
     IonAccordionGroup,
     IonAccordion,
-    IonList
+    IonList,
+    IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { playCircle, bedOutline, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
@@ -47,6 +48,7 @@ type Encuentro = Convocatoria; // alias for clarity in this component
         IonAccordionGroup,
         IonAccordion,
         IonList,
+        IonText,
         DateBadgeComponent,
     ],
     templateUrl: './rutinas-semana.component.html',
@@ -54,6 +56,14 @@ type Encuentro = Convocatoria; // alias for clarity in this component
         ::ng-deep ion-accordion[disabled] .ion-accordion-toggle-icon,
         ::ng-deep ion-accordion.accordion-disabled .ion-accordion-toggle-icon {
             display: none !important;
+        }
+        /* Day rows — esquinas redondeadas como los items de las otras listas */
+        ::ng-deep ion-item[slot="header"] {
+            border-radius: 12px !important;
+            overflow: hidden !important;
+        }
+        ::ng-deep ion-accordion::part(header) {
+            border-radius: 12px !important;
         }
     `]
 })

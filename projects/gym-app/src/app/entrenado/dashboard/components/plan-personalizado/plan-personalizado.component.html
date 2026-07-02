@@ -1,27 +1,30 @@
 <ion-card>
   <ion-grid class="ion-no-padding">
     <ion-row class="ion-text-center">
-      
-      <!-- Nivel -->
+
       <ion-col size="4" class="ion-padding-vertical">
-        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Nivel</div>
-        <ion-badge color="secondary" class="w-full max-w-[90%] truncate">
+        <ion-text color="medium">
+          <p class="ion-text-uppercase" style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em;">Nivel</p>
+        </ion-text>
+        <ion-badge color="secondary" class="ion-text-uppercase">
           {{ nivel || 'No definido' }}
         </ion-badge>
       </ion-col>
 
-      <!-- Objetivo -->
       <ion-col size="4" class="ion-padding-vertical">
-        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Objetivo</div>
-        <ion-badge color="secondary" class="w-full max-w-[90%] truncate" [title]="objetivo">
+        <ion-text color="medium">
+          <p class="ion-text-uppercase" style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em;">Objetivo</p>
+        </ion-text>
+        <ion-badge color="secondary" [title]="objetivo">
           {{ objetivo || 'No definido' }}
         </ion-badge>
       </ion-col>
 
-      <!-- Frecuencia -->
       <ion-col size="4" class="ion-padding-vertical">
-        <div class="text-[10px] font-bold uppercase tracking-wider opacity-60 mb-1">Frecuencia</div>
-        <ion-badge color="secondary" class="w-full max-w-[90%] truncate">
+        <ion-text color="medium">
+          <p class="ion-text-uppercase" style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em;">Frecuencia</p>
+        </ion-text>
+        <ion-badge color="secondary">
           {{ frecuencia || '0' }} d/sem
         </ion-badge>
       </ion-col>
@@ -29,15 +32,15 @@
     </ion-row>
   </ion-grid>
 
-  @if(entrenadorAsignado) {
+  @if (entrenadorAsignado) {
     <ion-item lines="none">
-      <ion-avatar slot="start" class="mr-3">
+      <ion-avatar slot="start">
         <img [src]="photoURL || 'assets/images/avatar-placeholder.png'" alt="Avatar">
       </ion-avatar>
       <ion-label>
         <p>{{ entrenadorAsignado }}</p>
       </ion-label>
-      <ion-note slot="end">Entrenador</ion-note>
+      <ion-note slot="end" color="medium">Entrenador</ion-note>
     </ion-item>
   }
 </ion-card>

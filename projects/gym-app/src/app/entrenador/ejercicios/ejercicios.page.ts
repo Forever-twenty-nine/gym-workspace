@@ -9,7 +9,7 @@ import { UserService } from '../../core/services/user.service';
 
 import { EjerciciosListComponent } from './components/ejercicios-list/ejercicios-list.component';
 import { EjercicioModalComponent } from './components/ejercicio-modal/ejercicio-modal.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AccionesEjercicioComponent } from './components/acciones-ejercicio/acciones-ejercicio.component';
 
 @Component({
@@ -20,7 +20,7 @@ import { AccionesEjercicioComponent } from './components/acciones-ejercicio/acci
     IonContent,
     EjerciciosListComponent,
     EjercicioModalComponent,
-    TrainerBackgroundComponent,
+    BackgroundComponent,
     AccionesEjercicioComponent]
 })
 export class EjerciciosPage implements OnInit {
@@ -31,8 +31,6 @@ export class EjerciciosPage implements OnInit {
   private toastController = inject(ToastController);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
-
   ejerciciosCreados: Signal<any[]> = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];

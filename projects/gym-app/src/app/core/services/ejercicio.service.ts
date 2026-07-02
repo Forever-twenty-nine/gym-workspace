@@ -315,38 +315,40 @@ export class EjercicioService {
 		return [Rol.ENTRENADO, Rol.ENTRENADOR];
 	}
 
-	private mapFromFirestore(data: any): Ejercicio {
-		return {
-			id: data.id,
-			nombre: data.nombre || '',
-			descripcion: data.descripcion,
-			series: data.series || 0,
-			repeticiones: data.repeticiones || 0,
-			peso: data.peso,
-			descansoSegundos: data.descansoSegundos,
-			serieSegundos: data.serieSegundos,
-			fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : data.fechaCreacion,
-			fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion,
-			creadorId: data.creadorId
-		};
-	}
+private mapFromFirestore(data: any): Ejercicio {
+        return {
+            id: data.id,
+            nombre: data.nombre || '',
+            descripcion: data.descripcion,
+            series: data.series || 0,
+            repeticiones: data.repeticiones || 0,
+            peso: data.peso,
+            descansoSegundos: data.descansoSegundos,
+            serieSegundos: data.serieSegundos,
+            fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : data.fechaCreacion,
+            fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion,
+            creadorId: data.creadorId,
+            gimnasioId: data.gimnasioId
+        } as Ejercicio;
+    }
 
-	private mapToFirestore(ejercicio: Ejercicio): any {
-		const data: any = {
-			nombre: ejercicio.nombre,
-			descripcion: ejercicio.descripcion || null,
-			series: ejercicio.series,
-			repeticiones: ejercicio.repeticiones
-		};
+    private mapToFirestore(ejercicio: Ejercicio): any {
+        const data: any = {
+            nombre: ejercicio.nombre,
+            descripcion: ejercicio.descripcion || null,
+            series: ejercicio.series,
+            repeticiones: ejercicio.repeticiones
+        };
 
-		if (ejercicio.peso !== undefined) data.peso = ejercicio.peso;
-		if (ejercicio.descansoSegundos !== undefined) data.descansoSegundos = ejercicio.descansoSegundos;
-		if (ejercicio.serieSegundos !== undefined) data.serieSegundos = ejercicio.serieSegundos;
-		if (ejercicio.fechaCreacion) data.fechaCreacion = ejercicio.fechaCreacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaCreacion) : ejercicio.fechaCreacion;
-		if (ejercicio.fechaModificacion) data.fechaModificacion = ejercicio.fechaModificacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaModificacion) : ejercicio.fechaModificacion;
-		if (ejercicio.creadorId) data.creadorId = ejercicio.creadorId;
+        if (ejercicio.peso !== undefined) data.peso = ejercicio.peso;
+        if (ejercicio.descansoSegundos !== undefined) data.descansoSegundos = ejercicio.descansoSegundos;
+        if (ejercicio.serieSegundos !== undefined) data.serieSegundos = ejercicio.serieSegundos;
+        if (ejercicio.fechaCreacion) data.fechaCreacion = ejercicio.fechaCreacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaCreacion) : ejercicio.fechaCreacion;
+        if (ejercicio.fechaModificacion) data.fechaModificacion = ejercicio.fechaModificacion instanceof Date ? Timestamp.fromDate(ejercicio.fechaModificacion) : ejercicio.fechaModificacion;
+        if (ejercicio.creadorId) data.creadorId = ejercicio.creadorId;
+        if ((ejercicio as any).gimnasioId) data.gimnasioId = (ejercicio as any).gimnasioId;
 
-		return data;
-	}
+        return data;
+    }
 }
 

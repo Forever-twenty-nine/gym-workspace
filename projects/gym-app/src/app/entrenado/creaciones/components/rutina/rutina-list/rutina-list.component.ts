@@ -1,20 +1,20 @@
 import { Component, Input, Output, EventEmitter, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  IonCard,
+  IonCardContent,
   IonList,
   IonItem,
   IonLabel,
   IonButton,
   IonIcon,
-  IonBadge,
-  IonPopover,
-  IonContent,
+  IonText,
   IonItemSliding,
   IonItemOptions,
   IonItemOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
+import { trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
 
 @Component({
@@ -22,15 +22,18 @@ import { Rutina } from 'gym-library';
   standalone: true,
   imports: [
     CommonModule,
+    IonCard,
+    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
     IonButton,
     IonIcon,
+    IonText,
     IonItemSliding,
     IonItemOptions,
     IonItemOption
-],
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './rutina-list.component.html'
 })
@@ -43,7 +46,7 @@ export class RutinaListComponent {
   @Output() edit = new EventEmitter<Rutina>();
 
   constructor() {
-    addIcons({ add, trashOutline, lockClosed, pencilOutline });
+    addIcons({ trashOutline, lockClosed, pencilOutline });
   }
 
   onCreate() {

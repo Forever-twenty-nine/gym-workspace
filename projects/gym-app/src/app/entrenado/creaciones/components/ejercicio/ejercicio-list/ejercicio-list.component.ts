@@ -1,32 +1,34 @@
 import { Component, Input, Output, EventEmitter, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  IonCard,
+  IonCardContent,
   IonList,
   IonItem,
   IonLabel,
   IonButton,
   IonIcon,
-  IonPopover,
-  IonContent,
+  IonText,
   IonItemSliding,
   IonItemOptions,
   IonItemOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
+import { trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-ejercicio-list',
   standalone: true,
   imports: [
     CommonModule,
+    IonCard,
+    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
     IonButton,
     IonIcon,
-    IonPopover,
-    IonContent,
+    IonText,
     IonItemSliding,
     IonItemOptions,
     IonItemOption
@@ -53,7 +55,7 @@ export class EjercicioListComponent {
   @Output() edit = new EventEmitter<import('gym-library').Ejercicio>();
 
   constructor() {
-    addIcons({ add, trashOutline, lockClosed, pencilOutline });
+    addIcons({ trashOutline, lockClosed, pencilOutline });
   }
 
   isOwn(id: string): boolean {

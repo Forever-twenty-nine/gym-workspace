@@ -61,6 +61,10 @@
   --color-title: var(--brand-dark);
   --color-text: var(--brand-medium);
   --color-primary: var(--brand-primary);
+
+  /* Items dentro de listas (light mode) */
+  --ion-list-item-bg: rgba(0, 0, 0, 0.035);
+  --ion-list-item-border: rgba(0, 0, 0, 0.12);
 }
 
 /* ==========================================================================
@@ -103,6 +107,10 @@
   --color-title: #f9f9f9;
   --color-text: #e1e1e1;
   --color-primary: var(--brand-primary);
+
+  /* Items dentro de listas (dark mode) */
+  --ion-list-item-bg: rgba(255, 255, 255, 0.06);
+  --ion-list-item-border: rgba(255, 255, 255, 0.14);
 }
 
 

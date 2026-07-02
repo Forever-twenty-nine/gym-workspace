@@ -22,7 +22,7 @@ import { UserService } from '../../core/services/user.service';
 import { Convocatoria, Rol } from 'gym-library';
 
 import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear-agenda-modal.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { ConvocatoriaListComponent } from './components/convocatoria-list/convocatoria-list.component';
 
 @Component({
@@ -38,7 +38,7 @@ import { ConvocatoriaListComponent } from './components/convocatoria-list/convoc
     IonSegment,
     IonSegmentButton,
     CrearAgendaModalComponent,
-    TrainerBackgroundComponent,
+    BackgroundComponent,
     ConvocatoriaListComponent
   ]
 })
@@ -104,8 +104,6 @@ export class AgendaPage implements OnInit {
   convocatoriasAtletas = computed(() => {
     return this.convocatoriasGimnasio().filter(c => !c.esOficial);
   });
-
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === 'premium');
 
   mappedConvocatoriasOficiales = computed(() => {
     return this.convocatoriasOficiales().map(c => ({

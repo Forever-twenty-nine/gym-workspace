@@ -21,7 +21,7 @@ import { InvitacionService } from '../../core/services/invitacion.service';
 import { InvitacionModalComponent } from '../../entrenador/entrenados/components/invitacion-modal/invitacion-modal.component';
 import { EntrenadorListComponent } from "./components/entrenador-list/entrenador-list.component";
 import { InvitacionesPendientesListComponent } from "./components/invitaciones-pendientes-list/invitaciones-pendientes-list.component";
-import { GymBackgroundComponent } from "../../shared/components/gym-background/gym-background.component";
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-gimnasio-entrenadores',
@@ -37,7 +37,7 @@ import { GymBackgroundComponent } from "../../shared/components/gym-background/g
     InvitacionModalComponent,
     EntrenadorListComponent,
     InvitacionesPendientesListComponent,
-    GymBackgroundComponent
+    BackgroundComponent
 ],
 })
 export class GimnasioEntrenadoresPage implements OnInit {
@@ -50,8 +50,6 @@ export class GimnasioEntrenadoresPage implements OnInit {
   private alertController = inject(AlertController);
   private fb = inject(FormBuilder);
 
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
-  
   searchQuery = signal<string>('');
 
   // Listado de entrenadores reactivo desde Firestore

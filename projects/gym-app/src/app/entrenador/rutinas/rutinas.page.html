@@ -2,7 +2,7 @@
 
 <ion-content [fullscreen]="true">
   
-  <app-trainer-background [isPremium]="isPremium()"></app-trainer-background>
+  <app-background />
   <!-- Acciones y Límite de Plan -->
   <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
     (crearRutina)="crearRutina()">

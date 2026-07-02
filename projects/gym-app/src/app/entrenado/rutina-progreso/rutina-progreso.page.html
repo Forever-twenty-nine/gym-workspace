@@ -8,17 +8,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" >
-    <!-- Background differentiated by plan (consistent with other entrenado pages) -->
-    @if (isPremium()) {
-      <!-- Premium workout background image -->
-      <div class="fixed inset-0 z-0 bg-cover bg-center pointer-events-none opacity-40 dark:opacity-30"
-        style="background-image: url('assets/images/cardio-progreso-bg.png');">
-        <div class="absolute inset-0 bg-linear-to-b from-white/20 to-gray-50/10 dark:from-black/40 dark:to-black/60"></div>
-      </div>
-    } @else {
-      <!-- Free users: standard app gradient (no photo background) -->
-      <div class="fixed inset-0 z-0 bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full pointer-events-none"></div>
-    }
+    <app-background />
 
     <div class="relative z-10">
         <!-- Progress Header Component -->

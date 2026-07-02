@@ -1,24 +1,37 @@
 import { Component, Input, Output, EventEmitter, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonList, IonItem, IonLabel, IonButton, IonIcon, IonPopover, IonContent, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/angular/standalone';
+import {
+  IonCard,
+  IonCardContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonText,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
+  IonIcon
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trashOutline, pencilOutline } from 'ionicons/icons';
+import { trashOutline, pencilOutline } from 'ionicons/icons';
+import { DateBadgeComponent } from '../../../../../shared/components/date-badge/date-badge.component';
 
 @Component({
   selector: 'app-convocatoria-list',
   standalone: true,
   imports: [
     CommonModule,
+    IonCard,
+    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
-    IonButton,
-    IonIcon,
-    IonPopover,
-    IonContent,
+    IonText,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonIcon,
+    DateBadgeComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './convocatoria-list.component.html'
@@ -30,7 +43,7 @@ export class ConvocatoriaListComponent {
   @Output() edit = new EventEmitter<import('gym-library').Convocatoria>();
 
   constructor() {
-    addIcons({ add, trashOutline, pencilOutline });
+    addIcons({ trashOutline, pencilOutline });
   }
 
   onCreate() {

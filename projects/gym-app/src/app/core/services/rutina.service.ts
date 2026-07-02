@@ -250,8 +250,9 @@ export class RutinaService {
             fechaModificacion: data.fechaModificacion instanceof Timestamp ? data.fechaModificacion.toDate() : data.fechaModificacion,
             duracion: data.duracion,
             creadorId: data.creadorId,
+            gimnasioId: data.gimnasioId,
             diasSemana: data.diasSemana || []
-        };
+        } as Rutina;
     }
 
     private mapToFirestore(rutina: Rutina): any {
@@ -266,6 +267,7 @@ export class RutinaService {
         if (rutina.fechaModificacion) data.fechaModificacion = rutina.fechaModificacion instanceof Date ? Timestamp.fromDate(rutina.fechaModificacion) : rutina.fechaModificacion;
         if (rutina.duracion && rutina.duracion > 0) data.duracion = rutina.duracion;
         if (rutina.creadorId) data.creadorId = rutina.creadorId;
+        if ((rutina as any).gimnasioId) data.gimnasioId = (rutina as any).gimnasioId;
         if (rutina.diasSemana && Array.isArray(rutina.diasSemana) && rutina.diasSemana.length > 0) data.diasSemana = rutina.diasSemana;
 
         return data;

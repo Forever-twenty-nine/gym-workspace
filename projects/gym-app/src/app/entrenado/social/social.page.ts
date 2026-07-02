@@ -3,7 +3,7 @@ import {
   IonContent, IonSegment, IonSegmentButton, IonLabel, IonHeader,
   SegmentCustomEvent, ModalController, ToastController, IonToolbar } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -15,7 +15,7 @@ import { FeedTabComponent } from './components/para-ti-tab/feed-tab/feed-tab.com
 import { ParaTiTabComponent } from './components/para-ti-tab/para-ti-tab.component';
 import { ChatDetailModalComponent } from '../../shared/components/chat/chat-detail-modal/chat-detail-modal.component';
 
-import { Plan, Convocatoria, Desafio } from 'gym-library';
+import { Convocatoria, Desafio } from 'gym-library';
 import { MatchActual } from '../../core/types/descubrir.types';
 
 import { ConvocatoriaService } from '../../core/services/convocatoria.service';
@@ -37,7 +37,7 @@ import { DesafioModalStoriesComponent } from './components/para-ti-tab/desafio-m
     FeedTabComponent,
     ParaTiTabComponent,
     IonHeader,
-    PageBackgroundComponent,
+    BackgroundComponent,
     StoriesComponent,
     ConvocatoriaModalStoriesComponent,
     DesafioModalStoriesComponent
@@ -52,7 +52,6 @@ export class SocialPage {
   private toastCtrl        = inject(ToastController);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   selectedTab = signal<'para-ti' | 'siguiendo' | 'descubrir'>('para-ti');
 

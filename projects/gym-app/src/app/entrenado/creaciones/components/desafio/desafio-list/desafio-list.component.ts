@@ -1,36 +1,38 @@
 import { Component, Input, Output, EventEmitter, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  IonCard,
+  IonCardContent,
   IonList,
   IonItem,
   IonLabel,
-  IonButton,
-  IonIcon,
-  IonPopover,
-  IonContent,
+  IonText,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption
+  IonItemOption,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, trashOutline, pencilOutline } from 'ionicons/icons';
+import { trashOutline, pencilOutline } from 'ionicons/icons';
 import { Desafio } from 'gym-library';
+import { DateBadgeComponent } from '../../../../../shared/components/date-badge/date-badge.component';
 
 @Component({
   selector: 'app-desafio-list',
   standalone: true,
   imports: [
     CommonModule,
+    IonCard,
+    IonCardContent,
     IonList,
     IonItem,
     IonLabel,
-    IonButton,
-    IonIcon,
-    IonPopover,
-    IonContent,
+    IonText,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonIcon,
+    DateBadgeComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './desafio-list.component.html'
@@ -42,7 +44,25 @@ export class DesafioListComponent {
   @Output() edit = new EventEmitter<Desafio>();
 
   constructor() {
-    addIcons({ add, trashOutline, pencilOutline });
+    addIcons({ trashOutline, pencilOutline });
+  }
+
+  /** Días calendario entre hoy (00:00) y la fecha objetivo (00:00). Negativo si ya venció. */
+  diasRestantes(fecha: Date | string | null | undefined): number {
+    if (!fecha) return 0;
+    const target = new Date(fecha);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    target.setHours(0, 0, 0, 0);
+    return Math.round((target.getTime() - today.getTime()) / 86_400_000);
+  }
+
+  vencimientoInfo(fecha: Date | string | null | undefined): { texto: string; color: 'danger' | 'warning' | 'medium' } {
+    const dias = this.diasRestantes(fecha);
+    if (dias < 0) return { texto: 'Vencido', color: 'danger' };
+    if (dias === 0) return { texto: 'Vence hoy', color: 'warning' };
+    if (dias === 1) return { texto: 'Vence mañana', color: 'warning' };
+    return { texto: `Vence en ${dias} días`, color: 'medium' };
   }
 
   onCreate() {

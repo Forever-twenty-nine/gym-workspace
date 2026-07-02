@@ -1,14 +1,14 @@
 <ion-modal [isOpen]="isOpen" (didDismiss)="closeModal()" [breakpoints]="[0, 1]" initialBreakpoint="1">
   <ng-template>
     <ion-header class="ion-no-border">
-      <ion-toolbar class="bg-transparent backdrop-blur-xl">
+      <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button fill="clear" (click)="closeModal()" color="medium">
             <ion-icon name="close" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title class="font-black text-sm tracking-tight">
-          {{ isEditing ? 'Editar Desafío' : 'Lanzar Desafío 🏆' }}
+        <ion-title>
+          {{ isEditing ? 'Editar Desafío' : 'Lanzar Desafío' }}
         </ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="guardar()" [disabled]="form.invalid || saving()" color="primary">
@@ -18,89 +18,52 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding">
-      <form [formGroup]="form" class="flex flex-col gap-6 pb-10">
+    <ion-content>
+      <ion-list lines="full" class="ion-no-padding">
 
-        <!-- Ayuda solo en modo crear, usando ion-popover -->
-        @if (!isEditing) {
-          <div class="flex justify-end mb-2">
-            <ion-button id="help-desafio" fill="clear" size="small" class="m-0 p-0 text-amber-500">
-              <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-          </div>
+        <form [formGroup]="form">
 
-          <ion-popover trigger="help-desafio" triggerAction="click">
-            <ng-template>
-              <ion-content class="ion-padding" style="max-width: 260px; font-size: 12px;">
-                <div class="text-[11px] font-medium text-gray-600 dark:text-gray-300 leading-relaxed flex flex-col gap-1.5">
-                  <p>• Publicás un <strong>reto declarativo</strong> para tu gimnasio.</p>
-                  <p>• Otros atletas pueden <strong>aceptarlo</strong> deslizando a la derecha.</p>
-                  <p>• Antes de que venza, cada uno declara <strong>si lo superó o no</strong> 💪.</p>
-                  <p>• El desafío vence en la fecha elegida y deja de aparecer.</p>
-                </div>
-              </ion-content>
-            </ng-template>
-          </ion-popover>
-        }
-
-        <!-- Título del desafío -->
-        <div class="flex flex-col gap-2">
-          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
-            El desafío *
-          </label>
-          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+          <ion-item>
+            <ion-label position="stacked" color="medium">El desafío *</ion-label>
             <ion-textarea
               formControlName="titulo"
               placeholder='Ej: "¿Quién me sigue el ritmo? Esta semana hago 100 sentadillas"'
               [rows]="3"
-              class="text-sm font-semibold px-2"
               [counter]="true"
               maxlength="180">
             </ion-textarea>
-          </div>
-          @if (form.get('titulo')?.touched && form.get('titulo')?.hasError('required')) {
-            <p class="text-[10px] text-red-500 font-bold px-1">El desafío no puede estar vacío.</p>
-          }
-          @if (form.get('titulo')?.touched && form.get('titulo')?.hasError('minlength')) {
-            <p class="text-[10px] text-red-500 font-bold px-1">Mínimo 10 caracteres.</p>
-          }
-        </div>
+            @if (form.get('titulo')?.touched && form.get('titulo')?.hasError('required')) {
+              <ion-note color="danger">El desafío no puede estar vacío.</ion-note>
+            }
+            @if (form.get('titulo')?.touched && form.get('titulo')?.hasError('minlength')) {
+              <ion-note color="danger">Mínimo 10 caracteres.</ion-note>
+            }
+          </ion-item>
 
-        <!-- Logro relacionado (opcional) -->
-        <div class="flex flex-col gap-2">
-          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
-            Marca / Logro a superar <span class="normal-case font-semibold">(opcional)</span>
-          </label>
-          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
+          <ion-item>
+            <ion-label position="stacked" color="medium">
+              Marca / Logro a superar <ion-text color="medium">(opcional)</ion-text>
+            </ion-label>
             <ion-input
               formControlName="logroRelacionado"
-              placeholder='Ej: "150kg en sentadilla" · "10km en 52min"'
-              class="text-sm font-semibold px-2">
+              placeholder='Ej: "150kg en sentadilla" · "10km en 52min"'>
             </ion-input>
-          </div>
-        </div>
+          </ion-item>
 
-        <!-- Fecha de vencimiento -->
-        <div class="flex flex-col gap-2">
-          <label class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-widest px-1">
-            Vence el *
-          </label>
-          <div class="bg-white/40 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-2xl overflow-hidden">
-            <ion-item lines="none" class="--background: transparent; --padding-start: 12px;">
-              <ion-icon name="calendar-outline" slot="start" class="text-amber-500 mr-2"></ion-icon>
-              <ion-input
-                formControlName="fechaVencimiento"
-                type="date"
-                class="text-sm font-bold">
-              </ion-input>
-            </ion-item>
-          </div>
-          <p class="text-[10px] font-medium text-gray-400 dark:text-gray-500 px-1">
-            Después de esta fecha el desafío deja de mostrarse y ya no se pueden declarar resultados.
-          </p>
-        </div>
+          <ion-item>
+            <ion-label position="stacked" color="medium">Vence el *</ion-label>
+            <ion-input
+              formControlName="fechaVencimiento"
+              type="date">
+            </ion-input>
+            <ion-note color="medium">
+              Después de esta fecha el desafío deja de mostrarse y ya no se pueden declarar resultados.
+            </ion-note>
+          </ion-item>
 
-      </form>
+        </form>
+
+      </ion-list>
     </ion-content>
   </ng-template>
 </ion-modal>

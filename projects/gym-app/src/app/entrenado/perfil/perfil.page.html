@@ -43,16 +43,8 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
-  @if (currentUser(); as user) {
-  @if (user.role === 'entrenador') {
-  <app-trainer-background [isPremium]="isPremium()" />
-  } @else if (user.role === 'gimnasio') {
-  <app-gym-background [isPremium]="isPremium()" />
-  } @else {
-  <app-page-background />
-  }
-  }
+
+  <app-background />
 
   <div class="main-container ion-padding relative z-10">
 

@@ -15,7 +15,7 @@ import { EntrenadorService } from '../../core/services/entrenador.service';
 import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
 import { AccionesRutinaComponent } from './components/acciones-rutina/acciones-rutina.component';
 import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-rutinas',
@@ -26,7 +26,7 @@ import { TrainerBackgroundComponent } from '../../shared/components/trainer-back
     ListaRutinasComponent,
     AccionesRutinaComponent,
     RutinaModalComponent,
-    TrainerBackgroundComponent
+    BackgroundComponent
   ],
   styles: []
 })
@@ -35,8 +35,6 @@ export class RutinasPage implements OnInit {
   private rutinaService = inject(RutinaService);
   private entrenadorService = inject(EntrenadorService);
   private toastController = inject(ToastController);
-
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
 
   // --- Señales Datos ---
   rutinasCreadas: Signal<any[]> = computed(() => {

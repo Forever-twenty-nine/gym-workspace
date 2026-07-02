@@ -12,7 +12,7 @@ import {
   flagOutline, barChartOutline
 } from 'ionicons/icons';
 
-import { User as LibraryUser, Rutina, Plan, SolicitudPlan, SesionRutina, Rol } from 'gym-library';
+import { User as LibraryUser, Rutina, SolicitudPlan, SesionRutina, Rol } from 'gym-library';
 export interface User extends LibraryUser {
   id: string;
   photoURL?: string;
@@ -29,9 +29,7 @@ import { MensajeService } from '../../core/services/mensaje.service';
 import { MensajesGlobalesService } from '../../core/services/mensajes-globales.service';
 import { InvitacionService } from '../../core/services/invitacion.service';
 
-import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
-import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { ProgresoEstadisticasComponent } from './perfil-tab-estadisticas/components/progreso-estadisticas/progreso-estadisticas.component';
 import { EditProfileModalComponent } from './components/edit-profile-modal/edit-profile-modal.component';
 import { PremiumRequestModalComponent } from './components/premium-request-modal/premium-request-modal.component';
@@ -60,9 +58,7 @@ import { PerfilTabEstadisticasComponent } from './perfil-tab-estadisticas/perfil
     IonSpinner,
     IonHeader,
     IonToolbar,
-    PageBackgroundComponent,
-    TrainerBackgroundComponent,
-    GymBackgroundComponent,
+    BackgroundComponent,
     EditProfileModalComponent,
     PremiumRequestModalComponent,
     PerfilTabInfoComponent,
@@ -90,8 +86,7 @@ export class PerfilPage implements OnInit {
 
   readonly currentSegment = signal<PerfilSegment>('perfil');
   readonly currentUser = computed(() => this.authService.currentUser() as User);
-  readonly isPremium = computed(() => this.currentUser()?.plan === Plan.PREMIUM);
-  
+
   readonly currentEntrenado = computed(() => {
     const user = this.currentUser();
     return user?.role === 'entrenado' ? this.entrenadoService.getEntrenado(user.uid)() : null;

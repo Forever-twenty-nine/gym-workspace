@@ -11,7 +11,7 @@ import { Entrenado } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { EstadisticasCardsComponent } from './components/estadisticas-cards/estadisticas-cards.component';
 import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,7 +21,7 @@ import { TrainerBackgroundComponent } from '../../shared/components/trainer-back
     IonContent,
     EstadisticasCardsComponent,
     ProximosEntrenadosComponent,
-    TrainerBackgroundComponent
+    BackgroundComponent
   ],
 })
 export class DashboardPage implements OnInit {

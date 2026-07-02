@@ -5,7 +5,7 @@ import {
   IonContent,
   IonSearchbar
 } from '@ionic/angular/standalone';
-import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -20,7 +20,7 @@ import { EntrenadosGroupedListComponent } from './components/entrenados-grouped-
     IonContent,
     IonSearchbar,
     EntrenadosGroupedListComponent,
-    GymBackgroundComponent
+    BackgroundComponent
   ],
 })
 export class GimnasioEntrenadosPage implements OnInit {
@@ -28,8 +28,6 @@ export class GimnasioEntrenadosPage implements OnInit {
   private userService = inject(UserService);
   private entrenadoService = inject(EntrenadoService);
 
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
-  
   searchQuery = signal<string>('');
 
   // Listado de entrenados reactivo desde Firestore

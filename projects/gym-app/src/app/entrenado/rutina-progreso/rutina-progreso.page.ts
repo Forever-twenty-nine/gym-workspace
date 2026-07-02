@@ -10,16 +10,17 @@ import { RutinaEjercicioDetalleModalComponent } from './components/rutina-ejerci
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, timerOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, refreshOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, pauseCircleOutline, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause } from 'ionicons/icons';
 import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
-import { Ejercicio, SesionRutinaStatus, Plan } from 'gym-library';
+import { Ejercicio, SesionRutinaStatus } from 'gym-library';
 import { RutinaService } from '../../core/services/rutina.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 import { StopwatchService } from '../../core/services/stopwatch.service';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-rutina-progreso', standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, RutinaProgresoHeaderComponent, RutinaEjercicioItemComponent, RutinaOverlayComponent, RutinaEjercicioDetalleModalComponent],
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, RutinaProgresoHeaderComponent, RutinaEjercicioItemComponent, RutinaOverlayComponent, RutinaEjercicioDetalleModalComponent, BackgroundComponent],
   templateUrl: './rutina-progreso.page.html',
   styles: [`@keyframes bounceIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } } .animate-bounce-in { animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }`]
 })
@@ -59,8 +60,6 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     if (state === 'En progreso') return 'primary';
     return 'medium';
   });
-
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === Plan.PREMIUM);
 
   constructor() { addIcons({ arrowBackOutline, timerOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, refreshOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, pauseCircleOutline, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause }); }
 

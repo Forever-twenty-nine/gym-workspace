@@ -16,7 +16,7 @@ import { UserService } from '../../core/services/user.service';
 import { Convocatoria } from 'gym-library';
 import { ConvocatoriaListComponent } from './components/convocatoria-list/convocatoria-list.component';
 import { AgendaHelpPopoverComponent } from './components/agenda-help-popover/agenda-help-popover.component';
-import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 
 @Component({
@@ -31,15 +31,13 @@ import { GymBackgroundComponent } from '../../shared/components/gym-background/g
     IonSegmentButton,
     ConvocatoriaListComponent,
     AgendaHelpPopoverComponent,
-    GymBackgroundComponent
+    BackgroundComponent
   ]
 })
 export class AgendaPage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private convocatoriaService = inject(ConvocatoriaService);
-
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
 
   readonly currentUserSignal = this.authService.currentUser;
   

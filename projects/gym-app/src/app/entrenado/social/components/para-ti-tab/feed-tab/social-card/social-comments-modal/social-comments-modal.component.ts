@@ -25,7 +25,7 @@ import { AuthService } from '../../../../../../../core/services/auth.service';
 import { UserService } from '../../../../../../../core/services/user.service';
 import { ComentarioSocialService } from '../../../../../../../core/services/comentario-social.service';
 import { FormatFechaPipe } from '../../../../../../../shared/pipes/format-fecha.pipe';
-import { PageBackgroundComponent } from '../../../../../../../shared/components/page-background/page-background.component';
+import { BackgroundComponent } from '../../../../../../../shared/components/background/background.component';
 import { SesionRutina, Comentario } from 'gym-library';
 
 @Component({
@@ -49,7 +49,7 @@ import { SesionRutina, Comentario } from 'gym-library';
     IonList,
     IonInput,
     IonFooter,
-    PageBackgroundComponent
+    BackgroundComponent
   ],
   templateUrl: './social-comments-modal.component.html'
 })

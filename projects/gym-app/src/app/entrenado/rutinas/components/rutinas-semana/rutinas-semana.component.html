@@ -1,89 +1,80 @@
-<ion-card>
-    <ion-card-header class="p-4 pb-3">
-        <ion-card-title>Esta Semana</ion-card-title>
-    </ion-card-header>
+<ion-card style="--background: none;">
+  <ion-card-header class="ion-padding-vertical">
+    <ion-card-title>Esta Semana</ion-card-title>
+  </ion-card-header>
 
-    <ion-card-content class="p-4 pt-0">
-        @if (tieneActividadProgramada) {
-        <ion-accordion-group [multiple]="true">
-            @for (dia of rutinasPorDia; track dia.fecha) {
-            <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
-                
-                <!-- HEADER del día (siempre visible, 1 línea por día) -->
-                <ion-item slot="header" button detail="false">
-                    <!-- Date badge (compartido para todo el día) -->
-                    <app-date-badge slot="start" class="ion-margin-end"
-                        [class.opacity-60]="!diaTieneActividad(dia)"
-                        [fecha]="dia.fecha"
-                        [esEjecutable]="dia.esHoy && diaTieneActividad(dia)"
-                        [diaCorto]="dia.diaCorto">
-                    </app-date-badge>
+  <ion-card-content>
+    @if (tieneActividadProgramada) {
+      <ion-accordion-group [multiple]="true">
+        @for (dia of rutinasPorDia; track dia.fecha) {
+          <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
 
+            <ion-item slot="header" button detail="false" style="--padding-start: 0;">
+              <app-date-badge slot="start" class="ion-margin-end"
+                [class.opacity-60]="!diaTieneActividad(dia)"
+                [fecha]="dia.fecha"
+                [esEjecutable]="dia.esHoy && diaTieneActividad(dia)"
+                [diaCorto]="dia.diaCorto">
+              </app-date-badge>
+
+              <ion-label>
+                @if (diaTieneActividad(dia)) {
+                  <h2>{{ getEventSummary(dia) }}</h2>
+                } @else {
+                  <h2>Descanso</h2>
+                }
+              </ion-label>
+
+              @if (dia.esHoy && diaTieneActividad(dia)) {
+                <ion-badge slot="end" color="primary">Hoy</ion-badge>
+              }
+            </ion-item>
+
+            <ion-list slot="content" lines="none">
+              @if (diaTieneActividad(dia)) {
+                @for (rutina of dia.rutinas; track rutina.id) {
+                  <ion-item button (click)="onVerDetalles(rutina, dia.esFuturo)">
                     <ion-label>
-                        @if (diaTieneActividad(dia)) {
-                            <div class="flex items-center gap-2">
-                                <h3>{{ getEventSummary(dia) }}</h3>
-                                @if (dia.esHoy) {
-                                    <ion-badge color="primary" class="shrink-0">Hoy</ion-badge>
-                                }
-                            </div>
-                        } @else {
-                            <h3>Descanso</h3>
-                        }
+                      <h2>{{ rutina.nombre }}</h2>
                     </ion-label>
-                </ion-item>
 
-                <!-- CONTENIDO expandido: aquí sí se ven los eventos del día -->
-                <div slot="content">
-                    @if (diaTieneActividad(dia)) {
-                    <ion-list lines="none">
-                        <!-- Rutinas -->
-                        @for (rutina of dia.rutinas; track rutina.id) {
-                        <ion-item button (click)="onVerDetalles(rutina, dia.esFuturo)"
-                            [class.border-l-4]="dia.esHoy" [class.border-l-primary]="dia.esHoy">
-                            <ion-label>
-                                <h3>{{ rutina.nombre }}</h3>
-                            </ion-label>
-
-                            @if (!dia.esFuturo) {
-                            <ion-button fill="clear" slot="end" (click)="onIniciarEntrenamientoDirecto($event, rutina)">
-                                <ion-icon name="play-circle" slot="icon-only" color="primary"></ion-icon>
-                            </ion-button>
-                            }
-                        </ion-item>
-                        }
-
-                        <!-- Encuentros -->
-                        @for (enc of dia.encuentros; track enc.id) {
-                        <ion-item button (click)="onVerEncuentro(enc)"
-                            [class.border-l-4]="dia.esHoy" [class.border-l-secondary]="dia.esHoy">
-                            <ion-label>
-                                <h3>{{ enc.titulo || 'Encuentro' }}</h3>
-                            </ion-label>
-
-                            <ion-button fill="clear" slot="end" (click)="onVerEncuentro(enc); $event.stopPropagation()">
-                                <ion-icon name="chevron-forward-outline" slot="icon-only" color="secondary"></ion-icon>
-                            </ion-button>
-                        </ion-item>
-                        }
-                    </ion-list>
-                    } @else {
-                    <ion-item lines="none">
-                        <ion-label class="ion-text-center">
-                            <p class="italic">Sin rutinas ni encuentros este día.</p>
-                        </ion-label>
-                    </ion-item>
+                    @if (!dia.esFuturo) {
+                      <ion-button fill="clear" slot="end" (click)="onIniciarEntrenamientoDirecto($event, rutina)">
+                        <ion-icon name="play-circle" slot="icon-only" color="primary"></ion-icon>
+                      </ion-button>
                     }
-                </div>
-            </ion-accordion>
-            }
-        </ion-accordion-group>
-        } @else {
-        <div class="ion-text-center ion-padding" style="opacity: 0.6;">
-            <ion-icon name="calendar-outline" style="font-size: 48px;"></ion-icon>
-            <h4>Sin actividad programada</h4>
-            <p>Crea rutinas o encuentros en Creaciones, o pídele un plan a tu entrenador.</p>
-        </div>
+                  </ion-item>
+                }
+
+                @for (enc of dia.encuentros; track enc.id) {
+                  <ion-item button (click)="onVerEncuentro(enc)">
+                    <ion-label>
+                      <h2>{{ enc.titulo || 'Encuentro' }}</h2>
+                    </ion-label>
+
+                    <ion-button fill="clear" slot="end" (click)="onVerEncuentro(enc); $event.stopPropagation()">
+                      <ion-icon name="chevron-forward-outline" slot="icon-only" color="secondary"></ion-icon>
+                    </ion-button>
+                  </ion-item>
+                }
+              } @else {
+                <ion-item lines="none">
+                  <ion-label class="ion-text-center">
+                    <p class="italic">Sin rutinas ni encuentros este día.</p>
+                  </ion-label>
+                </ion-item>
+              }
+            </ion-list>
+
+          </ion-accordion>
         }
-    </ion-card-content>
+      </ion-accordion-group>
+    } @else {
+      <ion-text color="medium" class="ion-text-center">
+        <ion-icon name="calendar-outline" size="large"></ion-icon>
+        <h2>Sin actividad programada</h2>
+        <p>Crea rutinas o encuentros en Creaciones, o pídele un plan a tu entrenador.</p>
+      </ion-text>
+    }
+  </ion-card-content>
 </ion-card>

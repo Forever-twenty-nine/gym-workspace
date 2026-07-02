@@ -9,12 +9,16 @@ import {
   IonButton,
   IonIcon,
   IonItem,
+  IonLabel,
   IonModal,
   IonButtons,
   IonInput,
   IonTextarea,
-  IonPopover,
-  ToastController, IonNote, IonList } from '@ionic/angular/standalone';
+  ToastController,
+  IonNote,
+  IonList,
+  IonText
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, trophyOutline, flameOutline, calendarOutline,
   helpCircleOutline, chevronDownOutline, chevronUpOutline
@@ -32,7 +36,7 @@ import { Desafio } from 'gym-library';
     ReactiveFormsModule,
     IonHeader, IonToolbar, IonTitle, IonContent,
     IonButton, IonIcon, IonItem,
-    IonModal, IonButtons, IonInput, IonTextarea, IonPopover],
+    IonModal, IonButtons, IonInput, IonTextarea, IonNote, IonList, IonLabel, IonText],
   templateUrl: './desafio-modal.component.html'
 })
 export class DesafioModalComponent implements OnChanges {
@@ -144,7 +148,7 @@ export class DesafioModalComponent implements OnChanges {
       }
 
       await this.desafioService.save(desafioData as any);
-      this.showToast(this.isEditing ? 'Desafío actualizado' : '¡Desafío lanzado! 🏆', 'success');
+      this.showToast(this.isEditing ? 'Desafío actualizado' : '¡Desafío lanzado!', 'success');
       this.saved.emit();
       this.closeModal();
     } catch (e) {

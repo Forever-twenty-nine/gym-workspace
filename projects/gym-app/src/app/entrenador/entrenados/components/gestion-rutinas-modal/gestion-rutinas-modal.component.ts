@@ -1,5 +1,5 @@
 import { Component, input, output, computed } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
     IonHeader,
     IonToolbar,
@@ -21,6 +21,7 @@ import {
     IonSelectOption
 } from '@ionic/angular/standalone';
 import { Entrenado, Rutina, Plan } from 'gym-library';
+import { BackgroundComponent } from '../../../../shared/components/background/background.component';
 
 @Component({
     selector: 'app-gestion-rutinas-modal',
@@ -28,7 +29,6 @@ import { Entrenado, Rutina, Plan } from 'gym-library';
     standalone: true,
     imports: [
     CommonModule,
-    NgOptimizedImage,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -44,7 +44,8 @@ import { Entrenado, Rutina, Plan } from 'gym-library';
     IonLabel,
     IonBadge,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    BackgroundComponent
 ]
 })
 export class GestionRutinasModalComponent {

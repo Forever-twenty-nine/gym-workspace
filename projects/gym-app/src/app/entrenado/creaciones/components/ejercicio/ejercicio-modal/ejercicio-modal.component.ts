@@ -12,8 +12,15 @@ import {
   IonButtons,
   IonInput,
   IonTextarea,
-  IonPopover,
-  ToastController
+  ToastController,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonNote,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, saveOutline, barbellOutline, helpCircleOutline } from 'ionicons/icons';
@@ -38,8 +45,15 @@ import { Plan } from 'gym-library';
     IonButtons,
     IonInput,
     IonTextarea,
-    IonPopover,
-    IonContent
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonList,
+    IonNote,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonText
   ],
   templateUrl: './ejercicio-modal.component.html'
 })
@@ -115,7 +129,7 @@ export class EjercicioModalComponent implements OnChanges {
     if (!this.isEditing) {
       const plan = this.authService.currentUser()?.plan;
       if (plan !== Plan.PREMIUM) {
-        this.showToast('La creación de ejercicios personalizados es exclusiva para usuarios Premium 🔒', 'warning');
+        this.showToast('La creación de ejercicios personalizados es exclusiva para usuarios Premium', 'warning');
         this.closeModal();
         return;
       }
@@ -125,7 +139,7 @@ export class EjercicioModalComponent implements OnChanges {
     try {
       const formValue = this.form.value;
 
-      let ejercicioData: Partial<import('gym-library').Ejercicio>;
+      let ejercicioData: Partial<import('gym-library').Ejercicio> & { gimnasioId?: string };
 
       if (this.isEditing && this.item) {
         ejercicioData = {
@@ -147,6 +161,7 @@ export class EjercicioModalComponent implements OnChanges {
           descansoSegundos: 60,
           serieSegundos: 0,
           creadorId: uid,
+          gimnasioId: user.gimnasioId
         };
       }
 

@@ -1,83 +1,89 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div style="display: flex; justify-content: center; width: 100%; padding: 0 12px;">
-      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios"
-        style="width: 100%; max-width: 520px;">
-        <ion-segment-button value="convocatorias">
-          <ion-label>Convocatorias</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="desafios">
-          <ion-label>Desafíos</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="rutinas">
-          <ion-label>Rutinas</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="ejercicios">
-          <ion-label>Ejercicios</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
+    <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="convocatorias">
+        <ion-label>Convocatorias</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="desafios">
+        <ion-label>Desafíos</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="rutinas">
+        <ion-label>Rutinas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ejercicios">
+        <ion-label>Ejercicios</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" style="--background: transparent;">
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-background />
 
-  @if (isPremium()) {
-  <div class="fixed inset-0 z-0 opacity-25 dark:opacity-100 pointer-events-none">
-    <img ngSrc="assets/images/test-gym-1.jpg" priority fill alt="background"
-      class="object-cover filter dark:brightness-[0.4] dark:contrast-125">
-  </div>
-  }@else {
-  <div
-    class="bg-linear-to-br from-blue-900 via-green-700 to-blue-900 h-full w-full absolute inset-0 z-0 pointer-events-none">
-  </div>
+  @switch (selectedTab()) {
+    @case ('convocatorias') {
+      <app-convocatoria-list
+        [convocatorias]="misConvocatorias()"
+        (create)="abrirModalConvocatoria()"
+        (delete)="eliminarConvocatoria($event)"
+        (edit)="onEditConvocatoria($event)">
+      </app-convocatoria-list>
+    }
+
+    @case ('desafios') {
+      <app-desafio-list
+        [desafios]="misDesafios()"
+        (create)="abrirModalDesafio()"
+        (delete)="eliminarDesafio($event)"
+        (edit)="onEditDesafio($event)">
+      </app-desafio-list>
+    }
+
+    @case ('rutinas') {
+      <app-rutina-list
+        [rutinas]="rutinasPropias()"
+        [isPremium]="isPremium()"
+        (create)="abrirModalRutina()"
+        (delete)="eliminarRutina($event)"
+        (edit)="onEditRutina($event)">
+      </app-rutina-list>
+    }
+
+    @case ('ejercicios') {
+      <app-ejercicio-list
+        [ejercicios]="ejerciciosCreados()"
+        [isPremium]="isPremium()"
+        (create)="abrirModalEjercicio()"
+        (delete)="eliminarEjercicio($event)"
+        (edit)="onEditEjercicio($event)">
+      </app-ejercicio-list>
+    }
   }
 
-  <div class="relative z-10 px-4 pb-20 pt-2 flex flex-col gap-4">
-    @switch (selectedTab()) {
-      @case ('convocatorias') {
-        <app-convocatoria-list
-          [convocatorias]="misConvocatorias()"
-          (create)="abrirModalConvocatoria()"
-          (delete)="eliminarConvocatoria($event)"
-          (edit)="onEditConvocatoria($event)">
-        </app-convocatoria-list>
-      }
+  <!-- FAB de ayuda (esquina inferior izquierda, color secondary + outlined = menos prominente) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button id="help-fab" color="secondary" fill="outline">
+      <ion-icon name="help"></ion-icon>
+    </ion-fab-button>
+    <ion-popover trigger="help-fab" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding">
+          {{ helpText() }}
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </ion-fab>
 
-      @case ('desafios') {
-        <app-desafio-list
-          [desafios]="misDesafios()"
-          (create)="abrirModalDesafio()"
-          (delete)="eliminarDesafio($event)"
-          (edit)="onEditDesafio($event)">
-        </app-desafio-list>
-      }
-
-      @case ('rutinas') {
-        <app-rutina-list
-          [rutinas]="rutinasPropias()"
-          [isPremium]="isPremium()"
-          (create)="abrirModalRutina()"
-          (delete)="eliminarRutina($event)"
-          (edit)="onEditRutina($event)">
-        </app-rutina-list>
-      }
-
-      @case ('ejercicios') {
-        <app-ejercicio-list
-          [ejercicios]="ejerciciosCreados()"
-          [isPremium]="isPremium()"
-          (create)="abrirModalEjercicio()"
-          (delete)="eliminarEjercicio($event)"
-          (edit)="onEditEjercicio($event)">
-        </app-ejercicio-list>
-      }
-    }
-  </div>
+  <!-- FAB de crear (esquina inferior derecha, color primary + solid = acción principal) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="onFabCreate()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <!-- Componente Modal de Convocatoria -->
-  <app-convocatoria-modal 
-    [isOpen]="isConvocatoriaModalOpen()" 
+  <app-convocatoria-modal
+    [isOpen]="isConvocatoriaModalOpen()"
     [item]="convocatoriaToEdit()"
     (close)="cerrarModalConvocatoria()"
     (saved)="onConvocatoriaSaved()">

@@ -2,12 +2,16 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from 
 import { CommonModule } from '@angular/common';
 import {
   IonCard,
+  IonCardHeader,
+  IonCardTitle,
   IonCardContent,
   IonList,
   IonItem,
   IonIcon,
   IonButton,
-  IonLabel, IonCardHeader } from '@ionic/angular/standalone';
+  IonLabel,
+  IonText
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, chevronForward, playCircle, calendarOutline, flameOutline, calendarClearOutline } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
@@ -26,15 +30,18 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
   selector: 'app-rutinas-asignadas',
   templateUrl: './rutinas-asignadas.component.html',
   standalone: true,
-  imports: [IonCardHeader, 
-    IonLabel,
+  imports: [
     CommonModule,
     IonCard,
+    IonCardHeader,
+    IonCardTitle,
     IonCardContent,
     IonList,
     IonItem,
     IonIcon,
     IonButton,
+    IonLabel,
+    IonText,
     DateBadgeComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

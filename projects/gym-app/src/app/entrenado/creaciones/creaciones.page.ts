@@ -1,12 +1,18 @@
 import { Component, OnInit, inject, computed, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { add, help } from 'ionicons/icons';
 import {
   IonContent,
   IonHeader,
   IonSegment,
   IonSegmentButton,
   IonLabel,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonPopover,
   ToastController,
   AlertController,
   SegmentCustomEvent
@@ -20,6 +26,7 @@ import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { DesafioService } from '../../core/services/desafio.service';
 import { Plan, Convocatoria, Desafio, Rutina, Ejercicio } from 'gym-library';
 
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { ConvocatoriaModalComponent } from './components/convocatoria/convocatoria-modal/convocatoria-modal.component';
 import { DesafioModalComponent } from './components/desafio/desafio-modal/desafio-modal.component';
 import { RutinaModalComponent } from './components/rutina/rutina-modal/rutina-modal.component';
@@ -37,12 +44,16 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
   standalone: true,
   imports: [
     CommonModule,
-    NgOptimizedImage,
     IonContent,
     IonHeader,
     IonSegment,
     IonSegmentButton,
     IonLabel,
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    IonPopover,
+    BackgroundComponent,
     ConvocatoriaModalComponent,
     DesafioModalComponent,
     RutinaModalComponent,
@@ -154,6 +165,31 @@ export class CreacionesPage implements OnInit {
   });
 
   constructor() {
+    addIcons({ add, help });
+  }
+
+  // Texto de ayuda contextual según el tab activo
+  readonly helpText = computed(() => {
+    switch (this.selectedTab()) {
+      case 'convocatorias':
+        return 'Publica tu horario para que otros atletas de tu gimnasio puedan sumarse.';
+      case 'desafios':
+        return 'Lanza retos para tu gimnasio. Otros atletas pueden aceptarlos y declararlos cumplidos.';
+      case 'rutinas':
+        return 'Crea rutinas semanales ilimitadas combinando ejercicios del catálogo (función Premium).';
+      case 'ejercicios':
+        return 'Añade ejercicios personalizados al catálogo compartido (función Premium).';
+    }
+  });
+
+  // Acción del FAB "+" — dispatch al modal correcto según el tab activo
+  onFabCreate() {
+    switch (this.selectedTab()) {
+      case 'convocatorias': this.abrirModalConvocatoria(); break;
+      case 'desafios':      this.abrirModalDesafio(); break;
+      case 'rutinas':       this.abrirModalRutina(); break;
+      case 'ejercicios':    this.abrirModalEjercicio(); break;
+    }
   }
 
   ngOnInit() {
@@ -201,7 +237,7 @@ export class CreacionesPage implements OnInit {
     if (this.isPremium()) {
       this.isRutinaModalOpen.set(true);
     } else {
-      this.showPremiumToast('La creación de rutinas personalizadas es una función Premium 🔒');
+      this.showPremiumToast('La creación de rutinas personalizadas es una función Premium');
     }
   }
 
@@ -217,7 +253,7 @@ export class CreacionesPage implements OnInit {
     if (this.isPremium()) {
       this.isEjercicioModalOpen.set(true);
     } else {
-      this.showPremiumToast('La creación de ejercicios personalizados es una función Premium 🔒');
+      this.showPremiumToast('La creación de ejercicios personalizados es una función Premium');
     }
   }
 
@@ -241,7 +277,7 @@ export class CreacionesPage implements OnInit {
 
   onEditRutina(item: Rutina) {
     if (!this.isPremium()) {
-      this.showPremiumToast('La edición de rutinas personalizadas es una función Premium 🔒');
+      this.showPremiumToast('La edición de rutinas personalizadas es una función Premium');
       return;
     }
     this.rutinaToEdit.set(item);
@@ -250,7 +286,7 @@ export class CreacionesPage implements OnInit {
 
   onEditEjercicio(item: Ejercicio) {
     if (!this.isPremium()) {
-      this.showPremiumToast('La edición de ejercicios personalizados es una función Premium 🔒');
+      this.showPremiumToast('La edición de ejercicios personalizados es una función Premium');
       return;
     }
     this.ejercicioToEdit.set(item);

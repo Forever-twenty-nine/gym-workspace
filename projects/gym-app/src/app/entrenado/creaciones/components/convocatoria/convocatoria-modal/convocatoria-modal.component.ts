@@ -14,8 +14,12 @@ import {
   IonButtons,
   IonInput,
   IonTextarea,
-  IonPopover,
-  ToastController, IonList } from '@ionic/angular/standalone';
+  ToastController,
+  IonList,
+  IonGrid,
+  IonRow,
+  IonCol
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, sparkles, paperPlaneOutline, helpCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../../core/services/convocatoria.service';
@@ -40,7 +44,10 @@ import { Convocatoria, Rol } from 'gym-library';
     IonButtons,
     IonInput,
     IonTextarea,
-    IonPopover],
+    IonList,
+    IonGrid,
+    IonRow,
+    IonCol],
   templateUrl: './convocatoria-modal.component.html'
 })
 export class ConvocatoriaModalComponent implements OnInit, OnChanges {

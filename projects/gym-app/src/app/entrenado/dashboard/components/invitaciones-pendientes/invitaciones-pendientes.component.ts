@@ -1,21 +1,27 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Invitacion } from 'gym-library';
-import { IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonCard, IonCardContent, IonItemSliding, IonItemOption, IonItemOptions, IonNote } from '@ionic/angular/standalone';
+import { IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonCard, IonCardContent, IonItemSliding, IonItemOption, IonItemOptions, IonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, closeCircleOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-invitaciones-pendientes',
   templateUrl: './invitaciones-pendientes.component.html',
-  imports: [IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard,
+  imports: [
     CommonModule,
+    IonItemOptions,
+    IonItemOption,
+    IonItemSliding,
+    IonCard,
     IonAvatar,
     IonIcon,
     IonItem,
     IonLabel,
     IonList,
-    IonCardContent],
+    IonCardContent,
+    IonText
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InvitacionesPendientesComponent {

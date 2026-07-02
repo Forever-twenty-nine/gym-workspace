@@ -21,7 +21,7 @@ import { InvitacionesPendientesComponent, InvitacionViewModel } from './componen
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
 import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
 import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal/gestion-rutinas-modal.component';
-import { TrainerBackgroundComponent } from '../../shared/components/trainer-background/trainer-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AccionesEntrenadosComponent } from './components/acciones-entrenados/acciones-entrenados.component';
 
 @Component({
@@ -37,7 +37,7 @@ import { AccionesEntrenadosComponent } from './components/acciones-entrenados/ac
     EntrenadoDetallePopoverComponent,
     InvitacionModalComponent,
     GestionRutinasModalComponent,
-    TrainerBackgroundComponent,
+    BackgroundComponent,
     AccionesEntrenadosComponent
   ],
   styles: []

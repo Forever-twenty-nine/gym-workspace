@@ -1,13 +1,13 @@
 <ion-modal [isOpen]="isOpen" (didDismiss)="closeModal()">
   <ng-template>
     <ion-header class="ion-no-border">
-      <ion-toolbar class="bg-transparent backdrop-blur-xl">
+      <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="closeModal()" class="text-gray-500 hover:text-gray-800">
+          <ion-button (click)="closeModal()" color="medium">
             <ion-icon name="close" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title class="font-black tracking-tight text-lg text-gray-900 dark:text-white">
+        <ion-title>
           {{ isEditing ? 'Editar Convocatoria' : 'Publicar Convocatoria' }}
         </ion-title>
         <ion-buttons slot="end">
@@ -18,95 +18,59 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding" style="--background: transparent;">
-      <div class="flex flex-col gap-6">
+    <ion-content>
+      <ion-list lines="full" class="ion-no-padding">
 
-        <!-- Ayuda solo en modo crear, usando ion-popover -->
-        @if (!isEditing) {
-        <div class="flex justify-end">
-          <ion-button id="help-convocatoria" fill="clear" size="small" class="m-0 p-0 text-blue-500">
-            <ion-icon name="help-circle-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </div>
+        <form [formGroup]="form">
 
-        <ion-popover trigger="help-convocatoria" triggerAction="click">
-          <ng-template>
-            <ion-content class="ion-padding" style="max-width: 260px; font-size: 12px;">
-              ¿Quieres entrenar acompañado? Publica tu horario de entrenamiento para hoy o mañana. Los atletas de tu
-              gimnasio verán tu publicación y podrán sumarse chocando los 5. ✋
-            </ion-content>
-          </ng-template>
-        </ion-popover>
-        }
+          <ion-item>
+            <ion-label position="stacked" color="medium">¿Qué día entrenas?</ion-label>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-button expand="block" type="button" (click)="seleccionarDia('hoy')"
+                    [fill]="diaSeleccionado === 'hoy' ? 'solid' : 'outline'">
+                    Hoy
+                  </ion-button>
+                </ion-col>
+                <ion-col>
+                  <ion-button expand="block" type="button" (click)="seleccionarDia('manana')"
+                    [fill]="diaSeleccionado === 'manana' ? 'solid' : 'outline'">
+                    Mañana
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+            <ion-label position="stacked" color="medium">O selecciona otra fecha</ion-label>
+            <ion-input type="date" formControlName="fechaCustom" (change)="onFechaCustomChange()"></ion-input>
+          </ion-item>
 
-        <form [formGroup]="form" class="flex flex-col gap-5">
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked" color="medium">Hora Inicio</ion-label>
+                  <ion-input type="time" formControlName="horaInicio"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item>
+                  <ion-label position="stacked" color="medium">Hora Fin</ion-label>
+                  <ion-input type="time" formControlName="horaFin"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
 
-          <!-- Día del Entrenamiento -->
-          <div class="flex flex-col gap-2">
-            <ion-label
-              class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">¿Qué día
-              entrenas?</ion-label>
-            <div class="grid grid-cols-2 gap-3">
-              <ion-button type="button" (click)="seleccionarDia('hoy')"
-                [fill]="diaSeleccionado === 'hoy' ? 'solid' : 'outline'"
-                class="font-black text-sm m-0! rounded-2xl! overflow-hidden">
-                Hoy
-              </ion-button>
-              <ion-button type="button" (click)="seleccionarDia('manana')"
-                [fill]="diaSeleccionado === 'manana' ? 'solid' : 'outline'"
-                class="font-black text-sm m-0! rounded-2xl! overflow-hidden">
-                Mañana
-              </ion-button>
-            </div>
-
-            <div class="mt-1">
-              <ion-item lines="none"
-                class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-black/30 overflow-hidden --background: transparent;">
-                <ion-label position="stacked"
-                  class="text-[10px] font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider">O
-                  selecciona otra fecha</ion-label>
-                <ion-input type="date" formControlName="fechaCustom" (change)="onFechaCustomChange()"
-                  class="mt-1"></ion-input>
-              </ion-item>
-            </div>
-          </div>
-
-          <!-- Rango Horario -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="flex flex-col gap-1.5">
-              <ion-label
-                class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">Hora
-                Inicio</ion-label>
-              <ion-item lines="none"
-                class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-black/30 overflow-hidden --background: transparent;">
-                <ion-input type="time" formControlName="horaInicio"></ion-input>
-              </ion-item>
-            </div>
-            <div class="flex flex-col gap-1.5">
-              <ion-label
-                class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">Hora
-                Fin</ion-label>
-              <ion-item lines="none"
-                class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-black/30 overflow-hidden --background: transparent;">
-                <ion-input type="time" formControlName="horaFin"></ion-input>
-              </ion-item>
-            </div>
-          </div>
-
-          <!-- Mensaje / Nota -->
-          <div class="flex flex-col gap-1.5">
-            <ion-label
-              class="text-xs font-extrabold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-1">Mensaje /
-              ¿Qué entrenas?</ion-label>
-            <ion-item lines="none"
-              class="rounded-2xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-black/30 overflow-hidden --background: transparent;">
-              <ion-textarea formControlName="mensaje" rows="3"
-                placeholder="Ej: Rutina de pecho y bíceps. ¿Quién se suma a tirar pesado?"></ion-textarea>
-            </ion-item>
-          </div>
+          <ion-item>
+            <ion-label position="stacked" color="medium">Mensaje / ¿Qué entrenas?</ion-label>
+            <ion-textarea formControlName="mensaje" rows="3"
+              placeholder="Ej: Rutina de pecho y bíceps. ¿Quién se suma a tirar pesado?"></ion-textarea>
+          </ion-item>
 
         </form>
-      </div>
+
+      </ion-list>
     </ion-content>
   </ng-template>
 </ion-modal>

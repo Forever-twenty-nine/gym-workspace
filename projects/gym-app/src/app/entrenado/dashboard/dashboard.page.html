@@ -1,10 +1,9 @@
-<ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
-  <app-page-background />
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-background />
 
   <ion-grid>
     <ion-row class="ion-justify-content-center">
-      <ion-col size="12" size-md="8" size-lg="6" class="py-2">
+      <ion-col size="12" size-md="8" size-lg="6">
         <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
           [entrenadorAsignado]="entrenadorAsignado()?.nombre || ''" [photoURL]="photoURL()"
           [frecuencia]="frecuenciaSemanal()">
@@ -13,7 +12,7 @@
     </ion-row>
 
     <ion-row class="ion-justify-content-center">
-      <ion-col size="12" size-md="8" size-lg="6" class="py-2">
+      <ion-col size="12" size-md="8" size-lg="6">
         <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
           (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
         </app-rutinas-asignadas>

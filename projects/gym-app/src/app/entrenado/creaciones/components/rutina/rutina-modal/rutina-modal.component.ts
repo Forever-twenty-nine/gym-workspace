@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, signal, computed, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonItem, IonLabel, IonModal, IonButtons, IonInput, IonTextarea, IonCheckbox, IonList, IonSelect, IonSelectOption, ToastController, IonPopover } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonItem, IonLabel, IonModal, IonButtons, IonInput, IonTextarea, IonCheckbox, IonList, IonSelect, IonSelectOption, ToastController, IonNote, IonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, saveOutline, barbellOutline, add, helpCircleOutline } from 'ionicons/icons';
 import { RutinaService } from '../../../../../core/services/rutina.service';
@@ -31,9 +31,10 @@ import { Plan } from 'gym-library';
     IonTextarea,
     IonCheckbox,
     IonList,
-    IonPopover,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonNote,
+    IonText
 ],
   templateUrl: './rutina-modal.component.html'
 })
@@ -151,7 +152,7 @@ export class RutinaModalComponent implements OnChanges {
     if (!this.isEditing) {
       const plan = this.authService.currentUser()?.plan;
       if (plan !== Plan.PREMIUM) {
-        this.showToast('La creación de rutinas personalizadas es exclusiva para usuarios Premium 🔒', 'warning');
+        this.showToast('La creación de rutinas personalizadas es exclusiva para usuarios Premium', 'warning');
         this.closeModal();
         return;
       }
@@ -165,7 +166,7 @@ export class RutinaModalComponent implements OnChanges {
       const dias = (formValue.diasSemana || []).slice();
       dias.sort((a: string, b: string) => order.indexOf(a) - order.indexOf(b));
 
-      let rutinaData: Partial<import('gym-library').Rutina>;
+      let rutinaData: Partial<import('gym-library').Rutina> & { gimnasioId?: string };
 
       if (this.isEditing && this.item) {
         rutinaData = {
@@ -182,7 +183,8 @@ export class RutinaModalComponent implements OnChanges {
           descripcion: (formValue.descripcion || '').trim(),
           ejerciciosIds: this.selectedIds(),
           diasSemana: dias,
-          creadorId: uid
+          creadorId: uid,
+          gimnasioId: user.gimnasioId
         };
       }
 

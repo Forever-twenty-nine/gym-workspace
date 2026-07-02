@@ -16,7 +16,7 @@ import { GymTraineeStatsComponent } from './components/gym-trainee-stats/gym-tra
 import { LevelDistributionChartComponent } from './components/level-distribution-chart/level-distribution-chart.component';
 import { ObjectiveDistributionChartComponent } from './components/objective-distribution-chart/objective-distribution-chart.component';
 import { PremiumUpgradeBannerComponent } from './components/premium-upgrade-banner/premium-upgrade-banner.component';
-import { GymBackgroundComponent } from '../../shared/components/gym-background/gym-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-gimnasio-dashboard',
@@ -30,7 +30,7 @@ import { GymBackgroundComponent } from '../../shared/components/gym-background/g
     LevelDistributionChartComponent,
     ObjectiveDistributionChartComponent,
     PremiumUpgradeBannerComponent,
-    GymBackgroundComponent
+    BackgroundComponent
   ],
 })
 export class GimnasioDashboardPage implements OnInit {

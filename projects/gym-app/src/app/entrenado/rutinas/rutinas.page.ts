@@ -4,8 +4,8 @@ import {
   IonToolbar, SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
-import { Rutina, Plan, Convocatoria, SesionRutina } from 'gym-library';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
+import { Rutina, Convocatoria, SesionRutina } from 'gym-library';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -42,7 +42,7 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     RutinasSemanaComponent,
     RutinasHistorialComponent,
     ProgresoHistorialDetalleComponent,
-    PageBackgroundComponent
+    BackgroundComponent
   ],
 })
 export class RutinasPage {
@@ -57,7 +57,6 @@ export class RutinasPage {
   private alertController = inject(AlertController);
 
   readonly currentUserSignal = this.authService.currentUser;
-  readonly isPremium = computed(() => this.currentUserSignal()?.plan === Plan.PREMIUM);
 
   selectedTab = signal<'rutinas' | 'historial'>('rutinas');
   sesionSeleccionada = signal<SesionRutina | null>(null);

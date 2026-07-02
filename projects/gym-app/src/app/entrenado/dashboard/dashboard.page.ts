@@ -23,7 +23,7 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { Entrenado, User as LibraryUser } from 'gym-library';
 import { PlanPersonalizadoComponent } from './components/plan-personalizado/plan-personalizado.component';
 import { RutinasAsignadasComponent, type DashboardRutina } from './components/rutinas-asignadas/rutinas-asignadas.component';
-import { PageBackgroundComponent } from '../../shared/components/page-background/page-background.component';
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 export interface User extends LibraryUser {
   photoURL?: string;
@@ -38,7 +38,7 @@ export interface User extends LibraryUser {
     FormsModule,
     PlanPersonalizadoComponent,
     RutinasAsignadasComponent,
-    PageBackgroundComponent
+    BackgroundComponent
   ],
 })
 export class DashboardPage {
