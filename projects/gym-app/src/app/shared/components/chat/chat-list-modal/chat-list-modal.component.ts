@@ -67,7 +67,8 @@ export class ChatListModalComponent {
 
     // Mapear a objetos de hilo y resolver perfiles de usuario
     return Array.from(map.entries()).map(([otherUserId, info]) => {
-      const otherUser = this.userService.getUserByUid(otherUserId)();
+      const fetched = this.userService.getUserByUid(otherUserId)();
+      const otherUser = fetched || { uid: otherUserId, nombre: null, email: null, photoURL: null } as any;
       return {
         otherUserId,
         otherUser,
@@ -84,7 +85,7 @@ export class ChatListModalComponent {
     if (!query) return list;
 
     return list.filter(chat => {
-      const nombre = chat.otherUser?.nombre?.toLowerCase() || '';
+      const nombre = (chat.otherUser.nombre || '').toLowerCase();
       return nombre.includes(query);
     });
   });

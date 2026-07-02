@@ -45,24 +45,36 @@
                class="p-4 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-2xl flex items-center justify-between gap-3 cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:bg-white/60 dark:hover:bg-black/60 shadow-xs relative">
             
             <!-- Avatar y Detalle -->
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-              <!-- Foto de Perfil -->
-              <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs shrink-0">
-                @if (chat.otherUser?.photoURL) {
-                  <img [src]="chat.otherUser?.photoURL" alt="Avatar" class="w-full h-full object-cover">
-                } @else {
-                  <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
-                }
-              </div>
+            @if (chat.otherUser) {
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <!-- Foto de Perfil -->
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs shrink-0">
+                  @if (chat.otherUser.photoURL) {
+                    <img [src]="chat.otherUser.photoURL" alt="Avatar" class="w-full h-full object-cover">
+                  } @else {
+                    <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
+                  }
+                </div>
 
-              <!-- Nombre y snippet del último mensaje -->
-              <div class="text-left min-w-0 flex-1">
-                <h4 class="text-xs font-black text-gray-900 dark:text-white leading-none mb-1.5 truncate">{{ chat.otherUser?.nombre || 'Compañero' }}</h4>
-                <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-450 leading-none truncate m-0">
-                  {{ chat.lastMsg.contenido }}
-                </p>
+                <!-- Nombre y snippet del último mensaje -->
+                <div class="text-left min-w-0 flex-1">
+                  <h4 class="text-xs font-black text-gray-900 dark:text-white leading-none mb-1.5 truncate">{{ chat.otherUser.nombre || 'Compañero' }}</h4>
+                  <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-450 leading-none truncate m-0">
+                    {{ chat.lastMsg.contenido }}
+                  </p>
+                </div>
               </div>
-            </div>
+            } @else {
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                <div class="w-12 h-12 rounded-full bg-slate-800 border-2 border-white/25 dark:border-white/5 flex items-center justify-center shadow-xs shrink-0">
+                  <ion-icon name="person-outline" class="text-xl text-gray-400"></ion-icon>
+                </div>
+                <div class="text-left min-w-0 flex-1">
+                  <h4 class="text-xs font-black text-gray-900 dark:text-white leading-none mb-1.5 truncate">Compañero</h4>
+                  <p class="text-[11px] font-semibold text-gray-600 dark:text-gray-450 leading-none truncate m-0">{{ chat.lastMsg.contenido }}</p>
+                </div>
+              </div>
+            }
 
             <!-- Hora e Insignia no leídos -->
             <div class="flex flex-col items-end gap-1.5 shrink-0">
