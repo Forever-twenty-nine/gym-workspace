@@ -1,0 +1,98 @@
+<!-- Cabecera de la Bandeja de Entrada -->
+<ion-header class="ion-no-border">
+  <ion-toolbar style="--background: transparent; --border-color: transparent;">
+    <ion-title>Bandeja de Mensajes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Buscador -->
+  <ion-toolbar style="--background: transparent; padding: 0 8px 8px;">
+    <ion-searchbar
+      placeholder="Buscar conversación..."
+      [value]="searchQuery()"
+      (ionInput)="onSearch($event)"
+      style="--border-radius: 16px;">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<!-- Contenido Principal -->
+<ion-content style="--background: transparent;">
+  <app-background />
+
+  <div style="position: relative; z-index: 10; padding: 16px;">
+
+    @if (chatsFiltrados().length === 0) {
+      <!-- Estado vacío -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 16px; text-align: center; margin: 48px 0; background: rgba(255,255,255,0.06); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: var(--ion-color-medium); margin-bottom: 20px;">
+          <ion-icon name="chatbubbles-outline" style="font-size: 1.5rem;"></ion-icon>
+        </div>
+        <h3 style="font-size: 0.875rem; font-weight: 800; color: var(--ion-text-color); margin: 0 0 8px;">Sin conversaciones activas</h3>
+        <p style="font-size: 0.75rem; font-weight: 600; color: var(--ion-color-medium); max-width: 320px; padding: 0 8px; line-height: 1.5; margin: 0;">
+          Tus chats aparecerán aquí cuando chocas los 5 con otros atletas en la sección <strong>Descubrir</strong> y conectas.
+        </p>
+      </div>
+    } @else {
+      <!-- Listado de Hilos de Chat -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        @for (chat of chatsFiltrados(); track chat.otherUserId) {
+          <div (click)="abrirConversacion(chat.otherUserId)"
+               style="padding: 16px; background: rgba(255,255,255,0.08); border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.12);">
+
+            <!-- Avatar y Detalle -->
+            @if (chat.otherUser) {
+              <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                <!-- Foto de Perfil -->
+                <div style="width: 48px; height: 48px; border-radius: 50%; overflow: hidden; background: var(--ion-color-medium); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  @if (chat.otherUser.photoURL) {
+                    <img [src]="chat.otherUser.photoURL" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                  } @else {
+                    <ion-icon name="person-outline" style="font-size: 1.25rem; color: var(--ion-color-medium);"></ion-icon>
+                  }
+                </div>
+
+                <!-- Nombre y snippet del último mensaje -->
+                <div style="text-align: left; min-width: 0; flex: 1;">
+                  <h4 style="font-size: 0.75rem; font-weight: 800; color: var(--ion-text-color); margin: 0 0 6px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ chat.otherUser.nombre || 'Compañero' }}</h4>
+                  <p style="font-size: 0.6875rem; font-weight: 600; color: var(--ion-color-medium); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">
+                    {{ chat.lastMsg.contenido }}
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--ion-color-medium); border: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <ion-icon name="person-outline" style="font-size: 1.25rem; color: var(--ion-color-medium);"></ion-icon>
+                </div>
+                <div style="text-align: left; min-width: 0; flex: 1;">
+                  <h4 style="font-size: 0.75rem; font-weight: 800; color: var(--ion-text-color); margin: 0 0 6px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Compañero</h4>
+                  <p style="font-size: 0.6875rem; font-weight: 600; color: var(--ion-color-medium); line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">{{ chat.lastMsg.contenido }}</p>
+                </div>
+              </div>
+            }
+
+            <!-- Hora e Insignia no leídos -->
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0;">
+              <span style="font-size: 0.5625rem; font-weight: 800; color: var(--ion-color-medium); text-transform: uppercase; letter-spacing: 0.05em;">
+                {{ formatTime(chat.lastMsg.fechaEnvio) }}
+              </span>
+
+              @if (chat.unreadCount > 0) {
+                <ion-badge color="danger" style="min-width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.625rem; font-weight: 700; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1);">
+                  {{ chat.unreadCount }}
+                </ion-badge>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>

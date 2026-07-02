@@ -3,13 +3,11 @@ import { IonContent } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
-import { EjercicioService } from '../../core/services/ejercicio.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 import { Entrenado } from 'gym-library';
 
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
-import { EstadisticasCardsComponent } from './components/estadisticas-cards/estadisticas-cards.component';
 import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
 
@@ -19,7 +17,6 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
   standalone: true,
   imports: [
     IonContent,
-    EstadisticasCardsComponent,
     ProximosEntrenadosComponent,
     BackgroundComponent
   ],
@@ -28,17 +25,9 @@ export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
   private entrenadoService = inject(EntrenadoService);
   private rutinaService = inject(RutinaService);
-  private ejercicioService = inject(EjercicioService);
   private userService = inject(UserService);
   private entrenadorService = inject(EntrenadorService);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
-
-  readonly isPremium = computed(() => this.authService.currentUser()?.plan === 'premium');
-
-  entrenadorData = computed(() => {
-    const uid = this.authService.currentUser()?.uid;
-    return uid ? this.entrenadorService.getEntrenadorById(uid)() : null;
-  });
 
   entrenador = computed(() => {
     const user = this.authService.currentUser();
@@ -49,10 +38,6 @@ export class DashboardPage implements OnInit {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
   });
-
-  rutinasCreadasCount = computed(() => this.entrenadorData()?.rutinasCreadasIds?.length || 0);
-  ejerciciosCreadosCount = computed(() => this.entrenadorData()?.ejerciciosCreadasIds?.length || 0);
-  entrenadosAsignadosCount = computed(() => this.entrenadorData()?.entrenadosAsignadosIds?.length || 0);
 
   entrenadosConRutinasProximas = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
@@ -92,12 +77,10 @@ export class DashboardPage implements OnInit {
   });
 
   constructor() {
-    // Inicializar listeners para asegurar que los datos estén disponibles
     this.entrenadorService.initializeListener();
     this.entrenadoService.initializeListener();
-    this.rutinaService.rutinas; // Trigger listener getter
-    this.ejercicioService.ejercicios; // Trigger listener getter
-    this.rutinaAsignadaService.getRutinasAsignadas(); // Trigger listener
+    this.rutinaService.rutinas;
+    this.rutinaAsignadaService.getRutinasAsignadas();
   }
 
   private calcularFecha(asig: any, hoy: Date): Date | null {
@@ -123,8 +106,9 @@ export class DashboardPage implements OnInit {
     if (diff === 2) return 'Pasado mañana';
     return fecha.toLocaleDateString('es-ES', { weekday: 'long' });
   }
+
   ngOnInit(): void {
-    // ...existing code...
+    // Inicialización manejada en el constructor
   }
 
   getUserName(userId: string): string {
@@ -132,6 +116,4 @@ export class DashboardPage implements OnInit {
     const user = users.find(u => u.uid === userId);
     return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
   }
-
-
 }

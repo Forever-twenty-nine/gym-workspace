@@ -1,0 +1,225 @@
+<!-- ============ INFORMACIÓN GENERAL (todos los roles) ============ -->
+
+<ion-list-header>
+  <ion-label>
+    <ion-text color="primary"><small>Información General</small></ion-text>
+  </ion-label>
+</ion-list-header>
+
+<ion-list lines="full">
+  <ion-item>
+    <ion-icon slot="start" name="mail-outline" color="primary"></ion-icon>
+    <ion-label>
+      <h2>Email</h2>
+      <p>{{ user().email || '—' }}</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
+
+
+<!-- ============ ENTRENADO ============ -->
+@if (isEntrenado() && entrenadoData(); as e) {
+
+  <ion-list-header>
+    <ion-label>
+      <ion-text color="primary"><small>Perfil Fitness</small></ion-text>
+    </ion-label>
+  </ion-list-header>
+
+  <ion-list lines="full">
+
+    @if (e.objetivo) {
+      <ion-item>
+        <ion-icon slot="start" name="trophy-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h2>Objetivo</h2>
+          <p>{{ e.objetivo }}</p>
+        </ion-label>
+      </ion-item>
+    }
+
+    @if (e.nivel) {
+      <ion-item>
+        <ion-icon slot="start" name="ribbon-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h2>Nivel</h2>
+          <p>{{ e.nivel }}</p>
+        </ion-label>
+      </ion-item>
+    }
+
+    @if (e.franjaHoraria?.inicio && e.franjaHoraria?.fin) {
+      <ion-item>
+        <ion-icon slot="start" name="time-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h2>Franja horaria</h2>
+          <p>{{ e.franjaHoraria!.inicio }} – {{ e.franjaHoraria!.fin }}</p>
+        </ion-label>
+      </ion-item>
+    }
+
+    <ion-item>
+      <ion-icon slot="start" [name]="e.visibleDescubrir ? 'eye-outline' : 'eye-off-outline'" color="primary"></ion-icon>
+      <ion-label>
+        <h2>Visible en Descubrir</h2>
+        <p>{{ e.visibleDescubrir ? 'Sí' : 'No' }}</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+  @if (e.bio) {
+    <ion-list-header>
+      <ion-label>
+        <ion-text color="primary"><small>Biografía</small></ion-text>
+      </ion-label>
+    </ion-list-header>
+
+    <ion-list lines="full">
+      <ion-item>
+        <ion-label>
+          <p>{{ e.bio }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  }
+
+  <ion-list-header>
+    <ion-label>
+      <ion-text color="primary"><small>Red</small></ion-text>
+    </ion-label>
+  </ion-list-header>
+
+  <ion-grid>
+    <ion-row>
+      @if (fechaCreacionDate()) {
+        <ion-col class="ion-text-center">
+          <h2>{{ fechaCreacionDate() | date:'MMM y' }}</h2>
+          <ion-text color="medium"><small>Miembro desde</small></ion-text>
+        </ion-col>
+      }
+      <ion-col class="ion-text-center">
+        <h2>{{ seguidoresCount() }}</h2>
+        <ion-text color="medium"><small>Seguidores</small></ion-text>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <h2>{{ seguidosCount() }}</h2>
+        <ion-text color="medium"><small>Seguidos</small></ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+}
+
+
+<!-- ============ ENTRENADOR / PERSONAL TRAINER ============ -->
+@if (isEntrenador() && entrenadorData(); as en) {
+
+  <ion-list-header>
+    <ion-label>
+      <ion-text color="primary"><small>Como Entrenador</small></ion-text>
+    </ion-label>
+  </ion-list-header>
+
+  @if (en.descripcion) {
+    <ion-list lines="full">
+      <ion-item>
+        <ion-label>
+          <p>{{ en.descripcion }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  }
+
+  <ion-grid>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <h2>{{ entrenadosAsignadosCount() }}</h2>
+        <ion-text color="medium"><small>Entrenados</small></ion-text>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <h2>{{ rutinasCreadasCount() }}</h2>
+        <ion-text color="medium"><small>Rutinas</small></ion-text>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <h2>{{ gimnasiosCountEntrenador() }}</h2>
+        <ion-text color="medium"><small>Gimnasios</small></ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  @if (ejerciciosCount() > 0) {
+    <ion-list-header>
+      <ion-label>
+        <ion-text color="primary"><small>Catálogo</small></ion-text>
+      </ion-label>
+    </ion-list-header>
+
+    <ion-list lines="full">
+      <ion-item>
+        <ion-icon slot="start" name="fitness-outline" color="primary"></ion-icon>
+        <ion-label>
+          <h2>Ejercicios creados</h2>
+          <p>{{ ejerciciosCount() }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  }
+}
+
+
+<!-- ============ GIMNASIO ============ -->
+@if (isGimnasio() && gimnasioData(); as g) {
+
+  <ion-list-header>
+    <ion-label>
+      <ion-text color="primary"><small>Información del Gimnasio</small></ion-text>
+    </ion-label>
+  </ion-list-header>
+
+  <ion-list lines="full">
+
+    <ion-item>
+      <ion-icon slot="start" name="location-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>Dirección</h2>
+        <p>{{ g.direccion || '—' }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>Es Personal Trainer</h2>
+        <p>{{ g.isPersonalTrainer ? 'Sí' : 'No' }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="card-outline" color="primary"></ion-icon>
+      <ion-label>
+        <h2>Cobra Mensualidad</h2>
+        <p>{{ g.cobraMensualidad ? 'Sí' : 'No' }}</p>
+      </ion-label>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list-header>
+    <ion-label>
+      <ion-text color="primary"><small>Red del Gimnasio</small></ion-text>
+    </ion-label>
+  </ion-list-header>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col class="ion-text-center">
+        <h2>{{ entrenadoresCountGimnasio() }}</h2>
+        <ion-text color="medium"><small>Entrenadores</small></ion-text>
+      </ion-col>
+      <ion-col class="ion-text-center">
+        <h2>{{ entrenadosCountGimnasio() }}</h2>
+        <ion-text color="medium"><small>Entrenados</small></ion-text>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+}

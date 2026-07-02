@@ -1,4 +1,4 @@
-import { Component, Input, inject, computed, signal, ViewChild, effect, afterNextRender } from '@angular/core';
+import { Component, Input, inject, computed, signal, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -82,12 +82,9 @@ export class ChatDetailModalComponent {
   }
 
   scrollToBottom(delay = 100) {
-    // Use afterNextRender for post-DOM updates instead of setTimeout when possible
-    afterNextRender(() => {
-      setTimeout(() => {
-        this.content?.scrollToBottom(300).catch(() => {});
-      }, delay);
-    });
+    setTimeout(() => {
+      this.content?.scrollToBottom(300).catch(() => {});
+    }, delay);
   }
 
   private async marcarMensajesComoLeidos(currentId: string, otherId: string, msgs: Mensaje[]) {

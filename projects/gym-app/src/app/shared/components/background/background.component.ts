@@ -1,5 +1,4 @@
 import { Component, inject, input, computed, Signal } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { Plan, User, Rol } from 'gym-library';
 
@@ -27,7 +26,7 @@ export const BG_IMAGES: Record<Rol, string> = {
 @Component({
   selector: 'app-background',
   standalone: true,
-  imports: [NgOptimizedImage],
+  imports: [],
   templateUrl: './background.component.html',
 })
 export class BackgroundComponent {

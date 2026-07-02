@@ -1,86 +1,23 @@
 <ion-content [fullscreen]="true" style="--background: transparent;">
-  <!-- Background Layer -->
   <app-background />
-  <!-- CONTENIDO DE ESTADÍSTICAS DETALLADAS (GLASSMORPHIC) -->
-  <div class="relative z-10 p-4 max-w-lg mx-auto mb-16 fade-in">
 
-    <!-- Cabecera de Página Minimalista (Estilo App Móvil) -->
-    <div class="flex items-center justify-between px-2 mb-6">
-      <div>
-        <h2 class="text-xl font-black text-white m-0 tracking-tight">Estadísticas</h2>
-        <span class="text-[9px] font-extrabold text-(--ion-color-primary) tracking-widest uppercase block mt-0.5">Gimnasio</span>
-      </div>
-      
-      <!-- Mini Anillo de Activación SVG -->
-      @if (isPremium()) {
-        <app-gym-activation-ring [rate]="stats().activationRate"></app-gym-activation-ring>
-      }
+  <div style="position: relative; z-index: 10; padding: 24px 16px; max-width: 512px; margin: 0 auto;">
+
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0;">Mi Gimnasio</h2>
+      <span style="font-size: 0.625rem; font-weight: 800; color: var(--ion-color-primary); letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 2px;">Panel principal</span>
     </div>
 
-    @if (isPremium()) {
-      <!-- Selector de Segmento Pill (Estilo App Móvil) -->
-      <div class="flex bg-white/5 border border-white/10 rounded-xl p-1 mb-4">
-        <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
-                [class.bg-white/10]="selectedSegment() === 'entrenadores'"
-                [class.text-white]="selectedSegment() === 'entrenadores'"
-                [class.text-white/40]="selectedSegment() !== 'entrenadores'"
-                (click)="selectedSegment.set('entrenadores')">
-          Entrenadores
-        </button>
-        <button class="flex-1 py-1.5 text-xs font-black rounded-lg transition-all duration-200"
-                [class.bg-white/10]="selectedSegment() === 'entrenados'"
-                [class.text-white]="selectedSegment() === 'entrenados'"
-                [class.text-white/40]="selectedSegment() !== 'entrenados'"
-                (click)="selectedSegment.set('entrenados')">
-          Entrenados
-        </button>
-      </div>
-
-      <!-- 2. Sección: Entrenadores -->
-      @if (selectedSegment() === 'entrenadores') {
-        <app-gym-trainer-stats
-          [totalTrainers]="stats().totalTrainers"
-          [activeTrainers]="stats().activeTrainers"
-          [avgTraineesPerTrainer]="stats().avgTraineesPerTrainer"
-          [routinesCreatedByTrainers]="stats().routinesCreatedByTrainers"
-          [pendingInvitations]="stats().pendingInvitations">
-        </app-gym-trainer-stats>
-      }
-
-      <!-- 3. Sección: Entrenados -->
-      @if (selectedSegment() === 'entrenados') {
-        <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 mb-5 fade-in">
-          <div class="pb-2 border-b border-white/5 mb-3">
-            <h3 class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">Entrenados</h3>
-          </div>
-
-          <app-gym-trainee-stats
-            [totalTrainees]="stats().totalTrainees"
-            [activeTrainees]="stats().activeTrainees"
-            [traineesWithoutTrainer]="stats().traineesWithoutTrainer">
-          </app-gym-trainee-stats>
-
-          <!-- Gráfico de Columnas Verticales para Distribución de Nivel -->
-          <app-level-distribution-chart
-            [total]="stats().totalTrainees"
-            [novato]="stats().levelNovatoPrincipiante"
-            [intermedio]="stats().levelIntermedio"
-            [avanzado]="stats().levelAvanzadoExperto">
-          </app-level-distribution-chart>
-
-          <!-- Gráfico de Barra Segmentada Acumulativa para Objetivos -->
-          <app-objective-distribution-chart
-            [total]="stats().totalTrainees"
-            [salud]="stats().objSalud"
-            [volumen]="stats().objVolumen"
-            [definicion]="stats().objDefinicion"
-            [fuerza]="stats().objFuerza">
-          </app-objective-distribution-chart>
-        </div>
-      }
-    } @else {
-      <app-premium-upgrade-banner (upgrade)="mejorarPlan()"></app-premium-upgrade-banner>
-    }
+    <ion-card class="ion-no-margin">
+      <ion-card-content style="padding: 24px 16px; text-align: center;">
+        <ion-icon name="bar-chart-outline" color="primary" style="font-size: 3rem;"></ion-icon>
+        <h3 style="font-size: 1rem; font-weight: 700; margin: 12px 0 4px;">Tus estadísticas están en tu perfil</h3>
+        <p style="font-size: 0.875rem; color: var(--ion-color-medium); margin: 0; line-height: 1.4;">
+          Desde la pestaña <strong>Perfil &rarr; Estadísticas</strong> podés ver la distribución de tus entrenadores
+          y entrenados, métricas de activación y mucho más.
+        </p>
+      </ion-card-content>
+    </ion-card>
 
   </div>
 </ion-content>

@@ -1,0 +1,173 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="close()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar color="black" class="ion-padding-horizontal">
+        <ion-buttons slot="start">
+          <ion-button (click)="close()">Cancelar</ion-button>
+        </ion-buttons>
+        <ion-title class="ion-text-center">Editar</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="saveProfile()" [disabled]="editForm.invalid" color="primary" style="font-weight: 700;">GUARDAR</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content color="black">
+      @if (user) {
+        <div style="max-width: 480px; margin: 0 auto;" [formGroup]="editForm">
+
+          <!-- Edición de Foto -->
+          <div style="display: flex; flex-direction: column; align-items: center; padding: 20px 0 12px;">
+            <div style="position: relative; cursor: pointer;" (click)="triggerFileInput()">
+              <div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--ion-color-primary); overflow: hidden; background: var(--ion-color-medium); position: relative;">
+                @if (user.photoURL) {
+                  <img [ngSrc]="user.photoURL" width="80" height="80" style="width: 100%; height: 100%; object-fit: cover;" alt="Foto de perfil" />
+                } @else {
+                  <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; color: var(--ion-color-primary);">
+                    {{ getIniciales(user.nombre) }}
+                  </div>
+                }
+
+                @if (isUploading()) {
+                  <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 10;">
+                    <ion-spinner name="crescent" color="primary"></ion-spinner>
+                  </div>
+                }
+              </div>
+
+              <div style="position: absolute; bottom: -4px; right: -4px; z-index: 20; width: 28px; height: 28px; border-radius: 50%; background: var(--ion-color-primary); display: flex; align-items: center; justify-content: center; border: 2px solid var(--ion-background-color, #121212);">
+                <ion-icon name="camera-outline" style="font-size: 14px; color: var(--ion-color-primary-contrast);"></ion-icon>
+              </div>
+            </div>
+            <input type="file" id="modal-photo-input" style="display: none;" accept="image/*" (change)="onFileSelected($event)">
+            <p style="margin: 8px 0 0; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--ion-color-primary);">Toca para cambiar foto</p>
+          </div>
+
+          <ion-list lines="none" style="background: transparent;">
+            <ion-list-header style="padding: 0 16px; margin-bottom: 8px;">
+              <ion-label color="primary" style="font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Información General</ion-label>
+            </ion-list-header>
+
+            <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+              <ion-input label="Nombre Completo" label-placement="stacked" formControlName="nombre" type="text" placeholder="Escribe tu nombre"></ion-input>
+            </ion-item>
+
+            <!-- ============ ENTRENADOR / PERSONAL TRAINER ============ -->
+            @if (user.role === 'entrenador' || user.role === 'personal_trainer') {
+              <ion-list-header style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px;">
+                <ion-label color="primary" style="font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Perfil Profesional</ion-label>
+              </ion-list-header>
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-textarea label="Descripción / Bio" label-placement="stacked" formControlName="descripcion" placeholder="Contales a tus entrenados tu enfoque, especialidades, experiência..." [autoGrow]="true" rows="3"></ion-textarea>
+              </ion-item>
+            }
+
+            <!-- ============ GIMNASIO ============ -->
+            @if (user.role === 'gimnasio') {
+              <ion-list-header style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px;">
+                <ion-label color="primary" style="font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Información del Gimnasio</ion-label>
+              </ion-list-header>
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-input label="Dirección" label-placement="stacked" formControlName="direccion" type="text" placeholder="Calle, número, ciudad..."></ion-input>
+              </ion-item>
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+                <ion-label>
+                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0;">Es Personal Trainer</h2>
+                  <p style="font-size: 0.75rem; color: var(--ion-color-medium); margin: 2px 0 0;">Activa la atencion 1 a 1 sin local físico</p>
+                </ion-label>
+                <ion-toggle formControlName="isPersonalTrainer" slot="end" color="primary"></ion-toggle>
+              </ion-item>
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-icon slot="start" name="card-outline" color="primary"></ion-icon>
+                <ion-label>
+                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0;">Cobra Mensualidad</h2>
+                  <p style="font-size: 0.75rem; color: var(--ion-color-medium); margin: 2px 0 0;">Define si tus clientes pagan una cuota</p>
+                </ion-label>
+                <ion-toggle formControlName="cobraMensualidad" slot="end" color="primary"></ion-toggle>
+              </ion-item>
+            }
+
+
+            @if (user.role === 'entrenado') {
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-select label="Objetivo" label-placement="stacked" formControlName="objetivo" placeholder="Selecciona..." interface="action-sheet">
+                  @for (opcion of objetivoOptions; track opcion) {
+                    <ion-select-option [value]="opcion">{{ opcion }}</ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
+
+              <ion-list-header style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px;">
+                <ion-label color="primary" style="font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Ajustes</ion-label>
+              </ion-list-header>
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-icon slot="start" name="notifications-outline" color="primary"></ion-icon>
+                <ion-label>Recordatorios</ion-label>
+                <ion-toggle formControlName="recordatoriosEntrenamiento" slot="end" color="primary"></ion-toggle>
+              </ion-item>
+
+              @if (editForm.get('recordatoriosEntrenamiento')?.value) {
+                <div style="margin: 0 16px 16px;">
+                  <ion-item style="border-radius: 16px 16px 0 0;">
+                    <ion-label color="medium">Hora de entrenamiento</ion-label>
+                    <ion-datetime-button datetime="timepicker_modal" slot="end"></ion-datetime-button>
+                    <ion-modal [keepContentsMounted]="true">
+                      <ng-template>
+                        <ion-datetime id="timepicker_modal" presentation="time" formControlName="horaRecordatorio"></ion-datetime>
+                      </ng-template>
+                    </ion-modal>
+                  </ion-item>
+
+                  <div style="background: var(--ion-color-dark); padding: 16px; border-radius: 0 0 16px 16px;">
+                    <p style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ion-color-medium); margin: 0 0 12px;">Días de entrenamiento</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                      @for (dia of diasSemana; track dia.n) {
+                        <ion-chip [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'" (click)="toggleDia(dia.n)" style="margin: 0;">
+                          <ion-label style="font-weight: 700;">{{ dia.label }}</ion-label>
+                        </ion-chip>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
+                <ion-label>
+                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0;">Visible en Descubrir</h2>
+                  <p style="font-size: 0.75rem; color: var(--ion-color-medium); margin: 2px 0 0;">Permite a otros chocar los 5 contigo</p>
+                </ion-label>
+                <ion-toggle formControlName="visibleDescubrir" slot="end" color="primary"></ion-toggle>
+              </ion-item>
+
+              @if (editForm.get('visibleDescubrir')?.value) {
+                <ion-list-header style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px;">
+                  <ion-label color="primary" style="font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;">Perfil Fitness (Descubrir)</ion-label>
+                </ion-list-header>
+
+                <ion-item style="border-radius: 16px; margin: 0 16px 16px;">
+                  <ion-textarea label="Sobre mí (Biografía)" label-placement="stacked" formControlName="bio" placeholder="Escribe una breve biografía..." [autoGrow]="true" rows="2"></ion-textarea>
+                </ion-item>
+
+                <div style="display: flex; gap: 16px; margin: 0 16px 16px;">
+                  <ion-item style="border-radius: 16px; flex: 1; margin: 0;">
+                    <ion-input label="Entrena Desde" label-placement="stacked" type="time" formControlName="franjaInicio"></ion-input>
+                  </ion-item>
+                  <ion-item style="border-radius: 16px; flex: 1; margin: 0;">
+                    <ion-input label="Entrena Hasta" label-placement="stacked" type="time" formControlName="franjaFin"></ion-input>
+                  </ion-item>
+                </div>
+              }
+            }
+          </ion-list>
+        </div>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

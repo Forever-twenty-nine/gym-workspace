@@ -1,11 +1,11 @@
 import { Component, OnInit, signal, computed, inject, effect, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { Platform, LoadingController, ToastController, MenuController } from '@ionic/angular/standalone';
+import { Platform, LoadingController, ToastController, MenuController, ModalController } from '@ionic/angular/standalone';
 
 import {
   IonButton, IonIcon, IonMenu, IonSpinner,
-  IonHeader, IonToolbar, IonContent, IonButtons, IonFooter
+  IonHeader, IonToolbar, IonContent, IonButtons, IonFooter, IonBadge, IonItem, IonLabel
 } from '@ionic/angular/standalone';
 import { Unsubscribe } from 'firebase/firestore';
 import { addIcons } from 'ionicons';
@@ -14,23 +14,27 @@ import {
   trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline,
   closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline,
   checkmarkCircle, person, trophy, mail, star, helpCircleOutline,
-  flagOutline, barChartOutline
+  flagOutline, barChartOutline, chatbubblesOutline
 } from 'ionicons/icons';
 
-import { User as LibraryUser, Rutina, Plan, SolicitudPlan, Objetivo } from 'gym-library';
+import { User as LibraryUser, Rutina, Plan, SolicitudPlan, Objetivo, Rol } from 'gym-library';
 export interface User extends LibraryUser {
   photoURL?: string;
 }
 
-import { UserService } from '../../../../../core/services/user.service';
-import { AuthService } from '../../../../../core/services/auth.service';
-import { RutinaService } from '../../../../../core/services/rutina.service';
-import { EntrenadoService } from '../../../../../core/services/entrenado.service';
-import { PlanService } from '../../../../../core/services/plan.service';
-import { NotificacionService } from '../../../../../core/services/notificacion.service';
+import { UserService } from '../../../../core/services/user.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { RutinaService } from '../../../../core/services/rutina.service';
+import { EntrenadoService } from '../../../../core/services/entrenado.service';
+import { PlanService } from '../../../../core/services/plan.service';
+import { MensajeService } from '../../../../core/services/mensaje.service';
+import { MensajesGlobalesService } from '../../../../core/services/mensajes-globales.service';
+import { InvitacionService } from '../../../../core/services/invitacion.service';
 
-import { EditProfileModalComponent } from '../../../../../entrenado/perfil/components/edit-profile-modal/edit-profile-modal.component';
-import { PremiumRequestModalComponent } from '../../../../../entrenado/perfil/components/premium-request-modal/premium-request-modal.component';
+import { EditProfileModalComponent } from '../../../perfil/components/edit-profile-modal/edit-profile-modal.component';
+import { PremiumRequestModalComponent } from '../../../perfil/components/premium-request-modal/premium-request-modal.component';
+import { NotificationsComponent } from '../../../perfil/notifications/notifications.component';
+import { ChatListModalComponent } from '../../../perfil/chat/chat-list-modal/chat-list-modal.component';
 
 @Component({
   selector: 'app-profile',
@@ -39,7 +43,7 @@ import { PremiumRequestModalComponent } from '../../../../../entrenado/perfil/co
   imports: [
     CommonModule,
     IonIcon, IonMenu, IonSpinner, IonButton,
-    IonHeader, IonToolbar, IonContent, IonButtons, IonFooter,
+    IonHeader, IonToolbar, IonContent, IonButtons, IonFooter, IonBadge, IonItem, IonLabel,
     NgOptimizedImage, EditProfileModalComponent, PremiumRequestModalComponent
   ],
 })
@@ -49,12 +53,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private rutinaService = inject(RutinaService);
   public entrenadoService = inject(EntrenadoService);
   private planService = inject(PlanService);
-  private notificacionService = inject(NotificacionService);
+  private mensajeService = inject(MensajeService);
+  private mensajesGlobalesService = inject(MensajesGlobalesService);
+  private invitacionService = inject(InvitacionService);
   private router = inject(Router);
   public loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
   private platform = inject(Platform);
   private menuCtrl = inject(MenuController);
+  private modalCtrl = inject(ModalController);
 
   currentUser = computed(() => this.authService.currentUser() as User);
   currentEntrenado = computed(() => {
@@ -67,6 +74,36 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   isEditModalOpen = signal<boolean>(false);
   isPremiumModalOpen = signal<boolean>(false);
+  isLoggingOut = signal(false);
+
+  // Contadores para atajos de Alertas y Mensajes
+  readonly unreadChatsCount = computed(() => {
+    const user = this.currentUser();
+    if (!user) return 0;
+    return this.mensajeService.getContadorNoLeidos(user.uid)();
+  });
+
+  readonly mensajesNoLeidos = this.mensajesGlobalesService.mensajesNoLeidos;
+
+  readonly invitacionesPendientes = computed(() => {
+    const user = this.currentUser();
+    if (!user) return [];
+    if (user.role === Rol.ENTRENADOR || user.role === Rol.PERSONAL_TRAINER) {
+      return this.invitacionService.getInvitacionesPendientesPorEntrenador(user.uid)();
+    } else if (user.role === Rol.ENTRENADO) {
+      return this.invitacionService.getInvitacionesPendientesPorEntrenado(user.uid)();
+    }
+    return [];
+  });
+
+  readonly totalNotificationsCount = computed(() => {
+    return this.unreadChatsCount() + this.mensajesNoLeidos().length + this.invitacionesPendientes().length;
+  });
+
+  readonly canUseChat = computed(() => {
+    const user = this.currentUser();
+    return user && user.role !== 'gimnasio';
+  });
 
   private solicitudesUnsubscribe?: Unsubscribe;
 
@@ -76,7 +113,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline,
       closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline,
       checkmarkCircle, person, trophy, mail, star, helpCircleOutline,
-      flagOutline, barChartOutline
+      flagOutline, barChartOutline, chatbubblesOutline
     });
 
     effect(() => {
@@ -89,7 +126,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.rutinas.set(this.rutinaService.rutinas());
-    // Aseguramos que el gesto de swipe desde el borde izquierdo funcione
     this.menuCtrl.enable(true, 'profile-menu');
   }
 
@@ -115,6 +151,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.isPremiumModalOpen.set(false);
   }
 
+  async openNotifications(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: NotificationsComponent,
+      cssClass: 'premium-modal'
+    });
+    await modal.present();
+  }
+
+  async openChatList(): Promise<void> {
+    const modal = await this.modalCtrl.create({
+      component: ChatListModalComponent,
+      cssClass: 'premium-modal'
+    });
+    await modal.present();
+  }
+
   private iniciarListenerSolicitudes(userId: string) {
     if (this.solicitudesUnsubscribe) this.solicitudesUnsubscribe();
     this.solicitudesUnsubscribe = this.planService.getSolicitudesUsuarioListener(userId, (solicitudes: SolicitudPlan[]) => {
@@ -127,8 +179,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     toast.present();
   }
 
-  isLoggingOut = signal(false);
-
   async logout() {
     const loading = await this.loadingCtrl.create({
       message: 'Cerrando sesión...',
@@ -139,27 +189,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     try {
       this.isLoggingOut.set(true);
 
-      // PASO CRÍTICO: Esperar a que el menú se cierre TOTALMENTE antes de que el @if 
-      // de app.component destruya este componente. Si se destruye antes, el backdrop se queda "huérfano" y bloquea la UI.
       if (this.menuCtrl) {
         await this.menuCtrl.close('profile-menu');
-        await this.menuCtrl.close(); // Doble cierre por seguridad
+        await this.menuCtrl.close();
       }
 
-      // Pequeño delay adicional para que Ionic limpie el DOM del menú
       await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Cerramos sesión en Firebase (esto disparará el @if y destruirá este componente)
       await this.authService.logout();
-
-      // Limpiar caché local
       localStorage.removeItem('gym_auth_user');
-
-      // Redirigir al login
       await this.router.navigate(['/login'], { replaceUrl: true });
     } catch (error) {
       console.error('🛡️ Profile: Error en logout:', error);
-      // Fallback: Si el router se queda bloqueado, forzamos recarga
       window.location.href = '/login';
     } finally {
       this.isLoggingOut.set(false);
