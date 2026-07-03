@@ -1,12 +1,6 @@
 
 
-<ion-content [fullscreen]="true">
-  
-  <app-background />
-  <!-- Acciones y Límite de Plan -->
-  <app-acciones-rutina [hasReachedLimit]="hasReachedRutinaLimit()" [limitMessage]="rutinaLimitMessage()"
-    (crearRutina)="crearRutina()">
-  </app-acciones-rutina>
+
 
   <!-- Lista de Rutinas -->
   <app-lista-rutinas [rutinas]="rutinasCreadas()" (verRutina)="verRutina($event)" (deleteRutina)="deleteRutina($event)">
@@ -19,4 +13,3 @@
     (close)="closeRutinaModal()" 
     (save)="saveRutinaChanges($event)">
   </app-rutina-modal>
-</ion-content>

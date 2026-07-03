@@ -1,11 +1,11 @@
 <ion-card
-  class="m-0! rounded-4xl! overflow-hidden shadow-lg border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative w-full h-130 flex flex-col">
+  class="m-0! rounded-4xl! overflow-hidden shadow-lg border backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative w-full h-130 flex flex-col">
   <!-- Foto de Perfil con Fallback -->
   @if(safePhoto()) {
   <img [src]="safePhoto()" alt="Perfil" class="w-full h-full object-cover" (error)="onPhotoError()">
   } @else {
-  <div class="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-    <ion-icon name="person" class="text-6xl text-gray-400"></ion-icon>
+  <div class="w-full h-full flex items-center justify-center">
+    <ion-icon name="person" class="text-6xl"></ion-icon>
   </div>
   }
 
@@ -14,7 +14,7 @@
     <ion-card-title>{{ userName() }}</ion-card-title>
     }
     @if(data()?.bio) {
-    <ion-card-subtitle class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ data().bio }}</ion-card-subtitle>
+    <ion-card-subtitle class="text-xs mt-0.5">{{ data().bio }}</ion-card-subtitle>
     }@else {
     <p>Sin Descripción</p>
     }

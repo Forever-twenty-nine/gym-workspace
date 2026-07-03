@@ -1,0 +1,52 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="entrenados">
+        <ion-label>Entrenados</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="rutinas">
+        <ion-label>Rutinas</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="ejercicios">
+        <ion-label>Ejercicios</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-background />
+
+  @switch (selectedTab()) {
+    @case ('entrenados') {
+      <app-entrenados></app-entrenados>
+    }
+    @case ('rutinas') {
+      <app-rutinas></app-rutinas>
+    }
+    @case ('ejercicios') {
+      <app-ejercicios></app-ejercicios>
+    }
+  }
+
+  <!-- FAB de ayuda (esquina inferior izquierda) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button id="trainer-help-fab" color="secondary" fill="outline">
+      <ion-icon name="help"></ion-icon>
+    </ion-fab-button>
+    <ion-popover trigger="trainer-help-fab" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding">
+          <div style="white-space: pre-line; line-height: 1.5; font-size: 14px;">{{ helpText() }}</div>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </ion-fab>
+
+  <!-- FAB de crear (esquina inferior derecha) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="onFabCreate()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

@@ -4,11 +4,13 @@ import {
   IonContent,
   IonLabel,
   IonSegment,
-  IonSegmentButton
+  IonSegmentButton,
+  IonButton,
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
-  calendarOutline, timeOutline, personOutline, handRightOutline 
+  calendarOutline, timeOutline, personOutline, handRightOutline, informationCircleOutline
 } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -29,6 +31,8 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
     IonLabel,
     IonSegment,
     IonSegmentButton,
+    IonButton,
+    IonIcon,
     ConvocatoriaListComponent,
     AgendaHelpPopoverComponent,
     BackgroundComponent
@@ -106,7 +110,7 @@ export class AgendaPage implements OnInit {
 
   constructor() {
     addIcons({ 
-      calendarOutline, timeOutline, personOutline, handRightOutline 
+      calendarOutline, timeOutline, personOutline, handRightOutline, informationCircleOutline 
     });
   }
 

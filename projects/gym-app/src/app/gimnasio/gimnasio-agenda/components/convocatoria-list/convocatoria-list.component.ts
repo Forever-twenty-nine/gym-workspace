@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, IonText } from '@ionic/angular/standalone';
+import { IonIcon, IonText, IonCard, IonCardContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline, handRightOutline } from 'ionicons/icons';
 import { ConvocatoriaCardComponent } from '../convocatoria-card/convocatoria-card.component';
@@ -12,6 +12,8 @@ import { ConvocatoriaCardComponent } from '../convocatoria-card/convocatoria-car
     CommonModule, 
     IonIcon, 
     IonText,
+    IonCard,
+    IonCardContent,
     ConvocatoriaCardComponent
   ],
   templateUrl: './convocatoria-list.component.html'

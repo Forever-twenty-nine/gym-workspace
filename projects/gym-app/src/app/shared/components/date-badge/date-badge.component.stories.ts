@@ -7,7 +7,7 @@ const meta: Meta<DateBadgeComponent> = {
   component: DateBadgeComponent,
   tags: ['autodocs'],
   decorators: [
-    componentWrapperDecorator((story) => `<ion-app class="relative flex items-center justify-center h-[120px] bg-slate-50 dark:bg-slate-900">${story}</ion-app>`)
+    componentWrapperDecorator((story) => `<ion-app class="relative flex items-center justify-center h-[120px]">${story}</ion-app>`)
   ]
 };
 

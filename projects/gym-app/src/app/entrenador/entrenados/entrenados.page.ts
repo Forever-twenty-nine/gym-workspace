@@ -2,7 +2,7 @@ import { Component, OnInit, inject, computed, Signal, signal } from '@angular/co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
@@ -21,8 +21,6 @@ import { InvitacionesPendientesComponent, InvitacionViewModel } from './componen
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
 import { InvitacionModalComponent } from './components/invitacion-modal/invitacion-modal.component';
 import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal/gestion-rutinas-modal.component';
-import { BackgroundComponent } from '../../shared/components/background/background.component';
-import { AccionesEntrenadosComponent } from './components/acciones-entrenados/acciones-entrenados.component';
 
 @Component({
   selector: 'app-entrenados',
@@ -31,14 +29,11 @@ import { AccionesEntrenadosComponent } from './components/acciones-entrenados/ac
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonContent,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,
     InvitacionModalComponent,
-    GestionRutinasModalComponent,
-    BackgroundComponent,
-    AccionesEntrenadosComponent
+    GestionRutinasModalComponent
   ],
   styles: []
 })
@@ -565,6 +560,32 @@ export class EntrenadosPage implements OnInit {
 
     } catch (error) {
       console.error('Error al desasignar rutina:', error);
+    }
+  }
+
+  async desasociarEntrenado(entrenado: Entrenado) {
+    const entrenadorId = this.authService.currentUser()?.uid;
+    if (!entrenadorId) return;
+
+    try {
+      await this.entrenadorService.desvincularEntrenado(entrenadorId, entrenado.id);
+
+      const toast = await this.toastController.create({
+        message: 'Entrenado desasociado y rutinas limpiadas con éxito',
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      await toast.present();
+    } catch (error) {
+      console.error('Error al desasociar entrenado:', error);
+      const toast = await this.toastController.create({
+        message: 'Error al desasociar al entrenado',
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
+      await toast.present();
     }
   }
 }

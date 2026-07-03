@@ -1,4 +1,4 @@
-<div class="flex flex-col gap-4">
+<div style="display: flex; flex-direction: column; gap: 16px;">
   @for (item of items(); track item.convocatoria.id) {
     <app-convocatoria-card
       [convocatoria]="item.convocatoria"
@@ -9,16 +9,16 @@
     </app-convocatoria-card>
   } @empty {
     <!-- Estado vacío -->
-    <div class="flex flex-col items-center justify-center py-16 text-center bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-3xl border border-white/20">
-      <div class="w-16 h-16 bg-white/20 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-4">
-        <ion-icon [name]="emptyIcon()" class="text-3xl text-gray-400 dark:text-gray-500"></ion-icon>
-      </div>
-      <ion-text class="block text-base font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-        <h3 class="m-0">{{ emptyTitle() }}</h3>
-      </ion-text>
-      <ion-text class="block text-xs font-medium text-gray-600 dark:text-white/70 px-8 leading-relaxed">
-        <p class="m-0">{{ emptyMessage() }}</p>
-      </ion-text>
-    </div>
+    <ion-card class="ion-text-center ion-padding">
+      <ion-card-content>
+        <ion-icon [name]="emptyIcon()" color="medium" style="font-size: 4rem; margin-bottom: 16px;"></ion-icon>
+        <ion-text>
+          <h3 style="font-weight: bold; margin: 0; margin-bottom: 8px;">{{ emptyTitle() }}</h3>
+        </ion-text>
+        <ion-text color="medium">
+          <p style="margin: 0;">{{ emptyMessage() }}</p>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
   }
 </div>

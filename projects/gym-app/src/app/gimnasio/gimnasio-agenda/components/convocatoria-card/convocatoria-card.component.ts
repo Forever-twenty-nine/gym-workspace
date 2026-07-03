@@ -2,7 +2,14 @@ import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { 
   IonCard, 
-  IonIcon
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonAvatar,
+  IonBadge,
+  IonCardContent,
+  IonChip,
+  IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline, timeOutline, personOutline } from 'ionicons/icons';
@@ -13,7 +20,14 @@ import { calendarOutline, timeOutline, personOutline } from 'ionicons/icons';
   imports: [
     CommonModule, 
     IonCard, 
-    IonIcon
+    IonIcon,
+    IonItem,
+    IonLabel,
+    IonAvatar,
+    IonBadge,
+    IonCardContent,
+    IonChip,
+    IonList
   ],
   templateUrl: './convocatoria-card.component.html'
 })

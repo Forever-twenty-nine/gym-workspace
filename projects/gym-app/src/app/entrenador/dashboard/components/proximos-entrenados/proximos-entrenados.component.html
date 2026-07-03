@@ -1,19 +1,23 @@
 @if (entrenados().length > 0) {
-<div class="p-2 m-2">
-  <div class="py-2 mb-3 text-center">
-    <h3 class="text-xs font-bold uppercase tracking-widest text-white/70 m-0">próximos 3 días</h3>
-    <p class="text-[10px] text-white/45 mt-1 mb-0">Entrenados con rutinas programadas en los siguientes 3 días</p>
+<div class="ion-padding">
+  <div class="ion-text-center ion-padding-bottom">
+    <ion-text class="ion-text-uppercase">
+      <h6><strong>PRÓXIMOS 3 DÍAS</strong></h6>
+    </ion-text>
+    <ion-text color="medium">
+      <p><small>Entrenados con rutinas programadas en los siguientes 3 días</small></p>
+    </ion-text>
   </div>
-  <ion-list style="background: none;" class="p-0 m-0">
+  <ion-list lines="none">
     @for (entrenado of entrenados(); track entrenado.id) {
     <div class="gym-sliding-item">
-      <ion-item [button]="false" [detail]="false" class="--background: transparent;">
+      <ion-item>
         <ion-avatar slot="start">
           <img [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
         </ion-avatar>
-        <ion-label slot="start" class="mx-2">
-          <h3 class="font-bold text-white">{{ getUserName()(entrenado.id) }}</h3>
-          <p class="text-white/60 text-xs mt-1 truncate max-w-xs">{{ entrenado.nombreRutina }}</p>
+        <ion-label>
+          <h3><strong>{{ getUserName()(entrenado.id) }}</strong></h3>
+          <p class="ion-text-nowrap">{{ entrenado.nombreRutina }}</p>
         </ion-label>
       </ion-item>
     </div>
@@ -21,8 +25,10 @@
   </ion-list>
 </div>
 } @else {
-<div class="m-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-10 text-center text-white/50">
-  <ion-icon name="calendar-outline" class="text-6xl mb-4 opacity-20"></ion-icon>
-  <p class="text-base">No hay rutinas asignadas para los próximos 3 días.</p>
-</div>
+<ion-card class="ion-text-center ion-padding ion-margin">
+  <ion-card-content>
+    <ion-icon name="calendar-outline" style="font-size: 64px; opacity: 0.2;" class="ion-margin-bottom"></ion-icon>
+    <p>No hay rutinas asignadas para los próximos 3 días.</p>
+  </ion-card-content>
+</ion-card>
 }

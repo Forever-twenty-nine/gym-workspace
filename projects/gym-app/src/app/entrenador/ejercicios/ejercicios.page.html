@@ -1,13 +1,4 @@
-<ion-content [fullscreen]="true">
-  
-  <app-background />
 
-  <!-- Acciones -->
-  <app-acciones-ejercicio 
-    [hasReachedLimit]="hasReachedEjercicioLimit()" 
-    [limitMessage]="ejercicioLimitMessage()"
-    (crearEjercicio)="crearEjercicio()">
-  </app-acciones-ejercicio>
 
   <app-ejercicios-list 
     [ejercicios]="ejerciciosCreados()"
@@ -24,4 +15,3 @@
     (close)="closeEjercicioModal()"
     (save)="saveEjercicioChanges($event)">
   </app-ejercicio-modal>
-</ion-content>

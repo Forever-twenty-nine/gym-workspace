@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { Routes, Router } from '@angular/router';
+import { inject } from '@angular/core';
 import { EntrenadorTabsPage } from './entrenador-tabs.page';
 
 export const routes: Routes = [
@@ -17,20 +18,30 @@ export const routes: Routes = [
           import('../agenda/agenda.page').then((m) => m.AgendaPage),
       },
       {
-        path: 'entrenados',
+        path: 'creaciones',
         loadComponent: () =>
-          import('../entrenados/entrenados.page').then((m) => m.EntrenadosPage),
+          import('../creaciones/creaciones.page').then((m) => m.CreacionesPage),
+      },
+      {
+        path: 'entrenados',
+        redirectTo: () => {
+          const router = inject(Router);
+          return router.createUrlTree(['/entrenador-tabs/creaciones'], { queryParams: { tab: 'entrenados' } });
+        }
       },
       {
         path: 'rutinas',
-        loadComponent: () =>
-          import('../rutinas/rutinas.page').then((m) => m.RutinasPage),
+        redirectTo: () => {
+          const router = inject(Router);
+          return router.createUrlTree(['/entrenador-tabs/creaciones'], { queryParams: { tab: 'rutinas' } });
+        }
       },
-      
       {
         path: 'ejercicios',
-        loadComponent: () =>
-          import('../ejercicios/ejercicios.page').then((m) => m.EjerciciosPage),
+        redirectTo: () => {
+          const router = inject(Router);
+          return router.createUrlTree(['/entrenador-tabs/creaciones'], { queryParams: { tab: 'ejercicios' } });
+        }
       },
       {
         path: 'perfil',

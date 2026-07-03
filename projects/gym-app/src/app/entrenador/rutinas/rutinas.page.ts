@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import {
-  IonContent,
   ToastController,
   IonCard
 } from '@ionic/angular/standalone';
@@ -13,20 +12,15 @@ import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 
 import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
-import { AccionesRutinaComponent } from './components/acciones-rutina/acciones-rutina.component';
 import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
-import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 @Component({
   selector: 'app-rutinas',
   templateUrl: './rutinas.page.html',
   standalone: true,
   imports: [
-    IonContent,
     ListaRutinasComponent,
-    AccionesRutinaComponent,
-    RutinaModalComponent,
-    BackgroundComponent
+    RutinaModalComponent
   ],
   styles: []
 })

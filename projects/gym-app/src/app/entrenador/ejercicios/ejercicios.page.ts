@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { IonContent, ToastController } from '@ionic/angular/standalone';
+import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -9,19 +9,14 @@ import { UserService } from '../../core/services/user.service';
 
 import { EjerciciosListComponent } from './components/ejercicios-list/ejercicios-list.component';
 import { EjercicioModalComponent } from './components/ejercicio-modal/ejercicio-modal.component';
-import { BackgroundComponent } from '../../shared/components/background/background.component';
-import { AccionesEjercicioComponent } from './components/acciones-ejercicio/acciones-ejercicio.component';
 
 @Component({
   selector: 'app-ejercicios',
   templateUrl: './ejercicios.page.html',
   standalone: true,
   imports: [
-    IonContent,
     EjerciciosListComponent,
-    EjercicioModalComponent,
-    BackgroundComponent,
-    AccionesEjercicioComponent]
+    EjercicioModalComponent]
 })
 export class EjerciciosPage implements OnInit {
   private authService = inject(AuthService);

@@ -6,7 +6,8 @@ import {
   IonAvatar, 
   IonLabel, 
   IonListHeader, 
-  IonText 
+  IonText,
+  IonCard
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -19,7 +20,8 @@ import {
     IonAvatar, 
     IonLabel, 
     IonListHeader, 
-    IonText
+    IonText,
+    IonCard
   ],
   templateUrl: './entrenados-grouped-list.component.html'
 })

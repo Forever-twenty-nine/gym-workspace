@@ -1,9 +1,9 @@
 <ion-header class="ion-no-border z-50">
-    <ion-toolbar class="bg-transparent px-4">
+    <ion-toolbar class="px-4">
         <ion-buttons slot="start">
             <ion-back-button defaultHref="/entrenado-tabs/rutinas" text="" icon="arrow-back-outline"  ></ion-back-button>
         </ion-buttons>
-        <ion-title class="font-bold text-slate-800 dark:text-white text-right pr-0">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
+        <ion-title class="font-bold text-right pr-0">{{ rutina()?.nombre || 'Mi Rutina' }}</ion-title>
     </ion-toolbar>
 </ion-header>
 
@@ -28,7 +28,7 @@
         <!-- Exercises List -->
         @if (rutinaIniciada() || rutinaCompletada()) {
         <div class="px-2 pb-24 pt-2">
-            <h3 class="text-xs font-bold mb-2 px-4 text-slate-500 dark:text-gray-400 uppercase tracking-wider">
+            <h3 class="text-xs font-bold mb-2 px-4 uppercase tracking-wider">
                 Ejercicios ({{ ejerciciosCompletados() }}/{{ ejerciciosTotales() }})
             </h3>
 
@@ -60,16 +60,16 @@
 
 <!-- Footer con botones de control -->
 @if (!rutinaCompletada()) {
-<ion-footer class="ion-no-border bg-white/60 dark:bg-black/60 backdrop-blur-xl border-t border-white/20">
+<ion-footer class="ion-no-border backdrop-blur-xl border-t">
     <div class="px-6 py-10" style="padding-bottom: calc(2.5rem + var(--ion-safe-area-bottom, 0px));">
         <div class="flex items-center gap-4">
             @if (rutinaIniciada()) {
                 <ion-button (click)="pausarReanudar()" 
                     fill="clear"
-                    class="h-16 w-16 min-w-16 rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 shadow-lg m-0! overflow-hidden --padding-start=0 --padding-end=0">
+                    class="h-16 w-16 min-w-16 rounded-full backdrop-blur-md border shadow-lg m-0! overflow-hidden --padding-start=0 --padding-end=0">
                     <ion-icon [name]="stopwatch.isPaused() ? 'play' : 'pause'"
                         slot="icon-only"
-                        class="text-3xl" [class.text-primary]="stopwatch.isPaused()"></ion-icon>
+                        class="text-3xl" [class.]="stopwatch.isPaused()"></ion-icon>
                 </ion-button>
             }
             

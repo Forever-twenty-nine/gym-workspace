@@ -2,13 +2,17 @@ import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   IonContent,
-  IonButton,
-  IonIcon,
-  IonLabel,
+  IonHeader,
+  IonToolbar,
   IonSegment,
   IonSegmentButton,
+  IonLabel,
+  IonFab,
+  IonFabButton,
+  IonIcon,
   ToastController,
-  AlertController
+  AlertController,
+  SegmentCustomEvent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -32,11 +36,14 @@ import { ConvocatoriaListComponent } from './components/convocatoria-list/convoc
   imports: [
     CommonModule,
     IonContent,
-    IonButton,
-    IonIcon,
-    IonLabel,
+    IonHeader,
+    IonToolbar,
     IonSegment,
     IonSegmentButton,
+    IonLabel,
+    IonFab,
+    IonFabButton,
+    IonIcon,
     CrearAgendaModalComponent,
     BackgroundComponent,
     ConvocatoriaListComponent
@@ -156,8 +163,11 @@ export class AgendaPage implements OnInit {
     // Firestore actualiza en tiempo real
   }
 
-  cambiarSegmento(event: any) {
-    this.segmentoActivo.set(event.detail.value);
+  cambiarSegmento(event: SegmentCustomEvent) {
+    const val = event.detail.value as 'oficial' | 'atletas' | undefined;
+    if (val) {
+      this.segmentoActivo.set(val);
+    }
   }
 
   async confirmarEliminacion(id: string) {

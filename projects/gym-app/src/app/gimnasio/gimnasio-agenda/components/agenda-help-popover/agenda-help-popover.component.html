@@ -1,21 +1,22 @@
-<ion-popover [trigger]="triggerId()" triggerAction="click"
-             style="--width: 290px; --max-width: 290px; --background: transparent; --box-shadow: none; --border-radius: 16px;">
+<ion-popover [trigger]="triggerId()" triggerAction="click">
   <ng-template>
-    <div class="p-4 bg-white/95 dark:bg-slate-900/95 text-gray-800 dark:text-gray-200 backdrop-blur-md rounded-2xl flex flex-col gap-3 shadow-2xl border border-white/20 dark:border-white/10">
-      <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800/80 pb-2">
-        <span class="material-symbols-outlined text-(--ion-color-primary) text-lg">info</span>
-        <span class="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">Visualizador de Actividad</span>
-      </div>
-      <p class="text-[11px] leading-relaxed m-0 font-semibold text-gray-700 dark:text-gray-300">
-        Revisa la agenda oficial y las convocatorias de tu gimnasio para la semana en curso:
-      </p>
-      <ul class="text-[10px] leading-relaxed m-0 pl-4 flex flex-col gap-1.5 font-semibold text-gray-600 dark:text-gray-400 list-disc">
-        <li><strong class="text-gray-800 dark:text-gray-200">Agenda Oficial (WODs):</strong> Entrenamientos planificados por el gimnasio o entrenadores.</li>
-        <li><strong class="text-gray-800 dark:text-gray-200">Propuestas de Atletas:</strong> Convocatorias y entrenamientos creados por los propios alumnos.</li>
-      </ul>
-      <p class="text-[9px] text-gray-400 dark:text-gray-500 italic mt-1 text-center">
-        ¡Haz clic en cualquier clase para ver más detalles!
-      </p>
-    </div>
+    <ion-card class="ion-no-margin">
+      <ion-card-header>
+        <ion-card-title style="font-size: 0.8rem; text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
+          <ion-icon name="information-circle-outline" color="primary"></ion-icon>
+          Visualizador de Actividad
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p style="margin-bottom: 8px;">Revisa la agenda oficial y las convocatorias de tu gimnasio para la semana en curso:</p>
+        <ul style="padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li><strong>Agenda Oficial (WODs):</strong> Entrenamientos planificados por el gimnasio o entrenadores.</li>
+          <li><strong>Propuestas de Atletas:</strong> Convocatorias y entrenamientos creados por los propios alumnos.</li>
+        </ul>
+        <p style="text-align: center; font-style: italic; font-size: 0.8rem; margin-top: 16px;">
+          ¡Haz clic en cualquier clase para ver más detalles!
+        </p>
+      </ion-card-content>
+    </ion-card>
   </ng-template>
 </ion-popover>

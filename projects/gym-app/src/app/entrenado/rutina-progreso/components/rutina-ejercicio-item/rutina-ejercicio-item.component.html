@@ -1,5 +1,5 @@
 <div (click)="toggle.emit()"
-    class="flex items-center gap-4 py-3 px-4 mb-3 rounded-2xl transition-all active:scale-[0.98] overflow-hidden bg-white dark:bg-slate-800 shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] border border-slate-100 dark:border-slate-700 relative cursor-pointer"
+    class="flex items-center gap-4 py-3 px-4 mb-3 rounded-2xl transition-all active:scale-[0.98] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)] border relative cursor-pointer"
     [style.opacity]="completado() ? '0.5' : '1'">
     
     <!-- Checkbox Icon (Primary indicator) -->
@@ -10,12 +10,12 @@
 
     <!-- Content -->
     <div class="flex-1 min-w-0 pr-10">
-        <h4 class="text-base font-bold m-0 truncate transition-all duration-300 text-slate-800 dark:text-white"
+        <h4 class="text-base font-bold m-0 truncate transition-all duration-300"
             [style.color]="completado() ? 'var(--ion-color-success)' : ''"
             [class.line-through]="completado()">
             {{ ejercicio().nombre }}
         </h4>
-        <div class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+        <div class="mt-1 text-sm font-medium">
             {{ ejercicio().series }} series x {{ ejercicio().repeticiones }} reps
             @if (ejercicio().descansoSegundos) {
                 <span class="mx-1 opacity-50">•</span> {{ ejercicio().descansoSegundos }}s descanso
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Info/Details Button (Specifically for modal) -->
-    <div class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-500 dark:text-slate-300 active:scale-90 transition-all z-20 shadow-sm border border-slate-200/50 dark:border-slate-600/50"
+    <div class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-all z-20 shadow-sm border"
         (click)="showDetails.emit(); $event.stopPropagation()">
         <ion-icon name="information-circle-outline" class="text-2xl"></ion-icon>
     </div>

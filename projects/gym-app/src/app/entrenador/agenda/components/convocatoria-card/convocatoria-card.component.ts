@@ -3,7 +3,16 @@ import { CommonModule } from '@angular/common';
 import { 
   IonCard, 
   IonIcon,
-  IonButton
+  IonButton,
+  IonText,
+  IonItem,
+  IonLabel,
+  IonBadge,
+  IonCardContent,
+  IonChip,
+  IonList,
+  IonListHeader,
+  IonAvatar
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline, timeOutline, personOutline, trashOutline } from 'ionicons/icons';
@@ -15,7 +24,16 @@ import { calendarOutline, timeOutline, personOutline, trashOutline } from 'ionic
     CommonModule, 
     IonCard, 
     IonIcon,
-    IonButton
+    IonButton,
+    IonText,
+    IonItem,
+    IonLabel,
+    IonBadge,
+    IonCardContent,
+    IonChip,
+    IonList,
+    IonListHeader,
+    IonAvatar
   ],
   templateUrl: './convocatoria-card.component.html'
 })
@@ -25,6 +43,7 @@ export class ConvocatoriaCardComponent {
   creadorPhoto = input<string | null>(null);
   fechaFormateada = input<string>('');
   asistentes = input<{ name: string; photo: string | null }[]>([]);
+  canDelete = input<boolean>(true);
 
   eliminar = output<string>();
 

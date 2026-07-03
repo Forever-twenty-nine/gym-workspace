@@ -1,15 +1,8 @@
-<ion-content [fullscreen]="true">
 
-  <app-background />
-
-  <!-- Acciones y Límite de Plan -->
-  <app-acciones-entrenados [hasReachedLimit]="hasReachedClientLimit()" [limitMessage]="clientLimitMessage()"
-    (openInvitacionModal)="openInvitacionModal()">
-  </app-acciones-entrenados>
 
   <!-- Listado de Entrenados -->
   <app-mis-entrenados [entrenados]="entrenadosViewModel()"
-    (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)">
+    (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)" (desasociar)="desasociarEntrenado($event)">
   </app-mis-entrenados>
 
   <!-- Invitaciones Pendientes -->
@@ -23,7 +16,6 @@
     (close)="closeModal()">
   </app-entrenado-detalle-popover>
 
-</ion-content>
 
 <!-- Modal de Invitación -->
 <app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"

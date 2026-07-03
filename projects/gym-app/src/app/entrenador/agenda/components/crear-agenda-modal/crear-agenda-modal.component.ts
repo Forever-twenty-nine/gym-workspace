@@ -17,6 +17,11 @@ import {
   IonToggle,
   IonSelect,
   IonSelectOption,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonList,
+  IonText,
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -45,7 +50,12 @@ import { Convocatoria, Rol } from 'gym-library';
     IonTextarea,
     IonToggle,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonList,
+    IonText
   ],
   templateUrl: './crear-agenda-modal.component.html'
 })

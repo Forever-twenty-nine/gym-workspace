@@ -4,16 +4,17 @@ import {
   IonList, 
   IonItem, 
   IonLabel, 
-  IonButton, 
   IonIcon,
-  IonAvatar,
   IonNote,
   IonItemSliding,
   IonItemOptions,
-  IonItemOption
+  IonItemOption,
+  IonText,
+  IonCard,
+  IonCardContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { pencilOutline, trashOutline, barbellOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-ejercicios-list',
@@ -28,7 +29,10 @@ import { pencilOutline, trashOutline, barbellOutline } from 'ionicons/icons';
     IonNote,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonText,
+    IonCard,
+    IonCardContent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,16 +42,7 @@ export class EjerciciosListComponent {
   @Output() eliminar = new EventEmitter<string>();
 
   constructor() {
-    addIcons({ pencilOutline, trashOutline, barbellOutline });
-  }
-
-  async toggleSliding(slidingItem: IonItemSliding) {
-    const isOpened = await slidingItem.getOpenAmount() > 0;
-    if (isOpened) {
-      await slidingItem.close();
-    } else {
-      await slidingItem.open('end');
-    }
+    addIcons({ pencilOutline, trashOutline });
   }
 
   onVer(ejercicio: any) {

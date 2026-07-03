@@ -4,16 +4,17 @@ import {
     IonList,
     IonItem,
     IonLabel,
-    IonButton,
     IonIcon,
-    IonAvatar,
     IonNote,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonCard,
+    IonCardContent,
+    IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { pencilOutline, trashOutline, calendarOutline } from 'ionicons/icons';
+import { pencilOutline, trashOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-lista-rutinas',
@@ -28,7 +29,10 @@ import { pencilOutline, trashOutline, calendarOutline } from 'ionicons/icons';
     IonNote,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonCard,
+    IonCardContent,
+    IonText
 ]
 })
 export class ListaRutinasComponent {
@@ -38,14 +42,5 @@ export class ListaRutinasComponent {
 
     constructor() {
         addIcons({ pencilOutline, trashOutline });
-    }
-
-    async toggleSliding(slidingItem: IonItemSliding) {
-        const isOpened = await slidingItem.getOpenAmount() > 0;
-        if (isOpened) {
-            await slidingItem.close();
-        } else {
-            await slidingItem.open('end');
-        }
     }
 }

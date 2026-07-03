@@ -1,27 +1,31 @@
 @if (invitaciones().length > 0) {
-<div class="mt-6">
-    <div class="py-2 mb-3">
-        <h3 class="text-center text-xs font-bold uppercase tracking-widest text-white/70 m-0">Invitaciones Pendientes</h3>
+<div class="ion-padding-vertical">
+    <div class="ion-text-center ion-padding-bottom">
+        <ion-text class="ion-text-uppercase">
+            <h6><strong>Invitaciones Pendientes</strong></h6>
+        </ion-text>
     </div>
-    <ion-list style="background: none;" class="p-2 m-2">
+    <ion-list lines="none" class="ion-padding-vertical">
         @for (invitacion of invitaciones(); track invitacion.id) {
         <ion-item-sliding class="gym-sliding-item" #slidingItem>
-            <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
-                <ion-avatar slot="start" class="flex items-center justify-center bg-white/10 rounded-full border border-white/5">
-                    <ion-icon name="mail-outline" class="text-white/80" style="font-size: 1.2rem;"></ion-icon>
+            <ion-item button (click)="toggleSliding(slidingItem)">
+                <ion-avatar slot="start">
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--ion-color-light);">
+                        <ion-icon name="mail-outline" color="medium"></ion-icon>
+                    </div>
                 </ion-avatar>
-                <ion-label slot="start" class="mx-2">
-                    <h3 class="font-bold text-white">{{ invitacion.nombre }}</h3>
-                    <p class="text-white/60 text-xs truncate max-w-xs">{{ invitacion.email }}</p>
+                <ion-label>
+                    <h3><strong>{{ invitacion.nombre }}</strong></h3>
+                    <p class="ion-text-nowrap">{{ invitacion.email }}</p>
                 </ion-label>
-                <ion-note slot="end" class="mx-2 text-white/50 text-xs">
+                <ion-note slot="end">
                     {{ invitacion.fechaCreacion | date:'dd/MM/yyyy' }}
                 </ion-note>
             </ion-item>
             
-            <ion-item-options side="end">
+            <ion-item-options side="start">
                 <ion-item-option color="danger" (click)="onCancelar.emit(invitacion.id); slidingItem.close()">
-                    <ion-icon slot="start" name="close-circle-outline"></ion-icon>
+                    <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
                 </ion-item-option>
             </ion-item-options>
         </ion-item-sliding>

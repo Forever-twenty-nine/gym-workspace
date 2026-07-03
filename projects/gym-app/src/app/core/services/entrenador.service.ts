@@ -21,6 +21,7 @@ import { UserService } from './user.service';
 import { NotificacionService } from './notificacion.service';
 import { MensajeService } from './mensaje.service';
 import { InvitacionService } from './invitacion.service';
+import { RutinaAsignadaService } from './rutina-asignada.service';
 import { FIRESTORE } from '../firebase.tokens';
 
 // Clase de error personalizada para límites
@@ -48,6 +49,7 @@ export class EntrenadorService {
   private notificacionService = inject(NotificacionService);
   private mensajeService = inject(MensajeService);
   private invitacionService = inject(InvitacionService);
+  private rutinaAsignadaService = inject(RutinaAsignadaService);
 
   // 📊 Signals para el estado de los entrenadores
   private readonly _entrenadores = signal<Entrenador[]>([]);
@@ -264,13 +266,35 @@ export class EntrenadorService {
   }
 
   /**
-   * Desvincula un entrenado de un entrenador
+   * Desvincula un entrenado de un entrenador y limpia sus rutinas asignadas
    */
   async desvincularEntrenado(entrenadorId: string, entrenadoId: string): Promise<void> {
     const entrenado = this.entrenadoService.getEntrenadoById(entrenadoId)();
     if (entrenado) {
+      // 1) Obtener todas las rutinas creadas por este entrenador
+      const rutinasDelEntrenador = this.rutinaService.rutinas().filter(r => r.creadorId === entrenadorId);
+      const rutinaIdsDelEntrenador = rutinasDelEntrenador.map(r => r.id);
+
+      // 2) Obtener todas las asignaciones diarias de este entrenado y eliminar aquellas vinculadas a este entrenador
+      const asignaciones = this.rutinaAsignadaService.getRutinasAsignadasByEntrenado(entrenadoId)()
+        .filter(a => a.entrenadorId === entrenadorId || (a.rutinaId && rutinaIdsDelEntrenador.includes(a.rutinaId)));
+
+      for (const asignacion of asignaciones) {
+        await this.rutinaAsignadaService.delete(asignacion.id);
+      }
+
+      // 3) Limpiar del array principal rutinasAsignadasIds aquellas rutinas creadas por este entrenador
+      const rutinasAsignadasRestantes = (entrenado.rutinasAsignadasIds || [])
+        .filter(id => !rutinaIdsDelEntrenador.includes(id));
+
+      // 4) Eliminar al entrenador actual de la lista de entrenadores del alumno
       const entrenadoresId = (entrenado.entrenadoresId || []).filter((id: string) => id !== entrenadorId);
-      await this.entrenadoService.save({ ...entrenado, entrenadoresId });
+
+      await this.entrenadoService.save({
+        ...entrenado,
+        entrenadoresId,
+        rutinasAsignadasIds: rutinasAsignadasRestantes
+      });
     }
 
     const entrenador = this.getEntrenadorById(entrenadorId)();

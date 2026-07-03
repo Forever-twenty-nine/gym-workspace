@@ -15,7 +15,8 @@ import {
     IonTextarea,
     IonSelect,
     IonSelectOption,
-    IonBadge
+    IonBadge,
+    IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close } from 'ionicons/icons';
@@ -41,7 +42,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
         IonInput,
         IonTextarea,
         IonSelect,
-        IonSelectOption
+        IonSelectOption,
+        IonList
     ]
 })
 export class RutinaModalComponent {

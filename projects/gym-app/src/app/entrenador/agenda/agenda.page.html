@@ -1,31 +1,22 @@
-<ion-content [fullscreen]="true" style="--background: transparent;">
-  
-  <app-background />
-
-  <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
-    
-    <!-- Botón para crear nueva sesión en agenda -->
-    <div class="flex justify-between items-center gap-4 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 rounded-3xl p-4 shadow-lg">
-      <div class="text-left">
-        <h3 class="text-sm font-black text-gray-900 dark:text-white m-0">Planificar Actividades</h3>
-       
-      </div>
-      <ion-button (click)="abrirCrearModal()" class="premium-button font-black text-xs px-4 m-0! rounded-2xl! overflow-hidden">
-        <ion-icon name="add" slot="start" class="text-sm"></ion-icon>
-        Programar WOD
-      </ion-button>
-    </div>
-
-    <!-- Selector de Segmento -->
-    <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-2xl p-1">
-      <ion-segment-button value="oficial" class="font-extrabold text-xs">
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" mode="ios">
+      <ion-segment-button value="oficial">
         <ion-label>Agenda Oficial (WODs)</ion-label>
       </ion-segment-button>
-      <ion-segment-button value="atletas" class="font-extrabold text-xs">
+      <ion-segment-button value="atletas">
         <ion-label>Propuestas de Atletas</ion-label>
       </ion-segment-button>
     </ion-segment>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <app-background />
+
+  <div class="main-container">
+    
     <!-- Contenido de Convocatorias Oficiales (WODs) -->
     @if (segmentoActivo() === 'oficial') {
       <app-convocatoria-list
@@ -41,14 +32,21 @@
     @if (segmentoActivo() === 'atletas') {
       <app-convocatoria-list
         [items]="mappedConvocatoriasAtletas()"
+        [canDelete]="false"
         emptyTitle="Sin propuestas"
         emptyMessage="No hay convocatorias activas publicadas por tus alumnos por el momento."
-        emptyIcon="hand-right-outline"
-        (eliminar)="confirmarEliminacion($event)">
+        emptyIcon="hand-right-outline">
       </app-convocatoria-list>
     }
 
   </div>
+
+  <!-- FAB de crear (esquina inferior derecha) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="abrirCrearModal()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 
   <!-- Modal Component para Crear Sesión de Agenda -->
   <app-crear-agenda-modal 

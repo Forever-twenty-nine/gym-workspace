@@ -1,35 +1,39 @@
-<ion-list style="background: none;" class="p-2 m-2">
-  @for (ejercicio of ejercicios; track ejercicio.id) {
-  <ion-item-sliding class="gym-sliding-item" #slidingItem>
-    <ion-item [button]="true" [detail]="false" (click)="toggleSliding(slidingItem)">
-      <!-- <ion-avatar slot="start" class="flex items-center justify-center">
-        <ion-icon name="barbell-outline" class="text-white" style="font-size: 1.5rem;"></ion-icon>
-      </ion-avatar> -->
-      <ion-label slot="start" class="mx-2">
-        <h3 class="font-bold text-white">{{ ejercicio.nombre }}</h3>
-        <!-- @if (ejercicio.descripcion) {
-        <p class="text-white/60 text-xs mt-1 truncate max-w-xs">{{ ejercicio.descripcion }}</p>
-        } -->
-      </ion-label>
-      <ion-note slot="end" class="mx-2 text-white/50 text-xs">
-        {{ ejercicio.series }}x{{ ejercicio.repeticiones }}@if(ejercicio.peso) { ({{ ejercicio.peso }}kg)}
-      </ion-note>
-    </ion-item>
-    
-    <ion-item-options side="end">
-      <ion-item-option color="primary" (click)="onVer(ejercicio); slidingItem.close()">
-        <ion-icon slot="start" name="pencil-outline"></ion-icon>
-      </ion-item-option>
-      <ion-item-option color="danger" (click)="onEliminar(ejercicio.id); slidingItem.close()">
-        <ion-icon slot="start" name="trash-outline"></ion-icon>
-      </ion-item-option>
-    </ion-item-options>
-  </ion-item-sliding>
-  } @empty {
-  <ion-item class="--background: transparent; ion-text-center">
-    <ion-label class="text-white opacity-60">
-      <p class="m-0 py-4">No hay ejercicios creados. ¡Crea el primero!</p>
-    </ion-label>
-  </ion-item>
-  }
-</ion-list>
+<ion-card>
+  <ion-card-content>
+    @if (ejercicios.length > 0) {
+      <ion-list lines="none">
+        @for (ejercicio of ejercicios; track ejercicio.id) {
+          <ion-item-sliding #slidingItem>
+            <ion-item>
+              <ion-label>
+                <h2>{{ ejercicio.nombre }}</h2>
+              </ion-label>
+              <ion-note slot="end">
+                {{ ejercicio.series }}x{{ ejercicio.repeticiones }}@if(ejercicio.peso) { ({{ ejercicio.peso }}kg)}
+              </ion-note>
+            </ion-item>
+
+            <ion-item-options side="start">
+              <ion-item-option color="danger" (click)="onEliminar(ejercicio.id); slidingItem.close()">
+                <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+
+            <ion-item-options side="end">
+              <ion-item-option color="primary" (click)="onVer(ejercicio); slidingItem.close()">
+                <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        }
+      </ion-list>
+    } @else {
+      <ion-text color="medium">
+        <p class="ion-text-center">
+          <em>Aún no has creado ejercicios.</em><br>
+          <small>Usa el botón "+" para agregar uno.</small>
+        </p>
+      </ion-text>
+    }
+  </ion-card-content>
+</ion-card>

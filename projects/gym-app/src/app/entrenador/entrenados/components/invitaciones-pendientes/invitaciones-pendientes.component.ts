@@ -9,7 +9,8 @@ import {
     IonNote,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, closeCircleOutline } from 'ionicons/icons';
@@ -36,7 +37,8 @@ export interface InvitacionViewModel {
         IonAvatar,
         IonNote,
         IonItemOptions,
-        IonItemOption
+        IonItemOption,
+        IonText
     ]
 })
 export class InvitacionesPendientesComponent {

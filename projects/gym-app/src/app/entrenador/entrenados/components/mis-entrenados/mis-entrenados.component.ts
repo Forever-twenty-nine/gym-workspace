@@ -1,9 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonList, IonItem, IonLabel, IonIcon, IonAvatar, IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard, IonCardContent, IonCardTitle, IonCardHeader } from '@ionic/angular/standalone';
+import { IonList, IonItem, IonLabel, IonIcon, IonAvatar, IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard, IonCardContent, IonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { Entrenado } from 'gym-library';
-import { eyeOutline, barbellOutline, mailOutline, chevronBackOutline } from 'ionicons/icons';
+import { eyeOutline, barbellOutline, mailOutline, trashOutline } from 'ionicons/icons';
 
 export interface EntrenadoViewModel {
     id: string;
@@ -19,7 +19,7 @@ export interface EntrenadoViewModel {
     selector: 'app-mis-entrenados',
     templateUrl: './mis-entrenados.component.html',
     standalone: true,
-    imports: [IonCardHeader, IonCardTitle, IonCardContent, 
+    imports: [
     CommonModule,
     IonList,
     IonItem,
@@ -30,7 +30,9 @@ export interface EntrenadoViewModel {
     IonItemOptions,
     IonItemOption,
     IonItemSliding,
-    IonCard
+    IonCard,
+    IonCardContent,
+    IonText
 ]
 })
 export class MisEntrenadosComponent {
@@ -40,22 +42,14 @@ export class MisEntrenadosComponent {
             'eye-outline': eyeOutline,
             'barbell-outline': barbellOutline,
             'mail-outline': mailOutline,
-            'chevron-back-outline': chevronBackOutline,
+            'trash-outline': trashOutline
         });
     }
     entrenados = input.required<EntrenadoViewModel[]>();
 
     verCliente = output<Entrenado>();
     openRutinasModal = output<Entrenado>();
-
-    async toggleSliding(slidingItem: IonItemSliding) {
-        const isOpened = await slidingItem.getOpenAmount() > 0;
-        if (isOpened) {
-            await slidingItem.close();
-        } else {
-            await slidingItem.open('end');
-        }
-    }
+    desasociar = output<Entrenado>();
 
     getAvatarUrl() {
         return 'https://ionicframework.com/docs/img/demos/avatar.svg';

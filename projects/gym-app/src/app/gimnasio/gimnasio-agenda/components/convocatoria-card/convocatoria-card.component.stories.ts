@@ -7,7 +7,7 @@ const meta: Meta<ConvocatoriaCardComponent> = {
   component: ConvocatoriaCardComponent,
   tags: ['autodocs'],
   decorators: [
-    componentWrapperDecorator((story) => `<ion-app class="p-4 bg-slate-900 flex justify-center items-center"><div style="width: 100%; max-width: 450px;">${story}</div></ion-app>`)
+    componentWrapperDecorator((story) => `<ion-app class="p-4 flex justify-center items-center"><div style="width: 100%; max-width: 450px;">${story}</div></ion-app>`)
   ]
 };
 

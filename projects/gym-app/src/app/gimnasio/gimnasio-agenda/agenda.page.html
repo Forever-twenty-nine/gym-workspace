@@ -5,18 +5,18 @@
   <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
     
     <div class="flex items-center gap-3">
-      <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-full p-1 flex-1" style="--border-radius: 9999px;">
-        <ion-segment-button value="oficial" class="font-extrabold text-xs" style="--border-radius: 9999px;">
+      <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment flex-1">
+        <ion-segment-button value="oficial" class="font-extrabold text-xs">
           <ion-label>Agenda Oficial (WODs)</ion-label>
         </ion-segment-button>
-        <ion-segment-button value="atletas" class="font-extrabold text-xs" style="--border-radius: 9999px;">
+        <ion-segment-button value="atletas" class="font-extrabold text-xs">
           <ion-label>Propuestas de Atletas</ion-label>
         </ion-segment-button>
       </ion-segment>
       
-      <button id="help-trigger-agenda" class="w-9 h-9 rounded-full bg-white/30 dark:bg-black/30 backdrop-blur-md hover:bg-white/40 active:scale-95 transition-all flex items-center justify-center border border-white/20 text-white shadow-md cursor-pointer shrink-0" style="border-radius: 50% !important;">
-        <span class="material-symbols-outlined text-lg">info</span>
-      </button>
+      <ion-button id="help-trigger-agenda" fill="clear" color="medium" class="m-0">
+        <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
+      </ion-button>
     </div>
 
     <app-agenda-help-popover triggerId="help-trigger-agenda"></app-agenda-help-popover>

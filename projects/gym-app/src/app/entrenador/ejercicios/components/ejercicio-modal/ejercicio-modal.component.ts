@@ -13,7 +13,9 @@ import {
   IonButtons,
   IonInput,
   IonTextarea,
-  IonText
+  IonText,
+  IonList,
+  IonLabel
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, star } from 'ionicons/icons';
@@ -36,7 +38,9 @@ import { close, star } from 'ionicons/icons';
     IonButtons,
     IonInput,
     IonTextarea,
-    IonText
+    IonText,
+    IonList,
+    IonLabel
   ],
   styles: [`
     .ejercicio-modal {

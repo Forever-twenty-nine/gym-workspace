@@ -10,7 +10,7 @@
  */
 
 /* 1) Importing Fonts
-* ---------------------------------------------------------------------------- */
+ * ---------------------------------------------------------------------------- */
 /* Import Core Ionic first */
  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
  @import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
@@ -29,7 +29,7 @@
  }
 
  /* 2) Ionic Styles
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  /* Import Core Ionic first */
  @import "@ionic/angular/css/core.css";
  @import "@ionic/angular/css/normalize.css";
@@ -45,23 +45,23 @@
 
 
  /* 3) Ionic - Angular .dark class
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  @import '@ionic/angular/css/palettes/dark.class.css';
 
 
  /* 4) Variables del proyecto que reemplan las de Ionic
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  @import "./theme/variables.css";
 
 
 
  /* 5) Ionic Components
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  /* Removido ionic-components.css */
 
 
  /* 6) Tailwind Styles (no pisa los estilos de ionic a no ser que se use "!"antes de la clase)
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  @import "tailwindcss";
 
  @theme {
@@ -70,7 +70,7 @@
  }
 
  /* 7) Custom Styles
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  /* Removido custom.css */
 
  html {
@@ -78,7 +78,7 @@
  }
 
  /* 8) Estilos globales para listas (ion-list)
- * ---------------------------------------------------------------------------- */
+  * ---------------------------------------------------------------------------- */
  ion-list {
    background: transparent !important;
    padding-top: 0 !important;
@@ -121,4 +121,10 @@ ion-card:has(> ion-card-content > ion-list) {
 /* Evitar fondos en los contenedores deslizables */
 ion-item-sliding {
   background: transparent !important;
+}
+
+/* Forzar que ion-segment ocupe todo el ancho disponible en la cabecera (especialmente en iOS) */
+ion-toolbar ion-segment {
+  width: 100% !important;
+  max-width: 100% !important;
 }

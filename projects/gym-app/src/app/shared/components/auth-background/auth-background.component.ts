@@ -6,6 +6,6 @@ import { Component, Input } from '@angular/core';
   standalone: true
 })
 export class AuthBackgroundComponent {
-  @Input() opacityClass: string = 'to-white dark:to-black';
+  @Input() opacityClass: string = ' ';
   @Input() showBlur: boolean = true;
 }

@@ -5,7 +5,10 @@ import {
   IonItem,
   IonAvatar,
   IonLabel,
-  IonIcon
+  IonIcon,
+  IonText,
+  IonCard,
+  IonCardContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { calendarOutline } from 'ionicons/icons';
@@ -20,7 +23,10 @@ import { calendarOutline } from 'ionicons/icons';
     IonItem,
     IonAvatar,
     IonLabel,
-    IonIcon
+    IonIcon,
+    IonText,
+    IonCard,
+    IonCardContent
   ]
 })
 export class ProximosEntrenadosComponent {

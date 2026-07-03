@@ -7,7 +7,8 @@ import {
   IonLabel, 
   IonButton, 
   IonIcon,
-  IonText 
+  IonText,
+  IonCard
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personRemove } from 'ionicons/icons';
@@ -23,7 +24,8 @@ import { personRemove } from 'ionicons/icons';
     IonLabel, 
     IonButton, 
     IonIcon,
-    IonText
+    IonText,
+    IonCard
   ],
   templateUrl: './entrenador-list.component.html'
 })
