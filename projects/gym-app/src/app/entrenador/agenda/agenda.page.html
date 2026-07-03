@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" mode="ios">
       <ion-segment-button value="oficial">
-        <ion-label>Agenda Oficial (WODs)</ion-label>
+        <ion-label>Oficial</ion-label>
       </ion-segment-button>
       <ion-segment-button value="atletas">
         <ion-label>Propuestas de Atletas</ion-label>
@@ -21,10 +21,12 @@
     @if (segmentoActivo() === 'oficial') {
       <app-convocatoria-list
         [items]="mappedConvocatoriasOficiales()"
+        [canDelete]="true"
         emptyTitle="Agenda vacía"
         emptyMessage="No tienes entrenamientos o WODs planificados para hoy o mañana."
         emptyIcon="calendar-outline"
-        (eliminar)="confirmarEliminacion($event)">
+        (eliminar)="confirmarEliminacion($event)"
+        (editar)="abrirEditarModal($event)">
       </app-convocatoria-list>
     }
 
@@ -48,9 +50,11 @@
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Modal Component para Crear Sesión de Agenda -->
+  <!-- Modal Component para Crear/Editar Sesión de Agenda -->
   <app-crear-agenda-modal 
     [isOpen]="isCrearModalOpen()" 
+    [convocatoria]="modalDataConvocatoria()"
+    [isCreating]="isCreatingModal()"
     (close)="cerrarCrearModal()"
     (saved)="onSesionSaved()">
   </app-crear-agenda-modal>

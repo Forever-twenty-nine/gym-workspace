@@ -1,9 +1,21 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, IonText, IonCard, IonCardTitle, IonCardContent } from '@ionic/angular/standalone';
+import {
+  IonIcon,
+  IonText,
+  IonCard,
+  IonCardContent,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { calendarOutline, handRightOutline } from 'ionicons/icons';
+import { calendarOutline, handRightOutline, trashOutline, pencilOutline, timeOutline } from 'ionicons/icons';
 import { ConvocatoriaCardComponent } from '../convocatoria-card/convocatoria-card.component';
+import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 
 @Component({
   selector: 'app-convocatoria-list',
@@ -12,10 +24,16 @@ import { ConvocatoriaCardComponent } from '../convocatoria-card/convocatoria-car
     CommonModule,
     IonIcon,
     IonCard,
-    IonCardTitle,
     IonCardContent,
-    ConvocatoriaCardComponent
-],
+    IonList,
+    IonItem,
+    IonLabel,
+    IonItemSliding,
+    IonItemOptions,
+    IonItemOption,
+    ConvocatoriaCardComponent,
+    DateBadgeComponent
+  ],
   templateUrl: './convocatoria-list.component.html'
 })
 export class ConvocatoriaListComponent {
@@ -26,12 +44,17 @@ export class ConvocatoriaListComponent {
   canDelete = input<boolean>(true);
 
   eliminar = output<string>();
+  editar = output<any>();
 
   constructor() {
-    addIcons({ calendarOutline, handRightOutline });
+    addIcons({ calendarOutline, handRightOutline, trashOutline, pencilOutline, timeOutline });
   }
 
   onEliminar(id: string) {
     this.eliminar.emit(id);
+  }
+
+  onEditar(convocatoria: any) {
+    this.editar.emit(convocatoria);
   }
 }

@@ -39,6 +39,7 @@ export * from './lib/models/desafio-participacion.model';
 export * from './lib/models/match-interaction.model';
 export * from './lib/models/convocatoria.model';
 export * from './lib/models/comentario.model';
+export * from './lib/models/tipo-entrenamiento.model';
 /*
  * utils
  */

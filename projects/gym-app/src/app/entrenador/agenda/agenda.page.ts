@@ -61,6 +61,8 @@ export class AgendaPage implements OnInit {
   // Segment: 'oficial' | 'atletas'
   segmentoActivo = signal<'oficial' | 'atletas'>('oficial');
   isCrearModalOpen = signal(false);
+  modalDataConvocatoria = signal<Convocatoria | null>(null);
+  isCreatingModal = signal(true);
 
   // Convocatorias del gimnasio filtradas por tipo
   convocatoriasGimnasio = computed(() => {
@@ -84,13 +86,11 @@ export class AgendaPage implements OnInit {
           const dateEntrenamiento = new Date(c.fechaEntrenamiento);
           return dateEntrenamiento >= startOfToday && dateEntrenamiento <= endOfNextWeek;
         } else {
-          // No mostrar convocatorias de atletas pasadas hace más de 24 horas para mantener limpia la agenda
+          // Mostrar solo convocatorias de atletas vigentes (cuyo entrenamiento no haya finalizado aún)
           const endTraining = new Date(c.fechaEntrenamiento);
           const [hours, minutes] = c.horaFin.split(':').map(Number);
           endTraining.setHours(hours, minutes, 0, 0);
-
-          const expirationTime = new Date(endTraining.getTime() + 24 * 60 * 60 * 1000);
-          return now < expirationTime;
+          return now <= endTraining;
         }
       })
       .sort((a, b) => {
@@ -152,11 +152,20 @@ export class AgendaPage implements OnInit {
   }
 
   abrirCrearModal() {
+    this.isCreatingModal.set(true);
+    this.modalDataConvocatoria.set(null);
+    this.isCrearModalOpen.set(true);
+  }
+
+  abrirEditarModal(convocatoria: Convocatoria) {
+    this.isCreatingModal.set(false);
+    this.modalDataConvocatoria.set(convocatoria);
     this.isCrearModalOpen.set(true);
   }
 
   cerrarCrearModal() {
     this.isCrearModalOpen.set(false);
+    this.modalDataConvocatoria.set(null);
   }
 
   onSesionSaved() {

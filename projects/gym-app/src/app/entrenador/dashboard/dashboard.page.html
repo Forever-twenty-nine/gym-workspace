@@ -1,10 +1,38 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" style="--background: transparent;">
 
   <app-background />
 
-  <!-- PRÓXIMOS ENTRENAMIENTOS -->
-  <app-proximos-entrenados
-    [entrenados]="entrenadosConRutinasProximas()"
-    [getUserName]="getUserName.bind(this)">
-  </app-proximos-entrenados>
+  <div style="position: relative; z-index: 10; padding: 24px 16px; max-width: 512px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+    <!-- PRÓXIMOS ENTRENAMIENTOS -->
+    <app-proximos-entrenados
+      [entrenados]="entrenadosConRutinasProximas()"
+      [getUserName]="getUserName.bind(this)">
+    </app-proximos-entrenados>
+
+    <!-- GESTIÓN DE TIPOS DE ENCUENTRO -->
+    <div style="display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <h2 style="font-size: 1.25rem; font-weight: 800; margin: 0;">Tipos de Entrenamiento</h2>
+      </div>
+      <ion-button (click)="crearTipo()" size="small" fill="clear" style="margin: 0;">
+        <ion-icon name="add" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <app-tipos-entrenamiento-list
+      [tipos]="tipos()"
+      (edit)="editarTipo($event)"
+      (delete)="eliminarTipo($event)"
+      (loadDefaults)="cargarPredeterminados()">
+    </app-tipos-entrenamiento-list>
+
+    <!-- Modal de Creación/Edición -->
+    <app-tipo-entrenamiento-modal
+      [isOpen]="isModalOpen()"
+      [tipo]="modalData()"
+      [isCreating]="isCreating()"
+      (close)="closeModal()"
+      (save)="saveChanges($event)">
+    </app-tipo-entrenamiento-modal>
+  </div>
 </ion-content>
