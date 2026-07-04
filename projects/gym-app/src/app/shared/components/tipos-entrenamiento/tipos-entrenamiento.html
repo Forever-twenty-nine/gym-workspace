@@ -1,0 +1,28 @@
+    <ion-card class="background-transparent">
+      <ion-card-header class="ion-no-padding">
+        <ion-item lines="none">
+          <ion-card-title>Tipos de Entrenamiento</ion-card-title>
+          <ion-button slot="end" (click)="crearTipo()" fill="solid" shape="round">
+            <ion-icon name="add" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-card-header>
+
+      <ion-card-content>
+        <app-tipos-entrenamiento-list
+          [tipos]="tipos()"
+          (edit)="editarTipo($event)"
+          (delete)="eliminarTipo($event)"
+          (loadDefaults)="cargarPredeterminados()">
+        </app-tipos-entrenamiento-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Modal de Creación/Edición -->
+    <app-tipo-entrenamiento-modal
+      [isOpen]="isModalOpen()"
+      [tipo]="modalData()"
+      [isCreating]="isCreating()"
+      (close)="closeModal()"
+      (save)="saveChanges($event)">
+    </app-tipo-entrenamiento-modal>

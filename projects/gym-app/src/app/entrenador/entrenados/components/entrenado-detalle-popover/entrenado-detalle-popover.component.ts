@@ -19,7 +19,6 @@ import { Entrenado } from 'gym-library';
 @Component({
     selector: 'app-entrenado-detalle-popover',
     templateUrl: './entrenado-detalle-popover.component.html',
-    styleUrls: ['./entrenado-detalle-popover.component.css'],
     standalone: true,
     imports: [
     CommonModule,

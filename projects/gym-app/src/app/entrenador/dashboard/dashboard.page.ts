@@ -7,14 +7,12 @@ import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { UserService } from '../../core/services/user.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
-import { Entrenado, TipoEntrenamiento } from 'gym-library';
+import { Entrenado } from 'gym-library';
 
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { ProximosEntrenadosComponent } from './components/proximos-entrenados/proximos-entrenados.component';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
-import { TiposEntrenamientoListComponent } from '../../shared/components/tipos-entrenamiento-list/tipos-entrenamiento-list.component';
-import { TipoEntrenamientoModalComponent } from '../../shared/components/tipo-entrenamiento-modal/tipo-entrenamiento-modal.component';
-import { TipoEntrenamientoService } from '../../core/services/tipo-entrenamiento.service';
+import { TiposEntrenamientoComponent } from '../../shared/components/tipos-entrenamiento/tipos-entrenamiento';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,13 +20,10 @@ import { TipoEntrenamientoService } from '../../core/services/tipo-entrenamiento
   standalone: true,
   imports: [
     IonContent,
-    IonButton,
-    IonIcon,
     ProximosEntrenadosComponent,
     BackgroundComponent,
-    TiposEntrenamientoListComponent,
-    TipoEntrenamientoModalComponent
-  ],
+    TiposEntrenamientoComponent
+],
 })
 export class DashboardPage implements OnInit {
   private authService = inject(AuthService);
@@ -37,16 +32,8 @@ export class DashboardPage implements OnInit {
   private userService = inject(UserService);
   private entrenadorService = inject(EntrenadorService);
   private rutinaAsignadaService = inject(RutinaAsignadaService);
-  private tipoEntrenamientoService = inject(TipoEntrenamientoService);
   private alertCtrl = inject(AlertController);
   private toastCtrl = inject(ToastController);
-
-  readonly tipos = this.tipoEntrenamientoService.tipos;
-
-  isModalOpen = signal(false);
-  modalData = signal<TipoEntrenamiento | null>(null);
-  isCreating = signal(false);
-
 
   entrenador = computed(() => {
     const user = this.authService.currentUser();
@@ -128,101 +115,7 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit(): void {
-    const user = this.authService.currentUser();
-    if (user?.gimnasioId) {
-      this.tipoEntrenamientoService.initializeListener(user.gimnasioId);
-    }
-  }
-
-  crearTipo() {
-    this.isCreating.set(true);
-    this.modalData.set(null);
-    this.isModalOpen.set(true);
-  }
-
-  editarTipo(tipo: TipoEntrenamiento) {
-    this.isCreating.set(false);
-    this.modalData.set(tipo);
-    this.isModalOpen.set(true);
-  }
-
-  closeModal() {
-    this.isModalOpen.set(false);
-    this.modalData.set(null);
-  }
-
-  async saveChanges(nombre: string) {
-    const user = this.authService.currentUser();
-    if (!user || !user.gimnasioId) return;
-
-    try {
-      const data = this.modalData();
-      const duplicate = this.tipos().some(t => t.nombre.toLowerCase() === nombre.toLowerCase() && (!data || t.id !== data.id));
-      if (duplicate) {
-        this.showToast('Este tipo de entrenamiento ya existe', 'warning');
-        return;
-      }
-
-      if (this.isCreating()) {
-        const nuevoTipo: TipoEntrenamiento = {
-          id: '',
-          nombre,
-          gimnasioId: user.gimnasioId,
-          fechaCreacion: new Date()
-        };
-        await this.tipoEntrenamientoService.save(nuevoTipo);
-        this.showToast('¡Tipo de entrenamiento creado!', 'success');
-      } else if (data) {
-        const tipoActualizado: TipoEntrenamiento = {
-          ...data,
-          nombre
-        };
-        await this.tipoEntrenamientoService.save(tipoActualizado);
-        this.showToast('¡Tipo de entrenamiento actualizado!', 'success');
-      }
-      this.closeModal();
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al guardar cambios', 'danger');
-    }
-  }
-
-  async eliminarTipo(tipo: TipoEntrenamiento) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar Tipo',
-      message: `¿Estás seguro de que deseas eliminar "${tipo.nombre}"? Esto no afectará a los encuentros ya programados.`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: async () => {
-            try {
-              await this.tipoEntrenamientoService.delete(tipo.id);
-              this.showToast('Tipo de entrenamiento eliminado', 'success');
-            } catch (e) {
-              console.error(e);
-              this.showToast('Error al eliminar', 'danger');
-            }
-          }
-        }
-      ],
-      cssClass: 'premium-alert'
-    });
-    await alert.present();
-  }
-
-  async cargarPredeterminados() {
-    const user = this.authService.currentUser();
-    if (!user || !user.gimnasioId) return;
-
-    try {
-      await this.tipoEntrenamientoService.loadDefaultTypes(user.gimnasioId);
-      this.showToast('Tipos predeterminados cargados correctamente', 'success');
-    } catch (e) {
-      console.error(e);
-      this.showToast('Error al cargar tipos predeterminados', 'danger');
-    }
+    // any init logic left
   }
 
   private async showToast(message: string, color: 'success' | 'warning' | 'danger') {

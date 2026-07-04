@@ -1,31 +1,28 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     @if (currentUser(); as user) {
-      @if (user.role === 'entrenado') {
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 12px;">
-          <div style="flex: 1;">
-            <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios">
-              <ion-segment-button value="perfil">
-                <ion-label>Perfil</ion-label>
-              </ion-segment-button>
-              <ion-segment-button value="plan">
-                <ion-label>Plan</ion-label>
-              </ion-segment-button>
-              <ion-segment-button value="estadisticas">
-                <ion-label>Estadísticas</ion-label>
-              </ion-segment-button>
-            </ion-segment>
-          </div>
-
-          <app-notifications-bell
-            [count]="totalNotificationsCount()"
-            iconColor="medium"
-            (bellClick)="openNotifications()">
-          </app-notifications-bell>
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 12px;">
+        <div style="flex: 1;">
+          <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios">
+            <ion-segment-button value="perfil">
+              <ion-label>Perfil</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="plan">
+              <ion-label>Plan</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="estadisticas">
+              <ion-label>Estadísticas</ion-label>
+            </ion-segment-button>
+          </ion-segment>
         </div>
-      }
-    }
-    @if (!currentUser() || currentUser().role !== 'entrenado') {
+
+        <app-notifications-bell
+          [count]="totalNotificationsCount()"
+          iconColor="medium"
+          (bellClick)="openNotifications()">
+        </app-notifications-bell>
+      </div>
+    } @else {
       <div style="display: flex; align-items: center; justify-content: flex-end; width: 100%; padding: 0 12px;">
         <app-notifications-bell
           [count]="totalNotificationsCount()"

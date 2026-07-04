@@ -15,13 +15,13 @@ import {
   IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { close, checkmark } from 'ionicons/icons';
 import { TipoEntrenamiento } from 'gym-library';
-import { BackgroundComponent } from '../background/background.component';
+import { BackgroundComponent } from '../../background/background.component';
 
 @Component({
   selector: 'app-tipo-entrenamiento-modal',
-  templateUrl: './tipo-entrenamiento-modal.component.html',
+  templateUrl: './tipo-entrenamiento-modal.html',
   standalone: true,
   imports: [
     CommonModule,
@@ -36,9 +36,8 @@ import { BackgroundComponent } from '../background/background.component';
     IonModal,
     IonButtons,
     IonInput,
-    IonList,
-    BackgroundComponent
-  ]
+    IonList
+]
 })
 export class TipoEntrenamientoModalComponent {
   private fb = inject(FormBuilder);
@@ -58,7 +57,7 @@ export class TipoEntrenamientoModalComponent {
   });
 
   constructor() {
-    addIcons({ close });
+    addIcons({ close, checkmark });
 
     effect(() => {
       const item = this.tipo();
@@ -70,8 +69,6 @@ export class TipoEntrenamientoModalComponent {
         formGroup.statusChanges.subscribe(status => this.formStatus.set(status));
         this.form.set(formGroup);
         this.formStatus.set(formGroup.status);
-      } else {
-        this.form.set(null);
       }
     });
   }

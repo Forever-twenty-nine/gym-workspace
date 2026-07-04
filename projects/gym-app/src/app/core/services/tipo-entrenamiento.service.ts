@@ -15,10 +15,12 @@ import {
 } from 'firebase/firestore';
 import { TipoEntrenamiento } from 'gym-library';
 import { FIRESTORE } from '../firebase.tokens';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class TipoEntrenamientoService {
     private readonly firestore = inject(FIRESTORE);
+    private readonly authService = inject(AuthService);
     private readonly COLLECTION = 'tipos-entrenamiento';
 
     private readonly _tipos: WritableSignal<TipoEntrenamiento[]> = signal<TipoEntrenamiento[]>([]);
@@ -77,9 +79,47 @@ export class TipoEntrenamientoService {
     }
 
     /**
+     * Guarda un tipo de entrenamiento (nuevo o edición) aplicando las reglas de negocio.
+     */
+    async guardarTipo(nombre: string, tipoActual?: TipoEntrenamiento | null): Promise<void> {
+        const user = this.authService.currentUser();
+        if (!user) throw new Error('Usuario no autenticado');
+        const gymId = user.gimnasioId || user.uid;
+
+        const duplicate = this.tipos().some((t) => t.nombre.toLowerCase() === nombre.toLowerCase() && (!tipoActual || t.id !== tipoActual.id));
+        if (duplicate) {
+            throw new Error('Este tipo de entrenamiento ya existe');
+        }
+
+        if (!tipoActual) {
+            const nuevoTipo: TipoEntrenamiento = {
+                id: '',
+                nombre,
+                gimnasioId: gymId,
+                creadoPor: user.uid,
+                fechaCreacion: new Date()
+            };
+            await this.save(nuevoTipo);
+        } else {
+            const tipoActualizado: TipoEntrenamiento = {
+                ...tipoActual,
+                nombre
+            };
+            await this.save(tipoActualizado);
+        }
+    }
+
+    /**
      * Carga tipos predeterminados si la lista está vacía.
      */
-    async loadDefaultTypes(gymId: string): Promise<void> {
+    async cargarPredeterminadosParaUsuarioActual(): Promise<void> {
+        const user = this.authService.currentUser();
+        if (!user) throw new Error('Usuario no autenticado');
+        const gymId = user.gimnasioId || user.uid;
+        await this.loadDefaultTypes(gymId, user.uid);
+    }
+
+    async loadDefaultTypes(gymId: string, userId: string = ''): Promise<void> {
         const defaultNames = [
             'WOD del Día',
             'Entrenamiento Semanal',
@@ -92,6 +132,7 @@ export class TipoEntrenamientoService {
                 id: '',
                 nombre: name,
                 gimnasioId: gymId,
+                creadoPor: userId,
                 fechaCreacion: new Date()
             });
         }
@@ -102,6 +143,7 @@ export class TipoEntrenamientoService {
             id: data.id,
             nombre: data.nombre || '',
             gimnasioId: data.gimnasioId || '',
+            creadoPor: data.creadoPor,
             fechaCreacion: data.fechaCreacion instanceof Timestamp ? data.fechaCreacion.toDate() : (data.fechaCreacion ? new Date(data.fechaCreacion) : new Date())
         };
     }
@@ -111,6 +153,9 @@ export class TipoEntrenamientoService {
             nombre: tipo.nombre,
             gimnasioId: tipo.gimnasioId
         };
+        if (tipo.creadoPor) {
+            data.creadoPor = tipo.creadoPor;
+        }
         if (tipo.fechaCreacion) {
             data.fechaCreacion = tipo.fechaCreacion instanceof Date ? Timestamp.fromDate(tipo.fechaCreacion) : tipo.fechaCreacion;
         } else {

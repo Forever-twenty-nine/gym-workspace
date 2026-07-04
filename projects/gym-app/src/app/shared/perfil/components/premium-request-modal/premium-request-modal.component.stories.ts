@@ -3,7 +3,7 @@ import { applicationConfig, componentWrapperDecorator } from '@storybook/angular
 import { PremiumRequestModalComponent } from './premium-request-modal.component';
 import { fn } from '@storybook/test';
 import { Rol, Plan } from 'gym-library';
-import { mockProviders } from '../../../social/testing-mocks';
+import { mockProviders } from '../../../../entrenado/social/testing-mocks';
 import { ToastController, LoadingController } from '@ionic/angular/standalone';
 
 const meta: Meta<PremiumRequestModalComponent> = {

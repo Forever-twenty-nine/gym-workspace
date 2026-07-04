@@ -46,8 +46,8 @@
               }
             ],
             "styles": [
-              "src/global.css",
-              "src/theme/variables.css"
+              "src/styles/global.css",
+              "src/styles/theme/variables.css"
             ],
             "scripts": [],
             "browser": "src/main.ts",

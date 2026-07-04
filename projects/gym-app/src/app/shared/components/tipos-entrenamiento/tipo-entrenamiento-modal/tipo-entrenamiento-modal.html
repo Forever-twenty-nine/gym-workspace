@@ -1,0 +1,29 @@
+<ion-modal [isOpen]="isOpen()" (didDismiss)="close.emit()" class="modal-small">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="close.emit()">
+            <ion-icon name="close" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title class="ion-text-center">{{ isCreating() ? 'Nuevo Tipo' : 'Editar Tipo' }}</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onSave()" [disabled]="isSaveDisabled()" color="primary" fill="solid" shape="round">
+            <ion-icon name="checkmark" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    @if (form(); as f) {
+      <form [formGroup]="f" class="ion-padding">
+        <ion-list lines="none">
+          <ion-item>
+            <ion-input label="NOMBRE DEL TIPO" labelPlacement="stacked" type="text" formControlName="nombre" placeholder="Ej: WOD, Yoga, Fuerza, Funcional"></ion-input>
+          </ion-item>
+        </ion-list>
+      </form>
+    }
+  </ng-template>
+</ion-modal>

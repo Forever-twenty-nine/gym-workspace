@@ -107,6 +107,5 @@ export const ImageMap = {
     `,
     moduleMetadata: { imports: [] },
   }),
-  // @ts-expect-error - storybook control helper
   imageMap: BG_IMAGES,
 };

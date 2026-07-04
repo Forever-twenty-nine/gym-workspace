@@ -28,16 +28,13 @@ import { TipoEntrenamiento } from 'gym-library';
     IonLabel,
     IonButton,
     IonIcon,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
-  ],
-  templateUrl: './tipos-entrenamiento-list.component.html',
-  styleUrls: ['./tipos-entrenamiento-list.component.scss'],
+    IonItemOption,
+    IonItem,
+    IonLabel
+],
+  templateUrl: './tipos-entrenamiento-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TiposEntrenamientoListComponent {

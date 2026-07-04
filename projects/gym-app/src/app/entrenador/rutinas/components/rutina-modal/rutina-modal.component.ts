@@ -25,7 +25,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 @Component({
     selector: 'app-rutina-modal',
     templateUrl: './rutina-modal.component.html',
-    styleUrls: ['./rutina-modal.component.css'],
     standalone: true,
     imports: [
         CommonModule,

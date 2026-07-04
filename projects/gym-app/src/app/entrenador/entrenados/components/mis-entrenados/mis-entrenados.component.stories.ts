@@ -27,8 +27,7 @@ const mockEntrenadosVM: EntrenadoViewModel[] = [
       id: 'user-1',
       entrenadoresId: ['coach-123'],
       rutinasAsignadasIds: ['r-1', 'r-2'],
-      objetivo: Objetivo.DEFINICION,
-      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=juan'
+      objetivo: Objetivo.DEFINICION
     }
   },
   {
@@ -42,8 +41,7 @@ const mockEntrenadosVM: EntrenadoViewModel[] = [
       id: 'user-2',
       entrenadoresId: ['coach-123'],
       rutinasAsignadasIds: [],
-      objetivo: Objetivo.VOLUMEN,
-      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=maria'
+      objetivo: Objetivo.VOLUMEN
     }
   }
 ];

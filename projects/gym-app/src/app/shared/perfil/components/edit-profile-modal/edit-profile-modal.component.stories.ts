@@ -3,7 +3,7 @@ import { applicationConfig, componentWrapperDecorator } from '@storybook/angular
 import { EditProfileModalComponent } from './edit-profile-modal.component';
 import { fn } from '@storybook/test';
 import { Rol, Plan } from 'gym-library';
-import { mockProviders } from '../../../social/testing-mocks';
+import { mockProviders } from '../../../../entrenado/social/testing-mocks';
 import { FormBuilder } from '@angular/forms';
 import { ToastController, LoadingController, Platform } from '@ionic/angular/standalone';
 
