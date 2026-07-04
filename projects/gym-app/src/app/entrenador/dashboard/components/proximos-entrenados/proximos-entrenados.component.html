@@ -1,34 +1,43 @@
-@if (entrenados().length > 0) {
-<div class="ion-padding">
-  <div class="ion-text-center ion-padding-bottom">
-    <ion-text class="ion-text-uppercase">
-      <h6><strong>PRÓXIMOS 3 DÍAS</strong></h6>
-    </ion-text>
-    <ion-text color="medium">
-      <p><small>Entrenados con rutinas programadas en los siguientes 3 días</small></p>
-    </ion-text>
-  </div>
-  <ion-list lines="none">
-    @for (entrenado of entrenados(); track entrenado.id) {
-    <div class="gym-sliding-item">
-      <ion-item>
-        <ion-avatar slot="start">
-          <img [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
-        </ion-avatar>
-        <ion-label>
-          <h3><strong>{{ getUserName()(entrenado.id) }}</strong></h3>
-          <p class="ion-text-nowrap">{{ entrenado.nombreRutina }}</p>
-        </ion-label>
-      </ion-item>
-    </div>
-    }
-  </ion-list>
-</div>
-} @else {
-<ion-card class="ion-text-center ion-padding ion-margin">
-  <ion-card-content>
-    <ion-icon name="calendar-outline" style="font-size: 64px; opacity: 0.2;" class="ion-margin-bottom"></ion-icon>
-    <p>No hay rutinas asignadas para los próximos 3 días.</p>
+<ion-card class="background-transparent ion-no-margin">
+  <ion-card-header class="ion-no-padding">
+    <ion-item lines="none">
+      <ion-card-title>Calendario de Entrenamientos</ion-card-title>
+    </ion-item>
+  </ion-card-header>
+  <ion-card-content style="display: flex; justify-content: center; padding-top: 10px;">
+    <ion-datetime
+      presentation="date"
+      [highlightedDates]="highlightedDates()"
+      (ionChange)="onDateSelected($event)"
+    ></ion-datetime>
   </ion-card-content>
 </ion-card>
-}
+
+<ion-modal [isOpen]="isModalOpen()" (didDismiss)="isModalOpen.set(false)" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5, 0.75, 1]">
+  <ng-template>
+    <ion-content class="ion-padding">
+      @if (selectedDateEntrenados().length > 0) {
+      <ion-list lines="none">
+        @for (entrenado of selectedDateEntrenados(); track entrenado.id) {
+        <ion-item>
+          <ion-avatar slot="start">
+            <img [src]="entrenado.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + entrenado.id" />
+          </ion-avatar>
+          <ion-label>
+            <h3><strong>{{ getUserName()(entrenado.id) }}</strong></h3>
+            <p>{{ entrenado.nombreRutina }}</p>
+          </ion-label>
+        </ion-item>
+        }
+      </ion-list>
+      } @else {
+      <ion-card class="ion-text-center ion-padding ion-margin">
+        <ion-card-content>
+          <ion-icon name="calendar-outline" style="font-size: 48px; opacity: 0.3;" class="ion-margin-bottom"></ion-icon>
+          <p>No hay rutinas asignadas para esta fecha.</p>
+        </ion-card-content>
+      </ion-card>
+      }
+    </ion-content>
+  </ng-template>
+</ion-modal>

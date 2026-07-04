@@ -1,54 +1,55 @@
-<ion-card class="ion-no-margin">
-  <ion-card-header style="padding: 12px 16px;">
-    <ion-card-title style="font-size: 1rem; font-weight: 700;">Resumen de tu actividad como entrenador</ion-card-title>
-  </ion-card-header>
-  <ion-card-content style="padding: 12px 16px;">
-    <ion-grid class="ion-no-padding">
-      <ion-row>
-        <!-- Entrenados Asignados -->
-        <ion-col size="6" style="padding: 6px;">
-          <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 8px; border: 1px solid var(--ion-color-medium); border-radius: 12px; background: rgba(0,0,0,0.04);">
-            <ion-icon name="people-outline" color="primary" style="font-size: 1.5rem; margin-bottom: 4px;"></ion-icon>
-            <ion-text style="font-size: 1.5rem; font-weight: 800;">{{ stats().entrenadosAsignados }}</ion-text>
-            <ion-text color="medium" style="font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">Entrenados</ion-text>
-          </div>
-        </ion-col>
+<div class="stats-container">
+  <!-- Gráfica de Área (Sesiones) -->
+  <ion-card class="ion-no-margin ion-margin-bottom">
+    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
+      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Actividad de tus alumnos (7 días)</ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="padding-bottom: 0px">
+      <apx-chart
+        [series]="chartOptions().series"
+        [chart]="chartOptions().chart"
+        [dataLabels]="chartOptions().dataLabels"
+        [plotOptions]="chartOptions().plotOptions"
+        [xaxis]="chartOptions().xaxis"
+        [yaxis]="chartOptions().yaxis"
+        [colors]="chartOptions().colors"
+        [theme]="chartOptions().theme"
+      ></apx-chart>
+    </ion-card-content>
+  </ion-card>
 
-        <!-- Rutinas Creadas -->
-        <ion-col size="6" style="padding: 6px;">
-          <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 8px; border: 1px solid var(--ion-color-medium); border-radius: 12px; background: rgba(0,0,0,0.04);">
-            <ion-icon name="fitness-outline" color="success" style="font-size: 1.5rem; margin-bottom: 4px;"></ion-icon>
-            <ion-text style="font-size: 1.5rem; font-weight: 800;">{{ stats().rutinasCreadas }}</ion-text>
-            <ion-text color="medium" style="font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">Rutinas</ion-text>
-          </div>
-        </ion-col>
+  <!-- Gráfica de Objetivos (Donut) -->
+  <ion-card class="ion-no-margin ion-margin-bottom">
+    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
+      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Objetivos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="padding-bottom: 0px">
+      <apx-chart
+        [series]="objetivosChartOptions().series"
+        [chart]="objetivosChartOptions().chart"
+        [labels]="objetivosChartOptions().labels"
+        [colors]="objetivosChartOptions().colors"
+        [plotOptions]="objetivosChartOptions().plotOptions"
+        [dataLabels]="objetivosChartOptions().dataLabels"
+        [theme]="objetivosChartOptions().theme"
+      ></apx-chart>
+    </ion-card-content>
+  </ion-card>
 
-        <!-- Ejercicios Creados -->
-        <ion-col size="6" style="padding: 6px;">
-          <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 8px; border: 1px solid var(--ion-color-medium); border-radius: 12px; background: rgba(0,0,0,0.04);">
-            <ion-icon name="barbell-outline" color="tertiary" style="font-size: 1.5rem; margin-bottom: 4px;"></ion-icon>
-            <ion-text style="font-size: 1.5rem; font-weight: 800;">{{ stats().ejerciciosCreados }}</ion-text>
-            <ion-text color="medium" style="font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">Ejercicios</ion-text>
-          </div>
-        </ion-col>
-
-        <!-- Sesiones de tus entrenados -->
-        <ion-col size="6" style="padding: 6px;">
-          <div style="display: flex; flex-direction: column; align-items: center; padding: 16px 8px; border: 1px solid var(--ion-color-medium); border-radius: 12px; background: rgba(0,0,0,0.04);">
-            <ion-icon name="time-outline" color="warning" style="font-size: 1.5rem; margin-bottom: 4px;"></ion-icon>
-            <ion-text style="font-size: 1.5rem; font-weight: 800;">{{ stats().sesionesTotalesDeTusEntrenados }}</ion-text>
-            <ion-text color="medium" style="font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">Sesiones</ion-text>
-          </div>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <div style="margin-top: 16px; padding: 12px; border-radius: 12px; border: 1px solid var(--ion-color-primary); background: rgba(0,0,0,0.02); display: flex; align-items: center; gap: 12px;">
-      <ion-icon name="calendar-outline" color="primary" style="font-size: 1.25rem;"></ion-icon>
-      <div style="flex: 1;">
-        <ion-text style="font-size: 0.75rem; color: var(--ion-color-medium); display: block;">Rutinas asignadas activas</ion-text>
-        <ion-text style="font-size: 1.25rem; font-weight: 700;">{{ stats().rutinasAsignadasActivas }}</ion-text>
-      </div>
-    </div>
-  </ion-card-content>
-</ion-card>
+  <!-- Gráfica de Nivel (Pie) -->
+  <ion-card class="ion-no-margin ion-margin-bottom">
+    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
+      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Nivel de Experiencia</ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="padding-bottom: 0px">
+      <apx-chart
+        [series]="nivelChartOptions().series"
+        [chart]="nivelChartOptions().chart"
+        [labels]="nivelChartOptions().labels"
+        [colors]="nivelChartOptions().colors"
+        [dataLabels]="nivelChartOptions().dataLabels"
+        [theme]="nivelChartOptions().theme"
+      ></apx-chart>
+    </ion-card-content>
+  </ion-card>
+</div>

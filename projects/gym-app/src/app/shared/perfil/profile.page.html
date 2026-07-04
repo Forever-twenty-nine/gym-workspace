@@ -1,9 +1,21 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     @if (currentUser(); as user) {
-      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 12px;">
-        <div style="flex: 1;">
-          <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0 12px;
+        "
+      >
+        <div style="flex: 1">
+          <ion-segment
+            [value]="currentSegment()"
+            (ionChange)="segmentChanged($event)"
+            mode="ios"
+          >
             <ion-segment-button value="perfil">
               <ion-label>Perfil</ion-label>
             </ion-segment-button>
@@ -19,15 +31,25 @@
         <app-notifications-bell
           [count]="totalNotificationsCount()"
           iconColor="medium"
-          (bellClick)="openNotifications()">
+          (bellClick)="openNotifications()"
+        >
         </app-notifications-bell>
       </div>
     } @else {
-      <div style="display: flex; align-items: center; justify-content: flex-end; width: 100%; padding: 0 12px;">
+      <div
+        style="
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          width: 100%;
+          padding: 0 12px;
+        "
+      >
         <app-notifications-bell
           [count]="totalNotificationsCount()"
           iconColor="medium"
-          (bellClick)="openNotifications()">
+          (bellClick)="openNotifications()"
+        >
         </app-notifications-bell>
       </div>
     }
@@ -35,46 +57,55 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
   <app-background />
 
-  <div class="ion-padding" style="position: relative; z-index: 10;">
-
+  <div class="ion-padding" style="position: relative; z-index: 10">
     @if (currentUser(); as user) {
-
       <!-- ================= TAB: PERFIL ================= -->
-      @if (currentSegment() === 'perfil') {
+      @if (currentSegment() === "perfil") {
         <app-perfil-tab-info
           [user]="user"
           [entrenadoData]="currentEntrenado()"
           [entrenadorData]="currentEntrenador()"
           [gimnasioData]="currentGimnasio()"
           (editClick)="openEditModal()"
-          (logoutClick)="logout()">
+          (logoutClick)="logout()"
+        >
         </app-perfil-tab-info>
       }
 
       <!-- ================= TAB: PLAN ================= -->
-      @if (currentSegment() === 'plan') {
-        <app-perfil-tab-plan [user]="user" [ultimaSolicitud]="ultimasolicitud()"
-          (openPremiumModal)="openPremiumModal()">
+      @if (currentSegment() === "plan") {
+        <app-perfil-tab-plan
+          [user]="user"
+          [ultimaSolicitud]="ultimasolicitud()"
+          (openPremiumModal)="openPremiumModal()"
+        >
         </app-perfil-tab-plan>
       }
 
       <!-- ================= TAB: ESTADÍSTICAS ================= -->
-      @if (currentSegment() === 'estadisticas') {
+      @if (currentSegment() === "estadisticas") {
         <app-perfil-tab-estadisticas
           [user]="user"
-          (viewPlansClick)="currentSegment.set('plan')">
+          (viewPlansClick)="currentSegment.set('plan')"
+        >
         </app-perfil-tab-estadisticas>
       }
-
     } @else if (!isLoggingOut()) {
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; height: 100%;">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 48px 0;
+          height: 100%;
+        "
+      >
         <ion-spinner name="crescent" color="primary"></ion-spinner>
       </div>
     }
-
   </div>
 
   <!-- Modals -->
@@ -86,10 +117,15 @@
       [entrenadorData]="currentEntrenador()"
       [gimnasioData]="currentGimnasio()"
       (modalClosed)="closeEditModal()"
-      (logoutClicked)="logout()">
+      (logoutClicked)="logout()"
+    >
     </app-edit-profile-modal>
 
-    <app-premium-request-modal [isOpen]="isPremiumModalOpen()" [user]="currentUser()" (modalClosed)="closePremiumModal()">
+    <app-premium-request-modal
+      [isOpen]="isPremiumModalOpen()"
+      [user]="currentUser()"
+      (modalClosed)="closePremiumModal()"
+    >
     </app-premium-request-modal>
   }
 </ion-content>

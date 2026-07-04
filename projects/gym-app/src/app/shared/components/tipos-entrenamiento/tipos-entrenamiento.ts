@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, computed, Signal, signal, input } from '@angular/core';
-import { IonContent, IonButton, IonIcon, AlertController, ToastController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem } from '@ionic/angular/standalone';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { IonButton, IonIcon, AlertController, ToastController, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 import { TipoEntrenamiento } from 'gym-library';
@@ -22,7 +22,7 @@ import { AuthService } from '../../../core/services/auth.service';
     IonItem,
     TiposEntrenamientoListComponent,
     TipoEntrenamientoModalComponent
-  ],
+],
   templateUrl: './tipos-entrenamiento.html'
 })
 export class TiposEntrenamientoComponent implements OnInit {

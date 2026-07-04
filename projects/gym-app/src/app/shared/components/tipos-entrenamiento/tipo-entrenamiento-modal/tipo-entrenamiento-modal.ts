@@ -29,7 +29,6 @@ import { BackgroundComponent } from '../../background/background.component';
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonContent,
     IonButton,
     IonIcon,
     IonItem,

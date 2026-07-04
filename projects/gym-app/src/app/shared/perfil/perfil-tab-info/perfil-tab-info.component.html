@@ -1,7 +1,11 @@
-<app-perfil-user-header [user]="userProfileHead()" (editClick)="editClick.emit()" />
+<app-perfil-user-header
+  [user]="userProfileHead()"
+  (editClick)="editClick.emit()"
+/>
 
 <perfil-user-body
   [user]="user()"
   [entrenadoData]="entrenadoData()"
   [entrenadorData]="entrenadorData()"
-  [gimnasioData]="gimnasioData()" />
+  [gimnasioData]="gimnasioData()"
+/>

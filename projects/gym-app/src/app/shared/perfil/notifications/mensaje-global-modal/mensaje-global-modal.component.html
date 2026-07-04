@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar style="padding: 0 8px;">
+  <ion-toolbar style="padding: 0 8px">
     <ion-title>Aviso del Sistema</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
@@ -10,24 +10,38 @@
 </ion-header>
 
 <ion-content>
-  <ion-card class="ion-no-margin" style="height: 100%; display: flex; flex-direction: column; justify-content: center; box-shadow: none;">
+  <ion-card
+    class="ion-no-margin"
+    style="
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: none;
+    "
+  >
     <ion-card-header class="ion-text-center">
-      <div style="font-size: 64px; margin-bottom: 20px;">
+      <div style="font-size: 64px; margin-bottom: 20px">
         <ion-icon name="information-circle" color="primary"></ion-icon>
       </div>
-      <ion-card-title style="font-size: 28px; font-weight: bold;">
+      <ion-card-title style="font-size: 28px; font-weight: bold">
         {{ mensaje.titulo }}
       </ion-card-title>
     </ion-card-header>
 
-    <ion-card-content class="ion-text-center" style="font-size: 18px; line-height: 1.6; color: var(--ion-color-step-700, var(--ion-color-medium));">
+    <ion-card-content
+      class="ion-text-center"
+      style="
+        font-size: 18px;
+        line-height: 1.6;
+        color: var(--ion-color-step-700, var(--ion-color-medium));
+      "
+    >
       {{ mensaje.mensaje }}
     </ion-card-content>
   </ion-card>
 </ion-content>
 
 <ion-footer class="ion-no-border ion-padding">
-  <ion-button expand="block" (click)="dismiss()">
-    Entendido
-  </ion-button>
+  <ion-button expand="block" (click)="dismiss()"> Entendido </ion-button>
 </ion-footer>

@@ -17,12 +17,20 @@ export interface EstadisticasGeneralesEntrenado {
   tiempoTotal: number;
 }
 
+export interface SesionesPorDia {
+  fecha: string;
+  cantidad: number;
+}
+
 export interface EstadisticasGeneralesEntrenador {
   entrenadosAsignados: number;
   rutinasCreadas: number;
   ejerciciosCreados: number;
   sesionesTotalesDeTusEntrenados: number;
   rutinasAsignadasActivas: number;
+  sesionesUltimos7Dias: SesionesPorDia[];
+  distribucionNivel: DesgloseNivel;
+  distribucionObjetivo: DesgloseObjetivo;
 }
 
 export interface DesgloseNivel {
@@ -150,19 +158,91 @@ export class PerfilEstadisticasService {
 
       // Sesiones de tus entrenados (agregadas)
       let sesionesTotales = 0;
+      const sesionesTodosLosEntrenados: SesionRutina[] = [];
       entrenadosAsignados.forEach(e => {
-        sesionesTotales += this.sesionRutinaService.getSesionesPorEntrenado(e.id)().length;
+        const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(e.id)();
+        sesionesTotales += sesiones.length;
+        sesionesTodosLosEntrenados.push(...sesiones);
       });
+
+      // Calcular últimos 7 días
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const hace7Dias = new Date(hoy);
+      hace7Dias.setDate(hace7Dias.getDate() - 6);
+
+      const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const sesionesPorDiaMap = new Map<string, number>();
+
+      // Inicializar el map con los últimos 7 días en orden
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(hace7Dias);
+        d.setDate(d.getDate() + i);
+        const diaStr = `${d.getDate()}/${d.getMonth()+1} - ${diasSemana[d.getDay()]}`;
+        sesionesPorDiaMap.set(diaStr, 0);
+      }
+
+      sesionesTodosLosEntrenados.forEach(s => {
+        const fechaSesion = s.fechaInicio instanceof Date ? s.fechaInicio : new Date(s.fechaInicio);
+        fechaSesion.setHours(0, 0, 0, 0);
+        if (fechaSesion >= hace7Dias && fechaSesion <= hoy) {
+           const diaStr = `${fechaSesion.getDate()}/${fechaSesion.getMonth()+1} - ${diasSemana[fechaSesion.getDay()]}`;
+           if (sesionesPorDiaMap.has(diaStr)) {
+             sesionesPorDiaMap.set(diaStr, sesionesPorDiaMap.get(diaStr)! + 1);
+           }
+        }
+      });
+
+      const sesionesUltimos7Dias: SesionesPorDia[] = Array.from(sesionesPorDiaMap.entries()).map(([fecha, cantidad]) => ({ fecha, cantidad }));
 
       // Rutinas asignadas activas (rutinas que este entrenador tiene asignadas y están activas)
       const rutinasAsignadasActivas = entrenador?.rutinasCreadasIds?.length || 0;
 
+      // Desglose por nivel
+      let principiante = 0;
+      let intermedio = 0;
+      let avanzado = 0;
+      // Desglose por objetivo
+      let salud = 0;
+      let volumen = 0;
+      let definicion = 0;
+      let fuerza = 0;
+
+      entrenadosAsignados.forEach(tp => {
+        const lvl = tp.nivel?.toLowerCase();
+        if (lvl === 'novato' || lvl === 'principiante') principiante++;
+        else if (lvl === 'intermedio') intermedio++;
+        else if (lvl === 'avanzado' || lvl === 'experto') avanzado++;
+
+        const obj = tp.objetivo?.toLowerCase();
+        if (obj === 'salud') salud++;
+        else if (obj === 'volumen') volumen++;
+        else if (obj === 'definicion') definicion++;
+        else if (obj === 'fuerza') fuerza++;
+      });
+
+      const totalEntrenados = entrenador?.entrenadosAsignadosIds?.length || entrenadosAsignados.length;
+
       return {
-        entrenadosAsignados: entrenador?.entrenadosAsignadosIds?.length || entrenadosAsignados.length,
+        entrenadosAsignados: totalEntrenados,
         rutinasCreadas: entrenador?.rutinasCreadasIds?.length || 0,
         ejerciciosCreados: entrenador?.ejerciciosCreadasIds?.length || 0,
         sesionesTotalesDeTusEntrenados: sesionesTotales,
         rutinasAsignadasActivas,
+        sesionesUltimos7Dias,
+        distribucionNivel: {
+          total: totalEntrenados,
+          principiante,
+          intermedio,
+          avanzado,
+        },
+        distribucionObjetivo: {
+          total: totalEntrenados,
+          salud,
+          volumen,
+          definicion,
+          fuerza,
+        },
       };
     });
   }

@@ -1,53 +1,102 @@
 <!-- ENTRENADO: stats de progreso (premium gate) -->
-@if (user().role === 'entrenado') {
+@if (user().role === "entrenado") {
   @if (isPremium()) {
-    <div style="width: 100%;">
+    <div style="width: 100%">
       @if (estadisticasEntrenado(); as stats) {
         <app-progreso-estadisticas
           [stats]="stats"
           [sesiones]="historialSesiones()"
-          [dbStats]="dbEstadisticas()">
+          [dbStats]="dbEstadisticas()"
+        >
         </app-progreso-estadisticas>
       } @else {
-        <div style="display: flex; justify-content: center; align-items: center; padding: 40px 0;">
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+          "
+        >
           <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <span style="margin-left: 8px; font-size: 0.875rem; color: var(--ion-color-medium);">Cargando estadísticas...</span>
+          <span
+            style="
+              margin-left: 8px;
+              font-size: 0.875rem;
+              color: var(--ion-color-medium);
+            "
+            >Cargando estadísticas...</span
+          >
         </div>
       }
     </div>
   } @else {
-    <app-perfil-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-perfil-stats-teaser>
+    <app-perfil-stats-teaser
+      (viewPlansClick)="viewPlansClick.emit()"
+    ></app-perfil-stats-teaser>
   }
 }
 
 <!-- ENTRENADOR: stats de su actividad como coach (premium gate) -->
-@if (user().role === 'entrenador') {
+@if (user().role === "entrenador") {
   @if (isPremium()) {
     @if (estadisticasEntrenador(); as stats) {
       <app-entrenador-stats [stats]="stats"></app-entrenador-stats>
     } @else {
-      <div style="display: flex; justify-content: center; align-items: center; padding: 40px 0;">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 0;
+        "
+      >
         <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span style="margin-left: 8px; font-size: 0.875rem; color: var(--ion-color-medium);">Cargando estadísticas...</span>
+        <span
+          style="
+            margin-left: 8px;
+            font-size: 0.875rem;
+            color: var(--ion-color-medium);
+          "
+          >Cargando estadísticas...</span
+        >
       </div>
     }
   } @else {
-    <app-perfil-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-perfil-stats-teaser>
+    <app-perfil-stats-teaser
+      (viewPlansClick)="viewPlansClick.emit()"
+    ></app-perfil-stats-teaser>
   }
 }
 
 <!-- GIMNASIO: stats globales de la organización (premium gate) -->
-@if (user().role === 'gimnasio') {
+@if (user().role === "gimnasio") {
   @if (isPremium()) {
     @if (estadisticasGimnasio(); as stats) {
       <app-gimnasio-stats [stats]="stats"></app-gimnasio-stats>
     } @else {
-      <div style="display: flex; justify-content: center; align-items: center; padding: 40px 0;">
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 0;
+        "
+      >
         <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span style="margin-left: 8px; font-size: 0.875rem; color: var(--ion-color-medium);">Cargando estadísticas...</span>
+        <span
+          style="
+            margin-left: 8px;
+            font-size: 0.875rem;
+            color: var(--ion-color-medium);
+          "
+          >Cargando estadísticas...</span
+        >
       </div>
     }
   } @else {
-    <app-perfil-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-perfil-stats-teaser>
+    <app-perfil-stats-teaser
+      (viewPlansClick)="viewPlansClick.emit()"
+    ></app-perfil-stats-teaser>
   }
 }

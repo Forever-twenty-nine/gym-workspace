@@ -11,15 +11,13 @@
     <ion-icon slot="start" name="mail-outline" color="primary"></ion-icon>
     <ion-label>
       <h2>Email</h2>
-      <p>{{ user().email || '—' }}</p>
+      <p>{{ user().email || "—" }}</p>
     </ion-label>
   </ion-item>
 </ion-list>
 
-
 <!-- ============ ENTRENADO ============ -->
 @if (isEntrenado() && entrenadoData(); as e) {
-
   <ion-list-header>
     <ion-label>
       <ion-text color="primary"><small>Perfil Fitness</small></ion-text>
@@ -27,7 +25,6 @@
   </ion-list-header>
 
   <ion-list lines="full">
-
     @if (e.objetivo) {
       <ion-item>
         <ion-icon slot="start" name="trophy-outline" color="primary"></ion-icon>
@@ -59,13 +56,16 @@
     }
 
     <ion-item>
-      <ion-icon slot="start" [name]="e.visibleDescubrir ? 'eye-outline' : 'eye-off-outline'" color="primary"></ion-icon>
+      <ion-icon
+        slot="start"
+        [name]="e.visibleDescubrir ? 'eye-outline' : 'eye-off-outline'"
+        color="primary"
+      ></ion-icon>
       <ion-label>
         <h2>Visible en Descubrir</h2>
-        <p>{{ e.visibleDescubrir ? 'Sí' : 'No' }}</p>
+        <p>{{ e.visibleDescubrir ? "Sí" : "No" }}</p>
       </ion-label>
     </ion-item>
-
   </ion-list>
 
   @if (e.bio) {
@@ -94,7 +94,7 @@
     <ion-row>
       @if (fechaCreacionDate()) {
         <ion-col class="ion-text-center">
-          <h2>{{ fechaCreacionDate() | date:'MMM y' }}</h2>
+          <h2>{{ fechaCreacionDate() | date: "MMM y" }}</h2>
           <ion-text color="medium"><small>Miembro desde</small></ion-text>
         </ion-col>
       }
@@ -110,10 +110,8 @@
   </ion-grid>
 }
 
-
 <!-- ============ ENTRENADOR / PERSONAL TRAINER ============ -->
 @if (isEntrenador() && entrenadorData(); as en) {
-
   <ion-list-header>
     <ion-label>
       <ion-text color="primary"><small>Como Entrenador</small></ion-text>
@@ -156,7 +154,11 @@
 
     <ion-list lines="full">
       <ion-item>
-        <ion-icon slot="start" name="fitness-outline" color="primary"></ion-icon>
+        <ion-icon
+          slot="start"
+          name="fitness-outline"
+          color="primary"
+        ></ion-icon>
         <ion-label>
           <h2>Ejercicios creados</h2>
           <p>{{ ejerciciosCount() }}</p>
@@ -166,23 +168,22 @@
   }
 }
 
-
 <!-- ============ GIMNASIO ============ -->
 @if (isGimnasio() && gimnasioData(); as g) {
-
   <ion-list-header>
     <ion-label>
-      <ion-text color="primary"><small>Información del Gimnasio</small></ion-text>
+      <ion-text color="primary"
+        ><small>Información del Gimnasio</small></ion-text
+      >
     </ion-label>
   </ion-list-header>
 
   <ion-list lines="full">
-
     <ion-item>
       <ion-icon slot="start" name="location-outline" color="primary"></ion-icon>
       <ion-label>
         <h2>Dirección</h2>
-        <p>{{ g.direccion || '—' }}</p>
+        <p>{{ g.direccion || "—" }}</p>
       </ion-label>
     </ion-item>
 
@@ -190,7 +191,7 @@
       <ion-icon slot="start" name="person-outline" color="primary"></ion-icon>
       <ion-label>
         <h2>Es Personal Trainer</h2>
-        <p>{{ g.isPersonalTrainer ? 'Sí' : 'No' }}</p>
+        <p>{{ g.isPersonalTrainer ? "Sí" : "No" }}</p>
       </ion-label>
     </ion-item>
 
@@ -198,10 +199,9 @@
       <ion-icon slot="start" name="card-outline" color="primary"></ion-icon>
       <ion-label>
         <h2>Cobra Mensualidad</h2>
-        <p>{{ g.cobraMensualidad ? 'Sí' : 'No' }}</p>
+        <p>{{ g.cobraMensualidad ? "Sí" : "No" }}</p>
       </ion-label>
     </ion-item>
-
   </ion-list>
 
   <ion-list-header>

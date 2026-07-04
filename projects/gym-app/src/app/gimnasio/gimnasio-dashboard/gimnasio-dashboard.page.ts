@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, AlertController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, AlertController, ToastController, IonRow, IonCol, IonText, IonGrid, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barChartOutline, add } from 'ionicons/icons';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
@@ -15,10 +15,15 @@ import { TipoEntrenamiento } from 'gym-library';
   imports: [
     IonContent,
     IonCard,
-    IonCardContent,
     IonIcon,
     BackgroundComponent,
-    TiposEntrenamientoComponent
+    TiposEntrenamientoComponent,
+    IonRow,
+    IonCol,
+    IonText,
+    IonGrid,
+    IonItem,
+    IonLabel
 ],
 })
 export class GimnasioDashboardPage implements OnInit {

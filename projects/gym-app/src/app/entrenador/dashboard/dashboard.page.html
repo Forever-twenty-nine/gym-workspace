@@ -1,5 +1,10 @@
-<ion-content [fullscreen]="true" class="transparent-bg">
+<ion-header class="ion-no-border">
+  <ion-toolbar color="transparent">
+    <ion-title class="ion-text-center">Hola, {{ entrenador().nombre }}</ion-title>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="transparent-bg">
   <app-background />
 
   <ion-grid fixed class="dashboard-container ion-padding">

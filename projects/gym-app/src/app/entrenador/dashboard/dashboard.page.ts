@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { IonContent, IonButton, IonIcon, AlertController, ToastController } from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonIcon, AlertController, ToastController, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
@@ -19,10 +19,16 @@ import { TiposEntrenamientoComponent } from '../../shared/components/tipos-entre
   templateUrl: './dashboard.page.html',
   standalone: true,
   imports: [
+    IonHeader,
+    IonToolbar,
+    IonTitle,
     IonContent,
     ProximosEntrenadosComponent,
     BackgroundComponent,
-    TiposEntrenamientoComponent
+    TiposEntrenamientoComponent,
+    IonGrid,
+    IonRow,
+    IonCol
 ],
 })
 export class DashboardPage implements OnInit {
@@ -54,7 +60,7 @@ export class DashboardPage implements OnInit {
 
     const hoy = new Date();
     const limite = new Date();
-    limite.setDate(hoy.getDate() + 3);
+    limite.setDate(hoy.getDate() + 30);
     limite.setHours(23, 59, 59, 999);
 
     const proximoMapa = new Map<string, any>();
