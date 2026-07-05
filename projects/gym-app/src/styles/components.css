@@ -21,3 +21,108 @@
     --padding-start: 16px;
     --padding-end: 16px;
 }
+
+/* ---------------------------------------------------- */
+/* Stats Dashboards (Entrenador, Gimnasio, Entrenado) */
+/* ---------------------------------------------------- */
+.stats-card-content {
+    padding: 16px;
+    padding-bottom: 16px;
+}
+
+.stats-kpi-col {
+    padding: 4px;
+}
+
+.stats-kpi-col-lg {
+    padding: 6px;
+}
+
+.stats-kpi-card {
+    text-align: center;
+    padding: 12px 4px;
+    box-shadow: none;
+    border-radius: 12px;
+}
+
+.stats-kpi-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: block;
+}
+
+.stats-kpi-value-lg {
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: block;
+}
+
+.stats-kpi-value-xl {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+}
+
+.stats-kpi-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.85;
+    display: block;
+}
+
+.stats-chart-header {
+    padding-top: 24px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+.stats-chart-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.stats-chart-content {
+    padding-bottom: 0px;
+}
+
+.stats-tasa-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.stats-tasa-label {
+    font-size: 0.625rem;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+}
+
+.stats-tasa-sub {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.stats-segment-container {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 16px;
+    border: 1px solid var(--ion-color-medium);
+    border-radius: 12px;
+}
+
+.stats-segment-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}

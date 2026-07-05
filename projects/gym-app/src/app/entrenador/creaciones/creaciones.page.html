@@ -1,9 +1,6 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
-      <ion-segment-button value="entrenados">
-        <ion-label>Entrenados</ion-label>
-      </ion-segment-button>
       <ion-segment-button value="rutinas">
         <ion-label>Rutinas</ion-label>
       </ion-segment-button>
@@ -18,9 +15,6 @@
   <app-background />
 
   @switch (selectedTab()) {
-    @case ('entrenados') {
-      <app-entrenados></app-entrenados>
-    }
     @case ('rutinas') {
       <app-rutinas></app-rutinas>
     }

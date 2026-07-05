@@ -1,24 +1,21 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonModal,
-    IonButton,
     IonIcon,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
     IonList,
     IonItem,
-    IonItemGroup,
     IonLabel,
-    IonBadge,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonNote,
+    IonListHeader,
+    IonItemSliding,
+    IonItemOptions,
+    IonItemOption
 } from '@ionic/angular/standalone';
 import { Entrenado, Rutina, Plan } from 'gym-library';
 import { BackgroundComponent } from '../../../../shared/components/background/background.component';
@@ -28,25 +25,24 @@ import { BackgroundComponent } from '../../../../shared/components/background/ba
     templateUrl: './gestion-rutinas-modal.component.html',
     standalone: true,
     imports: [
-    CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonModal,
-    IonButton,
-    IonIcon,
-    IonCard,
-    IonCardContent,
-    IonList,
-    IonItem,
-    IonItemGroup,
-    IonLabel,
-    IonBadge,
-    IonSelect,
-    IonSelectOption,
-    BackgroundComponent
-]
+        CommonModule,
+        IonContent,
+        IonModal,
+        IonIcon,
+        IonCard,
+        IonCardContent,
+        IonList,    
+        IonItem,
+        IonLabel,
+        IonSelect,
+        IonSelectOption,
+        IonNote,
+        IonListHeader,
+        IonItemSliding,
+        IonItemOptions,
+        IonItemOption,
+        BackgroundComponent
+    ]
 })
 export class GestionRutinasModalComponent {
     isOpen = input.required<boolean>();
@@ -68,4 +64,21 @@ export class GestionRutinasModalComponent {
     quitarDiaDeRutina = output<{ rutinaId: string, dia: string }>();
     asignarDiaARutina = output<{ rutina: Rutina, event: any }>();
     asignarRutina = output<Rutina>();
+
+    actualizarDias(rutina: Rutina, nuevosDias: string[]) {
+        const diasActuales = this.getDiasAsignados()(rutina.id) || [];
+        
+        // Days to add
+        const diasAAgregar = nuevosDias.filter(d => !diasActuales.includes(d));
+        // Days to remove
+        const diasAQuitar = diasActuales.filter(d => !nuevosDias.includes(d));
+
+        diasAAgregar.forEach(dia => {
+            this.asignarDiaARutina.emit({ rutina, event: { detail: { value: dia } } });
+        });
+
+        diasAQuitar.forEach(dia => {
+            this.quitarDiaDeRutina.emit({ rutinaId: rutina.id, dia });
+        });
+    }
 }

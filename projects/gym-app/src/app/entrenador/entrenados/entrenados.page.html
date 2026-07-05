@@ -1,4 +1,10 @@
+<ion-header class="ion-no-border" style="background: transparent;">
+  <ion-toolbar style="--background: transparent; --border-color: transparent; border: none; box-shadow: none;">
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="ion-padding">
+  <app-background />
 
   <!-- Listado de Entrenados -->
   <app-mis-entrenados [entrenados]="entrenadosViewModel()"
@@ -11,22 +17,43 @@
 
   <!-- Detalle del Entrenado -->
   <app-entrenado-detalle-popover [isOpen]="isModalOpen()" [entrenado]="selectedEntrenado()"
-    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)"
+    [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)" [getUserPhoto]="getUserPhoto.bind(this)"
     [formatearTiempo]="formatearTiempo.bind(this)" [getAntiguedadDias]="getAntiguedadDias.bind(this)"
     (close)="closeModal()">
   </app-entrenado-detalle-popover>
 
+  <!-- Modal de Invitación -->
+  <app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"
+    [isSaveDisabled]="isInvitacionSaveDisabled()" (close)="closeInvitacionModal()" (save)="saveInvitacion()">
+  </app-invitacion-modal>
 
-<!-- Modal de Invitación -->
-<app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"
-  [isSaveDisabled]="isInvitacionSaveDisabled()" (close)="closeInvitacionModal()" (save)="saveInvitacion()">
-</app-invitacion-modal>
+  <!-- Modal de Gestión de Rutinas -->
+  <app-gestion-rutinas-modal [isOpen]="isRutinasModalOpen()" [entrenado]="selectedEntrenado()"
+    [rutinasEntrenado]="rutinasEntrenado()" [rutinasDisponibles]="rutinasDisponibles()" [diasSemana]="diasSemana"
+    [plan]="plan()" [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)"
+    (close)="closeRutinasModal()" (desasignarRutina)="desasignarRutina($event)"
+    (quitarDiaDeRutina)="quitarDiaDeRutina($event.rutinaId, $event.dia)"
+    (asignarDiaARutina)="asignarDiaARutina($event.rutina, $event.event)" (asignarRutina)="asignarRutina($event)">
+  </app-gestion-rutinas-modal>
 
-<!-- Modal de Gestión de Rutinas -->
-<app-gestion-rutinas-modal [isOpen]="isRutinasModalOpen()" [entrenado]="selectedEntrenado()"
-  [rutinasEntrenado]="rutinasEntrenado()" [rutinasDisponibles]="rutinasDisponibles()" [diasSemana]="diasSemana"
-  [plan]="plan()" [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)"
-  (close)="closeRutinasModal()" (desasignarRutina)="desasignarRutina($event)"
-  (quitarDiaDeRutina)="quitarDiaDeRutina($event.rutinaId, $event.dia)"
-  (asignarDiaARutina)="asignarDiaARutina($event.rutina, $event.event)" (asignarRutina)="asignarRutina($event)">
-</app-gestion-rutinas-modal>
+  <!-- FAB de ayuda (esquina inferior izquierda) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button id="entrenados-help-fab" color="secondary" fill="outline">
+      <ion-icon name="help"></ion-icon>
+    </ion-fab-button>
+    <ion-popover trigger="entrenados-help-fab" triggerAction="click">
+      <ng-template>
+        <ion-content class="ion-padding">
+          <div style="white-space: pre-line; line-height: 1.5; font-size: 14px;">{{ helpText() }}</div>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
+  </ion-fab>
+
+  <!-- FAB de crear (esquina inferior derecha) -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="onFabCreate()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

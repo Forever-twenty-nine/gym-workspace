@@ -1,22 +1,19 @@
-<ion-popover [isOpen]="isOpen()" (willDismiss)="close.emit()" side="end" [backdropDismiss]="true"
-    class="entrenado-popover">
+<ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [backdropDismiss]="true" [initialBreakpoint]="0.6" [breakpoints]="[0, 0.6, 0.85, 1]">
     <ng-template>
-        <ion-header>
-            <ion-toolbar color="primary">
-                <ion-title>Detalles del Entrenado</ion-title>
-                <ion-button slot="end" fill="clear" color="light" (click)="close.emit()">
-                    <span class="material-symbols-outlined">close</span>
-                </ion-button>
-            </ion-toolbar>
-        </ion-header>
+
         
         <ion-content class="ion-padding">
+            <app-background></app-background>
             @if (entrenado()) {
             <!-- Perfil del Entrenado -->
-            <div class="ion-text-center ion-padding-vertical">
+            <div class="ion-text-center ion-padding-vertical" style="position: relative; z-index: 1;">
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                    <ion-avatar style="width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; background: var(--ion-color-light); border-radius: 50%;">
-                        <span class="material-symbols-outlined" style="font-size: 40px; color: var(--ion-color-medium);">person</span>
+                    <ion-avatar style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; background: var(--ion-color-light); border-radius: 50%; overflow: hidden; border: 3px solid var(--ion-color-primary); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        @if (getUserPhoto()(entrenado()!.id)) {
+                            <img [src]="getUserPhoto()(entrenado()!.id)" style="width: 100%; height: 100%; object-fit: cover;" />
+                        } @else {
+                            <span class="material-symbols-outlined" style="font-size: 60px; color: var(--ion-color-medium);">person</span>
+                        }
                     </ion-avatar>
                     <h2 class="ion-no-margin" style="font-weight: 600; color: var(--ion-color-primary);">
                         {{ getUserName()(entrenado()!.id) }}
@@ -25,10 +22,7 @@
             </div>
 
             <!-- Información General -->
-            <ion-list lines="inset">
-                <ion-list-header class="ion-no-padding">
-                    <ion-label color="medium">Información General</ion-label>
-                </ion-list-header>
+            <ion-list lines="inset" style="position: relative; z-index: 1; background: transparent;">
 
                 @if (entrenado()!.objetivo) {
                 <ion-item>
@@ -44,10 +38,7 @@
 
             <!-- Estadísticas de Progreso -->
             @if (estadisticas()) {
-            <ion-list lines="inset" class="ion-margin-top">
-                <ion-list-header class="ion-no-padding">
-                    <ion-label color="medium">Estadísticas y Progreso</ion-label>
-                </ion-list-header>
+            <ion-list lines="inset" class="ion-margin-top" style="position: relative; z-index: 1; background: transparent;">
 
                 @for (item of itemsEstadisticas(); track item.titulo) {
                 <ion-item>
@@ -65,4 +56,4 @@
             }
         </ion-content>
     </ng-template>
-</ion-popover>
+</ion-modal>

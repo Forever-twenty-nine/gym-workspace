@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, input, computed, signal } from '@an
 import { CommonModule } from '@angular/common';
 import {
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonText
+  IonText, IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, barbellOutline, fitnessOutline, calendarOutline, timeOutline } from 'ionicons/icons';
@@ -38,8 +38,9 @@ export type ChartOptions = {
   imports: [
     CommonModule,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
+    IonText, IonGrid, IonRow, IonCol,
     NgApexchartsModule
-],
+  ],
   templateUrl: './entrenador-stats.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

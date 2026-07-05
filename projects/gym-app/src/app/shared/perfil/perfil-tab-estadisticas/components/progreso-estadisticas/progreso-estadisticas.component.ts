@@ -1,4 +1,4 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, Input, computed, signal } from '@angular/core';
 import {
     IonCard,
     IonCardHeader,
@@ -15,6 +15,21 @@ import {
     IonText,
     IonList
 } from '@ionic/angular/standalone';
+
+import { NgApexchartsModule, ApexAxisChartSeries, ApexNonAxisChartSeries, ApexChart, ApexDataLabels, ApexPlotOptions, ApexXAxis, ApexYAxis, ApexTheme } from 'ng-apexcharts';
+import { EstadisticasGeneralesEntrenado } from '../../../../../core/services/perfil-estadisticas.service';
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries | ApexNonAxisChartSeries;
+  chart: ApexChart;
+  dataLabels: ApexDataLabels;
+  plotOptions: ApexPlotOptions;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  theme: ApexTheme;
+  colors: string[];
+  labels: string[];
+};
 
 @Component({
     selector: 'app-progreso-estadisticas',
@@ -33,20 +48,27 @@ import {
         IonNote,
         IonProgressBar,
         IonText,
-        IonList
+        IonList,
+        NgApexchartsModule
     ],
     templateUrl: './progreso-estadisticas.component.html'
 })
 export class ProgresoEstadisticasComponent {
-    @Input() stats: any = null;                 // TODO: tipar con interfaz de estadísticas generales
+    @Input() stats: EstadisticasGeneralesEntrenado | null = null;
     @Input() sesiones: import('gym-library').SesionRutina[] = [];
     @Input() dbStats: import('gym-library').EstadisticasEntrenado | null = null;
 
+    isDarkMode = signal<boolean>(window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    constructor() {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        this.isDarkMode.set(e.matches);
+      });
+    }
+
     // Computed chart data
-    readonly weeklyActivity = computed(() => this.computeWeeklyActivity());
     readonly topRutinas = computed(() => this.computeTopRutinas());
     readonly completionRate = computed(() => this.computeCompletionRate());
-    readonly maxWeeklyValue = computed(() => Math.max(1, ...this.weeklyActivity().map(d => d.value)));
 
     formatearTiempo(minutos: number): string {
         const horas = Math.floor(minutos / 60);
@@ -58,45 +80,94 @@ export class ProgresoEstadisticasComponent {
         return `${mins}m`;
     }
 
-    private computeWeeklyActivity() {
-        if (!this.sesiones || this.sesiones.length === 0) {
-            return Array.from({ length: 7 }, (_, i) => ({ label: this.dayLabel(i), value: 0, minutes: 0 }));
-        }
-
-        const now = new Date();
-        const dayNames = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-        const activity = Array.from({ length: 7 }, (_, i) => {
-            const d = new Date(now);
-            d.setDate(d.getDate() - (6 - i));
-            return {
-                label: dayNames[d.getDay()],
-                dateKey: d.toISOString().slice(0, 10),
-                value: 0,
-                minutes: 0
-            };
-        });
-
-        const map = new Map(activity.map(a => [a.dateKey, a]));
-
-        this.sesiones.forEach((s) => {
-            if (!s.fechaInicio || !s.completada) return;
-            const d = new Date(s.fechaInicio);
-            const key = d.toISOString().slice(0, 10);
-            const entry = map.get(key);
-            if (entry) {
-                entry.value += 1;
-                entry.minutes += Math.round((s.duracion || 0) / 60);
+    areaChartOptions = computed<ChartOptions>(() => {
+        const sesiones = this.stats?.sesionesUltimos7Dias || [];
+        
+        return {
+          series: [
+            {
+              name: "Sesiones Completadas",
+              data: sesiones.map(dia => dia.cantidad)
             }
-        });
+          ],
+          chart: {
+            type: "area",
+            height: 280,
+            toolbar: { show: false },
+            background: 'transparent'
+          },
+          colors: ['#3880ff'], // Primary ionic color
+          plotOptions: {
+            bar: {
+              horizontal: false,
+            }
+          },
+          dataLabels: {
+            enabled: true,
+            style: {
+              colors: ['#3880ff']
+            },
+            background: {
+              enabled: true,
+              foreColor: '#ffffff',
+              borderWidth: 0,
+            }
+          },
+          xaxis: {
+            categories: sesiones.map(dia => dia.fecha),
+            labels: {
+              style: {
+                colors: '#8e8e93'
+              }
+            }
+          },
+          yaxis: {
+            labels: {
+              style: {
+                colors: '#8e8e93',
+                fontSize: '12px'
+              }
+            },
+            min: 0,
+            forceNiceScale: true,
+            decimalsInFloat: 0
+          },
+          theme: {
+            mode: this.isDarkMode() ? 'dark' : 'light'
+          },
+          labels: []
+        };
+    });
 
-        return activity;
-    }
-
-    private dayLabel(offsetFromToday: number): string {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - offsetFromToday));
-        return ['D','L','M','X','J','V','S'][d.getDay()];
-    }
+    donutChartOptions = computed<ChartOptions>(() => {
+        const comp = this.stats?.completadas || 0;
+        const prog = this.stats?.enProgreso || 0;
+        
+        return {
+          series: [comp, prog],
+          chart: {
+            type: "donut",
+            height: 250,
+            toolbar: { show: false },
+            background: 'transparent'
+          },
+          labels: ['Completadas', 'En Progreso'],
+          colors: ['#2dd36f', '#ffc409'], // Success, Warning
+          plotOptions: {
+            pie: {
+              donut: {
+                size: '65%'
+              }
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          theme: { mode: this.isDarkMode() ? 'dark' : 'light' },
+          xaxis: { categories: [] },
+          yaxis: {}
+        } as any;
+    });
 
     private computeTopRutinas() {
         const counts = new Map<string, number>();

@@ -18,14 +18,12 @@ import {
   SegmentCustomEvent
 } from '@ionic/angular/standalone';
 
-import { EntrenadosPage } from '../entrenados/entrenados.page';
 import { RutinasPage } from '../rutinas/rutinas.page';
 import { EjerciciosPage } from '../ejercicios/ejercicios.page';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
-import { EntrenadoService } from '../../core/services/entrenado.service';
 import { Plan } from 'gym-library';
 
 @Component({
@@ -45,7 +43,6 @@ import { Plan } from 'gym-library';
     IonIcon,
     IonPopover,
     BackgroundComponent,
-    EntrenadosPage,
     RutinasPage,
     EjerciciosPage
   ]
@@ -54,22 +51,15 @@ export class CreacionesPage implements OnInit {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   private entrenadorService = inject(EntrenadorService);
-  private entrenadoService = inject(EntrenadoService);
   private toastController = inject(ToastController);
 
-  @ViewChild(EntrenadosPage) entrenadosComponent?: EntrenadosPage;
   @ViewChild(RutinasPage) rutinasComponent?: RutinasPage;
   @ViewChild(EjerciciosPage) ejerciciosComponent?: EjerciciosPage;
 
-  selectedTab = signal<'entrenados' | 'rutinas' | 'ejercicios'>('entrenados');
+  selectedTab = signal<'rutinas' | 'ejercicios'>('rutinas');
 
   // --- Límites de Plan ---
   readonly plan = computed(() => this.authService.currentUser()?.plan || Plan.FREE);
-
-  readonly entrenadosAsociados = computed(() => {
-    const entrenadorId = this.authService.currentUser()?.uid;
-    return entrenadorId ? this.entrenadoService.entrenados().filter(e => e.entrenadoresId?.includes(entrenadorId)) : [];
-  });
 
   readonly rutinasCreadas = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
@@ -79,21 +69,6 @@ export class CreacionesPage implements OnInit {
   readonly ejerciciosCreados = computed(() => {
     const entrenadorId = this.authService.currentUser()?.uid;
     return entrenadorId ? this.entrenadorService.getEjerciciosByEntrenador(entrenadorId)() : [];
-  });
-
-  // Client Limits
-  readonly hasReachedClientLimit = computed(() => {
-    const entrenadorId = this.authService.currentUser()?.uid;
-    if (!entrenadorId) return false;
-    const limits = this.entrenadorService.getLimits(entrenadorId);
-    return this.entrenadosAsociados().length >= limits.maxClients;
-  });
-
-  readonly clientLimitMessage = computed(() => {
-    const entrenadorId = this.authService.currentUser()?.uid;
-    if (!entrenadorId) return '';
-    const limits = this.entrenadorService.getLimits(entrenadorId);
-    return `Clientes activos: ${this.entrenadosAsociados().length}/${limits.maxClients}`;
   });
 
   // Routine Limits
@@ -131,8 +106,6 @@ export class CreacionesPage implements OnInit {
   // --- Texto de ayuda contextual ---
   readonly helpText = computed(() => {
     switch (this.selectedTab()) {
-      case 'entrenados':
-        return `Gestiona tus alumnos asociados. Puedes enviarles invitaciones de correo para unirse a tu equipo.\n\nLímite actual:\n${this.clientLimitMessage()}`;
       case 'rutinas':
         return `Crea y personaliza las rutinas de ejercicios que asignarás a tus alumnos.\n\nLímite actual:\n${this.rutinaLimitMessage()}`;
       case 'ejercicios':
@@ -147,17 +120,16 @@ export class CreacionesPage implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       const tab = params['tab'];
-      if (tab === 'entrenados' || tab === 'rutinas' || tab === 'ejercicios') {
+      if (tab === 'rutinas' || tab === 'ejercicios') {
         this.selectedTab.set(tab);
       }
     });
 
     this.entrenadorService.initializeListener();
-    this.entrenadoService.initializeListener();
   }
 
   segmentChanged(event: SegmentCustomEvent) {
-    const val = event.detail.value as 'entrenados' | 'rutinas' | 'ejercicios' | undefined;
+    const val = event.detail.value as 'rutinas' | 'ejercicios' | undefined;
     if (val) {
       this.selectedTab.set(val);
     }
@@ -165,13 +137,6 @@ export class CreacionesPage implements OnInit {
 
   async onFabCreate() {
     switch (this.selectedTab()) {
-      case 'entrenados':
-        if (this.hasReachedClientLimit()) {
-          this.mostrarLimitToast('Límite de entrenados alcanzado para tu plan.');
-        } else {
-          this.entrenadosComponent?.openInvitacionModal();
-        }
-        break;
       case 'rutinas':
         if (this.hasReachedRutinaLimit()) {
           this.mostrarLimitToast('Límite de rutinas alcanzado para tu plan.');

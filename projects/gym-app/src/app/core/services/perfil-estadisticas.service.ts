@@ -15,6 +15,7 @@ export interface EstadisticasGeneralesEntrenado {
   completadas: number;
   enProgreso: number;
   tiempoTotal: number;
+  sesionesUltimos7Dias: SesionesPorDia[];
 }
 
 export interface SesionesPorDia {
@@ -26,6 +27,7 @@ export interface EstadisticasGeneralesEntrenador {
   entrenadosAsignados: number;
   rutinasCreadas: number;
   ejerciciosCreados: number;
+  gimnasiosCount: number;
   sesionesTotalesDeTusEntrenados: number;
   rutinasAsignadasActivas: number;
   sesionesUltimos7Dias: SesionesPorDia[];
@@ -63,6 +65,8 @@ export interface EstadisticasGeneralesGimnasio {
   entrenadosActivos: number;
   entrenadosSinEntrenador: number;
 
+  sesionesUltimos7Dias: SesionesPorDia[];
+
   distribucionNivel: DesgloseNivel;
   distribucionObjetivo: DesgloseObjetivo;
 }
@@ -94,12 +98,42 @@ export class PerfilEstadisticasService {
         const enProgreso = sesiones.filter(s => !s.completada).length;
         const tiempoSegundos = sesiones.reduce((total, s) => total + (s.duracion || 0), 0);
 
+        // Calcular últimos 7 días
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const hace7Dias = new Date(hoy);
+        hace7Dias.setDate(hace7Dias.getDate() - 6);
+
+        const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        const sesionesPorDiaMap = new Map<string, number>();
+
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(hace7Dias);
+          d.setDate(d.getDate() + i);
+          const diaStr = `${d.getDate()}/${d.getMonth()+1} - ${diasSemana[d.getDay()]}`;
+          sesionesPorDiaMap.set(diaStr, 0);
+        }
+
+        sesiones.forEach(s => {
+          const fechaSesion = s.fechaInicio instanceof Date ? s.fechaInicio : new Date(s.fechaInicio);
+          fechaSesion.setHours(0, 0, 0, 0);
+          if (fechaSesion >= hace7Dias && fechaSesion <= hoy) {
+             const diaStr = `${fechaSesion.getDate()}/${fechaSesion.getMonth()+1} - ${diasSemana[fechaSesion.getDay()]}`;
+             if (sesionesPorDiaMap.has(diaStr)) {
+               sesionesPorDiaMap.set(diaStr, sesionesPorDiaMap.get(diaStr)! + 1);
+             }
+          }
+        });
+
+        const sesionesUltimos7Dias: SesionesPorDia[] = Array.from(sesionesPorDiaMap.entries()).map(([fecha, cantidad]) => ({ fecha, cantidad }));
+
         return {
           rutinasAsignadas: rutinas.length,
           sesionesTotales: sesiones.length,
           completadas,
           enProgreso,
-          tiempoTotal: Math.round(tiempoSegundos / 60)
+          tiempoTotal: Math.round(tiempoSegundos / 60),
+          sesionesUltimos7Dias
         };
       }
       return null;
@@ -225,8 +259,9 @@ export class PerfilEstadisticasService {
 
       return {
         entrenadosAsignados: totalEntrenados,
-        rutinasCreadas: entrenador?.rutinasCreadasIds?.length || 0,
-        ejerciciosCreados: entrenador?.ejerciciosCreadasIds?.length || 0,
+        rutinasCreadas: this.rutinaService.rutinas().filter(r => r.creadorId === user.uid).length,
+        ejerciciosCreados: this.ejercicioService.ejercicios().filter(e => e.creadorId === user.uid).length,
+        gimnasiosCount: entrenador?.gimnasioId?.length || 0,
         sesionesTotalesDeTusEntrenados: sesionesTotales,
         rutinasAsignadasActivas,
         sesionesUltimos7Dias,
@@ -320,6 +355,42 @@ export class PerfilEstadisticasService {
         else if (obj === 'fuerza') fuerza++;
       });
 
+      // Sesiones de todos los entrenados del gimnasio
+      const sesionesTotalesGym: SesionRutina[] = [];
+      gymTraineeProfiles.forEach(tp => {
+        const sesiones = this.sesionRutinaService.getSesionesPorEntrenado(tp.id!)();
+        sesionesTotalesGym.push(...sesiones);
+      });
+
+      // Calcular últimos 7 días
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const hace7Dias = new Date(hoy);
+      hace7Dias.setDate(hace7Dias.getDate() - 6);
+
+      const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const sesionesPorDiaMap = new Map<string, number>();
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(hace7Dias);
+        d.setDate(d.getDate() + i);
+        const diaStr = `${d.getDate()}/${d.getMonth()+1} - ${diasSemana[d.getDay()]}`;
+        sesionesPorDiaMap.set(diaStr, 0);
+      }
+
+      sesionesTotalesGym.forEach(s => {
+        const fechaSesion = s.fechaInicio instanceof Date ? s.fechaInicio : new Date(s.fechaInicio);
+        fechaSesion.setHours(0, 0, 0, 0);
+        if (fechaSesion >= hace7Dias && fechaSesion <= hoy) {
+           const diaStr = `${fechaSesion.getDate()}/${fechaSesion.getMonth()+1} - ${diasSemana[fechaSesion.getDay()]}`;
+           if (sesionesPorDiaMap.has(diaStr)) {
+             sesionesPorDiaMap.set(diaStr, sesionesPorDiaMap.get(diaStr)! + 1);
+           }
+        }
+      });
+
+      const sesionesUltimos7Dias: SesionesPorDia[] = Array.from(sesionesPorDiaMap.entries()).map(([fecha, cantidad]) => ({ fecha, cantidad }));
+
       return {
         totalUsuarios,
         usuariosActivos,
@@ -334,6 +405,8 @@ export class PerfilEstadisticasService {
         totalEntrenados,
         entrenadosActivos,
         entrenadosSinEntrenador,
+
+        sesionesUltimos7Dias,
 
         distribucionNivel: {
           total: totalEntrenados,

@@ -24,10 +24,8 @@ export const routes: Routes = [
       },
       {
         path: 'entrenados',
-        redirectTo: () => {
-          const router = inject(Router);
-          return router.createUrlTree(['/entrenador-tabs/creaciones'], { queryParams: { tab: 'entrenados' } });
-        }
+        loadComponent: () =>
+          import('../entrenados/entrenados.page').then((m) => m.EntrenadosPage),
       },
       {
         path: 'rutinas',

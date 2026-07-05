@@ -2,9 +2,18 @@ import { Component, OnInit, inject, computed, Signal, signal } from '@angular/co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastController } from '@ionic/angular/standalone';
+import { 
+  ToastController,
+  IonContent,
+  IonHeader,
+  IonToolbar,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonPopover
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed } from 'ionicons/icons';
+import { add, help, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -16,6 +25,7 @@ import { InvitacionService } from '../../core/services/invitacion.service';
 import { RutinaAsignadaService } from '../../core/services/rutina-asignada.service';
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 
+import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { MisEntrenadosComponent, EntrenadoViewModel } from './components/mis-entrenados/mis-entrenados.component';
 import { InvitacionesPendientesComponent, InvitacionViewModel } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
@@ -29,6 +39,14 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    IonContent,
+    IonHeader,
+    IonToolbar,
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    IonPopover,
+    BackgroundComponent,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,
@@ -60,6 +78,24 @@ export class EntrenadosPage implements OnInit {
     const currentCount = this.entrenadosAsociados().length;
     return `Clientes activos: ${currentCount}/${limits.maxClients}`;
   });
+
+  readonly helpText = computed(() => {
+    return `Gestiona tus alumnos asociados. Puedes enviarles invitaciones de correo para unirse a tu equipo.\n\nLímite actual:\n${this.clientLimitMessage()}`;
+  });
+
+  async onFabCreate() {
+    if (this.hasReachedClientLimit()) {
+      const toast = await this.toastController.create({
+        message: 'Límite de entrenados alcanzado para tu plan.',
+        duration: 3000,
+        color: 'warning',
+        position: 'top'
+      });
+      await toast.present();
+    } else {
+      this.openInvitacionModal();
+    }
+  }
 
   private userService = inject(UserService);
   private notificacionService = inject(NotificacionService);
@@ -231,7 +267,7 @@ export class EntrenadosPage implements OnInit {
   }
 
   constructor() {
-    addIcons({ closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed });
+    addIcons({ add, help, closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline });
   }
 
   ngOnInit() {
@@ -269,6 +305,13 @@ export class EntrenadosPage implements OnInit {
     const users = this.userService.users();
     const user = users.find(u => u.uid === userId);
     return user ? user.nombre || 'Sin nombre' : 'Usuario no encontrado';
+  }
+
+  getUserPhoto(userId: string): string | undefined {
+    const entrenado = this.entrenadoService.entrenados().find(e => e.id === userId);
+    const users = this.userService.users();
+    const user = users.find(u => u.uid === userId);
+    return entrenado?.photoSocialURL || user?.photoURL || undefined;
   }
 
   estaEntrenando(entrenadoId: string): boolean {

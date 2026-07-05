@@ -5,7 +5,7 @@ import {
     IonToolbar,
     IonTitle,
     IonContent,
-    IonPopover,
+    IonModal,
     IonButton,
     IonIcon,
     IonAvatar,
@@ -15,6 +15,7 @@ import {
     IonListHeader
 } from '@ionic/angular/standalone';
 import { Entrenado } from 'gym-library';
+import { BackgroundComponent } from '../../../../shared/components/background/background.component';
 
 @Component({
     selector: 'app-entrenado-detalle-popover',
@@ -22,17 +23,13 @@ import { Entrenado } from 'gym-library';
     standalone: true,
     imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonPopover,
-    IonButton,
     IonAvatar,
     IonList,
     IonItem,
     IonLabel,
-    IonListHeader
+    BackgroundComponent,
+    IonModal
 ]
 })
 export class EntrenadoDetallePopoverComponent {
@@ -42,6 +39,7 @@ export class EntrenadoDetallePopoverComponent {
 
     // Callbacks
     getUserName = input.required<(id: string) => string>();
+    getUserPhoto = input.required<(id: string) => string | undefined>();
     formatearTiempo = input.required<(segundos: number) => string>();
     getAntiguedadDias = input.required<(userId: string) => number | null>();
 

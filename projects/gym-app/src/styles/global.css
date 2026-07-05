@@ -157,3 +157,8 @@ ion-toolbar ion-segment {
   width: 100% !important;
   max-width: 100% !important;
 }
+
+/* Permitir que la alerta de selección de días sea más alta y no haga scroll */
+ion-alert.days-alert {
+  --max-height: 85vh;
+}

@@ -45,12 +45,12 @@
       </ion-item>
     }
 
-    @if (e.franjaHoraria?.inicio && e.franjaHoraria?.fin) {
+    @if (e.franjaHoraria; as fh) {
       <ion-item>
         <ion-icon slot="start" name="time-outline" color="primary"></ion-icon>
         <ion-label>
           <h2>Franja horaria</h2>
-          <p>{{ e.franjaHoraria!.inicio }} – {{ e.franjaHoraria!.fin }}</p>
+          <p>{{ fh.inicio }} – {{ fh.fin }}</p>
         </ion-label>
       </ion-item>
     }
@@ -128,44 +128,6 @@
     </ion-list>
   }
 
-  <ion-grid>
-    <ion-row>
-      <ion-col class="ion-text-center">
-        <h2>{{ entrenadosAsignadosCount() }}</h2>
-        <ion-text color="medium"><small>Entrenados</small></ion-text>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <h2>{{ rutinasCreadasCount() }}</h2>
-        <ion-text color="medium"><small>Rutinas</small></ion-text>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <h2>{{ gimnasiosCountEntrenador() }}</h2>
-        <ion-text color="medium"><small>Gimnasios</small></ion-text>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  @if (ejerciciosCount() > 0) {
-    <ion-list-header>
-      <ion-label>
-        <ion-text color="primary"><small>Catálogo</small></ion-text>
-      </ion-label>
-    </ion-list-header>
-
-    <ion-list lines="full">
-      <ion-item>
-        <ion-icon
-          slot="start"
-          name="fitness-outline"
-          color="primary"
-        ></ion-icon>
-        <ion-label>
-          <h2>Ejercicios creados</h2>
-          <p>{{ ejerciciosCount() }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  }
 }
 
 <!-- ============ GIMNASIO ============ -->
@@ -204,22 +166,4 @@
     </ion-item>
   </ion-list>
 
-  <ion-list-header>
-    <ion-label>
-      <ion-text color="primary"><small>Red del Gimnasio</small></ion-text>
-    </ion-label>
-  </ion-list-header>
-
-  <ion-grid>
-    <ion-row>
-      <ion-col class="ion-text-center">
-        <h2>{{ entrenadoresCountGimnasio() }}</h2>
-        <ion-text color="medium"><small>Entrenadores</small></ion-text>
-      </ion-col>
-      <ion-col class="ion-text-center">
-        <h2>{{ entrenadosCountGimnasio() }}</h2>
-        <ion-text color="medium"><small>Entrenados</small></ion-text>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 }

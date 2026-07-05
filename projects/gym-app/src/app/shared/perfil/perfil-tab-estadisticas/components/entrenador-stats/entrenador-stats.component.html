@@ -1,10 +1,38 @@
 <div class="stats-container">
+  <!-- Resumen (KPIs) -->
+  <ion-card class="ion-no-margin ion-margin-bottom">
+    <ion-card-content class="stats-card-content">
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col size="4" class="stats-kpi-col">
+            <ion-card color="light" class="ion-no-margin stats-kpi-card">
+              <ion-text class="stats-kpi-value">{{ stats().entrenadosAsignados }}</ion-text>
+              <ion-text class="stats-kpi-label">Entrenados</ion-text>
+            </ion-card>
+          </ion-col>
+          <ion-col size="4" class="stats-kpi-col">
+            <ion-card color="success" class="ion-no-margin stats-kpi-card">
+              <ion-text class="stats-kpi-value">{{ stats().rutinasCreadas }}</ion-text>
+              <ion-text class="stats-kpi-label">Rutinas</ion-text>
+            </ion-card>
+          </ion-col>
+          <ion-col size="4" class="stats-kpi-col">
+            <ion-card color="warning" class="ion-no-margin stats-kpi-card">
+              <ion-text class="stats-kpi-value">{{ stats().ejerciciosCreados }}</ion-text>
+              <ion-text class="stats-kpi-label">Ejercicios</ion-text>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
   <!-- Gráfica de Área (Sesiones) -->
   <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
-      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Actividad de tus alumnos (7 días)</ion-card-title>
+    <ion-card-header class="stats-chart-header">
+      <ion-card-title class="stats-chart-title">Actividad de tus alumnos (7 días)</ion-card-title>
     </ion-card-header>
-    <ion-card-content style="padding-bottom: 0px">
+    <ion-card-content class="stats-chart-content">
       <apx-chart
         [series]="chartOptions().series"
         [chart]="chartOptions().chart"
@@ -20,10 +48,10 @@
 
   <!-- Gráfica de Objetivos (Donut) -->
   <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
-      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Objetivos</ion-card-title>
+    <ion-card-header class="stats-chart-header">
+      <ion-card-title class="stats-chart-title">Objetivos</ion-card-title>
     </ion-card-header>
-    <ion-card-content style="padding-bottom: 0px">
+    <ion-card-content class="stats-chart-content">
       <apx-chart
         [series]="objetivosChartOptions().series"
         [chart]="objetivosChartOptions().chart"
@@ -38,10 +66,10 @@
 
   <!-- Gráfica de Nivel (Pie) -->
   <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header style="padding-top: 24px; padding-bottom: 8px; text-align: center;">
-      <ion-card-title style="font-size: 1.1rem; font-weight: 700;">Nivel de Experiencia</ion-card-title>
+    <ion-card-header class="stats-chart-header">
+      <ion-card-title class="stats-chart-title">Nivel de Experiencia</ion-card-title>
     </ion-card-header>
-    <ion-card-content style="padding-bottom: 0px">
+    <ion-card-content class="stats-chart-content">
       <apx-chart
         [series]="nivelChartOptions().series"
         [chart]="nivelChartOptions().chart"

@@ -12,7 +12,8 @@ import {
   statsChartOutline, 
   personOutline ,
   calendarOutline,
-  addCircleOutline
+  addCircleOutline,
+  peopleOutline
 } from 'ionicons/icons';
 
 @Component({
@@ -33,7 +34,8 @@ export class EntrenadorTabsPage {
       statsChartOutline,
       personOutline,
       calendarOutline,
-      addCircleOutline
+      addCircleOutline,
+      peopleOutline
     });
   }
 }
