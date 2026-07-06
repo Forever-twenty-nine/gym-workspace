@@ -30,6 +30,5 @@ export class PerfilTabInfoComponent {
 
   isPremium = computed(() => this.user().plan === Plan.PREMIUM);
 
-  editClick = output<void>();
   logoutClick = output<void>();
 }

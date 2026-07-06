@@ -52,7 +52,6 @@ import { PerfilTabEstadisticasComponent } from './perfil-tab-estadisticas/perfil
     CommonModule,
     IonContent,
     IonButton,
-    IonIcon,
     IonSegment,
     IonSegmentButton,
     IonLabel,

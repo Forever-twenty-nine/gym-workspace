@@ -15,12 +15,5 @@
     <h2>{{ user().username || "" }}</h2>
   </ion-label>
   <ion-note slot="end">{{ user().userRole || "" }}</ion-note>
-  <ion-button
-    slot="end"
-    color="primary"
-    fill="clear"
-    (click)="editClick.emit()"
-  >
-    <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-  </ion-button>
+
 </ion-item>

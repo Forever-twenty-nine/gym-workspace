@@ -52,7 +52,6 @@
           [entrenadoData]="currentEntrenado()"
           [entrenadorData]="currentEntrenador()"
           [gimnasioData]="currentGimnasio()"
-          (editClick)="openEditModal()"
           (logoutClick)="logout()"
         >
         </app-perfil-tab-info>
@@ -105,9 +104,15 @@
   }
 </ion-content>
 
-<ion-footer class="ion-no-border ion-padding">
-  <ion-button expand="block" color="danger" fill="outline" (click)="logout()">
-    <ion-icon name="log-out-outline" slot="start"></ion-icon>
-    Cerrar sesión
-  </ion-button>
-</ion-footer>
+@if (currentSegment() === 'perfil') {
+  <ion-footer class="ion-no-border ion-padding">
+    <div class="flex gap-3 w-full">
+      <ion-button class="flex-1" color="danger" fill="outline" (click)="logout()">
+        Cerrar sesión
+      </ion-button>
+      <ion-button class="flex-1" color="primary" fill="solid" (click)="openEditModal()">
+        Editar perfil
+      </ion-button>
+    </div>
+  </ion-footer>
+}
