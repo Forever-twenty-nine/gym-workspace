@@ -8,60 +8,53 @@
     </ion-buttons>
 
     <!-- Info del destinatario -->
-    <div style="display: flex; align-items: center; gap: 10px; text-align: left; padding: 4px 0;">
-      <div style="width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: var(--ion-color-medium); border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+    <div class="detail-modal-div-104">
+      <div class="detail-modal-div-105">
         @if (partnerPhoto()) {
-          <img [src]="partnerPhoto()" alt="Partner" style="width: 100%; height: 100%; object-fit: cover;">
+          <img class="w-full h-full object-cover" [src]="partnerPhoto()" alt="Partner">
         } @else {
-          <ion-icon name="person-outline" style="font-size: 0.875rem; color: var(--ion-color-medium);"></ion-icon>
+          <ion-icon class="text-[var(--ion-color-medium)] text-sm" name="person-outline"></ion-icon>
         }
       </div>
       <div>
-        <h3 style="font-size: 0.875rem; font-weight: 800; color: var(--ion-text-color); margin: 0 0 2px; line-height: 1;">{{ partnerName() }}</h3>
-        <span style="font-size: 0.5625rem; font-weight: 800; text-transform: uppercase; color: var(--ion-color-success); letter-spacing: 0.05em;">Partner Conectado</span>
+        <h3 class="detail-modal-h3-106">{{ partnerName() }}</h3>
+        <span class="detail-modal-span-107">Partner Conectado</span>
       </div>
     </div>
   </ion-toolbar>
 </ion-header>
 
 <!-- Contenido del Chat -->
-<ion-content style="--background: transparent;">
+<ion-content class="transparent-bg">
   <app-background />
 
-  <div style="position: relative; z-index: 10; display: flex; flex-direction: column; justify-content: flex-end; min-height: 100%; padding-bottom: 16px;">
+  <div class="detail-modal-div-108">
 
     @if (mensajesFiltrados().length === 0) {
       <!-- Estado inicial -->
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 16px; text-align: center; margin: auto 0;">
-        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(45, 211, 111, 0.1); border: 1px solid rgba(45, 211, 111, 0.3); display: flex; align-items: center; justify-content: center; color: var(--ion-color-success); margin-bottom: 16px;">
-          <ion-icon name="chatbubbles-outline" style="font-size: 1.5rem;"></ion-icon>
+      <div class="detail-modal-div-109">
+        <div class="detail-modal-div-110">
+          <ion-icon class="text-2xl" name="chatbubbles-outline"></ion-icon>
         </div>
-        <h4 style="font-size: 0.875rem; font-weight: 800; color: var(--ion-text-color); margin: 0 0 4px;">¡Saluda a tu nuevo compañero!</h4>
-        <p style="font-size: 0.75rem; font-weight: 600; color: var(--ion-color-medium); max-width: 320px; line-height: 1.5; margin: 0;">
+        <h4 class="detail-modal-h4-111">¡Saluda a tu nuevo compañero!</h4>
+        <p class="detail-modal-p-112">
           Comiencen a coordinar su entrenamiento. Chocar esos 5 fue solo el primer paso.
         </p>
       </div>
     } @else {
       <!-- Lista de Burbujas de Chat -->
-      <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px 16px 0;">
+      <div class="detail-modal-div-113">
         @for (msg of mensajesFiltrados(); track msg.id) {
           <!-- Contenedor alineado -->
-          <div [style.display]="'flex'"
-               [style.justify-content]="msg.remitenteId === currentUser()?.uid ? 'flex-end' : 'flex-start'"
-               style="width: 100%;">
+          <div class="w-full" [style.display]="'flex'" [style.justify-content]="msg.remitenteId === currentUser()?.uid ? 'flex-end' : 'flex-start'">
 
             <!-- Burbuja -->
-            <div [style.background]="msg.remitenteId === currentUser()?.uid ? 'var(--ion-color-primary)' : 'rgba(255,255,255,0.06)'"
-                 [style.color]="msg.remitenteId === currentUser()?.uid ? 'var(--ion-color-primary-contrast)' : 'var(--ion-text-color)'"
-                 [style.border]="msg.remitenteId === currentUser()?.uid ? 'none' : '1px solid rgba(255,255,255,0.08)'"
-                 [style.border-radius]="msg.remitenteId === currentUser()?.uid ? '16px 16px 4px 16px' : '16px 16px 16px 4px'"
-                 style="max-width: 78%; padding: 10px 16px; display: flex; flex-direction: column; gap: 2px;">
+            <div class="detail-modal-div-114" [style.background]="msg.remitenteId === currentUser()?.uid ? 'var(--ion-color-primary)' : 'rgba(255,255,255,0.06)'" [style.color]="msg.remitenteId === currentUser()?.uid ? 'var(--ion-color-primary-contrast)' : 'var(--ion-text-color)'" [style.border]="msg.remitenteId === currentUser()?.uid ? 'none' : '1px solid rgba(255,255,255,0.08)'" [style.border-radius]="msg.remitenteId === currentUser()?.uid ? '16px 16px 4px 16px' : '16px 16px 16px 4px'">
 
-              <p style="font-size: 0.875rem; font-weight: 600; line-height: 1.5; margin: 0; text-align: left; white-space: pre-wrap; user-select: text;">{{ msg.contenido }}</p>
+              <p class="detail-modal-p-115">{{ msg.contenido }}</p>
 
               <!-- Timestamp de envío -->
-              <span [style.color]="msg.remitenteId === currentUser()?.uid ? 'rgba(255,255,255,0.8)' : 'var(--ion-color-medium)'"
-                    style="display: block; font-size: 0.5rem; font-weight: 700; text-align: right; letter-spacing: 0.05em; opacity: 0.6; margin-top: 2px;">
+              <span class="detail-modal-span-116" [style.color]="msg.remitenteId === currentUser()?.uid ? 'rgba(255,255,255,0.8)' : 'var(--ion-color-medium)'">
                 {{ formatTime(msg.fechaEnvio) }}
               </span>
             </div>
@@ -76,27 +69,17 @@
 
 <!-- Caja de Entrada -->
 <ion-footer class="ion-no-border">
-  <div style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; padding-bottom: calc(10px + env(safe-area-inset-bottom)); background: var(--ion-color-step-50, var(--ion-background-color)); border-top: 1px solid var(--ion-color-step-150, rgba(255,255,255,0.1));">
+  <div class="detail-modal-div-117">
 
     <!-- Textarea autocreciente -->
-    <div style="flex: 1; border: 1px solid var(--ion-color-step-150, rgba(255,255,255,0.1)); border-radius: 16px; padding: 4px 12px; display: flex; align-items: center; background: var(--ion-color-step-100, rgba(255,255,255,0.03));">
-      <ion-textarea
-        placeholder="Escribe un mensaje..."
-        [ngModel]="nuevoMensaje()"
-        (ngModelChange)="nuevoMensaje.set($event)"
-        (keydown.enter)="enviarMensaje($event)"
-        [rows]="1"
-        [autoGrow]="true"
-        style="--padding-top: 8px; --padding-bottom: 8px; --placeholder-color: var(--ion-color-medium); --placeholder-opacity: 0.6; font-size: 0.75rem; font-weight: 600;">
+    <div class="detail-modal-div-118">
+      <ion-textarea class="detail-modal-textarea-119" placeholder="Escribe un mensaje..." [ngModel]="nuevoMensaje()" (ngModelChange)="nuevoMensaje.set($event)" (keydown.enter)="enviarMensaje($event)" [rows]="1" [autoGrow]="true">
       </ion-textarea>
     </div>
 
     <!-- Botón Enviar -->
-    <button (click)="enviarMensaje()"
-            [disabled]="!nuevoMensaje().trim()"
-            style="width: 40px; height: 40px; border-radius: 12px; background: var(--ion-color-primary); color: var(--ion-color-primary-contrast); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.2); opacity: 1; transition: opacity 0.2s, transform 0.2s;"
-            [style.opacity]="!nuevoMensaje().trim() ? '0.4' : '1'">
-      <ion-icon name="send" style="font-size: 0.875rem;"></ion-icon>
+    <button class="detail-modal-button-120" (click)="enviarMensaje()" [disabled]="!nuevoMensaje().trim()" [style.opacity]="!nuevoMensaje().trim() ? '0.4' : '1'">
+      <ion-icon class="text-sm" name="send"></ion-icon>
     </button>
   </div>
 </ion-footer>

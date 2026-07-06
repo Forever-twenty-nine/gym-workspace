@@ -1,0 +1,14 @@
+<app-entrenadores-list 
+  [entrenadores]="gymTrainerService.entrenadoresAsociados()" 
+  [invitaciones]="gymTrainerService.invitacionesPendientes()" 
+  (desvincular)="desvincularEntrenador($event)" 
+  (cancelar)="cancelarInvitacion($event)"
+  (verDetalles)="verDetallesEntrenador($event)"
+  (invitar)="openInviteModal()">
+</app-entrenadores-list>
+
+<app-entrenador-invite-modal 
+  [isOpen]="isInviteModalOpen()" 
+  (close)="closeInviteModal()" 
+  (save)="saveInvitacion($event)">
+</app-entrenador-invite-modal>

@@ -1,16 +1,8 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     @if (currentUser(); as user) {
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          padding: 0 12px;
-        "
-      >
-        <div style="flex: 1">
+      <div class="flex items-center justify-between w-full px-3">
+        <div class="profile-page-div-191">
           <ion-segment
             [value]="currentSegment()"
             (ionChange)="segmentChanged($event)"
@@ -36,15 +28,7 @@
         </app-notifications-bell>
       </div>
     } @else {
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          width: 100%;
-          padding: 0 12px;
-        "
-      >
+      <div class="flex items-center justify-end w-full px-3">
         <app-notifications-bell
           [count]="totalNotificationsCount()"
           iconColor="medium"
@@ -59,7 +43,7 @@
 <ion-content [fullscreen]="true">
   <app-background />
 
-  <div class="ion-padding" style="position: relative; z-index: 10">
+  <div class="ion-padding relative z-10">
     @if (currentUser(); as user) {
       <!-- ================= TAB: PERFIL ================= -->
       @if (currentSegment() === "perfil") {
@@ -93,16 +77,7 @@
         </app-perfil-tab-estadisticas>
       }
     } @else if (!isLoggingOut()) {
-      <div
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 48px 0;
-          height: 100%;
-        "
-      >
+      <div class="profile-page-div-192">
         <ion-spinner name="crescent" color="primary"></ion-spinner>
       </div>
     }

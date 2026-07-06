@@ -61,7 +61,7 @@
 <!-- Footer con botones de control -->
 @if (!rutinaCompletada()) {
 <ion-footer class="ion-no-border backdrop-blur-xl border-t">
-    <div class="px-6 py-10" style="padding-bottom: calc(2.5rem + var(--ion-safe-area-bottom, 0px));">
+    <div class="px-6 py-10 progreso-page-div-10">
         <div class="flex items-center gap-4">
             @if (rutinaIniciada()) {
                 <ion-button (click)="pausarReanudar()" 

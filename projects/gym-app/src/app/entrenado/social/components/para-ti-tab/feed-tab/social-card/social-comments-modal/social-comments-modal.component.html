@@ -10,36 +10,36 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      <ion-content class="ion-padding" style="--background: transparent;">
+      <ion-content class="ion-padding transparent-bg">
         <app-background />
         @if (comentarios().length === 0) {
-          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--ion-color-medium); text-align: center; padding: 20px;">
-            <p style="font-size: 1rem; margin-top: 10px;">Aun no hay comentarios.</p>
-            <p style="font-size: 0.85rem;">Se el primero en comentar esta publicacion.</p>
+          <div class="comments-modal-div-34">
+            <p class="comments-modal-p-35">Aun no hay comentarios.</p>
+            <p class="comments-modal-p-36">Se el primero en comentar esta publicacion.</p>
           </div>
         } @else {
           <ion-list lines="none">
             @for (com of comentarios(); track com.id) {
               <!-- Comentario principal -->
-              <ion-item style="--padding-start: 0; --inner-padding-end: 0; margin-bottom: 12px; align-items: flex-start;">
-                <ion-avatar slot="start" style="width: 36px; height: 36px; margin-top: 4px; margin-right: 12px; flex-shrink: 0;">
+              <ion-item class="comments-modal-item-37">
+                <ion-avatar class="comments-modal-avatar-38" slot="start">
                   <img [src]="com.fotoUsuario || 'assets/images/test-foto.png'" alt="Foto de perfil">
                 </ion-avatar>
-                <ion-label style="margin: 0;">
-                  <div style="display: flex; align-items: baseline; gap: 8px;">
-                    <span style="font-weight: bold; font-size: 0.9rem; color: var(--ion-text-color);">{{ com.nombreUsuario }}</span>
-                    <span style="font-size: 0.75rem; color: var(--ion-color-medium);">
+                <ion-label class="m-0">
+                  <div class="comments-modal-div-39">
+                    <span class="comments-modal-span-40">{{ com.nombreUsuario }}</span>
+                    <span class="text-xs text-[var(--ion-color-medium)]">
                       {{ com.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
                     </span>
                   </div>
-                  <p style="font-size: 0.875rem; color: var(--ion-text-color); white-space: normal; margin-top: 4px; margin-bottom: 4px; line-height: 1.25;" [style.opacity]="comentarioEnEdicion()?.id === com.id ? 0.5 : 1">
+                  <p class="comments-modal-p-41" [style.opacity]="comentarioEnEdicion()?.id === com.id ? 0.5 : 1">
                     {{ com.contenido }}
                   </p>
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                  <div class="flex justify-between items-center mt-1">
                     <!-- Grupo Izquierda: Like y Responder -->
-                    <div style="display: flex; align-items: center; gap: 16px;">
+                    <div class="flex items-center gap-4">
                       <!-- Like a comentario -->
-                      <ion-button fill="clear" size="small" [color]="hasLikedComentario(com) ? 'danger' : 'medium'" (click)="toggleLikeComentario(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem;">
+                      <ion-button class="comments-modal-button-42" fill="clear" size="small" [color]="hasLikedComentario(com) ? 'danger' : 'medium'" (click)="toggleLikeComentario(com)">
                         <ion-icon slot="start" [name]="hasLikedComentario(com) ? 'heart' : 'heart-outline'"></ion-icon>
                         @if ((com.likes || []).length > 0) {
                           <span>{{ (com.likes || []).length }}</span>
@@ -48,24 +48,24 @@
 
                       <!-- Responder (solo para el creador del post) -->
                       @if (isOwnPost() && !com.respuesta && comentarioEnEdicion()?.id !== com.id) {
-                        <ion-button fill="clear" size="small" color="primary" (click)="seleccionarParaResponder(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem; font-weight: bold;">
+                        <ion-button class="comments-modal-button-43" fill="clear" size="small" color="primary" (click)="seleccionarParaResponder(com)">
                           Responder
                         </ion-button>
                       }
                     </div>
 
                     <!-- Grupo Derecha: Editar y Eliminar -->
-                    <div style="display: flex; align-items: center; gap: 8px;">
+                    <div class="flex items-center gap-2">
                       <!-- Editar comentario (solo creador del comentario) -->
                       @if (com.entrenadoId === currentUser()?.uid && comentarioEnEdicion()?.id !== com.id) {
-                        <ion-button fill="clear" size="small" color="primary" (click)="iniciarEdicionComentario(com)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
-                          <ion-icon slot="icon-only" name="create-outline" style="font-size: 1.05rem;"></ion-icon>
+                        <ion-button class="comments-modal-button-44" fill="clear" size="small" color="primary" (click)="iniciarEdicionComentario(com)">
+                          <ion-icon class="comments-modal-icon-45" slot="icon-only" name="create-outline"></ion-icon>
                         </ion-button>
                       }
                       <!-- Eliminar comentario (solo creador del comentario) -->
                       @if (com.entrenadoId === currentUser()?.uid && comentarioEnEdicion()?.id !== com.id) {
-                        <ion-button fill="clear" size="small" color="danger" (click)="eliminarComentario(com.id)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
-                          <ion-icon slot="icon-only" name="trash-outline" style="font-size: 1.05rem;"></ion-icon>
+                        <ion-button class="comments-modal-button-44" fill="clear" size="small" color="danger" (click)="eliminarComentario(com.id)">
+                          <ion-icon class="comments-modal-icon-45" slot="icon-only" name="trash-outline"></ion-icon>
                         </ion-button>
                       }
                     </div>
@@ -75,28 +75,28 @@
 
               <!-- Respuesta del creador -->
               @if (com.respuesta) {
-                <div style="display: flex; align-items: flex-start; margin-left: 0; margin-bottom: 16px; margin-top: 4px;">
-                  <ion-icon name="return-down-forward-outline" color="medium" style="font-size: 1.3rem; margin-top: 6px; margin-right: 6px; flex-shrink: 0;"></ion-icon>
-                  <ion-item style="flex: 1; --padding-start: 0; --inner-padding-end: 0; margin: 0; align-items: flex-start;">
-                    <ion-avatar slot="start" style="width: 36px; height: 36px; margin-top: 4px; margin-right: 12px; flex-shrink: 0; border: 2px solid var(--ion-color-primary); padding: 2px; border-radius: 50%;">
-                      <img [src]="com.respuesta.fotoUsuario || 'assets/images/test-foto.png'" alt="Foto de perfil del creador" style="border-radius: 50%; width: 100%; height: 100%; object-fit: cover;">
+                <div class="comments-modal-div-46">
+                  <ion-icon class="comments-modal-icon-47" name="return-down-forward-outline" color="medium"></ion-icon>
+                  <ion-item class="comments-modal-item-48">
+                    <ion-avatar class="comments-modal-avatar-49" slot="start">
+                      <img class="comments-modal-img-50" [src]="com.respuesta.fotoUsuario || 'assets/images/test-foto.png'" alt="Foto de perfil del creador">
                     </ion-avatar>
-                    <ion-label style="margin: 0;">
-                      <div style="display: flex; align-items: baseline; gap: 8px;">
-                        <span style="font-weight: bold; font-size: 0.9rem; color: var(--ion-text-color);">
+                    <ion-label class="m-0">
+                      <div class="comments-modal-div-39">
+                        <span class="comments-modal-span-40">
                           {{ com.respuesta.nombreUsuario }}
                         </span>
-                        <span style="font-size: 0.75rem; color: var(--ion-color-medium);">
+                        <span class="text-xs text-[var(--ion-color-medium)]">
                           {{ com.respuesta.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
                         </span>
                       </div>
-                      <p style="font-size: 0.875rem; color: var(--ion-text-color); white-space: normal; margin-top: 4px; line-height: 1.25;" [style.opacity]="respuestaEnEdicion()?.id === com.id ? 0.5 : 1">
+                      <p class="comments-modal-p-51" [style.opacity]="respuestaEnEdicion()?.id === com.id ? 0.5 : 1">
                         {{ com.respuesta.contenido }}
                       </p>
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                      <div class="flex justify-between items-center mt-1">
                         <!-- Grupo Izquierda: Like a respuesta -->
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                          <ion-button fill="clear" size="small" [color]="hasLikedRespuesta(com) ? 'danger' : 'medium'" (click)="toggleLikeRespuesta(com)" style="margin: 0; --padding-start: 0; --padding-end: 0; height: auto; font-size: 0.75rem;">
+                        <div class="flex items-center gap-4">
+                          <ion-button class="comments-modal-button-42" fill="clear" size="small" [color]="hasLikedRespuesta(com) ? 'danger' : 'medium'" (click)="toggleLikeRespuesta(com)">
                             <ion-icon slot="start" [name]="hasLikedRespuesta(com) ? 'heart' : 'heart-outline'"></ion-icon>
                             @if (getReplyLikesCount(com) > 0) {
                               <span>{{ getReplyLikesCount(com) }}</span>
@@ -105,17 +105,17 @@
                         </div>
 
                         <!-- Grupo Derecha: Editar y Eliminar respuesta -->
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="flex items-center gap-2">
                           <!-- Editar respuesta (solo creador de la respuesta) -->
                           @if (isOwnPost() && respuestaEnEdicion()?.id !== com.id) {
-                            <ion-button fill="clear" size="small" color="primary" (click)="iniciarEdicionRespuesta(com)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
-                              <ion-icon slot="icon-only" name="create-outline" style="font-size: 1.05rem;"></ion-icon>
+                            <ion-button class="comments-modal-button-44" fill="clear" size="small" color="primary" (click)="iniciarEdicionRespuesta(com)">
+                              <ion-icon class="comments-modal-icon-45" slot="icon-only" name="create-outline"></ion-icon>
                             </ion-button>
                           }
                           <!-- Eliminar respuesta (solo el creador de la respuesta, es decir, el autor del post) -->
                           @if (isOwnPost() && respuestaEnEdicion()?.id !== com.id) {
-                            <ion-button fill="clear" size="small" color="danger" (click)="eliminarRespuesta(com.id)" style="margin: 0; --padding-start: 4px; --padding-end: 4px; height: auto;">
-                              <ion-icon slot="icon-only" name="trash-outline" style="font-size: 1.05rem;"></ion-icon>
+                            <ion-button class="comments-modal-button-44" fill="clear" size="small" color="danger" (click)="eliminarRespuesta(com.id)">
+                              <ion-icon class="comments-modal-icon-45" slot="icon-only" name="trash-outline"></ion-icon>
                             </ion-button>
                           }
                         </div>
@@ -132,26 +132,21 @@
       <!-- Footer con Input para escribir -->
       <ion-footer>
         @if (comentarioAResponder()) {
-          <div style="background: var(--ion-color-light); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--ion-color-medium);">
+          <div class="comments-modal-div-52">
             <span>Respondiendo a <b>{{ comentarioAResponder()!.nombreUsuario }}</b></span>
-            <ion-button fill="clear" size="small" color="danger" (click)="cancelarRespuesta()" style="margin: 0; font-weight: bold; font-size: 0.8rem; height: auto;">Cancelar</ion-button>
+            <ion-button class="comments-modal-button-53" fill="clear" size="small" color="danger" (click)="cancelarRespuesta()">Cancelar</ion-button>
           </div>
         }
         @if (comentarioEnEdicion() || respuestaEnEdicion()) {
-          <div style="background: var(--ion-color-light); padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--ion-color-medium);">
+          <div class="comments-modal-div-52">
             <span>Editando comentario...</span>
-            <ion-button fill="clear" size="small" color="danger" (click)="cancelarEdicion()" style="margin: 0; font-weight: bold; font-size: 0.8rem; height: auto;">Cancelar</ion-button>
+            <ion-button class="comments-modal-button-53" fill="clear" size="small" color="danger" (click)="cancelarEdicion()">Cancelar</ion-button>
           </div>
         }
-        <div style="display: flex; align-items: center; padding: 8px 12px; gap: 8px;">
-          <ion-input [(ngModel)]="nuevoComentarioTexto" 
-                     [placeholder]="(comentarioEnEdicion() || respuestaEnEdicion()) ? 'Editar comentario...' : 'Escribe un comentario...'" 
-                     fill="solid" 
-                     maxlength="250" 
-                     style="--border-radius: 20px; --padding-start: 16px; font-size: 0.9rem;" 
-                     (keyup.enter)="enviarComentario()">
+        <div class="comments-modal-div-54">
+          <ion-input class="comments-modal-input-55" [(ngModel)]="nuevoComentarioTexto" [placeholder]="(comentarioEnEdicion() || respuestaEnEdicion()) ? 'Editar comentario...' : 'Escribe un comentario...'" fill="solid" maxlength="250" (keyup.enter)="enviarComentario()">
           </ion-input>
-          <ion-button fill="clear" color="primary" (click)="enviarComentario()" style="margin: 0; --padding-start: 4px; --padding-end: 4px;">
+          <ion-button class="comments-modal-button-56" fill="clear" color="primary" (click)="enviarComentario()">
             <ion-icon slot="icon-only" [name]="(comentarioEnEdicion() || respuestaEnEdicion()) ? 'checkmark-outline' : 'send-outline'"></ion-icon>
           </ion-button>
         </div>

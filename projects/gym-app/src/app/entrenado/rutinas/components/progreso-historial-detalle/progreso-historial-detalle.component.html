@@ -19,7 +19,7 @@
                             <!-- Columna Fecha -->
                             <ion-col class="ion-text-center">
                                 <ion-text color="medium"><strong>FECHA</strong></ion-text>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px;">
+                                <div class="flex flex-col items-center gap-1 mt-2">
                                     <ion-icon name="calendar-outline" size="large"></ion-icon>
                                     <ion-note>{{ formatearFecha(sesionSeleccionada.fechaInicio) }}</ion-note>
                                 </div>
@@ -28,7 +28,7 @@
                             <!-- Columna Duración -->
                             <ion-col class="ion-text-center">
                                 <ion-text color="medium"><strong>DURACIÓN</strong></ion-text>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px;">
+                                <div class="flex flex-col items-center gap-1 mt-2">
                                     <ion-icon name="time-outline" size="large"></ion-icon>
                                     <ion-note>{{ redondearMinutos(sesionSeleccionada.duracion || 0) }}m</ion-note>
                                 </div>
@@ -37,7 +37,7 @@
                             <!-- Columna Estado -->
                             <ion-col class="ion-text-center">
                                 <ion-text color="medium"><strong>ESTADO</strong></ion-text>
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 8px;">
+                                <div class="flex flex-col items-center gap-1 mt-2">
                                     <ion-icon name="checkmark-circle-outline" size="large" [color]="getColorEstado(sesionSeleccionada)"></ion-icon>
                                     <ion-note>{{ getEstadoSesion(sesionSeleccionada) }}</ion-note>
                                 </div>
@@ -59,27 +59,23 @@
                 <!-- Sección de Foto Premium -->
                 @if (isPremium() && sesionSeleccionada.compartida) {
                 <ion-card-content>
-                    <div style="position: relative; width: 100%; aspect-ratio: 1; border: 2px dashed var(--ion-color-medium); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;"
-                        (click)="triggerPhotoInput()">
+                    <div class="detalle-div-15" (click)="triggerPhotoInput()">
 
                         @if (fotoProgresoUrl()) {
-                        <img [src]="fotoProgresoUrl()"
-                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+                        <img class="detalle-img-16" [src]="fotoProgresoUrl()">
                         } @else {
                         <ion-icon name="camera-outline" size="large" color="medium"></ion-icon>
                         <ion-text color="medium"><small><strong>Subir foto del entrenamiento</strong></small></ion-text>
                         }
 
                         @if (isUploading()) {
-                        <div
-                            style="position: absolute; inset: 0; background: rgba(var(--ion-background-color-rgb), 0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px;">
+                        <div class="detalle-div-17">
                             <ion-spinner name="crescent" color="primary"></ion-spinner>
                             <ion-text color="primary"><small><strong>SUBIENDO...</strong></small></ion-text>
                         </div>
                         }
                     </div>
-                    <input type="file" id="foto-progreso-input" style="display: none;" accept="image/*"
-                        (change)="onPhotoSelected($event)">
+                    <input class="hidden" type="file" id="foto-progreso-input" accept="image/*" (change)="onPhotoSelected($event)">
                 </ion-card-content>
                 }
             </ion-card>

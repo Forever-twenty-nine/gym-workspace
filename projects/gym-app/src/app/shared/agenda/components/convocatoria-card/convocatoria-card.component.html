@@ -1,0 +1,129 @@
+<!-- Tarjeta Oficial -->
+@if (convocatoria().esOficial) {
+<ion-card>
+  <ion-item lines="none">
+    <ion-avatar slot="start">
+      <div class="avatar-placeholder">
+        <ion-icon name="calendar-outline" color="medium"></ion-icon>
+      </div>
+    </ion-avatar>
+    <ion-label class="ion-text-wrap">
+      <h2 class="card-h2-4">
+        <ion-badge color="primary">WOD OFICIAL</ion-badge>
+        @if (convocatoria().esSemanal) {
+          <ion-badge class="card-badge-3" color="warning">SEMANAL</ion-badge>
+        }
+      </h2>
+      <h3>{{ convocatoria().titulo || 'Sesión de Entrenamiento' }}</h3>
+    </ion-label>
+    @if (canDelete()) {
+      <ion-button slot="end" fill="clear" color="danger" (click)="onEliminar()">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    }
+  </ion-item>
+
+  <ion-card-content>
+    <ion-chip color="primary">
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>{{ fechaFormateada() }} • {{ convocatoria().horaInicio }} a {{ convocatoria().horaFin }}</ion-label>
+    </ion-chip>
+
+    <div class="ion-padding-vertical">
+      <ion-text color="medium">
+        <p>{{ convocatoria().mensaje }}</p>
+      </ion-text>
+    </div>
+
+    <!-- Asistencia -->
+    <ion-item lines="none">
+      <ion-label class="ion-text-wrap">
+        @if (asistentes().length > 0) {
+          <ion-text>
+            <strong>✋ {{ asistentes().length }} {{ asistentes().length === 1 ? 'atleta asistirá' : 'atletas asistirán' }}</strong>
+          </ion-text>
+        } @else {
+          <ion-text color="medium">
+            <p><em>Ningún atleta se ha sumado aún</em></p>
+          </ion-text>
+        }
+      </ion-label>
+    </ion-item>
+
+    @if (asistentes().length > 0) {
+      <ion-list lines="none">
+        <ion-list-header>
+          <ion-label>Lista de Asistencia</ion-label>
+        </ion-list-header>
+        @for (ast of asistentes(); track ast.name) {
+          <ion-item>
+            <ion-avatar slot="start">
+              @if (ast.photo) {
+                <img [src]="ast.photo" />
+              } @else {
+                <div class="avatar-placeholder">
+                  <ion-icon name="person-outline" color="medium"></ion-icon>
+                </div>
+              }
+            </ion-avatar>
+            <ion-label>{{ ast.name }}</ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    }
+  </ion-card-content>
+</ion-card>
+} @else {
+<!-- Tarjeta Atleta -->
+<ion-card>
+  <ion-item lines="none">
+    <ion-avatar slot="start">
+      @if (creadorPhoto()) {
+        <img [src]="creadorPhoto()" alt="Perfil">
+      } @else {
+        <div class="avatar-placeholder">
+          <ion-icon name="person-outline" color="medium"></ion-icon>
+        </div>
+      }
+    </ion-avatar>
+    <ion-label class="ion-text-wrap">
+      <h2>{{ creadorName() }}</h2>
+      <p>Atleta del Gimnasio</p>
+    </ion-label>
+    @if (canDelete()) {
+      <ion-button slot="end" fill="clear" color="danger" (click)="onEliminar()">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    }
+  </ion-item>
+
+  <ion-card-content>
+    <ion-chip color="primary">
+      <ion-icon name="time-outline"></ion-icon>
+      <ion-label>{{ fechaFormateada() }} • {{ convocatoria().horaInicio }} a {{ convocatoria().horaFin }}</ion-label>
+    </ion-chip>
+
+    @if (convocatoria().mensaje) {
+      <div class="ion-padding-vertical">
+        <ion-text>
+          <p><em>"{{ convocatoria().mensaje }}"</em></p>
+        </ion-text>
+      </div>
+    }
+
+    <ion-item lines="none">
+      <ion-label class="ion-text-wrap">
+        @if (asistentes().length > 0) {
+          <ion-text>
+            <strong>✋ {{ asistentes().length }} se sumaron</strong>
+          </ion-text>
+        } @else {
+          <ion-text color="medium">
+            <p><em>Nadie se ha sumado</em></p>
+          </ion-text>
+        }
+      </ion-label>
+    </ion-item>
+  </ion-card-content>
+</ion-card>
+}

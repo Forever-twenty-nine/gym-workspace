@@ -1,5 +1,5 @@
-<ion-header class="ion-no-border absolute top-0 left-0 w-full z-50" style="background: transparent;">
-  <ion-toolbar style="--background: transparent; --border-width: 0;">
+<ion-header class="ion-no-border absolute top-0 left-0 w-full z-50 bg-transparent">
+  <ion-toolbar class="auth-toolbar-transparent">
     <ion-buttons slot="end">
       <ion-button (click)="cancelarOnboarding()" color="medium">
         <ion-icon name="close-outline" slot="icon-only"></ion-icon>
@@ -52,8 +52,7 @@
         <ion-label position="stacked">
           Tipo de Usuario *
         </ion-label>
-        <ion-select [ngModel]="formData().role" (ngModelChange)="updateFormField('role', $event)"
-          placeholder="Selecciona tu rol" style="--placeholder-color: var(--ion-color-medium);">
+        <ion-select class="onboarding-page-select-1" [ngModel]="formData().role" (ngModelChange)="updateFormField('role', $event)" placeholder="Selecciona tu rol">
           <ion-select-option value="entrenado">Entrenado</ion-select-option>
           <ion-select-option value="entrenador">Entrenador</ion-select-option>
           <ion-select-option value="gimnasio">Gimnasio</ion-select-option>

@@ -1,4 +1,4 @@
-<ion-card style="--background: none;">
+<ion-card class="historial-card-19">
   <ion-card-header class="ion-padding-vertical">
     <ion-card-title>Rutinas completadas</ion-card-title>
     <ion-card-subtitle>{{ sesiones.length }} rutinas</ion-card-subtitle>
@@ -9,7 +9,7 @@
       <ion-list>
         @for (sesion of sesiones; track sesion.id) {
           <ion-item-sliding>
-            <ion-item button detail="true" (click)="onVerDetalle(sesion)" style="--padding-start: 0;">
+            <ion-item class="list-item-2" button detail="true" (click)="onVerDetalle(sesion)">
               <app-date-badge slot="start" [fecha]="sesion.fechaInicio"></app-date-badge>
               <ion-label class="ion-margin-start">
                 @if (sesion.duracion) {

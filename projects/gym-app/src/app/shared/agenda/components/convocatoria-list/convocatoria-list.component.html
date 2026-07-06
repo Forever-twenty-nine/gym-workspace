@@ -1,0 +1,53 @@
+<ion-card>
+  <ion-card-content>
+    @if (items().length > 0) {
+      <ion-list lines="none">
+        @for (item of items(); track item.convocatoria.id) {
+          @if (canDelete()) {
+            <ion-item-sliding #slidingItem>
+              <ion-item class="list-item-1">
+                <app-date-badge slot="start" [fecha]="item.convocatoria.fechaEntrenamiento"></app-date-badge>
+                <ion-label class="ion-margin-start">
+                  <h2>{{ item.convocatoria.titulo }}</h2>
+                  @if (item.convocatoria.esSemanal) {
+                    <p>Semanal</p>
+                  }
+                </ion-label>
+              </ion-item>
+
+              <ion-item-options side="start">
+                <ion-item-option color="danger" (click)="onEliminar(item.convocatoria.id); slidingItem.close()">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+
+              <ion-item-options side="end">
+                <ion-item-option color="primary" (click)="onEditar(item.convocatoria); slidingItem.close()">
+                  <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          } @else {
+            <app-convocatoria-card
+              [convocatoria]="item.convocatoria"
+              [creadorName]="item.creadorName"
+              [creadorPhoto]="item.creadorPhoto"
+              [fechaFormateada]="item.fechaFormateada"
+              [asistentes]="item.asistentes"
+              [canDelete]="false">
+            </app-convocatoria-card>
+          }
+        }
+      </ion-list>
+    } @else {
+      <!-- Estado vacío -->
+      <div class="ion-text-center ion-padding">
+        <div class="list-div-4">
+          <ion-icon class="list-icon-3" [name]="emptyIcon()" color="medium"></ion-icon>
+        </div>
+        <h3 class="list-h3-2">{{ emptyTitle() }}</h3>
+        <p class="text-[var(--ion-color-medium)] m-0">{{ emptyMessage() }}</p>
+      </div>
+    }
+  </ion-card-content>
+</ion-card>

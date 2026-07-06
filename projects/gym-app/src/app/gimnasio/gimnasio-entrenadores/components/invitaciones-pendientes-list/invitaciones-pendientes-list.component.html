@@ -1,21 +1,21 @@
 @if (invitaciones().length > 0) {
   <ion-card class="ion-margin-top ion-no-margin">
     <ion-card-header>
-      <ion-card-title style="font-size: 0.8rem; text-transform: uppercase; text-align: center;">
+      <ion-card-title class="list-title-96">
         Invitaciones Pendientes
       </ion-card-title>
     </ion-card-header>
     
-    <ion-list style="background: transparent;">
+    <ion-list class="bg-transparent">
       @for (invitacion of invitaciones(); track invitacion.id) {
-        <ion-item lines="full" style="--background: transparent;">
-          <ion-avatar slot="start" style="border: 1px solid var(--ion-color-step-150, #d7d8da);">
+        <ion-item class="transparent-bg" lines="full">
+          <ion-avatar class="card-avatar-85" slot="start">
             <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + invitacion.id" />
           </ion-avatar>
           <ion-label>
-            <h3 style="font-weight: bold; margin: 0;">{{ invitacion.entrenadorNombre || invitacion.emailDestinatario }}</h3>
-            <p style="font-size: 0.8rem; margin: 4px 0;">{{ invitacion.emailDestinatario }}</p>
-            <p style="font-size: 0.7rem; color: var(--ion-color-medium);">
+            <h3 class="font-bold m-0">{{ invitacion.entrenadorNombre || invitacion.emailDestinatario }}</h3>
+            <p class="list-p-97">{{ invitacion.emailDestinatario }}</p>
+            <p class="text-[0.7rem] text-[var(--ion-color-medium)]">
               Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
             </p>
           </ion-label>

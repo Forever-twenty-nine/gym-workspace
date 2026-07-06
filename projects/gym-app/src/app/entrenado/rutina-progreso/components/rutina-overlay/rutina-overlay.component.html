@@ -7,24 +7,22 @@
             [style.color]="type() === 'success' ? 'var(--ion-color-success)' : 'var(--ion-color-primary)'"></ion-icon>
     </div>
 
-    <h2 class="text-2xl font-black" style="color: var(--color-title);" [class.text-3xl]="type() === 'success'">
+    <h2 class="text-2xl font-black overlay-h2-6" [class.text-3xl]="type() === 'success'">
         {{ title() }}
     </h2>
 
     @if (type() === 'start' && yaRealizadaHoy()) {
-    <div class="mt-4 mx-4 p-3 rounded-xl border"
-        style="background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.1); border-color: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.3);">
-        <p class="font-bold m-0 flex items-center justify-center gap-1 text-sm"
-            style="color: var(--ion-color-warning);">
+    <div class="mt-4 mx-4 p-3 rounded-xl border overlay-div-7">
+        <p class="font-bold m-0 flex items-center justify-center gap-1 text-sm text-[var(--ion-color-warning)]">
             <ion-icon name="warning-outline" class="text-lg"></ion-icon>
             ¡Ya completaste esta rutina hoy!
         </p>
-        <p class="text-xs m-0 mt-1 opacity-80" style="color: var(--ion-color-warning);">Puedes volver a repetirla si lo
+        <p class="text-xs m-0 mt-1 opacity-80 text-[var(--ion-color-warning)]">Puedes volver a repetirla si lo
             deseas.
         </p>
     </div>
     } @else {
-    <p class="mt-2 px-8" style="color: var(--ion-color-medium);">
+    <p class="mt-2 px-8 text-[var(--ion-color-medium)]">
         {{ subtitle() }}
     </p>
     }

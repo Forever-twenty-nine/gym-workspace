@@ -18,7 +18,7 @@
         <ion-content>
             <ion-card class="my-2">
                 <ion-card-content>
-                    <p style="margin-top: 8px;">
+                    <p class="mt-2">
                         {{ rutina.descripcion || '"Disfruta de tu entrenamiento. Sigue las instrucciones y mantén la
                         consistencia para lograr tus objetivos."' }}
                     </p>
@@ -30,17 +30,14 @@
                     <ion-grid>
                         <ion-row class="ion-align-items-start">
                             <ion-col class="ion-text-center">
-                                <ion-icon name="fitness-outline" color="primary"
-                                    style="font-size: 32px; margin-bottom: 4px;"></ion-icon>
+                                <ion-icon class="detalle-modal-icon-18" name="fitness-outline" color="primary"></ion-icon>
                                 <div><ion-note color="medium"><strong>EJERCICIOS</strong></ion-note></div>
                                 <h2><strong>{{ rutina.ejerciciosIds?.length || 0 }}</strong></h2>
                             </ion-col>
                             <ion-col class="ion-text-center">
-                                <ion-icon name="time-outline" color="warning"
-                                    style="font-size: 32px; margin-bottom: 4px;"></ion-icon>
+                                <ion-icon class="detalle-modal-icon-18" name="time-outline" color="warning"></ion-icon>
                                 <div><ion-note color="medium"><strong>DURACIÓN EST.</strong></ion-note></div>
-                                <h2><strong>{{ rutina.duracion || 45 }} <span
-                                            style="font-size: 14px;">min</span></strong></h2>
+                                <h2><strong>{{ rutina.duracion || 45 }} <span class="text-sm">min</span></strong></h2>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
@@ -58,11 +55,11 @@
                         @for (ej of ejercicios; track ej.id) {
                         <ion-item>
                             <ion-label>
-                                <h2 style="white-space: normal;"><strong>{{ ej.nombre }}</strong></h2>
+                                <h2 class="whitespace-normal"><strong>{{ ej.nombre }}</strong></h2>
 
                             </ion-label>
                             <ion-note>
-                                <p style="display: flex; align-items: center; gap: 4px; margin-top: 4px;">
+                                <p class="flex items-center gap-1 mt-1">
                                     {{ ej.series }} series x {{ ej.repeticiones }} reps
                                 </p>
                             </ion-note>

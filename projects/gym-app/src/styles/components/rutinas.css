@@ -1,0 +1,238 @@
+/* ---------------------------------------------------- */
+/* Estilos para Rutinas, Ejercicios y Progreso */
+/* ---------------------------------------------------- */
+
+.rutina-modal {
+    --width: 95%;
+    --max-width: 600px;
+    --border-radius: 16px;
+    --backdrop-opacity: 0.3;
+}
+
+.overlay-h2-6 {
+    color: var(--color-title);
+}
+
+.overlay-div-7 {
+    background: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.1);
+    border-color: rgba(var(--ion-color-warning-rgb, 255, 196, 9), 0.3);
+}
+
+.header-div-8 {
+    background: var(--ion-card-background, var(--ion-background-color, #fff));
+}
+
+.header-span-9 {
+    color: var(--ion-color-primary);
+}
+
+.progreso-page-div-10 {
+    padding-bottom: calc(2.5rem + var(--ion-safe-area-bottom, 0px));
+}
+
+.detalle-modal-avatar-11 {
+    margin-inline-end: 12px;
+    width: 40px;
+    height: 40px;
+}
+
+.detalle-modal-div-12 {
+    margin-inline-end: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ion-color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detalle-modal-avatar-13 {
+    width: 40px;
+    height: 40px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.detalle-modal-div-14 {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ion-color-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.detalle-div-15 {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px dashed var(--ion-color-medium);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.detalle-img-16 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.detalle-div-17 {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--ion-background-color-rgb), 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.detalle-modal-icon-18 {
+    font-size: 32px;
+    margin-bottom: 4px;
+}
+
+.card-chip-20 {
+    margin-right:6px;
+    margin-bottom:4px;
+}
+
+.card-img-27 {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+}
+
+.card-div-28 {
+    height: 1px;
+    background: var(--ion-color-step-150, #e0e0e0);
+    width: 100%;
+}
+
+.card-div-29 {
+    margin-left: -16px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-span-30 {
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.card-p-31 {
+    color: var(--ion-text-color);
+}
+
+.card-div-32 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--ion-color-medium);
+}
+
+.card-span-33 {
+    opacity: 0.5;
+}
+
+.card-h2-59 {
+    margin-bottom: 4px;
+}
+
+.card-badge-60 {
+    margin-left: 4px;
+}
+
+.ejercicio-modal-text-69 {
+    font-size: 0.9em;
+}
+
+.rutinas-modal-item-76 {
+    --inner-padding-end: 4px;
+}
+
+.rutinas-modal-h2-77 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.rutinas-modal-div-78 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    margin: 0;
+}
+
+.rutinas-modal-select-79 {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.rutinas-modal-icon-80 {
+    font-size: 18px;
+}
+
+.card-avatar-85 {
+    border: 1px solid var(--ion-color-step-150, #d7d8da);
+}
+
+.card-div-86 {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.card-p-87 {
+    white-space: pre-line;
+    color: var(--ion-text-color);
+}
+
+.card-item-88 {
+    --padding-start: 0;
+    border-top: 1px solid var(--ion-color-step-150, #d7d8da);
+}
+
+.card-h3-89 {
+    font-style: italic;
+    color: var(--ion-color-medium);
+}
+
+.card-list-90 {
+    border-top: 1px solid var(--ion-color-step-100, #f4f5f8);
+}
+
+.card-avatar-91 {
+    width: 30px;
+    height: 30px;
+}
+
+.card-label-92 {
+    font-size: 0.9rem;
+}
+
+.card-div-93 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-style: italic;
+}

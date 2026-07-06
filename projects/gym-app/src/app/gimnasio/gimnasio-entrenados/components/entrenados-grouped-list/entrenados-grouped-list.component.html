@@ -1,17 +1,17 @@
 <div>
   @for (group of groupedUsers(); track group.trainerName) {
-    <ion-list-header style="margin-top: 16px;">
-      <ion-label style="font-weight: bold; text-transform: uppercase; color: var(--ion-color-primary);">{{ group.trainerName }}</ion-label>
+    <ion-list-header class="mt-4">
+      <ion-label class="list-label-98">{{ group.trainerName }}</ion-label>
     </ion-list-header>
 
-    <ion-list style="background: transparent;">
+    <ion-list class="bg-transparent">
       @for (user of group.users; track user.uid) {
-        <ion-item lines="full" style="--background: transparent;">
-          <ion-avatar slot="start" style="border: 1px solid var(--ion-color-step-150, #d7d8da);">
+        <ion-item class="transparent-bg" lines="full">
+          <ion-avatar class="card-avatar-85" slot="start">
             <img [src]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
           </ion-avatar>
           <ion-label>
-            <h2 style="font-weight: bold;">{{ user.nombre || 'Usuario sin nombre' }}</h2>
+            <h2 class="font-bold">{{ user.nombre || 'Usuario sin nombre' }}</h2>
           </ion-label>
         </ion-item>
       }
@@ -19,7 +19,7 @@
   } @empty {
     <ion-card class="ion-text-center ion-padding ion-margin-top">
       <ion-text color="medium">
-        <p style="margin: 0; font-size: 0.9rem;">No se encontraron entrenados vinculados a tu gimnasio.</p>
+        <p class="list-p-95">No se encontraron entrenados vinculados a tu gimnasio.</p>
       </ion-text>
     </ion-card>
   }

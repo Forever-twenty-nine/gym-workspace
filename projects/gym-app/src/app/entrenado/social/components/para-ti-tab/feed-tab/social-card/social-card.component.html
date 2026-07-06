@@ -1,6 +1,6 @@
 <ion-card>
   <!-- Header: Perfil de Usuario -->
-  <ion-item lines="none" style="--background: transparent;">
+  <ion-item class="transparent-bg" lines="none">
     @if (userProfilePhoto()) {
     <ion-avatar slot="start">
       <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" alt="Foto de perfil">
@@ -36,22 +36,21 @@
 
   <!-- Foto de Progreso (Hero style - Edge to edge) -->
   @if (sesion!.fotoProgreso) {
-  <img [src]="sesion!.fotoProgreso" alt="Foto del entrenamiento" (error)="$any($event.target).style.display='none'"
-    style="width: 100%; aspect-ratio: 4/5; object-fit: cover;">
+  <img class="card-img-27" [src]="sesion!.fotoProgreso" alt="Foto del entrenamiento" (error)="$any($event.target).style.display='none'">
   } @else {
   <!-- Separator if no image, to make it look clean -->
-  <div style="height: 1px; background: var(--ion-color-step-150, #e0e0e0); width: 100%;"></div>
+  <div class="card-div-28"></div>
   }
 
   <!-- Body: Contenido de la rutina y acciones -->
   <ion-card-content>
     <!-- Action buttons (Like, Comment, etc) -->
-    <div style="margin-left: -16px; margin-top: -8px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+    <div class="card-div-29">
       <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
         [color]="hasLiked() ? 'danger' : 'medium'">
         <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
         @if (likesCount() > 0) {
-          <span style="font-weight: bold; margin-left: 6px;">{{ likesCount() }}</span>
+          <span class="card-span-30">{{ likesCount() }}</span>
         }
       </ion-button>
 
@@ -59,7 +58,7 @@
         <ion-button fill="clear" color="medium" id="open-comments-{{ sesion.id }}">
           <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
           @if (comentarios().length > 0) {
-            <span style="font-weight: bold; margin-left: 6px;">{{ comentarios().length }}</span>
+            <span class="card-span-30">{{ comentarios().length }}</span>
           } @else {
             <span>Comentar</span>
           }
@@ -68,24 +67,23 @@
     </div>
 
     <!-- Routine Title and Description -->
-    <p style="color: var(--ion-text-color);">
+    <p class="card-p-31">
       <b>{{ sesion!.nombreUsuario || 'Usuario' }}</b>
       completó su sesión de <b>{{ sesion!.rutinaResumen.nombre || 'Entrenamiento' }}</b>.
     </p>
 
     <!-- Secondary stats inline -->
-    <div
-      style="display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 14px; color: var(--ion-color-medium);">
-      <div style="display: flex; align-items: center; gap: 4px;">
+    <div class="card-div-32">
+      <div class="flex items-center gap-1">
         <ion-icon name="time-outline"></ion-icon>
         <span>{{ redondearMinutos(sesion!.duracion || 0) }} min</span>
       </div>
-      <span style="opacity: 0.5;">•</span>
-      <div style="display: flex; align-items: center; gap: 4px;">
+      <span class="card-span-33">•</span>
+      <div class="flex items-center gap-1">
         <ion-icon name="barbell-outline"></ion-icon>
         <span>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</span>
       </div>
-      <span style="opacity: 0.5;">•</span>
+      <span class="card-span-33">•</span>
       <ion-icon name="calendar-outline"></ion-icon>
       <span>{{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}</span>
     </div>

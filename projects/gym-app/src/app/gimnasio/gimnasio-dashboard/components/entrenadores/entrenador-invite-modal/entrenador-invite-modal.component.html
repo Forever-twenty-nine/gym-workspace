@@ -1,0 +1,40 @@
+<ion-modal [isOpen]="isOpen()" (didDismiss)="cancel()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Invitar Entrenador</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="cancel()">Cancelar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <form [formGroup]="invitacionForm" (ngSubmit)="submit()">
+        <ion-item>
+          <ion-input 
+            label="Correo electrónico" 
+            labelPlacement="stacked" 
+            type="email" 
+            formControlName="email" 
+            placeholder="ejemplo@entrenador.com">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input 
+            label="Mensaje (opcional)" 
+            labelPlacement="stacked" 
+            type="text" 
+            formControlName="mensaje" 
+            placeholder="Únete a nuestro gimnasio">
+          </ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" [disabled]="invitacionForm.invalid" class="ion-margin-top">
+          Enviar Invitación
+        </ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -1,8 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <div style="display: flex; justify-content: center; width: 100%; padding: 0 12px;">
-      <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios"
-        style="width: 100%; max-width: 420px;">
+    <div class="flex justify-center w-full px-3">
+      <ion-segment class="social-page-segment-57" [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
         <ion-segment-button value="para-ti">
           <ion-label>Para ti</ion-label>
         </ion-segment-button>
@@ -17,11 +16,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" style="--background: transparent;">
+<ion-content class="transparent-bg" [fullscreen]="true">
 
   <app-background />
   @if (selectedTab() === 'para-ti' && storiesList().length > 0) {
-  <div class="sticky top-0 z-50" style="background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.85); backdrop-filter: blur(10px);">
+  <div class="sticky top-0 z-50 social-page-div-58">
     <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
   </div>
   }

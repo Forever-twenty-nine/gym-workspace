@@ -1,0 +1,31 @@
+/* ---------------------------------------------------- */
+/* Estilos para Vistas de Gimnasio y Entrenador */
+/* ---------------------------------------------------- */
+
+.gym-modal-item {
+    --background: rgba(255, 255, 255, 0.05);
+    --border-radius: 12px;
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --padding-start: 16px;
+    --padding-end: 16px;
+}
+
+.entrenados-content-67 {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.entrenados-icon-68 {
+    font-size: 48px;
+    opacity: 0.3;
+}
+
+.entrenados-page-toolbar-81 {
+    --background: transparent;
+    --border-color: transparent;
+    border: none;
+    box-shadow: none;
+}

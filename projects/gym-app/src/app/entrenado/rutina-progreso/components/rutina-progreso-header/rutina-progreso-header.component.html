@@ -1,8 +1,7 @@
-<div class="p-4 shadow-sm mb-2 rounded-b-[32px] flex flex-col items-center justify-center relative"
-    style="background: var(--ion-card-background, var(--ion-background-color, #fff));">
+<div class="p-4 shadow-sm mb-2 rounded-b-[32px] flex flex-col items-center justify-center relative header-div-8">
     
     <!-- Timer (Huge and Centered) -->
-    <div class="text-[5rem] leading-[1] font-black tracking-tighter my-4" style="color: var(--color-title);">
+    <div class="text-[5rem] leading-[1] font-black tracking-tighter my-4 overlay-h2-6">
         {{ tiempo() }}
     </div>
 
@@ -12,7 +11,7 @@
             <span [style.color]="iniciada() ? 'var(--ion-color-warning)' : 'var(--ion-color-medium)'">
                 {{ estado() }}
             </span>
-            <span style="color: var(--ion-color-primary);">{{ porcentaje() }}%</span>
+            <span class="header-span-9">{{ porcentaje() }}%</span>
         </div>
         <ion-progress-bar [value]="porcentaje() / 100" color="primary" class="rounded-full h-1.5"></ion-progress-bar>
     </div>

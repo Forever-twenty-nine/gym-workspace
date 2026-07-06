@@ -1,20 +1,12 @@
 <ion-card class="ion-no-margin">
   <ion-card-header>
-    <ion-card-title
-      style="
-        font-size: 1.125rem;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      "
-    >
+    <ion-card-title class="actions-title-183">
       <ion-icon name="star-outline" color="primary"></ion-icon>
       Cambio de Plan
     </ion-card-title>
   </ion-card-header>
   <ion-card-content>
-    <p style="font-size: 0.875rem; line-height: 1.4; margin-bottom: 16px">
+    <p class="actions-p-184">
       @if (isPremium()) {
         Tu membresía Premium está activa. Si deseas cancelarla o modificar la
         suscripción, por favor contactate con el soporte del gimnasio.
@@ -27,58 +19,23 @@
 
     @if (!isPremium()) {
       @if (ultimaSolicitud()?.estado === "pendiente") {
-        <div
-          style="
-            background: var(--ion-color-warning-tint);
-            color: var(--ion-color-warning-shade);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-          "
-        >
-          <div
-            style="
-              font-weight: bold;
-              font-size: 0.875rem;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-            "
-          >
+        <div class="actions-div-185">
+          <div class="font-bold text-sm flex items-center justify-center gap-2">
             <ion-icon name="time-outline"></ion-icon>
             Solicitud de Premium pendiente
           </div>
-          <p style="font-size: 0.7rem; margin-top: 4px">
+          <p class="text-[0.7rem] mt-1">
             Tu entrenador o el gimnasio está evaluando tu solicitud. Te
             notificaremos pronto.
           </p>
         </div>
       } @else if (ultimaSolicitud()?.estado === "rechazada") {
-        <div
-          style="
-            background: var(--ion-color-danger-tint);
-            color: var(--ion-color-danger-shade);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 16px;
-          "
-        >
-          <div
-            style="
-              font-weight: bold;
-              font-size: 0.875rem;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-            "
-          >
+        <div class="actions-div-186">
+          <div class="font-bold text-sm flex items-center justify-center gap-2">
             <ion-icon name="alert-circle-outline"></ion-icon>
             Solicitud Premium rechazada
           </div>
-          <p style="font-size: 0.7rem; margin-top: 4px">
+          <p class="text-[0.7rem] mt-1">
             Tu solicitud anterior fue rechazada. Podés volver a intentarlo o
             consultar con la administración.
           </p>
@@ -101,20 +58,8 @@
         </ion-button>
       }
     } @else {
-      <div
-        style="
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          color: var(--ion-color-success);
-          font-weight: bold;
-        "
-      >
-        <ion-icon
-          name="checkmark-circle-outline"
-          style="font-size: 1.5rem"
-        ></ion-icon>
+      <div class="actions-div-187">
+        <ion-icon class="text-2xl" name="checkmark-circle-outline"></ion-icon>
         <span>Premium activo</span>
       </div>
     }

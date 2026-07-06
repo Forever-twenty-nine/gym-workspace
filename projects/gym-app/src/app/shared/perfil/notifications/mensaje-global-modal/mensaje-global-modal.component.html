@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar style="padding: 0 8px">
+  <ion-toolbar class="px-2">
     <ion-title>Aviso del Sistema</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()">
@@ -10,33 +10,17 @@
 </ion-header>
 
 <ion-content>
-  <ion-card
-    class="ion-no-margin"
-    style="
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      box-shadow: none;
-    "
-  >
+  <ion-card class="ion-no-margin global-modal-card-167">
     <ion-card-header class="ion-text-center">
-      <div style="font-size: 64px; margin-bottom: 20px">
+      <div class="global-modal-div-168">
         <ion-icon name="information-circle" color="primary"></ion-icon>
       </div>
-      <ion-card-title style="font-size: 28px; font-weight: bold">
+      <ion-card-title class="global-modal-title-169">
         {{ mensaje.titulo }}
       </ion-card-title>
     </ion-card-header>
 
-    <ion-card-content
-      class="ion-text-center"
-      style="
-        font-size: 18px;
-        line-height: 1.6;
-        color: var(--ion-color-step-700, var(--ion-color-medium));
-      "
-    >
+    <ion-card-content class="ion-text-center global-modal-content-170">
       {{ mensaje.mensaje }}
     </ion-card-content>
   </ion-card>

@@ -1,11 +1,5 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar
-    style="
-      --background: transparent;
-      --border-color: transparent;
-      padding: 0 16px;
-    "
-  >
+  <ion-toolbar class="notifications-toolbar-175">
     <ion-title>Notificaciones</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()">
@@ -15,22 +9,16 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content style="--background: transparent; padding: 0 16px">
+<ion-content class="notifications-content-176">
   <app-background />
 
   @if (canUseChat()) {
-    <div style="padding-top: 8px; padding-bottom: 12px">
-      <ion-button
-        expand="block"
-        fill="outline"
-        color="primary"
-        (click)="openChatList()"
-        style="height: 44px"
-      >
+    <div class="pt-2 pb-3">
+      <ion-button class="h-11" expand="block" fill="outline" color="primary" (click)="openChatList()">
         <ion-icon slot="start" name="chatbubbles-outline"></ion-icon>
         Mensajes / Chats
         @if (unreadChatsCount() > 0) {
-          <ion-badge color="danger" style="margin-left: 8px">{{
+          <ion-badge class="ml-2" color="danger">{{
             unreadChatsCount()
           }}</ion-badge>
         }
@@ -43,17 +31,8 @@
     invitacionesPendientes().length === 0 &&
     mensajesLeidos().length === 0
   ) {
-    <div
-      style="
-        text-align: center;
-        color: var(--ion-color-medium);
-        padding: 40px 20px;
-      "
-    >
-      <ion-icon
-        name="mail-outline"
-        style="font-size: 48px; margin-bottom: 16px"
-      ></ion-icon>
+    <div class="notifications-div-177">
+      <ion-icon class="text-[48px] mb-4" name="mail-outline"></ion-icon>
       <p>No tienes notificaciones pendientes</p>
     </div>
   } @else {
@@ -72,10 +51,10 @@
               color="secondary"
             ></ion-icon>
             <ion-label>
-              <h2 style="font-weight: bold">
+              <h2 class="font-bold">
                 Invitación de {{ inv.entrenadorNombre }}
               </h2>
-              <p style="white-space: normal">
+              <p class="whitespace-normal">
                 {{
                   inv.mensajePersonalizado ||
                     "Te ha invitado a vincularse como tu entrenador"
@@ -84,10 +63,7 @@
             </ion-label>
           </ion-item>
           <ion-item lines="full">
-            <div
-              slot="end"
-              style="display: flex; gap: 8px; padding-bottom: 12px"
-            >
+            <div class="flex gap-2 pb-3" slot="end">
               <ion-button size="small" (click)="aceptarInvitacion(inv.id)"
                 >Aceptar</ion-button
               >
@@ -117,9 +93,9 @@
               color="primary"
             ></ion-icon>
             <ion-label>
-              <h2 style="font-weight: bold">{{ msg.titulo }}</h2>
-              <p style="white-space: normal">{{ msg.mensaje }}</p>
-              <p style="font-size: 0.75rem; color: var(--ion-color-medium)">
+              <h2 class="font-bold">{{ msg.titulo }}</h2>
+              <p class="whitespace-normal">{{ msg.mensaje }}</p>
+              <p class="text-xs text-[var(--ion-color-medium)]">
                 {{ msg.fechaCreacion | date: "short" }}
               </p>
             </ion-label>
@@ -129,17 +105,12 @@
 
       <!-- Mensajes Globales (Ya Leídos) -->
       @if (mensajesLeidos().length > 0) {
-        <ion-item-divider sticky style="padding: 0 16px">
+        <ion-item-divider class="px-4" sticky>
           <ion-label>Anuncios Anteriores</ion-label>
         </ion-item-divider>
 
         @for (msg of mensajesLeidos(); track msg.id) {
-          <ion-item
-            button
-            detail="true"
-            (click)="openMensaje(msg)"
-            style="opacity: 0.7"
-          >
+          <ion-item class="opacity-70" button detail="true" (click)="openMensaje(msg)">
             <ion-icon
               slot="start"
               name="mail-outline"
@@ -147,7 +118,7 @@
             ></ion-icon>
             <ion-label>
               <h2>{{ msg.titulo }}</h2>
-              <p style="white-space: normal">{{ msg.mensaje }}</p>
+              <p class="whitespace-normal">{{ msg.mensaje }}</p>
             </ion-label>
           </ion-item>
         }

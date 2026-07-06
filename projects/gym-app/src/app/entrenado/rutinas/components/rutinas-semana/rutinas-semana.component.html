@@ -1,4 +1,4 @@
-<ion-card style="--background: none;">
+<ion-card class="historial-card-19">
   <ion-card-header class="ion-padding-vertical">
     <ion-card-title>Esta Semana</ion-card-title>
   </ion-card-header>
@@ -9,7 +9,7 @@
         @for (dia of rutinasPorDia; track dia.fecha) {
           <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
 
-            <ion-item slot="header" button detail="false" style="--padding-start: 0;">
+            <ion-item class="list-item-2" slot="header" button detail="false">
               <app-date-badge slot="start" class="ion-margin-end"
                 [class.opacity-60]="!diaTieneActividad(dia)"
                 [fecha]="dia.fecha"

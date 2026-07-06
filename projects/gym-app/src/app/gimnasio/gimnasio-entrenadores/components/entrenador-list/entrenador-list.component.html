@@ -1,11 +1,11 @@
-<ion-list style="background: transparent;" class="ion-no-padding ion-margin-top">
+<ion-list class="ion-no-padding ion-margin-top bg-transparent">
   @for (user of entrenadores(); track user.uid) {
-    <ion-item lines="full" style="--background: transparent;">
-      <ion-avatar slot="start" style="border: 1px solid var(--ion-color-step-150, #d7d8da);">
+    <ion-item class="transparent-bg" lines="full">
+      <ion-avatar class="card-avatar-85" slot="start">
         <img [src]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
       </ion-avatar>
       <ion-label>
-        <h2 style="font-weight: bold;">{{ user.nombre || 'Usuario sin nombre' }}</h2>
+        <h2 class="font-bold">{{ user.nombre || 'Usuario sin nombre' }}</h2>
       </ion-label>
       <ion-button slot="end" fill="clear" color="danger" (click)="desvincular.emit(user)">
         <ion-icon slot="icon-only" name="person-remove"></ion-icon>
@@ -14,7 +14,7 @@
   } @empty {
     <ion-card class="ion-text-center ion-padding ion-margin-top">
       <ion-text color="medium">
-        <p style="margin: 0; font-size: 0.9rem;">No se encontraron entrenadores vinculados a tu gimnasio.</p>
+        <p class="list-p-95">No se encontraron entrenadores vinculados a tu gimnasio.</p>
       </ion-text>
     </ion-card>
   }

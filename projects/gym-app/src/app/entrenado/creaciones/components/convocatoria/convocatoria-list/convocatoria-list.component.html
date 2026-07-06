@@ -4,7 +4,7 @@
       <ion-list lines="none">
         @for (c of convocatorias; track c.id) {
           <ion-item-sliding>
-            <ion-item style="--padding-start: 0;">
+            <ion-item class="list-item-2">
               <app-date-badge slot="start" [fecha]="c.fechaEntrenamiento"></app-date-badge>
               <ion-label class="ion-margin-start">
                 <h2>{{ c.horaInicio }} - {{ c.horaFin }}</h2>

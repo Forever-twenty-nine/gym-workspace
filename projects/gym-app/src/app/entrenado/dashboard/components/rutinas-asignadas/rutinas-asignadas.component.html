@@ -10,8 +10,7 @@
     @if (rutinas.length > 0) {
       <ion-list lines="none">
         @for (rutina of rutinas; track rutina.id || rutina.nombre) {
-          <ion-item button [detail]="false" [disabled]="!rutina.esEjecutable"
-            (click)="verDetalle.emit(rutina)" style="--padding-start: 0;">
+          <ion-item class="list-item-2" button [detail]="false" [disabled]="!rutina.esEjecutable" (click)="verDetalle.emit(rutina)">
             <app-date-badge slot="start" class="ion-margin-end"
               [fecha]="rutina.fecha"
               [esEjecutable]="rutina.esEjecutable ?? false"

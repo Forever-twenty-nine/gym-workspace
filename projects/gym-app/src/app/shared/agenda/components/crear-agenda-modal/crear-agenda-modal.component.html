@@ -1,0 +1,94 @@
+<ion-modal [isOpen]="isOpen" (didDismiss)="closeModal()">
+  <ng-template>
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="closeModal()">
+            <ion-icon name="close" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-title>Publicar Sesión</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="guardar()" [disabled]="form.invalid" color="primary">
+            <ion-icon name="paper-plane-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding transparent-bg">
+      <app-background />
+      <form [formGroup]="form">
+        <ion-list lines="none">
+          <!-- Tipo de Sesión -->
+          <ion-item>
+            <ion-select label="TIPO DE ENTRENAMIENTO" labelPlacement="stacked" formControlName="tipo" interface="popover" placeholder="Selecciona el tipo">
+              @for (tipo of tiposDisponibles(); track tipo.id) {
+                <ion-select-option [value]="tipo.nombre">{{ tipo.nombre }}</ion-select-option>
+              }
+            </ion-select>
+          </ion-item>
+
+          <!-- Título del Entrenamiento -->
+          <ion-item>
+            <ion-input label="TÍTULO DE LA SESIÓN / ENFOQUE" labelPlacement="stacked" type="text" formControlName="tituloSesion" placeholder="Ej: Fullbody AMRAP, Murph, Empuje Pesado"></ion-input>
+          </ion-item>
+
+          <!-- Selección de Fecha -->
+          <ion-item>
+            <div class="agenda-modal-div-4">
+              <ion-label class="agenda-modal-label-3">FECHA DEL ENTRENAMIENTO</ion-label>
+              <ion-segment class="m-0 w-full" [value]="diaSeleccionado" (ionChange)="seleccionarDiaSegmento($event)" mode="ios">
+                <ion-segment-button value="hoy">
+                  <ion-label>Hoy</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="manana">
+                  <ion-label>Mañana</ion-label>
+                </ion-segment-button>
+                <ion-segment-button value="custom">
+                  <ion-label>Otra Fecha</ion-label>
+                </ion-segment-button>
+              </ion-segment>
+            </div>
+          </ion-item>
+
+          @if (diaSeleccionado === 'custom') {
+            <ion-item>
+              <ion-input label="SELECCIONAR FECHA" labelPlacement="stacked" type="date" formControlName="fechaCustom" (change)="onFechaCustomChange()"></ion-input>
+            </ion-item>
+          }
+
+          <!-- Rango Horario -->
+          <ion-grid class="ion-no-padding">
+            <ion-row>
+              <ion-col>
+                <ion-item>
+                  <ion-input label="HORA INICIO" labelPlacement="stacked" type="time" formControlName="horaInicio"></ion-input>
+                </ion-item>
+              </ion-col>
+              <ion-col>
+                <ion-item>
+                  <ion-input label="HORA FIN" labelPlacement="stacked" type="time" formControlName="horaFin"></ion-input>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <!-- Entrenamiento Semanal Toggle -->
+          <ion-item>
+            <ion-toggle formControlName="esSemanal" justify="space-between">
+              <strong>Entrenamiento Semanal</strong>
+              <p class="agenda-modal-p-1">Disponible en la agenda de la semana entrante</p>
+            </ion-toggle>
+          </ion-item>
+
+          <!-- Detalle del WOD -->
+          <ion-item>
+            <ion-textarea label="DESCRIPCIÓN / DETALLE DEL WOD O RUTINA" labelPlacement="stacked" formControlName="mensaje" rows="8" placeholder="Escribe las repeticiones, ejercicios y descansos. Ej:&#10;5 Rondas de:&#10;- 10 Sentadillas con barra&#10;- 15 Pushups&#10;- 20 abdominales.&#10;Límite de tiempo: 15 min."></ion-textarea>
+          </ion-item>
+
+        </ion-list>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>

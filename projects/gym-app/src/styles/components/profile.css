@@ -1,0 +1,336 @@
+/* ---------------------------------------------------- */
+/* Estilos para Perfil de Usuario y Estadisticas */
+/* ---------------------------------------------------- */
+
+.stats-card-content {
+    padding: 16px;
+    padding-bottom: 16px;
+}
+
+.stats-kpi-col {
+    padding: 4px;
+}
+
+.stats-kpi-col-lg {
+    padding: 6px;
+}
+
+.stats-kpi-card {
+    text-align: center;
+    padding: 12px 4px;
+    box-shadow: none;
+    border-radius: 12px;
+}
+
+.stats-kpi-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: block;
+}
+
+.stats-kpi-value-lg {
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: block;
+}
+
+.stats-kpi-value-xl {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+}
+
+.stats-kpi-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.85;
+    display: block;
+}
+
+.stats-chart-header {
+    padding-top: 24px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+.stats-chart-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.stats-chart-content {
+    padding-bottom: 0px;
+}
+
+.stats-tasa-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.stats-tasa-label {
+    font-size: 0.625rem;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+}
+
+.stats-tasa-sub {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.stats-segment-container {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 16px;
+    border: 1px solid var(--ion-color-medium);
+    border-radius: 12px;
+}
+
+.stats-segment-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.profile-modal-div-142 {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.profile-modal-div-143 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 12px;
+}
+
+.profile-modal-div-144 {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-modal-div-145 {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--ion-color-primary);
+    overflow: hidden;
+    background: var(--ion-color-medium);
+    position: relative;
+}
+
+.profile-modal-div-146 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ion-color-primary);
+}
+
+.profile-modal-div-147 {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.profile-modal-div-148 {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    z-index: 20;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ion-color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ion-background-color, #121212);
+}
+
+.profile-modal-icon-149 {
+    font-size: 14px;
+    color: var(--ion-color-primary-contrast);
+}
+
+.profile-modal-p-150 {
+    margin: 8px 0 0;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ion-color-primary);
+}
+
+.profile-modal-label-151 {
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.profile-item-card {
+    border-radius: 16px;
+    margin: 0 16px 16px;
+}
+
+.profile-modal-p-152 {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+    margin: 2px 0 0;
+}
+
+.profile-modal-div-153 {
+    margin: 0 16px 16px;
+}
+
+.profile-modal-item-154 {
+    border-radius: 16px 16px 0 0;
+}
+
+.profile-modal-div-155 {
+    background: var(--ion-color-dark);
+    padding: 16px;
+    border-radius: 0 0 16px 16px;
+}
+
+.profile-modal-p-156 {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ion-color-medium);
+    margin: 0 0 12px;
+}
+
+.profile-modal-div-157 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.profile-modal-div-158 {
+    display: flex;
+    gap: 16px;
+    margin: 0 16px 16px;
+}
+
+.profile-modal-item-159 {
+    border-radius: 16px;
+    flex: 1;
+    margin: 0;
+}
+
+.teaser-card-178 {
+    border: 1px solid var(--ion-color-warning);
+    background: var(--ion-color-warning-tint);
+    color: var(--ion-color-warning-shade);
+    text-align: center;
+}
+
+.teaser-title-179 {
+    color: var(--ion-color-warning-shade);
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.teaser-p-180 {
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.estadisticas-div-181 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.actions-title-183 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.actions-p-184 {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    margin-bottom: 16px;
+}
+
+.actions-div-185 {
+    background: var(--ion-color-warning-tint);
+    color: var(--ion-color-warning-shade);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.actions-div-186 {
+    background: var(--ion-color-danger-tint);
+    color: var(--ion-color-danger-shade);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.actions-div-187 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--ion-color-success);
+    font-weight: bold;
+}
+
+.status-subtitle-188 {
+    letter-spacing: 2px;
+}
+
+.plan-div-189 {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.plan-div-190 {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile-page-div-191 {
+    flex: 1;
+}
+
+.profile-page-div-192 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 0;
+    height: 100%;
+}

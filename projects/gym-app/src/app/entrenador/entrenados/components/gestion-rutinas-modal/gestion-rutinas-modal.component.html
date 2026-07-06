@@ -1,6 +1,6 @@
 <ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [initialBreakpoint]="0.7" [breakpoints]="[0, 0.5, 0.7, 1]">
     <ng-template>
-        <ion-content class="ion-padding" style="--background: transparent;">
+        <ion-content class="ion-padding transparent-bg">
             <app-background [isPremium]="isPremium()" />
 
             <!-- Rutinas asignadas -->
@@ -20,34 +20,26 @@
                             </ion-item-option>
                         </ion-item-options>
 
-                        <ion-item style="--inner-padding-end: 4px;">
+                        <ion-item class="rutinas-modal-item-76">
                             <ion-icon name="fitness-outline" slot="start" color="primary"></ion-icon>
                             <ion-label>
-                                <h2 class="ion-text-nowrap" style="text-overflow: ellipsis; overflow: hidden;">{{
+                                <h2 class="ion-text-nowrap rutinas-modal-h2-77">{{
                                     rutina.nombre }}</h2>
                             </ion-label>
 
-                            <div slot="end"
-                                style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin: 0;">
-                                <ion-note
-                                    style="display: flex; align-items: center; gap: 4px; margin: 0; font-size: 14px;"
-                                    color="medium">
+                            <div class="rutinas-modal-div-78" slot="end">
+                                <ion-note class="flex items-center gap-1 m-0 text-sm" color="medium">
                                     {{ rutina.ejerciciosIds?.length || 0 }}
-                                    <ion-icon name="barbell-outline" style="font-size: 16px;"></ion-icon>
+                                    <ion-icon class="text-base" name="barbell-outline"></ion-icon>
                                 </ion-note>
-                                <ion-note
-                                    style="display: flex; align-items: center; gap: 4px; margin: 0; font-size: 14px;"
-                                    color="medium">
+                                <ion-note class="flex items-center gap-1 m-0 text-sm" color="medium">
                                     {{ getDiasAsignados()(rutina.id).length }}
-                                    <ion-icon name="calendar" style="font-size: 16px;"></ion-icon>
+                                    <ion-icon class="text-base" name="calendar"></ion-icon>
                                 </ion-note>
                             </div>
 
                             <!-- Hidden select multiple to trigger on swipe action -->
-                            <ion-select #daySelect style="opacity: 0; width: 0; height: 0; position: absolute;"
-                                multiple="true" interface="alert" [interfaceOptions]="{ cssClass: 'days-alert' }"
-                                [value]="getDiasAsignados()(rutina.id)"
-                                (ionChange)="actualizarDias(rutina, $event.detail.value)">
+                            <ion-select class="rutinas-modal-select-79" #daySelect multiple="true" interface="alert" [interfaceOptions]="{ cssClass: 'days-alert' }" [value]="getDiasAsignados()(rutina.id)" (ionChange)="actualizarDias(rutina, $event.detail.value)">
                                 @for (dia of diasSemana(); track dia) {
                                 <ion-select-option [value]="dia">{{ dia }}</ion-select-option>
                                 }
@@ -81,17 +73,16 @@
                     <ion-list lines="full">
                         @for (rutina of rutinasDisponibles(); track rutina.id) {
                         <ion-item-sliding>
-                            <ion-item style="--inner-padding-end: 4px;">
+                            <ion-item class="rutinas-modal-item-76">
                                 <ion-icon name="fitness-outline" slot="start" color="medium"></ion-icon>
                                 <ion-label>
-                                    <h2 class="ion-text-nowrap" style="text-overflow: ellipsis; overflow: hidden;">{{
+                                    <h2 class="ion-text-nowrap rutinas-modal-h2-77">{{
                                         rutina.nombre }}</h2>
                                 </ion-label>
 
-                                <ion-note slot="end" style="display: flex; align-items: center; gap: 4px; margin: 0;"
-                                    color="medium">
+                                <ion-note class="flex items-center gap-1 m-0" slot="end" color="medium">
                                     {{ rutina.ejerciciosIds?.length || 0 }}
-                                    <ion-icon name="barbell-outline" style="font-size: 18px;"></ion-icon>
+                                    <ion-icon class="rutinas-modal-icon-80" name="barbell-outline"></ion-icon>
                                 </ion-note>
                             </ion-item>
 

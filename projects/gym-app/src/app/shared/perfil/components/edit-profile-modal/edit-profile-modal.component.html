@@ -7,12 +7,7 @@
         </ion-buttons>
         <ion-title class="ion-text-center">Editar</ion-title>
         <ion-buttons slot="end">
-          <ion-button
-            (click)="saveProfile()"
-            [disabled]="editForm.invalid"
-            color="primary"
-            style="font-weight: 700"
-            >GUARDAR</ion-button
+          <ion-button class="font-bold" (click)="saveProfile()" [disabled]="editForm.invalid" color="primary">GUARDAR</ion-button
           >
         </ion-buttons>
       </ion-toolbar>
@@ -20,134 +15,43 @@
 
     <ion-content color="black">
       @if (user) {
-        <div style="max-width: 480px; margin: 0 auto" [formGroup]="editForm">
+        <div class="profile-modal-div-142" [formGroup]="editForm">
           <!-- Edición de Foto -->
-          <div
-            style="
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              padding: 20px 0 12px;
-            "
-          >
-            <div
-              style="position: relative; cursor: pointer"
-              (click)="triggerFileInput()"
-            >
-              <div
-                style="
-                  width: 80px;
-                  height: 80px;
-                  border-radius: 50%;
-                  border: 2px solid var(--ion-color-primary);
-                  overflow: hidden;
-                  background: var(--ion-color-medium);
-                  position: relative;
-                "
-              >
+          <div class="profile-modal-div-143">
+            <div class="profile-modal-div-144" (click)="triggerFileInput()">
+              <div class="profile-modal-div-145">
                 @if (user.photoURL) {
-                  <img
-                    [ngSrc]="user.photoURL"
-                    width="80"
-                    height="80"
-                    style="width: 100%; height: 100%; object-fit: cover"
-                    alt="Foto de perfil"
-                  />
+                  <img class="w-full h-full object-cover" [ngSrc]="user.photoURL" width="80" height="80" alt="Foto de perfil" />
                 } @else {
-                  <div
-                    style="
-                      width: 100%;
-                      height: 100%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-size: 1.5rem;
-                      font-weight: 700;
-                      color: var(--ion-color-primary);
-                    "
-                  >
+                  <div class="profile-modal-div-146">
                     {{ getIniciales(user.nombre) }}
                   </div>
                 }
 
                 @if (isUploading()) {
-                  <div
-                    style="
-                      position: absolute;
-                      inset: 0;
-                      background: rgba(0, 0, 0, 0.6);
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      z-index: 10;
-                    "
-                  >
+                  <div class="profile-modal-div-147">
                     <ion-spinner name="crescent" color="primary"></ion-spinner>
                   </div>
                 }
               </div>
 
-              <div
-                style="
-                  position: absolute;
-                  bottom: -4px;
-                  right: -4px;
-                  z-index: 20;
-                  width: 28px;
-                  height: 28px;
-                  border-radius: 50%;
-                  background: var(--ion-color-primary);
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  border: 2px solid var(--ion-background-color, #121212);
-                "
-              >
-                <ion-icon
-                  name="camera-outline"
-                  style="
-                    font-size: 14px;
-                    color: var(--ion-color-primary-contrast);
-                  "
-                ></ion-icon>
+              <div class="profile-modal-div-148">
+                <ion-icon class="profile-modal-icon-149" name="camera-outline"></ion-icon>
               </div>
             </div>
-            <input
-              type="file"
-              id="modal-photo-input"
-              style="display: none"
-              accept="image/*"
-              (change)="onFileSelected($event)"
-            />
-            <p
-              style="
-                margin: 8px 0 0;
-                font-size: 9px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 0.2em;
-                color: var(--ion-color-primary);
-              "
-            >
+            <input class="hidden" type="file" id="modal-photo-input" accept="image/*" (change)="onFileSelected($event)" />
+            <p class="profile-modal-p-150">
               Toca para cambiar foto
             </p>
           </div>
 
-          <ion-list lines="none" style="background: transparent">
-            <ion-list-header style="padding: 0 16px; margin-bottom: 8px">
-              <ion-label
-                color="primary"
-                style="
-                  font-weight: 700;
-                  font-size: 0.75rem;
-                  letter-spacing: 0.1em;
-                  text-transform: uppercase;
-                "
-                >Información General</ion-label
+          <ion-list class="bg-transparent" lines="none">
+            <ion-list-header class="px-4 mb-2">
+              <ion-label class="profile-modal-label-151" color="primary">Información General</ion-label
               >
             </ion-list-header>
 
-            <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+            <ion-item class="profile-item-card">
               <ion-input
                 label="Nombre Completo"
                 label-placement="stacked"
@@ -161,22 +65,12 @@
             @if (
               user.role === "entrenador" || user.role === "personal_trainer"
             ) {
-              <ion-list-header
-                style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px"
-              >
-                <ion-label
-                  color="primary"
-                  style="
-                    font-weight: 700;
-                    font-size: 0.75rem;
-                    letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                  "
-                  >Perfil Profesional</ion-label
+              <ion-list-header class="px-4 mt-4 mb-2">
+                <ion-label class="profile-modal-label-151" color="primary">Perfil Profesional</ion-label
                 >
               </ion-list-header>
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-textarea
                   label="Descripción / Bio"
                   label-placement="stacked"
@@ -190,22 +84,12 @@
 
             <!-- ============ GIMNASIO ============ -->
             @if (user.role === "gimnasio") {
-              <ion-list-header
-                style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px"
-              >
-                <ion-label
-                  color="primary"
-                  style="
-                    font-weight: 700;
-                    font-size: 0.75rem;
-                    letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                  "
-                  >Información del Gimnasio</ion-label
+              <ion-list-header class="px-4 mt-4 mb-2">
+                <ion-label class="profile-modal-label-151" color="primary">Información del Gimnasio</ion-label
                 >
               </ion-list-header>
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-input
                   label="Dirección"
                   label-placement="stacked"
@@ -215,23 +99,17 @@
                 ></ion-input>
               </ion-item>
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-icon
                   slot="start"
                   name="person-outline"
                   color="primary"
                 ></ion-icon>
                 <ion-label>
-                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0">
+                  <h2 class="font-bold text-sm m-0">
                     Es Personal Trainer
                   </h2>
-                  <p
-                    style="
-                      font-size: 0.75rem;
-                      color: var(--ion-color-medium);
-                      margin: 2px 0 0;
-                    "
-                  >
+                  <p class="profile-modal-p-152">
                     Activa la atencion 1 a 1 sin local físico
                   </p>
                 </ion-label>
@@ -242,23 +120,17 @@
                 ></ion-toggle>
               </ion-item>
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-icon
                   slot="start"
                   name="card-outline"
                   color="primary"
                 ></ion-icon>
                 <ion-label>
-                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0">
+                  <h2 class="font-bold text-sm m-0">
                     Cobra Mensualidad
                   </h2>
-                  <p
-                    style="
-                      font-size: 0.75rem;
-                      color: var(--ion-color-medium);
-                      margin: 2px 0 0;
-                    "
-                  >
+                  <p class="profile-modal-p-152">
                     Define si tus clientes pagan una cuota
                   </p>
                 </ion-label>
@@ -271,7 +143,7 @@
             }
 
             @if (user.role === "entrenado") {
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-select
                   label="Objetivo"
                   label-placement="stacked"
@@ -287,22 +159,12 @@
                 </ion-select>
               </ion-item>
 
-              <ion-list-header
-                style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px"
-              >
-                <ion-label
-                  color="primary"
-                  style="
-                    font-weight: 700;
-                    font-size: 0.75rem;
-                    letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                  "
-                  >Ajustes</ion-label
+              <ion-list-header class="px-4 mt-4 mb-2">
+                <ion-label class="profile-modal-label-151" color="primary">Ajustes</ion-label
                 >
               </ion-list-header>
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-icon
                   slot="start"
                   name="notifications-outline"
@@ -317,8 +179,8 @@
               </ion-item>
 
               @if (editForm.get("recordatoriosEntrenamiento")?.value) {
-                <div style="margin: 0 16px 16px">
-                  <ion-item style="border-radius: 16px 16px 0 0">
+                <div class="profile-modal-div-153">
+                  <ion-item class="profile-modal-item-154">
                     <ion-label color="medium">Hora de entrenamiento</ion-label>
                     <ion-datetime-button
                       datetime="timepicker_modal"
@@ -335,34 +197,14 @@
                     </ion-modal>
                   </ion-item>
 
-                  <div
-                    style="
-                      background: var(--ion-color-dark);
-                      padding: 16px;
-                      border-radius: 0 0 16px 16px;
-                    "
-                  >
-                    <p
-                      style="
-                        font-size: 10px;
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        letter-spacing: 0.1em;
-                        color: var(--ion-color-medium);
-                        margin: 0 0 12px;
-                      "
-                    >
+                  <div class="profile-modal-div-155">
+                    <p class="profile-modal-p-156">
                       Días de entrenamiento
                     </p>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                    <div class="profile-modal-div-157">
                       @for (dia of diasSemana; track dia.n) {
-                        <ion-chip
-                          [outline]="!isDiaSelected(dia.n)"
-                          [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'"
-                          (click)="toggleDia(dia.n)"
-                          style="margin: 0"
-                        >
-                          <ion-label style="font-weight: 700">{{
+                        <ion-chip class="m-0" [outline]="!isDiaSelected(dia.n)" [color]="isDiaSelected(dia.n) ? 'primary' : 'medium'" (click)="toggleDia(dia.n)">
+                          <ion-label class="font-bold">{{
                             dia.label
                           }}</ion-label>
                         </ion-chip>
@@ -372,23 +214,17 @@
                 </div>
               }
 
-              <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+              <ion-item class="profile-item-card">
                 <ion-icon
                   slot="start"
                   name="person-outline"
                   color="primary"
                 ></ion-icon>
                 <ion-label>
-                  <h2 style="font-weight: 700; font-size: 0.875rem; margin: 0">
+                  <h2 class="font-bold text-sm m-0">
                     Visible en Descubrir
                   </h2>
-                  <p
-                    style="
-                      font-size: 0.75rem;
-                      color: var(--ion-color-medium);
-                      margin: 2px 0 0;
-                    "
-                  >
+                  <p class="profile-modal-p-152">
                     Permite a otros chocar los 5 contigo
                   </p>
                 </ion-label>
@@ -400,22 +236,12 @@
               </ion-item>
 
               @if (editForm.get("visibleDescubrir")?.value) {
-                <ion-list-header
-                  style="padding: 0 16px; margin-top: 16px; margin-bottom: 8px"
-                >
-                  <ion-label
-                    color="primary"
-                    style="
-                      font-weight: 700;
-                      font-size: 0.75rem;
-                      letter-spacing: 0.1em;
-                      text-transform: uppercase;
-                    "
-                    >Perfil Fitness (Descubrir)</ion-label
+                <ion-list-header class="px-4 mt-4 mb-2">
+                  <ion-label class="profile-modal-label-151" color="primary">Perfil Fitness (Descubrir)</ion-label
                   >
                 </ion-list-header>
 
-                <ion-item style="border-radius: 16px; margin: 0 16px 16px">
+                <ion-item class="profile-item-card">
                   <ion-textarea
                     label="Sobre mí (Biografía)"
                     label-placement="stacked"
@@ -426,8 +252,8 @@
                   ></ion-textarea>
                 </ion-item>
 
-                <div style="display: flex; gap: 16px; margin: 0 16px 16px">
-                  <ion-item style="border-radius: 16px; flex: 1; margin: 0">
+                <div class="profile-modal-div-158">
+                  <ion-item class="profile-modal-item-159">
                     <ion-input
                       label="Entrena Desde"
                       label-placement="stacked"
@@ -435,7 +261,7 @@
                       formControlName="franjaInicio"
                     ></ion-input>
                   </ion-item>
-                  <ion-item style="border-radius: 16px; flex: 1; margin: 0">
+                  <ion-item class="profile-modal-item-159">
                     <ion-input
                       label="Entrena Hasta"
                       label-placement="stacked"

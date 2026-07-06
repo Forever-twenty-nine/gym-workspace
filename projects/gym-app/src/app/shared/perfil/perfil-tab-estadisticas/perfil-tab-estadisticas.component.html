@@ -1,7 +1,7 @@
 <!-- ENTRENADO: stats de progreso (premium gate) -->
 @if (user().role === "entrenado") {
   @if (isPremium()) {
-    <div style="width: 100%">
+    <div class="w-full">
       @if (estadisticasEntrenado(); as stats) {
         <app-progreso-estadisticas
           [stats]="stats"
@@ -10,22 +10,9 @@
         >
         </app-progreso-estadisticas>
       } @else {
-        <div
-          style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 0;
-          "
-        >
+        <div class="estadisticas-div-181">
           <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <span
-            style="
-              margin-left: 8px;
-              font-size: 0.875rem;
-              color: var(--ion-color-medium);
-            "
-            >Cargando estadísticas...</span
+          <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
           >
         </div>
       }
@@ -43,22 +30,9 @@
     @if (estadisticasEntrenador(); as stats) {
       <app-entrenador-stats [stats]="stats"></app-entrenador-stats>
     } @else {
-      <div
-        style="
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 40px 0;
-        "
-      >
+      <div class="estadisticas-div-181">
         <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span
-          style="
-            margin-left: 8px;
-            font-size: 0.875rem;
-            color: var(--ion-color-medium);
-          "
-          >Cargando estadísticas...</span
+        <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
         >
       </div>
     }
@@ -75,22 +49,9 @@
     @if (estadisticasGimnasio(); as stats) {
       <app-gimnasio-stats [stats]="stats"></app-gimnasio-stats>
     } @else {
-      <div
-        style="
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 40px 0;
-        "
-      >
+      <div class="estadisticas-div-181">
         <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span
-          style="
-            margin-left: 8px;
-            font-size: 0.875rem;
-            color: var(--ion-color-medium);
-          "
-          >Cargando estadísticas...</span
+        <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
         >
       </div>
     }

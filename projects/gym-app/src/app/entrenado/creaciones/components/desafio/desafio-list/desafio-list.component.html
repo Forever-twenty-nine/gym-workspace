@@ -4,7 +4,7 @@
       <ion-list lines="none">
         @for (d of desafios; track d.id) {
           <ion-item-sliding>
-            <ion-item style="--padding-start: 0;">
+            <ion-item class="list-item-2">
               <app-date-badge slot="start" [fecha]="d.fechaVencimiento"></app-date-badge>
               <ion-label class="ion-margin-start">
                 @if (vencimientoInfo(d.fechaVencimiento); as info) {

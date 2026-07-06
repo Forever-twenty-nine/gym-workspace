@@ -1,15 +1,15 @@
 @if (isLoading()) {
-  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 0;">
-    <ion-spinner name="crescent" color="primary" style="transform: scale(1.5); margin-bottom: 16px;"></ion-spinner>
-    <p style="color: var(--ion-color-medium); font-size: 0.875rem; font-weight: 500;">Cargando actividad...</p>
+  <div class="tab-div-22">
+    <ion-spinner class="tab-spinner-23" name="crescent" color="primary"></ion-spinner>
+    <p class="tab-p-24">Cargando actividad...</p>
   </div>
 } @else if (filteredFeed().length === 0) {
-  <ion-card style="margin: 16px; text-align: center; --background: var(--ion-color-step-50, #f5f5f5); box-shadow: none;">
+  <ion-card class="tab-card-25">
     <ion-card-header>
-      <ion-card-title style="font-size: 1.25rem; font-weight: bold; color: var(--ion-color-dark);">
+      <ion-card-title class="tab-title-26">
         {{ tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
       </ion-card-title>
-      <ion-card-subtitle style="color: var(--ion-color-medium); font-size: 0.875rem;">
+      <ion-card-subtitle class="text-[var(--ion-color-medium)] text-sm">
         {{ tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
       </ion-card-subtitle>
     </ion-card-header>
