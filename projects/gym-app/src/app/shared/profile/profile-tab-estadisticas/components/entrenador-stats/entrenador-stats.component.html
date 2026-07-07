@@ -1,83 +1,81 @@
-<div class="stats-container">
-  <!-- Resumen (KPIs) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-content class="stats-card-content">
-      <ion-grid class="ion-no-padding">
-        <ion-row>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="light" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().entrenadosAsignados }}</ion-text>
-              <ion-text class="stats-kpi-label">Entrenados</ion-text>
-            </ion-card>
-          </ion-col>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="success" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().rutinasCreadas }}</ion-text>
-              <ion-text class="stats-kpi-label">Rutinas</ion-text>
-            </ion-card>
-          </ion-col>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="warning" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().ejerciciosCreados }}</ion-text>
-              <ion-text class="stats-kpi-label">Ejercicios</ion-text>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
+<!-- KPIs -->
+<ion-card>
+  <ion-card-content>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4">
+          <ion-card color="light">
+            <ion-text>{{ stats().entrenadosAsignados }}</ion-text>
+            <ion-text>Entrenados</ion-text>
+          </ion-card>
+        </ion-col>
+        <ion-col size="4">
+          <ion-card color="success">
+            <ion-text>{{ stats().rutinasCreadas }}</ion-text>
+            <ion-text>Rutinas</ion-text>
+          </ion-card>
+        </ion-col>
+        <ion-col size="4">
+          <ion-card color="warning">
+            <ion-text>{{ stats().ejerciciosCreados }}</ion-text>
+            <ion-text>Ejercicios</ion-text>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
 
-  <!-- Gráfica de Área (Sesiones) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Actividad de tus alumnos (7 días)</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="stats-chart-content">
-      <apx-chart
-        [series]="chartOptions().series"
-        [chart]="chartOptions().chart"
-        [dataLabels]="chartOptions().dataLabels"
-        [plotOptions]="chartOptions().plotOptions"
-        [xaxis]="chartOptions().xaxis"
-        [yaxis]="chartOptions().yaxis"
-        [colors]="chartOptions().colors"
-        [theme]="chartOptions().theme"
-      ></apx-chart>
-    </ion-card-content>
-  </ion-card>
+<!-- Actividad 7 días -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Actividad de tus alumnos (7 días)</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="chartOptions().series"
+      [chart]="chartOptions().chart"
+      [dataLabels]="chartOptions().dataLabels"
+      [plotOptions]="chartOptions().plotOptions"
+      [xaxis]="chartOptions().xaxis"
+      [yaxis]="chartOptions().yaxis"
+      [colors]="chartOptions().colors"
+      [theme]="chartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>
 
-  <!-- Gráfica de Objetivos (Donut) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Objetivos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="stats-chart-content">
-      <apx-chart
-        [series]="objetivosChartOptions().series"
-        [chart]="objetivosChartOptions().chart"
-        [labels]="objetivosChartOptions().labels"
-        [colors]="objetivosChartOptions().colors"
-        [plotOptions]="objetivosChartOptions().plotOptions"
-        [dataLabels]="objetivosChartOptions().dataLabels"
-        [theme]="objetivosChartOptions().theme"
-      ></apx-chart>
-    </ion-card-content>
-  </ion-card>
+<!-- Objetivos -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Objetivos</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="objetivosChartOptions().series"
+      [chart]="objetivosChartOptions().chart"
+      [labels]="objetivosChartOptions().labels"
+      [colors]="objetivosChartOptions().colors"
+      [plotOptions]="objetivosChartOptions().plotOptions"
+      [dataLabels]="objetivosChartOptions().dataLabels"
+      [theme]="objetivosChartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>
 
-  <!-- Gráfica de Nivel (Pie) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Nivel de Experiencia</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="stats-chart-content">
-      <apx-chart
-        [series]="nivelChartOptions().series"
-        [chart]="nivelChartOptions().chart"
-        [labels]="nivelChartOptions().labels"
-        [colors]="nivelChartOptions().colors"
-        [dataLabels]="nivelChartOptions().dataLabels"
-        [theme]="nivelChartOptions().theme"
-      ></apx-chart>
-    </ion-card-content>
-  </ion-card>
-</div>
+<!-- Nivel de Experiencia -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Nivel de Experiencia</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="nivelChartOptions().series"
+      [chart]="nivelChartOptions().chart"
+      [labels]="nivelChartOptions().labels"
+      [colors]="nivelChartOptions().colors"
+      [dataLabels]="nivelChartOptions().dataLabels"
+      [theme]="nivelChartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>

@@ -29,14 +29,14 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
 import { HelpFabComponent } from '../../shared/components/help-fab/help-fab.component';
 import { ConvocatoriaModalComponent } from './components/convocatoria/convocatoria-modal/convocatoria-modal.component';
 import { DesafioModalComponent } from './components/desafio/desafio-modal/desafio-modal.component';
-import { RutinaModalComponent } from './components/rutina/rutina-modal/rutina-modal.component';
+import { RutinaSelfModalComponent } from './components/rutina/rutina-modal/rutina-modal.component';
 import { EjercicioModalComponent } from './components/ejercicio/ejercicio-modal/ejercicio-modal.component';
 
 import { ConvocatoriaListComponent } from './components/convocatoria/convocatoria-list/convocatoria-list.component';
 import { DesafioListComponent } from './components/desafio/desafio-list/desafio-list.component';
 import { RutinaListComponent } from './components/rutina/rutina-list/rutina-list.component';
 import { EjercicioListComponent } from './components/ejercicio/ejercicio-list/ejercicio-list.component';
-import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
+import { closeModalWithAnimation } from '../../core/utils/modal.utils';
 
 @Component({
   selector: 'app-creaciones',
@@ -56,7 +56,7 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     HelpFabComponent,
     ConvocatoriaModalComponent,
     DesafioModalComponent,
-    RutinaModalComponent,
+    RutinaSelfModalComponent,
     EjercicioModalComponent,
     ConvocatoriaListComponent,
     DesafioListComponent,

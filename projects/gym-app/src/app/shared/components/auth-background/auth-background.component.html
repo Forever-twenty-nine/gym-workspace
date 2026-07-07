@@ -1,4 +1,12 @@
-<div class="fixed inset-0 z-0">
-  <div class="w-full h-full bg-[url('/assets/images/bg.jpg')] bg-cover bg-center" [class.blur-xs]="showBlur"></div>
-  <div class="absolute inset-0 pointer-events-none background-div-100" [class]="opacityClass"></div>
+<!--
+  auth-background: capa fija de full-screen.
+  Estructura justificada: 1 <div> raíz posicionado absoluto + 1 <div> overlay.
+  Migrar a host element requeriría añadir ::after con gradient + bg-image al host,
+  perdería la capacidad de alternar entre imagen y overlay con un solo binding.
+-->
+<div [attr.data-blur]="showBlur ? true : null">
+  <img src="/assets/images/bg.jpg" alt="" />
 </div>
+@if (opacityClass.trim()) {
+  <span [attr.data-overlay]="opacityClass.trim()"></span>
+}

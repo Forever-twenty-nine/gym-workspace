@@ -2,7 +2,6 @@ import { Component, Input, Output, EventEmitter, inject, signal, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonIcon,
   IonInput,
   IonTextarea,
   ToastController,
@@ -15,8 +14,6 @@ import {
   IonCol,
   IonText
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { barbellOutline, helpCircleOutline } from 'ionicons/icons';
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { AuthService } from '../../../../../core/services/auth.service';
@@ -30,7 +27,6 @@ import { EditModalComponent } from '../../../../../shared/components/edit-modal/
     CommonModule,
     ReactiveFormsModule,
     EditModalComponent,
-    IonIcon,
     IonInput,
     IonTextarea,
     IonItem,
@@ -62,7 +58,6 @@ export class EjercicioModalComponent implements OnChanges {
   form: FormGroup;
 
   constructor() {
-    addIcons({ barbellOutline, helpCircleOutline });
 
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],

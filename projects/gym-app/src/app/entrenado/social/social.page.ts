@@ -13,7 +13,7 @@ import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.
 import { MutualMatchOverlayComponent } from './components/mutual-match-overlay/mutual-match-overlay.component';
 import { FeedTabComponent } from './components/para-ti-tab/feed-tab/feed-tab.component';
 import { ParaTiTabComponent } from './components/para-ti-tab/para-ti-tab.component';
-import { ChatDetailModalComponent } from '../../shared/components/chat/chat-detail-modal/chat-detail-modal.component';
+import { ChatDetailModalComponent } from '../../shared/chat/chat-detail-modal/chat-detail-modal.component';
 
 import { Convocatoria, Desafio } from 'gym-library';
 import { MatchActual } from '../../core/types/descubrir.types';

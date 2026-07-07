@@ -1,26 +1,20 @@
 <!-- ENTRENADO: stats de progreso (premium gate) -->
 @if (user().role === "entrenado") {
   @if (isPremium()) {
-    <div class="w-full">
-      @if (estadisticasEntrenado(); as stats) {
-        <app-progreso-estadisticas
-          [stats]="stats"
-          [sesiones]="historialSesiones()"
-          [dbStats]="dbEstadisticas()"
-        >
-        </app-progreso-estadisticas>
-      } @else {
-        <div class="estadisticas-div-181">
-          <ion-spinner name="crescent" color="primary"></ion-spinner>
-          <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
-          >
-        </div>
-      }
-    </div>
+    @if (estadisticasEntrenado(); as stats) {
+      <app-progreso-estadisticas
+        [stats]="stats"
+        [sesiones]="historialSesiones()"
+        [dbStats]="dbEstadisticas()"
+      ></app-progreso-estadisticas>
+    } @else {
+      <ion-item>
+        <ion-spinner slot="start" name="crescent" color="primary"></ion-spinner>
+        <ion-label color="medium">Cargando estadísticas...</ion-label>
+      </ion-item>
+    }
   } @else {
-    <app-profile-stats-teaser
-      (viewPlansClick)="viewPlansClick.emit()"
-    ></app-profile-stats-teaser>
+    <app-profile-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-profile-stats-teaser>
   }
 }
 
@@ -30,16 +24,13 @@
     @if (estadisticasEntrenador(); as stats) {
       <app-entrenador-stats [stats]="stats"></app-entrenador-stats>
     } @else {
-      <div class="estadisticas-div-181">
-        <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
-        >
-      </div>
+      <ion-item>
+        <ion-spinner slot="start" name="crescent" color="primary"></ion-spinner>
+        <ion-label color="medium">Cargando estadísticas...</ion-label>
+      </ion-item>
     }
   } @else {
-    <app-profile-stats-teaser
-      (viewPlansClick)="viewPlansClick.emit()"
-    ></app-profile-stats-teaser>
+    <app-profile-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-profile-stats-teaser>
   }
 }
 
@@ -49,15 +40,12 @@
     @if (estadisticasGimnasio(); as stats) {
       <app-gimnasio-stats [stats]="stats"></app-gimnasio-stats>
     } @else {
-      <div class="estadisticas-div-181">
-        <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <span class="ml-2 text-sm text-[var(--ion-color-medium)]">Cargando estadísticas...</span
-        >
-      </div>
+      <ion-item>
+        <ion-spinner slot="start" name="crescent" color="primary"></ion-spinner>
+        <ion-label color="medium">Cargando estadísticas...</ion-label>
+      </ion-item>
     }
   } @else {
-    <app-profile-stats-teaser
-      (viewPlansClick)="viewPlansClick.emit()"
-    ></app-profile-stats-teaser>
+    <app-profile-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-profile-stats-teaser>
   }
 }

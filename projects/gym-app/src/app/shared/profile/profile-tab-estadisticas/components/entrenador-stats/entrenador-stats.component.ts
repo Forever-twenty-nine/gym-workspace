@@ -4,8 +4,6 @@ import {
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
   IonText, IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { peopleOutline, barbellOutline, fitnessOutline, calendarOutline, timeOutline } from 'ionicons/icons';
 import { EstadisticasGeneralesEntrenador } from '../../../../../core/services/profile-stats.service';
 import { NgApexchartsModule } from 'ng-apexcharts';
 

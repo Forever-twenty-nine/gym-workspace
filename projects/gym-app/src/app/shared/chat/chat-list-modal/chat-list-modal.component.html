@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bandeja de Mensajes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-searchbar
+      placeholder="Buscar conversación..."
+      [value]="searchQuery()"
+      (ionInput)="onSearch($event)"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <app-background />
+
+  @if (chatsFiltrados().length === 0) {
+    <ion-icon name="chatbubbles-outline" color="medium"></ion-icon>
+    <h3>Sin conversaciones activas</h3>
+    <p>
+      Tus chats aparecerán aquí cuando chocas los 5 con otros atletas en la
+      sección <strong>Descubrir</strong> y conectas.
+    </p>
+  } @else {
+    <ion-list lines="full">
+      @for (chat of chatsFiltrados(); track chat.otherUserId) {
+        <ion-item button (click)="abrirConversacion(chat.otherUserId)">
+          <ion-avatar slot="start">
+            @if (chat.otherUser?.photoURL) {
+              <img [src]="chat.otherUser.photoURL" alt="Avatar" />
+            } @else {
+              <ion-icon name="person-outline" color="medium"></ion-icon>
+            }
+          </ion-avatar>
+          <ion-label>
+            <h2>{{ chat.otherUser?.nombre || "Compañero" }}</h2>
+            <p>{{ chat.lastMsg.contenido }}</p>
+          </ion-label>
+          <ion-note slot="end">
+            <small>{{ formatTime(chat.lastMsg.fechaEnvio) }}</small>
+          </ion-note>
+          @if (chat.unreadCount > 0) {
+            <ion-badge slot="end" color="danger">{{ chat.unreadCount }}</ion-badge>
+          }
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>

@@ -1,14 +1,12 @@
 @if (tipos.length === 0) {
   <ion-item lines="none">
-    <ion-label class="ion-text-center ion-text-wrap">
+    <ion-label>
       <p>Aún no has configurado tipos de entrenamiento para tu gimnasio. Los encuentros y agendas usarán los valores predeterminados.</p>
-      <ion-button expand="block" fill="outline" (click)="onLoadDefaults()" class="ion-margin-top">
-        Cargar Predeterminados
-      </ion-button>
+      <ion-button expand="block" fill="outline" (click)="onLoadDefaults()">Cargar Predeterminados</ion-button>
     </ion-label>
   </ion-item>
 } @else {
-  <ion-list lines="none" class="list-scroll-small">
+  <ion-list lines="none">
     @for (tipo of tipos; track tipo.id) {
       <ion-item-sliding #slidingItem>
         <ion-item>

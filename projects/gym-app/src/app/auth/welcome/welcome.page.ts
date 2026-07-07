@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IonContent, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, NavController, IonRow, IonCardSubtitle, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, NavController, IonRow, IonCardSubtitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personAddOutline,
@@ -32,7 +32,7 @@ export class WelcomePage {
   private readonly router = inject(Router);
 
   constructor() {
-    addIcons({ fitnessOutline, personAddOutline, arrowForwardOutline, logInOutline });
+    addIcons({ fitnessOutline, personAddOutline, arrowForwardOutline });;
   }
 
   goToRegister() {

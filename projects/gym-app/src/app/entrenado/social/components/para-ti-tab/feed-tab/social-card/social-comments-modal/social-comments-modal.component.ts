@@ -22,7 +22,7 @@ import {
   IonNote
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sendOutline, returnDownForwardOutline, heart, heartOutline, trashOutline, createOutline, checkmarkOutline } from 'ionicons/icons';
+import { sendOutline, returnDownForwardOutline, heartOutline, trashOutline, createOutline, checkmarkOutline } from 'ionicons/icons';
 
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { UserService } from '../../../../../../../core/services/user.service';
@@ -98,7 +98,7 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
   });
 
   constructor() {
-    addIcons({ sendOutline, returnDownForwardOutline, heart, heartOutline, trashOutline, createOutline, checkmarkOutline });
+    addIcons({ sendOutline, returnDownForwardOutline, heartOutline, trashOutline, createOutline, checkmarkOutline });;
   }
 
   ngOnInit() {}

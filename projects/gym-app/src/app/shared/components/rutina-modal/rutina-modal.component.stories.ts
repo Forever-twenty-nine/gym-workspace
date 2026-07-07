@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { RutinaModalComponent } from './rutina-modal.component';
 
 const meta: Meta<RutinaModalComponent> = {
-  title: 'Secciones/entrenador/rutinas/Componentes/rutina-modal',
+  title: 'Shared/Componentes/rutina-modal',
   component: RutinaModalComponent,
   tags: ['autodocs'],
   decorators: [

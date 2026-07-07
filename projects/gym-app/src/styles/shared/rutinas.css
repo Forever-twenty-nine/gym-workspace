@@ -1,135 +1,277 @@
-﻿/* ---------------------------------------------------- */
-/* Estilos para Rutinas, Ejercicios y Progreso */
-/* ---------------------------------------------------- */
+/* ============================================================ */
+/* Rutinas - feature compartida entre entrenado y entrenador       */
+/* ============================================================ */
 
-.rutina-modal {
-    --width: 95%;
-    --max-width: 600px;
-    --backdrop-opacity: 0.3;
+/* ============================================================ */
+/* Sección entrenador — página + lista + modal-ancho              */
+/* ============================================================ */
+
+app-rutinas {
+    /* Página simple */
 }
 
-/* .overlay-h2-6, .overlay-div-7, .header-div-8, .header-span-9, .progreso-page-div-10
-   Migrados a src/styles/entrenado/rutina-progreso.css con nombres semÃ¡nticos
-   (overlay-title, overlay-warning, progreso-header-card, progreso-header-percentage,
-   progreso-footer). */
+app-lista-rutinas {
+    ion-card {
+        --background: transparent;
+        box-shadow: none;
+    }
 
-/* Avatares/fallbacks de encuentro (40px/32px) y foto de progreso:
-   migrados a src/styles/entrenado/rutinas.css con nombres semÃ¡nticos
-   (encuentro-avatar, encuentro-fallback-avatar, photo-frame, etc.). */
+    ion-card-content {
+        padding: 0;
+    }
 
-.detalle-modal-icon-18 {
-    font-size: 1.5rem;
-    margin-bottom: 4px;
+    ion-text {
+        display: block;
+        text-align: center;
+        padding: var(--ion-padding);
+        color: var(--ion-color-medium);
+    }
 }
 
-.card-chip-20 {
-    margin-right:6px;
-    margin-bottom:4px;
+/* Modal reusable — vive en shared/components/rutina-modal.
+   El "smart" RutinaSelfModalComponent usa su propio selector (app-rutina-self-modal)
+   y vive en entrenado/creaciones/components/rutina/rutina-modal. */
+app-rutina-modal {
+    ion-modal {
+        --width: 95%;
+        --max-width: 600px;
+        --border-radius: 16px;
+        --backdrop-opacity: 0.3;
+    }
+
+    ion-button[type="submit"] {
+        margin-top: var(--ion-margin);
+    }
 }
 
-.card-img-27 {
-    width: 100%;
-    aspect-ratio: 4/5;
-    object-fit: cover;
+/* ============================================================ */
+/* Sección entrenado — historial, semana + modales                */
+/* ============================================================ */
+
+app-rutinas-historial,
+app-rutinas-semana {
+    ion-card {
+        --background: none;
+    }
 }
 
-.card-div-28 {
-    height: 1px;
-    background: var(--ion-color-step-150, #e0e0e0);
-    width: 100%;
+app-rutinas-semana ion-label {
+    text-align: center;
 }
 
-.card-div-29 {
-    margin-left: -16px;
-    margin-top: -8px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+/* --- Modal: app-encuentro-detalle-modal --- */
+app-encuentro-detalle-modal {
+    ion-title {
+        padding: 8px;
+    }
+
+    ion-footer ion-button {
+        margin: var(--ion-margin);
+    }
+
+    ion-card {
+        margin: 8px;
+    }
+
+    ion-row {
+        align-items: flex-start;
+    }
+
+    ion-col {
+        text-align: center;
+    }
+
+    ion-col > ion-avatar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    ion-item[lines='none'] ion-label {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: initial;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child {
+        display: flex;
+    }
+
+    ion-label h2 {
+        margin: 0;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        margin-inline-end: 12px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-inline-end: 12px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child ion-icon {
+        font-size: 1.5rem;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--ion-background-color);
+        flex-shrink: 0;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar:not(:first-child) {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--ion-background-color);
+        flex-shrink: 0;
+    }
 }
 
-.card-span-30 {
-    font-weight: bold;
-    margin-left: 6px;
+/* --- Modal: app-progreso-historial-detalle --- */
+app-progreso-historial-detalle {
+    ion-title {
+        padding: 16px;
+    }
+
+    ion-row {
+        align-items: flex-start;
+    }
+
+    ion-col {
+        text-align: center;
+    }
+
+    ion-col > ion-avatar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    ion-card {
+        margin-top: 16px;
+        margin-bottom: 16px;
+    }
+
+    input[type='file'] {
+        display: none;
+    }
+
+    ion-card-header:has(ion-card-title) {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    ion-footer ion-button {
+        margin: 0;
+    }
+
+    ion-footer ion-button + ion-button {
+        margin-top: 8px;
+    }
+
+    ion-footer ion-button[color="primary"] {
+        margin-bottom: 8px;
+    }
+
+    ion-button[expand="block"][fill="outline"] {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 12px;
+        overflow: hidden;
+        background: var(--ion-color-light);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+    }
+
+    ion-button[expand="block"][fill="outline"] > img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    ion-button[expand="block"][fill="outline"] > ion-spinner {
+        margin-bottom: 8px;
+    }
 }
 
-.card-p-31 {
-    color: var(--ion-text-color);
-}
+/* --- Modal: app-rutina-detalle-modal --- */
+app-rutina-detalle-modal {
+    ion-header {
+        padding: 8px;
+    }
 
-.card-div-32 {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 12px;
-    color: var(--ion-color-medium);
-}
+    ion-row {
+        align-items: flex-start;
+    }
 
-.card-span-33 {
-    opacity: 0.5;
-}
+    ion-col {
+        text-align: center;
+    }
 
-.card-h2-59 {
-    margin-bottom: 4px;
-}
+    ion-card-header {
+        padding: 8px;
+    }
 
-.card-badge-60 {
-    margin-left: 4px;
-}
+    ion-card-title {
+        text-align: center;
+    }
 
-.rutinas-modal-item-76 {
-    --inner-padding-end: 4px;
-}
+    > ion-content > ion-card {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
 
-.rutinas-modal-h2-77 {
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
+    > ion-content > ion-card > ion-card-content > p {
+        margin-top: 8px;
+    }
 
-.rutinas-modal-div-78 {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    margin: 0;
-}
+    ion-col ion-icon[name="fitness-outline"],
+    ion-col ion-icon[name="time-outline"] {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
 
-.rutinas-modal-select-79 {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-}
+    ion-col h2 span {
+        font-size: 0.875rem;
+    }
 
-.card-div-86 {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 4px;
-    flex-wrap: wrap;
+    ion-footer ion-button {
+        margin: var(--ion-margin);
+    }
 }
-
-.card-p-87 {
-    white-space: pre-line;
-    color: var(--ion-text-color);
-}
-
-.card-item-88 {
-    --padding-start: 0;
-}
-
-.card-h3-89 {
-    font-style: italic;
-    color: var(--ion-color-medium);
-}
-
-.card-avatar-91 {
-    width: 30px;
-    height: 30px;
-}
-
-.card-div-93 {
-    margin-top: 16px;
-    margin-bottom: 16px;
-    font-style: italic;
-}
-

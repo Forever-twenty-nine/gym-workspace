@@ -6,7 +6,7 @@ import { IonicStorageModule } from '@ionic/storage-angular';
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 import { applyInitialTheme } from 'theme';
-import { InjectionToken, isDevMode } from '@angular/core';
+import { isDevMode } from '@angular/core';
 import { environment } from './environments/environment';
 import { initializeApp } from 'firebase/app';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';

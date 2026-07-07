@@ -1,13 +1,9 @@
-<div class="plan-div-189">
-  <div class="plan-div-190">
-    <app-profile-plan-status [plan]="user().plan" [isPremium]="isPremium()">
-    </app-profile-plan-status>
+<app-profile-plan-status [plan]="user().plan" [isPremium]="isPremium()">
+</app-profile-plan-status>
 
-    <app-profile-plan-actions
-      [isPremium]="isPremium()"
-      [ultimaSolicitud]="ultimaSolicitud()"
-      (openPremiumModal)="openPremiumModal.emit()"
-    >
-    </app-profile-plan-actions>
-  </div>
-</div>
+<app-profile-plan-actions
+  [isPremium]="isPremium()"
+  [ultimaSolicitud]="ultimaSolicitud()"
+  (openPremiumModal)="openPremiumModal.emit()"
+>
+</app-profile-plan-actions>

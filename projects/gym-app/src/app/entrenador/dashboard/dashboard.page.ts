@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
-import { IonContent, IonButton, IonIcon, AlertController, ToastController, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
+import { Component, OnInit, inject, computed, Signal } from '@angular/core';
+import { IonContent, AlertController, ToastController, IonGrid, IonRow, IonCol, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';

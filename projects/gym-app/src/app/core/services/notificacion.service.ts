@@ -17,7 +17,7 @@ import {
     updateDoc,
     getDocs
 } from 'firebase/firestore';
-import { Notificacion, TipoNotificacion, ConfigNotificacion } from 'gym-library';
+import { Notificacion, ConfigNotificacion } from 'gym-library';
 import { FIRESTORE } from '../firebase.tokens';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Platform } from '@ionic/angular';

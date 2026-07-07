@@ -17,7 +17,6 @@ import {
 import { addIcons } from 'ionicons';
 import { close, checkmark } from 'ionicons/icons';
 import { TipoEntrenamiento } from 'gym-library';
-import { BackgroundComponent } from '../../background/background.component';
 
 @Component({
   selector: 'app-tipo-entrenamiento-modal',

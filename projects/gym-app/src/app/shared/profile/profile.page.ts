@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject, computed, effect, DestroyRef } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
-import { IonContent, IonButton, IonIcon, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonHeader, IonToolbar, IonButtons, IonFooter } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
+import { IonContent, IonButton, IonSegment, IonSegmentButton, IonLabel, IonSpinner, IonHeader, IonToolbar, IonButtons, IonFooter } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   logOutOutline, personOutline, mailOutline, shieldOutline, timeOutline, checkmarkCircleOutline,
@@ -30,7 +30,6 @@ import { MensajesGlobalesService } from '../../core/services/mensajes-globales.s
 import { InvitacionService } from '../../core/services/invitacion.service';
 
 import { BackgroundComponent } from '../components/background/background.component';
-import { ProgresoEstadisticasComponent } from './profile-tab-estadisticas/components/progreso-estadisticas/progreso-estadisticas.component';
 import { EditProfileModalComponent } from './components/edit-profile-modal/edit-profile-modal.component';
 import { PremiumRequestModalComponent } from './components/premium-request-modal/premium-request-modal.component';
 import { NotificationsComponent } from './notifications/notifications.component';
@@ -141,13 +140,7 @@ export class ProfilePage implements OnInit {
   });
 
   constructor() {
-    addIcons({
-      logOutOutline, personOutline, mailOutline, shieldOutline, timeOutline, checkmarkCircleOutline,
-      trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline,
-      closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline,
-      checkmarkCircle, person, trophy, mail, star, helpCircleOutline,
-      flagOutline, barChartOutline
-    });
+    addIcons({ personOutline, mailOutline, timeOutline, checkmarkCircleOutline, trophyOutline, fitnessOutline, statsChartOutline, pencilOutline, cameraOutline, saveOutline, closeOutline, notificationsOutline, lockClosedOutline, arrowBackOutline, starOutline, alertCircleOutline, checkmarkCircle, person, star, barChartOutline });;
 
     effect((onCleanup) => {
       const user = this.currentUser();

@@ -3,15 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonButtons, IonButton, IonIcon,
-  IonContent, IonSearchbar, IonBadge, ModalController, IonTitle
+  IonContent, IonSearchbar, IonBadge, ModalController, IonTitle,
+  IonAvatar, IonItem, IonLabel, IonNote, IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, searchOutline, personOutline, chatbubblesOutline } from 'ionicons/icons';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
-import { MensajeService } from '../../../../core/services/mensaje.service';
-import { ChatDetailModalComponent } from '../../../components/chat/chat-detail-modal/chat-detail-modal.component';
-import { BackgroundComponent } from '../../../components/background/background.component';
+import { closeOutline, personOutline, chatbubblesOutline } from 'ionicons/icons';
+import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
+import { MensajeService } from '../../../core/services/mensaje.service';
+import { ChatDetailModalComponent } from '../chat-detail-modal/chat-detail-modal.component';
+import { BackgroundComponent } from '../../components/background/background.component';
 import { Mensaje } from 'gym-library';
 
 @Component({
@@ -20,7 +21,8 @@ import { Mensaje } from 'gym-library';
   imports: [
     CommonModule, FormsModule,
     IonHeader, IonToolbar, IonButtons, IonButton, IonIcon,
-    IonContent, IonSearchbar, IonBadge,     IonTitle,
+    IonContent, IonSearchbar, IonBadge, IonTitle,
+    IonAvatar, IonItem, IonLabel, IonNote, IonList,
     BackgroundComponent
   ],
   templateUrl: './chat-list-modal.component.html'
@@ -91,7 +93,7 @@ export class ChatListModalComponent {
   });
 
   constructor() {
-    addIcons({ closeOutline, searchOutline, personOutline, chatbubblesOutline });
+    addIcons({ closeOutline, personOutline, chatbubblesOutline });;
   }
 
   async abrirConversacion(otherUserId: string) {

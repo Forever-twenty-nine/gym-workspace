@@ -1,7 +1,7 @@
 import { Component, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonButtons, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar, IonRow } from '@ionic/angular/standalone';
+import { ToastController, IonContent, IonCard, IonLabel, IonInput, IonButton, IonButtons, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonHeader, IonToolbar, IonRow } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -101,16 +101,7 @@ export class OnboardingPage {
     private router: Router,
     private toastCtrl: ToastController
   ) {
-    addIcons({
-      personOutline,
-      peopleOutline,
-      bookmarkOutline,
-      checkmarkCircleOutline,
-      arrowForwardOutline,
-      fitnessOutline,
-      rocketOutline,
-      closeOutline
-    });
+    addIcons({ personOutline, peopleOutline, checkmarkCircleOutline, arrowForwardOutline, fitnessOutline, rocketOutline, closeOutline });;
 
     // Para testing: simular usuario autenticado si no hay uno
     this.initializeForTesting();

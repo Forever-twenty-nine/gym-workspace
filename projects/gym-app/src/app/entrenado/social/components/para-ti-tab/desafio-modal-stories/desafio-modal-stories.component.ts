@@ -113,10 +113,7 @@ export class DesafioModalStoriesComponent implements OnChanges {
   });
 
   constructor() {
-    addIcons({
-      trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
-      sadOutline, peopleOutline, timerOutline, trashOutline, personOutline, timeOutline
-    });
+    addIcons({ trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline, sadOutline, peopleOutline, trashOutline, personOutline, timeOutline });;
   }
 
   ngOnChanges(changes: SimpleChanges) {

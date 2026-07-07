@@ -3,16 +3,14 @@ import {
   ToastController,
   IonCard
 } from '@ionic/angular/standalone';
-import { NgOptimizedImage } from '@angular/common';
 import { addIcons } from 'ionicons';
-import { fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed } from 'ionicons/icons';
+import { fitnessOutline, close, add, informationCircleOutline, lockClosed } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { RutinaService } from '../../core/services/rutina.service';
-import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
 
 import { ListaRutinasComponent } from './components/lista-rutinas/lista-rutinas.component';
-import { RutinaModalComponent } from './components/rutina-modal/rutina-modal.component';
+import { RutinaModalComponent } from '../../shared/components/rutina-modal/rutina-modal.component';
 
 @Component({
   selector: 'app-rutinas',
@@ -65,7 +63,7 @@ export class RutinasPage implements OnInit {
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   constructor() {
-    addIcons({ fitnessOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed });
+    addIcons({ fitnessOutline, close, add, informationCircleOutline, lockClosed });;
   }
 
   ngOnInit() {

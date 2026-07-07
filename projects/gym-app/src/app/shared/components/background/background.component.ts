@@ -1,4 +1,5 @@
 import { Component, inject, input, computed, Signal } from '@angular/core';
+import { IonImg } from '@ionic/angular/standalone';
 import { AuthService } from '../../../core/services/auth.service';
 import { Plan, User, Rol } from 'gym-library';
 
@@ -26,7 +27,7 @@ export const BG_IMAGES: Record<Rol, string> = {
 @Component({
   selector: 'app-background',
   standalone: true,
-  imports: [],
+  imports: [IonImg],
   templateUrl: './background.component.html',
 })
 export class BackgroundComponent {

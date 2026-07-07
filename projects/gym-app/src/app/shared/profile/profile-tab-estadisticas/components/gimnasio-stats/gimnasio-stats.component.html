@@ -1,36 +1,122 @@
-<div class="stats-container">
-  <!-- Encabezado: tasa de activación + totales -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-content class="stats-card-content">
-      <div class="stats-tasa-container">
-        <div>
-          <ion-text class="stats-tasa-label">Tasa de activación</ion-text>
-          <ion-text class="stats-kpi-value-xl">{{ stats().tasaActivacion }}%</ion-text>
-        </div>
-        <div class="flex flex-col items-end">
-          <ion-text class="stats-tasa-label">Activos / Total</ion-text>
-          <ion-text class="stats-tasa-sub">{{ stats().usuariosActivos }} / {{ stats().totalUsuarios }}</ion-text>
-        </div>
-      </div>
+<ion-card>
+  <ion-card-content>
+    <ion-text>Tasa de activación</ion-text>
+    <ion-text>{{ stats().tasaActivacion }}%</ion-text>
+    <ion-text>Activos / Total</ion-text>
+    <ion-text>{{ stats().usuariosActivos }} / {{ stats().totalUsuarios }}</ion-text>
 
-      <ion-grid class="ion-no-padding">
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4">
+          <ion-card color="primary">
+            <ion-text>{{ stats().totalEntrenadores }}</ion-text>
+            <ion-text>Entrenadores</ion-text>
+          </ion-card>
+        </ion-col>
+        <ion-col size="4">
+          <ion-card color="success">
+            <ion-text>{{ stats().totalEntrenados }}</ion-text>
+            <ion-text>Entrenados</ion-text>
+          </ion-card>
+        </ion-col>
+        <ion-col size="4">
+          <ion-card color="warning">
+            <ion-text>{{ stats().entrenadosSinEntrenador }}</ion-text>
+            <ion-text>Sin coach</ion-text>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<!-- Actividad Global Chart -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Actividad Global (7 días)</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="areaChartOptions().series"
+      [chart]="areaChartOptions().chart"
+      [dataLabels]="areaChartOptions().dataLabels"
+      [plotOptions]="areaChartOptions().plotOptions"
+      [xaxis]="areaChartOptions().xaxis"
+      [yaxis]="areaChartOptions().yaxis"
+      [colors]="areaChartOptions().colors"
+      [theme]="areaChartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>
+
+<!-- Selector de segmento -->
+<ion-segment [value]="selectedSegment()" (ionChange)="setSegment($event.detail.value)">
+  <ion-segment-button value="entrenadores">
+    <ion-label>Entrenadores</ion-label>
+  </ion-segment-button>
+  <ion-segment-button value="entrenados">
+    <ion-label>Entrenados</ion-label>
+  </ion-segment-button>
+</ion-segment>
+
+<!-- Sección: Entrenadores -->
+@if (selectedSegment() === "entrenadores") {
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
         <ion-row>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="primary" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().totalEntrenadores }}</ion-text>
-              <ion-text class="stats-kpi-label">Entrenadores</ion-text>
+          <ion-col size="6">
+            <ion-card color="light">
+              <ion-text>{{ stats().entrenadoresActivos }}</ion-text>
+              <ion-text>Activos</ion-text>
             </ion-card>
           </ion-col>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="success" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().totalEntrenados }}</ion-text>
-              <ion-text class="stats-kpi-label">Entrenados</ion-text>
+          <ion-col size="6">
+            <ion-card color="light">
+              <ion-text>{{ stats().promedioEntrenadosPorEntrenador }}</ion-text>
+              <ion-text>Clientes / Coach</ion-text>
             </ion-card>
           </ion-col>
-          <ion-col size="4" class="stats-kpi-col">
-            <ion-card color="warning" class="ion-no-margin stats-kpi-card">
-              <ion-text class="stats-kpi-value">{{ stats().entrenadosSinEntrenador }}</ion-text>
-              <ion-text class="stats-kpi-label">Sin coach</ion-text>
+          <ion-col size="6">
+            <ion-card color="success">
+              <ion-text>{{ stats().rutinasCreadasPorEntrenadores }}</ion-text>
+              <ion-text>Rutinas creadas</ion-text>
+            </ion-card>
+          </ion-col>
+          <ion-col size="6">
+            <ion-card color="danger">
+              <ion-text>{{ stats().invitacionesPendientes }}</ion-text>
+              <ion-text>Invitaciones</ion-text>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+}
+
+<!-- Sección: Entrenados -->
+@if (selectedSegment() === "entrenados") {
+  <ion-card>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="4">
+            <ion-card color="light">
+              <ion-text>{{ stats().totalEntrenados }}</ion-text>
+              <ion-text>Registrados</ion-text>
+            </ion-card>
+          </ion-col>
+          <ion-col size="4">
+            <ion-card color="success">
+              <ion-text>{{ stats().entrenadosActivos }}</ion-text>
+              <ion-text>Activos</ion-text>
+            </ion-card>
+          </ion-col>
+          <ion-col size="4">
+            <ion-card color="warning">
+              <ion-text>{{ stats().entrenadosSinEntrenador }}</ion-text>
+              <ion-text>Sin coach</ion-text>
             </ion-card>
           </ion-col>
         </ion-row>
@@ -38,139 +124,38 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Gráfica de Área (Actividad 7 Días) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Actividad Global (7 días)</ion-card-title>
+  <!-- Nivel de Experiencia -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Nivel de Experiencia</ion-card-title>
     </ion-card-header>
-    <ion-card-content class="stats-chart-content">
+    <ion-card-content>
       <apx-chart
-        [series]="areaChartOptions().series"
-        [chart]="areaChartOptions().chart"
-        [dataLabels]="areaChartOptions().dataLabels"
-        [plotOptions]="areaChartOptions().plotOptions"
-        [xaxis]="areaChartOptions().xaxis"
-        [yaxis]="areaChartOptions().yaxis"
-        [colors]="areaChartOptions().colors"
-        [theme]="areaChartOptions().theme"
+        [series]="nivelChartOptions().series"
+        [chart]="nivelChartOptions().chart"
+        [labels]="nivelChartOptions().labels"
+        [colors]="nivelChartOptions().colors"
+        [dataLabels]="nivelChartOptions().dataLabels"
+        [theme]="nivelChartOptions().theme"
       ></apx-chart>
     </ion-card-content>
   </ion-card>
 
-  <!-- Selector de segmento -->
-  <div class="stats-segment-container">
-    <button type="button" (click)="setSegment('entrenadores')"
-      class="stats-segment-btn"
-      [style.background]="selectedSegment() === 'entrenadores' ? 'var(--ion-color-primary)' : 'transparent'"
-      [style.color]="selectedSegment() === 'entrenadores' ? 'var(--ion-color-primary-contrast)' : 'var(--ion-color-medium)'">
-      Entrenadores
-    </button>
-    <button type="button" (click)="setSegment('entrenados')"
-      class="stats-segment-btn"
-      [style.background]="selectedSegment() === 'entrenados' ? 'var(--ion-color-primary)' : 'transparent'"
-      [style.color]="selectedSegment() === 'entrenados' ? 'var(--ion-color-primary-contrast)' : 'var(--ion-color-medium)'">
-      Entrenados
-    </button>
-  </div>
-
-  <!-- Sección: Entrenadores -->
-  @if (selectedSegment() === "entrenadores") {
-    <ion-card class="ion-no-margin ion-margin-bottom">
-      <ion-card-content class="stats-card-content">
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <ion-col size="6" class="stats-kpi-col-lg">
-              <ion-card color="light" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value-lg">{{ stats().entrenadoresActivos }}</ion-text>
-                <ion-text class="stats-kpi-label">Activos</ion-text>
-              </ion-card>
-            </ion-col>
-            <ion-col size="6" class="stats-kpi-col-lg">
-              <ion-card color="light" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value-lg">{{ stats().promedioEntrenadosPorEntrenador }}</ion-text>
-                <ion-text class="stats-kpi-label">Clientes / Coach</ion-text>
-              </ion-card>
-            </ion-col>
-            <ion-col size="6" class="stats-kpi-col-lg">
-              <ion-card color="success" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value-lg">{{ stats().rutinasCreadasPorEntrenadores }}</ion-text>
-                <ion-text class="stats-kpi-label">Rutinas creadas</ion-text>
-              </ion-card>
-            </ion-col>
-            <ion-col size="6" class="stats-kpi-col-lg">
-              <ion-card color="danger" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value-lg">{{ stats().invitacionesPendientes }}</ion-text>
-                <ion-text class="stats-kpi-label">Invitaciones</ion-text>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
-  }
-
-  <!-- Sección: Entrenados -->
-  @if (selectedSegment() === "entrenados") {
-    <ion-card class="ion-no-margin ion-margin-bottom">
-      <ion-card-content class="stats-card-content">
-        <ion-grid class="ion-no-padding">
-          <ion-row>
-            <ion-col size="4" class="stats-kpi-col">
-              <ion-card color="light" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value">{{ stats().totalEntrenados }}</ion-text>
-                <ion-text class="stats-kpi-label">Registrados</ion-text>
-              </ion-card>
-            </ion-col>
-            <ion-col size="4" class="stats-kpi-col">
-              <ion-card color="success" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value">{{ stats().entrenadosActivos }}</ion-text>
-                <ion-text class="stats-kpi-label">Activos</ion-text>
-              </ion-card>
-            </ion-col>
-            <ion-col size="4" class="stats-kpi-col">
-              <ion-card color="warning" class="ion-no-margin stats-kpi-card">
-                <ion-text class="stats-kpi-value">{{ stats().entrenadosSinEntrenador }}</ion-text>
-                <ion-text class="stats-kpi-label">Sin coach</ion-text>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Gráfica de Nivel (Pie) -->
-    <ion-card class="ion-no-margin ion-margin-bottom">
-      <ion-card-header class="stats-chart-header">
-        <ion-card-title class="stats-chart-title">Nivel de Experiencia</ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="stats-chart-content">
-        <apx-chart
-          [series]="nivelChartOptions().series"
-          [chart]="nivelChartOptions().chart"
-          [labels]="nivelChartOptions().labels"
-          [colors]="nivelChartOptions().colors"
-          [dataLabels]="nivelChartOptions().dataLabels"
-          [theme]="nivelChartOptions().theme"
-        ></apx-chart>
-      </ion-card-content>
-    </ion-card>
-
-    <!-- Gráfica de Objetivos (Donut) -->
-    <ion-card class="ion-no-margin ion-margin-bottom">
-      <ion-card-header class="stats-chart-header">
-        <ion-card-title class="stats-chart-title">Objetivos</ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="stats-chart-content">
-        <apx-chart
-          [series]="objetivosChartOptions().series"
-          [chart]="objetivosChartOptions().chart"
-          [labels]="objetivosChartOptions().labels"
-          [colors]="objetivosChartOptions().colors"
-          [plotOptions]="objetivosChartOptions().plotOptions"
-          [dataLabels]="objetivosChartOptions().dataLabels"
-          [theme]="objetivosChartOptions().theme"
-        ></apx-chart>
-      </ion-card-content>
-    </ion-card>
-  }
-</div>
+  <!-- Objetivos -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Objetivos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <apx-chart
+        [series]="objetivosChartOptions().series"
+        [chart]="objetivosChartOptions().chart"
+        [labels]="objetivosChartOptions().labels"
+        [colors]="objetivosChartOptions().colors"
+        [plotOptions]="objetivosChartOptions().plotOptions"
+        [dataLabels]="objetivosChartOptions().dataLabels"
+        [theme]="objetivosChartOptions().theme"
+      ></apx-chart>
+    </ion-card-content>
+  </ion-card>
+}

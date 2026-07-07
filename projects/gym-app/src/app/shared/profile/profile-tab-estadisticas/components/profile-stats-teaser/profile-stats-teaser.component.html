@@ -1,15 +1,1 @@
-<ion-card class="ion-no-margin teaser-card-178">
-  <ion-card-content>
-    <ion-icon class="text-5xl" name="trophy-outline" color="warning"></ion-icon>
-    <ion-card-title class="teaser-title-179">Estadísticas Avanzadas</ion-card-title
-    >
-    <p class="teaser-p-180">
-      Registrá tus entrenamientos y desbloqueá el gráfico semanal de actividad,
-      el historial detallado de sesiones y las rachas de entrenamiento con una
-      cuenta Premium.
-    </p>
-    <ion-button class="font-bold mt-3" (click)="viewPlansClick.emit()" color="warning" fill="solid" size="small">
-      Ver Planes
-    </ion-button>
-  </ion-card-content>
-</ion-card>
+<app-profile-stats-teaser (viewPlansClick)="viewPlansClick.emit()"></app-profile-stats-teaser>

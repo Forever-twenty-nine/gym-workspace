@@ -26,6 +26,7 @@ export type ChartOptions = {
     CommonModule,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonGrid, IonRow, IonCol, IonText,
+    IonSegment, IonSegmentButton, IonLabel,
     NgApexchartsModule
 ],
   templateUrl: './gimnasio-stats.component.html',
@@ -43,8 +44,10 @@ export class GimnasioStatsComponent {
     });
   }
 
-  setSegment(value: 'entrenadores' | 'entrenados') {
-    this.selectedSegment.set(value);
+  setSegment(value: any) {
+    if (value === 'entrenadores' || value === 'entrenados') {
+      this.selectedSegment.set(value);
+    }
   }
 
   areaChartOptions = computed<ChartOptions>(() => {

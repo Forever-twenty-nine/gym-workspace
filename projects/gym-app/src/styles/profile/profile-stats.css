@@ -1,0 +1,256 @@
+/* ============================================================ */
+/* Profile Tab Estadísticas - 5 componentes                      */
+/* ============================================================ */
+
+/* ============================================================ */
+/* Root tab - carga estados (premium/no premium/loading)          */
+/* ============================================================ */
+app-profile-tab-estadisticas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+/* Loading state: spinner + texto — sustituye al viejo div.estadisticas-div-181 */
+app-profile-tab-estadisticas > ion-item {
+    --background: transparent;
+    --inner-padding-end: 0;
+    --padding-start: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 16px;
+    gap: 8px;
+}
+
+app-profile-tab-estadisticas > ion-item ion-spinner {
+    width: 24px;
+    height: 24px;
+}
+
+/* ============================================================ */
+/* Profile Stats Teaser - card premium gate                       */
+/* ============================================================ */
+app-profile-stats-teaser > ion-card {
+    margin: 0;
+    background: var(--ion-color-warning-tint);
+    color: var(--ion-color-warning-shade);
+}
+
+app-profile-stats-teaser > ion-card > ion-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 24px 16px;
+    text-align: center;
+}
+
+app-profile-stats-teaser ion-icon[name="trophy-outline"] {
+    font-size: 3rem;
+    color: var(--ion-color-warning);
+}
+
+app-profile-stats-teaser ion-card-title {
+    color: var(--ion-color-warning-shade);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+app-profile-stats-teaser p {
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* ============================================================ */
+/* Gimnasio Stats / Entrenador Stats - contenedor raíz            */
+/* ============================================================ */
+app-gimnasio-stats,
+app-entrenador-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+app-gimnasio-stats > ion-card,
+app-entrenador-stats > ion-card {
+    margin: 0;
+}
+
+/* Header de cada card-chart */
+app-gimnasio-stats > ion-card > ion-card-header,
+app-entrenador-stats > ion-card > ion-card-header {
+    padding-top: 24px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+app-gimnasio-stats > ion-card > ion-card-title,
+app-entrenador-stats > ion-card > ion-card-title {
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Tasa de activación (primer card del gimnasio-stats): 2 bloques label+value */
+app-gimnasio-stats > ion-card:first-of-type > ion-card-content {
+    padding: 16px 16px 16px;
+}
+
+/* los 4 ion-text son: label, value-xl, label, value-sub */
+app-gimnasio-stats > ion-card:first-of-type > ion-card-content > ion-text:nth-child(1),
+app-gimnasio-stats > ion-card:first-of-type > ion-card-content > ion-text:nth-child(3) {
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    display: block;
+    font-size: 0.75rem;
+}
+
+app-gimnasio-stats > ion-card:first-of-type > ion-card-content > ion-text:nth-child(2) {
+    font-weight: 800;
+    line-height: 1;
+    font-size: 2rem;
+    display: block;
+}
+
+app-gimnasio-stats > ion-card:first-of-type > ion-card-content > ion-text:nth-child(4) {
+    font-weight: 700;
+    display: block;
+    text-align: right;
+}
+
+/* KPI cards anidadas en ion-col (color="primary|success|warning|danger|light") */
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card {
+    margin: 0;
+    text-align: center;
+    padding: 12px 4px;
+    --background: var(--ion-color-step-50, var(--ion-background-color));
+}
+
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
+    padding: 4px;
+}
+
+/* columns de 6 (más grandes) */
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"],
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] {
+    padding: 6px;
+}
+
+/* ion-text dentro de KPI cards */
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text {
+    display: block;
+}
+
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:first-of-type,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:first-of-type {
+    font-weight: 800;
+    font-size: 1.25rem;
+    line-height: 1.2;
+}
+
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] > ion-card > ion-text:first-of-type,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] > ion-card > ion-text:first-of-type {
+    font-size: 1.5rem;
+}
+
+app-gimnasio-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:last-of-type,
+app-entrenador-stats > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:last-of-type {
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.85;
+    font-size: 0.7rem;
+    margin-top: 4px;
+}
+
+/* ============================================================ */
+/* Progreso Estadísticas - entrenado XP/rachas/top rutinas        */
+/* ============================================================ */
+app-progreso-estadisticas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+app-progreso-estadisticas > ion-card {
+    margin: 0;
+}
+
+app-progreso-estadisticas > ion-card > ion-card-header {
+    padding-top: 24px;
+    padding-bottom: 8px;
+    text-align: center;
+}
+
+app-progreso-estadisticas > ion-card > ion-card-title {
+    font-weight: 700;
+    margin: 0;
+}
+
+app-progreso-estadisticas > ion-card:first-of-type > ion-card-content {
+    padding-block-end: 24px;
+}
+
+/* grid de "Rachas & Métricas" - tipografía tipográfica */
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid ion-col {
+    text-align: center;
+}
+
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid h5 {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ion-color-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid h2 {
+    margin: 4px 0 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--ion-text-color);
+}
+
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--ion-text-color);
+}
+
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid p {
+    margin: 2px 0 0;
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+}
+
+/* Separación entre filas del grid de métricas */
+app-progreso-estadisticas > ion-card:nth-of-type(2) > ion-card-content > ion-grid ion-row:nth-of-type(2) {
+    margin-top: 16px;
+}
+
+/* Top rutinas list */
+app-progreso-estadisticas ion-list {
+    background: transparent;
+    padding: 0;
+}
+
+app-progreso-estadisticas ion-list ion-item {
+    --inner-padding-end: 0;
+    --padding-start: 0;
+}
+
+app-progreso-estadisticas ion-list ion-item h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}

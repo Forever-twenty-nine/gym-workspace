@@ -1,5 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonList, IonItem, IonLabel, ModalController, IonIcon, IonButton, IonItemDivider, ToastController, IonBadge } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, personAddOutline, informationCircleOutline, chatbubblesOutline, closeOutline } from 'ionicons/icons';
@@ -8,7 +8,7 @@ import { MensajesGlobalesService } from '../../../core/services/mensajes-globale
 import { InvitacionService } from '../../../core/services/invitacion.service';
 import { MensajeService } from '../../../core/services/mensaje.service';
 import { MensajeGlobalModalComponent } from './mensaje-global-modal/mensaje-global-modal.component';
-import { ChatListModalComponent } from '../chat/chat-list-modal/chat-list-modal.component';
+import { ChatListModalComponent } from '../../chat/chat-list-modal/chat-list-modal.component';
 import { BackgroundComponent } from '../../components/background/background.component';
 import { Rol } from 'gym-library';
 

@@ -1,8 +1,11 @@
+<!--
+  background: capa fija de fondo condicional (premium = imagen, default = gradient).
+  Estructura justificada: 1 <div> por rama con bg-image o linear-gradient aplicado via CSS.
+-->
 @if (isPremiumEffective() && effectiveImage()) {
-  <div class="background-div-101">
-    <img class="background-img-102" [src]="effectiveImage()!" alt="background">
+  <div>
+    <ion-img [src]="effectiveImage()!" alt="background"></ion-img>
   </div>
 } @else {
-  <div class="background-div-103">
-  </div>
+  <div></div>
 }

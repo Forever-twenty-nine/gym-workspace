@@ -6,7 +6,7 @@ import {
   IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
   IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
   IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
-  IonAvatar, IonNote, IonTextarea, IonIcon
+  IonAvatar, IonNote, IonTextarea, IonIcon, IonGrid, IonRow, IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, notificationsOutline, cameraOutline, cardOutline, locationOutline } from 'ionicons/icons';
@@ -32,7 +32,7 @@ import { FirebaseStorageService } from '../../../../core/services/firebase-stora
     IonButton, IonChip, IonLabel, IonInput, IonSelect, IonSelectOption,
     IonToggle, IonDatetime, IonDatetimeButton, IonModal, IonHeader, IonToolbar,
     IonTitle, IonContent, IonButtons, IonSpinner, IonList, IonListHeader, IonItem,
-    IonTextarea, IonIcon
+    IonAvatar, IonTextarea, IonIcon, IonGrid, IonRow, IonCol
   ],
 })
 export class EditProfileModalComponent implements OnInit, OnChanges {

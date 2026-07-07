@@ -92,11 +92,7 @@ export class SocialCardComponent implements OnInit, OnDestroy {
   private unsubscribeComentarios?: () => void;
 
   constructor() {
-    addIcons({
-      barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
-      personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person,
-      chatbubbleOutline
-    });
+    addIcons({ heartOutline, ellipsisHorizontal, personRemove, eyeOffOutline, timeOutline, barbellOutline, person, chatbubbleOutline });;
   }
 
   ngOnInit() {

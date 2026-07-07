@@ -21,7 +21,7 @@ import {
     IonNote,
     IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, syncCircleOutline, lockClosed, barbellOutline } from 'ionicons/icons';
+import { closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, lockClosed, barbellOutline } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutina-detalle-modal',
@@ -58,16 +58,7 @@ export class RutinaDetalleModalComponent {
     @Output() iniciarEntrenamiento = new EventEmitter<import('gym-library').Rutina>();
 
     constructor() {
-        addIcons({
-            closeOutline,
-            fitnessOutline,
-            timeOutline,
-            repeatOutline,
-            playCircle,
-            syncCircleOutline,
-            lockClosed,
-            barbellOutline
-        });
+        addIcons({ closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, lockClosed, barbellOutline });;
     }
 
     cerrarModal() {

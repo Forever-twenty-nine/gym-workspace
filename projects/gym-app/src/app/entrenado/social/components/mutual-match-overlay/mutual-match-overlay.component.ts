@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonAvatar, IonModal, IonItem, IonAccordion, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonAvatar, IonModal, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { MatchActual } from '../../../../core/types/descubrir.types';
 
 @Component({

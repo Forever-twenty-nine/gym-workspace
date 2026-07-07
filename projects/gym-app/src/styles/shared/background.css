@@ -1,0 +1,24 @@
+/* ============================================================ */
+/* App Background - capa fija condicional (premium | gradient)   */
+/* ============================================================ */
+
+app-background > div {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+app-background > div:has(ion-img) {
+    opacity: 0.25;
+}
+
+app-background > div:has(ion-img) > ion-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+app-background > div:not(:has(ion-img)) {
+    background: linear-gradient(135deg, #1e3a8a, #15803d, #1e3a8a);
+}

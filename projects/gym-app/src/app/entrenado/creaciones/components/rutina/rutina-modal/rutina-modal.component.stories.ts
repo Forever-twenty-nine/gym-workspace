@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { applicationConfig, componentWrapperDecorator } from '@storybook/angular';
-import { RutinaModalComponent } from './rutina-modal.component';
+import { RutinaSelfModalComponent } from './rutina-modal.component';
 import { mockProviders } from '../../../../social/testing-mocks';
 
-const meta: Meta<RutinaModalComponent> = {
-  title: 'Secciones/entrenado/creaciones/Componentes/rutina/rutina-modal',
-  component: RutinaModalComponent,
+const meta: Meta<RutinaSelfModalComponent> = {
+  title: 'Secciones/entrenado/creaciones/Componentes/rutina/rutina-self-modal',
+  component: RutinaSelfModalComponent,
   tags: ['autodocs'],
   decorators: [
     applicationConfig({
@@ -16,11 +16,9 @@ const meta: Meta<RutinaModalComponent> = {
 };
 
 export default meta;
-type Story = StoryObj<RutinaModalComponent>;
+type Story = StoryObj<RutinaSelfModalComponent>;
 
 export const Default: Story = {
   args: {
   },
 };
-
-

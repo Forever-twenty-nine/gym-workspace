@@ -141,11 +141,7 @@ export class AgendaPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ 
-      add, calendarOutline, timeOutline, personOutline, 
-      trashOutline, handRightOutline, checkmarkCircleOutline,
-      chevronDownOutline, chevronUpOutline
-    });
+    addIcons({ add, calendarOutline, timeOutline, personOutline, trashOutline, handRightOutline, checkmarkCircleOutline });;
   }
 
   ngOnInit() {

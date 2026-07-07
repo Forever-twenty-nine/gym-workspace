@@ -16,8 +16,7 @@ import {
     DocumentSnapshot,
     arrayUnion
 } from 'firebase/firestore';
-import { EntrenadoService } from './entrenado.service';
-import { EntrenadorService, PlanLimitError } from './entrenador.service';
+import { EntrenadorService } from './entrenador.service';
 import { GimnasioService } from './gimnasio.service';
 import { Invitacion, Notificacion, TipoNotificacion } from 'gym-library';
 import { NotificacionService } from './notificacion.service';

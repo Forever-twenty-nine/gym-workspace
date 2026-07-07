@@ -2,8 +2,6 @@ import { Component, Input, Output, EventEmitter, inject, signal, computed, OnCha
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonCheckbox, IonList, IonSelect, IonSelectOption, ToastController, IonNote, IonText } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { barbellOutline, add, helpCircleOutline } from 'ionicons/icons';
 import { RutinaService } from '../../../../../core/services/rutina.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
@@ -13,7 +11,7 @@ import { Plan } from 'gym-library';
 import { EditModalComponent } from '../../../../../shared/components/edit-modal/edit-modal.component';
 
 @Component({
-  selector: 'app-rutina-modal',
+  selector: 'app-rutina-self-modal',
   standalone: true,
   imports: [
     CommonModule,
@@ -33,7 +31,7 @@ import { EditModalComponent } from '../../../../../shared/components/edit-modal/
 ],
   templateUrl: './rutina-modal.component.html'
 })
-export class RutinaModalComponent implements OnChanges {
+export class RutinaSelfModalComponent implements OnChanges {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private rutinaService = inject(RutinaService);
@@ -68,8 +66,6 @@ export class RutinaModalComponent implements OnChanges {
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   constructor() {
-    addIcons({ barbellOutline, add, helpCircleOutline });
-
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
       descripcion: ['', [Validators.maxLength(300)]],

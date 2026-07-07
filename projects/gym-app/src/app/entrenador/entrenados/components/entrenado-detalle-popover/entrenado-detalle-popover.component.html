@@ -1,56 +1,50 @@
 <ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [backdropDismiss]="true" [initialBreakpoint]="0.6" [breakpoints]="[0, 0.6, 0.85, 1]">
-    <ng-template>
-        <ion-content>
-            <app-background></app-background>
+  <ng-template>
+    <ion-content>
+      <app-background></app-background>
 
-            @if (entrenado()) {
-                <!-- Perfil del Entrenado -->
-                <ion-card>
-                    <ion-card-content>
-                        <ion-avatar>
-                            @if (getUserPhoto()(entrenado()!.id)) {
-                                <img [src]="getUserPhoto()(entrenado()!.id)" />
-                            } @else {
-                                <span class="material-symbols-outlined">person</span>
-                            }
-                        </ion-avatar>
-                        <h2>
-                            {{ getUserName()(entrenado()!.id) }}
-                        </h2>
-                    </ion-card-content>
-                </ion-card>
+      @if (entrenado()) {
+        <ion-card>
+          <ion-card-content>
+            <ion-avatar>
+              @if (getUserPhoto()(entrenado()!.id)) {
+                <img [src]="getUserPhoto()(entrenado()!.id)" />
+              } @else {
+                <span class="material-symbols-outlined">person</span>
+              }
+            </ion-avatar>
+            <h2>
+              {{ getUserName()(entrenado()!.id) }}
+            </h2>
+          </ion-card-content>
+        </ion-card>
 
-                <!-- Información General -->
-                <ion-list lines="inset">
+        <ion-list lines="inset">
+          @if (entrenado()!.objetivo) {
+            <ion-item>
+              <span slot="start" class="material-symbols-outlined">emoji_events</span>
+              <ion-label>
+                <h3>Objetivo</h3>
+                <p>{{ entrenado()!.objetivo }}</p>
+              </ion-label>
+            </ion-item>
+          }
+        </ion-list>
 
-                    @if (entrenado()!.objetivo) {
-                        <ion-item>
-                            <span slot="start" class="material-symbols-outlined">emoji_events</span>
-                            <ion-label>
-                                <h3>Objetivo</h3>
-                                <p>{{ entrenado()!.objetivo }}</p>
-                            </ion-label>
-                        </ion-item>
-                    }
-
-                </ion-list>
-
-                <!-- Estadísticas de Progreso -->
-                @if (estadisticas()) {
-                    <ion-list lines="inset">
-
-                        @for (item of itemsEstadisticas(); track item.titulo) {
-                            <ion-item [style.--stat-color]="'var(--ion-color-' + item.color + ')'">
-                                <span slot="start" class="material-symbols-outlined">{{ item.icon }}</span>
-                                <ion-label>
-                                    <h3>{{ item.titulo }}</h3>
-                                    <p>{{ item.valor }}</p>
-                                </ion-label>
-                            </ion-item>
-                        }
-                    </ion-list>
-                }
+        @if (estadisticas()) {
+          <ion-list lines="inset">
+            @for (item of itemsEstadisticas(); track item.titulo) {
+              <ion-item [attr.data-color]="item.color">
+                <span slot="start" class="material-symbols-outlined">{{ item.icon }}</span>
+                <ion-label>
+                  <h3>{{ item.titulo }}</h3>
+                  <p>{{ item.valor }}</p>
+                </ion-label>
+              </ion-item>
             }
-        </ion-content>
-    </ng-template>
+          </ion-list>
+        }
+      }
+    </ion-content>
+  </ng-template>
 </ion-modal>

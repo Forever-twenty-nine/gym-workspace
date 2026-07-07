@@ -74,11 +74,6 @@ export class ProfileUserBodyComponent {
   seguidosCount = computed(() => this.entrenadoData()?.seguidos?.length ?? 0);
 
   constructor() {
-    addIcons({
-      mailOutline, calendarOutline, trophyOutline, ribbonOutline,
-      chatbubblesOutline, eyeOutline, eyeOffOutline, timeOutline,
-      locationOutline, cardOutline, storefrontOutline, peopleCircleOutline,
-      fitnessOutline, businessOutline, personOutline
-    });
+    addIcons({ mailOutline, calendarOutline, trophyOutline, ribbonOutline, chatbubblesOutline, eyeOutline, eyeOffOutline, timeOutline, locationOutline, cardOutline, fitnessOutline, personOutline });;
   }
 }

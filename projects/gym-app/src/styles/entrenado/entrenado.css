@@ -10,7 +10,7 @@ app-dashboard,
 app-desafio-modal,
 app-desafio-modal-stories,
 app-ejercicio-modal,
-app-rutina-modal,
+app-rutina-self-modal,
 app-rutina-detalle-modal,
 app-rutina-ejercicio-detalle-modal,
 app-rutina-progreso,
@@ -49,7 +49,7 @@ app-progreso-historial-detalle {
 app-convocatoria-modal,
 app-desafio-modal,
 app-ejercicio-modal,
-app-rutina-modal {
+app-rutina-self-modal {
     ion-list {
         --padding-start: 0;
         --padding-end: 0;
@@ -113,6 +113,5 @@ app-rutinas-semana ion-text {
 /* Importaciones de Módulos (Secciones Específicas)             */
 /* ============================================================ */
 @import "./dashboard.css";
-@import "./rutinas.css";
 @import "./rutina-progreso.css";
 @import "./social.css";

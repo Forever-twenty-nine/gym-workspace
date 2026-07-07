@@ -12,8 +12,8 @@ import {
   IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline } from 'ionicons/icons';
-import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
+import { add, peopleOutline, close, person, checkmarkCircle, calendar, mailOutline, fitnessOutline, addCircleOutline, closeCircleOutline, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline } from 'ionicons/icons';
+import { Entrenado, Rutina, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
@@ -267,7 +267,7 @@ export class EntrenadosPage implements OnInit {
   }
 
   constructor() {
-    addIcons({ add, closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline });
+    addIcons({ add, closeCircleOutline, peopleOutline, close, person, checkmarkCircle, calendar, mailOutline, fitnessOutline, addCircleOutline, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline });;
   }
 
   ngOnInit() {

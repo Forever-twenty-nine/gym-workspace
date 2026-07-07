@@ -1,105 +1,102 @@
-<div class="stats-container">
-  <!-- XP Card -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-subtitle>Nivel {{ getNivel() }}</ion-card-subtitle>
-      <ion-card-title color="primary" class="stats-chart-title">
-        {{ getExperiencia() }} / {{ getExperienciaProximo() }} XP
-      </ion-card-title>
+<!-- XP Card -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-subtitle>Nivel {{ getNivel() }}</ion-card-subtitle>
+    <ion-card-title color="primary">
+      {{ getExperiencia() }} / {{ getExperienciaProximo() }} XP
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-progress-bar color="primary" [value]="getXpPercent() / 100"></ion-progress-bar>
+  </ion-card-content>
+</ion-card>
+
+<!-- Rachas & Métricas -->
+<ion-card>
+  <ion-card-content>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <ion-text color="medium"><h5>Racha actual</h5></ion-text>
+          <ion-text color="dark"><h2>{{ getRacha() }} días</h2></ion-text>
+        </ion-col>
+        <ion-col size="6">
+          <ion-text color="medium"><h5>Mejor racha</h5></ion-text>
+          <ion-text color="dark"><h2>{{ getMejorRacha() }} días</h2></ion-text>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="4">
+          <ion-text color="dark"><h3>{{ stats?.completadas || 0 }}</h3></ion-text>
+          <ion-text color="medium"><p>Completadas</p></ion-text>
+        </ion-col>
+        <ion-col size="4">
+          <ion-text color="dark"><h3>{{ formatearTiempo(stats?.tiempoTotal || 0) }}</h3></ion-text>
+          <ion-text color="medium"><p>Tiempo</p></ion-text>
+        </ion-col>
+        <ion-col size="4">
+          <ion-text color="dark"><h3>{{ stats?.sesionesTotales || 0 }}</h3></ion-text>
+          <ion-text color="medium"><p>Totales</p></ion-text>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card-content>
+</ion-card>
+
+<!-- Actividad 7 días -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Actividad (7 días)</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="areaChartOptions().series"
+      [chart]="areaChartOptions().chart"
+      [dataLabels]="areaChartOptions().dataLabels"
+      [plotOptions]="areaChartOptions().plotOptions"
+      [xaxis]="areaChartOptions().xaxis"
+      [yaxis]="areaChartOptions().yaxis"
+      [colors]="areaChartOptions().colors"
+      [theme]="areaChartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>
+
+<!-- Estado de Sesiones (Donut) -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Estado de Sesiones</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <apx-chart
+      [series]="donutChartOptions().series"
+      [chart]="donutChartOptions().chart"
+      [labels]="donutChartOptions().labels"
+      [colors]="donutChartOptions().colors"
+      [plotOptions]="donutChartOptions().plotOptions"
+      [dataLabels]="donutChartOptions().dataLabels"
+      [theme]="donutChartOptions().theme"
+    ></apx-chart>
+  </ion-card-content>
+</ion-card>
+
+@if (topRutinas().length > 0) {
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Rutinas Favoritas</ion-card-title>
     </ion-card-header>
-    <ion-card-content class="pb-6">
-      <ion-progress-bar color="primary" [value]="getXpPercent() / 100"></ion-progress-bar>
+    <ion-card-content>
+      <ion-list lines="none">
+        @for (r of topRutinas(); track r.name) {
+          <ion-item>
+            <ion-label>
+              <h3>{{ r.name }}</h3>
+              <ion-progress-bar color="success" [value]="r.percent / 100"></ion-progress-bar>
+            </ion-label>
+            <ion-note slot="end" color="dark">{{ r.count }}</ion-note>
+          </ion-item>
+        }
+      </ion-list>
     </ion-card-content>
   </ion-card>
-
-  <!-- Rachas & Métricas -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-content class="pb-4">
-      <ion-grid>
-        <ion-row>
-          <ion-col size="6" class="ion-text-center">
-            <ion-text color="medium"><h5>Racha actual</h5></ion-text>
-            <ion-text color="dark"><h2>{{ getRacha() }} días</h2></ion-text>
-          </ion-col>
-          <ion-col size="6" class="ion-text-center">
-            <ion-text color="medium"><h5>Mejor racha</h5></ion-text>
-            <ion-text color="dark"><h2>{{ getMejorRacha() }} días</h2></ion-text>
-          </ion-col>
-        </ion-row>
-        <ion-row class="mt-4">
-          <ion-col size="4" class="ion-text-center">
-            <ion-text color="dark"><h3>{{ stats?.completadas || 0 }}</h3></ion-text>
-            <ion-text color="medium"><p>Completadas</p></ion-text>
-          </ion-col>
-          <ion-col size="4" class="ion-text-center">
-            <ion-text color="dark"><h3>{{ formatearTiempo(stats?.tiempoTotal || 0) }}</h3></ion-text>
-            <ion-text color="medium"><p>Tiempo</p></ion-text>
-          </ion-col>
-          <ion-col size="4" class="ion-text-center">
-            <ion-text color="dark"><h3>{{ stats?.sesionesTotales || 0 }}</h3></ion-text>
-            <ion-text color="medium"><p>Totales</p></ion-text>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Gráfica de Área (Actividad 7 Días) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Actividad (7 días)</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="stats-chart-content">
-      <apx-chart
-        [series]="areaChartOptions().series"
-        [chart]="areaChartOptions().chart"
-        [dataLabels]="areaChartOptions().dataLabels"
-        [plotOptions]="areaChartOptions().plotOptions"
-        [xaxis]="areaChartOptions().xaxis"
-        [yaxis]="areaChartOptions().yaxis"
-        [colors]="areaChartOptions().colors"
-        [theme]="areaChartOptions().theme"
-      ></apx-chart>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Gráfica de Dono (Tasa de Completado) -->
-  <ion-card class="ion-no-margin ion-margin-bottom">
-    <ion-card-header class="stats-chart-header">
-      <ion-card-title class="stats-chart-title">Estado de Sesiones</ion-card-title>
-    </ion-card-header>
-    <ion-card-content class="stats-chart-content">
-      <apx-chart
-        [series]="donutChartOptions().series"
-        [chart]="donutChartOptions().chart"
-        [labels]="donutChartOptions().labels"
-        [colors]="donutChartOptions().colors"
-        [plotOptions]="donutChartOptions().plotOptions"
-        [dataLabels]="donutChartOptions().dataLabels"
-        [theme]="donutChartOptions().theme"
-      ></apx-chart>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Top Rutinas -->
-  @if (topRutinas().length > 0) {
-    <ion-card class="ion-no-margin ion-margin-bottom">
-      <ion-card-header class="stats-chart-header">
-        <ion-card-title class="stats-chart-title">Rutinas Favoritas</ion-card-title>
-      </ion-card-header>
-      <ion-card-content class="pb-4">
-        <ion-list lines="none">
-          @for (r of topRutinas(); track r.name) {
-            <ion-item>
-              <ion-label>
-                <h3>{{ r.name }}</h3>
-                <ion-progress-bar color="success" [value]="r.percent / 100"></ion-progress-bar>
-              </ion-label>
-              <ion-note slot="end" color="dark">{{ r.count }}</ion-note>
-            </ion-item>
-          }
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
-  }
-</div>
+}

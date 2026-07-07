@@ -1,12 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { IonContent, IonCard, IonCardContent, IonIcon, IonButton, AlertController, ToastController, IonRow, IonCol, IonText, IonGrid, IonItem, IonLabel } from '@ionic/angular/standalone';
+import { Component, OnInit, inject } from '@angular/core';
+import { IonContent, IonCard, IonIcon, AlertController, ToastController, IonRow, IonCol, IonText, IonGrid, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barChartOutline, add } from 'ionicons/icons';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { TiposEntrenamientoComponent } from '../../shared/components/tipos-entrenamiento/tipos-entrenamiento';
 import { AuthService } from '../../core/services/auth.service';
 import { TipoEntrenamientoService } from '../../core/services/tipo-entrenamiento.service';
-import { TipoEntrenamiento } from 'gym-library';
 
 @Component({
   selector: 'app-gimnasio-dashboard',

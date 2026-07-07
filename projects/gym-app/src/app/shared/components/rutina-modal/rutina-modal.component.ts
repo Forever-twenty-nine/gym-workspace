@@ -9,8 +9,7 @@ import {
     IonSelectOption,
     IonList
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { EditModalComponent } from '../../../../shared/components/edit-modal/edit-modal.component';
+import { EditModalComponent } from '../edit-modal/edit-modal.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -62,8 +61,6 @@ export class RutinaModalComponent {
     });
 
     constructor() {
-        addIcons({ });
-
         effect(() => {
             const data = this.rutinaData();
             if (data) {

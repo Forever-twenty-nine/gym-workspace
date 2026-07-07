@@ -2,13 +2,13 @@ import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ActionSheetController, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, IonGrid, IonRow, IonCol, IonList, IonListHeader, IonLabel, IonItem } from '@ionic/angular/standalone';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, IonGrid, IonRow, IonCol, IonList, IonListHeader, IonLabel, IonItem } from '@ionic/angular/standalone';
 import { RutinaProgresoHeaderComponent } from './components/rutina-progreso-header/rutina-progreso-header.component';
 import { RutinaEjercicioItemComponent } from './components/rutina-ejercicio-item/rutina-ejercicio-item.component';
 import { RutinaOverlayComponent } from './components/rutina-overlay/rutina-overlay.component';
 import { RutinaEjercicioDetalleModalComponent } from './components/rutina-ejercicio-detalle-modal/rutina-ejercicio-detalle-modal.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, timerOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, refreshOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, pauseCircleOutline, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause } from 'ionicons/icons';
+import { arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline } from 'ionicons/icons';
 import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
 import { Ejercicio, SesionRutinaStatus } from 'gym-library';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -61,7 +61,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     return 'medium';
   });
 
-  constructor() { addIcons({ arrowBackOutline, timerOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, refreshOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, pauseCircleOutline, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause }); }
+  constructor() { addIcons({ arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline });; }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('rutinaId');

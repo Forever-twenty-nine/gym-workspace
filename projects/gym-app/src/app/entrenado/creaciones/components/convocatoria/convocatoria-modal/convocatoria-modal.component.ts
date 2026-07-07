@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -14,7 +14,6 @@ import {
   IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sparkles, helpCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../../core/services/convocatoria.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { Convocatoria, Rol } from 'gym-library';
@@ -55,7 +54,7 @@ export class ConvocatoriaModalComponent implements OnInit, OnChanges {
   isEditing = false;
 
   constructor() {
-    addIcons({ helpCircleOutline });
+    ;
     
     const ahora = new Date();
     const horaInicioStr = this.padZero(ahora.getHours()) + ':' + this.padZero(ahora.getMinutes());

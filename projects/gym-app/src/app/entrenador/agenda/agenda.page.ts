@@ -26,7 +26,7 @@ import {
 import { ConvocatoriaService } from '../../core/services/convocatoria.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
-import { Convocatoria, Rol } from 'gym-library';
+import { Convocatoria } from 'gym-library';
 
 import { CrearAgendaModalComponent } from './components/crear-agenda-modal/crear-agenda-modal.component';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
@@ -145,11 +145,7 @@ export class AgendaPage implements OnInit {
   });
 
   constructor() {
-    addIcons({ 
-      add, calendarOutline, timeOutline, personOutline, 
-      trashOutline, handRightOutline, checkmarkCircleOutline,
-      chevronDownOutline, chevronUpOutline
-    });
+    addIcons({ add, calendarOutline, timeOutline, personOutline, trashOutline, handRightOutline, checkmarkCircleOutline });;
   }
 
   ngOnInit() {

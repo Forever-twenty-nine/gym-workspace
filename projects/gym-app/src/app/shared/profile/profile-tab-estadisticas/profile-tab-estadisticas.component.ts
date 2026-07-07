@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonSpinner } from '@ionic/angular/standalone';
+import { IonSpinner, IonItem, IonLabel } from '@ionic/angular/standalone';
 import { ProfileStatsTeaserComponent } from './components/profile-stats-teaser/profile-stats-teaser.component';
 import { ProgresoEstadisticasComponent } from './components/progreso-estadisticas/progreso-estadisticas.component';
 import { EntrenadorStatsComponent } from './components/entrenador-stats/entrenador-stats.component';
@@ -18,6 +18,8 @@ export interface User extends LibraryUser {
   imports: [
     CommonModule,
     IonSpinner,
+    IonItem,
+    IonLabel,
     ProfileStatsTeaserComponent,
     ProgresoEstadisticasComponent,
     EntrenadorStatsComponent,

@@ -1,10 +1,6 @@
-import { Injectable, computed, Signal, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { EntrenadoService } from './entrenado.service';
 import { EstadisticasEntrenadoService } from './estadisticas-entrenado.service';
-import { Entrenado } from 'gym-library';
-import { SesionRutina } from 'gym-library';
-import { EstadisticasEntrenado } from 'gym-library';
-import { uuidv4 } from 'gym-library';
 
 @Injectable({ providedIn: 'root' })
 export class ProgresoService {

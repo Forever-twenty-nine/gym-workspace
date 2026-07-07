@@ -15,7 +15,7 @@ import {
     IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { playCircle, bedOutline, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
+import { playCircle, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
 import { Rutina, Convocatoria } from 'gym-library';
 import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
@@ -103,12 +103,7 @@ export class RutinasSemanaComponent {
 
 
     constructor() {
-        addIcons({
-            playCircle,
-            bedOutline,
-            chevronForwardOutline,
-            calendarOutline
-        });
+        addIcons({ playCircle, chevronForwardOutline, calendarOutline });;
     }
 
     onVerDetalles(rutina: Rutina, esFuturo: boolean = false) {

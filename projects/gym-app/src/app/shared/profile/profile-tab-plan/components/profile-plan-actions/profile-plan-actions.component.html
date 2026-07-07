@@ -1,12 +1,13 @@
-<ion-card class="ion-no-margin">
+<ion-card>
   <ion-card-header>
-    <ion-card-title class="actions-title-183">
+    <ion-card-title>
       <ion-icon name="star-outline" color="primary"></ion-icon>
       Cambio de Plan
     </ion-card-title>
   </ion-card-header>
+
   <ion-card-content>
-    <p class="actions-p-184">
+    <p>
       @if (isPremium()) {
         Tu membresía Premium está activa. Si deseas cancelarla o modificar la
         suscripción, por favor contactate con el soporte del gimnasio.
@@ -19,49 +20,39 @@
 
     @if (!isPremium()) {
       @if (ultimaSolicitud()?.estado === "pendiente") {
-        <div class="actions-div-185">
-          <div class="font-bold text-sm flex items-center justify-center gap-2">
-            <ion-icon name="time-outline"></ion-icon>
-            Solicitud de Premium pendiente
-          </div>
-          <p class="text-[0.7rem] mt-1">
-            Tu entrenador o el gimnasio está evaluando tu solicitud. Te
-            notificaremos pronto.
-          </p>
-        </div>
+        <ion-card [attr.data-status]="'pending'">
+          <ion-card-content>
+            <p>
+              <ion-icon name="time-outline"></ion-icon>
+              Solicitud de Premium pendiente
+            </p>
+            <small>Tu entrenador o el gimnasio está evaluando tu solicitud. Te notificaremos pronto.</small>
+          </ion-card-content>
+        </ion-card>
       } @else if (ultimaSolicitud()?.estado === "rechazada") {
-        <div class="actions-div-186">
-          <div class="font-bold text-sm flex items-center justify-center gap-2">
-            <ion-icon name="alert-circle-outline"></ion-icon>
-            Solicitud Premium rechazada
-          </div>
-          <p class="text-[0.7rem] mt-1">
-            Tu solicitud anterior fue rechazada. Podés volver a intentarlo o
-            consultar con la administración.
-          </p>
-        </div>
-        <ion-button
-          expand="block"
-          color="danger"
-          (click)="openPremiumModal.emit()"
-        >
+        <ion-card [attr.data-status]="'rejected'">
+          <ion-card-content>
+            <p>
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              Solicitud Premium rechazada
+            </p>
+            <small>Tu solicitud anterior fue rechazada. Podés volver a intentarlo o consultar con la administración.</small>
+          </ion-card-content>
+        </ion-card>
+        <ion-button expand="block" color="danger" (click)="openPremiumModal.emit()">
           Reintentar Premium
         </ion-button>
       } @else {
-        <ion-button
-          expand="block"
-          color="primary"
-          (click)="openPremiumModal.emit()"
-        >
+        <ion-button expand="block" color="primary" (click)="openPremiumModal.emit()">
           <ion-icon name="trophy-outline" slot="start"></ion-icon>
           Solicitar Plan Premium
         </ion-button>
       }
     } @else {
-      <div class="actions-div-187">
-        <ion-icon class="text-2xl" name="checkmark-circle-outline"></ion-icon>
-        <span>Premium activo</span>
-      </div>
+      <p [attr.data-premium]="true">
+        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+        Premium activo
+      </p>
     }
   </ion-card-content>
 </ion-card>

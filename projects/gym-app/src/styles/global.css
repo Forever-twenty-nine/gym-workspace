@@ -37,10 +37,10 @@
 /* 6) Estilos Globales (Afectan a 2 o más secciones) */
 @import "./global/global-elements.css";
 
-/* 7) Estilos de Componentes Compartidos (shared) */
+/* 7) Estilos por Feature (carpetas de estilo reflejan dominio) */
 @import "./shared/shared.css";
-@import "./shared/profile.css";
-@import "./shared/rutinas.css";
+@import "./profile/profile.css";
+@import "./chat/chat.css";
 
 /* 8) Estilos de Secciones Específicas */
 @import "./auth/auth.css";

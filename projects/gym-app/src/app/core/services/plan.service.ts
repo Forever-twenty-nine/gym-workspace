@@ -15,7 +15,6 @@ import {
 } from 'firebase/firestore';
 import { User, Plan, SolicitudPlan } from 'gym-library';
 import { FIRESTORE } from '../firebase.tokens';
-import { Observable } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'

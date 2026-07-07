@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges, computed, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, SimpleChanges, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
@@ -26,7 +26,7 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, paperPlaneOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
+import { close, paperPlaneOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TipoEntrenamientoService } from '../../../../core/services/tipo-entrenamiento.service';
@@ -98,7 +98,7 @@ export class CrearAgendaModalComponent implements OnInit, OnChanges {
   fechaSeleccionada: Date = new Date();
 
   constructor() {
-    addIcons({ close, paperPlaneOutline, chevronDownOutline, chevronUpOutline });
+    addIcons({ close, paperPlaneOutline });;
     
     const ahora = new Date();
     const horaInicioStr = this.padZero(ahora.getHours()) + ':' + this.padZero(ahora.getMinutes());

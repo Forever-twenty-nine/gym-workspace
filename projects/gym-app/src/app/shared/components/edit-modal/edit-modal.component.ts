@@ -10,6 +10,8 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close, saveOutline } from 'ionicons/icons';
 
 /**
  * Modal wrapper reutilizable para crear/editar entidades.
@@ -49,6 +51,13 @@ import {
   ]
 })
 export class EditModalComponent {
+  constructor() {
+    // El modal usa `close` (botón cancelar) y `save-outline` (botón guardar) en su toolbar.
+    // Los registramos acá para que cualquier consumidor tenga los iconos disponibles
+    // sin depender de que su módulo padre los provea.
+    addIcons({ close, saveOutline });
+  }
+
   /** Estado de apertura del modal. */
   isOpen = input.required<boolean>();
 

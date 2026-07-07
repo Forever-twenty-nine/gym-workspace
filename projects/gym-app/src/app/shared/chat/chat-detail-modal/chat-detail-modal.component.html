@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrar()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+    <ion-title size="small">
+      <ion-avatar>
+        @if (partnerPhoto()) {
+          <img [src]="partnerPhoto()" alt="Partner" />
+        } @else {
+          <ion-icon name="person-outline" color="medium"></ion-icon>
+        }
+      </ion-avatar>
+      <span>{{ partnerName() }}</span>
+    </ion-title>
+    <ion-note slot="end" color="success">Conectado</ion-note>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <app-background />
+
+  @if (mensajesFiltrados().length === 0) {
+    <ion-icon name="chatbubbles-outline" color="success"></ion-icon>
+    <h4>¡Saluda a tu nuevo compañero!</h4>
+    <p>Comiencen a coordinar su entrenamiento. Chocar esos 5 fue solo el primer paso.</p>
+  } @else {
+    <ion-list>
+      @for (msg of mensajesFiltrados(); track msg.id) {
+        <ion-item [attr.data-mine]="msg.remitenteId === currentUser()?.uid ? true : null">
+          <p>{{ msg.contenido }}</p>
+          <small>{{ formatTime(msg.fechaEnvio) }}</small>
+        </ion-item>
+      }
+    </ion-list>
+  }
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-textarea
+      placeholder="Escribe un mensaje..."
+      [ngModel]="nuevoMensaje()"
+      (ngModelChange)="nuevoMensaje.set($event)"
+      (keydown.enter)="enviarMensaje($event)"
+      [rows]="1"
+      [autoGrow]="true"
+    ></ion-textarea>
+    <ion-buttons slot="end">
+      <ion-button (click)="enviarMensaje()" [disabled]="!nuevoMensaje().trim()">
+        <ion-icon slot="icon-only" name="send"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

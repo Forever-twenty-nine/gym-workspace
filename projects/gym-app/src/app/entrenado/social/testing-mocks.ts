@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { Rol, TipoMensaje, Plan, Convocatoria, Desafio, DesafioParticipacion, SesionRutina } from 'gym-library';
+import { Rol, TipoMensaje, Plan, Convocatoria, Desafio, DesafioParticipacion } from 'gym-library';
 import { TarjetaDescubrir } from '../../core/types/descubrir.types';
 import { Subject } from 'rxjs';
 

@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, Signal, WritableSignal, computed } from '@angular/core';
-import { Firestore, collection, onSnapshot, query, where, orderBy, QuerySnapshot, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { Firestore, collection, onSnapshot, QuerySnapshot, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { MensajeGlobal } from 'gym-library';
 import { FIRESTORE } from '../firebase.tokens';
 import { AuthService } from './auth.service';

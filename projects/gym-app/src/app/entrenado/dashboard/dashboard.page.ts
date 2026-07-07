@@ -13,7 +13,6 @@ import {
   IonCard,
   NavController, IonGrid, IonCol, IonRow } from '@ionic/angular/standalone';
 
-import { Objetivo, Plan } from 'gym-library';
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
 import { UserService } from '../../core/services/user.service';

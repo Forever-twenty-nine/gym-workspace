@@ -57,7 +57,7 @@ export class DesafioModalComponent implements OnChanges {
   }
 
   constructor() {
-    addIcons({ trophyOutline, flameOutline, calendarOutline, helpCircleOutline });
+    addIcons({ trophyOutline, flameOutline, calendarOutline });;
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(180)]],
       logroRelacionado: ['', [Validators.maxLength(120)]],

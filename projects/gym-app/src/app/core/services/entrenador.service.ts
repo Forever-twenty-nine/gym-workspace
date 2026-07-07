@@ -13,7 +13,7 @@ import {
   where,
   updateDoc
 } from 'firebase/firestore';
-import { Entrenador, Ejercicio, Plan, Rol, PlanLimits, ROL_PLAN_LIMITS } from 'gym-library';
+import { Entrenador, Plan, Rol, PlanLimits, ROL_PLAN_LIMITS } from 'gym-library';
 import { RutinaService } from './rutina.service';
 import { EjercicioService } from './ejercicio.service';
 import { EntrenadoService } from './entrenado.service';

@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonHeader, IonToolbar, IonButtons, IonButton, IonIcon,
-  IonContent, IonFooter, IonTextarea, ModalController
+  IonContent, IonFooter, IonTextarea, ModalController,
+  IonAvatar, IonTitle, IonList, IonItem, IonNote
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, send, personOutline } from 'ionicons/icons';
-import { AuthService } from '../../../../core/services/auth.service';
-import { UserService } from '../../../../core/services/user.service';
-import { MensajeService } from '../../../../core/services/mensaje.service';
-import { BackgroundComponent } from '../../background/background.component';
+import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
+import { MensajeService } from '../../../core/services/mensaje.service';
+import { BackgroundComponent } from '../../components/background/background.component';
 import { Rol, TipoMensaje, Mensaje } from 'gym-library';
 
 @Component({
@@ -18,8 +19,9 @@ import { Rol, TipoMensaje, Mensaje } from 'gym-library';
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    IonHeader, IonToolbar, IonButtons, IonButton, IonIcon,
-    IonContent, IonFooter, IonTextarea, BackgroundComponent
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon,
+    IonContent, IonFooter, IonTextarea, BackgroundComponent,
+    IonAvatar, IonList, IonItem, IonNote
   ],
   templateUrl: './chat-detail-modal.component.html'
 })

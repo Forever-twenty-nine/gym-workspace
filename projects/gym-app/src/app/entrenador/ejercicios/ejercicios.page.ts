@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, computed, Signal, signal } from '@angular/core';
 import { ToastController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
+import { barbellOutline, close, add, informationCircleOutline, lockClosed, star } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { EjercicioService } from '../../core/services/ejercicio.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
@@ -59,7 +59,7 @@ export class EjerciciosPage implements OnInit {
   readonly isEjercicioCreating = signal(false);
 
   constructor() {
-    addIcons({ barbellOutline, close, add, pencil, trash, barbell, informationCircleOutline, lockClosed, star });
+    addIcons({ barbellOutline, close, add, informationCircleOutline, lockClosed, star });;
   }
 
   ngOnInit() {

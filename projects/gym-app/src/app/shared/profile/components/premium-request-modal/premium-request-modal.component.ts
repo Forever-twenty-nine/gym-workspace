@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoadingController, ToastController } from '@ionic/angular';
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonNote, IonIcon } from '@ionic/angular/standalone';
+import { IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonIcon } from '@ionic/angular/standalone';
 import { User as LibraryUser } from 'gym-library';
 export interface User extends LibraryUser {
   photoURL?: string;
@@ -13,7 +13,7 @@ import { starOutline, checkmarkCircleOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-premium-request-modal',
   standalone: true,
-  imports: [CommonModule, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonNote, IonIcon],
+  imports: [CommonModule, IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonList, IonItem, IonLabel, IonIcon],
   templateUrl: './premium-request-modal.component.html'
 })
 export class PremiumRequestModalComponent {

@@ -87,12 +87,12 @@
   </app-desafio-modal>
 
   <!-- Componente Modal de Rutina -->
-  <app-rutina-modal
+  <app-rutina-self-modal
     [isOpen]="isRutinaModalOpen()"
     [item]="rutinaToEdit()"
     (close)="cerrarModalRutina()"
     (saved)="onRutinaSaved()">
-  </app-rutina-modal>
+  </app-rutina-self-modal>
 
   <!-- Componente Modal de Ejercicio -->
   <app-ejercicio-modal

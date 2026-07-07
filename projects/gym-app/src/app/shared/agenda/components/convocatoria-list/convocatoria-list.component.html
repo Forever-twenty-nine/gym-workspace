@@ -5,9 +5,9 @@
         @for (item of items(); track item.convocatoria.id) {
           @if (canDelete()) {
             <ion-item-sliding #slidingItem>
-              <ion-item class="list-item-1">
+              <ion-item>
                 <app-date-badge slot="start" [fecha]="item.convocatoria.fechaEntrenamiento"></app-date-badge>
-                <ion-label class="ion-margin-start">
+                <ion-label>
                   <h2>{{ item.convocatoria.titulo }}</h2>
                   @if (item.convocatoria.esSemanal) {
                     <p>Semanal</p>
@@ -34,20 +34,15 @@
               [creadorPhoto]="item.creadorPhoto"
               [fechaFormateada]="item.fechaFormateada"
               [asistentes]="item.asistentes"
-              [canDelete]="false">
-            </app-convocatoria-card>
+              [canDelete]="false"
+            ></app-convocatoria-card>
           }
         }
       </ion-list>
     } @else {
-      <!-- Estado vacío -->
-      <div class="ion-text-center ion-padding">
-        <div class="list-div-4">
-          <ion-icon class="list-icon-3" [name]="emptyIcon()" color="medium"></ion-icon>
-        </div>
-        <h3 class="list-h3-2">{{ emptyTitle() }}</h3>
-        <p class="text-[var(--ion-color-medium)] m-0">{{ emptyMessage() }}</p>
-      </div>
+      <ion-icon [name]="emptyIcon()" color="medium"></ion-icon>
+      <h3>{{ emptyTitle() }}</h3>
+      <p>{{ emptyMessage() }}</p>
     }
   </ion-card-content>
 </ion-card>

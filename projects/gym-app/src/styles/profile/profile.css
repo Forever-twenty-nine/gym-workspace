@@ -1,0 +1,555 @@
+﻿/* ============================================================ */
+/* Profile - reglas elementales (dominio compartido)             */
+/* ============================================================ */
+
+@import "./profile-stats.css";
+
+/* Toolbar del perfil: header sin borde, segment ocupa el espacio disponible */
+app-profile ion-segment {
+    width: 100%;
+    max-width: 420px;
+}
+
+/* ion-col dentro del profile: tipografía centrada por defecto */
+app-profile ion-col {
+    text-align: center;
+}
+
+/* ion-item del perfil sin padding (reemplaza class="ion-no-padding") */
+app-profile-user-header ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+}
+
+/* ion-label padding (reemplaza class="ion-label-182") */
+app-profile-user-header ion-label {
+    padding: 8px;
+}
+
+/* ion-avatar dentro del header de perfil: 64x64 */
+app-profile-user-header ion-avatar {
+    width: 64px;
+    height: 64px;
+}
+
+/* Footer con dos botones lado a lado */
+app-profile ion-footer ion-buttons {
+    display: flex;
+    width: 100%;
+    gap: 12px;
+    padding: 0 16px;
+}
+
+app-profile ion-footer ion-buttons ion-button {
+    flex: 1;
+    margin: 0;
+}
+
+/* Centrado de tipografía h2 + ion-text dentro de cada ion-col de perfil */
+app-profile-user-body ion-col h2 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+app-profile-user-body ion-col ion-text {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+
+/* ion-content del profile: padding (reemplaza class="ion-padding") */
+app-profile ion-content > *:not(app-background):not(.modal-wrapper):not(ion-modal) {
+    padding: 16px;
+    position: relative;
+    z-index: 10;
+}
+
+/* ion-list-header del perfil: tipografía primaria */
+app-profile-user-body ion-list-header ion-label ion-text {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================================ */
+/* Notifications                                                  */
+/* ============================================================ */
+
+/* Toolbar transparente del modal de notificaciones */
+app-notifications ion-header ion-toolbar,
+app-notifications > ion-header + ion-content {
+    --background: transparent;
+}
+
+/* Contenido del modal: padding consistente + transparente */
+app-notifications ion-content {
+    --background: transparent;
+    padding: 16px;
+}
+
+/* Empty state */
+app-notifications > ion-content > ion-icon {
+    display: block;
+    margin: 0 auto 16px;
+    font-size: 48px;
+    color: var(--ion-color-medium);
+}
+
+app-notifications > ion-content > p {
+    text-align: center;
+    color: var(--ion-color-medium);
+}
+
+/* Botón "Mensajes/Chats" en la parte superior */
+app-notifications ion-button[expand="block"][color="primary"] {
+    margin-bottom: 16px;
+}
+
+/* Badge del contador de chats al lado del label del botón */
+app-notifications ion-button[expand="block"] ion-badge {
+    margin-inline-start: 8px;
+}
+
+/* Tipografía de las tarjetas dentro de la lista */
+app-notifications ion-item h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+app-notifications ion-item p {
+    white-space: normal;
+}
+
+/* Marcas de "leído": opacidad reducida (reemplaza class="opacity-70") */
+app-notifications ion-item.is-read {
+    opacity: 0.7;
+}
+
+/* Fecha del mensaje en línea secundaria con tamaño xs */
+app-notifications ion-item p > small {
+    font-size: 0.75rem;
+    color: var(--ion-color-medium);
+}
+
+/* ion-item-divider: padding lateral estándar */
+app-notifications ion-item-divider ion-label {
+    padding-inline: 16px;
+}
+
+/* ion-buttons[slot="end"] con dos botones de acción inline */
+app-notifications ion-item ion-buttons[slot="end"] {
+    display: flex;
+    gap: 8px;
+    padding-block-end: 12px;
+    padding-inline-end: 16px;
+    justify-content: flex-end;
+}
+
+/* ============================================================ */
+/* Notifications Bell (sin wrapper div, badge en esquina)         */
+/* ============================================================ */
+app-notifications-bell {
+    display: inline-block;
+}
+
+app-notifications-bell ion-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    --padding-start: 6px;
+    --padding-end: 6px;
+    margin: 0;
+}
+
+app-notifications-bell ion-button ion-icon {
+    font-size: 22px;
+}
+
+app-notifications-bell ion-button span {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 9px;
+    background: var(--ion-color-danger);
+    color: var(--ion-color-danger-contrast);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 18px;
+    text-align: center;
+    box-shadow: 0 0 0 2px var(--ion-background-color, #121212);
+    pointer-events: none;
+    transform: translate(2px, -2px);
+    z-index: 1;
+}
+
+/* ============================================================ */
+/* Mensaje Global Modal                                           */
+/* ============================================================ */
+app-mensaje-global-modal ion-header,
+app-mensaje-global-modal ion-footer {
+    --border-color: transparent;
+    --border-width: 0;
+}
+
+app-mensaje-global-modal ion-footer ion-toolbar {
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+}
+
+app-mensaje-global-modal ion-content ion-card {
+    margin: 0;
+}
+
+app-mensaje-global-modal ion-card-header,
+app-mensaje-global-modal ion-card-content {
+    text-align: center;
+}
+
+app-mensaje-global-modal ion-card-header {
+    padding: 16px;
+}
+
+app-mensaje-global-modal ion-card-header ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+app-mensaje-global-modal ion-card-title {
+    font-weight: 700;
+    margin: 0;
+}
+
+app-mensaje-global-modal ion-card-content {
+    line-height: 1.6;
+    color: var(--ion-color-step-700, var(--ion-color-medium));
+    padding: 16px;
+}
+
+/* ============================================================ */
+/* Edit Profile Modal - form de edición con foto, fields, toggles */
+/* ============================================================ */
+app-edit-profile-modal {
+    ion-header {
+        --border-color: transparent;
+        --border-width: 0;
+    }
+
+    ion-toolbar {
+        padding-inline: 16px;
+    }
+
+    ion-title {
+        text-align: center;
+    }
+
+    ion-button[color="primary"][disabled] {
+        font-weight: 700;
+        --opacity: 1;
+    }
+
+    ion-list {
+        background: transparent;
+        padding-bottom: 32px;
+    }
+
+    ion-list-header ion-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    ion-item {
+        margin: 0 16px 12px;
+    }
+
+    ion-item h2 {
+        font-weight: 700;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    ion-item p {
+        color: var(--ion-color-medium);
+        font-size: 0.85rem;
+        margin: 4px 0 0;
+    }
+
+    /* Avatar de foto: clickable, contiene img o iniciales, spinner + icon overlay */
+    > form > ion-avatar {
+        position: relative;
+        width: 96px;
+        height: 96px;
+        margin: 32px auto 12px;
+        cursor: pointer;
+        background: var(--ion-color-medium);
+    }
+
+    > form > ion-avatar > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    > form > ion-avatar > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--ion-color-primary);
+    }
+
+    > form > ion-avatar > ion-spinner {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        background: rgba(0, 0, 0, 0.55);
+        color: #fff;
+    }
+
+    > form > ion-avatar > ion-icon {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 28px;
+        height: 28px;
+        padding: 6px;
+        background: var(--ion-color-primary);
+        color: var(--ion-color-primary-contrast);
+        font-size: 16px;
+        border-radius: 14px;
+        box-shadow: 0 0 0 4px var(--ion-background-color, #121212);
+    }
+
+    /* Botón "Toca para cambiar foto" debajo del avatar */
+    > form > ion-button {
+        display: block;
+        margin: -4px auto 24px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-size: 0.75rem;
+        color: var(--ion-color-primary);
+    }
+
+    /* Input file invisible */
+    > form > input[type="file"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* ion-grid para franja horaria (Entrena Desde / Hasta) */
+    > form > ion-list > ion-grid {
+        padding: 0 16px;
+    }
+
+    > form > ion-list ion-grid ion-col {
+        padding: 0 4px;
+    }
+
+    /* Bloque "Días de entrenamiento" — p header + chips en fila */
+    > form > ion-list > p {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--ion-color-medium);
+        margin: 8px 16px 12px;
+        font-size: 0.85rem;
+    }
+
+    > form > ion-list > p + ion-chip,
+    > form > ion-list > ion-chip + ion-chip {
+        margin-inline-start: 8px;
+    }
+}
+
+/* ============================================================ */
+/* Premium Request Modal                                          */
+/* ============================================================ */
+app-premium-request-modal {
+    ion-header {
+        --border-color: transparent;
+        --border-width: 0;
+    }
+
+    ion-title {
+        text-align: center;
+    }
+
+    ion-content ion-card {
+        margin: 16px;
+    }
+
+    ion-card-header {
+        text-align: center;
+        padding: 24px 16px 8px;
+    }
+
+    ion-card-header > ion-icon {
+        font-size: 48px;
+        margin-bottom: 8px;
+    }
+
+    ion-card-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    ion-card-content {
+        text-align: center;
+        padding: 16px;
+    }
+
+    ion-card-content > p:first-of-type {
+        color: var(--ion-color-step-700, var(--ion-color-medium));
+        line-height: 1.6;
+        margin-top: 0;
+    }
+
+    ion-card-content ion-list {
+        margin: 16px 0;
+        background: transparent;
+    }
+
+    ion-card-content ion-list ion-label {
+        font-size: 0.9rem;
+    }
+
+    ion-card-content > p:last-of-type {
+        font-style: italic;
+        font-size: 0.8rem;
+        color: var(--ion-color-medium);
+        margin: 16px 0 0;
+    }
+}
+
+/* ============================================================ */
+/* Reglas legacy (pre-migración) — solo las usadas por sitios     */
+/* aún sin migrar; ir reemplazando cuando se refactoricen.        */
+/* ============================================================ */
+
+
+/* ============================================================ */
+/* Profile Tab Plan - 2 cards (status + actions) vertical stack   */
+/* ============================================================ */
+app-profile-tab-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+    width: 100%;
+}
+
+/* ============================================================ */
+/* Profile Plan Status - card "Tu Plan Actual"                    */
+/* ============================================================ */
+app-profile-plan-status {
+    > ion-card {
+        margin: 0;
+        text-align: center;
+    }
+
+    ion-card-subtitle {
+        letter-spacing: 2px;
+        color: var(--ion-color-medium);
+    }
+
+    ion-card-title {
+        font-weight: 900;
+        font-size: 1.875rem;
+        margin: 0;
+    }
+
+    ion-card-content > p {
+        font-size: 0.85rem;
+        color: var(--ion-color-medium);
+        line-height: 1.4;
+        margin: 0;
+    }
+}
+
+/* ============================================================ */
+/* Profile Plan Actions - card "Cambio de Plan" + estados        */
+/* ============================================================ */
+app-profile-plan-actions {
+    > ion-card {
+        margin: 0;
+    }
+
+    > ion-card > ion-card-header > ion-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+    }
+
+    /* Texto descriptivo principal */
+    > ion-card > ion-card-content > p:first-of-type {
+        line-height: 1.4;
+        margin-bottom: 16px;
+        color: var(--ion-color-medium);
+    }
+
+    /* Card anidado de estado (pendiente / rechazada) */
+    > ion-card > ion-card-content > ion-card {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    > ion-card > ion-card-content > ion-card > ion-card-content > p {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    > ion-card > ion-card-content > ion-card > ion-card-content > small {
+        display: block;
+        font-size: 0.75rem;
+        margin-top: 4px;
+        opacity: 0.85;
+    }
+
+    ion-card[data-status="pending"] {
+        background: var(--ion-color-warning-tint);
+        color: var(--ion-color-warning-shade);
+    }
+
+    ion-card[data-status="rejected"] {
+        background: var(--ion-color-danger-tint);
+        color: var(--ion-color-danger-shade);
+    }
+
+    /* Premium activo */
+    > ion-card > ion-card-content > p[data-premium] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        color: var(--ion-color-success);
+        margin: 0;
+    }
+
+    > ion-card > ion-card-content > p[data-premium] > ion-icon {
+        font-size: 1.5rem;
+    }
+}
