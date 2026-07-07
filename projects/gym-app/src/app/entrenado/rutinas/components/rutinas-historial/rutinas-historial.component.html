@@ -1,5 +1,5 @@
-<ion-card class="historial-card-19">
-  <ion-card-header class="ion-padding-vertical">
+<ion-card>
+  <ion-card-header>
     <ion-card-title>Rutinas completadas</ion-card-title>
     <ion-card-subtitle>{{ sesiones.length }} rutinas</ion-card-subtitle>
   </ion-card-header>
@@ -9,9 +9,9 @@
       <ion-list>
         @for (sesion of sesiones; track sesion.id) {
           <ion-item-sliding>
-            <ion-item class="list-item-2" button detail="true" (click)="onVerDetalle(sesion)">
+            <ion-item button detail="true" (click)="onVerDetalle(sesion)">
               <app-date-badge slot="start" [fecha]="sesion.fechaInicio"></app-date-badge>
-              <ion-label class="ion-margin-start">
+              <ion-label>
                 @if (sesion.duracion) {
                   <h2>{{ redondearMinutos(sesion.duracion) }} min</h2>
                 } @else {
@@ -30,11 +30,10 @@
         }
       </ion-list>
     } @else {
-      <ion-text color="medium" class="ion-text-center">
-        <ion-icon name="calendar-outline" size="large"></ion-icon>
-        <p>Aún no hay rutinas completadas</p>
-        <p><small>Cuando termines una rutina aparecerá aquí.</small></p>
-      </ion-text>
+      <app-empty-state
+        icon="calendar-outline"
+        title="Aún no hay rutinas completadas"
+        message="Cuando termines una rutina aparecerá aquí." />
     }
   </ion-card-content>
 </ion-card>

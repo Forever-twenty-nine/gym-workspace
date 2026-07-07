@@ -1,30 +1,24 @@
 <ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
   <app-background />
 
-  <!-- Buscador Reactivo -->
-  <ion-searchbar placeholder="Buscar entrenadores..." class="ion-margin-bottom"
+  <ion-searchbar placeholder="Buscar entrenadores..."
     (ionInput)="searchQuery.set($event.detail.value || '')"></ion-searchbar>
 
-  <!-- Botón de Invitación para Entrenadores -->
-  <ion-button expand="block"  color="primary" (click)="openInvitacionModal()" class="ion-margin-bottom">
+  <ion-button expand="block" color="primary" (click)="openInvitacionModal()">
     <ion-icon name="mail-outline" slot="start"></ion-icon>
     Invitar Entrenador
   </ion-button>
 
-  <!-- Listado de Entrenadores -->
-  <app-entrenador-list 
-    [entrenadores]="filteredUsers()" 
+  <app-entrenador-list
+    [entrenadores]="filteredUsers()"
     (desvincular)="desvincularEntrenador($event)">
   </app-entrenador-list>
 
-  <!-- Listado de Invitaciones Pendientes -->
-  <app-invitaciones-pendientes-list 
-    [invitaciones]="invitacionesPendientes()" 
+  <app-invitaciones-pendientes-list
+    [invitaciones]="invitacionesPendientes()"
     (cancelar)="cancelarInvitacion($event)">
   </app-invitaciones-pendientes-list>
 
-  <!-- Modal de Invitación reutilizable -->
   <app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"
     [isSaveDisabled]="isInvitacionSaveDisabled()"
     [mensajePlaceholder]="'¡Hola! Te invito a unirte a nuestro gimnasio como entrenador...'"

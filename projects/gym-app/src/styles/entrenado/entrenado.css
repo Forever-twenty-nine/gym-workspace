@@ -1,17 +1,118 @@
-/* ---------------------------------------------------- */
-/* Estilos para Sección de Entrenado (Alumno) */
-/* ---------------------------------------------------- */
+/* ============================================================ */
+/* Estilos Comunes - Sección Entrenado                          */
+/* ============================================================ */
 
-.historial-card-19 {
-    --background: none;
+/* Cabeceras y footers sin borde (look Apple-style en iOS) */
+app-creaciones,
+app-convocatoria-modal,
+app-convocatoria-modal-stories,
+app-dashboard,
+app-desafio-modal,
+app-desafio-modal-stories,
+app-ejercicio-modal,
+app-rutina-modal,
+app-rutina-detalle-modal,
+app-rutina-ejercicio-detalle-modal,
+app-rutina-progreso,
+app-rutinas,
+app-social {
+    ion-header,
+    ion-footer {
+        --border-color: transparent;
+        --border-width: 0;
+    }
 }
 
-.desafio-modal-div-21 {
-    background-color: var(--ion-color-light);
+/* Padding consistente en `ion-content` de páginas y modales.
+   Solo aplica a los que aún no tienen padding propio. */
+app-dashboard,
+app-rutinas,
+app-creaciones,
+app-rutina-progreso,
+app-progreso-historial-detalle {
+    ion-content {
+        --padding-start: var(--ion-padding);
+        --padding-end: var(--ion-padding);
+        --padding-top: var(--ion-padding);
+        --padding-bottom: var(--ion-padding);
+    }
+
+    ion-popover ion-content {
+        --padding-start: var(--ion-padding);
+        --padding-end: var(--ion-padding);
+        --padding-top: var(--ion-padding);
+        --padding-bottom: var(--ion-padding);
+    }
 }
 
-.personalizado-p-3 {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+/* Listas dentro de modales: sin padding */
+app-convocatoria-modal,
+app-desafio-modal,
+app-ejercicio-modal,
+app-rutina-modal {
+    ion-list {
+        --padding-start: 0;
+        --padding-end: 0;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        padding: 0;
+    }
 }
+
+/* Cabeceras de card con padding vertical consistente */
+app-rutinas-asignadas,
+app-rutinas-historial,
+app-rutinas-semana {
+    ion-card-header {
+        padding-top: var(--ion-padding);
+        padding-bottom: var(--ion-padding);
+    }
+}
+
+/* Date badge con margen derecho consistente */
+app-rutinas-asignadas,
+app-rutinas-semana {
+    app-date-badge {
+        margin-inline-end: var(--ion-margin);
+    }
+}
+
+/* List items de listas (sin padding, fondo transparente) */
+app-desafio-list,
+app-convocatoria-list,
+app-ejercicio-list,
+app-rutinas-historial,
+app-rutinas-semana,
+app-rutinas-asignadas {
+    ion-item {
+        --padding-start: 0;
+        --inner-padding-end: 0;
+        --background: transparent;
+    }
+}
+
+/* Margin inicial del label en items de lista */
+app-convocatoria-list,
+app-desafio-list,
+app-rutinas-historial {
+    ion-item ion-label {
+        margin-inline-start: var(--ion-margin);
+    }
+}
+
+/* Centrado de textos en empty states */
+app-rutinas-asignadas ion-text,
+app-desafio-list ion-text,
+app-convocatoria-list ion-text,
+app-rutinas-historial ion-text,
+app-rutinas-semana ion-text {
+    text-align: center;
+}
+
+/* ============================================================ */
+/* Importaciones de Módulos (Secciones Específicas)             */
+/* ============================================================ */
+@import "./dashboard.css";
+@import "./rutinas.css";
+@import "./rutina-progreso.css";
+@import "./social.css";

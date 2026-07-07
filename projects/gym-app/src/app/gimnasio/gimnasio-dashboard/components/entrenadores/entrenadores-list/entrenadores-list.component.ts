@@ -1,11 +1,11 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonList, 
-  IonItem, 
-  IonAvatar, 
-  IonLabel, 
-  IonButton, 
+import {
+  IonList,
+  IonItem,
+  IonAvatar,
+  IonLabel,
+  IonButton,
   IonIcon,
   IonCard,
   IonCardHeader,
@@ -17,17 +17,18 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personRemove, closeCircle, eye, add } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-entrenadores-list',
   standalone: true,
   imports: [
-    CommonModule, 
-    IonList, 
-    IonItem, 
-    IonAvatar, 
-    IonLabel, 
-    IonButton, 
+    CommonModule,
+    IonList,
+    IonItem,
+    IonAvatar,
+    IonLabel,
+    IonButton,
     IonIcon,
     IonCard,
     IonCardHeader,
@@ -35,7 +36,8 @@ import { personRemove, closeCircle, eye, add } from 'ionicons/icons';
     IonCardContent,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    EmptyStateComponent
   ],
   templateUrl: './entrenadores-list.component.html'
 })

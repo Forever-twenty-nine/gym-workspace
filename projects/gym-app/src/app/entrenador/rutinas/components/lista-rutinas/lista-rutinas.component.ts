@@ -10,11 +10,11 @@ import {
     IonItemOptions,
     IonItemOption,
     IonCard,
-    IonCardContent,
-    IonText
+    IonCardContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { pencilOutline, trashOutline } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
     selector: 'app-lista-rutinas',
@@ -32,7 +32,7 @@ import { pencilOutline, trashOutline } from 'ionicons/icons';
     IonItemOption,
     IonCard,
     IonCardContent,
-    IonText
+    EmptyStateComponent
 ]
 })
 export class ListaRutinasComponent {

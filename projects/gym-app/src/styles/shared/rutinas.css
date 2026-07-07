@@ -1,0 +1,135 @@
+﻿/* ---------------------------------------------------- */
+/* Estilos para Rutinas, Ejercicios y Progreso */
+/* ---------------------------------------------------- */
+
+.rutina-modal {
+    --width: 95%;
+    --max-width: 600px;
+    --backdrop-opacity: 0.3;
+}
+
+/* .overlay-h2-6, .overlay-div-7, .header-div-8, .header-span-9, .progreso-page-div-10
+   Migrados a src/styles/entrenado/rutina-progreso.css con nombres semÃ¡nticos
+   (overlay-title, overlay-warning, progreso-header-card, progreso-header-percentage,
+   progreso-footer). */
+
+/* Avatares/fallbacks de encuentro (40px/32px) y foto de progreso:
+   migrados a src/styles/entrenado/rutinas.css con nombres semÃ¡nticos
+   (encuentro-avatar, encuentro-fallback-avatar, photo-frame, etc.). */
+
+.detalle-modal-icon-18 {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.card-chip-20 {
+    margin-right:6px;
+    margin-bottom:4px;
+}
+
+.card-img-27 {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+}
+
+.card-div-28 {
+    height: 1px;
+    background: var(--ion-color-step-150, #e0e0e0);
+    width: 100%;
+}
+
+.card-div-29 {
+    margin-left: -16px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-span-30 {
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.card-p-31 {
+    color: var(--ion-text-color);
+}
+
+.card-div-32 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    color: var(--ion-color-medium);
+}
+
+.card-span-33 {
+    opacity: 0.5;
+}
+
+.card-h2-59 {
+    margin-bottom: 4px;
+}
+
+.card-badge-60 {
+    margin-left: 4px;
+}
+
+.rutinas-modal-item-76 {
+    --inner-padding-end: 4px;
+}
+
+.rutinas-modal-h2-77 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.rutinas-modal-div-78 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    margin: 0;
+}
+
+.rutinas-modal-select-79 {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.card-div-86 {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+
+.card-p-87 {
+    white-space: pre-line;
+    color: var(--ion-text-color);
+}
+
+.card-item-88 {
+    --padding-start: 0;
+}
+
+.card-h3-89 {
+    font-style: italic;
+    color: var(--ion-color-medium);
+}
+
+.card-avatar-91 {
+    width: 30px;
+    height: 30px;
+}
+
+.card-div-93 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-style: italic;
+}
+

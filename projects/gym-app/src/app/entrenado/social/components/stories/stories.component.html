@@ -1,38 +1,27 @@
 @if (stories.length > 0) {
-<div
-  class="overflow-x-auto overflow-y-hidden whitespace-nowrap w-full scrollbar-none" >
-  <!-- Ocultar scrollbar estándar -->
-  <div class="flex gap-2 py-1 px-4 w-max">
+<ion-list lines="none">
+  <ion-item>
     @for (story of stories; track story.id) {
     @if (story.type === 'convocatoria') {
     <!-- Convocatoria circle -->
-    <div (click)="storyClick.emit(story)"
-      class="relative flex flex-col items-center cursor-pointer min-w-16">
-      <ion-avatar
-        class="w-15.5 h-15.5 border-[3px] border-(--ion-color-primary) p-0.5 bg-(--ion-background-color) shadow-md">
-        @if (story.photoUrl) {
-        <img [src]="story.photoUrl" class="rounded-full w-full h-full object-cover"
-          alt="Creador">
-        } @else {
-        <ion-icon name="person-outline" color="primary" class="w-full h-full rounded-full flex items-center justify-center"></ion-icon>
-        }
-      </ion-avatar>
-    </div>
+    <ion-avatar button (click)="storyClick.emit(story)">
+      @if (story.photoUrl) {
+      <img [src]="story.photoUrl" alt="Creador">
+      } @else {
+      <ion-icon name="person-outline" color="primary"></ion-icon>
+      }
+    </ion-avatar>
     } @else {
     <!-- Desafío circle -->
-    <div (click)="storyClick.emit(story)"
-      class="relative flex flex-col items-center cursor-pointer min-w-16">
-      <ion-avatar
-        class="w-15.5 h-15.5 border-[3px] border-(--ion-color-warning) p-0.5 bg-(--ion-background-color) shadow-md">
-        @if (story.photoUrl) {
-        <img [src]="story.photoUrl" class="rounded-full w-full h-full object-cover" alt="">
-        } @else {
-        <ion-icon name="trophy-outline" color="primary" class="w-full h-full rounded-full flex items-center justify-center"></ion-icon>
-        }
-      </ion-avatar>
-    </div>
+    <ion-avatar button (click)="storyClick.emit(story)">
+      @if (story.photoUrl) {
+      <img [src]="story.photoUrl" alt="">
+      } @else {
+      <ion-icon name="trophy-outline" color="primary"></ion-icon>
+      }
+    </ion-avatar>
     }
     }
-  </div>
-</div>
+  </ion-item>
+</ion-list>
 }

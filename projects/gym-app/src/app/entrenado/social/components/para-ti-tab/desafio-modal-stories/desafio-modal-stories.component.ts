@@ -13,7 +13,7 @@ import {
   IonFooter,
   IonButton,
   IonLabel,
-  ToastController, IonTitle, IonText, IonButtons, IonContent, IonItem, IonCard, IonCardTitle, IonCardSubtitle, IonNote, IonListHeader, IonCardContent } from '@ionic/angular/standalone';
+  ToastController, IonTitle, IonText, IonButtons, IonContent, IonItem, IonCard, IonCardTitle, IonCardSubtitle, IonNote, IonListHeader, IonCardContent, IonGrid, IonRow, IonCol, IonChip, IonList } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   trophyOutline, closeOutline, checkmarkOutline, closeCircle, ribbonOutline,
@@ -39,7 +39,8 @@ import { DesafioService } from '../../../../../core/services/desafio.service';
     IonFooter,
     IonButton,
     IonLabel,
-    IonText, IonTitle],
+    IonText, IonTitle,
+    IonGrid, IonRow, IonCol, IonChip, IonList, IonButtons, IonListHeader],
   templateUrl: './desafio-modal-stories.component.html'
 })
 export class DesafioModalStoriesComponent implements OnChanges {

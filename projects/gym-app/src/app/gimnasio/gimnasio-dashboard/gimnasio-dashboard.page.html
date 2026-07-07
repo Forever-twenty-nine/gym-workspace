@@ -1,33 +1,31 @@
-<ion-content [fullscreen]="true" class="transparent-bg">
+<ion-content [fullscreen]="true">
   <app-background />
 
-  <ion-grid fixed class="dashboard-container ion-padding">
-    
-    <!-- Cabecera del Panel -->
-    <ion-row class="ion-align-items-center ion-margin-bottom">
+  <ion-grid fixed>
+    <ion-row>
       <ion-col>
-        <h2 class="dashboard-title">Mi Gimnasio</h2>
+        <ion-text>
+          <h2>Mi Gimnasio</h2>
+        </ion-text>
         <ion-text color="primary">
-          <span class="dashboard-subtitle">Panel principal</span>
+          <span>Panel principal</span>
         </ion-text>
       </ion-col>
     </ion-row>
 
-    <!-- Gestión de Tipos de Entrenamiento -->
     <ion-row>
-      <ion-col class="ion-no-padding">
+      <ion-col>
         <app-tipos-entrenamiento-manager></app-tipos-entrenamiento-manager>
       </ion-col>
     </ion-row>
 
-    <!-- Tarjeta de Estadísticas Informativa -->
-    <ion-row class="ion-margin-top">
-      <ion-col class="ion-no-padding">
-        <ion-card class="ion-no-margin premium-stats-card">
-          <ion-item lines="none" class="ion-padding-vertical">
+    <ion-row>
+      <ion-col>
+        <ion-card>
+          <ion-item lines="none">
             <ion-icon name="bar-chart-outline" color="primary" slot="start" size="large"></ion-icon>
-            <ion-label class="ion-text-wrap">
-              <h3 class="ion-text-bold">Estadísticas del gimnasio</h3>
+            <ion-label>
+              <h3>Estadísticas del gimnasio</h3>
               <p>
                 Para ver la distribución de entrenadores, alumnos y métricas de activación, ve a <strong>Perfil &rarr; Estadísticas</strong>.
               </p>
@@ -36,6 +34,5 @@
         </ion-card>
       </ion-col>
     </ion-row>
-
   </ion-grid>
 </ion-content>

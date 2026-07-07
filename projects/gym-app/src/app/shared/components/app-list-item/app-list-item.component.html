@@ -1,0 +1,16 @@
+<ion-item [button]="button()">
+  <ion-avatar slot="start">
+    @if (photo()) {
+      <img [src]="photo()" />
+    } @else {
+      <ion-icon [name]="photoIcon()"></ion-icon>
+    }
+  </ion-avatar>
+  <ion-label>
+    <h2>{{ name() }}</h2>
+    @if (meta()) {
+      <p>{{ meta() }}</p>
+    }
+  </ion-label>
+  <ng-content></ng-content>
+</ion-item>

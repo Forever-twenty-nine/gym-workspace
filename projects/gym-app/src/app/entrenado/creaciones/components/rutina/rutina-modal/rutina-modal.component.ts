@@ -1,15 +1,16 @@
 import { Component, Input, Output, EventEmitter, inject, signal, computed, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon, IonItem, IonLabel, IonModal, IonButtons, IonInput, IonTextarea, IonCheckbox, IonList, IonSelect, IonSelectOption, ToastController, IonNote, IonText } from '@ionic/angular/standalone';
+import { IonButton, IonItem, IonLabel, IonInput, IonTextarea, IonCheckbox, IonList, IonSelect, IonSelectOption, ToastController, IonNote, IonText } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, saveOutline, barbellOutline, add, helpCircleOutline } from 'ionicons/icons';
+import { barbellOutline, add, helpCircleOutline } from 'ionicons/icons';
 import { RutinaService } from '../../../../../core/services/rutina.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { EjercicioService } from '../../../../../core/services/ejercicio.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { RutinaAsignadaService } from '../../../../../core/services/rutina-asignada.service';
 import { Plan } from 'gym-library';
+import { EditModalComponent } from '../../../../../shared/components/edit-modal/edit-modal.component';
 
 @Component({
   selector: 'app-rutina-modal',
@@ -17,16 +18,10 @@ import { Plan } from 'gym-library';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
+    EditModalComponent,
     IonButton,
-    IonIcon,
     IonItem,
     IonLabel,
-    IonModal,
-    IonButtons,
     IonInput,
     IonTextarea,
     IonCheckbox,
@@ -73,7 +68,7 @@ export class RutinaModalComponent implements OnChanges {
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   constructor() {
-    addIcons({ close, saveOutline, barbellOutline, add, helpCircleOutline });
+    addIcons({ barbellOutline, add, helpCircleOutline });
 
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],

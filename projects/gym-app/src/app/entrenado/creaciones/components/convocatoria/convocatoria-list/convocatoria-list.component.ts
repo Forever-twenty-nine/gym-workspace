@@ -6,7 +6,6 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonText,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
@@ -15,6 +14,7 @@ import {
 import { addIcons } from 'ionicons';
 import { trashOutline, pencilOutline } from 'ionicons/icons';
 import { DateBadgeComponent } from '../../../../../shared/components/date-badge/date-badge.component';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-convocatoria-list',
@@ -26,12 +26,12 @@ import { DateBadgeComponent } from '../../../../../shared/components/date-badge/
     IonList,
     IonItem,
     IonLabel,
-    IonText,
     IonItemSliding,
     IonItemOptions,
     IonItemOption,
     IonIcon,
-    DateBadgeComponent
+    DateBadgeComponent,
+    EmptyStateComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './convocatoria-list.component.html'

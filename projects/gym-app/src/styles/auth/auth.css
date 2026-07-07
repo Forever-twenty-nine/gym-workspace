@@ -107,7 +107,7 @@ app-onboarding {
         @apply font-heading font-semibold text-center mt-20 mb-8;
     }
     ion-card {
-        @apply p-4 shadow-md;
+        @apply p-4;
     }
     ion-card-header {
         @apply p-0;

@@ -10,7 +10,8 @@ import {
   IonButton,
   IonAvatar,
   IonCardContent,
-  IonBadge
+  IonBadge,
+  IonImg
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -43,6 +44,7 @@ import { SocialCommentsModalComponent } from './social-comments-modal/social-com
     IonButton,
     IonCardContent,
     IonBadge,
+    IonImg,
     SocialCommentsModalComponent
   ],
   templateUrl: './social-card.component.html'

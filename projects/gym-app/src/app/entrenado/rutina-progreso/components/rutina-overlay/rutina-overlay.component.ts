@@ -1,11 +1,34 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import {
+    IonButton,
+    IonIcon,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonCardSubtitle,
+    IonAvatar,
+    IonToolbar
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { warningOutline, playOutline, checkmarkCircle } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutina-overlay',
     standalone: true,
-    imports: [CommonModule, IonButton, IonIcon],
+    imports: [
+        CommonModule,
+        IonButton,
+        IonIcon,
+        IonCard,
+        IonCardHeader,
+        IonCardTitle,
+        IonCardContent,
+        IonCardSubtitle,
+        IonAvatar,
+        IonToolbar
+    ],
     templateUrl: './rutina-overlay.component.html',
     styles: [`
     @keyframes fadeIn {
@@ -30,4 +53,8 @@ export class RutinaOverlayComponent {
     readonly hideButton = input<boolean>(false);
 
     readonly action = output<void>();
+
+    constructor() {
+        addIcons({ warningOutline, playOutline, checkmarkCircle });
+    }
 }

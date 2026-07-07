@@ -1,33 +1,27 @@
-<ion-header class="ion-no-border bg-transparent">
-  <ion-toolbar class="entrenados-page-toolbar-81">
-  </ion-toolbar>
+<ion-header>
+  <ion-toolbar></ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
   <app-background />
 
-  <!-- Listado de Entrenados -->
   <app-mis-entrenados [entrenados]="entrenadosViewModel()"
     (verCliente)="verCliente($event)" (openRutinasModal)="openRutinasModal($event)" (desasociar)="desasociarEntrenado($event)">
   </app-mis-entrenados>
 
-  <!-- Invitaciones Pendientes -->
   <app-invitaciones-pendientes [invitaciones]="invitacionesViewModel()" (onCancelar)="cancelarInvitacion($event)">
   </app-invitaciones-pendientes>
 
-  <!-- Detalle del Entrenado -->
   <app-entrenado-detalle-popover [isOpen]="isModalOpen()" [entrenado]="selectedEntrenado()"
     [estadisticas]="estadisticasEntrenado()" [getUserName]="getUserName.bind(this)" [getUserPhoto]="getUserPhoto.bind(this)"
     [formatearTiempo]="formatearTiempo.bind(this)" [getAntiguedadDias]="getAntiguedadDias.bind(this)"
     (close)="closeModal()">
   </app-entrenado-detalle-popover>
 
-  <!-- Modal de Invitación -->
   <app-invitacion-modal [isOpen]="isInvitacionModalOpen()" [form]="invitacionForm()"
     [isSaveDisabled]="isInvitacionSaveDisabled()" (close)="closeInvitacionModal()" (save)="saveInvitacion()">
   </app-invitacion-modal>
 
-  <!-- Modal de Gestión de Rutinas -->
   <app-gestion-rutinas-modal [isOpen]="isRutinasModalOpen()" [entrenado]="selectedEntrenado()"
     [rutinasEntrenado]="rutinasEntrenado()" [rutinasDisponibles]="rutinasDisponibles()" [diasSemana]="diasSemana"
     [plan]="plan()" [getUserName]="getUserName.bind(this)" [getDiasAsignados]="getDiasAsignados.bind(this)"
@@ -36,21 +30,8 @@
     (asignarDiaARutina)="asignarDiaARutina($event.rutina, $event.event)" (asignarRutina)="asignarRutina($event)">
   </app-gestion-rutinas-modal>
 
-  <!-- FAB de ayuda (esquina inferior izquierda) -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
-    <ion-fab-button id="entrenados-help-fab" color="secondary" fill="outline">
-      <ion-icon name="help"></ion-icon>
-    </ion-fab-button>
-    <ion-popover trigger="entrenados-help-fab" triggerAction="click">
-      <ng-template>
-        <ion-content class="ion-padding">
-          <div class="creaciones-page-div-66">{{ helpText() }}</div>
-        </ion-content>
-      </ng-template>
-    </ion-popover>
-  </ion-fab>
+  <app-help-fab [helpText]="helpText()" />
 
-  <!-- FAB de crear (esquina inferior derecha) -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="onFabCreate()" color="primary">
       <ion-icon name="add"></ion-icon>

@@ -1,58 +1,55 @@
 <ion-modal [isOpen]="isOpen()" (willDismiss)="close.emit()" [backdropDismiss]="true" [initialBreakpoint]="0.6" [breakpoints]="[0, 0.6, 0.85, 1]">
     <ng-template>
-
-        
-        <ion-content class="ion-padding">
+        <ion-content>
             <app-background></app-background>
+
             @if (entrenado()) {
-            <!-- Perfil del Entrenado -->
-            <div class="ion-text-center ion-padding-vertical popover-div-70">
-                <div class="flex flex-col items-center gap-2">
-                    <ion-avatar class="popover-avatar-71">
-                        @if (getUserPhoto()(entrenado()!.id)) {
-                            <img class="w-full h-full object-cover" [src]="getUserPhoto()(entrenado()!.id)" />
-                        } @else {
-                            <span class="material-symbols-outlined popover-span-72">person</span>
+                <!-- Perfil del Entrenado -->
+                <ion-card>
+                    <ion-card-content>
+                        <ion-avatar>
+                            @if (getUserPhoto()(entrenado()!.id)) {
+                                <img [src]="getUserPhoto()(entrenado()!.id)" />
+                            } @else {
+                                <span class="material-symbols-outlined">person</span>
+                            }
+                        </ion-avatar>
+                        <h2>
+                            {{ getUserName()(entrenado()!.id) }}
+                        </h2>
+                    </ion-card-content>
+                </ion-card>
+
+                <!-- Información General -->
+                <ion-list lines="inset">
+
+                    @if (entrenado()!.objetivo) {
+                        <ion-item>
+                            <span slot="start" class="material-symbols-outlined">emoji_events</span>
+                            <ion-label>
+                                <h3>Objetivo</h3>
+                                <p>{{ entrenado()!.objetivo }}</p>
+                            </ion-label>
+                        </ion-item>
+                    }
+
+                </ion-list>
+
+                <!-- Estadísticas de Progreso -->
+                @if (estadisticas()) {
+                    <ion-list lines="inset">
+
+                        @for (item of itemsEstadisticas(); track item.titulo) {
+                            <ion-item [style.--stat-color]="'var(--ion-color-' + item.color + ')'">
+                                <span slot="start" class="material-symbols-outlined">{{ item.icon }}</span>
+                                <ion-label>
+                                    <h3>{{ item.titulo }}</h3>
+                                    <p>{{ item.valor }}</p>
+                                </ion-label>
+                            </ion-item>
                         }
-                    </ion-avatar>
-                    <h2 class="ion-no-margin popover-h2-73">
-                        {{ getUserName()(entrenado()!.id) }}
-                    </h2>
-                </div>
-            </div>
-
-            <!-- Información General -->
-            <ion-list class="popover-list-74" lines="inset">
-
-                @if (entrenado()!.objetivo) {
-                <ion-item>
-                    <span slot="start" class="material-symbols-outlined popover-span-75">emoji_events</span>
-                    <ion-label>
-                        <h3>Objetivo</h3>
-                        <p>{{ entrenado()!.objetivo }}</p>
-                    </ion-label>
-                </ion-item>
+                    </ion-list>
                 }
-
-            </ion-list>
-
-            <!-- Estadísticas de Progreso -->
-            @if (estadisticas()) {
-            <ion-list lines="inset" class="ion-margin-top popover-list-74">
-
-                @for (item of itemsEstadisticas(); track item.titulo) {
-                <ion-item>
-                    <span slot="start" class="material-symbols-outlined" [style]="'color: var(--ion-color-' + item.color + '); font-size: 24px; margin-inline-end: 16px;'">
-                        {{ item.icon }}
-                    </span>
-                    <ion-label>
-                        <h3>{{ item.titulo }}</h3>
-                        <p>{{ item.valor }}</p>
-                    </ion-label>
-                </ion-item>
-                }
-            </ion-list>
-            }
             }
         </ion-content>
     </ng-template>

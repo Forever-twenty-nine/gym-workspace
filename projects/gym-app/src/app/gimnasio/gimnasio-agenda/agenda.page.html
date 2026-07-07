@@ -1,43 +1,42 @@
-<ion-content class="transparent-bg" [fullscreen]="true">
+<ion-content [fullscreen]="true">
 
   <app-background />
 
-  <div class="main-container ion-padding relative z-10 flex flex-col gap-6 pb-20">
-    
-    <div class="flex items-center gap-3">
-      <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" class="premium-segment flex-1">
-        <ion-segment-button value="oficial" class="font-extrabold text-xs">
-          <ion-label>Oficial</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="atletas" class="font-extrabold text-xs">
-          <ion-label>Propuestas de Atletas</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-      
-      <ion-button id="help-trigger-agenda" fill="clear" color="medium" class="m-0">
+  <ion-toolbar>
+    <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" mode="ios">
+      <ion-segment-button value="oficial">
+        <ion-label>Oficial</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="atletas">
+        <ion-label>Propuestas de Atletas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-buttons slot="end">
+      <ion-button id="help-trigger-agenda" fill="clear" color="medium">
         <ion-icon slot="icon-only" name="information-circle-outline"></ion-icon>
       </ion-button>
-    </div>
+    </ion-buttons>
+  </ion-toolbar>
 
-    <app-agenda-help-popover triggerId="help-trigger-agenda"></app-agenda-help-popover>
+  <app-agenda-help-popover triggerId="help-trigger-agenda"></app-agenda-help-popover>
 
-    @if (segmentoActivo() === 'oficial') {
-      <app-convocatoria-list
-        [items]="mappedConvocatoriasOficiales()"
-        emptyTitle="Sin WODs"
-        emptyMessage="No hay entrenamientos planificados para esta semana."
-        emptyIcon="calendar-outline">
-      </app-convocatoria-list>
-    }
+  @if (segmentoActivo() === 'oficial') {
+    <app-convocatoria-list
+      [items]="mappedConvocatoriasOficiales()"
+      emptyTitle="Sin WODs"
+      emptyMessage="No hay entrenamientos planificados para esta semana."
+      emptyIcon="calendar-outline">
+    </app-convocatoria-list>
+  }
 
-    @if (segmentoActivo() === 'atletas') {
-      <app-convocatoria-list
-        [items]="mappedConvocatoriasAtletas()"
-        emptyTitle="Sin propuestas"
-        emptyMessage="No hay convocatorias activas de alumnos esta semana."
-        emptyIcon="hand-right-outline">
-      </app-convocatoria-list>
-    }
+  @if (segmentoActivo() === 'atletas') {
+    <app-convocatoria-list
+      [items]="mappedConvocatoriasAtletas()"
+      emptyTitle="Sin propuestas"
+      emptyMessage="No hay convocatorias activas de alumnos esta semana."
+      emptyIcon="hand-right-outline">
+    </app-convocatoria-list>
+  }
 
-  </div>
 </ion-content>

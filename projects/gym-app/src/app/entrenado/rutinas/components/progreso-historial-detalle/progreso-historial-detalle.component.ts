@@ -21,7 +21,7 @@ import {
     IonRow,
     IonCol,
     IonNote,
-    IonText, IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
+    IonText, IonCardHeader, IonCardTitle, IonAvatar } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
     calendarOutline,
@@ -66,7 +66,8 @@ import { SocialShareService } from '../../../../core/services/social-share.servi
     IonRow,
     IonCol,
     IonNote,
-    IonText],
+    IonText,
+    IonAvatar],
     templateUrl: './progreso-historial-detalle.component.html',
     
 })

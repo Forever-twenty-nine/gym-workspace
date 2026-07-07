@@ -16,7 +16,10 @@ import {
   IonList,
   IonInput,
   IonFooter,
-  AlertController
+  AlertController,
+  IonCard,
+  IonCardContent,
+  IonNote
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { sendOutline, returnDownForwardOutline, heart, heartOutline, trashOutline, createOutline, checkmarkOutline } from 'ionicons/icons';
@@ -49,7 +52,10 @@ import { SesionRutina, Comentario } from 'gym-library';
     IonList,
     IonInput,
     IonFooter,
-    BackgroundComponent
+    BackgroundComponent,
+    IonCard,
+    IonCardContent,
+    IonNote
   ],
   templateUrl: './social-comments-modal.component.html'
 })

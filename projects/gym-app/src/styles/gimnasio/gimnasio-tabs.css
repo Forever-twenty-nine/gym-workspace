@@ -1,0 +1,10 @@
+/* ============================================================ */
+/* Estilos Específicos - Tabs del Gimnasio                       */
+/* ============================================================ */
+
+app-gimnasio-tabs {
+    /* Material symbols en los tabs */
+    span.material-symbols-outlined {
+        font-size: 24px;
+    }
+}

@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-segment [value]="currentSegment()" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="profile">
+        <ion-label>Perfil</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="plan">
+        <ion-label>Plan</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="stats">
+        <ion-label>Estadísticas</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <ion-buttons slot="end">
+      <app-notifications-bell
+        [count]="totalNotificationsCount()"
+        iconColor="medium"
+        (bellClick)="openNotifications()" />
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <app-background />
+
+  @if (currentUser(); as user) {
+    @if (currentSegment() === "profile") {
+      <app-profile-tab-info
+        [user]="user"
+        [entrenadoData]="currentEntrenado()"
+        [entrenadorData]="currentEntrenador()"
+        [gimnasioData]="currentGimnasio()"
+        (logoutClick)="logout()" />
+    }
+
+    @if (currentSegment() === "plan") {
+      <app-profile-tab-plan
+        [user]="user"
+        [ultimaSolicitud]="ultimasolicitud()"
+        (openPremiumModal)="openPremiumModal()" />
+    }
+
+    @if (currentSegment() === "stats") {
+      <app-profile-tab-estadisticas
+        [user]="user"
+        (viewPlansClick)="currentSegment.set('plan')" />
+    }
+  } @else if (!isLoggingOut()) {
+    <ion-spinner name="crescent" color="primary" />
+  }
+
+  @if (currentUser()) {
+    <app-edit-profile-modal
+      [isOpen]="isEditModalOpen()"
+      [user]="currentUser()"
+      [entrenadoData]="currentEntrenado()"
+      [entrenadorData]="currentEntrenador()"
+      [gimnasioData]="currentGimnasio()"
+      (modalClosed)="closeEditModal()"
+      (logoutClicked)="logout()" />
+
+    <app-premium-request-modal
+      [isOpen]="isPremiumModalOpen()"
+      [user]="currentUser()"
+      (modalClosed)="closePremiumModal()" />
+}
+
+@if (currentSegment() === 'profile') {
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons>
+        <ion-button color="danger" fill="outline" (click)="logout()">Cerrar sesión</ion-button>
+        <ion-button color="primary" fill="solid" (click)="openEditModal()">Editar perfil</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+}

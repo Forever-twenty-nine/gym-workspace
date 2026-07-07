@@ -1,0 +1,8 @@
+<ion-button fill="clear" [color]="iconColor()" [attr.aria-label]="ariaLabel()" (click)="onClick()">
+  <ion-icon name="notifications-outline"></ion-icon>
+  @if (hasUnread()) {
+    <span role="status" [attr.aria-label]="count() + ' notificaciones no leídas'">
+      {{ displayCount() }}
+    </span>
+  }
+</ion-button>

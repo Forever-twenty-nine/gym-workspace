@@ -1,18 +1,14 @@
 import { Component, computed, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonModal,
-    IonButton,
-    IonIcon,
     IonAvatar,
+    IonCard,
+    IonCardContent,
     IonList,
     IonItem,
-    IonLabel,
-    IonListHeader
+    IonLabel
 } from '@ionic/angular/standalone';
 import { Entrenado } from 'gym-library';
 import { BackgroundComponent } from '../../../../shared/components/background/background.component';
@@ -22,15 +18,17 @@ import { BackgroundComponent } from '../../../../shared/components/background/ba
     templateUrl: './entrenado-detalle-popover.component.html',
     standalone: true,
     imports: [
-    CommonModule,
-    IonContent,
-    IonAvatar,
-    IonList,
-    IonItem,
-    IonLabel,
-    BackgroundComponent,
-    IonModal
-]
+        CommonModule,
+        IonContent,
+        IonModal,
+        IonAvatar,
+        IonCard,
+        IonCardContent,
+        IonList,
+        IonItem,
+        IonLabel,
+        BackgroundComponent
+    ]
 })
 export class EntrenadoDetallePopoverComponent {
     isOpen = input.required<boolean>();

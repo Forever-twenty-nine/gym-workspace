@@ -1,35 +1,31 @@
 @if (invitaciones().length > 0) {
-<div class="ion-padding-vertical">
-    <div class="ion-text-center ion-padding-bottom">
-        <ion-text class="ion-text-uppercase">
-            <h6><strong>Invitaciones Pendientes</strong></h6>
-        </ion-text>
-    </div>
-    <ion-list lines="none" class="ion-padding-vertical">
-        @for (invitacion of invitaciones(); track invitacion.id) {
-        <ion-item-sliding class="gym-sliding-item" #slidingItem>
-            <ion-item button (click)="toggleSliding(slidingItem)">
-                <ion-avatar slot="start">
-                    <div class="avatar-placeholder">
-                        <ion-icon name="mail-outline" color="medium"></ion-icon>
-                    </div>
-                </ion-avatar>
-                <ion-label>
-                    <h3><strong>{{ invitacion.nombre }}</strong></h3>
-                    <p class="ion-text-nowrap">{{ invitacion.email }}</p>
-                </ion-label>
-                <ion-note slot="end">
-                    {{ invitacion.fechaCreacion | date:'dd/MM/yyyy' }}
-                </ion-note>
-            </ion-item>
-            
-            <ion-item-options side="start">
-                <ion-item-option color="danger" (click)="onCancelar.emit(invitacion.id); slidingItem.close()">
-                    <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
-                </ion-item-option>
-            </ion-item-options>
-        </ion-item-sliding>
-        }
-    </ion-list>
-</div>
+  <ion-list lines="none">
+    <ion-list-header>
+      <ion-label>
+        <h6>Invitaciones Pendientes</h6>
+      </ion-label>
+    </ion-list-header>
+    @for (invitacion of invitaciones(); track invitacion.id) {
+      <ion-item-sliding #slidingItem>
+        <ion-item button (click)="toggleSliding(slidingItem)">
+          <ion-avatar slot="start">
+            <ion-icon name="mail-outline" color="medium"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h3><strong>{{ invitacion.nombre }}</strong></h3>
+            <p>{{ invitacion.email }}</p>
+          </ion-label>
+          <ion-note slot="end">
+            {{ invitacion.fechaCreacion | date:'dd/MM/yyyy' }}
+          </ion-note>
+        </ion-item>
+
+        <ion-item-options side="start">
+          <ion-item-option color="danger" (click)="onCancelar.emit(invitacion.id); slidingItem.close()">
+            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    }
+  </ion-list>
 }

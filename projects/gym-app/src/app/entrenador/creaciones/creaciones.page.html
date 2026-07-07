@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
     <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
       <ion-segment-button value="rutinas">
@@ -11,7 +11,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
   <app-background />
 
   @switch (selectedTab()) {
@@ -23,21 +23,8 @@
     }
   }
 
-  <!-- FAB de ayuda (esquina inferior izquierda) -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
-    <ion-fab-button id="trainer-help-fab" color="secondary" fill="outline">
-      <ion-icon name="help"></ion-icon>
-    </ion-fab-button>
-    <ion-popover trigger="trainer-help-fab" triggerAction="click">
-      <ng-template>
-        <ion-content class="ion-padding">
-          <div class="creaciones-page-div-66">{{ helpText() }}</div>
-        </ion-content>
-      </ng-template>
-    </ion-popover>
-  </ion-fab>
+  <app-help-fab [helpText]="helpText()" />
 
-  <!-- FAB de crear (esquina inferior derecha) -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="onFabCreate()" color="primary">
       <ion-icon name="add"></ion-icon>

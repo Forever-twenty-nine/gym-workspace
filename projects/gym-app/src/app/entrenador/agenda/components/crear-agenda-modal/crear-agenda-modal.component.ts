@@ -2,16 +2,8 @@ import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
-  IonIcon,
   IonItem,
   IonLabel,
-  IonModal,
-  IonButtons,
   IonInput,
   IonTextarea,
   IonToggle,
@@ -26,12 +18,13 @@ import {
   ToastController
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, paperPlaneOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
+import { chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../core/services/convocatoria.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TipoEntrenamientoService } from '../../../../core/services/tipo-entrenamiento.service';
 import { Convocatoria, Rol } from 'gym-library';
 import { BackgroundComponent } from '../../../../shared/components/background/background.component';
+import { EditModalComponent } from '../../../../shared/components/edit-modal/edit-modal.component';
 
 @Component({
   selector: 'app-crear-agenda-modal',
@@ -39,16 +32,9 @@ import { BackgroundComponent } from '../../../../shared/components/background/ba
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonButton,
-    IonIcon,
+    EditModalComponent,
     IonItem,
     IonLabel,
-    IonModal,
-    IonButtons,
     IonInput,
     IonTextarea,
     IonToggle,
@@ -98,7 +84,7 @@ export class CrearAgendaModalComponent implements OnInit {
   fechaSeleccionada: Date = new Date();
 
   constructor() {
-    addIcons({ close, paperPlaneOutline, chevronDownOutline, chevronUpOutline });
+    addIcons({ chevronDownOutline, chevronUpOutline });
     
     const ahora = new Date();
     const horaInicioStr = this.padZero(ahora.getHours()) + ':' + this.padZero(ahora.getMinutes());

@@ -8,7 +8,6 @@ import {
   IonLabel,
   IonButton,
   IonIcon,
-  IonText,
   IonItemSliding,
   IonItemOptions,
   IonItemOption
@@ -16,6 +15,7 @@ import {
 import { addIcons } from 'ionicons';
 import { trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-rutina-list',
@@ -29,10 +29,10 @@ import { Rutina } from 'gym-library';
     IonLabel,
     IonButton,
     IonIcon,
-    IonText,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    EmptyStateComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './rutina-list.component.html'

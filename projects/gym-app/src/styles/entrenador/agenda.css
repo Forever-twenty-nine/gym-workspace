@@ -1,0 +1,119 @@
+/* ============================================================ */
+/* Estilos Específicos - Agenda del Entrenador                   */
+/* ============================================================ */
+
+/* === Convocatoria Card === */
+app-convocatoria-card {
+    ion-card {
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Badges dentro del header (WOD OFICIAL + SEMANAL) */
+    ion-item ion-label h2 {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+
+    /* Chip de tiempo */
+    ion-card-content ion-chip {
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Separación del texto principal respecto al chip */
+    ion-card-content ion-text {
+        display: block;
+        margin-top: var(--ion-margin);
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Avatar con icono fallback (sin foto) */
+    ion-avatar ion-icon {
+        font-size: 28px;
+    }
+}
+
+/* === Convocatoria List === */
+app-convocatoria-list {
+    ion-card {
+        --background: transparent;
+        box-shadow: none;
+    }
+
+    ion-card-content {
+        padding: 0;
+    }
+
+    /* Estado vacío: icono grande + título + mensaje */
+    ion-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--ion-margin);
+        padding: var(--ion-padding);
+    }
+
+    ion-text h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+    }
+
+    ion-text p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        max-width: 320px;
+    }
+
+    ion-text ion-icon {
+        font-size: 64px;
+        opacity: 0.4;
+    }
+
+    /* Label con margin inicial consistente (cuando es slide item) */
+    ion-item ion-label {
+        margin-inline-start: var(--ion-margin);
+    }
+
+    /* Date badge: margen derecho consistente */
+    app-date-badge {
+        margin-inline-end: var(--ion-margin);
+    }
+}
+
+/* === Crear Agenda Modal === */
+app-crear-agenda-modal {
+    /* Content con padding transparente para mostrar el background */
+    ion-content {
+        --background: transparent;
+    }
+
+    /* Segmento de selección de día */
+    ion-segment {
+        margin-bottom: var(--ion-margin);
+        padding-inline: var(--ion-padding);
+    }
+
+    /* Descripción del toggle */
+    ion-toggle p {
+        font-size: 12px;
+        color: var(--ion-color-medium);
+        margin: 0;
+    }
+
+    /* Grid sin padding para alinear time pickers */
+    ion-grid {
+        --ion-grid-padding: 0;
+        padding: 0;
+    }
+
+    ion-grid ion-col {
+        padding: 0;
+    }
+
+    ion-grid ion-col + ion-col {
+        padding-inline-start: 8px;
+    }
+}

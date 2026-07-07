@@ -26,9 +26,10 @@
 } @else {
   <ion-card>
     <ion-card-content>
-      <ion-text color="medium">
-        <p>No tienes invitaciones pendientes.</p>
-      </ion-text>
+      <app-empty-state
+        title="Sin invitaciones pendientes."
+        message="Cuando alguien te invite aparecerá aquí.">
+      </app-empty-state>
     </ion-card-content>
   </ion-card>
 }

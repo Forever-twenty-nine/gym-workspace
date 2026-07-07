@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
     <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
       <ion-segment-button value="rutinas">
@@ -11,7 +11,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
   <app-background />
 
   @switch (selectedTab()) {

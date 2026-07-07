@@ -1,5 +1,5 @@
 <ion-card>
-  <ion-card-header class="ion-padding-vertical">
+  <ion-card-header>
     <ion-card-title>Próximas Rutinas</ion-card-title>
     <ion-button slot="end" fill="clear" (click)="verTodas.emit()">
       Ver todas
@@ -8,39 +8,32 @@
 
   <ion-card-content>
     @if (rutinas.length > 0) {
-      <ion-list lines="none">
-        @for (rutina of rutinas; track rutina.id || rutina.nombre) {
-          <ion-item class="list-item-2" button [detail]="false" [disabled]="!rutina.esEjecutable" (click)="verDetalle.emit(rutina)">
-            <app-date-badge slot="start" class="ion-margin-end"
-              [fecha]="rutina.fecha"
-              [esEjecutable]="rutina.esEjecutable ?? false"
-              [diaCorto]="rutina.diaCorto">
-            </app-date-badge>
+    <ion-list lines="none">
+      @for (rutina of rutinas; track rutina.id || rutina.nombre) {
+      <ion-item button [detail]="false" [disabled]="!rutina.esEjecutable" (click)="verDetalle.emit(rutina)">
+        <app-date-badge slot="start" [fecha]="rutina.fecha" [esEjecutable]="rutina.esEjecutable ?? false"
+          [diaCorto]="rutina.diaCorto">
+        </app-date-badge>
 
-            <ion-label>
-              <h2>{{ rutina.nombre }}</h2>
-            </ion-label>
+        <ion-label>
+          <h2>{{ rutina.nombre }}</h2>
+        </ion-label>
 
-            @if (rutina.esEjecutable) {
-              <ion-icon slot="end" name="play-circle" color="primary" size="large"></ion-icon>
-            } @else {
-              <ion-icon slot="end" name="chevron-forward" color="medium"></ion-icon>
-            }
-          </ion-item>
+        @if (rutina.esEjecutable) {
+        <ion-icon slot="end" name="play-circle" color="primary" size="large"></ion-icon>
+        } @else {
+        <ion-icon slot="end" name="chevron-forward" color="medium"></ion-icon>
         }
-      </ion-list>
+      </ion-item>
+      }
+    </ion-list>
     } @else {
-      <ion-text color="medium" class="ion-text-center">
-        <ion-icon name="barbell-outline" size="large"></ion-icon>
-        <p><strong>No tienes rutinas asignadas</strong></p>
-        <p>
-          @if (entrenador) {
-            Tu entrenador te asignará rutinas pronto.
-          } @else {
-            Busca un entrenador para recibir rutinas personalizadas.
-          }
-        </p>
-      </ion-text>
+      <app-empty-state
+        icon="barbell-outline"
+        title="No tienes rutinas asignadas"
+        [message]="entrenador
+          ? 'Tu entrenador te asignará rutinas pronto.'
+          : 'Busca un entrenador para recibir rutinas personalizadas.'" />
     }
   </ion-card-content>
 </ion-card>

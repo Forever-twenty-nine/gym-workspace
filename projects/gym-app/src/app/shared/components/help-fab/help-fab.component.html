@@ -1,0 +1,14 @@
+<ion-fab slot="fixed" vertical="bottom" horizontal="start">
+  <ion-fab-button [id]="resolvedFabId()" color="secondary" fill="outline">
+    <ion-icon name="help"></ion-icon>
+  </ion-fab-button>
+  <ion-popover [trigger]="resolvedFabId()" triggerAction="click">
+    <ng-template>
+      <ion-content>
+        <ion-text>
+          <p>{{ helpText() }}</p>
+        </ion-text>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+</ion-fab>

@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import {
   IonContent, IonSegment, IonSegmentButton, IonLabel, IonHeader,
-  SegmentCustomEvent, ModalController, ToastController, IonToolbar } from '@ionic/angular/standalone';
+  SegmentCustomEvent, ModalController, ToastController, IonToolbar, IonCard, IonCardContent } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AuthService } from '../../core/services/auth.service';
@@ -28,7 +28,7 @@ import { DesafioModalStoriesComponent } from './components/para-ti-tab/desafio-m
   selector: 'app-social',
   templateUrl: './social.page.html',
   standalone: true,
-  imports: [IonToolbar, 
+  imports: [IonToolbar,
     CommonModule,
     IonContent,
     IonSegment, IonSegmentButton, IonLabel,
@@ -40,7 +40,8 @@ import { DesafioModalStoriesComponent } from './components/para-ti-tab/desafio-m
     BackgroundComponent,
     StoriesComponent,
     ConvocatoriaModalStoriesComponent,
-    DesafioModalStoriesComponent
+    DesafioModalStoriesComponent,
+    IonCard, IonCardContent
   ]
 })
 export class SocialPage {

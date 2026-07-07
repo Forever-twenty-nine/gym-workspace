@@ -1,31 +1,29 @@
 @if (isLoading()) {
-  <div class="tab-div-22">
-    <ion-spinner class="tab-spinner-23" name="crescent" color="primary"></ion-spinner>
-    <p class="tab-p-24">Cargando actividad...</p>
-  </div>
-} @else if (filteredFeed().length === 0) {
-  <ion-card class="tab-card-25">
-    <ion-card-header>
-      <ion-card-title class="tab-title-26">
-        {{ tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún' }}
-      </ion-card-title>
-      <ion-card-subtitle class="text-[var(--ion-color-medium)] text-sm">
-        {{ tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.' }}
-      </ion-card-subtitle>
-    </ion-card-header>
+  <ion-card>
     <ion-card-content>
-      <ion-img src="assets/images/empty-feed.png" alt="Cero actividad"></ion-img>
+      <app-empty-state title="Cargando actividad..." [loading]="true" />
+    </ion-card-content>
+  </ion-card>
+} @else if (filteredFeed().length === 0) {
+  <ion-card>
+    <ion-card-content>
+      <app-empty-state
+        icon="newspaper-outline"
+        [title]="tab === 'para-ti' ? 'Cero actividad aún' : 'No sigues a nadie aún'"
+        [message]="tab === 'para-ti' ? '¡Entrena hoy y comparte tu progreso con el resto!' : 'Sigue a otros atletas para ver su actividad aquí.'" />
     </ion-card-content>
   </ion-card>
 }
 
 <!-- FEED ACTIVO -->
 @else {
-  <div class="flex flex-col gap-2">
+  <ion-list lines="none">
     @for (item of filteredFeed(); track item.id) {
-      <app-social-card [sesion]="item"></app-social-card>
+      <ion-item>
+        <app-social-card [sesion]="item"></app-social-card>
+      </ion-item>
     }
-  </div>
+  </ion-list>
 
   <!-- Scroll Infinito -->
   @if (hasMoreItems()) {

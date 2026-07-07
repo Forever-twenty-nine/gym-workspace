@@ -2,16 +2,9 @@ import { Component, Input, Output, EventEmitter, inject, OnInit, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
   IonButton,
-  IonIcon,
   IonItem,
   IonLabel,
-  IonModal,
-  IonButtons,
   IonInput,
   IonTextarea,
   ToastController,
@@ -21,10 +14,11 @@ import {
   IonCol
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, sparkles, paperPlaneOutline, helpCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
+import { sparkles, helpCircleOutline, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { ConvocatoriaService } from '../../../../../core/services/convocatoria.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { Convocatoria, Rol } from 'gym-library';
+import { EditModalComponent } from '../../../../../shared/components/edit-modal/edit-modal.component';
 
 @Component({
   selector: 'app-convocatoria-modal',
@@ -32,16 +26,10 @@ import { Convocatoria, Rol } from 'gym-library';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
+    EditModalComponent,
     IonButton,
-    IonIcon,
     IonItem,
     IonLabel,
-    IonModal,
-    IonButtons,
     IonInput,
     IonTextarea,
     IonList,
@@ -67,7 +55,7 @@ export class ConvocatoriaModalComponent implements OnInit, OnChanges {
   isEditing = false;
 
   constructor() {
-    addIcons({ close, paperPlaneOutline, helpCircleOutline });
+    addIcons({ helpCircleOutline });
     
     const ahora = new Date();
     const horaInicioStr = this.padZero(ahora.getHours()) + ':' + this.padZero(ahora.getMinutes());

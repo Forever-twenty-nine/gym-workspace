@@ -9,13 +9,13 @@ import {
   IonItem,
   IonIcon,
   IonButton,
-  IonLabel,
-  IonText
+  IonLabel
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { barbellOutline, chevronForward, playCircle, calendarOutline, flameOutline, calendarClearOutline } from 'ionicons/icons';
 import { Rutina } from 'gym-library';
 import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 export interface DashboardRutina extends Rutina {
   esEjecutable?: boolean;
@@ -41,8 +41,8 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
     IonIcon,
     IonButton,
     IonLabel,
-    IonText,
-    DateBadgeComponent
+    DateBadgeComponent,
+    EmptyStateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`

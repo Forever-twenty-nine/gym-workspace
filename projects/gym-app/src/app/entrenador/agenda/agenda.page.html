@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
     <ion-segment [value]="segmentoActivo()" (ionChange)="cambiarSegmento($event)" mode="ios">
       <ion-segment-button value="oficial">
@@ -11,37 +11,43 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  
+<ion-content [fullscreen]="true">
+
   <app-background />
 
-  <div class="main-container">
-    
+  <ion-grid>
     <!-- Contenido de Convocatorias Oficiales (WODs) -->
     @if (segmentoActivo() === 'oficial') {
-      <app-convocatoria-list
-        [items]="mappedConvocatoriasOficiales()"
-        [canDelete]="true"
-        emptyTitle="Agenda vacía"
-        emptyMessage="No tienes entrenamientos o WODs planificados para hoy o mañana."
-        emptyIcon="calendar-outline"
-        (eliminar)="confirmarEliminacion($event)"
-        (editar)="abrirEditarModal($event)">
-      </app-convocatoria-list>
+      <ion-row>
+        <ion-col>
+          <app-convocatoria-list
+            [items]="mappedConvocatoriasOficiales()"
+            [canDelete]="true"
+            emptyTitle="Agenda vacía"
+            emptyMessage="No tienes entrenamientos o WODs planificados para hoy o mañana."
+            emptyIcon="calendar-outline"
+            (eliminar)="confirmarEliminacion($event)"
+            (editar)="abrirEditarModal($event)">
+          </app-convocatoria-list>
+        </ion-col>
+      </ion-row>
     }
 
     <!-- Contenido de Convocatorias de Atletas (Propuestas) -->
     @if (segmentoActivo() === 'atletas') {
-      <app-convocatoria-list
-        [items]="mappedConvocatoriasAtletas()"
-        [canDelete]="false"
-        emptyTitle="Sin propuestas"
-        emptyMessage="No hay convocatorias activas publicadas por tus alumnos por el momento."
-        emptyIcon="hand-right-outline">
-      </app-convocatoria-list>
+      <ion-row>
+        <ion-col>
+          <app-convocatoria-list
+            [items]="mappedConvocatoriasAtletas()"
+            [canDelete]="false"
+            emptyTitle="Sin propuestas"
+            emptyMessage="No hay convocatorias activas publicadas por tus alumnos por el momento."
+            emptyIcon="hand-right-outline">
+          </app-convocatoria-list>
+        </ion-col>
+      </ion-row>
     }
-
-  </div>
+  </ion-grid>
 
   <!-- FAB de crear (esquina inferior derecha) -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
@@ -51,8 +57,8 @@
   </ion-fab>
 
   <!-- Modal Component para Crear/Editar Sesión de Agenda -->
-  <app-crear-agenda-modal 
-    [isOpen]="isCrearModalOpen()" 
+  <app-crear-agenda-modal
+    [isOpen]="isCrearModalOpen()"
     [convocatoria]="modalDataConvocatoria()"
     [isCreating]="isCreatingModal()"
     (close)="cerrarCrearModal()"

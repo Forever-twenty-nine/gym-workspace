@@ -36,12 +36,9 @@
         }
       </ion-list>
     } @else {
-      <ion-text color="medium">
-        <p class="ion-text-center">
-          <em>Aún no tienes entrenados asociados.</em><br>
-          <small>Usa el botón "+" para invitar a uno.</small>
-        </p>
-      </ion-text>
+      <app-empty-state
+        title="Aún no tienes entrenados asociados."
+        message="Usa el botón + para invitar a uno." />
     }
   </ion-card-content>
 </ion-card>

@@ -1,24 +1,18 @@
-<div class="flex flex-col gap-4">
-  @for (item of items(); track item.convocatoria.id) {
-    <app-convocatoria-card
-      [convocatoria]="item.convocatoria"
-      [creadorName]="item.creadorName"
-      [creadorPhoto]="item.creadorPhoto"
-      [fechaFormateada]="item.fechaFormateada"
-      [asistentes]="item.asistentes">
-    </app-convocatoria-card>
-  } @empty {
-    <!-- Estado vacío -->
-    <ion-card class="ion-text-center ion-padding">
-      <ion-card-content>
-        <ion-icon class="list-icon-94" [name]="emptyIcon()" color="medium"></ion-icon>
-        <ion-text>
-          <h3 class="font-bold m-0 mb-2">{{ emptyTitle() }}</h3>
-        </ion-text>
-        <ion-text color="medium">
-          <p class="m-0">{{ emptyMessage() }}</p>
-        </ion-text>
-      </ion-card-content>
-    </ion-card>
-  }
-</div>
+<ion-card>
+  <ion-card-content>
+    @for (item of items(); track item.convocatoria.id) {
+      <app-convocatoria-card
+        [convocatoria]="item.convocatoria"
+        [creadorName]="item.creadorName"
+        [creadorPhoto]="item.creadorPhoto"
+        [fechaFormateada]="item.fechaFormateada"
+        [asistentes]="item.asistentes">
+      </app-convocatoria-card>
+    } @empty {
+      <app-empty-state
+        [icon]="emptyIcon()"
+        [title]="emptyTitle()"
+        [message]="emptyMessage()" />
+    }
+  </ion-card-content>
+</ion-card>

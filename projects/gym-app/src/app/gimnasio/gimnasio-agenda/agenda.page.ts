@@ -6,7 +6,9 @@ import {
   IonSegment,
   IonSegmentButton,
   IonButton,
-  IonIcon
+  IonIcon,
+  IonToolbar,
+  IonButtons
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { 
@@ -33,6 +35,8 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
     IonSegmentButton,
     IonButton,
     IonIcon,
+    IonToolbar,
+    IonButtons,
     ConvocatoriaListComponent,
     AgendaHelpPopoverComponent,
     BackgroundComponent

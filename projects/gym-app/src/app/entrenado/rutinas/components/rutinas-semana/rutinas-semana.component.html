@@ -1,5 +1,5 @@
-<ion-card class="historial-card-19">
-  <ion-card-header class="ion-padding-vertical">
+<ion-card>
+  <ion-card-header>
     <ion-card-title>Esta Semana</ion-card-title>
   </ion-card-header>
 
@@ -9,8 +9,8 @@
         @for (dia of rutinasPorDia; track dia.fecha) {
           <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
 
-            <ion-item class="list-item-2" slot="header" button detail="false">
-              <app-date-badge slot="start" class="ion-margin-end"
+            <ion-item slot="header" button detail="false">
+              <app-date-badge slot="start"
                 [class.opacity-60]="!diaTieneActividad(dia)"
                 [fecha]="dia.fecha"
                 [esEjecutable]="dia.esHoy && diaTieneActividad(dia)"
@@ -59,8 +59,8 @@
                 }
               } @else {
                 <ion-item lines="none">
-                  <ion-label class="ion-text-center">
-                    <p class="italic">Sin rutinas ni encuentros este día.</p>
+                  <ion-label>
+                    <p>Sin rutinas ni encuentros este día.</p>
                   </ion-label>
                 </ion-item>
               }
@@ -70,11 +70,10 @@
         }
       </ion-accordion-group>
     } @else {
-      <ion-text color="medium" class="ion-text-center">
-        <ion-icon name="calendar-outline" size="large"></ion-icon>
-        <h2>Sin actividad programada</h2>
-        <p>Crea rutinas o encuentros en Creaciones, o pídele un plan a tu entrenador.</p>
-      </ion-text>
+      <app-empty-state
+        icon="calendar-outline"
+        title="Sin actividad programada"
+        message="Crea rutinas o encuentros en Creaciones, o pídele un plan a tu entrenador." />
     }
   </ion-card-content>
 </ion-card>

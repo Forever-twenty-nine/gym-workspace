@@ -2,6 +2,7 @@ import { Component, input, output } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import {
     IonList,
+    IonListHeader,
     IonItem,
     IonLabel,
     IonIcon,
@@ -9,8 +10,7 @@ import {
     IonNote,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption,
-    IonText
+    IonItemOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, closeCircleOutline } from 'ionicons/icons';
@@ -30,6 +30,7 @@ export interface InvitacionViewModel {
         CommonModule,
         DatePipe,
         IonList,
+        IonListHeader,
         IonItem,
         IonLabel,
         IonIcon,
@@ -37,8 +38,7 @@ export interface InvitacionViewModel {
         IonAvatar,
         IonNote,
         IonItemOptions,
-        IonItemOption,
-        IonText
+        IonItemOption
     ]
 })
 export class InvitacionesPendientesComponent {

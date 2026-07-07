@@ -1,0 +1,86 @@
+/* ============================================================ */
+/* Estilos Específicos - Gimnasio Entrenadores                   */
+/* ============================================================ */
+
+app-gimnasio-entrenadores {
+    ion-content {
+        --background: transparent;
+    }
+
+    /* Searchbar + Invitar */
+    ion-searchbar {
+        --background: rgba(255, 255, 255, 0.05);
+        --border-radius: 12px;
+    }
+
+    ion-button[expand="block"] {
+        margin-top: var(--ion-margin);
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Espaciado entre bloques */
+    app-entrenador-list,
+    app-invitaciones-pendientes-list {
+        display: block;
+        margin-top: var(--ion-margin);
+    }
+}
+
+/* === Entrenador List === */
+app-entrenador-list {
+    ion-list {
+        padding: 0;
+        margin-top: var(--ion-margin);
+        background: transparent;
+    }
+
+    ion-item {
+        --background: transparent;
+    }
+
+    /* Empty state */
+    ion-card {
+        margin-top: var(--ion-margin);
+    }
+
+    ion-text {
+        padding: var(--ion-padding);
+        text-align: center;
+    }
+
+    ion-text p {
+        margin: 0;
+    }
+}
+
+/* === Invitaciones Pendientes List === */
+app-invitaciones-pendientes-list {
+    ion-card {
+        margin-top: var(--ion-margin);
+    }
+
+    ion-card-title {
+        text-transform: uppercase;
+        font-weight: 700;
+    }
+
+    ion-list {
+        background: transparent;
+    }
+
+    ion-item {
+        --background: transparent;
+    }
+
+    ion-item h3 {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* "Enviada el ..." con size pequeño + color medium */
+    ion-item ion-label p:last-of-type {
+        font-size: 0.7rem;
+        color: var(--ion-color-medium);
+        margin: 0;
+    }
+}

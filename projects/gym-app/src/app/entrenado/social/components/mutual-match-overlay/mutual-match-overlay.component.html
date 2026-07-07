@@ -1,37 +1,38 @@
 <ion-modal [isOpen]="true" (ionModalDidDismiss)="onDidDismiss()">
   <ng-template>
-    <ion-card class="m-0 border text-center flex flex-col items-center gap-4 p-6">
+    <ion-card>
 
-      <ion-card-header class="p-0 flex flex-col gap-1 items-center">
-        <ion-card-title class="text-xl font-bold">¡Conexión Realizada!</ion-card-title>
-        <ion-card-subtitle class="text-xs">Nueva coincidencia para entrenar</ion-card-subtitle>
+      <ion-card-header>
+        <ion-card-title>¡Conexión Realizada!</ion-card-title>
+        <ion-card-subtitle>Nueva coincidencia para entrenar</ion-card-subtitle>
       </ion-card-header>
 
-      <ion-card-content class="w-full p-0 flex flex-col items-center gap-4">
+      <ion-card-content>
         <!-- Avatares Simples -->
-        <div class="flex items-center justify-center gap-4 py-2">
-          <!-- Mi Foto -->
-          <ion-avatar
-            class="w-16 h-16 border-2 flex items-center justify-center overflow-hidden">
-            @if (currentUserPhoto) {
-            <img [src]="currentUserPhoto" alt="Mi Foto" class="w-full h-full object-cover">
-            } @else {
-            <span class="text-[10px] font-bold uppercase">Tú</span>
-            }
-          </ion-avatar>
+        <ion-list lines="none">
+          <ion-item>
+            <!-- Mi Foto -->
+            <ion-avatar slot="start">
+              @if (currentUserPhoto) {
+              <img [src]="currentUserPhoto" alt="Mi Foto">
+              } @else {
+              <span>Tú</span>
+              }
+            </ion-avatar>
 
-          <div class="font-bold text-sm">Y</div>
+            <ion-label>Y</ion-label>
 
-          <!-- Foto de Partner -->
-          <ion-avatar
-            class="w-16 h-16 border-2 flex items-center justify-center overflow-hidden">
-            @if (partnerPhoto) {
-            <img [src]="partnerPhoto" [alt]="matchActual.partnerName" class="w-full h-full object-cover">
-            } @else {
-            <span class="text-[10px] font-bold uppercase">Socio</span>
-            }
-          </ion-avatar>
-        </div>
+            <!-- Foto de Partner -->
+            <ion-avatar slot="end">
+              @if (partnerPhoto) {
+              <img [src]="partnerPhoto" [alt]="matchActual.partnerName">
+              } @else {
+              <span>Socio</span>
+              }
+            </ion-avatar>
+          </ion-item>
+        </ion-list>
+
         <!-- Mensaje Contextual -->
         @if (matchMessage) {
         <ion-label>
@@ -48,7 +49,6 @@
       <ion-button (click)="onCerrarMatch()" fill="outline" color="medium">
         Seguir Buscando
       </ion-button>
-
 
     </ion-card>
   </ng-template>

@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
     <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
       <ion-segment-button value="convocatorias">
@@ -17,7 +17,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
   <app-background />
 
   @switch (selectedTab()) {
@@ -60,19 +60,8 @@
     }
   }
 
-  <!-- FAB de ayuda (esquina inferior izquierda, color secondary + outlined = menos prominente) -->
-  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
-    <ion-fab-button id="help-fab" color="secondary" fill="outline">
-      <ion-icon name="help"></ion-icon>
-    </ion-fab-button>
-    <ion-popover trigger="help-fab" triggerAction="click">
-      <ng-template>
-        <ion-content class="ion-padding">
-          {{ helpText() }}
-        </ion-content>
-      </ng-template>
-    </ion-popover>
-  </ion-fab>
+  <!-- FAB de ayuda (compartido via <app-help-fab>) -->
+  <app-help-fab [helpText]="helpText()" />
 
   <!-- FAB de crear (esquina inferior derecha, color primary + solid = acción principal) -->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">

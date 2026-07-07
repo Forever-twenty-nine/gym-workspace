@@ -78,3 +78,103 @@ ion-toolbar ion-segment {
 ion-alert.days-alert {
   --max-height: 85vh;
 }
+
+/* ============================================================ */
+/* Patrón de Diseño Global: ion-card                            */
+/* ============================================================ */
+ion-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  margin: 16px;
+  border: 1px solid rgba(var(--ion-color-medium-rgb), 0.1);
+  background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color, #fff)));
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ============================================================ */
+/* Animaciones globales                                          */
+/* ============================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================ */
+/* Utility: avatar fallback (para cuando el usuario no tiene foto) */
+/* ============================================================ */
+/* ion-avatar por defecto (look consistente en toda la app) */
+ion-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ion-color-medium);
+  color: var(--ion-color-medium-contrast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+ion-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+ion-avatar ion-icon {
+  font-size: 22px;
+}
+
+/* Variante: fallback con texto/iniciales */
+ion-avatar span,
+ion-avatar > span:not(.material-symbols-outlined) {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Variante: fallback con material-symbols (Google Fonts) */
+ion-avatar > span.material-symbols-outlined {
+  font-size: 32px;
+}
+
+/* Variante: avatares apilados (con borde que simula superposición) */
+ion-avatar.avatar-stacked {
+  border: 2px solid var(--ion-background-color);
+}
+
+/* Stat-cell pattern: ion-col con ion-note arriba + ion-avatar con icon+valor */
+/* Lookup estructural: cualquier stat cell dentro de un grid sigue este look */
+ion-grid > ion-row > ion-col > ion-note {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  margin: 0;
+}
+
+ion-grid > ion-row > ion-col > ion-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 8px;
+  background: transparent;
+  width: auto;
+  height: auto;
+}
+
+ion-grid > ion-row > ion-col > ion-avatar ion-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+ion-grid > ion-row > ion-col > ion-avatar ion-text {
+  font-weight: 900;
+  font-size: 1rem;
+  line-height: 1.2;
+}

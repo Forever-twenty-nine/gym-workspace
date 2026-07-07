@@ -2,23 +2,16 @@ import { Component, input, output, effect, signal, computed, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
   IonIcon,
   IonItem,
-  IonModal,
-  IonButtons,
   IonInput,
   IonTextarea,
   IonText,
-  IonList,
-  IonLabel
+  IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, star } from 'ionicons/icons';
+import { star } from 'ionicons/icons';
+import { EditModalComponent } from '../../../../shared/components/edit-modal/edit-modal.component';
 
 @Component({
   selector: 'app-ejercicio-modal',
@@ -27,38 +20,14 @@ import { close, star } from 'ionicons/icons';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonButton,
+    EditModalComponent,
     IonIcon,
     IonItem,
-    IonModal,
-    IonButtons,
     IonInput,
     IonTextarea,
     IonText,
-    IonList,
-    IonLabel
-  ],
-  styles: [`
-    .ejercicio-modal {
-      --width: 95%;
-      --max-width: 600px;
-      --border-radius: 16px;
-      --backdrop-opacity: 0.3;
-    }
-    .gym-modal-item {
-      --background: rgba(255, 255, 255, 0.05);
-      --border-radius: 12px;
-      --border-width: 1px;
-      --border-style: solid;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --padding-start: 16px;
-      --padding-end: 16px;
-    }
-  `]
+    IonList
+  ]
 })
 export class EjercicioModalComponent {
   private fb = inject(FormBuilder);
@@ -79,7 +48,7 @@ export class EjercicioModalComponent {
   });
 
   constructor() {
-    addIcons({ close, star });
+    addIcons({ star });
 
     // Cuando cambia el ejercicio o el estado de apertura, recreamos el formulario
     effect(() => {

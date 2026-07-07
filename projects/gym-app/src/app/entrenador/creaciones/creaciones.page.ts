@@ -13,7 +13,6 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  IonPopover,
   ToastController,
   SegmentCustomEvent
 } from '@ionic/angular/standalone';
@@ -21,6 +20,7 @@ import {
 import { RutinasPage } from '../rutinas/rutinas.page';
 import { EjerciciosPage } from '../ejercicios/ejercicios.page';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
+import { HelpFabComponent } from '../../shared/components/help-fab/help-fab.component';
 
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadorService } from '../../core/services/entrenador.service';
@@ -41,8 +41,8 @@ import { Plan } from 'gym-library';
     IonFab,
     IonFabButton,
     IonIcon,
-    IonPopover,
     BackgroundComponent,
+    HelpFabComponent,
     RutinasPage,
     EjerciciosPage
   ]

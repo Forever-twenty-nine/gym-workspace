@@ -4,9 +4,9 @@
       <ion-list lines="none">
         @for (d of desafios; track d.id) {
           <ion-item-sliding>
-            <ion-item class="list-item-2">
+            <ion-item>
               <app-date-badge slot="start" [fecha]="d.fechaVencimiento"></app-date-badge>
-              <ion-label class="ion-margin-start">
+              <ion-label>
                 @if (vencimientoInfo(d.fechaVencimiento); as info) {
                   <p><ion-text [color]="info.color">{{ info.texto }}</ion-text></p>
                 }
@@ -26,12 +26,10 @@
         }
       </ion-list>
     } @else {
-      <ion-text color="medium">
-        <p class="ion-text-center">
-          <em>No has lanzado desafíos aún.</em><br>
-          <small>Usa el botón "+" para agregar uno.</small>
-        </p>
-      </ion-text>
+      <app-empty-state
+        title="No has lanzado desafíos aún."
+        message="Usa el botón + para agregar uno.">
+      </app-empty-state>
     }
   </ion-card-content>
 </ion-card>

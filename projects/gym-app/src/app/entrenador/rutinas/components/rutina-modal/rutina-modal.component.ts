@@ -2,24 +2,15 @@ import { Component, input, output, effect, inject, signal, computed } from '@ang
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonModal,
-    IonButtons,
-    IonButton,
-    IonIcon,
     IonItem,
     IonInput,
     IonTextarea,
     IonSelect,
     IonSelectOption,
-    IonBadge,
     IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { EditModalComponent } from '../../../../shared/components/edit-modal/edit-modal.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -29,14 +20,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
     imports: [
         CommonModule,
         ReactiveFormsModule,
-        IonHeader,
-        IonToolbar,
-        IonTitle,
-        IonContent,
-        IonModal,
-        IonButtons,
-        IonButton,
-        IonIcon,
+        EditModalComponent,
         IonItem,
         IonInput,
         IonTextarea,
@@ -78,7 +62,7 @@ export class RutinaModalComponent {
     });
 
     constructor() {
-        addIcons({ close });
+        addIcons({ });
 
         effect(() => {
             const data = this.rutinaData();

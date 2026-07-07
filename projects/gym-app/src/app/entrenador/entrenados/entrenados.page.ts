@@ -2,18 +2,17 @@ import { Component, OnInit, inject, computed, Signal, signal } from '@angular/co
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { 
+import {
   ToastController,
   IonContent,
   IonHeader,
   IonToolbar,
   IonFab,
   IonFabButton,
-  IonIcon,
-  IonPopover
+  IonIcon
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { add, help, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline } from 'ionicons/icons';
+import { add, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, closeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline } from 'ionicons/icons';
 import { Entrenado, Rutina, Rol, TipoNotificacion, RutinaAsignada, SesionRutinaStatus, Plan } from 'gym-library';
 import { AuthService } from '../../core/services/auth.service';
 import { EntrenadoService } from '../../core/services/entrenado.service';
@@ -26,6 +25,7 @@ import { RutinaAsignadaService } from '../../core/services/rutina-asignada.servi
 import { SesionRutinaService } from '../../core/services/sesion-rutina.service';
 
 import { BackgroundComponent } from '../../shared/components/background/background.component';
+import { HelpFabComponent } from '../../shared/components/help-fab/help-fab.component';
 import { MisEntrenadosComponent, EntrenadoViewModel } from './components/mis-entrenados/mis-entrenados.component';
 import { InvitacionesPendientesComponent, InvitacionViewModel } from './components/invitaciones-pendientes/invitaciones-pendientes.component';
 import { EntrenadoDetallePopoverComponent } from './components/entrenado-detalle-popover/entrenado-detalle-popover.component';
@@ -45,8 +45,8 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     IonFab,
     IonFabButton,
     IonIcon,
-    IonPopover,
     BackgroundComponent,
+    HelpFabComponent,
     MisEntrenadosComponent,
     InvitacionesPendientesComponent,
     EntrenadoDetallePopoverComponent,
@@ -267,7 +267,7 @@ export class EntrenadosPage implements OnInit {
   }
 
   constructor() {
-    addIcons({ add, help, closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline });
+    addIcons({ add, closeCircleOutline, peopleOutline, close, person, trophy, checkmarkCircle, calendar, business, mailOutline, fitnessOutline, addCircleOutline, removeCircleOutline, flame, timeOutline, statsChartOutline, lockClosed, unlinkOutline, barbellOutline, arrowUpOutline });
   }
 
   ngOnInit() {

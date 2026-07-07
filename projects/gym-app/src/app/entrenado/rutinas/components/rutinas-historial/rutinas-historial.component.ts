@@ -12,13 +12,13 @@ import {
   IonCardHeader,
   IonCardContent,
   IonCardTitle,
-  IonCardSubtitle,
-  IonText
+  IonCardSubtitle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { trashOutline, calendarOutline } from 'ionicons/icons';
 import { SesionRutina } from 'gym-library';
 import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-rutinas-historial',
@@ -38,8 +38,8 @@ import { DateBadgeComponent } from '../../../../shared/components/date-badge/dat
     IonCardContent,
     IonCardTitle,
     IonCardSubtitle,
-    IonText,
-    DateBadgeComponent
+    DateBadgeComponent,
+    EmptyStateComponent
   ]
 })
 export class RutinasHistorialComponent {

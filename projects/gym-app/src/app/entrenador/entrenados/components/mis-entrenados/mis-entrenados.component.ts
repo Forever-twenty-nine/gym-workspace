@@ -1,9 +1,10 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonList, IonItem, IonLabel, IonIcon, IonAvatar, IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard, IonCardContent, IonText } from '@ionic/angular/standalone';
+import { IonList, IonItem, IonLabel, IonIcon, IonAvatar, IonNote, IonItemOptions, IonItemOption, IonItemSliding, IonCard, IonCardContent } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { Entrenado } from 'gym-library';
 import { eyeOutline, barbellOutline, mailOutline, trashOutline } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 export interface EntrenadoViewModel {
     id: string;
@@ -32,7 +33,7 @@ export interface EntrenadoViewModel {
     IonItemSliding,
     IonCard,
     IonCardContent,
-    IonText
+    EmptyStateComponent
 ]
 })
 export class MisEntrenadosComponent {

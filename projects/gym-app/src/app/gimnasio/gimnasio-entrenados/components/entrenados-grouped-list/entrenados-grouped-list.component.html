@@ -1,26 +1,17 @@
-<div>
-  @for (group of groupedUsers(); track group.trainerName) {
-    <ion-list-header class="mt-4">
-      <ion-label class="list-label-98">{{ group.trainerName }}</ion-label>
-    </ion-list-header>
+@for (group of groupedUsers(); track group.trainerName) {
+  <ion-list-header>
+    <ion-label>{{ group.trainerName }}</ion-label>
+  </ion-list-header>
 
-    <ion-list class="bg-transparent">
-      @for (user of group.users; track user.uid) {
-        <ion-item class="transparent-bg" lines="full">
-          <ion-avatar class="card-avatar-85" slot="start">
-            <img [src]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid" />
-          </ion-avatar>
-          <ion-label>
-            <h2 class="font-bold">{{ user.nombre || 'Usuario sin nombre' }}</h2>
-          </ion-label>
-        </ion-item>
-      }
-    </ion-list>
-  } @empty {
-    <ion-card class="ion-text-center ion-padding ion-margin-top">
-      <ion-text color="medium">
-        <p class="list-p-95">No se encontraron entrenados vinculados a tu gimnasio.</p>
-      </ion-text>
-    </ion-card>
-  }
-</div>
+  <ion-list>
+    @for (user of group.users; track user.uid) {
+      <app-list-item
+        [photo]="user.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user.uid"
+        [name]="user.nombre || 'Usuario sin nombre'" />
+    }
+  </ion-list>
+} @empty {
+  <app-empty-state
+    title="No se encontraron entrenados."
+    message="Cuando vincules uno aparecerá aquí." />
+}

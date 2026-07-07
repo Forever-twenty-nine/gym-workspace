@@ -1,12 +1,9 @@
 <ion-content [fullscreen]="true">
-  <!-- Background Image Layer (Fixed) -->
   <app-background />
 
-  <!-- Buscador Reactivo -->
-  <ion-searchbar placeholder="Buscar entrenados..." class="ion-margin-bottom"
+  <ion-searchbar placeholder="Buscar entrenados..."
     (ionInput)="searchQuery.set($event.detail.value || '')"></ion-searchbar>
 
-  <!-- Listado de Entrenados -->
   <app-entrenados-grouped-list [groupedUsers]="groupedUsers()"></app-entrenados-grouped-list>
 
 </ion-content>

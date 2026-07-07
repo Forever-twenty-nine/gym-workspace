@@ -1,20 +1,20 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonList, 
-  IonItem, 
-  IonLabel, 
+import {
+  IonList,
+  IonItem,
+  IonLabel,
   IonIcon,
   IonNote,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
-  IonText,
   IonCard,
   IonCardContent
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { pencilOutline, trashOutline } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-ejercicios-list',
@@ -30,9 +30,9 @@ import { pencilOutline, trashOutline } from 'ionicons/icons';
     IonItemSliding,
     IonItemOptions,
     IonItemOption,
-    IonText,
     IonCard,
-    IonCardContent
+    IonCardContent,
+    EmptyStateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -1,18 +1,26 @@
-<div class="p-4 shadow-sm mb-2 rounded-b-[32px] flex flex-col items-center justify-center relative header-div-8">
-    
-    <!-- Timer (Huge and Centered) -->
-    <div class="text-[5rem] leading-[1] font-black tracking-tighter my-4 overlay-h2-6">
-        {{ tiempo() }}
-    </div>
+<ion-card>
 
-    <!-- Progreso y Estado (Subtle) -->
-    <div class="w-full px-4 mt-2 mb-1 flex flex-col gap-1.5">
-        <div class="flex items-center justify-between w-full text-xs font-semibold uppercase tracking-wider">
-            <span [style.color]="iniciada() ? 'var(--ion-color-warning)' : 'var(--ion-color-medium)'">
-                {{ estado() }}
-            </span>
-            <span class="header-span-9">{{ porcentaje() }}%</span>
-        </div>
-        <ion-progress-bar [value]="porcentaje() / 100" color="primary" class="rounded-full h-1.5"></ion-progress-bar>
-    </div>
-</div>
+    <ion-card-header>
+        <!-- Timer (Huge and Centered) -->
+        <ion-card-title>
+            {{ tiempo() }}
+        </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+        <!-- Progreso y Estado (Subtle) -->
+        <ion-list lines="none">
+            <ion-item>
+                <ion-label>
+                    <span [style.color]="iniciada() ? 'var(--ion-color-warning)' : 'var(--ion-color-medium)'">
+                        {{ estado() }}
+                    </span>
+                </ion-label>
+                <ion-note slot="end">{{ porcentaje() }}%</ion-note>
+            </ion-item>
+            <ion-item lines="none">
+                <ion-progress-bar [value]="porcentaje() / 100" color="primary"></ion-progress-bar>
+            </ion-item>
+        </ion-list>
+    </ion-card-content>
+</ion-card>

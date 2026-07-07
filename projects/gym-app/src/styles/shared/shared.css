@@ -2,6 +2,11 @@
 /* Estilos para Componentes Compartidos (Shared) */
 /* ---------------------------------------------------- */
 
+@import "./help-fab.css";
+@import "./empty-state.css";
+@import "./edit-modal.css";
+@import "./app-list-item.css";
+
 /* Chat Detail Modal */
 .detail-modal-div-104 {
     display: flex;
@@ -25,7 +30,6 @@
 }
 
 .detail-modal-h3-106 {
-    font-size: 0.875rem;
     font-weight: 800;
     color: var(--ion-text-color);
     margin: 0 0 2px;
@@ -33,7 +37,6 @@
 }
 
 .detail-modal-span-107 {
-    font-size: 0.5625rem;
     font-weight: 800;
     text-transform: uppercase;
     color: var(--ion-color-success);
@@ -74,14 +77,12 @@
 }
 
 .detail-modal-h4-111 {
-    font-size: 0.875rem;
     font-weight: 800;
     color: var(--ion-text-color);
     margin: 0 0 4px;
 }
 
 .detail-modal-p-112 {
-    font-size: 0.75rem;
     font-weight: 600;
     color: var(--ion-color-medium);
     max-width: 320px;
@@ -105,7 +106,6 @@
 }
 
 .detail-modal-p-115 {
-    font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.5;
     margin: 0;
@@ -116,7 +116,6 @@
 
 .detail-modal-span-116 {
     display: block;
-    font-size: 0.5rem;
     font-weight: 700;
     text-align: right;
     letter-spacing: 0.05em;
@@ -149,7 +148,6 @@
     --padding-bottom: 8px;
     --placeholder-color: var(--ion-color-medium);
     --placeholder-opacity: 0.6;
-    font-size: 0.75rem;
     font-weight: 600;
 }
 
@@ -178,7 +176,6 @@
 
 .request-modal-card-161 {
     margin: 0;
-    border-radius: 16px;
 }
 
 .request-modal-div-162 {
@@ -200,7 +197,6 @@
 }
 
 .request-modal-p-164 {
-    font-size: 0.875rem;
     line-height: 1.5;
     margin: 0 24px 16px;
 }
@@ -214,7 +210,6 @@
 }
 
 .request-modal-note-166 {
-    font-size: 11px;
     color: var(--ion-color-medium);
     display: block;
     padding: 0 16px;
@@ -227,21 +222,17 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-shadow: none;
 }
 
 .global-modal-div-168 {
-    font-size: 64px;
     margin-bottom: 20px;
 }
 
 .global-modal-title-169 {
-    font-size: 28px;
     font-weight: bold;
 }
 
 .global-modal-content-170 {
-    font-size: 18px;
     line-height: 1.6;
     color: var(--ion-color-step-700, var(--ion-color-medium));
 }
@@ -313,6 +304,5 @@
 
 .agenda-modal-p-65 {
     margin: 4px 0 0;
-    font-size: 0.8rem;
     color: var(--ion-color-medium);
 }

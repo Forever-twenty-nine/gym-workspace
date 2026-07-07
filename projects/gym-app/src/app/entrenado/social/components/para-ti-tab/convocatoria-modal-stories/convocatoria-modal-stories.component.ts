@@ -11,7 +11,7 @@ import {
   IonButton,
   IonLabel,
   ToastController,
-  AlertController, IonNote, IonButtons, IonContent, IonText, IonCard, IonCardContent, IonList, IonListHeader, IonItem } from '@ionic/angular/standalone';
+  AlertController, IonNote, IonButtons, IonContent, IonText, IonCard, IonCardContent, IonList, IonListHeader, IonItem, IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   closeOutline, handRightOutline, handRight, trashOutline,
@@ -25,17 +25,22 @@ import { ConvocatoriaService } from '../../../../../core/services/convocatoria.s
 @Component({
   selector: 'app-convocatoria-modal-stories',
   standalone: true,
-  imports: [IonItem, IonCardContent, IonCard, IonText, IonContent, IonButtons, IonNote,
+imports: [IonItem, IonCardContent, IonCard, IonText, IonContent, IonButtons, IonNote,
     CommonModule,
     IonModal,
-    IonIcon,
-    IonHeader,
-    IonToolbar,
-    IonAvatar,
-    IonBadge,
-    IonFooter,
-    IonButton,
-    IonLabel],
+  IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonAvatar,
+  IonBadge,
+  IonFooter,
+  IonButton,
+  IonLabel,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonList,
+  IonListHeader],
   templateUrl: './convocatoria-modal-stories.component.html'
 })
 export class ConvocatoriaModalStoriesComponent {

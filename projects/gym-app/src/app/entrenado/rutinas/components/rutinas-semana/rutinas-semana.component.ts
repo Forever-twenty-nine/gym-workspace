@@ -12,13 +12,13 @@ import {
     IonButton,
     IonAccordionGroup,
     IonAccordion,
-    IonList,
-    IonText
+    IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { playCircle, bedOutline, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
 import { Rutina, Convocatoria } from 'gym-library';
 import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 interface SemanaDia {
   fecha: Date;
@@ -48,8 +48,8 @@ type Encuentro = Convocatoria; // alias for clarity in this component
         IonAccordionGroup,
         IonAccordion,
         IonList,
-        IonText,
         DateBadgeComponent,
+        EmptyStateComponent,
     ],
     templateUrl: './rutinas-semana.component.html',
     styles: [`

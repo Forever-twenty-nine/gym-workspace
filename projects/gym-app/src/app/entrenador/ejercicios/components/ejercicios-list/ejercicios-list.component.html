@@ -28,12 +28,9 @@
         }
       </ion-list>
     } @else {
-      <ion-text color="medium">
-        <p class="ion-text-center">
-          <em>Aún no has creado ejercicios.</em><br>
-          <small>Usa el botón "+" para agregar uno.</small>
-        </p>
-      </ion-text>
+      <app-empty-state
+        title="Aún no has creado ejercicios."
+        message="Usa el botón + para agregar uno." />
     }
   </ion-card-content>
 </ion-card>

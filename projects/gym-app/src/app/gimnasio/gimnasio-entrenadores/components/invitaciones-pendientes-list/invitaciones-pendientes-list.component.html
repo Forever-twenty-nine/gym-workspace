@@ -1,23 +1,19 @@
 @if (invitaciones().length > 0) {
-  <ion-card class="ion-margin-top ion-no-margin">
+  <ion-card>
     <ion-card-header>
-      <ion-card-title class="list-title-96">
-        Invitaciones Pendientes
-      </ion-card-title>
+      <ion-card-title>Invitaciones Pendientes</ion-card-title>
     </ion-card-header>
-    
-    <ion-list class="bg-transparent">
+
+    <ion-list>
       @for (invitacion of invitaciones(); track invitacion.id) {
-        <ion-item class="transparent-bg" lines="full">
-          <ion-avatar class="card-avatar-85" slot="start">
+        <ion-item lines="full">
+          <ion-avatar slot="start">
             <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + invitacion.id" />
           </ion-avatar>
           <ion-label>
-            <h3 class="font-bold m-0">{{ invitacion.entrenadorNombre || invitacion.emailDestinatario }}</h3>
-            <p class="list-p-97">{{ invitacion.emailDestinatario }}</p>
-            <p class="text-[0.7rem] text-[var(--ion-color-medium)]">
-              Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
-            </p>
+            <h3>{{ invitacion.entrenadorNombre || invitacion.emailDestinatario }}</h3>
+            <p>{{ invitacion.emailDestinatario }}</p>
+            <p>Enviada el {{ invitacion.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</p>
           </ion-label>
           <ion-button slot="end" fill="clear" color="danger" (click)="cancelar.emit(invitacion.id)">
             <ion-icon name="close-circle-outline" slot="icon-only"></ion-icon>

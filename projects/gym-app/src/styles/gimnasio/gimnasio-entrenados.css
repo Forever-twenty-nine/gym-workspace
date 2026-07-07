@@ -1,0 +1,78 @@
+/* ============================================================ */
+/* Estilos Específicos - Gimnasio Entrenados                     */
+/* ============================================================ */
+
+app-gimnasio-entrenados {
+    ion-content {
+        --background: transparent;
+    }
+
+    ion-searchbar {
+        --background: rgba(255, 255, 255, 0.05);
+        --border-radius: 12px;
+        margin-bottom: var(--ion-margin);
+    }
+}
+
+/* === Entrenados Grouped List === */
+app-entrenados-grouped-list {
+    ion-list-header {
+        margin-top: var(--ion-margin);
+    }
+
+    ion-list-header ion-label {
+        font-weight: 700;
+        color: var(--ion-color-primary);
+    }
+
+    ion-list {
+        background: transparent;
+    }
+
+    ion-item {
+        --background: transparent;
+    }
+
+    ion-item h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    /* Empty state */
+    ion-card {
+        margin-top: var(--ion-margin);
+    }
+
+    ion-text {
+        padding: var(--ion-padding);
+        text-align: center;
+    }
+
+    ion-text p {
+        margin: 0;
+    }
+}
+
+/* === Invitación Entrenado Modal === */
+app-invitacion-entrenado-modal {
+    ion-searchbar {
+        --background: rgba(255, 255, 255, 0.05);
+        --border-radius: 12px;
+        margin-block: 8px;
+    }
+
+    /* Lista de resultados de búsqueda: se ve como una dropdown flotante */
+    ion-list {
+        position: absolute;
+        z-index: 10;
+        left: var(--ion-padding);
+        right: var(--ion-padding);
+        background: var(--ion-background-color, #fff);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        max-height: 220px;
+        overflow-y: auto;
+        padding: 0;
+        margin: 0;
+    }
+}

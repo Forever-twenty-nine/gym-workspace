@@ -36,16 +36,14 @@
 
 /* 6) Estilos Globales (Afectan a 2 o más secciones) */
 @import "./global/global-elements.css";
-@import "./global/global-utilities.css";
-@import "./global/profile.css";
-@import "./global/rutinas.css";
 
-/* 7) Estilos de Secciones Específicas */
+/* 7) Estilos de Componentes Compartidos (shared) */
+@import "./shared/shared.css";
+@import "./shared/profile.css";
+@import "./shared/rutinas.css";
+
+/* 8) Estilos de Secciones Específicas */
 @import "./auth/auth.css";
 @import "./gimnasio/gimnasio.css";
 @import "./entrenador/entrenador.css";
 @import "./entrenado/entrenado.css";
-@import "./entrenado/social.css";
-
-/* 8) Estilos Shared (Componentes Compartidos) */
-@import "./shared/shared.css";

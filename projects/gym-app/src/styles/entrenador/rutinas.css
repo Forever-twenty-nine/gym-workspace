@@ -1,0 +1,39 @@
+/* ============================================================ */
+/* Estilos Específicos - Rutinas                                 */
+/* ============================================================ */
+
+app-rutinas {
+    /* Página simple */
+}
+
+app-lista-rutinas {
+    ion-card {
+        --background: transparent;
+        box-shadow: none;
+    }
+
+    ion-card-content {
+        padding: 0;
+    }
+
+    ion-text {
+        display: block;
+        text-align: center;
+        padding: var(--ion-padding);
+        color: var(--ion-color-medium);
+    }
+}
+
+app-rutina-modal {
+    /* Modal más ancho */
+    ion-modal {
+        --width: 95%;
+        --max-width: 600px;
+        --border-radius: 16px;
+        --backdrop-opacity: 0.3;
+    }
+
+    ion-button[type="submit"] {
+        margin-top: var(--ion-margin);
+    }
+}

@@ -1,6 +1,18 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonIcon, IonButton } from '@ionic/angular/standalone';
+import {
+    IonIcon,
+    IonButton,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonAvatar
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, handRight, sparklesOutline } from 'ionicons/icons';
 import { MatchCardComponent } from './match-card/match-card.component';
@@ -14,6 +26,14 @@ import { TarjetaDescubrir } from '../../../../core/types/descubrir.types';
     CommonModule,
     IonIcon,
     IonButton,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonCard,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonCardContent,
+    IonAvatar,
     MatchCardComponent
   ]
 })

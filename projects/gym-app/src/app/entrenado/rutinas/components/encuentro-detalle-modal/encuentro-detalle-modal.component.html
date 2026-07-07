@@ -3,7 +3,7 @@
         @if (encuentro) {
         <ion-header>
             <ion-toolbar>
-                <ion-title class="p-2">{{ encuentro.titulo || 'Entrenamiento en grupo' }}</ion-title>
+                <ion-title>{{ encuentro.titulo || 'Entrenamiento en grupo' }}</ion-title>
                 <ion-buttons slot="end">
                     <ion-button (click)="cerrarModal()" shape="round" color="medium">
                         <ion-icon name="close-outline" size="large" color="secondary"></ion-icon>
@@ -12,34 +12,33 @@
             </ion-toolbar>
         </ion-header>
 
-
         <ion-content>
             @if(encuentro.mensaje) {
-            <ion-card class="m-2">
+            <ion-card>
                 <ion-card-content>
-                    <p>{{ encuentro.mensaje }}</p>
+                    {{ encuentro.mensaje }}
                 </ion-card-content>
             </ion-card>
             }
 
-            <ion-card class="m-2">
+            <ion-card>
                 <ion-card-content>
                     <ion-grid>
-                        <ion-row class="ion-align-items-start">
-                            <ion-col class="ion-text-center">
+                        <ion-row>
+                            <ion-col>
                                 <ion-note color="medium"><strong>FECHA</strong></ion-note>
-                                <div class="flex flex-col items-center gap-1 mt-2">
+                                <ion-avatar>
                                     <ion-icon name="calendar-outline" size="large" color="secondary"></ion-icon>
                                     <ion-text><strong>{{ fechaFormateada }}</strong></ion-text>
-                                </div>
+                                </ion-avatar>
                             </ion-col>
-                            <ion-col class="ion-text-center">
+                            <ion-col>
                                 <ion-note color="medium"><strong>HORARIO</strong></ion-note>
-                                <div class="flex flex-col items-center gap-1 mt-2">
+                                <ion-avatar>
                                     <ion-icon name="time-outline" size="large" color="warning"></ion-icon>
                                     <ion-text><strong>{{ encuentro.horaInicio }} - {{ encuentro.horaFin
                                             }}</strong></ion-text>
-                                </div>
+                                </ion-avatar>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
@@ -50,16 +49,16 @@
                 <ion-list lines="full">
                     <ion-item>
                         @if (encuentro.creadorFoto) {
-                        <ion-avatar class="detalle-modal-avatar-11" slot="start">
+                        <ion-avatar slot="start">
                             <img [src]="encuentro.creadorFoto" />
                         </ion-avatar>
                         } @else {
-                        <div class="detalle-modal-div-12" slot="start">
-                            <ion-icon class="text-2xl" name="person-outline" color="medium"></ion-icon>
-                        </div>
+                        <ion-avatar slot="start">
+                            <ion-icon name="person-outline" color="medium"></ion-icon>
+                        </ion-avatar>
                         }
                         <ion-label>
-                            <h2 class="m-0"><strong>{{ encuentro.creadorNombre || 'Atleta' }}</strong></h2>
+                            <h2><strong>{{ encuentro.creadorNombre || 'Atleta' }}</strong></h2>
                         </ion-label>
                         <ion-note slot="end" color="medium">
                             Organizador
@@ -67,25 +66,29 @@
                     </ion-item>
 
                     <ion-item lines="none">
-                        <ion-label class="ion-text-wrap">
-                            <div class="flex items-center gap-4">
+                        <ion-label>
+                            <ion-list lines="none">
                                 @if (interesadosUsers().length > 0) {
-                                <div class="flex">
+                                <ion-item>
                                     @for (user of interesadosUsers(); track user.uid; let first = $first) {
                                         @if (user.photoURL) {
-                                            <ion-avatar class="detalle-modal-avatar-13" [style.margin-left]="first ? '0' : '-16px'">
+                                            <ion-avatar [style.margin-left]="first ? '0' : '-16px'">
                                                 <img [src]="user.photoURL" [title]="user.nombre || 'Atleta'" />
                                             </ion-avatar>
                                         } @else {
-                                            <div class="detalle-modal-div-14" [style.margin-left]="first ? '0' : '-16px'" [title]="user.nombre || 'Atleta'">
+                                            <ion-avatar [style.margin-left]="first ? '0' : '-16px'" [title]="user.nombre || 'Atleta'">
                                                 <ion-icon name="person-outline" color="medium"></ion-icon>
-                                            </div>
+                                            </ion-avatar>
                                         }
                                     }
-                                </div>
+                                </ion-item>
                                 }
-                                <h2 class="m-0"><strong>{{ encuentro.interesados.length || 0 }}</strong></h2>
-                            </div>
+                                <ion-item lines="none">
+                                    <ion-label>
+                                        <h2><strong>{{ encuentro.interesados.length || 0 }}</strong></h2>
+                                    </ion-label>
+                                </ion-item>
+                            </ion-list>
                         </ion-label>
                         <ion-note slot="end">Interesados</ion-note>
                     </ion-item>
@@ -96,7 +99,7 @@
 
         <ion-footer>
             <ion-toolbar>
-                <ion-button expand="block" color="secondary" class="ion-margin" (click)="navegarASocial()">
+                <ion-button expand="block" color="secondary" (click)="navegarASocial()">
                     <strong>IR A SOCIAL</strong>
                     <ion-icon name="people-outline" slot="end"></ion-icon>
                 </ion-button>

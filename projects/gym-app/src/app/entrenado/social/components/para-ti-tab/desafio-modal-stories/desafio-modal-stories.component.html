@@ -1,25 +1,25 @@
 <ion-modal [isOpen]="isOpen()" (didDismiss)="onDidDismiss()">
   <ng-template>
     @if (desafio) {
-    <ion-header class="ion-no-border">
+    <ion-header>
       <ion-toolbar>
-        <ion-title class="font-bold">Desafío cruzado</ion-title>
-        <div slot="end" class="flex items-center gap-2 mr-2">
+        <ion-title>Desafío cruzado</ion-title>
+        <ion-buttons slot="end">
           @if (!vencio()) {
           <ion-badge color="warning">{{ tiempoRestante() }}</ion-badge>
           } @else {
           <ion-badge color="medium">Vencido</ion-badge>
           }
-          <ion-button fill="clear" color="primary" class="m-0" (click)="close.emit()">
+          <ion-button fill="clear" color="primary" (click)="close.emit()">
             <ion-icon name="close-outline" slot="icon-only"></ion-icon>
           </ion-button>
-        </div>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding">
+    <ion-content>
 
-      <ion-item lines="none" class="mb-4">
+      <ion-item lines="none">
         <ion-avatar slot="start">
           @if (creatorPhoto()) {
           <img [src]="creatorPhoto()">
@@ -28,138 +28,156 @@
           }
         </ion-avatar>
         <ion-label>
-          <h2 class="font-bold">{{ creatorName() }}</h2>
-          <p class="text-xs">lanzó este desafío</p>
+          <h2>{{ creatorName() }}</h2>
+          <p>lanzó este desafío</p>
         </ion-label>
       </ion-item>
 
-      <ion-card class="m-0 mb-5">
-        <ion-card-content class="text-center py-5">
-          <h2 class="text-base font-bold italic m-0">"{{ desafio.titulo }}"</h2>
+      <ion-card>
+        <ion-card-content>
+          <h2>"{{ desafio.titulo }}"</h2>
           @if (desafio.logroRelacionado) {
-          <div class="flex items-center justify-center gap-2 mt-3">
-            <ion-badge color="warning" class="uppercase text-[8px] tracking-wider">Récord</ion-badge>
-            <ion-note class="text-xs font-semibold">{{ desafio.logroRelacionado }}</ion-note>
-          </div>
+          <ion-chip color="warning">
+            <ion-label>Récord</ion-label>
+          </ion-chip>
+          <ion-note>{{ desafio.logroRelacionado }}</ion-note>
           }
         </ion-card-content>
       </ion-card>
 
       @if (totalAceptaron() > 0) {
-      <div class="flex justify-around mb-5 p-2 rounded-lg desafio-modal-div-21">
-        <div class="text-center">
-          <ion-note class="block text-xs uppercase tracking-wider">Aceptaron</ion-note>
-          <ion-text class="font-bold text-lg">{{ totalAceptaron() }}</ion-text>
-        </div>
-        <div class="text-center">
-          <ion-note color="success" class="block text-xs uppercase tracking-wider">Superaron</ion-note>
-          <ion-text color="success" class="font-bold text-lg">{{ totalSuperaron() }}</ion-text>
-        </div>
-        <div class="text-center">
-          <ion-note color="danger" class="block text-xs uppercase tracking-wider">Fallaron</ion-note>
-          <ion-text color="danger" class="font-bold text-lg">{{ totalNoSuperaron() }}</ion-text>
-        </div>
-      </div>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-note>Aceptaron</ion-note>
+            <ion-text>{{ totalAceptaron() }}</ion-text>
+          </ion-col>
+          <ion-col>
+            <ion-note color="success">Superaron</ion-note>
+            <ion-text color="success">{{ totalSuperaron() }}</ion-text>
+          </ion-col>
+          <ion-col>
+            <ion-note color="danger">Fallaron</ion-note>
+            <ion-text color="danger">{{ totalNoSuperaron() }}</ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
       }
 
       @if (participaciones().length > 0) {
-      <div>
-        <ion-note color="medium" class="uppercase text-xs font-bold block mb-3">
-          Participantes
-        </ion-note>
-        <div class="flex flex-wrap gap-3">
-          @for (p of participaciones(); track p.id) {
-          <div class="relative">
-            <ion-avatar class="w-10 h-10 border desafio-modal-div-21">
-              @if (p.participanteFoto) {
-              <img [src]="p.participanteFoto">
-              } @else {
-              <ion-icon name="person-outline"></ion-icon>
-              }
-            </ion-avatar>
-
-            @if (p.estado === 'superado') {
-            <ion-badge color="success" class="absolute -bottom-1 -right-1 rounded-full w-5 h-5 flex items-center justify-center p-0 text-[10px]">
-              <ion-icon name="ribbon-outline"></ion-icon>
-            </ion-badge>
-            } @else if (p.estado === 'no_superado') {
-            <ion-badge color="danger" class="absolute -bottom-1 -right-1 rounded-full w-5 h-5 flex items-center justify-center p-0 text-[10px]">
-              <ion-icon name="close-outline"></ion-icon>
-            </ion-badge>
+      <ion-list>
+        <ion-list-header>
+          <ion-label>Participantes</ion-label>
+        </ion-list-header>
+        @for (p of participaciones(); track p.id) {
+        <ion-item>
+          <ion-avatar>
+            @if (p.participanteFoto) {
+            <img [src]="p.participanteFoto">
+            } @else {
+            <ion-icon name="person-outline"></ion-icon>
             }
-          </div>
+          </ion-avatar>
+
+          @if (p.estado === 'superado') {
+          <ion-badge color="success" slot="end">
+            <ion-icon name="ribbon-outline"></ion-icon>
+          </ion-badge>
+          } @else if (p.estado === 'no_superado') {
+          <ion-badge color="danger" slot="end">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-badge>
           }
-        </div>
-      </div>
+        </ion-item>
+        }
+      </ion-list>
       }
 
     </ion-content>
 
-    <ion-footer class="ion-no-border">
+    <ion-footer>
       <ion-toolbar>
-        <div class="flex flex-col gap-2 p-4">
-          @if (esCreador()) {
-          <div class="flex items-center justify-between w-full">
-            <ion-badge color="warning">Tu desafío</ion-badge>
-            <ion-button fill="clear" color="danger" class="m-0" (click)="eliminarDesafio()" [disabled]="loading()">
-              <ion-icon name="trash-outline" slot="start"></ion-icon>
-              Eliminar
-            </ion-button>
-          </div>
-          } @else if (!vencio()) {
-          @if (!yaAcepto()) {
-          <div class="flex gap-2 w-full">
-            <ion-button fill="outline" color="medium" class="flex-1 m-0" (click)="pasarYcerrar()"
-              [disabled]="loading()">
-              Pasar
-            </ion-button>
-            <ion-button fill="solid" color="warning" class="flex-1 m-0" (click)="aceptarDesafio()"
-              [disabled]="loading()">
-              <ion-icon name="checkmark-outline" slot="start"></ion-icon>
-              Aceptar
-            </ion-button>
-          </div>
-          }
+        @if (esCreador()) {
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-badge color="warning">Tu desafío</ion-badge>
+            </ion-col>
+            <ion-col>
+              <ion-button fill="clear" color="danger" (click)="eliminarDesafio()" [disabled]="loading()">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                Eliminar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        } @else if (!vencio()) {
+        @if (!yaAcepto()) {
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button fill="outline" color="medium" expand="block" (click)="pasarYcerrar()"
+                [disabled]="loading()">
+                Pasar
+              </ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button fill="solid" color="warning" expand="block" (click)="aceptarDesafio()"
+                [disabled]="loading()">
+                <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+                Aceptar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        }
 
-          @if (yaAcepto() && !yaDeclaroResultado()) {
-          <ion-note color="warning" class="text-center font-bold uppercase text-xs block mb-2">¿Lo superaste?</ion-note>
-          <div class="flex gap-2 w-full">
-            <ion-button fill="outline" color="danger" class="flex-1 m-0" (click)="declararResultado(false)"
-              [disabled]="loading()">
-              <ion-icon name="close-circle" slot="start"></ion-icon>
-              No lo logré
-            </ion-button>
-            <ion-button fill="solid" color="success" class="flex-1 m-0" (click)="declararResultado(true)"
-              [disabled]="loading()">
-              <ion-icon name="ribbon-outline" slot="start"></ion-icon>
-              ¡Lo superé!
-            </ion-button>
-          </div>
-          }
+        @if (yaAcepto() && !yaDeclaroResultado()) {
+        <ion-note color="warning">¿Lo superaste?</ion-note>
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-button fill="outline" color="danger" expand="block" (click)="declararResultado(false)"
+                [disabled]="loading()">
+                <ion-icon name="close-circle" slot="start"></ion-icon>
+                No lo logré
+              </ion-button>
+            </ion-col>
+            <ion-col>
+              <ion-button fill="solid" color="success" expand="block" (click)="declararResultado(true)"
+                [disabled]="loading()">
+                <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+                ¡Lo superé!
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        }
 
-          @if (yaDeclaroResultado()) {
-          @if (loSupero()) {
-          <ion-button color="success" fill="solid" class="w-full max-w-64 mx-auto m-0" disabled>
-            <ion-icon name="ribbon-outline" slot="start"></ion-icon>
-            ¡Lo superaste!
-          </ion-button>
-          } @else {
-          <ion-button color="medium" fill="solid" class="w-full max-w-64 mx-auto m-0" disabled>
-            <ion-icon name="sad-outline" slot="start"></ion-icon>
-            No lo superaste
-          </ion-button>
-          }
-          }
+        @if (yaDeclaroResultado()) {
+        @if (loSupero()) {
+        <ion-button color="success" fill="solid" expand="block" disabled>
+          <ion-icon name="ribbon-outline" slot="start"></ion-icon>
+          ¡Lo superaste!
+        </ion-button>
+        } @else {
+        <ion-button color="medium" fill="solid" expand="block" disabled>
+          <ion-icon name="sad-outline" slot="start"></ion-icon>
+          No lo superaste
+        </ion-button>
+        }
+        }
 
-          } @else {
-          @if (yaAcepto() && !yaDeclaroResultado() && !esCreador()) {
-          <ion-note class="text-center block text-xs font-bold italic mb-2">Venció antes de declarar resultado</ion-note>
-          }
-          <div class="text-center p-3 border border-dashed rounded-lg">
-            <ion-note class="text-xs font-bold uppercase">Este desafío ya no acepta participantes</ion-note>
-          </div>
-          }
-        </div>
+        } @else {
+        @if (yaAcepto() && !yaDeclaroResultado() && !esCreador()) {
+        <ion-note>Venció antes de declarar resultado</ion-note>
+        }
+        <ion-card>
+          <ion-card-content>
+            <ion-note>Este desafío ya no acepta participantes</ion-note>
+          </ion-card-content>
+        </ion-card>
+        }
       </ion-toolbar>
     </ion-footer>
     }

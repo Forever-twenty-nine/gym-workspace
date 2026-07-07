@@ -6,6 +6,9 @@ import {
     IonIcon,
     IonCard,
     IonCardContent,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonText,
     IonList,
     IonItem,
     IonLabel,
@@ -31,7 +34,10 @@ import { BackgroundComponent } from '../../../../shared/components/background/ba
         IonIcon,
         IonCard,
         IonCardContent,
-        IonList,    
+        IonCardHeader,
+        IonCardSubtitle,
+        IonText,
+        IonList,
         IonItem,
         IonLabel,
         IonSelect,
@@ -67,7 +73,7 @@ export class GestionRutinasModalComponent {
 
     actualizarDias(rutina: Rutina, nuevosDias: string[]) {
         const diasActuales = this.getDiasAsignados()(rutina.id) || [];
-        
+
         // Days to add
         const diasAAgregar = nuevosDias.filter(d => !diasActuales.includes(d));
         // Days to remove

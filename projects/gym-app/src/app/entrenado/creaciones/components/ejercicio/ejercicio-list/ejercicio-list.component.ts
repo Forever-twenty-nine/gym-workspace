@@ -8,13 +8,13 @@ import {
   IonLabel,
   IonButton,
   IonIcon,
-  IonText,
   IonItemSliding,
   IonItemOptions,
   IonItemOption
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-ejercicio-list',
@@ -28,10 +28,10 @@ import { trashOutline, lockClosed, pencilOutline } from 'ionicons/icons';
     IonLabel,
     IonButton,
     IonIcon,
-    IonText,
     IonItemSliding,
     IonItemOptions,
-    IonItemOption
+    IonItemOption,
+    EmptyStateComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   templateUrl: './ejercicio-list.component.html'

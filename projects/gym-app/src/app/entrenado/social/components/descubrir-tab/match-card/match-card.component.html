@@ -1,32 +1,29 @@
-<ion-card
-  class="m-0! rounded-4xl! overflow-hidden shadow-lg border backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] hover:shadow-xl relative w-full h-130 flex flex-col">
+<ion-card>
   <!-- Foto de Perfil con Fallback -->
   @if(safePhoto()) {
-  <img [src]="safePhoto()" alt="Perfil" class="w-full h-full object-cover" (error)="onPhotoError()">
+  <ion-img [src]="safePhoto()" alt="Perfil" (error)="onPhotoError()"></ion-img>
   } @else {
-  <div class="w-full h-full flex items-center justify-center">
-    <ion-icon name="person" class="text-6xl"></ion-icon>
-  </div>
+  <ion-card-content>
+    <ion-icon name="person"></ion-icon>
+  </ion-card-content>
   }
 
-  <ion-card-header class="px-3 pt-2.5 pb-1.5 shrink-0 align-baseline">
+  <ion-card-header>
     @if (userName()) {
     <ion-card-title>{{ userName() }}</ion-card-title>
     }
     @if(data()?.bio) {
-    <ion-card-subtitle class="text-xs mt-0.5">{{ data().bio }}</ion-card-subtitle>
+    <ion-card-subtitle>{{ data().bio }}</ion-card-subtitle>
     }@else {
     <p>Sin Descripción</p>
     }
   </ion-card-header>
 
-  <ion-card-content class="px-3 pt-2 pb-2 text-[11px] flex flex-col gap-1">
-
+  <ion-card-content>
     @for (reason of matchReasons(); track reason) {
-    <ion-chip class="card-chip-20" outline color="medium">
+    <ion-chip outline color="medium">
       <ion-label>{{ reason }}</ion-label>
     </ion-chip>
     }
   </ion-card-content>
-
 </ion-card>

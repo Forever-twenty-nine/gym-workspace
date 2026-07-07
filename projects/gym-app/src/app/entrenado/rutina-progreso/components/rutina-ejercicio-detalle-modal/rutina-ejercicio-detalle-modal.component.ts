@@ -8,7 +8,14 @@ import {
     IonButtons,
     IonButton,
     IonIcon,
-    IonContent
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonCardContent,
+    IonGrid,
+    IonRow,
+    IonCol
 } from '@ionic/angular/standalone';
 import { Ejercicio } from 'gym-library';
 import { addIcons } from 'ionicons';
@@ -26,7 +33,14 @@ import { close, repeatOutline, timeOutline, barbellOutline, informationCircleOut
         IonButtons,
         IonButton,
         IonIcon,
-        IonContent
+        IonContent,
+        IonCard,
+        IonCardHeader,
+        IonCardSubtitle,
+        IonCardContent,
+        IonGrid,
+        IonRow,
+        IonCol
     ],
     templateUrl: './rutina-ejercicio-detalle-modal.component.html',
     styles: [`

@@ -10,6 +10,9 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
+  IonGrid,
+  IonRow,
+  IonCol,
   ToastController,
   AlertController,
   SegmentCustomEvent
@@ -44,6 +47,9 @@ import { ConvocatoriaListComponent } from './components/convocatoria-list/convoc
     IonFab,
     IonFabButton,
     IonIcon,
+    IonGrid,
+    IonRow,
+    IonCol,
     CrearAgendaModalComponent,
     BackgroundComponent,
     ConvocatoriaListComponent

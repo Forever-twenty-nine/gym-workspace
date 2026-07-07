@@ -23,6 +23,7 @@ import { DateBadgeComponent } from '../../../../shared/components/date-badge/dat
   imports: [
     CommonModule,
     IonIcon,
+    IonText,
     IonCard,
     IonCardContent,
     IonList,

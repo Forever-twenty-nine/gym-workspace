@@ -1,0 +1,373 @@
+/* ---------------------------------------------------- */
+/* Estilos para Rutina en Progreso del Entrenado        */
+/* ---------------------------------------------------- */
+
+/* ============================================================ */
+/* Página: app-rutina-progreso                                  */
+/* ============================================================ */
+app-rutina-progreso {
+    ion-toolbar {
+        padding-inline: 16px;
+    }
+
+    ion-title {
+        font-weight: 700;
+        text-align: right;
+        --padding-end: 0;
+    }
+
+    /* Footer con efecto glass */
+    ion-footer {
+        backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Footer: contenedor de padding (safe area) */
+    ion-footer ion-grid {
+        padding: 40px 24px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    }
+
+    /* Fila de controles del footer */
+    ion-footer ion-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Botón de pausa/play circular */
+    ion-footer ion-col[size="auto"] ion-button {
+        height: 64px;
+        width: 64px;
+        min-width: 64px;
+        backdrop-filter: blur(12px);
+        margin: 0 !important;
+        --padding-start: 0;
+        --padding-end: 0;
+    }
+
+    /* Botón COMENZAR/FINALIZAR */
+    ion-footer ion-col:last-child ion-button {
+        height: 64px;
+        font-weight: 900;
+        margin: 0 !important;
+    }
+
+    /* Botón FINALIZAR con transition */
+    ion-footer ion-col:last-child ion-button[color="success"] {
+        transition: all 0.3s;
+    }
+}
+
+/* ============================================================ */
+/* Componente: app-rutina-progreso-header                       */
+/* ============================================================ */
+app-rutina-progreso-header {
+    /* Tarjeta de cabecera con fondo glassmorphism */
+    ion-card {
+        padding: 16px;
+        margin-bottom: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background: rgba(var(--ion-color-primary-rgb), 0.08);
+        backdrop-filter: blur(12px);
+    }
+
+    /* Título del header (timer) */
+    ion-card-title {
+        font-weight: 900;
+    }
+
+    /* Lista de progreso y estado */
+    ion-list ion-item {
+        width: 100%;
+        padding: 0 16px;
+        margin-top: 8px;
+        margin-bottom: 4px;
+    }
+
+    ion-list ion-item ion-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Porcentaje con gradiente */
+    ion-note {
+        background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Barra de progreso */
+    ion-progress-bar {
+        --height: 6px;
+    }
+}
+
+/* ============================================================ */
+/* Componente: app-rutina-overlay                               */
+/* ============================================================ */
+app-rutina-overlay {
+    /* Card raíz del overlay */
+    ion-card {
+        padding: 24px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Min-height según tipo */
+    ion-card[class*="min-h-\[50vh\]"] {
+        min-height: 50vh;
+    }
+
+    ion-card[class*="min-h-\[60vh\]"] {
+        min-height: 60vh;
+    }
+
+    /* Avatar del icono central */
+    ion-avatar {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    /* Título del overlay (gradiente de marca) */
+    ion-card-title {
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    ion-card-title[class*="text-3xl"] {
+        font-size: 1.875rem;
+    }
+
+    /* Subtítulo */
+    ion-card-subtitle {
+        margin-top: 8px;
+        padding: 0 32px;
+        color: var(--ion-color-medium);
+    }
+
+    /* Caja de advertencia */
+    ion-card ion-card {
+        margin-top: 16px;
+        margin-inline: 16px;
+        padding: 12px;
+        background: rgba(var(--ion-color-warning-rgb), 0.08);
+        color: var(--ion-color-warning);
+    }
+
+    ion-card ion-card ion-card-subtitle {
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--ion-color-warning);
+        padding: 0;
+    }
+
+    ion-card ion-card p {
+        margin: 4px 0 0;
+        opacity: 0.8;
+        color: var(--ion-color-warning);
+    }
+
+    /* Toolbar con botón de acción */
+    ion-toolbar {
+        width: 100%;
+        margin-top: 32px;
+    }
+
+    ion-toolbar ion-button {
+        font-weight: 700;
+    }
+
+    ion-toolbar ion-button[class*="h-14"] {
+        height: 56px;
+        font-size: 1.125rem;
+    }
+}
+
+/* ============================================================ */
+/* Componente: app-rutina-ejercicio-detalle-modal               */
+/* ============================================================ */
+app-rutina-ejercicio-detalle-modal {
+    ion-title {
+        font-weight: 700;
+    }
+
+    /* Contenido del modal con padding */
+    > ion-content {
+        padding: 16px;
+    }
+
+    /* Tarjeta de descripción */
+    > ion-content > ion-card:first-child {
+        margin-bottom: 24px;
+        padding: 16px;
+    }
+
+    /* Encabezado de la sección de descripción */
+    > ion-content > ion-card:first-child ion-card-subtitle {
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Título "Detalles de ejecución" */
+    > ion-content > h3 {
+        font-weight: 700;
+        margin: 0 0 12px;
+        font-size: 1.125rem;
+    }
+
+    /* Cards de estadísticas */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Etiqueta de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-subtitle {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Valor de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-content {
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.5rem;
+    }
+
+    /* Unidad de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-content span {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+}
+
+/* ============================================================ */
+/* Componente: app-rutina-ejercicio-item                        */
+/* ============================================================ */
+app-rutina-ejercicio-item {
+    /* Card principal del ejercicio */
+    ion-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        margin: 0 0 12px 0;
+        border-radius: 16px;
+        transition: all 0.3s;
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .dark ion-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    ion-card:active {
+        transform: scale(0.98);
+    }
+
+    /* Avatar del icono de estado */
+    ion-item ion-avatar {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        flex-shrink: 0;
+        margin-left: -8px;
+        border-radius: 50%;
+    }
+
+    ion-item ion-avatar ion-icon {
+        font-size: 40px;
+    }
+
+    /* Nombre del ejercicio */
+    ion-item ion-label h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s;
+    }
+
+    /* Fila de series/repeticiones/descanso */
+    ion-item ion-label p {
+        margin-top: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    ion-item ion-label p span {
+        margin: 0 4px;
+        opacity: 0.5;
+    }
+
+    /* Botón de información */
+    ion-item ion-button[slot="end"] {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        z-index: 20;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+    }
+
+    ion-item ion-button[slot="end"]:active {
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    ion-item ion-button[slot="end"] ion-icon {
+        font-size: 1.5rem;
+    }
+}

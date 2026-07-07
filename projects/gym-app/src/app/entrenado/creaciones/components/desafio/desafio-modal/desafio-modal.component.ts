@@ -2,16 +2,8 @@ import { Component, Input, Output, EventEmitter, inject, signal, OnChanges, Simp
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
-  IonIcon,
   IonItem,
   IonLabel,
-  IonModal,
-  IonButtons,
   IonInput,
   IonTextarea,
   ToastController,
@@ -20,12 +12,13 @@ import {
   IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, trophyOutline, flameOutline, calendarOutline,
+import { trophyOutline, flameOutline, calendarOutline,
   helpCircleOutline, chevronDownOutline, chevronUpOutline
 } from 'ionicons/icons';
 import { DesafioService } from '../../../../../core/services/desafio.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { Desafio } from 'gym-library';
+import { EditModalComponent } from '../../../../../shared/components/edit-modal/edit-modal.component';
 
 
 @Component({
@@ -34,9 +27,10 @@ import { Desafio } from 'gym-library';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    IonHeader, IonToolbar, IonTitle, IonContent,
-    IonButton, IonIcon, IonItem,
-    IonModal, IonButtons, IonInput, IonTextarea, IonNote, IonList, IonLabel, IonText],
+    EditModalComponent,
+    IonItem,
+    IonLabel,
+    IonInput, IonTextarea, IonNote, IonList, IonText],
   templateUrl: './desafio-modal.component.html'
 })
 export class DesafioModalComponent implements OnChanges {
@@ -63,7 +57,7 @@ export class DesafioModalComponent implements OnChanges {
   }
 
   constructor() {
-    addIcons({ close, trophyOutline, flameOutline, calendarOutline, helpCircleOutline });
+    addIcons({ trophyOutline, flameOutline, calendarOutline, helpCircleOutline });
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(180)]],
       logroRelacionado: ['', [Validators.maxLength(120)]],

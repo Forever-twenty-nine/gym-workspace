@@ -4,12 +4,9 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent, 
-  IonCardSubtitle, 
-  IonImg,
-  IonSpinner 
+  IonCardContent,
+  IonList,
+  IonItem
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline } from 'ionicons/icons';
@@ -18,24 +15,24 @@ import { AuthService } from '../../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
 import { UserService } from '../../../../../core/services/user.service';
 import { SocialCardComponent } from './social-card/social-card.component';
+import { EmptyStateComponent } from '../../../../../shared/components/empty-state/empty-state.component';
 import { SesionRutina } from 'gym-library';
 
 @Component({
   selector: 'app-feed-tab',
   templateUrl: './feed-tab.component.html',
   standalone: true,
-  imports: [IonImg, IonCardSubtitle,
+  imports: [
     CommonModule,
     IonInfiniteScroll,
     IonInfiniteScrollContent,
     SocialCardComponent,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
     IonCardContent,
-    IonImg,
-    IonSpinner]
+    IonList,
+    IonItem,
+    EmptyStateComponent
+  ]
 })
 export class FeedTabComponent {
   private sesionRutinaService = inject(SesionRutinaService);

@@ -1,10 +1,10 @@
-<ion-card class="background-transparent ion-no-margin">
-  <ion-card-header class="ion-no-padding">
+<ion-card>
+  <ion-card-header>
     <ion-item lines="none">
       <ion-card-title>Calendario de Entrenamientos</ion-card-title>
     </ion-item>
   </ion-card-header>
-  <ion-card-content class="entrenados-content-67">
+  <ion-card-content>
     <ion-datetime
       presentation="date"
       [highlightedDates]="highlightedDates()"
@@ -15,7 +15,7 @@
 
 <ion-modal [isOpen]="isModalOpen()" (didDismiss)="isModalOpen.set(false)" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5, 0.75, 1]">
   <ng-template>
-    <ion-content class="ion-padding">
+    <ion-content>
       @if (selectedDateEntrenados().length > 0) {
       <ion-list lines="none">
         @for (entrenado of selectedDateEntrenados(); track entrenado.id) {
@@ -31,9 +31,9 @@
         }
       </ion-list>
       } @else {
-      <ion-card class="ion-text-center ion-padding ion-margin">
+      <ion-card>
         <ion-card-content>
-          <ion-icon name="calendar-outline" class="ion-margin-bottom entrenados-icon-68"></ion-icon>
+          <ion-icon name="calendar-outline"></ion-icon>
           <p>No hay rutinas asignadas para esta fecha.</p>
         </ion-card-content>
       </ion-card>

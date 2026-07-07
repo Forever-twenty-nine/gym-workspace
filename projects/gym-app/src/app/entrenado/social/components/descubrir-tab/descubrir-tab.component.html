@@ -1,38 +1,45 @@
-<div class="flex flex-col items-center justify-center min-h-137.5 px-2 py-4">
+<ion-card>
   @if (tarjetaActiva) {
-  <div class="w-full max-w-md flex flex-col gap-4 relative">
+  <ion-card-content>
 
     <!-- Contenedor de la Tarjeta con Animación de Deslizamiento -->
-    <div [class]="animacionCard()" (transitionend)="onCardTransitionEnd()">
+    <ion-card [class]="animacionCard()" (transitionend)="onCardTransitionEnd()">
       <app-match-card [tipo]="tarjetaActiva.tipo" [data]="tarjetaActiva.data">
       </app-match-card>
-    </div>
+    </ion-card>
 
-    <div class="flex justify-center items-center gap-6 mt-2">
-      <!-- Botón Pasar (Descartar) -->
-      <ion-button (click)="onPasar()" color="secondary" fill="outline">
-        <ion-icon name="close" class="text-2xl"></ion-icon>
-      </ion-button>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <!-- Botón Pasar (Descartar) -->
+            <ion-button (click)="onPasar()" color="secondary" fill="outline">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-col>
 
-      <ion-button (click)="onChocarLos5()" color="primary" fill="solid">
-        <ion-icon name="hand-right" class="text-3xl"></ion-icon>
-      </ion-button>
-    </div>
+          <ion-col>
+            <ion-button (click)="onChocarLos5()" color="primary" fill="solid">
+              <ion-icon name="hand-right"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
 
-  </div>
+  </ion-card-content>
   } @else {
   <!-- Estado Vacío del Mazo -->
-  <div
-    class="flex flex-col items-center justify-center text-center p-8 backdrop-blur-xl rounded-4xl border max-w-md w-full my-6">
-    <div
-      class="w-16 h-16 border rounded-2xl flex items-center justify-center mb-5">
-      <ion-icon name="sparkles-outline" class="text-3xl"></ion-icon>
-    </div>
-    <h3 class="text-base font-black mb-2 tracking-tight">¡Eso es todo por hoy!</h3>
-    <p class="text-xs font-semibold px-4 leading-relaxed m-0">
-      Has completado tu mazo de sugerencias. Vuelve más tarde para ver nuevos compañeros o desafíos disponibles en tu
-      gimnasio.
-    </p>
-  </div>
+  <ion-card>
+    <ion-card-content>
+      <ion-avatar>
+        <ion-icon name="sparkles-outline"></ion-icon>
+      </ion-avatar>
+      <ion-card-title>¡Eso es todo por hoy!</ion-card-title>
+      <ion-card-subtitle>
+        Has completado tu mazo de sugerencias. Vuelve más tarde para ver nuevos compañeros o desafíos disponibles en tu gimnasio.
+      </ion-card-subtitle>
+    </ion-card-content>
+  </ion-card>
   }
-</div>
+</ion-card>

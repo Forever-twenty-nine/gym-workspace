@@ -12,7 +12,6 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  IonPopover,
   ToastController,
   AlertController,
   SegmentCustomEvent
@@ -27,6 +26,7 @@ import { DesafioService } from '../../core/services/desafio.service';
 import { Plan, Convocatoria, Desafio, Rutina, Ejercicio } from 'gym-library';
 
 import { BackgroundComponent } from '../../shared/components/background/background.component';
+import { HelpFabComponent } from '../../shared/components/help-fab/help-fab.component';
 import { ConvocatoriaModalComponent } from './components/convocatoria/convocatoria-modal/convocatoria-modal.component';
 import { DesafioModalComponent } from './components/desafio/desafio-modal/desafio-modal.component';
 import { RutinaModalComponent } from './components/rutina/rutina-modal/rutina-modal.component';
@@ -52,8 +52,8 @@ import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/mod
     IonFab,
     IonFabButton,
     IonIcon,
-    IonPopover,
     BackgroundComponent,
+    HelpFabComponent,
     ConvocatoriaModalComponent,
     DesafioModalComponent,
     RutinaModalComponent,

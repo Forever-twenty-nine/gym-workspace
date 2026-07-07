@@ -1,9 +1,10 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Invitacion } from 'gym-library';
-import { IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonCard, IonCardContent, IonItemSliding, IonItemOption, IonItemOptions, IonText } from '@ionic/angular/standalone';
+import { IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonCard, IonCardContent, IonItemSliding, IonItemOption, IonItemOptions } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { checkmarkCircle, closeCircleOutline } from 'ionicons/icons';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-invitaciones-pendientes',
@@ -20,7 +21,7 @@ import { checkmarkCircle, closeCircleOutline } from 'ionicons/icons';
     IonLabel,
     IonList,
     IonCardContent,
-    IonText
+    EmptyStateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

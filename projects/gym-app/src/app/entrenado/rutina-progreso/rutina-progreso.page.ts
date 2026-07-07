@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ActionSheetController, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter } from '@ionic/angular/standalone';
+import { ActionSheetController, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, IonGrid, IonRow, IonCol, IonList, IonListHeader, IonLabel, IonItem } from '@ionic/angular/standalone';
 import { RutinaProgresoHeaderComponent } from './components/rutina-progreso-header/rutina-progreso-header.component';
 import { RutinaEjercicioItemComponent } from './components/rutina-ejercicio-item/rutina-ejercicio-item.component';
 import { RutinaOverlayComponent } from './components/rutina-overlay/rutina-overlay.component';
@@ -20,7 +20,7 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
 
 @Component({
   selector: 'app-rutina-progreso', standalone: true,
-  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, RutinaProgresoHeaderComponent, RutinaEjercicioItemComponent, RutinaOverlayComponent, RutinaEjercicioDetalleModalComponent, BackgroundComponent],
+  imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, IonGrid, IonRow, IonCol, IonList, IonListHeader, IonLabel, IonItem, RutinaProgresoHeaderComponent, RutinaEjercicioItemComponent, RutinaOverlayComponent, RutinaEjercicioDetalleModalComponent, BackgroundComponent],
   templateUrl: './rutina-progreso.page.html',
   styles: [`@keyframes bounceIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } } .animate-bounce-in { animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }`]
 })

@@ -3,7 +3,7 @@
         @if (sesionSeleccionada) {
         <ion-header>
             <ion-toolbar>
-                <ion-title class="p-4">{{ sesionSeleccionada.rutinaResumen.nombre || 'Resumen' }}</ion-title>
+                <ion-title>{{ sesionSeleccionada.rutinaResumen.nombre || 'Resumen' }}</ion-title>
                 <ion-buttons slot="end">
                     <ion-button (click)="cerrarDetalle()" shape="round" color="secondary">
                         <ion-icon name="close-outline" size="large"></ion-icon>
@@ -11,43 +11,44 @@
                 </ion-buttons>
             </ion-toolbar>
         </ion-header>
-        <ion-content class="ion-padding">
+        <ion-content>
             <ion-card>
                 <ion-card-content>
                     <ion-grid>
-                        <ion-row class="ion-align-items-start">
+                        <ion-row>
                             <!-- Columna Fecha -->
-                            <ion-col class="ion-text-center">
+                            <ion-col>
                                 <ion-text color="medium"><strong>FECHA</strong></ion-text>
-                                <div class="flex flex-col items-center gap-1 mt-2">
+                                <ion-avatar>
                                     <ion-icon name="calendar-outline" size="large"></ion-icon>
                                     <ion-note>{{ formatearFecha(sesionSeleccionada.fechaInicio) }}</ion-note>
-                                </div>
+                                </ion-avatar>
                             </ion-col>
-                            
+
                             <!-- Columna Duración -->
-                            <ion-col class="ion-text-center">
+                            <ion-col>
                                 <ion-text color="medium"><strong>DURACIÓN</strong></ion-text>
-                                <div class="flex flex-col items-center gap-1 mt-2">
+                                <ion-avatar>
                                     <ion-icon name="time-outline" size="large"></ion-icon>
                                     <ion-note>{{ redondearMinutos(sesionSeleccionada.duracion || 0) }}m</ion-note>
-                                </div>
+                                </ion-avatar>
                             </ion-col>
-                            
+
                             <!-- Columna Estado -->
-                            <ion-col class="ion-text-center">
+                            <ion-col>
                                 <ion-text color="medium"><strong>ESTADO</strong></ion-text>
-                                <div class="flex flex-col items-center gap-1 mt-2">
+                                <ion-avatar>
                                     <ion-icon name="checkmark-circle-outline" size="large" [color]="getColorEstado(sesionSeleccionada)"></ion-icon>
                                     <ion-note>{{ getEstadoSesion(sesionSeleccionada) }}</ion-note>
-                                </div>
+                                </ion-avatar>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
                 </ion-card-content>
             </ion-card>
+
             <!-- Compartir en Comunidad -->
-            <ion-card class="my-4">
+            <ion-card>
                 <ion-item lines="none">
                     <ion-label>
                         <h2><strong>Compartir en comunidad</strong></h2>
@@ -59,30 +60,28 @@
                 <!-- Sección de Foto Premium -->
                 @if (isPremium() && sesionSeleccionada.compartida) {
                 <ion-card-content>
-                    <div class="detalle-div-15" (click)="triggerPhotoInput()">
-
+                    <ion-button expand="block" fill="outline" (click)="triggerPhotoInput()">
                         @if (fotoProgresoUrl()) {
-                        <img class="detalle-img-16" [src]="fotoProgresoUrl()">
+                        <img [src]="fotoProgresoUrl()">
                         } @else {
                         <ion-icon name="camera-outline" size="large" color="medium"></ion-icon>
                         <ion-text color="medium"><small><strong>Subir foto del entrenamiento</strong></small></ion-text>
                         }
 
                         @if (isUploading()) {
-                        <div class="detalle-div-17">
-                            <ion-spinner name="crescent" color="primary"></ion-spinner>
-                            <ion-text color="primary"><small><strong>SUBIENDO...</strong></small></ion-text>
-                        </div>
+                        <ion-spinner name="crescent" color="primary"></ion-spinner>
+                        <ion-text color="primary"><small><strong>SUBIENDO...</strong></small></ion-text>
                         }
-                    </div>
-                    <input class="hidden" type="file" id="foto-progreso-input" accept="image/*" (change)="onPhotoSelected($event)">
+                    </ion-button>
+                    <input type="file" id="foto-progreso-input" accept="image/*" (change)="onPhotoSelected($event)">
                 </ion-card-content>
                 }
             </ion-card>
+
             <!-- Lista de ejercicios de la sesión -->
             @if(sesionSeleccionada.rutinaResumen.ejercicios.length) {
-            <ion-card class="my-4">
-                <ion-card-header class="p-4 flex flex-col gap-1">
+            <ion-card>
+                <ion-card-header>
                     <ion-card-title>Ejercicios</ion-card-title>
                 </ion-card-header>
                 <ion-card-content>
@@ -91,7 +90,7 @@
                         <ion-item>
                             <ion-label>
                                 <h2><strong>{{ ejercicio.nombre || 'Ejercicio' }}</strong></h2>
-                                
+
                             </ion-label>
                             <ion-note slot="end" color="medium">
                                 {{ ejercicio.series }} series <br> {{ ejercicio.repeticiones }} repeticiones
@@ -104,7 +103,7 @@
             }
         </ion-content>
         <ion-footer>
-            <div class="ion-padding flex flex-col gap-2">
+            <ion-toolbar>
                 <ion-button expand="block" color="primary" [disabled]="isSharing() || isUploading()"
                     (click)="compartirWhatsApp()">
                     @if (isSharing()) {
@@ -119,7 +118,7 @@
                     <ion-icon name="trash-outline" slot="start"></ion-icon>
                     Eliminar
                 </ion-button>
-            </div>
+            </ion-toolbar>
         </ion-footer>
         }
     </ng-template>

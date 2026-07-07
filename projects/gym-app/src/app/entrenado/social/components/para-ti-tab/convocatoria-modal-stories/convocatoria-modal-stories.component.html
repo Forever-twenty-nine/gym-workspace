@@ -1,66 +1,66 @@
 <ion-modal [isOpen]="isOpen" (didDismiss)="onDidDismiss()">
   <ng-template>
     @if (convocatoria) {
-    <ion-header class="ion-no-border">
-      <ion-toolbar>
-        <ion-item lines="none">
-          <ion-avatar slot="start">
-            @if (getUsuarioPhoto(convocatoria.creadorId)) {
-            <img [src]="getUsuarioPhoto(convocatoria.creadorId)">
-            } @else {
-            <ion-icon name="person-outline"></ion-icon>
-            }
-          </ion-avatar>
-          <ion-label>
-            <h2 class="font-bold">
-              {{ getUsuarioName(convocatoria.creadorId) }}
-              @if (convocatoria.esOficial) {
-              <ion-badge color="primary" class="ml-1">Coach</ion-badge>
+    <ion-header>
+        <ion-toolbar>
+          <ion-item lines="none">
+            <ion-avatar slot="start">
+              @if (getUsuarioPhoto(convocatoria.creadorId)) {
+              <img [src]="getUsuarioPhoto(convocatoria.creadorId)">
+              } @else {
+              <ion-icon name="person-outline"></ion-icon>
               }
-              @if (convocatoria.esSemanal) {
-              <ion-badge color="warning" class="ml-1">Semanal</ion-badge>
-              }
-            </h2>
-            <p class="flex items-center gap-1 mt-1 text-xs">
-              <ion-icon name="time-outline"></ion-icon>
-              {{ formatearFechaCompleta() }}
-            </p>
-          </ion-label>
-        </ion-item>
-        <ion-buttons slot="end">
-          <ion-button fill="clear" color="medium" (click)="close.emit()">
-            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
+            </ion-avatar>
+            <ion-label>
+              <h2>
+                {{ getUsuarioName(convocatoria.creadorId) }}
+                @if (convocatoria.esOficial) {
+                <ion-badge color="primary">Coach</ion-badge>
+                }
+                @if (convocatoria.esSemanal) {
+                <ion-badge color="warning">Semanal</ion-badge>
+                }
+              </h2>
+              <p>
+                <ion-icon name="time-outline"></ion-icon>
+                {{ formatearFechaCompleta() }}
+              </p>
+            </ion-label>
+          </ion-item>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" color="medium" (click)="close.emit()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding">
+    <ion-content>
       @if (convocatoria.titulo) {
       <ion-text color="primary">
-        <h2 class="font-bold text-lg m-0">{{ convocatoria.titulo }}</h2>
+        <h2>{{ convocatoria.titulo }}</h2>
       </ion-text>
       }
 
       @if (convocatoria.mensaje) {
-      <ion-card class="m-0 mt-4">
+      <ion-card>
         <ion-card-content>
-          <p class="italic text-sm m-0">"{{ convocatoria.mensaje }}"</p>
+          "{{ convocatoria.mensaje }}"
         </ion-card-content>
       </ion-card>
       } @else {
-      <ion-note class="block text-center mt-4 mb-2 text-sm italic">Sin nota adicional</ion-note>
+      <ion-note>Sin nota adicional</ion-note>
       }
 
-      <div class="mt-6">
-        <ion-note color="medium" class="uppercase text-xs font-bold block mb-3">
-          Interesados ({{ convocatoria.interesados.length }})
-        </ion-note>
+      <ion-list>
+        <ion-list-header>
+          <ion-label>Interesados ({{ convocatoria.interesados.length }})</ion-label>
+        </ion-list-header>
 
         @if (convocatoria.interesados.length > 0) {
-        <div class="flex flex-wrap gap-2">
+        <ion-item>
           @for (uid of convocatoria.interesados; track uid) {
-          <ion-avatar class="w-10 h-10 border">
+          <ion-avatar>
             @if (getUsuarioPhoto(uid)) {
             <img [src]="getUsuarioPhoto(uid)">
             } @else {
@@ -68,38 +68,42 @@
             }
           </ion-avatar>
           }
-        </div>
+        </ion-item>
         } @else {
-        <div class="text-center p-4 border border-dashed rounded-lg mt-2">
-          <ion-note class="text-xs">Nadie se ha sumado todavía. ¡Sé el primero!</ion-note>
-        </div>
+        <ion-item lines="none">
+          <ion-note>Nadie se ha sumado todavía. ¡Sé el primero!</ion-note>
+        </ion-item>
         }
-      </div>
+      </ion-list>
     </ion-content>
 
-    <ion-footer class="ion-no-border">
+    <ion-footer>
       <ion-toolbar>
-        <div class="flex flex-col gap-2 p-4">
-          @if (esCreador()) {
-          <div class="flex items-center justify-between w-full">
-            <ion-badge color="primary">Tu convocatoria</ion-badge>
-            <ion-button fill="clear" color="danger" class="m-0" (click)="confirmarEliminar()">
-              <ion-icon name="trash-outline" slot="start"></ion-icon>
-              Eliminar
-            </ion-button>
-          </div>
-          } @else {
-          <ion-button expand="block" (click)="toggleInteres()" [color]="yaInteresado() ? 'medium' : 'primary'"
-            [fill]="yaInteresado() ? 'outline' : 'solid'" class="m-0">
-            <ion-icon [name]="yaInteresado() ? 'checkmark' : 'hand-right-outline'" slot="start"></ion-icon>
-            {{ yaInteresado() ? 'Listo (Te has sumado)' : 'Chocar los 5' }}
-          </ion-button>
+        @if (esCreador()) {
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <ion-badge color="primary">Tu convocatoria</ion-badge>
+            </ion-col>
+            <ion-col>
+              <ion-button fill="clear" color="danger" (click)="confirmarEliminar()">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                Eliminar
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        } @else {
+        <ion-button expand="block" (click)="toggleInteres()" [color]="yaInteresado() ? 'medium' : 'primary'"
+          [fill]="yaInteresado() ? 'outline' : 'solid'">
+          <ion-icon [name]="yaInteresado() ? 'checkmark' : 'hand-right-outline'" slot="start"></ion-icon>
+          {{ yaInteresado() ? 'Listo (Te has sumado)' : 'Chocar los 5' }}
+        </ion-button>
 
-          @if (yaInteresado()) {
-          <ion-note class="text-center text-xs block mt-1">Puedes tocar de nuevo para retirar tu interés</ion-note>
-          }
-          }
-        </div>
+        @if (yaInteresado()) {
+        <ion-note>Puedes tocar de nuevo para retirar tu interés</ion-note>
+        }
+        }
       </ion-toolbar>
     </ion-footer>
     }

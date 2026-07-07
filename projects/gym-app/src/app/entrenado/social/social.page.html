@@ -1,45 +1,45 @@
-<ion-header class="ion-no-border">
+<ion-header>
   <ion-toolbar>
-    <div class="flex justify-center w-full px-3">
-      <ion-segment class="social-page-segment-57" [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
-        <ion-segment-button value="para-ti">
-          <ion-label>Para ti</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="siguiendo">
-          <ion-label>Siguiendo</ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="descubrir">
-          <ion-label>Descubrir</ion-label>
-        </ion-segment-button>
-      </ion-segment>
-    </div>
+    <ion-segment [value]="selectedTab()" (ionChange)="segmentChanged($event)" mode="ios">
+      <ion-segment-button value="para-ti">
+        <ion-label>Para ti</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="siguiendo">
+        <ion-label>Siguiendo</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="descubrir">
+        <ion-label>Descubrir</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="transparent-bg" [fullscreen]="true">
+<ion-content [fullscreen]="true">
 
   <app-background />
   @if (selectedTab() === 'para-ti' && storiesList().length > 0) {
-  <div class="sticky top-0 z-50 social-page-div-58">
+  <ion-card>
     <app-stories [stories]="storiesList()" (storyClick)="handleStoryClick($event)"></app-stories>
-  </div>
+  </ion-card>
   }
 
-  <div class="relative z-10 px-4 pb-6 pt-2">
-    <!-- Renderizado condicional por componente -->
-    @switch (selectedTab()) {
-    @case ('descubrir') {
-    <app-descubrir-tab [tarjetaActiva]="tarjetaActiva()" (pasar)="pasarTarjeta()" (chocarLos5)="chocarLos5()"
-      (cardTransitionEnd)="onCardTransitionEnd()" />
-    }
-    @case ('para-ti') {
-    <app-para-ti-tab />
-    }
-    @case ('siguiendo') {
-    <app-feed-tab tab="siguiendo" />
-    }
-    }
-  </div>
+  <ion-card>
+    <ion-card-content>
+      <!-- Renderizado condicional por componente -->
+      @switch (selectedTab()) {
+      @case ('descubrir') {
+      <app-descubrir-tab [tarjetaActiva]="tarjetaActiva()" (pasar)="pasarTarjeta()" (chocarLos5)="chocarLos5()"
+        (cardTransitionEnd)="onCardTransitionEnd()" />
+      }
+      @case ('para-ti') {
+      <app-para-ti-tab />
+      }
+      @case ('siguiendo') {
+      <app-feed-tab tab="siguiendo" />
+      }
+      }
+    </ion-card-content>
+  </ion-card>
 
   <!-- Superposición de Match Mutuo (Popup Global a Nivel de Página) -->
   @if (matchActual()) {

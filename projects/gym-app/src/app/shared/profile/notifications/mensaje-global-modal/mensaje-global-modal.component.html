@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Aviso del Sistema</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()" aria-label="Cerrar">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-header>
+      <ion-icon name="information-circle" color="primary"></ion-icon>
+      <ion-card-title>{{ mensaje.titulo }}</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>{{ mensaje.mensaje }}</ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-button expand="block" (click)="dismiss()">Entendido</ion-button>
+  </ion-toolbar>
+</ion-footer>

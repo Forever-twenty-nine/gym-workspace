@@ -1,0 +1,23 @@
+/* ============================================================ */
+/* Estilos Específicos - Dashboard del Entrenador                */
+/* ============================================================ */
+
+app-dashboard {
+    /* El toolbar transparente se hereda del entrenador.css */
+    ion-title {
+        font-family: var(--font-heading);
+        font-weight: 600;
+        font-size: 22px;
+        padding-inline-start: 8px;
+    }
+
+    ion-grid {
+        padding-top: var(--ion-padding);
+    }
+}
+
+app-proximos-entrenados {
+    ion-card-header {
+        padding-inline-start: 0;
+    }
+}

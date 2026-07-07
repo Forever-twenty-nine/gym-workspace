@@ -1,0 +1,32 @@
+/* ============================================================ */
+/* Estilos Específicos - Ejercicios                              */
+/* ============================================================ */
+
+app-ejercicio-modal {
+    /* Modal más ancho y elegante */
+    ion-modal {
+        --width: 95%;
+        --max-width: 600px;
+        --border-radius: 16px;
+        --backdrop-opacity: 0.3;
+    }
+
+    /* El aviso de campos premium */
+    ion-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ion-color-medium);
+        font-size: 13px;
+        font-style: italic;
+    }
+
+    /* Botón de submit con margen superior */
+    ion-button[type="submit"] {
+        margin-top: var(--ion-margin);
+    }
+}
+
+app-ejercicios {
+    /* Página wrapper de la lista + modal */
+}

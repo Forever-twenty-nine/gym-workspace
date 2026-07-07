@@ -1,0 +1,64 @@
+/* ============================================================ */
+/* Estilos Específicos - Gimnasio Dashboard                      */
+/* ============================================================ */
+
+app-gimnasio-dashboard {
+    ion-content {
+        --background: transparent;
+    }
+
+    ion-grid {
+        padding: var(--ion-padding);
+    }
+
+    /* Cabecera "Mi Gimnasio" + subtítulo */
+    ion-row:first-of-type ion-col {
+        margin-bottom: var(--ion-margin);
+    }
+
+    ion-row:first-of-type h2 {
+        font-family: var(--font-heading);
+        font-size: 26px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        color: var(--ion-color-primary);
+    }
+
+    ion-row:first-of-type ion-text span {
+        font-size: 14px;
+    }
+
+    /* Card de "Estadísticas del gimnasio" */
+    ion-row:last-of-type ion-card {
+        margin: var(--ion-margin) 0 0 0;
+    }
+
+    ion-row:last-of-type ion-item {
+        --padding-start: 0;
+        --inner-padding-end: 0;
+        --background: transparent;
+    }
+
+    ion-row:last-of-type h3 {
+        font-weight: 700;
+    }
+
+    ion-row:last-of-type ion-icon {
+        font-size: 32px;
+    }
+}
+
+/* === Entrenadores List === */
+app-entrenadores-list {
+    ion-card {
+        margin: 0;
+    }
+
+    ion-card-header {
+        padding: 0;
+    }
+
+    ion-card-content {
+        padding: 0;
+    }
+}

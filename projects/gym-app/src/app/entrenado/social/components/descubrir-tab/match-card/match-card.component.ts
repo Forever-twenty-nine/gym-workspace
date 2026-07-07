@@ -1,6 +1,6 @@
 import { Component, inject, computed, signal, input, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonCard, IonIcon, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonChip, IonLabel } from '@ionic/angular/standalone';
+import { IonCard, IonIcon, IonCardHeader, IonCardTitle, IonCardContent, IonCardSubtitle, IonChip, IonLabel, IonImg } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { person } from 'ionicons/icons';
 import { AuthService } from '../../../../../core/services/auth.service';
@@ -9,9 +9,9 @@ import { UserService } from '../../../../../core/services/user.service';
 @Component({
   selector: 'app-match-card',
   standalone: true,
-  imports: [IonCardSubtitle, 
+  imports: [IonCardSubtitle,
     CommonModule, IonCard, IonIcon,
-    IonCardHeader, IonCardContent, IonCardTitle, IonChip, IonLabel
+    IonCardHeader, IonCardContent, IonCardTitle, IonChip, IonLabel, IonImg
   ],
   templateUrl: './match-card.component.html'
 })

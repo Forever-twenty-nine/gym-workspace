@@ -29,7 +29,7 @@ export const routes: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('../../shared/perfil/profile.page').then((m) => m.ProfilePage),
+          import('../../shared/profile/profile.page').then((m) => m.ProfilePage),
       },
       {
         path: '',
