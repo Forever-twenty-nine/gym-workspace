@@ -1,0 +1,148 @@
+/* ---------------------------------------------------- */
+/* Estilos para Flujos de Autenticación (Auth)          */
+/* ---------------------------------------------------- */
+
+app-welcome, app-login, app-register, app-forgot-password {
+    /* Tarjeta transparente posicionada al fondo de la pantalla */
+    ion-card {
+        @apply z-10 p-2 absolute bottom-0 left-0 right-0 w-full pb-8;
+        --background: transparent;
+        --box-shadow: none;
+    }
+
+    /* Remover padding horizontal de headers y contents en tarjetas */
+    ion-card-header,
+    ion-card-content {
+        @apply px-0;
+    }
+
+    /* Títulos de autenticación (por defecto centrado y tamaño grande) */
+    ion-card-title {
+        @apply font-heading font-semibold mb-4 leading-tight text-center;
+    }
+
+    /* Subtítulos de autenticación (descripciones/instrucciones) */
+    ion-card-subtitle {
+        @apply text-center mb-6 opacity-90;
+        text-transform: none;
+        color: inherit;
+    }
+
+    /* Estilo de inputs */
+    ion-input {
+        @apply mb-4;
+    }
+
+    /* Botón Submit principal en formularios */
+    form > ion-button {
+        @apply w-full mt-4;
+    }
+
+    /* Fila del Footer con botones "clear" (Login, Register, Forgot Password) */
+    ion-row:has(p):has(ion-button[fill="clear"]) {
+        @apply flex gap-2 items-center justify-center w-full mt-4;
+        
+        p {
+            @apply text-center m-0;
+        }
+        
+        ion-button {
+            @apply m-0 p-0 font-bold;
+        }
+    }
+
+    /* Grupo de botones de acciones y sociales (Google) */
+    ion-row:has(> ion-text) {
+        @apply flex flex-col gap-4 mt-4 w-full;
+        
+        ion-text {
+            @apply text-center;
+        }
+        
+        ion-icon {
+            @apply w-5 h-5;
+        }
+        
+        ion-button {
+            @apply normal-case w-full mt-0! mb-4;
+        }
+    }
+}
+
+/* Relleno estándar para contenidos con scroll completo */
+app-register ion-content, app-onboarding ion-content {
+    --padding: 16px;
+}
+
+/* --- Especificidades de Welcome Page --- */
+app-welcome {
+    ion-card-title span {
+        color: var(--brand-primary);
+    }
+    ion-card-header img {
+        @apply mx-auto mb-4;
+    }
+    ion-card-content > ion-button {
+        @apply mb-6;
+    }
+}
+
+/* --- Especificidades de Login Page --- */
+app-login {
+    /* Fila de recordar contraseña */
+    ion-row:has(ion-checkbox) {
+        @apply flex items-center mb-2 px-1 w-full;
+    }
+}
+
+/* --- Estilos de Onboarding --- */
+app-onboarding {
+    ion-toolbar ion-row {
+        @apply px-4 pt-4 pb-2 w-full;
+    }
+    ion-toolbar p {
+        @apply text-center mb-2 opacity-80;
+    }
+    ion-content h1 {
+        @apply font-heading font-semibold text-center mt-20 mb-8;
+    }
+    ion-card {
+        @apply p-4 shadow-md;
+    }
+    ion-card-header {
+        @apply p-0;
+    }
+    ion-card-title {
+        @apply font-heading font-semibold text-center mb-4 leading-tight;
+    }
+    ion-card-subtitle {
+        @apply text-center text-(--brand-secondary);
+    }
+    ion-card-content {
+        @apply m-4;
+    }
+    
+    ion-card[color="warning"] {
+        @apply my-2;
+        
+        p {
+            @apply text-center my-4 mx-0 p-3;
+        }
+        
+        span {
+            @apply block;
+        }
+    }
+    
+    ion-content ion-button {
+        @apply mt-8! w-full;
+    }
+    ion-button ion-icon {
+        @apply ml-1;
+    }
+}
+
+/* Estilos de Onboarding */
+.onboarding-page-select-1 {
+    --placeholder-color: var(--ion-color-medium);
+}

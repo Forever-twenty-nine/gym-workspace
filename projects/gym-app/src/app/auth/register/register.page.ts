@@ -2,7 +2,22 @@ import { Component, computed, inject, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonContent, IonInput, IonButton, IonText, IonIcon, IonHeader, IonToolbar, IonButtons, IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/angular/standalone';
+import {
+  IonContent,
+  IonInput,
+  IonButton,
+  IonText,
+  IonIcon,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonRow,
+  IonCol
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   lockClosedOutline,
@@ -17,15 +32,24 @@ import { AuthBackgroundComponent } from '../../shared/components/auth-background
   selector: 'app-register',
   templateUrl: 'register.page.html',
   standalone: true,
-  imports: [IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, IonToolbar,
+  imports: [
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonButtons,
+    IonToolbar,
     IonContent,
     IonInput,
     IonButton,
     IonText,
     IonIcon,
+    IonRow,
+    IonCol,
     ReactiveFormsModule,
     AuthBackgroundComponent,
-    IonHeader]
+    IonHeader
+  ]
 })
 export class RegisterPage {
   private readonly router = inject(Router);

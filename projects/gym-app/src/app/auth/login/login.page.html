@@ -1,8 +1,8 @@
-<ion-header class="absolute top-0 z-50 w-full bg-transparent">
-  <ion-toolbar class="auth-toolbar-transparent">
+<ion-header [translucent]="true">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button fill="clear" (click)="goToWelcome()">
-        <ion-icon name="arrow-back-outline" class="text-3xl"></ion-icon>
+        <ion-icon name="arrow-back-outline" size="large"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
@@ -12,74 +12,73 @@
   <app-auth-background [showBlur]="true"></app-auth-background>
 
   <!-- content -->
-  <div class="absolute bottom-0 left-0 right-0 w-full pb-8">
-    <ion-card class="z-10 p-2 relative w-full auth-card-transparent">
-      <ion-card-header class="px-0">
-        <ion-card-title class="font-semibold font-heading text-3xl mb-2 text-center">
-          Bienvenido a GymApp
-        </ion-card-title>
-      </ion-card-header>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        Bienvenido a GymApp
+      </ion-card-title>
+    </ion-card-header>
 
-      <ion-card-content class="px-0">
+    <ion-card-content>
 
-        <form [formGroup]="loginForm">
-          <div class="mb-4">
-            <!-- email -->
+      <form [formGroup]="loginForm">
+        <ion-row>
+          <ion-col>
             <ion-input label="Email" label-placement="floating" type="email" formControlName="email"
-              placeholder="Ingresa tu email" class="mb-4" [errorText]="emailError">
+              placeholder="Ingresa tu email" [errorText]="emailError">
             </ion-input>
+          </ion-col>
+        </ion-row>
 
-            <!-- password -->
+        <ion-row>
+          <ion-col>
             <ion-input label="Contraseña" label-placement="floating" type="password" formControlName="password"
-              placeholder="Ingresa tu contraseña" class="mb-4" [errorText]="passwordError">
+              placeholder="Ingresa tu contraseña" [errorText]="passwordError">
             </ion-input>
-          </div>
+          </ion-col>
+        </ion-row>
 
-          <div class="flex items-center mb-2 px-1">
-            <ion-checkbox formControlName="rememberMe" label-placement="end" justify="start" class="text-sm">
-              Recordar mi contraseña
-            </ion-checkbox>
-          </div>
+        <ion-row>
+          <ion-checkbox formControlName="rememberMe" label-placement="end" justify="start">
+            Recordar mi contraseña
+          </ion-checkbox>
+        </ion-row>
 
-          <div class="gap-2 mt-4">
-            <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="login()"
-              [disabled]="isSubmitDisabled()">
-              Iniciar Sesión
-            </ion-button>
-          </div>
+        <ion-button expand="block" fill="solid" shape="round" color="primary" (click)="login()"
+          [disabled]="isSubmitDisabled()">
+          Iniciar Sesión
+        </ion-button>
+      </form>
 
-          <div class="flex flex-col gap-4 mt-4">
-            
-            <ion-text class="text-center">
-              o inicia sesión con:
-            </ion-text>
+      <ion-row>
+        <ion-text>
+          o inicia sesión con:
+        </ion-text>
 
-            <ion-button expand="block" fill="outline" size="large" shape="round" color="primary"
-              class="normal-case mb-4" (click)="loginWithGoogle()">
-              <ion-icon src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" slot="start"
-                class="w-5 h-5"></ion-icon>
-              <span class="px-1">oogle</span>
-            </ion-button>
-          </div>
-          <div class="flex gap-2 items-center justify-center mt-4">
-            <p class="text-center text-sm">
-              ¿No tienes una cuenta?
-            </p>
-            <ion-button fill="clear" size="small" color="primary" (click)="goToRegister()" class="m-0 p-0 font-bold">
-              Regístrate
-            </ion-button>
-          </div>
-          <div class="flex gap-2 items-center justify-center">
-            <p class="text-center text-sm">
-              ¿Olvidaste tu contraseña?
-            </p>
-            <ion-button fill="clear" size="small" color="primary" (click)="goToForgotPassword()" class="m-0 p-0 font-bold">
-              Recuperar
-            </ion-button>
-          </div>
+        <ion-button expand="block" fill="outline" shape="round" color="primary" (click)="loginWithGoogle()">
+          <ion-icon src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" slot="start"></ion-icon>
+          <span>oogle</span>
+        </ion-button>
+      </ion-row>
+      
+      <ion-row>
+        <p>
+          ¿No tienes una cuenta?
+        </p>
+        <ion-button fill="clear" size="small" color="primary" (click)="goToRegister()">
+          Regístrate
+        </ion-button>
+      </ion-row>
+      
+      <ion-row>
+        <p>
+          ¿Olvidaste tu contraseña?
+        </p>
+        <ion-button fill="clear" size="small" color="primary" (click)="goToForgotPassword()">
+          Recuperar Contraseña
+        </ion-button>
+      </ion-row>
 
-        </form>
-      </ion-card-content>
-    </ion-card>
-  </div>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

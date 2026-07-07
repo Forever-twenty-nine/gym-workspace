@@ -1,15 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import {
-  IonContent,
-  IonButton,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  NavController
-} from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonCard, IonCardHeader, IonCardTitle, IonCardContent, NavController, IonRow, IonCardSubtitle, IonHeader, IonToolbar, IonTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personAddOutline,
@@ -30,8 +22,10 @@ import { AuthBackgroundComponent } from '../../shared/components/auth-background
     IonCardContent,
     IonContent,
     IonButton,
-    AuthBackgroundComponent
-  ]
+    IonRow,
+    AuthBackgroundComponent,
+    IonCardSubtitle
+]
 })
 export class WelcomePage {
   private readonly navCtrl = inject(NavController);

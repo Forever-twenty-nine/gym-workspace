@@ -1,7 +1,7 @@
 import { Component, signal, computed, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonButtons, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar } from '@ionic/angular/standalone';
+import { ToastController, IonContent, IonCard, IonItem, IonLabel, IonInput, IonButton, IonButtons, IonText, IonIcon, IonSelect, IonSelectOption, IonProgressBar, IonCardContent, IonCardTitle, IonCardHeader, IonCardSubtitle, IonAccordion, IonHeader, IonToolbar, IonRow } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   personOutline,
@@ -50,6 +50,7 @@ const ONBOARDING_CONFIG = {
     IonProgressBar,
     FormsModule,
     IonButtons,
+    IonRow,
     AuthBackgroundComponent]
 })
 export class OnboardingPage {

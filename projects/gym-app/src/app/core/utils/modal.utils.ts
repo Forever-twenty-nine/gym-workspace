@@ -26,3 +26,57 @@ export function closeModalWithAnimation<T>(
 export function blurActiveElement(): void {
   (document.activeElement as HTMLElement | null)?.blur?.();
 }
+
+/**
+ * Obtiene el elemento activo real, incluso si está dentro de Shadow DOM.
+ */
+export function getDeepActiveElement(): Element | null {
+  let activeEl = document.activeElement;
+  while (activeEl && activeEl.shadowRoot && activeEl.shadowRoot.activeElement) {
+    activeEl = activeEl.shadowRoot.activeElement;
+  }
+  return activeEl;
+}
+
+/**
+ * Verifica si un elemento o alguno de sus ancestros (cruzando Shadow DOM)
+ * está oculto o tiene aria-hidden="true".
+ */
+export function isElementOrAncestorHidden(el: Element): boolean {
+  let current: Element | null = el;
+  while (current) {
+    if (
+      current.getAttribute('aria-hidden') === 'true' ||
+      current.classList.contains('ion-page-hidden') ||
+      current.hasAttribute('ion-page-hidden')
+    ) {
+      return true;
+    }
+    const parent: Element | null = current.parentElement;
+    if (parent) {
+      current = parent;
+    } else {
+      const root = current.getRootNode();
+      if (root instanceof ShadowRoot) {
+        current = root.host;
+      } else {
+        current = null;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Asegura que ningún elemento enfocado quede dentro de un contenedor oculto/aria-hidden.
+ * Útil después de navegaciones o cambios de visibilidad de páginas.
+ */
+export function checkAndFixHiddenFocus(): void {
+  const activeEl = getDeepActiveElement();
+  if (activeEl && activeEl !== document.body) {
+    if (isElementOrAncestorHidden(activeEl)) {
+      (activeEl as HTMLElement).blur?.();
+    }
+  }
+}
+

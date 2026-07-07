@@ -29,136 +29,23 @@
  * ---------------------------------------------------------------------------- */
 @import "tailwindcss";
 
-/* 6) Custom Shared and Components */
-@import './shared.css';
-@import './components.css';
-
 @theme {
   /* Creando clases de tailwind */
   --font-heading: 'Exo', system-ui, sans-serif;
 }
 
-/* 7) Global Classes */
-.material-symbols-outlined, .material-symbols-rounded {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-}
+/* 6) Estilos Globales (Afectan a 2 o más secciones) */
+@import "./global/global-elements.css";
+@import "./global/global-utilities.css";
+@import "./global/profile.css";
+@import "./global/rutinas.css";
 
- html {
-   font-size: 16px;
- }
+/* 7) Estilos de Secciones Específicas */
+@import "./auth/auth.css";
+@import "./gimnasio/gimnasio.css";
+@import "./entrenador/entrenador.css";
+@import "./entrenado/entrenado.css";
+@import "./entrenado/social.css";
 
- /* 8) Estilos globales para listas (ion-list)
-  * ---------------------------------------------------------------------------- */
- ion-list {
-   background: transparent !important;
-   padding-top: 0 !important;
-   padding-bottom: 0 !important;
- }
-
- /* Leve separación entre los elementos directos de la lista */
- ion-list > ion-item,
- ion-list > ion-item-sliding,
- ion-list > ion-item-group {
-   margin-bottom: 8px !important;
-   border-radius: 12px;
-   overflow: hidden;
- }
-
- ion-list > ion-item:first-child,
- ion-list > ion-item-sliding:first-child,
- ion-list > ion-item-group:first-child {
-   margin-top: 8px !important;
- }
-
- ion-list > ion-item:last-child,
- ion-list > ion-item-sliding:last-child,
- ion-list > ion-item-group:last-child {
-   margin-bottom: 0 !important;
- }
-
- /* Clases utilitarias globales */
- .list-scroll-small {
-   max-height: 200px;
-   overflow-y: auto;
- }
-
- .modal-small {
-   --width: 95%;
-   --max-width: 500px;
-   --height: auto;
-   --border-radius: 16px;
-   --backdrop-opacity: 0.7;
- }
-
-/* Ajustes adicionales para ion-item cuando está dentro de una lista */
-ion-list ion-item {
-  --border-radius: 12px;
-  --border-style: none !important;
-  --inner-border-width: 0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --inner-padding-start: 16px;
-  --inner-padding-end: 16px;
-  --padding-start: 16px;
-  --padding-end: 16px;
-}
-
-/* Dashboard Utilities */
- .transparent-bg {
-   --background: transparent !important;
- }
-
- .dashboard-container {
-   position: relative;
-   z-index: 10;
-   max-width: 512px;
-   margin: 0 auto;
- }
-
- .dashboard-title {
-   font-size: 1.25rem;
-   font-weight: 800;
-   margin: 0;
- }
-
- .dashboard-subtitle {
-   font-size: 0.625rem;
-   font-weight: 800;
-   letter-spacing: 0.1em;
-   text-transform: uppercase;
-   display: block;
-   margin-top: 2px;
- }
-
- .premium-stats-card {
-   border: 1px solid var(--ion-color-step-100, #f4f5f8);
-   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
- }
-
-/* Card que contiene listas — la hacemos transparente para que el fondo de página se vea */
-ion-card:has(ion-card-content ion-list) {
-  --background: transparent;
-  box-shadow: none;
-}
-
-/* Evitar fondos en los contenedores deslizables */
-ion-item-sliding {
-  background: transparent !important;
-}
-
-/* Forzar que ion-segment ocupe todo el ancho disponible en la cabecera (especialmente en iOS) */
-ion-toolbar ion-segment {
-  width: 100% !important;
-  max-width: 100% !important;
-}
-
-/* Permitir que la alerta de selección de días sea más alta y no haga scroll */
-ion-alert.days-alert {
-  --max-height: 85vh;
-}
+/* 8) Estilos Shared (Componentes Compartidos) */
+@import "./shared/shared.css";

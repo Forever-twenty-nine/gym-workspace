@@ -2,36 +2,32 @@
   <app-auth-background [showBlur]="false"></app-auth-background>
 
   <!-- content -->
-  <div class="absolute bottom-0 left-0 right-0 w-full pb-8">
-    <ion-card class="z-10 p-2 relative w-full auth-card-transparent">
-      <ion-card-header class="px-0">
-        <img src="/assets/images/logo.png" width="100" height="100" alt="Fondo" class="mb-4" />
-        <ion-card-title class="font-heading text-4xl font-semibold mb-2 leading-tight">
-          <span class="text-(--brand-primary-color)">Entrenamientos</span><br>
-          diseñados sólo para ti!
-        </ion-card-title>
-      </ion-card-header>
+  <ion-card>
+    <ion-card-header>
+      <img src="/assets/images/logo.png" width="100" height="100" alt="Fondo" />
+      <ion-card-title>
+        <span>Entrenamientos</span><br>
+        diseñados sólo para ti!
+      </ion-card-title>
+      <ion-card-subtitle>
+        Sigue un plan personalizado adaptado a tus objetivos, nivel fitness y preferencias.
+      </ion-card-subtitle>
+    </ion-card-header>
 
-      <ion-card-content class="px-0">
-        <p class="text-base mb-8 opacity-90">
-          Sigue un plan personalizado adaptado a tus objetivos, nivel fitness y preferencias.
+    <ion-card-content>
+
+      <ion-button expand="block" fill="solid" shape="round" color="primary" (click)="goToRegister()">
+        Regístrate
+      </ion-button>
+
+      <ion-row>
+        <p>
+          ¿Tienes una cuenta?
         </p>
-        
-        <ion-button expand="block" fill="solid" size="large" shape="round" color="primary" (click)="goToRegister()"
-          class="mb-6">
-          Regístrate
+        <ion-button fill="clear" (click)="goToLogin()">
+          Iniciar Sesión
         </ion-button>
-
-        <div class="flex gap-2 items-center justify-center">
-          <p class="text-center text-sm">
-            ¿Tienes una cuenta?
-          </p>
-          <ion-button expand="block" fill="solid" size="small" shape="round" color="secondary" (click)="goToLogin()"
-            class="mt-0! m-0">
-            Iniciar Sesión
-          </ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
-  </div>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

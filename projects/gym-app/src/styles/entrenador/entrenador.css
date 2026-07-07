@@ -1,0 +1,91 @@
+/* ---------------------------------------------------- */
+/* Estilos para Sección de Entrenador */
+/* ---------------------------------------------------- */
+
+.entrenados-content-67 {
+    display: flex;
+    justify-content: center;
+    padding-top: 10px;
+}
+
+.entrenados-icon-68 {
+    font-size: 48px;
+    opacity: 0.3;
+}
+
+.entrenados-page-toolbar-81 {
+    --background: transparent;
+    --border-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.creaciones-page-div-66 {
+    white-space: pre-line;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* Detalle Popover Entrenados */
+.popover-div-70 {
+    position: relative;
+    z-index: 1;
+}
+
+.popover-avatar-71 {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-light);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--ion-color-primary);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.popover-span-72 {
+    font-size: 60px;
+    color: var(--ion-color-medium);
+}
+
+.popover-h2-73 {
+    font-weight: 600;
+    color: var(--ion-color-primary);
+}
+
+.popover-list-74 {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.popover-span-75 {
+    color: var(--ion-color-primary);
+    font-size: 24px;
+    margin-inline-end: 16px;
+}
+
+.popover-title-82 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.popover-ul-83 {
+    padding-left: 16px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.popover-p-84 {
+    text-align: center;
+    font-style: italic;
+    font-size: 0.8rem;
+    margin-top: 16px;
+}

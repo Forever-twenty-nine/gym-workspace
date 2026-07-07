@@ -169,6 +169,7 @@ export class EntrenadorService {
               const entrenador: Entrenador = {
                 id: doc.id,
                 fechaRegistro: data['fechaRegistro']?.toDate?.() || data['fechaRegistro'] || new Date(),
+                entrenadosIds: data['entrenadosIds'] || [],
                 ejerciciosCreadasIds: data['ejerciciosCreadasIds'] || [],
                 entrenadosAsignadosIds: data['entrenadosAsignadosIds'] || [],
                 rutinasCreadasIds: data['rutinasCreadasIds'] || [],

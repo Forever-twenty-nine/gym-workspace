@@ -1,13 +1,3 @@
 {
-  // Configuraciones globales del workspace
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsconfig": true,
-  "typescript.preferences.autoImportFileExcludePatterns": ["@ionic/angular/common", "@ionic/angular"],
-  "java.import.gradle.excludedProjects": [
-    "**/android/**"
-  ],
-  "java.project.explorer.excludedFolders": [
-    "**/android"
-  ],
-  "java.import.gradle.enabled": false
+  "css.lint.unknownAtRules": "ignore"
 }

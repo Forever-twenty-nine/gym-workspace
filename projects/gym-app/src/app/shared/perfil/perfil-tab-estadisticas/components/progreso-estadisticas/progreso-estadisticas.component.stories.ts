@@ -21,7 +21,8 @@ export const Default: Story = {
       sesionesTotales: 15,
       completadas: 12,
       enProgreso: 3,
-      tiempoTotal: 450
+      tiempoTotal: 450,
+      sesionesUltimos7Dias: []
     },
     sesiones: [
       {

@@ -14,7 +14,10 @@ import {
   IonCard,
   IonCardHeader,
   IonCardTitle,
-  IonCardContent
+  IonCardContent,
+  IonRow,
+  IonCol,
+  IonCardSubtitle
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { mailOutline, arrowBackOutline } from 'ionicons/icons';
@@ -38,7 +41,10 @@ import { AuthBackgroundComponent } from '../../shared/components/auth-background
     IonCardContent,
     IonHeader,
     IonToolbar,
-    IonButtons
+    IonButtons,
+    IonRow,
+    IonCol,
+    IonCardSubtitle
 ]
 })
 export class ForgotPasswordPage {

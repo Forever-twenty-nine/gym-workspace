@@ -15,7 +15,11 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  NavController, IonText } from '@ionic/angular/standalone';
+  NavController,
+  IonText,
+  IonRow,
+  IonCol
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { personOutline, lockClosedOutline, arrowBackOutline } from 'ionicons/icons';
 import { Rol } from 'gym-library';
@@ -27,7 +31,8 @@ import { AuthBackgroundComponent } from '../../shared/components/auth-background
   selector: 'app-login',
   templateUrl: 'login.page.html',
   standalone: true,
-  imports: [IonText, 
+  imports: [
+    IonText, 
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -40,6 +45,8 @@ import { AuthBackgroundComponent } from '../../shared/components/auth-background
     IonButton,
     IonIcon,
     IonCheckbox,
+    IonRow,
+    IonCol,
     ReactiveFormsModule,
     AuthBackgroundComponent
   ]
