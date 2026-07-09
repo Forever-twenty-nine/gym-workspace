@@ -1,23 +1,6 @@
 /* ============================================================ */
 /* Page: rutinas (sección entrenado)                              */
-/* Estilos page-level — header compactado con segment            */
+/* Estilos page-level — solo lo específico de rutinas.            */
+/* El header compacto + segment-button look está en               */
+/* global-elements.css (regla `ion-toolbar:has(ion-segment)`).   */
 /* ============================================================ */
-
-/* Toolbar que contiene el segment Rutinas/Historial — más fina */
-ion-toolbar:has(ion-segment-button[value="rutinas"]) {
-    --min-height: 40px;
-    --padding-top: 4px;
-    --padding-bottom: 4px;
-}
-
-/* Segment-buttons del header de rutinas — más compactos */
-ion-segment-button[value="rutinas"],
-ion-segment-button[value="historial"] {
-    --indicator-height: 2px;
-    --padding-top: 6px;
-    --padding-bottom: 6px;
-    min-height: 36px;
-    font-size: 0.875rem;
-    text-transform: none;
-    font-weight: 600;
-}

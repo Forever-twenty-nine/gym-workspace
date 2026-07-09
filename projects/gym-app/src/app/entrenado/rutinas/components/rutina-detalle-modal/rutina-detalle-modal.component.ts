@@ -2,14 +2,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonButton,
     IonIcon,
-    IonTitle,
     IonContent,
-    IonFooter,
+    IonText,
     IonList,
     IonItem,
     IonLabel,
@@ -19,35 +14,34 @@ import {
     IonRow,
     IonCol,
     IonNote,
+    IonButton,
     IonCardHeader, IonCardTitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, lockClosed, barbellOutline } from 'ionicons/icons';
+import { fitnessOutline, timeOutline, playCircle, lockClosed } from 'ionicons/icons';
 
 @Component({
     selector: 'app-rutina-detalle-modal',
     standalone: true,
-    imports: [IonCardTitle, IonCardHeader,
-    CommonModule,
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonTitle,
-    IonContent,
-    IonFooter,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonCard,
-    IonCardContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonNote],
+    imports: [
+        IonCardTitle, IonCardHeader,
+        CommonModule,
+        IonModal,
+        IonIcon,
+        IonContent,
+        IonText,
+        IonList,
+        IonItem,
+        IonLabel,
+        IonCard,
+        IonCardContent,
+        IonGrid,
+        IonRow,
+        IonCol,
+        IonNote,
+        IonButton,
+    ],
     templateUrl: './rutina-detalle-modal.component.html',
-   
+
 })
 export class RutinaDetalleModalComponent {
     @Input() isOpen = false;
@@ -58,7 +52,7 @@ export class RutinaDetalleModalComponent {
     @Output() iniciarEntrenamiento = new EventEmitter<import('gym-library').Rutina>();
 
     constructor() {
-        addIcons({ closeOutline, fitnessOutline, timeOutline, repeatOutline, playCircle, lockClosed, barbellOutline });;
+        addIcons({ fitnessOutline, timeOutline, playCircle, lockClosed });
     }
 
     cerrarModal() {

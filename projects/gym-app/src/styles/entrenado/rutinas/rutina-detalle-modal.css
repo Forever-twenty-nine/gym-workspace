@@ -4,46 +4,77 @@
 /* ============================================================ */
 
 app-rutina-detalle-modal {
-    ion-header {
-        padding: 8px;
+    /* Sheet styling del modal — sizing, padding, backdrop.        */
+    /* Equivale a `<ion-content class="ion-padding modal-sheet">` */
+    /* pero hecho con selectores estructurales (cero class=).     */
+    > ion-modal {
+        --width: 100%;
+        --max-width: 100%;
+        --border-radius: 20px 20px 0 0;
+        --backdrop-opacity: 0.4;
     }
 
-    ion-row {
-        align-items: flex-start;
+    /* ion-content con padding consistente de toda la app.        */
+    > ion-modal > ng-template > ion-content {
+        --padding-start: var(--ion-padding);
+        --padding-end: var(--ion-padding);
+        --padding-top: 8px;
+        --padding-bottom: max(env(safe-area-inset-bottom), 24px);
     }
 
-    ion-col {
+    /* Heading del modal (primer ion-text hijo del ion-content).  */
+    /* Equivale al antiguo `<h2 class="modal-sheet-title">`.      */
+    > ion-modal ng-template > ion-content > ion-text:first-of-type {
+        display: block;
+        margin: 8px 0 16px;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: var(--ion-text-color);
+    }
+
+    /* CTA (ion-button directo en ion-content).                    */
+    > ion-modal ng-template > ion-content > ion-button {
+        margin: 4px 0 20px;
+    }
+
+    /* Stats card — único ion-grid del modal.                      */
+    /* Equivale a `.modal-stat-row .modal-stat-cell` de antes.    */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row {
+        align-items: stretch;
+        padding: 8px 0;
+    }
+
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
         text-align: center;
+        padding: 12px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
     }
 
-    ion-card-header {
-        padding: 8px;
-    }
-
-    ion-card-title {
-        text-align: center;
-    }
-
-    > ion-content > ion-card {
-        margin-top: 8px;
+    /* Icono de cada stat (grande).                                 */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-icon {
+        font-size: 36px;
         margin-bottom: 8px;
     }
 
-    > ion-content > ion-card > ion-card-content > p {
-        margin-top: 8px;
-    }
-
-    ion-col ion-icon[name="fitness-outline"],
-    ion-col ion-icon[name="time-outline"] {
+    /* Valor del stat (numérico, prominente).                     */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
         font-size: 1.5rem;
-        margin-bottom: 4px;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        color: var(--ion-text-color);
     }
 
-    ion-col h2 span {
-        font-size: 0.875rem;
-    }
-
-    ion-footer ion-button {
-        margin: var(--ion-margin);
+    /* Label del stat (uppercase, medium).                         */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-note {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 4px 0 0;
     }
 }

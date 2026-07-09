@@ -55,17 +55,23 @@ ion-list ion-item {
   --inner-padding-end: 16px;
   --padding-start: 16px;
   --padding-end: 16px;
-  /* Tile look — match rutinas-semana, aplicado a TODA la app */
-  --background: rgba(255, 255, 255, 0.05) !important;
+  /* Sólido (no translúcido) — evita bug visual con item-sliding (triple-blur
+     del card glass + item translúcido + botones de swipe). El border-radius +
+     border sutil siguen dando la profundidad del "tile look". */
+  --background: var(--ion-item-background, #1c1c1d) !important;
+  background: var(--ion-item-background, #1c1c1d) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Card que contiene listas — glassmorphism iOS-style.
    bg semi-transparente + backdrop blur + saturate + border sutil + shadow suave.
    Requiere que la página tenga algo interesante detrás (<app-background>)
-   para que el blur se note. Items adentro mantienen su propio glass (del global). */
+   para que el blur se note. Items adentro son sólidos (del global) — solo el
+   card lleva el efecto glass. */
 ion-card:has(ion-card-content ion-list) {
   --background: rgba(28, 28, 30, 0.4);
+  --ion-card-background: rgba(28, 28, 30, 0.4);
+  background: rgba(28, 28, 30, 0.4);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -81,6 +87,33 @@ ion-item-sliding {
 ion-toolbar ion-segment {
   width: 100% !important;
   max-width: 100% !important;
+}
+
+/* ============================================================ */
+/* App default: toolbar con segment — header compacto unificado */
+/* Aplica a TODOS los headers/toolbars con segmented control      */
+/* (rutinas, social, profile, entrenador/agenda,                 */
+/* entrenador/creaciones, gimnasio-agenda, etc.). Antes solo     */
+/* rutinas tenía este look — ahora criterio único en la app.     */
+/* Override local solo si necesitás algo distinto (ej. labels     */
+/* con tipografía custom como gimnasio/agenda).                  */
+/* ============================================================ */
+ion-toolbar:has(ion-segment) {
+  --min-height: 40px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+}
+
+/* Segment-buttons en toolbars de header — compactos, indicator   */
+/* fino, tipografía bold-medium consistente en toda la app.      */
+ion-toolbar ion-segment-button {
+  --indicator-height: 2px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  min-height: 36px;
+  font-size: 0.875rem;
+  text-transform: none;
+  font-weight: 600;
 }
 
 /* Permitir que la alerta de selección de días sea más alta y no haga scroll */
@@ -244,6 +277,22 @@ app-date-badge {
 }
 
 /* ============================================================ */
+/* App default: ion-button — criterio único en toda la app        */
+/* Tamaño "medium" (~44px) consistente con el patrón de login.    */
+/* Botones con `size="large"` declarado override local (ej. FAB,  */
+/* CTA de checkout). Mantiene look uniforme y evita que CTAs       */
+/* específicos se vuelvan disproportionately grandes.             */
+/* ============================================================ */
+ion-button {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+}
+
+/* ============================================================ */
 /* App default: headers y footers sin borde (look Apple-style)   */
 /* Aplica a TODA la app — secciones pueden override localmente.  */
 /* ============================================================ */
@@ -297,14 +346,27 @@ ion-modal {
 }
 
 /* ============================================================ */
-/* App default: glass item (lista con items estilo "vidrio")      */
-/* Look: fondo translúcido, borde sutil, padding interno,          */
-/* separación entre items. Se aplica automáticamente a items        */
-/* dentro de listas en modales (look consistente en toda la app).  */
-/* Override local solo si necesitás algo distinto (ej. chat bubble). */
+/* App default: sheet modal (iOS-style, sube desde abajo)        */
+/* Patrón para modales informativos / de detalle que NO necesitan */
+/* chrome (sin header ni footer fijo). Activar en el <ion-modal>    */
+/* con:                                                               */
+/*   [breakpoints]="[0, 0.5, 0.95]"                                */
+/*   [initialBreakpoint]="0.5"                                     */
+/*   backdropDismiss="true"                                        */
+/* Estilos viven en cada componente (CSS file del dominio) usando */
+/* selectores estructurales — sin clases custom en el HTML.       */
+/* ============================================================ */
+
+/* ============================================================ */
+/* App default: tile item (look iOS — items sólidos dentro de    */
+/* cards-glass o de cualquier lista). Fondo opaco, border sutil,   */
+/* border-radius para dar profundidad. Items con item-sliding      */
+/* adentro mantienen este look (los botones de swipe se leen     */
+/* limpiamente contra el fondo sólido). Override local solo si   */
+/* necesitás algo distinto (ej. chat bubble).                    */
 /* ============================================================ */
 ion-modal ion-list ion-item {
-  --background: rgba(255, 255, 255, 0.05);
+  --background: var(--ion-item-background, #1c1c1d);
   --border-radius: 12px;
   --border-width: 1px;
   --border-style: solid;

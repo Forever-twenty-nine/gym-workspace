@@ -17,11 +17,7 @@
 /* Página: app-social                                            */
 /* ============================================================ */
 app-social {
-    /* Segment en el toolbar */
-    ion-segment {
-        width: 100%;
-        max-width: 420px;
-    }
+    /* Segment en el toolbar — full-width via global (ion-toolbar ion-segment) */
 
     /* Sticky stories */
     > ion-content > ion-card:first-child {

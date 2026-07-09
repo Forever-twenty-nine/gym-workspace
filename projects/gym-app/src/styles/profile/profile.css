@@ -12,11 +12,9 @@
 @import "./entrenador-stats.css";
 @import "./progreso-estadisticas.css";
 
-/* Toolbar del perfil: segment ocupa el espacio disponible */
-app-profile ion-segment {
-    width: 100%;
-    max-width: 420px;
-}
+/* Toolbar del perfil: segment ocupa todo el ancho — full-width via global
+   (ion-toolbar ion-segment) que ya está en global-elements.css. Antes esta
+   regla tenía max-width: 420px que pisaba el global. */
 
 /* ion-col dentro del profile: tipografía centrada por defecto */
 app-profile ion-col {

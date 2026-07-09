@@ -1,26 +1,27 @@
-<ion-modal [isOpen]="isOpen" (didDismiss)="cerrarModal()">
+<ion-modal
+    [isOpen]="isOpen"
+    (didDismiss)="cerrarModal()"
+    [breakpoints]="[0, 0.5, 0.95]"
+    [initialBreakpoint]="0.5"
+    backdropDismiss="true">
+
     <ng-template>
 
         @if (rutina) {
-        <ion-header>
-            <ion-toolbar>
-                <ion-title>
-                    <h2><strong>{{ rutina.nombre }}</strong></h2>
-                </ion-title>
-                <ion-buttons slot="end">
-                    <ion-button (click)="cerrarModal()" color="medium" shape="round">
-                        <ion-icon name="close-outline" size="large"></ion-icon>
-                    </ion-button>
-                </ion-buttons>
-            </ion-toolbar>
-        </ion-header>
-
         <ion-content>
-            <ion-card>
-                <ion-card-content>
-                    {{ rutina.descripcion || '"Disfruta de tu entrenamiento. Sigue las instrucciones y mantén la consistencia para lograr tus objetivos."' }}
-                </ion-card-content>
-            </ion-card>
+            <ion-text>{{ rutina.nombre }}</ion-text>
+
+            @if (!esFuturo) {
+            <ion-button expand="block" color="secondary" (click)="iniciar()">
+                COMENZAR AHORA
+                <ion-icon name="play-circle" slot="end"></ion-icon>
+            </ion-button>
+            } @else {
+            <ion-button expand="block" color="medium" disabled="true">
+                AÚN NO DISPONIBLE
+                <ion-icon name="lock-closed" slot="end"></ion-icon>
+            </ion-button>
+            }
 
             <ion-card>
                 <ion-card-content>
@@ -28,13 +29,13 @@
                         <ion-row>
                             <ion-col>
                                 <ion-icon name="fitness-outline" color="primary"></ion-icon>
-                                <ion-note color="medium"><strong>EJERCICIOS</strong></ion-note>
-                                <h2><strong>{{ rutina.ejerciciosIds?.length || 0 }}</strong></h2>
+                                <ion-text>{{ rutina.ejerciciosIds?.length || 0 }}</ion-text>
+                                <ion-note color="medium">EJERCICIOS</ion-note>
                             </ion-col>
                             <ion-col>
                                 <ion-icon name="time-outline" color="warning"></ion-icon>
-                                <ion-note color="medium"><strong>DURACIÓN EST.</strong></ion-note>
-                                <h2><strong>{{ rutina.duracion || 45 }} <span>min</span></strong></h2>
+                                <ion-text>{{ rutina.duracion || 45 }} min</ion-text>
+                                <ion-note color="medium">DURACIÓN EST.</ion-note>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
@@ -43,17 +44,13 @@
 
             <ion-card>
                 <ion-card-header>
-                    <ion-card-title>
-                        <h2><strong>Ejercicios</strong></h2>
-                    </ion-card-title>
+                    <ion-card-title>Ejercicios</ion-card-title>
                 </ion-card-header>
                 <ion-card-content>
                     <ion-list lines="full">
                         @for (ej of ejercicios; track ej.id) {
                         <ion-item>
-                            <ion-label>
-                                <h2><strong>{{ ej.nombre }}</strong></h2>
-                            </ion-label>
+                            <ion-label>{{ ej.nombre }}</ion-label>
                             <ion-note slot="end">
                                 {{ ej.series }} series x {{ ej.repeticiones }} reps
                             </ion-note>
@@ -63,22 +60,7 @@
                 </ion-card-content>
             </ion-card>
         </ion-content>
-
-        <ion-footer>
-            <ion-toolbar>
-                @if (!esFuturo) {
-                <ion-button expand="block" color="secondary" (click)="iniciar()">
-                    <strong>COMENZAR AHORA</strong>
-                    <ion-icon name="play-circle" slot="end"></ion-icon>
-                </ion-button>
-                } @else {
-                <ion-button expand="block" color="medium" disabled="true">
-                    <strong>AÚN NO DISPONIBLE</strong>
-                    <ion-icon name="lock-closed" slot="end"></ion-icon>
-                </ion-button>
-                }
-            </ion-toolbar>
-        </ion-footer>
         }
+
     </ng-template>
 </ion-modal>

@@ -1,23 +1,24 @@
-<ion-modal [isOpen]="isOpen" (didDismiss)="cerrarModal()">
-    <ng-template>
-        @if (encuentro) {
-        <ion-header>
-            <ion-toolbar>
-                <ion-title>{{ encuentro.titulo || 'Entrenamiento en grupo' }}</ion-title>
-                <ion-buttons slot="end">
-                    <ion-button (click)="cerrarModal()" shape="round" color="medium">
-                        <ion-icon name="close-outline" size="large" color="secondary"></ion-icon>
-                    </ion-button>
-                </ion-buttons>
-            </ion-toolbar>
-        </ion-header>
+<ion-modal
+    [isOpen]="isOpen"
+    (didDismiss)="cerrarModal()"
+    [breakpoints]="[0, 0.5, 0.95]"
+    [initialBreakpoint]="0.5"
+    backdropDismiss="true">
 
+    <ng-template>
+
+        @if (encuentro) {
         <ion-content>
+            <ion-text>{{ encuentro.titulo || 'Entrenamiento en grupo' }}</ion-text>
+
+            <ion-button expand="block" color="secondary" (click)="navegarASocial()">
+                IR A SOCIAL
+                <ion-icon name="people-outline" slot="end"></ion-icon>
+            </ion-button>
+
             @if(encuentro.mensaje) {
             <ion-card>
-                <ion-card-content>
-                    {{ encuentro.mensaje }}
-                </ion-card-content>
+                <ion-card-content>{{ encuentro.mensaje }}</ion-card-content>
             </ion-card>
             }
 
@@ -26,19 +27,14 @@
                     <ion-grid>
                         <ion-row>
                             <ion-col>
-                                <ion-note color="medium"><strong>FECHA</strong></ion-note>
-                                <ion-avatar>
-                                    <ion-icon name="calendar-outline" size="large" color="secondary"></ion-icon>
-                                    <ion-text><strong>{{ fechaFormateada }}</strong></ion-text>
-                                </ion-avatar>
+                                <ion-icon name="calendar-outline" color="secondary"></ion-icon>
+                                <ion-text>{{ fechaFormateada }}</ion-text>
+                                <ion-note color="medium">FECHA</ion-note>
                             </ion-col>
                             <ion-col>
-                                <ion-note color="medium"><strong>HORARIO</strong></ion-note>
-                                <ion-avatar>
-                                    <ion-icon name="time-outline" size="large" color="warning"></ion-icon>
-                                    <ion-text><strong>{{ encuentro.horaInicio }} - {{ encuentro.horaFin
-                                            }}</strong></ion-text>
-                                </ion-avatar>
+                                <ion-icon name="time-outline" color="warning"></ion-icon>
+                                <ion-text>{{ encuentro.horaInicio }} - {{ encuentro.horaFin }}</ion-text>
+                                <ion-note color="medium">HORARIO</ion-note>
                             </ion-col>
                         </ion-row>
                     </ion-grid>
@@ -57,54 +53,33 @@
                             <ion-icon name="person-outline" color="medium"></ion-icon>
                         </ion-avatar>
                         }
-                        <ion-label>
-                            <h2><strong>{{ encuentro.creadorNombre || 'Atleta' }}</strong></h2>
-                        </ion-label>
-                        <ion-note slot="end" color="medium">
-                            Organizador
-                        </ion-note>
+                        <ion-label>{{ encuentro.creadorNombre || 'Atleta' }}</ion-label>
+                        <ion-note slot="end" color="medium">Organizador</ion-note>
                     </ion-item>
 
                     <ion-item lines="none">
-                        <ion-label>
-                            <ion-list lines="none">
-                                @if (interesadosUsers().length > 0) {
-                                <ion-item>
-                                    @for (user of interesadosUsers(); track user.uid; let first = $first) {
-                                        @if (user.photoURL) {
-                                            <ion-avatar [attr.data-first]="first ? '' : null">
-                                                <img [src]="user.photoURL" [title]="user.nombre || 'Atleta'" />
-                                            </ion-avatar>
-                                        } @else {
-                                            <ion-avatar [attr.data-first]="first ? '' : null" [title]="user.nombre || 'Atleta'">
-                                                <ion-icon name="person-outline" color="medium"></ion-icon>
-                                            </ion-avatar>
-                                        }
-                                    }
-                                </ion-item>
+                        @if (interesadosUsers().length > 0) {
+                        <ion-avatar slot="start">
+                            @for (user of interesadosUsers(); track user.uid; let first = $first) {
+                                @if (user.photoURL) {
+                                <ion-avatar [attr.data-first]="first ? '' : null">
+                                    <img [src]="user.photoURL" [title]="user.nombre || 'Atleta'" />
+                                </ion-avatar>
+                                } @else {
+                                <ion-avatar [attr.data-first]="first ? '' : null" [title]="user.nombre || 'Atleta'">
+                                    <ion-icon name="person-outline" color="medium"></ion-icon>
+                                </ion-avatar>
                                 }
-                                <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>{{ encuentro.interesados.length || 0 }}</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                            </ion-list>
-                        </ion-label>
+                            }
+                        </ion-avatar>
+                        }
+                        <ion-label>{{ encuentro.interesados.length || 0 }}</ion-label>
                         <ion-note slot="end">Interesados</ion-note>
                     </ion-item>
                 </ion-list>
             </ion-card>
-
         </ion-content>
-
-        <ion-footer>
-            <ion-toolbar>
-                <ion-button expand="block" color="secondary" (click)="navegarASocial()">
-                    <strong>IR A SOCIAL</strong>
-                    <ion-icon name="people-outline" slot="end"></ion-icon>
-                </ion-button>
-            </ion-toolbar>
-        </ion-footer>
         }
+
     </ng-template>
 </ion-modal>

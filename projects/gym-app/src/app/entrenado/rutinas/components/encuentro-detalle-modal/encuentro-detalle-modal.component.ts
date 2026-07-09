@@ -2,14 +2,9 @@ import { Component, Input, Output, EventEmitter, inject, computed, signal } from
 import { CommonModule } from '@angular/common';
 import {
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonButton,
     IonIcon,
-    IonTitle,
     IonContent,
-    IonFooter,
+    IonText,
     IonBadge,
     IonCardHeader,
     IonCard,
@@ -19,22 +14,21 @@ import {
     IonGrid,
     IonRow,
     IonNote,
-    IonText,
     IonCol,
     IonList,
     IonItem,
     IonLabel,
-    IonAvatar
+    IonAvatar,
+    IonButton,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
-    closeOutline,
     peopleOutline,
     timeOutline,
     calendarOutline,
     personOutline,
     chatbubbleOutline,
-    handRightOutline
+    handRightOutline,
 } from 'ionicons/icons';
 import { UserService } from '../../../../core/services/user.service';
 import { Convocatoria, User } from 'gym-library';
@@ -42,20 +36,17 @@ import { Convocatoria, User } from 'gym-library';
 @Component({
     selector: 'app-encuentro-detalle-modal',
     standalone: true,
-    imports: [IonItem, IonList, IonLabel, IonCol, IonText, IonNote, IonRow, IonGrid, IonCardContent, IonCard,
-    CommonModule,
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonTitle,
-    IonContent,
-    IonFooter,
-    IonAvatar],
+    imports: [
+        IonButton,
+        IonItem, IonList, IonLabel, IonCol, IonText, IonNote, IonRow, IonGrid, IonCardContent, IonCard,
+        CommonModule,
+        IonModal,
+        IonIcon,
+        IonContent,
+        IonAvatar,
+    ],
     templateUrl: './encuentro-detalle-modal.component.html',
-   
+
 })
 export class EncuentroDetalleModalComponent {
     private userService = inject(UserService);
@@ -95,13 +86,12 @@ export class EncuentroDetalleModalComponent {
 
     constructor() {
         addIcons({
-            closeOutline,
             peopleOutline,
             timeOutline,
             calendarOutline,
             personOutline,
             chatbubbleOutline,
-            handRightOutline
+            handRightOutline,
         });
     }
 

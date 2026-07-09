@@ -4,54 +4,78 @@
 /* ============================================================ */
 
 app-encuentro-detalle-modal {
-    ion-title {
-        padding: 8px;
+    /* Sheet styling base del modal. */
+    > ion-modal {
+        --width: 100%;
+        --max-width: 100%;
+        --border-radius: 20px 20px 0 0;
+        --backdrop-opacity: 0.4;
     }
 
-    ion-footer ion-button {
-        margin: var(--ion-margin);
+    > ion-modal > ng-template > ion-content {
+        --padding-start: var(--ion-padding);
+        --padding-end: var(--ion-padding);
+        --padding-top: 8px;
+        --padding-bottom: max(env(safe-area-inset-bottom), 24px);
     }
 
-    ion-card {
+    /* Heading del modal (primer ion-text hijo del ion-content).   */
+    > ion-modal ng-template > ion-content > ion-text:first-of-type {
+        display: block;
+        margin: 8px 0 16px;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: var(--ion-text-color);
+    }
+
+    /* CTA (ion-button directo en ion-content).                    */
+    > ion-modal ng-template > ion-content > ion-button {
+        margin: 4px 0 20px;
+    }
+
+    /* Cards: spacing consistente. */
+    > ion-content > ion-card {
         margin: 8px;
     }
 
-    ion-row {
-        align-items: flex-start;
+    /* Stats card (fecha / horario) — el único ion-grid del modal. */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row {
+        align-items: stretch;
+        padding: 8px 0;
     }
 
-    ion-col {
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
         text-align: center;
-    }
-
-    ion-col > ion-avatar {
+        padding: 12px 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 4px;
-        margin-top: 8px;
     }
 
-    ion-item[lines='none'] ion-label {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: initial;
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-icon {
+        font-size: 36px;
+        margin-bottom: 8px;
     }
 
-    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list {
-        display: flex;
-        align-items: center;
-        gap: 16px;
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1;
+        color: var(--ion-text-color);
     }
 
-    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child {
-        display: flex;
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-note {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 4px 0 0;
     }
 
-    ion-label h2 {
-        margin: 0;
-    }
-
+    /* Lista de organizador / interesados. */
     > ion-content > ion-card > ion-list > ion-item > ion-avatar {
         width: 40px;
         height: 40px;
@@ -59,42 +83,17 @@ app-encuentro-detalle-modal {
         margin-inline-end: 12px;
     }
 
-    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: var(--ion-color-medium);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        margin-inline-end: 12px;
-    }
-
-    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child ion-icon {
-        font-size: 1.5rem;
-    }
-
-    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar {
+    /* Avatares stacked (los interesados viven dentro de un
+       ion-avatar contenedor — patrón nuevo). */
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar > ion-avatar {
         width: 32px;
         height: 32px;
         border: 2px solid var(--ion-background-color);
         flex-shrink: 0;
     }
 
-    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar:not(:first-child) {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: var(--ion-color-medium);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 2px solid var(--ion-background-color);
-        flex-shrink: 0;
-    }
-
-    /* Avatares apilados de los interesados (borde simula overlap) */
+    /* Margin-left 0 al primer avatar del stack (el contenedor
+       del slot), -16 al resto para simular overlap. */
     ion-avatar[data-first] {
         margin-left: 0;
     }
