@@ -1,0 +1,125 @@
+/* ============================================================ */
+/* Componente: app-rutina-overlay                                 */
+/* Overlay animado de "start" / "success" al iniciar/finalizar   */
+/* ============================================================ */
+
+app-rutina-overlay {
+    /* Variante por tipo: success / start */
+    ion-avatar[data-type="success"] {
+        background: rgba(var(--ion-color-success-rgb, 16, 185, 129), 0.1);
+
+        ion-icon {
+            color: var(--ion-color-success);
+        }
+    }
+
+    ion-avatar[data-type="start"] {
+        background: rgba(var(--ion-color-primary-rgb, 187, 228, 10), 0.1);
+
+        ion-icon {
+            color: var(--ion-color-primary);
+        }
+    }
+
+    /* Card raíz del overlay */
+    ion-card {
+        padding: 24px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Min-height según tipo */
+    ion-card[class*="min-h-\[50vh\]"] {
+        min-height: 50vh;
+    }
+
+    ion-card[class*="min-h-\[60vh\]"] {
+        min-height: 60vh;
+    }
+
+    /* Avatar del icono central */
+    ion-avatar {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+
+    /* Título del overlay (gradiente de marca) */
+    ion-card-title {
+        font-weight: 900;
+        background: linear-gradient(135deg, var(--ion-color-primary), var(--ion-color-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    ion-card-title[class*="text-3xl"] {
+        font-size: 1.875rem;
+    }
+
+    /* Subtítulo */
+    ion-card-subtitle {
+        margin-top: 8px;
+        padding: 0 32px;
+        color: var(--ion-color-medium);
+    }
+
+    /* Caja de advertencia */
+    ion-card ion-card {
+        margin-top: 16px;
+        margin-inline: 16px;
+        padding: 12px;
+        background: rgba(var(--ion-color-warning-rgb), 0.08);
+        color: var(--ion-color-warning);
+    }
+
+    ion-card ion-card ion-card-subtitle {
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--ion-color-warning);
+        padding: 0;
+    }
+
+    ion-card ion-card p {
+        margin: 4px 0 0;
+        opacity: 0.8;
+        color: var(--ion-color-warning);
+    }
+
+    /* Toolbar con botón de acción */
+    ion-toolbar {
+        width: 100%;
+        margin-top: 32px;
+    }
+
+    ion-toolbar ion-button {
+        font-weight: 700;
+    }
+
+    ion-toolbar ion-button[class*="h-14"] {
+        height: 56px;
+        font-size: 1.125rem;
+    }
+}
+
+/* Animación local: fadeIn con translateY (distinta de la global
+   que es solo opacity — no se merge para no romper otros usos). */
+@keyframes rutinaOverlayFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: rutinaOverlayFadeIn 0.6s ease-out forwards;
+}

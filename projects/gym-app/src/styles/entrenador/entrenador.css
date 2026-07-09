@@ -2,33 +2,8 @@
 /* Estilos Comunes - Sección Entrenador                          */
 /* ============================================================ */
 
-/* Cabeceras y footers sin borde en componentes de Entrenador */
-app-entrenador-tabs,
-app-dashboard,
-app-creaciones,
-app-entrenados,
-app-agenda,
-app-convocatoria-card,
-app-convocatoria-list,
-app-crear-agenda-modal,
-app-invitaciones-pendientes,
-app-gestion-rutinas-modal,
-app-invitacion-modal,
-app-entrenado-detalle-popover,
-app-rutinas,
-app-lista-rutinas,
-app-rutina-modal,
-app-ejercicios,
-app-ejercicios-list,
-app-ejercicio-modal,
-app-proximos-entrenados,
-app-mis-entrenados {
-    ion-header,
-    ion-footer {
-        --border-color: transparent;
-        --border-width: 0;
-    }
-}
+/* ion-header / ion-footer transparent border — global-elements.css */
+/* ion-content padding — global-elements.css (incluye popovers) */
 
 /* Toolbar transparente (entrenados.page y dashboard) */
 app-entrenados ion-toolbar,
@@ -37,41 +12,6 @@ app-dashboard ion-toolbar {
     --border-color: transparent;
     border: none;
     box-shadow: none;
-}
-
-/* Padding consistente en `ion-content` de páginas y modales Entrenador */
-app-dashboard,
-app-creaciones,
-app-entrenados,
-app-agenda,
-app-rutinas,
-app-ejercicios,
-app-convocatoria-card {
-    ion-content {
-        --padding-start: var(--ion-padding);
-        --padding-end: var(--ion-padding);
-        --padding-top: var(--ion-padding);
-        --padding-bottom: var(--ion-padding);
-    }
-}
-
-app-creaciones,
-app-entrenados,
-app-agenda,
-app-ejercicio-modal,
-app-rutina-modal,
-app-ejercicios,
-app-rutinas,
-app-crear-agenda-modal,
-app-gestion-rutinas-modal,
-app-invitacion-modal,
-app-entrenado-detalle-popover {
-    ion-popover ion-content {
-        --padding-start: var(--ion-padding);
-        --padding-end: var(--ion-padding);
-        --padding-top: var(--ion-padding);
-        --padding-bottom: var(--ion-padding);
-    }
 }
 
 /* Lists dentro de modales Entrenador: sin padding */
@@ -107,35 +47,19 @@ app-convocatoria-card {
     }
 }
 
-/* gym-modal-item: items con fondo glass dentro de modales (ejercicio-modal, rutina-modal) */
-app-ejercicio-modal,
-app-rutina-modal {
-    ion-list ion-item {
-        --background: rgba(255, 255, 255, 0.05);
-        --border-radius: 12px;
-        --border-width: 1px;
-        --border-style: solid;
-        --border-color: rgba(255, 255, 255, 0.08);
-        --padding-start: 16px;
-        --padding-end: 16px;
-        margin-bottom: 12px;
-    }
-}
-
-/* Centrado de textos en empty states */
-app-convocatoria-list ion-text,
-app-mis-entrenados ion-text,
-app-lista-rutinas ion-text,
-app-ejercicios-list ion-text {
-    text-align: center;
-}
+/* gym-modal-item: items con fondo glass dentro de modales (ejercicio-modal, rutina-modal)
+   — global-elements.css (ion-modal ion-list ion-item) */
 
 /* ============================================================ */
 /* Importaciones de Módulos (Secciones Específicas)             */
 /* ============================================================ */
-@import "./agenda.css";
-@import "./dashboard.css";
-@import "./creaciones.css";
-@import "./ejercicios.css";
-@import "./entrenador-tabs.css";
-@import "./entrenados.css";
+@import "./agenda/agenda.css";
+@import "./dashboard/dashboard.css";
+@import "./creaciones/creaciones.css";
+@import "./ejercicios/ejercicios.css";
+@import "./entrenador-tabs/entrenador-tabs.css";
+@import "./entrenados/entrenados.css";
+@import "./entrenados/gestion-rutinas-modal.css";
+@import "./entrenados/entrenado-detalle-popover.css";
+@import "./entrenados/invitaciones-pendientes.css";
+@import "./entrenados/mis-entrenados.css";

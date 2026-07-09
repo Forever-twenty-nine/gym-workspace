@@ -1,0 +1,73 @@
+/* ============================================================ */
+/* Rutina en Progreso - nucleador                                  */
+/* (componentes: app-rutina-progreso page + animaciones)          */
+/* ============================================================ */
+
+/* Animación local: bounceIn (overlay de iniciar/finalizar)
+   Local para no chocar con el fadeIn simple de global-elements */
+@keyframes bounceIn {
+    0%   { transform: scale(0.8); opacity: 0; }
+    60%  { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-bounce-in {
+    animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ============================================================ */
+/* Página: app-rutina-progreso                                  */
+/* ============================================================ */
+app-rutina-progreso {
+    ion-toolbar {
+        padding-inline: 16px;
+    }
+
+    ion-title {
+        font-weight: 700;
+        text-align: right;
+        --padding-end: 0;
+    }
+
+    /* Footer con efecto glass */
+    ion-footer {
+        backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Footer: contenedor de padding (safe area) */
+    ion-footer ion-grid {
+        padding: 40px 24px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    }
+
+    /* Fila de controles del footer */
+    ion-footer ion-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Botón de pausa/play circular */
+    ion-footer ion-col[size="auto"] ion-button {
+        height: 64px;
+        width: 64px;
+        min-width: 64px;
+        backdrop-filter: blur(12px);
+        margin: 0 !important;
+        --padding-start: 0;
+        --padding-end: 0;
+    }
+
+    /* Botón COMENZAR/FINALIZAR */
+    ion-footer ion-col:last-child ion-button {
+        height: 64px;
+        font-weight: 900;
+        margin: 0 !important;
+    }
+
+    /* Botón FINALIZAR con transition */
+    ion-footer ion-col:last-child ion-button[color="success"] {
+        transition: all 0.3s;
+    }
+}

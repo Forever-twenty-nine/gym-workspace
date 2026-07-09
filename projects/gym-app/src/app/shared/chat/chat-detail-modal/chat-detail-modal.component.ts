@@ -7,7 +7,7 @@ import {
   IonAvatar, IonTitle, IonList, IonItem, IonNote
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, send, personOutline } from 'ionicons/icons';
+import { arrowBackOutline, send, personOutline, chatbubblesOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { MensajeService } from '../../../core/services/mensaje.service';
@@ -74,7 +74,7 @@ export class ChatDetailModalComponent {
   });
 
   constructor() {
-    addIcons({ arrowBackOutline, send, personOutline });
+    addIcons({ arrowBackOutline, send, personOutline, chatbubblesOutline });
 
     // Efecto reactivo para auto-scroll cuando cambia el número de mensajes
     effect(() => {

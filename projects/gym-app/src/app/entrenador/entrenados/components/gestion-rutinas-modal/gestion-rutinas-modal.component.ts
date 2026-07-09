@@ -20,6 +20,10 @@ import {
     IonItemOptions,
     IonItemOption
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+    unlinkOutline, arrowUpOutline, fitnessOutline, calendar, barbellOutline
+} from 'ionicons/icons';
 import { Entrenado, Rutina, Plan } from 'gym-library';
 import { BackgroundComponent } from '../../../../shared/components/background/background.component';
 
@@ -86,5 +90,9 @@ export class GestionRutinasModalComponent {
         diasAQuitar.forEach(dia => {
             this.quitarDiaDeRutina.emit({ rutinaId: rutina.id, dia });
         });
+    }
+
+    constructor() {
+        addIcons({ unlinkOutline, arrowUpOutline, fitnessOutline, calendar, barbellOutline });
     }
 }

@@ -1,0 +1,22 @@
+/* ============================================================ */
+/* Estilos del componente compartido app-edit-modal              */
+/* ============================================================ */
+
+app-edit-modal {
+    /* ion-modal sizing — global-elements.css */
+    /* glass item pattern — global-elements.css */
+
+    /* Listas dentro del modal: sin padding extra */
+    ion-content ion-list {
+        --padding-start: 0;
+        --padding-end: 0;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        padding: 0;
+    }
+
+    /* Modal tipo bottom-sheet ocupa todo el ancho del sheet */
+    ion-modal::part(content) {
+        max-width: none;
+    }
+}

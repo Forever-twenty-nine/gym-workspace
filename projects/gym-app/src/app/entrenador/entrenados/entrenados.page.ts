@@ -53,7 +53,6 @@ import { GestionRutinasModalComponent } from './components/gestion-rutinas-modal
     InvitacionModalComponent,
     GestionRutinasModalComponent
   ],
-  styles: []
 })
 export class EntrenadosPage implements OnInit {
   private authService = inject(AuthService);

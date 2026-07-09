@@ -1,0 +1,51 @@
+/* ============================================================ */
+/* Social - nucleador (página + sub-componentes)                   */
+/* ============================================================ */
+
+@import "./social-comments-modal.css";
+@import "./descubrir-tab.css";
+@import "./match-card.css";
+@import "./mutual-match-overlay.css";
+@import "./para-ti-tab.css";
+@import "./convocatoria-modal-stories.css";
+@import "./desafio-modal-stories.css";
+@import "./feed-tab.css";
+@import "./social-card.css";
+@import "./stories.css";
+
+/* ============================================================ */
+/* Página: app-social                                            */
+/* ============================================================ */
+app-social {
+    /* Segment en el toolbar */
+    ion-segment {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    /* Sticky stories */
+    > ion-content > ion-card:first-child {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(var(--ion-background-color-rgb, 255, 255, 255), 0.85);
+        backdrop-filter: blur(10px);
+    }
+
+    /* Wrapper del contenido */
+    > ion-content > ion-card:last-child {
+        position: relative;
+        z-index: 10;
+        margin: 0;
+        padding: 16px;
+    }
+
+    > ion-content > ion-card:last-child ion-card-content {
+        padding: 0;
+    }
+
+    /* ion-content transparente */
+    > ion-content {
+        --background: transparent;
+    }
+}

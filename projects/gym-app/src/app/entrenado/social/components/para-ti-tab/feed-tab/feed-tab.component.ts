@@ -9,7 +9,7 @@ import {
   IonItem
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { peopleOutline } from 'ionicons/icons';
+import { peopleOutline, newspaperOutline } from 'ionicons/icons';
 import { SesionRutinaService } from '../../../../../core/services/sesion-rutina.service';
 import { AuthService } from '../../../../../core/services/auth.service';
 import { EntrenadoService } from '../../../../../core/services/entrenado.service';
@@ -109,7 +109,7 @@ export class FeedTabComponent {
   });
 
   constructor() {
-    addIcons({ peopleOutline });
+    addIcons({ peopleOutline, newspaperOutline });
   }
 
   async loadMore(event: { target?: { complete: () => void; disabled?: boolean } }) {

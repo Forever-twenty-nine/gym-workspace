@@ -1,0 +1,64 @@
+/* ============================================================ */
+/* Componente: app-entrenador-stats                               */
+/* Stats del entrenador (mismo patrón que gimnasio-stats)         */
+/* ============================================================ */
+
+app-entrenador-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    > ion-card {
+        margin: 0;
+    }
+
+    > ion-card > ion-card-header {
+        padding-top: 24px;
+        padding-bottom: 8px;
+        text-align: center;
+    }
+
+    > ion-card > ion-card-title {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* KPI cards anidadas en ion-col */
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card {
+        margin: 0;
+        text-align: center;
+        padding: 12px 4px;
+        --background: var(--ion-color-step-50, var(--ion-background-color));
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
+        padding: 4px;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] {
+        padding: 6px;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text {
+        display: block;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:first-of-type {
+        font-weight: 800;
+        font-size: 1.25rem;
+        line-height: 1.2;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] > ion-card > ion-text:first-of-type {
+        font-size: 1.5rem;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:last-of-type {
+        text-transform: uppercase;
+        font-weight: 700;
+        opacity: 0.85;
+        font-size: 0.7rem;
+        margin-top: 4px;
+    }
+}

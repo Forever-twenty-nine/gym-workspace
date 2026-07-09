@@ -1,0 +1,23 @@
+/* ============================================================ */
+/* Componente: app-mis-entrenados                                  */
+/* Lista de entrenados asociados al entrenador                   */
+/* ============================================================ */
+
+app-mis-entrenados {
+    ion-card {
+        --background: transparent;
+        box-shadow: none;
+    }
+
+    ion-card-content {
+        padding: 0;
+    }
+
+    /* Texto del estado vacío centrado */
+    ion-text {
+        display: block;
+        text-align: center;
+        padding: var(--ion-padding);
+        color: var(--ion-color-medium);
+    }
+}

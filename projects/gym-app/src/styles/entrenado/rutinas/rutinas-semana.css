@@ -1,0 +1,45 @@
+/* ============================================================ */
+/* Componente: app-rutinas-semana                                 */
+/* Lista semanal con días clickeables (expand/collapse manual).   */
+/* Reemplaza al antiguo ion-accordion-group.                     */
+/* bg + border de items viene del global (ion-list ion-item).    */
+/* ============================================================ */
+
+app-rutinas-semana {
+    /* Gap consistente entre cualquier par de días consecutivos (collapsed o expanded) */
+    ion-list > ion-item:not(:first-child) {
+        margin-top: 8px;
+    }
+
+    /* Override :first-child global — sin margin-top extra en la primera rutina */
+    ion-list ion-list > ion-item:first-child {
+        margin-top: 0 !important;
+    }
+
+    /* Label estira para llenar espacio entre date-badge (start) y chevron/badge (end) */
+    ion-item > ion-label {
+        flex: 1;
+    }
+
+    /* Badge "Hoy" del header del día — más prominente que el default compacto */
+    ion-badge {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+    }
+
+    /* Botón play (ejecutar rutina) — más grande que el default icon-only,
+       para equiparar visualmente con el chevron del header del día */
+    ion-list ion-list > ion-item > ion-button[slot="end"] {
+        --padding-start: 8px;
+        --padding-end: 8px;
+        width: 44px;
+        height: 44px;
+        margin: 0;
+    }
+
+    ion-list ion-list > ion-item > ion-button[slot="end"] ion-icon {
+        font-size: 28px;
+    }
+}

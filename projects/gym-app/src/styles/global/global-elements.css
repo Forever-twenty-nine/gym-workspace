@@ -55,12 +55,21 @@ ion-list ion-item {
   --inner-padding-end: 16px;
   --padding-start: 16px;
   --padding-end: 16px;
+  /* Tile look — match rutinas-semana, aplicado a TODA la app */
+  --background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Card que contiene listas — la hacemos transparente para que el fondo de página se vea */
+/* Card que contiene listas — glassmorphism iOS-style.
+   bg semi-transparente + backdrop blur + saturate + border sutil + shadow suave.
+   Requiere que la página tenga algo interesante detrás (<app-background>)
+   para que el blur se note. Items adentro mantienen su propio glass (del global). */
 ion-card:has(ion-card-content ion-list) {
-  --background: transparent;
-  box-shadow: none;
+  --background: rgba(28, 28, 30, 0.4);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 /* Evitar fondos en los contenedores deslizables */
@@ -85,10 +94,15 @@ ion-alert.days-alert {
 ion-card {
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  margin: 16px;
+  margin: 8px;
   border: 1px solid rgba(var(--ion-color-medium-rgb), 0.1);
   background: var(--ion-card-background, var(--ion-item-background, var(--ion-background-color, #fff)));
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Padding consistente en cabeceras de card (default Ionic: 16px, lo dejamos explícito) */
+ion-card-header {
+  padding: var(--ion-padding);
 }
 
 /* ============================================================ */
@@ -177,4 +191,125 @@ ion-grid > ion-row > ion-col > ion-avatar ion-text {
   font-weight: 900;
   font-size: 1rem;
   line-height: 1.2;
+}
+
+/* ============================================================ */
+/* Componente Global: app-notifications-bell                    */
+/* (compartido por social, profile, y futuros toolbars)         */
+/* ============================================================ */
+app-notifications-bell {
+  display: inline-block;
+}
+
+app-notifications-bell ion-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  margin: 0;
+}
+
+app-notifications-bell ion-button ion-icon {
+  font-size: 22px;
+}
+
+app-notifications-bell ion-button span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--ion-color-danger);
+  color: var(--ion-color-danger-contrast);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--ion-background-color, #121212);
+  pointer-events: none;
+  transform: translate(2px, -2px);
+  z-index: 1;
+}
+
+/* ============================================================ */
+/* Componente Global: app-date-badge (separación inline-end)     */
+/* (compartido por listas de rutinas, convocatorias y agenda)    */
+/* ============================================================ */
+app-date-badge {
+  margin-inline-end: var(--ion-margin);
+}
+
+/* ============================================================ */
+/* App default: headers y footers sin borde (look Apple-style)   */
+/* Aplica a TODA la app — secciones pueden override localmente.  */
+/* ============================================================ */
+ion-header,
+ion-footer {
+  --border-color: transparent;
+  --border-width: 0;
+}
+
+/* ============================================================ */
+/* App default: padding consistente en `ion-content`            */
+/* Aplica a TODA la app — auth/chat ya tienen su propio padding  */
+/* ============================================================ */
+ion-content {
+  --padding-start: var(--ion-padding);
+  --padding-end: var(--ion-padding);
+  --padding-top: var(--ion-padding);
+  --padding-bottom: var(--ion-padding);
+}
+
+/* ============================================================ */
+/* App default: empty state                                      */
+/* Preferir siempre <app-empty-state> (componente shared).       */
+/* Para casos legacy con raw <ion-text> (ej. agenda convocatoria-*/
+/* list), la sección local define el patrón.                    */
+/* ============================================================ */
+
+/* ============================================================ */
+/* App default: tab bar transparente, sin borde superior         */
+/* (En dark mode, --ion-color-step-100 resolvía a un blanco que   */
+/* aparecía como una línea visible — removido para look limpio)  */
+/* ============================================================ */
+ion-tab-bar {
+  height: 44px;
+  min-height: 44px;
+  --background: transparent;
+  border-top: 1px solid transparent;
+}
+
+/* ============================================================ */
+/* App default: modal sizing (modales de toda la app)            */
+/* Look estándar: ancho casi completo, bordes redondeados,        */
+/* backdrop semi-transparente. Override local solo si necesitás   */
+/* algo distinto (ej. modal de tamaño fixed como match).          */
+/* ============================================================ */
+ion-modal {
+  --width: 95%;
+  --max-width: 600px;
+  --border-radius: 16px;
+  --backdrop-opacity: 0.3;
+}
+
+/* ============================================================ */
+/* App default: glass item (lista con items estilo "vidrio")      */
+/* Look: fondo translúcido, borde sutil, padding interno,          */
+/* separación entre items. Se aplica automáticamente a items        */
+/* dentro de listas en modales (look consistente en toda la app).  */
+/* Override local solo si necesitás algo distinto (ej. chat bubble). */
+/* ============================================================ */
+ion-modal ion-list ion-item {
+  --background: rgba(255, 255, 255, 0.05);
+  --border-radius: 12px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 12px;
 }

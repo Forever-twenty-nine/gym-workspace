@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import {
   IonContent,
   IonCard,
-  NavController, IonGrid, IonCol, IonRow } from '@ionic/angular/standalone';
+  NavController } from '@ionic/angular/standalone';
 
 import { EntrenadoService } from '../../core/services/entrenado.service';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -32,7 +32,7 @@ export interface User extends LibraryUser {
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
-  imports: [IonRow, IonCol, IonGrid, 
+  imports: [
     IonContent,
     FormsModule,
     PlanPersonalizadoComponent,

@@ -1,0 +1,70 @@
+/* ============================================================ */
+/* Componente: app-convocatoria-card                              */
+/* Card individual de convocatoria (entrenamiento en grupo)        */
+/* ============================================================ */
+
+app-convocatoria-card {
+    ion-card {
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Badges y título del header */
+    ion-item ion-label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    ion-item ion-label ion-badge {
+        align-self: flex-start;
+    }
+
+    ion-item ion-label h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    /* Chip de tiempo */
+    ion-card-content ion-chip {
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Contenido textual con margen */
+    ion-card-content ion-text {
+        display: block;
+        margin: var(--ion-margin) 0;
+    }
+
+    ion-card-content ion-text p {
+        margin: 0;
+    }
+
+    /* Avatar primario del header */
+    ion-avatar ion-icon {
+        font-size: 28px;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Avatar de la lista de asistentes */
+    ion-list ion-avatar ion-icon {
+        font-size: 22px;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Asistentes counter: heading con margin cero */
+    ion-card-content ion-text h3 {
+        margin: 0;
+    }
+
+    ion-card-content ion-item ion-label {
+        gap: 4px;
+    }
+
+    /* Empty / "no sumados" */
+    ion-card-content > ion-text:first-of-type h3 {
+        font-style: italic;
+        margin: 0;
+    }
+}

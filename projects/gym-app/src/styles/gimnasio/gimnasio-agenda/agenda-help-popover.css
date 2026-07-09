@@ -1,0 +1,36 @@
+/* ============================================================ */
+/* Componente: app-agenda-help-popover                            */
+/* Popover de ayuda para entender la agenda                       */
+/* ============================================================ */
+
+app-agenda-help-popover {
+    ion-card {
+        --background: var(--ion-color-light);
+        margin: 0;
+    }
+
+    ion-card-title {
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    ion-card-content ul {
+        padding-left: 16px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    ion-card-content p {
+        margin: 0 0 8px 0;
+    }
+
+    ion-card-content p:last-child {
+        text-align: center;
+        font-style: italic;
+        margin-top: 16px;
+    }
+}

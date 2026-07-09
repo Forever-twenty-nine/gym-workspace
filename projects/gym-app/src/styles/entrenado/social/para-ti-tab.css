@@ -1,0 +1,12 @@
+/* ============================================================ */
+/* Componente: app-para-ti-tab                                    */
+/* Tab "Para Ti" — feed personalizado de cards                   */
+/* ============================================================ */
+
+app-para-ti-tab {
+    /* Lista de cards */
+    > ion-list {
+        background: transparent;
+        padding: 0;
+    }
+}

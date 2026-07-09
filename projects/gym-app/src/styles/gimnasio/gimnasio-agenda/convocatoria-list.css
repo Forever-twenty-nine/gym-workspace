@@ -1,0 +1,44 @@
+/* ============================================================ */
+/* Componente: app-convocatoria-list                              */
+/* Lista de convocatorias (en agenda y otros contextos)           */
+/* ============================================================ */
+
+app-convocatoria-list {
+    ion-card {
+        --background: transparent;
+        box-shadow: none;
+    }
+
+    ion-card-content {
+        padding: 0;
+    }
+
+    ion-card-content > app-convocatoria-card {
+        display: block;
+        margin-bottom: var(--ion-margin);
+    }
+
+    /* Empty state: icono + título + mensaje */
+    ion-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: var(--ion-padding);
+        text-align: center;
+    }
+
+    ion-text h3 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    ion-text p {
+        margin: 0;
+    }
+
+    ion-text ion-icon {
+        font-size: 64px;
+        opacity: 0.4;
+    }
+}

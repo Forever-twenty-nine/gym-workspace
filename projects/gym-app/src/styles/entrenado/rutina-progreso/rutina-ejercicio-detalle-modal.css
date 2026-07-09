@@ -1,0 +1,72 @@
+/* ============================================================ */
+/* Componente: app-rutina-ejercicio-detalle-modal                 */
+/* Modal con ficha completa del ejercicio (stats, descripción)    */
+/* ============================================================ */
+
+app-rutina-ejercicio-detalle-modal {
+    display: block;
+
+    ion-title {
+        font-weight: 700;
+    }
+
+    /* Contenido del modal con padding */
+    > ion-content {
+        padding: 16px;
+    }
+
+    /* Tarjeta de descripción */
+    > ion-content > ion-card:first-child {
+        margin-bottom: 24px;
+        padding: 16px;
+    }
+
+    /* Encabezado de la sección de descripción */
+    > ion-content > ion-card:first-child ion-card-subtitle {
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Título "Detalles de ejecución" */
+    > ion-content > h3 {
+        font-weight: 700;
+        margin: 0 0 12px;
+        font-size: 1.125rem;
+    }
+
+    /* Cards de estadísticas */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Etiqueta de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-subtitle {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Valor de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-content {
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.5rem;
+    }
+
+    /* Unidad de la estadística */
+    > ion-content > ion-grid > ion-row > ion-col > ion-card ion-card-content span {
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+}

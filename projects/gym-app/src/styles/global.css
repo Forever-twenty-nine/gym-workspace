@@ -40,7 +40,6 @@
 /* 7) Estilos por Feature (carpetas de estilo reflejan dominio) */
 @import "./shared/shared.css";
 @import "./profile/profile.css";
-@import "./chat/chat.css";
 
 /* 8) Estilos de Secciones Específicas */
 @import "./auth/auth.css";

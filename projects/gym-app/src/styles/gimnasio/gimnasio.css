@@ -2,60 +2,11 @@
 /* Estilos Comunes - Sección Gimnasio                            */
 /* ============================================================ */
 
-/* gym-modal-item: items con fondo glass dentro de modales Gimnasio */
-app-entrenador-invite-modal,
-app-invitacion-entrenado-modal {
-    ion-list ion-item,
-    ion-item.gym-modal-item {
-        --background: rgba(255, 255, 255, 0.05);
-        --border-radius: 12px;
-        --border-width: 1px;
-        --border-style: solid;
-        --border-color: rgba(255, 255, 255, 0.08);
-        --padding-start: 16px;
-        --padding-end: 16px;
-        margin-bottom: 12px;
-    }
-}
+/* gym-modal-item: items con fondo glass dentro de modales Gimnasio
+   — global-elements.css (ion-modal ion-list ion-item) */
 
-/* Cabeceras y footers sin borde */
-app-gimnasio-tabs,
-app-gimnasio-dashboard,
-app-gimnasio-agenda,
-app-gimnasio-entrenadores,
-app-gimnasio-entrenados,
-app-agenda-help-popover,
-app-convocatoria-card,
-app-convocatoria-list,
-app-entrenador-list,
-app-invitaciones-pendientes-list,
-app-entrenados-grouped-list,
-app-entrenador-invite-modal,
-app-invitacion-entrenado-modal,
-app-entrenadores {
-    ion-header,
-    ion-footer {
-        --border-color: transparent;
-        --border-width: 0;
-    }
-}
-
-/* Padding consistente en `ion-content` de páginas y modales Gimnasio */
-app-gimnasio-dashboard,
-app-gimnasio-agenda,
-app-gimnasio-entrenadores,
-app-gimnasio-entrenados,
-app-convocatoria-card,
-app-entrenador-invite-modal,
-app-invitacion-entrenado-modal,
-app-entrenadores {
-    ion-content {
-        --padding-start: var(--ion-padding);
-        --padding-end: var(--ion-padding);
-        --padding-top: var(--ion-padding);
-        --padding-bottom: var(--ion-padding);
-    }
-}
+/* ion-header / ion-footer transparent border — global-elements.css */
+/* ion-content padding — global-elements.css */
 
 /* Margin/bottom helpers para `ion-button[type="submit"]` en modales */
 app-entrenador-invite-modal ion-button[type="submit"],
@@ -80,20 +31,15 @@ app-entrenadores-list {
     }
 }
 
-/* Centrado de textos en empty states */
-app-convocatoria-list ion-text,
-app-entrenador-list ion-text,
-app-invitaciones-pendientes-list ion-text,
-app-entrenados-grouped-list ion-text,
-app-entrenadores-list ion-text {
-    text-align: center;
-}
-
 /* ============================================================ */
 /* Importaciones de Módulos (Secciones Específicas)             */
 /* ============================================================ */
-@import "./gimnasio-agenda.css";
-@import "./gimnasio-dashboard.css";
-@import "./gimnasio-entrenadores.css";
-@import "./gimnasio-entrenados.css";
-@import "./gimnasio-tabs.css";
+@import "./gimnasio-agenda/gimnasio-agenda.css";
+@import "./gimnasio-agenda/convocatoria-card.css";
+@import "./gimnasio-agenda/convocatoria-list.css";
+@import "./gimnasio-agenda/agenda-help-popover.css";
+
+@import "./gimnasio-dashboard/gimnasio-dashboard.css";
+@import "./gimnasio-entrenadores/gimnasio-entrenadores.css";
+@import "./gimnasio-entrenados/gimnasio-entrenados.css";
+@import "./gimnasio-tabs/gimnasio-tabs.css";

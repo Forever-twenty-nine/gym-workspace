@@ -1,0 +1,68 @@
+/* ============================================================ */
+/* Componente: app-gestion-rutinas-modal                          */
+/* Modal para gestionar las rutinas asignadas a un entrenado       */
+/* ============================================================ */
+
+app-gestion-rutinas-modal {
+    ion-content {
+        --background: transparent;
+    }
+
+    /* Titulos de sección */
+    ion-list-header ion-label {
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    ion-card-subtitle {
+        text-transform: uppercase;
+    }
+
+    /* Header del card "Asignar" sin padding lateral extra */
+    ion-card ion-card-header {
+        padding-bottom: 0;
+    }
+
+    ion-card ion-card-content {
+        padding: 0;
+    }
+
+    /* Item de rutina: nombre sin wrap */
+    ion-item ion-label h2 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Notas meta con icono + número */
+    ion-item ion-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    ion-item ion-note ion-icon {
+        font-size: 16px;
+    }
+
+    /* Select oculto para swipe-to-add-day */
+    ion-item ion-select {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    /* Empty state centrado */
+    ion-text {
+        display: block;
+        text-align: center;
+        padding: var(--ion-padding);
+        color: var(--ion-color-medium);
+    }
+
+    ion-text p {
+        margin: 0;
+    }
+}

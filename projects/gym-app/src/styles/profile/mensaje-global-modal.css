@@ -1,0 +1,39 @@
+/* ============================================================ */
+/* Componente: app-mensaje-global-modal                           */
+/* Modal de mensaje informativo (premio, error genérico, etc.)    */
+/* ============================================================ */
+
+app-mensaje-global-modal {
+    ion-footer ion-toolbar {
+        padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+    }
+
+    ion-content ion-card {
+        margin: 0;
+    }
+
+    ion-card-header,
+    ion-card-content {
+        text-align: center;
+    }
+
+    ion-card-header {
+        padding: 16px;
+    }
+
+    ion-card-header ion-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+
+    ion-card-title {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    ion-card-content {
+        line-height: 1.6;
+        color: var(--ion-color-step-700, var(--ion-color-medium));
+        padding: 16px;
+    }
+}

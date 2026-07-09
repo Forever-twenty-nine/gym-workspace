@@ -1,0 +1,72 @@
+/* ============================================================ */
+/* Componente: app-profile-plan-actions                           */
+/* Card "Cambio de Plan" + estados (pendiente/rechazado/activo)   */
+/* ============================================================ */
+
+app-profile-plan-actions {
+    > ion-card {
+        margin: 0;
+    }
+
+    > ion-card > ion-card-header > ion-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+    }
+
+    /* Texto descriptivo principal */
+    > ion-card > ion-card-content > p:first-of-type {
+        line-height: 1.4;
+        margin-bottom: 16px;
+        color: var(--ion-color-medium);
+    }
+
+    /* Card anidado de estado (pendiente / rechazada) */
+    > ion-card > ion-card-content > ion-card {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    > ion-card > ion-card-content > ion-card > ion-card-content > p {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    > ion-card > ion-card-content > ion-card > ion-card-content > small {
+        display: block;
+        font-size: 0.75rem;
+        margin-top: 4px;
+        opacity: 0.85;
+    }
+
+    ion-card[data-status="pending"] {
+        background: var(--ion-color-warning-tint);
+        color: var(--ion-color-warning-shade);
+    }
+
+    ion-card[data-status="rejected"] {
+        background: var(--ion-color-danger-tint);
+        color: var(--ion-color-danger-shade);
+    }
+
+    /* Premium activo */
+    > ion-card > ion-card-content > p[data-premium] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-weight: 700;
+        color: var(--ion-color-success);
+        margin: 0;
+    }
+
+    > ion-card > ion-card-content > p[data-premium] > ion-icon {
+        font-size: 1.5rem;
+    }
+}

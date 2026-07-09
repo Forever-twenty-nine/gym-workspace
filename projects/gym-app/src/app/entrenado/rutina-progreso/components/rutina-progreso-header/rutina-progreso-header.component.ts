@@ -28,11 +28,6 @@ import {
         IonNote
     ],
     templateUrl: './rutina-progreso-header.component.html',
-    styles: [`
-    :host {
-        display: block;
-    }
-  `]
 })
 export class RutinaProgresoHeaderComponent {
     readonly porcentaje = input.required<number>();

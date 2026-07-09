@@ -1,0 +1,27 @@
+/* ============================================================ */
+/* Entrenados - nucleador (página + estilos compartidos)           */
+/* ============================================================ */
+
+@import "./mis-entrenados.css";
+@import "./invitaciones-pendientes.css";
+@import "./entrenado-detalle-popover.css";
+@import "./gestion-rutinas-modal.css";
+
+/* ============================================================ */
+/* Página: app-entrenados                                        */
+/* ============================================================ */
+app-entrenados {
+    /* Popovers de ayuda: texto multi-línea */
+    ion-popover ion-content p {
+        white-space: pre-line;
+        line-height: 1.5;
+        margin: 0;
+    }
+}
+
+/* ============================================================ */
+/* Componente: app-invitacion-modal (sin estilos)                  */
+/* ============================================================ */
+app-invitacion-modal {
+    /* Modal simple sin estilos adicionales */
+}

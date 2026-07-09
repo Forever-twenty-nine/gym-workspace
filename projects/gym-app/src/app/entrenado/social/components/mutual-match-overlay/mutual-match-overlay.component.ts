@@ -19,13 +19,6 @@ import { MatchActual } from '../../../../core/types/descubrir.types';
     IonModal,
     IonItem,
     IonList],
-  styles: [`
-    ion-modal {
-      --width: min(90%, 360px);
-      --height: auto;
-      --border-radius: 16px;
-    }
-  `]
 })
 export class MutualMatchOverlayComponent {
   @Input({ required: true }) matchActual!: MatchActual;

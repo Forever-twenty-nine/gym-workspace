@@ -1,0 +1,34 @@
+/* ============================================================ */
+/* Componente: app-invitaciones-pendientes                         */
+/* Lista de invitaciones pendientes de aceptar                    */
+/* ============================================================ */
+
+app-invitaciones-pendientes {
+    ion-list {
+        background: transparent;
+    }
+
+    ion-list-header ion-label {
+        text-align: center;
+    }
+
+    ion-list-header h6 {
+        text-transform: uppercase;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    ion-item {
+        --background: transparent;
+    }
+
+    ion-avatar ion-icon {
+        font-size: 28px;
+    }
+
+    ion-label p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

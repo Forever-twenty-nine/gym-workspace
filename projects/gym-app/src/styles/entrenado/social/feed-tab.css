@@ -1,0 +1,44 @@
+/* ============================================================ */
+/* Componente: app-feed-tab                                       */
+/* Tab "Feed" — lista de posts de la comunidad                   */
+/* ============================================================ */
+
+app-feed-tab {
+    /* Subtítulo del card */
+    ion-card-subtitle {
+        color: var(--ion-color-medium);
+        font-size: 0.875rem;
+    }
+
+    /* Estado de carga (spinner + texto) */
+    > ion-card > ion-card-content ion-spinner {
+        transform: scale(1.5);
+        margin-bottom: 16px;
+    }
+
+    > ion-card > ion-card-content p {
+        text-align: center;
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-weight: 500;
+    }
+
+    /* Estado vacío (card con imagen) */
+    > ion-card {
+        margin: 16px;
+        text-align: center;
+        --background: var(--ion-color-step-50, #f5f5f5);
+    }
+
+    > ion-card > ion-card-header > ion-card-title {
+        font-weight: bold;
+        color: var(--ion-color-dark);
+        text-transform: uppercase;
+    }
+
+    /* Lista de cards */
+    > ion-list {
+        background: transparent;
+        padding: 0;
+    }
+}

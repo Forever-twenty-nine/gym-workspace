@@ -43,11 +43,6 @@ import { close, repeatOutline, timeOutline, barbellOutline, informationCircleOut
         IonCol
     ],
     templateUrl: './rutina-ejercicio-detalle-modal.component.html',
-    styles: [`
-    :host {
-        display: block;
-    }
-  `]
 })
 export class RutinaEjercicioDetalleModalComponent {
     readonly ejercicio = input<Ejercicio | null>(null);

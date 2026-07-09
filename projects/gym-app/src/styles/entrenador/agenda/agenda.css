@@ -77,10 +77,7 @@ app-convocatoria-list {
         margin-inline-start: var(--ion-margin);
     }
 
-    /* Date badge: margen derecho consistente */
-    app-date-badge {
-        margin-inline-end: var(--ion-margin);
-    }
+    /* Date badge margin — movido a global-elements.css */
 }
 
 /* === Crear Agenda Modal === */

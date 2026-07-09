@@ -1,0 +1,76 @@
+/* ============================================================ */
+/* Componente: app-convocatoria-modal-stories                     */
+/* Modal stories para crear convocatoria                        */
+/* ============================================================ */
+
+app-convocatoria-modal-stories {
+    > ion-modal > ng-template > ion-content > ion-text > h2 {
+        font-weight: 700;
+        font-size: 1.125rem;
+        margin: 0;
+    }
+
+    > ion-modal > ng-template > ion-card > ion-card-content > p {
+        font-style: italic;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    /* Header: nombre del creador */
+    > ion-modal > ng-template > ion-header > ion-toolbar > ion-item > ion-label > h2 {
+        font-weight: 700;
+    }
+
+    > ion-modal > ng-template > ion-header > ion-toolbar > ion-item > ion-label > h2 > ion-badge {
+        margin-left: 4px;
+    }
+
+    > ion-modal > ng-template > ion-header > ion-toolbar > ion-item > ion-label > p {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 4px;
+        font-size: 0.75rem;
+    }
+
+    /* Lista de interesados */
+    > ion-modal > ng-template > ion-content > ion-list {
+        margin: 0;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-list > ion-list-header {
+        padding: 0;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-list > ion-list-header ion-label {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    /* Grid de interesados */
+    > ion-modal > ng-template > ion-content > ion-list > ion-item ion-avatar {
+        width: 40px;
+        height: 40px;
+        border: 1px solid;
+        margin: 4px;
+    }
+
+    /* Footer actions */
+    > ion-modal > ng-template > ion-footer > ion-toolbar ion-badge {
+        margin: 0;
+    }
+
+    > ion-modal > ng-template > ion-footer > ion-toolbar > ion-button {
+        margin: 0;
+    }
+
+    > ion-modal > ng-template > ion-footer > ion-toolbar > ion-note {
+        text-align: center;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 4px;
+    }
+}

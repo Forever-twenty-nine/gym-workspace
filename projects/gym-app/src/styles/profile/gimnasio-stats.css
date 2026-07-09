@@ -1,0 +1,96 @@
+/* ============================================================ */
+/* Componente: app-gimnasio-stats                                 */
+/* Stats del gimnasio (vista del admin gimnasio)                  */
+/* ============================================================ */
+
+app-gimnasio-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    > ion-card {
+        margin: 0;
+    }
+
+    /* Header de cada card-chart */
+    > ion-card > ion-card-header {
+        padding-top: 24px;
+        padding-bottom: 8px;
+        text-align: center;
+    }
+
+    > ion-card > ion-card-title {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Tasa de activación (primer card): 2 bloques label+value */
+    > ion-card:first-of-type > ion-card-content {
+        padding: 16px 16px 16px;
+    }
+
+    /* los 4 ion-text son: label, value-xl, label, value-sub */
+    > ion-card:first-of-type > ion-card-content > ion-text:nth-child(1),
+    > ion-card:first-of-type > ion-card-content > ion-text:nth-child(3) {
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        display: block;
+        font-size: 0.75rem;
+    }
+
+    > ion-card:first-of-type > ion-card-content > ion-text:nth-child(2) {
+        font-weight: 800;
+        line-height: 1;
+        font-size: 2rem;
+        display: block;
+    }
+
+    > ion-card:first-of-type > ion-card-content > ion-text:nth-child(4) {
+        font-weight: 700;
+        display: block;
+        text-align: right;
+    }
+
+    /* KPI cards anidadas en ion-col */
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card {
+        margin: 0;
+        text-align: center;
+        padding: 12px 4px;
+        --background: var(--ion-color-step-50, var(--ion-background-color));
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
+        padding: 4px;
+    }
+
+    /* columns de 6 (más grandes) */
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] {
+        padding: 6px;
+    }
+
+    /* ion-text dentro de KPI cards */
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text {
+        display: block;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:first-of-type {
+        font-weight: 800;
+        font-size: 1.25rem;
+        line-height: 1.2;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col[size="6"] > ion-card > ion-text:first-of-type {
+        font-size: 1.5rem;
+    }
+
+    > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-card > ion-text:last-of-type {
+        text-transform: uppercase;
+        font-weight: 700;
+        opacity: 0.85;
+        font-size: 0.7rem;
+        margin-top: 4px;
+    }
+}

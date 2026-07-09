@@ -1,0 +1,115 @@
+/* ============================================================ */
+/* Componente: app-desafio-modal-stories                          */
+/* Modal stories para crear desafío                              */
+/* ============================================================ */
+
+app-desafio-modal-stories {
+    /* Item del creador */
+    > ion-modal > ng-template > ion-content > ion-item {
+        margin-bottom: 16px;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-item > ion-label > h2 {
+        font-weight: 700;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-item > ion-label > p {
+        font-size: 0.75rem;
+    }
+
+    /* Card del desafío */
+    > ion-modal > ng-template > ion-content > ion-card {
+        margin: 0 0 20px 0;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-card > ion-card-content {
+        text-align: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-card > ion-card-content > h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        font-style: italic;
+        margin: 0;
+    }
+
+    /* Récord dentro del card */
+    > ion-modal > ng-template > ion-content > ion-card > ion-card-content > ion-chip {
+        margin-right: 8px;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-card > ion-card-content > ion-chip ion-label {
+        font-size: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Stats row */
+    > ion-modal > ng-template > ion-content > ion-grid > ion-row > ion-col ion-note {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-grid > ion-row > ion-col ion-text {
+        font-weight: 700;
+        font-size: 1.125rem;
+    }
+
+    /* Lista de participantes */
+    > ion-modal > ng-template > ion-content > ion-list > ion-list-header ion-label {
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 12px;
+    }
+
+    > ion-modal > ng-template > ion-content > ion-list > ion-item ion-avatar {
+        width: 40px;
+        height: 40px;
+        border: 1px solid;
+        margin: 0;
+    }
+
+    /* Badge sobre el avatar */
+    > ion-modal > ng-template > ion-content > ion-list > ion-item > ion-badge[slot="end"] {
+        position: absolute;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 0.625rem;
+        bottom: -4px;
+        right: -4px;
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Footer actions */
+    > ion-modal > ng-template > ion-footer > ion-toolbar > ion-grid > ion-row > ion-col ion-button {
+        margin: 0;
+    }
+
+    > ion-modal > ng-template > ion-footer > ion-toolbar > ion-note {
+        text-align: center;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* Caja de "desafío vencido" */
+    > ion-modal > ng-template > ion-footer > ion-toolbar > ion-grid ion-card {
+        text-align: center;
+        padding: 12px;
+        border: 1px dashed;
+        border-radius: 12px;
+        margin: 8px;
+    }
+}

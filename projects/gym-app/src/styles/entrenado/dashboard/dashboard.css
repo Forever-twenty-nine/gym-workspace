@@ -1,0 +1,9 @@
+/* ---------------------------------------------------- */
+/* Estilos para Dashboard del Entrenado                 */
+/* ---------------------------------------------------- */
+
+/* Empty states (Rutinas Asignadas) */
+app-rutinas-asignadas ion-text {
+    display: block;
+    text-align: center;
+}

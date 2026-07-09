@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
     IonIcon,
@@ -10,12 +10,16 @@ import {
     IonLabel,
     IonBadge,
     IonButton,
-    IonAccordionGroup,
-    IonAccordion,
     IonList
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { playCircle, chevronForwardOutline, calendarOutline } from 'ionicons/icons';
+import {
+    playCircle,
+    chevronForwardOutline,
+    chevronUpOutline,
+    chevronDownOutline,
+    calendarOutline
+} from 'ionicons/icons';
 import { Rutina, Convocatoria } from 'gym-library';
 import { DateBadgeComponent } from '../../../../shared/components/date-badge/date-badge.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
@@ -45,33 +49,51 @@ type Encuentro = Convocatoria; // alias for clarity in this component
         IonLabel,
         IonBadge,
         IonButton,
-        IonAccordionGroup,
-        IonAccordion,
         IonList,
         DateBadgeComponent,
         EmptyStateComponent,
     ],
     templateUrl: './rutinas-semana.component.html',
-    styles: [`
-        ::ng-deep ion-accordion[disabled] .ion-accordion-toggle-icon,
-        ::ng-deep ion-accordion.accordion-disabled .ion-accordion-toggle-icon {
-            display: none !important;
-        }
-        /* Day rows — esquinas redondeadas como los items de las otras listas */
-        ::ng-deep ion-item[slot="header"] {
-            border-radius: 12px !important;
-            overflow: hidden !important;
-        }
-        ::ng-deep ion-accordion::part(header) {
-            border-radius: 12px !important;
-        }
-    `]
 })
-export class RutinasSemanaComponent {
+export class RutinasSemanaComponent implements OnInit, OnChanges {
     @Input() rutinasPorDia: SemanaDia[] | null = [];
     @Output() verDetalles = new EventEmitter<{ rutina: Rutina, esFuturo: boolean }>();
     @Output() iniciarEntrenamientoDirecto = new EventEmitter<{ event: Event, rutina: Rutina }>();
     @Output() verEncuentro = new EventEmitter<Encuentro>();
+
+    /** Set de day-keys (yyyy-mm-dd) actualmente expandidos */
+    expandedDays = new Set<string>();
+
+    constructor() {
+        addIcons({
+            playCircle,
+            chevronForwardOutline,
+            chevronUpOutline,
+            chevronDownOutline,
+            calendarOutline
+        });
+    }
+
+    ngOnInit() {
+        this.autoExpandToday();
+    }
+
+    /** Reaccionar al @Input() cuando llega async desde el page (signals → @Input) */
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['rutinasPorDia'] && this.rutinasPorDia) {
+            this.autoExpandToday();
+        }
+    }
+
+    /** Auto-expand el día de hoy si tiene actividad (idempotente) */
+    private autoExpandToday() {
+        if (!this.rutinasPorDia) return;
+        for (const dia of this.rutinasPorDia) {
+            if (dia.esHoy && this.diaTieneActividad(dia)) {
+                this.expandedDays.add(this.getDiaKey(dia));
+            }
+        }
+    }
 
     get tieneActividadProgramada(): boolean {
         return (this.rutinasPorDia ?? []).some(dia =>
@@ -100,10 +122,19 @@ export class RutinasSemanaComponent {
         return parts.join(' • ');
     }
 
+    /** Toggle del estado expandido de un día (no-op si el día no tiene actividad) */
+    toggleDay(dia: SemanaDia) {
+        if (!this.diaTieneActividad(dia)) return;
+        const key = this.getDiaKey(dia);
+        if (this.expandedDays.has(key)) {
+            this.expandedDays.delete(key);
+        } else {
+            this.expandedDays.add(key);
+        }
+    }
 
-
-    constructor() {
-        addIcons({ playCircle, chevronForwardOutline, calendarOutline });;
+    isExpanded(dia: SemanaDia): boolean {
+        return this.expandedDays.has(this.getDiaKey(dia));
     }
 
     onVerDetalles(rutina: Rutina, esFuturo: boolean = false) {

@@ -25,11 +25,6 @@ import { checkmarkCircle, ellipseOutline, informationCircleOutline } from 'ionic
         IonIcon
     ],
     templateUrl: './rutina-ejercicio-item.component.html',
-    styles: [`
-    :host {
-        display: block;
-    }
-  `]
 })
 export class RutinaEjercicioItemComponent {
     readonly ejercicio = input.required<Ejercicio>();

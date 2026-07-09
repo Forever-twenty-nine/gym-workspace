@@ -1,10 +1,10 @@
-<ion-card (click)="toggle.emit()" button [style.opacity]="completado() ? '0.5' : '1'">
+<ion-card (click)="toggle.emit()" button [attr.data-completado]="completado() ? '' : null">
     <ion-item lines="none">
-        <ion-avatar slot="start" [style.color]="completado() ? 'var(--ion-color-success)' : 'var(--ion-color-medium)'">
+        <ion-avatar slot="start" [attr.data-completado]="completado() ? '' : null">
             <ion-icon [name]="completado() ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
         </ion-avatar>
         <ion-label>
-            <h4 [style.color]="completado() ? 'var(--ion-color-success)' : ''"
+            <h4 [attr.data-completado]="completado() ? '' : null"
                 [class.line-through]="completado()">
                 {{ ejercicio().nombre }}
             </h4>

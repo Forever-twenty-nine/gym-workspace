@@ -1,0 +1,60 @@
+/* ============================================================ */
+/* Componente: app-social-card                                    */
+/* Card de un post individual en el feed                         */
+/* ============================================================ */
+
+app-social-card {
+    ion-item {
+        --background: transparent;
+    }
+
+    ion-item ion-label {
+        margin-inline-start: 8px;
+    }
+
+    /* Foto de progreso */
+    > ion-card > ion-img {
+        width: 100%;
+        aspect-ratio: 4/5;
+        object-fit: cover;
+    }
+
+    /* Separador cuando no hay foto */
+    > ion-card > ion-card-content > hr {
+        height: 1px;
+        background: var(--ion-color-step-150, #e0e0e0);
+        width: 100%;
+        border: none;
+        margin: 0;
+    }
+
+    /* Acciones (Like, Comentar) */
+    > ion-card > ion-card-content > ion-item {
+        margin-top: -8px;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+
+    > ion-card > ion-card-content > ion-item ion-button > span {
+        font-weight: bold;
+        margin-left: 4px;
+    }
+
+    /* Texto principal del post */
+    > ion-card > ion-card-content > p {
+        color: var(--ion-text-color);
+    }
+
+    /* Stats inline (duración, ejercicios, fecha) */
+    > ion-card > ion-card-content > ion-item:last-child {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        color: var(--ion-color-medium);
+    }
+
+    > ion-card > ion-card-content > ion-item:last-child ion-icon {
+        margin-right: 4px;
+    }
+}

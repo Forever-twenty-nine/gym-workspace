@@ -17,7 +17,7 @@ import { addIcons } from 'ionicons';
 import {
   barbell, time, heart, heartOutline, ellipsisVertical, ellipsisHorizontal,
   personAdd, personRemove, trash, eyeOffOutline, timeOutline, barbellOutline, person,
-  chatbubbleOutline
+  chatbubbleOutline, calendarOutline
 } from 'ionicons/icons';
 
 import { SesionRutinaService } from '../../../../../../core/services/sesion-rutina.service';
@@ -92,7 +92,7 @@ export class SocialCardComponent implements OnInit, OnDestroy {
   private unsubscribeComentarios?: () => void;
 
   constructor() {
-    addIcons({ heartOutline, ellipsisHorizontal, personRemove, eyeOffOutline, timeOutline, barbellOutline, person, chatbubbleOutline });;
+    addIcons({ heartOutline, heart, ellipsisHorizontal, personRemove, personAdd, eyeOffOutline, timeOutline, barbellOutline, person, chatbubbleOutline, calendarOutline });;
   }
 
   ngOnInit() {

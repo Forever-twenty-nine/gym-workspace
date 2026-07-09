@@ -8,7 +8,7 @@ import { RutinaEjercicioItemComponent } from './components/rutina-ejercicio-item
 import { RutinaOverlayComponent } from './components/rutina-overlay/rutina-overlay.component';
 import { RutinaEjercicioDetalleModalComponent } from './components/rutina-ejercicio-detalle-modal/rutina-ejercicio-detalle-modal.component';
 import { addIcons } from 'ionicons';
-import { arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline } from 'ionicons/icons';
+import { arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause } from 'ionicons/icons';
 import { closeModalWithAnimation, blurActiveElement } from '../../core/utils/modal.utils';
 import { Ejercicio, SesionRutinaStatus } from 'gym-library';
 import { RutinaService } from '../../core/services/rutina.service';
@@ -22,7 +22,6 @@ import { BackgroundComponent } from '../../shared/components/background/backgrou
   selector: 'app-rutina-progreso', standalone: true,
   imports: [CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonButtons, IonIcon, IonBackButton, IonFooter, IonGrid, IonRow, IonCol, IonList, IonListHeader, IonLabel, IonItem, RutinaProgresoHeaderComponent, RutinaEjercicioItemComponent, RutinaOverlayComponent, RutinaEjercicioDetalleModalComponent, BackgroundComponent],
   templateUrl: './rutina-progreso.page.html',
-  styles: [`@keyframes bounceIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.05); } 100% { transform: scale(1); opacity: 1; } } .animate-bounce-in { animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }`]
 })
 export class RutinaProgresoPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute); private readonly router = inject(Router);
@@ -61,7 +60,7 @@ export class RutinaProgresoPage implements OnInit, OnDestroy {
     return 'medium';
   });
 
-  constructor() { addIcons({ arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline });; }
+  constructor() { addIcons({ arrowBackOutline, playOutline, checkmarkCircleOutline, closeCircleOutline, fitnessOutline, timeOutline, flameOutline, calendarOutline, checkmarkCircle, close, repeatOutline, warningOutline, ellipseOutline, chevronForwardOutline, informationCircleOutline, barbellOutline, play, pause });; }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('rutinaId');

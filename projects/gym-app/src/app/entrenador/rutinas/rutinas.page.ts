@@ -20,7 +20,6 @@ import { RutinaModalComponent } from '../../shared/components/rutina-modal/rutin
     ListaRutinasComponent,
     RutinaModalComponent
   ],
-  styles: []
 })
 export class RutinasPage implements OnInit {
   private authService = inject(AuthService);

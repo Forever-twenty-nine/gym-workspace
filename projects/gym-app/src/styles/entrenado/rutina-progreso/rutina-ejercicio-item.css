@@ -1,0 +1,110 @@
+/* ============================================================ */
+/* Componente: app-rutina-ejercicio-item                          */
+/* Card de un ejercicio dentro de la rutina en progreso          */
+/* ============================================================ */
+
+app-rutina-ejercicio-item {
+    display: block;
+
+    /* Variante: ejercicio completado (opacity baja + color success) */
+    ion-card[data-completado] {
+        opacity: 0.5;
+    }
+
+    ion-avatar[data-completado] {
+        color: var(--ion-color-success);
+    }
+
+    h4[data-completado] {
+        color: var(--ion-color-success);
+    }
+
+    /* Card principal del ejercicio */
+    ion-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        margin: 0 0 12px 0;
+        border-radius: 16px;
+        transition: all 0.3s;
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .dark ion-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    ion-card:active {
+        transform: scale(0.98);
+    }
+
+    /* Avatar del icono de estado */
+    ion-item ion-avatar {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        flex-shrink: 0;
+        margin-left: -8px;
+        border-radius: 50%;
+    }
+
+    ion-item ion-avatar ion-icon {
+        font-size: 40px;
+    }
+
+    /* Nombre del ejercicio */
+    ion-item ion-label h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: all 0.3s;
+    }
+
+    /* Fila de series/repeticiones/descanso */
+    ion-item ion-label p {
+        margin-top: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    ion-item ion-label p span {
+        margin: 0 4px;
+        opacity: 0.5;
+    }
+
+    /* Botón de información */
+    ion-item ion-button[slot="end"] {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        z-index: 20;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+    }
+
+    ion-item ion-button[slot="end"]:active {
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    ion-item ion-button[slot="end"] ion-icon {
+        font-size: 1.5rem;
+    }
+}

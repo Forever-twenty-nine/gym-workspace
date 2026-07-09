@@ -3,13 +3,7 @@
 /* ============================================================ */
 
 app-ejercicio-modal {
-    /* Modal más ancho y elegante */
-    ion-modal {
-        --width: 95%;
-        --max-width: 600px;
-        --border-radius: 16px;
-        --backdrop-opacity: 0.3;
-    }
+    /* ion-modal sizing — global-elements.css */
 
     /* El aviso de campos premium */
     ion-text {

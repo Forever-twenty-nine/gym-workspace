@@ -72,11 +72,11 @@
                                 <ion-item>
                                     @for (user of interesadosUsers(); track user.uid; let first = $first) {
                                         @if (user.photoURL) {
-                                            <ion-avatar [style.margin-left]="first ? '0' : '-16px'">
+                                            <ion-avatar [attr.data-first]="first ? '' : null">
                                                 <img [src]="user.photoURL" [title]="user.nombre || 'Atleta'" />
                                             </ion-avatar>
                                         } @else {
-                                            <ion-avatar [style.margin-left]="first ? '0' : '-16px'" [title]="user.nombre || 'Atleta'">
+                                            <ion-avatar [attr.data-first]="first ? '' : null" [title]="user.nombre || 'Atleta'">
                                                 <ion-icon name="person-outline" color="medium"></ion-icon>
                                             </ion-avatar>
                                         }

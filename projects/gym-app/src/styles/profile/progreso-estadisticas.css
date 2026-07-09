@@ -1,0 +1,86 @@
+/* ============================================================ */
+/* Componente: app-progreso-estadisticas                          */
+/* Stats del entrenado: XP, rachas, top rutinas                  */
+/* ============================================================ */
+
+app-progreso-estadisticas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+
+    > ion-card {
+        margin: 0;
+    }
+
+    > ion-card > ion-card-header {
+        padding-top: 24px;
+        padding-bottom: 8px;
+        text-align: center;
+    }
+
+    > ion-card > ion-card-title {
+        font-weight: 700;
+        margin: 0;
+    }
+
+    > ion-card:first-of-type > ion-card-content {
+        padding-block-end: 24px;
+    }
+
+    /* grid de "Rachas & Métricas" — tipografía tipográfica */
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid ion-col {
+        text-align: center;
+    }
+
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid h5 {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--ion-color-medium);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid h2 {
+        margin: 4px 0 0;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--ion-text-color);
+    }
+
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--ion-text-color);
+    }
+
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid p {
+        margin: 2px 0 0;
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+    }
+
+    /* Separación entre filas del grid de métricas */
+    > ion-card:nth-of-type(2) > ion-card-content > ion-grid ion-row:nth-of-type(2) {
+        margin-top: 16px;
+    }
+
+    /* Top rutinas list */
+    ion-list {
+        background: transparent;
+        padding: 0;
+    }
+
+    ion-list ion-item {
+        --inner-padding-end: 0;
+        --padding-start: 0;
+    }
+
+    ion-list ion-item h3 {
+        margin: 0 0 4px;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+}

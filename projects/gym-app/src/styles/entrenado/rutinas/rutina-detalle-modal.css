@@ -1,0 +1,49 @@
+/* ============================================================ */
+/* Componente: app-rutina-detalle-modal                          */
+/* Modal con detalle de una rutina (entrenado)                   */
+/* ============================================================ */
+
+app-rutina-detalle-modal {
+    ion-header {
+        padding: 8px;
+    }
+
+    ion-row {
+        align-items: flex-start;
+    }
+
+    ion-col {
+        text-align: center;
+    }
+
+    ion-card-header {
+        padding: 8px;
+    }
+
+    ion-card-title {
+        text-align: center;
+    }
+
+    > ion-content > ion-card {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    > ion-content > ion-card > ion-card-content > p {
+        margin-top: 8px;
+    }
+
+    ion-col ion-icon[name="fitness-outline"],
+    ion-col ion-icon[name="time-outline"] {
+        font-size: 1.5rem;
+        margin-bottom: 4px;
+    }
+
+    ion-col h2 span {
+        font-size: 0.875rem;
+    }
+
+    ion-footer ion-button {
+        margin: var(--ion-margin);
+    }
+}

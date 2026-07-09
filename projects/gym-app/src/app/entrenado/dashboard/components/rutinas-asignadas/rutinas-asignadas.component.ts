@@ -45,12 +45,6 @@ type EntrenadorInfo = Partial<import('gym-library').User> & { photoURL?: string 
     EmptyStateComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-    }
-  `]
 })
 export class RutinasAsignadasComponent {
   @Input() rutinas: DashboardRutina[] = [];

@@ -1,22 +1,13 @@
 <ion-content [fullscreen]="true">
   <app-background />
 
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="8" size-lg="6">
-        <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
-          [entrenadorAsignado]="entrenadorAsignado()?.nombre || ''" [photoURL]="photoURL()"
-          [frecuencia]="frecuenciaSemanal()">
-        </app-plan-personalizado>
-      </ion-col>
-    </ion-row>
+  <app-plan-personalizado [nivel]="entrenadoDataSignal()?.nivel" [objetivo]="objetivoActual()"
+    [entrenadorAsignado]="entrenadorAsignado()?.nombre || ''" [photoURL]="photoURL()"
+    [frecuencia]="frecuenciaSemanal()">
+  </app-plan-personalizado>
 
-    <ion-row>
-      <ion-col size="12" size-md="8" size-lg="6">
-        <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
-          (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
-        </app-rutinas-asignadas>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-content>
+  <app-rutinas-asignadas [rutinas]="rutinasAsignadas()" [entrenador]="entrenadorAsignado()"
+    (verDetalle)="verRutina($event)" (verTodas)="verTodasLasRutinas()">
+  </app-rutinas-asignadas>
+  
+</ion-content>

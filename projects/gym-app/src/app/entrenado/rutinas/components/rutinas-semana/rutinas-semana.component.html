@@ -5,32 +5,44 @@
 
   <ion-card-content>
     @if (tieneActividadProgramada) {
-      <ion-accordion-group [multiple]="true">
+      <ion-list lines="none">
         @for (dia of rutinasPorDia; track dia.fecha) {
-          <ion-accordion [value]="getDiaKey(dia)" [disabled]="!diaTieneActividad(dia)">
+          <!-- Header del día: clickable, toggle expand/collapse -->
+          <ion-item
+            button
+            detail="false"
+            (click)="toggleDay(dia)"
+            [disabled]="!diaTieneActividad(dia)">
+            <app-date-badge slot="start"
+              [class.opacity-60]="!diaTieneActividad(dia)"
+              [fecha]="dia.fecha"
+              [esEjecutable]="dia.esHoy && diaTieneActividad(dia)"
+              [diaCorto]="dia.diaCorto">
+            </app-date-badge>
 
-            <ion-item slot="header" button detail="false">
-              <app-date-badge slot="start"
-                [class.opacity-60]="!diaTieneActividad(dia)"
-                [fecha]="dia.fecha"
-                [esEjecutable]="dia.esHoy && diaTieneActividad(dia)"
-                [diaCorto]="dia.diaCorto">
-              </app-date-badge>
-
-              <ion-label>
-                @if (diaTieneActividad(dia)) {
-                  <h2>{{ getEventSummary(dia) }}</h2>
-                } @else {
-                  <h2>Descanso</h2>
-                }
-              </ion-label>
-
-              @if (dia.esHoy && diaTieneActividad(dia)) {
-                <ion-badge slot="end" color="primary">Hoy</ion-badge>
+            <ion-label>
+              @if (diaTieneActividad(dia)) {
+                <h2>{{ getEventSummary(dia) }}</h2>
+              } @else {
+                <h2>Descanso</h2>
               }
-            </ion-item>
+            </ion-label>
 
-            <ion-list slot="content" lines="none">
+            @if (dia.esHoy && diaTieneActividad(dia)) {
+              <ion-badge slot="end" color="primary">Hoy</ion-badge>
+            }
+
+            @if (diaTieneActividad(dia)) {
+              <ion-icon slot="end"
+                [name]="isExpanded(dia) ? 'chevron-up-outline' : 'chevron-down-outline'"
+                color="medium">
+              </ion-icon>
+            }
+          </ion-item>
+
+          <!-- Contenido del día: visible solo cuando está expandido -->
+          @if (isExpanded(dia)) {
+            <ion-list lines="none">
               @if (diaTieneActividad(dia)) {
                 @for (rutina of dia.rutinas; track rutina.id) {
                   <ion-item button (click)="onVerDetalles(rutina, dia.esFuturo)">
@@ -65,10 +77,9 @@
                 </ion-item>
               }
             </ion-list>
-
-          </ion-accordion>
+          }
         }
-      </ion-accordion-group>
+      </ion-list>
     } @else {
       <app-empty-state
         icon="calendar-outline"

@@ -1,0 +1,36 @@
+/* ============================================================ */
+/* Componente: app-gimnasio-agenda                                */
+/* Página de agenda del gimnasio                                  */
+/* ============================================================ */
+
+app-gimnasio-agenda {
+    ion-content {
+        --background: transparent;
+    }
+
+    /* Toolbar con segment + help button alineados a la derecha */
+    ion-toolbar {
+        --background: transparent;
+        --border-color: transparent;
+        padding-inline: var(--ion-padding);
+    }
+
+    ion-segment {
+        flex: 1;
+    }
+
+    ion-segment-button ion-label {
+        font-weight: 800;
+        font-size: 12px;
+    }
+
+    ion-buttons[slot="end"] ion-button {
+        margin: 0;
+    }
+
+    /* Spacing debajo de los listados */
+    app-convocatoria-list {
+        display: block;
+        margin-top: var(--ion-margin);
+    }
+}

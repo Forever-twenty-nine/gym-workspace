@@ -1,0 +1,76 @@
+/* ============================================================ */
+/* Componente: app-notifications                                  */
+/* Modal de notificaciones (lista + filtros)                      */
+/* ============================================================ */
+
+app-notifications {
+    /* Toolbar transparente del modal */
+    ion-header ion-toolbar,
+    > ion-header + ion-content {
+        --background: transparent;
+    }
+
+    /* Contenido del modal: padding consistente + transparente */
+    ion-content {
+        --background: transparent;
+        padding: 16px;
+    }
+
+    /* Empty state */
+    > ion-content > ion-icon {
+        display: block;
+        margin: 0 auto 16px;
+        font-size: 48px;
+        color: var(--ion-color-medium);
+    }
+
+    > ion-content > p {
+        text-align: center;
+        color: var(--ion-color-medium);
+    }
+
+    /* Botón "Mensajes/Chats" en la parte superior */
+    ion-button[expand="block"][color="primary"] {
+        margin-bottom: 16px;
+    }
+
+    /* Badge del contador de chats al lado del label del botón */
+    ion-button[expand="block"] ion-badge {
+        margin-inline-start: 8px;
+    }
+
+    /* Tipografía de las tarjetas dentro de la lista */
+    ion-item h2 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    ion-item p {
+        white-space: normal;
+    }
+
+    /* Marcas de "leído": opacidad reducida (reemplaza class="opacity-70") */
+    ion-item.is-read {
+        opacity: 0.7;
+    }
+
+    /* Fecha del mensaje en línea secundaria con tamaño xs */
+    ion-item p > small {
+        font-size: 0.75rem;
+        color: var(--ion-color-medium);
+    }
+
+    /* ion-item-divider: padding lateral estándar */
+    ion-item-divider ion-label {
+        padding-inline: 16px;
+    }
+
+    /* ion-buttons[slot="end"] con dos botones de acción inline */
+    ion-item ion-buttons[slot="end"] {
+        display: flex;
+        gap: 8px;
+        padding-block-end: 12px;
+        padding-inline-end: 16px;
+        justify-content: flex-end;
+    }
+}

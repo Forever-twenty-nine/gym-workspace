@@ -1,0 +1,28 @@
+/* ============================================================ */
+/* Componente: app-rutinas-asignadas                              */
+/* Card con lista de próximas rutinas del dashboard              */
+/* ============================================================ */
+
+app-rutinas-asignadas {
+    display: block;
+    width: 100%;
+
+    /* Header: posición relativa para el botón (padding viene de global-elements) */
+    ion-card-header {
+        position: relative;
+    }
+
+    /* Botón "Ver todas": posicionado absoluto a la derecha del header */
+    ion-card-header > ion-button {
+        position: absolute;
+        top: 50%;
+        right: var(--ion-padding);
+        transform: translateY(-50%);
+        margin: 0;
+    }
+
+    /* Label estira para llenar espacio entre date-badge (start) e icon (end) */
+    ion-label {
+        flex: 1;
+    }
+}

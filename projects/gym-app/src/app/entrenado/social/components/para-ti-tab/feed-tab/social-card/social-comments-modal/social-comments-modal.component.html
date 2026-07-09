@@ -35,7 +35,7 @@
                       {{ com.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
                     </ion-note>
                   </ion-item>
-                  <p [style.opacity]="comentarioEnEdicion()?.id === com.id ? 0.5 : 1">
+                  <p [attr.data-editing]="comentarioEnEdicion()?.id === com.id ? '' : null">
                     {{ com.contenido }}
                   </p>
                   <ion-item lines="none">
@@ -86,7 +86,7 @@
                             {{ com.respuesta.fecha | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}
                           </ion-note>
                         </ion-item>
-                        <p [style.opacity]="respuestaEnEdicion()?.id === com.id ? 0.5 : 1">
+                        <p [attr.data-editing]="respuestaEnEdicion()?.id === com.id ? '' : null">
                           {{ com.respuesta.contenido }}
                         </p>
                         <ion-item lines="none">

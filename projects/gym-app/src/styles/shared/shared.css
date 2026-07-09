@@ -2,10 +2,14 @@
 /* Componentes Compartidos — solo nucleador             */
 /* ---------------------------------------------------- */
 
-@import "./help-fab.css";
-@import "./empty-state.css";
-@import "./edit-modal.css";
-@import "./app-list-item.css";
-@import "./background.css";
-@import "./auth-background.css";
+@import "./components/help-fab.css";
+@import "./components/empty-state.css";
+@import "./components/edit-modal.css";
+@import "./components/app-list-item.css";
+@import "./components/background.css";
+@import "./components/auth-background.css";
+@import "./components/rutina-modal.css";
+@import "./components/date-badge.css";
+
 @import "./rutinas.css";
+@import "./chat/chat-list-modal.css";

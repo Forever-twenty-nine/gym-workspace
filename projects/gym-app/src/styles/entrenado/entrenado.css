@@ -2,48 +2,8 @@
 /* Estilos Comunes - Sección Entrenado                          */
 /* ============================================================ */
 
-/* Cabeceras y footers sin borde (look Apple-style en iOS) */
-app-creaciones,
-app-convocatoria-modal,
-app-convocatoria-modal-stories,
-app-dashboard,
-app-desafio-modal,
-app-desafio-modal-stories,
-app-ejercicio-modal,
-app-rutina-self-modal,
-app-rutina-detalle-modal,
-app-rutina-ejercicio-detalle-modal,
-app-rutina-progreso,
-app-rutinas,
-app-social {
-    ion-header,
-    ion-footer {
-        --border-color: transparent;
-        --border-width: 0;
-    }
-}
-
-/* Padding consistente en `ion-content` de páginas y modales.
-   Solo aplica a los que aún no tienen padding propio. */
-app-dashboard,
-app-rutinas,
-app-creaciones,
-app-rutina-progreso,
-app-progreso-historial-detalle {
-    ion-content {
-        --padding-start: var(--ion-padding);
-        --padding-end: var(--ion-padding);
-        --padding-top: var(--ion-padding);
-        --padding-bottom: var(--ion-padding);
-    }
-
-    ion-popover ion-content {
-        --padding-start: var(--ion-padding);
-        --padding-end: var(--ion-padding);
-        --padding-top: var(--ion-padding);
-        --padding-bottom: var(--ion-padding);
-    }
-}
+/* ion-header / ion-footer transparent border — global-elements.css */
+/* ion-content padding — global-elements.css (incluye popovers) */
 
 /* Listas dentro de modales: sin padding */
 app-convocatoria-modal,
@@ -59,25 +19,9 @@ app-rutina-self-modal {
     }
 }
 
-/* Cabeceras de card con padding vertical consistente */
-app-rutinas-asignadas,
-app-rutinas-historial,
-app-rutinas-semana {
-    ion-card-header {
-        padding-top: var(--ion-padding);
-        padding-bottom: var(--ion-padding);
-    }
-}
+/* Date badge con margen derecho consistente — movido a global-elements.css */
 
-/* Date badge con margen derecho consistente */
-app-rutinas-asignadas,
-app-rutinas-semana {
-    app-date-badge {
-        margin-inline-end: var(--ion-margin);
-    }
-}
-
-/* List items de listas (sin padding, fondo transparente) */
+/* List items de listas (sin padding, bg+border viene del global) */
 app-desafio-list,
 app-convocatoria-list,
 app-ejercicio-list,
@@ -87,7 +31,6 @@ app-rutinas-asignadas {
     ion-item {
         --padding-start: 0;
         --inner-padding-end: 0;
-        --background: transparent;
     }
 }
 
@@ -100,18 +43,33 @@ app-rutinas-historial {
     }
 }
 
-/* Centrado de textos en empty states */
-app-rutinas-asignadas ion-text,
-app-desafio-list ion-text,
-app-convocatoria-list ion-text,
-app-rutinas-historial ion-text,
-app-rutinas-semana ion-text {
-    text-align: center;
-}
-
 /* ============================================================ */
 /* Importaciones de Módulos (Secciones Específicas)             */
 /* ============================================================ */
-@import "./dashboard.css";
-@import "./rutina-progreso.css";
-@import "./social.css";
+@import "./dashboard/dashboard.css";
+@import "./dashboard/rutinas-asignadas.css";
+@import "./dashboard/plan-personalizado.css";
+
+@import "./social/social.css";
+@import "./social/feed-tab.css";
+@import "./social/descubrir-tab.css";
+@import "./social/para-ti-tab.css";
+@import "./social/match-card.css";
+@import "./social/social-card.css";
+@import "./social/stories.css";
+@import "./social/mutual-match-overlay.css";
+@import "./social/social-comments-modal.css";
+@import "./social/convocatoria-modal-stories.css";
+@import "./social/desafio-modal-stories.css";
+
+@import "./rutinas/rutinas.css";
+@import "./rutinas/rutinas-semana.css";
+@import "./rutinas/progreso-historial-detalle.css";
+@import "./rutinas/encuentro-detalle-modal.css";
+@import "./rutinas/rutina-detalle-modal.css";
+
+@import "./rutina-progreso/rutina-progreso.css";
+@import "./rutina-progreso/rutina-progreso-header.css";
+@import "./rutina-progreso/rutina-overlay.css";
+@import "./rutina-progreso/rutina-ejercicio-item.css";
+@import "./rutina-progreso/rutina-ejercicio-detalle-modal.css";

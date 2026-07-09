@@ -1,0 +1,12 @@
+/* ============================================================ */
+/* Componente: app-rutina-modal                                   */
+/* Modal reusable de rutina (vive en shared/components)          */
+/* ============================================================ */
+
+app-rutina-modal {
+    /* ion-modal sizing — global-elements.css */
+
+    ion-button[type="submit"] {
+        margin-top: var(--ion-margin);
+    }
+}

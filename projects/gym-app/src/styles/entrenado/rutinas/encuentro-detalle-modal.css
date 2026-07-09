@@ -1,0 +1,105 @@
+/* ============================================================ */
+/* Componente: app-encuentro-detalle-modal                        */
+/* Modal con detalle de un entrenamiento en grupo                */
+/* ============================================================ */
+
+app-encuentro-detalle-modal {
+    ion-title {
+        padding: 8px;
+    }
+
+    ion-footer ion-button {
+        margin: var(--ion-margin);
+    }
+
+    ion-card {
+        margin: 8px;
+    }
+
+    ion-row {
+        align-items: flex-start;
+    }
+
+    ion-col {
+        text-align: center;
+    }
+
+    ion-col > ion-avatar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    ion-item[lines='none'] ion-label {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: initial;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child {
+        display: flex;
+    }
+
+    ion-label h2 {
+        margin: 0;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        margin-inline-end: 12px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-inline-end: 12px;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item > ion-avatar:last-child ion-icon {
+        font-size: 1.5rem;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--ion-background-color);
+        flex-shrink: 0;
+    }
+
+    > ion-content > ion-card > ion-list > ion-item ion-label > ion-list > ion-item:first-child > ion-avatar:not(:first-child) {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--ion-color-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--ion-background-color);
+        flex-shrink: 0;
+    }
+
+    /* Avatares apilados de los interesados (borde simula overlap) */
+    ion-avatar[data-first] {
+        margin-left: 0;
+    }
+
+    ion-avatar:not([data-first]) {
+        margin-left: -16px;
+    }
+}

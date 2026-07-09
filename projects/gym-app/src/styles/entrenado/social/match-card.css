@@ -1,0 +1,81 @@
+/* ============================================================ */
+/* Componente: app-match-card                                     */
+/* Card de match en el mazo (foto + nombre + chips de razones)    */
+/* ============================================================ */
+
+app-match-card {
+    /* Card raíz */
+    > ion-card {
+        margin: 0 !important;
+        border-radius: 2rem !important;
+        overflow: hidden;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        border: 1px solid rgba(var(--ion-color-medium-rgb), 0.2);
+        backdrop-filter: blur(24px);
+        transition: all 0.3s;
+        position: relative;
+        width: 100%;
+        height: 520px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    > ion-card:hover {
+        transform: scale(1.01);
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    /* Foto de perfil */
+    > ion-card > ion-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Placeholder si no hay foto */
+    > ion-card > ion-card-content:first-child {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    > ion-card > ion-card-content:first-child ion-icon {
+        font-size: 4rem;
+    }
+
+    /* Header de la card */
+    > ion-card > ion-card-header {
+        padding-inline-start: 0.75rem;
+        padding-inline-end: 0.75rem;
+        padding-top: 0.625rem;
+        padding-bottom: 0.375rem;
+        flex-shrink: 0;
+        align-items: baseline;
+    }
+
+    /* Subtítulo */
+    > ion-card > ion-card-header > ion-card-subtitle {
+        font-size: 0.75rem;
+        margin-top: 2px;
+    }
+
+    /* Contenido de la card (chips) */
+    > ion-card > ion-card-content:last-child {
+        padding-inline-start: 0.75rem;
+        padding-inline-end: 0.75rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    /* Chip de razones */
+    > ion-card > ion-card-content:last-child > ion-chip {
+        margin-right: 6px;
+        margin-bottom: 4px;
+    }
+}
