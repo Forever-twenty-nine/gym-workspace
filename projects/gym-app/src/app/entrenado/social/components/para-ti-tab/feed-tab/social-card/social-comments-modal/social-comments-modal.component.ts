@@ -5,30 +5,27 @@ import {
   IonIcon,
   IonItem,
   IonLabel,
-  IonButtons,
   IonButton,
   IonAvatar,
   IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
   IonList,
   IonInput,
-  IonFooter,
   AlertController,
   IonCard,
   IonCardContent,
-  IonNote
+  IonText
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sendOutline, returnDownForwardOutline, heartOutline, heart, trashOutline, createOutline, checkmarkOutline } from 'ionicons/icons';
+import {
+  sendOutline, returnDownForwardOutline, heartOutline, heart, trashOutline,
+  createOutline, checkmarkOutline, checkmarkCircle, chatbubblesOutline, paperPlaneOutline
+} from 'ionicons/icons';
 
 import { AuthService } from '../../../../../../../core/services/auth.service';
 import { UserService } from '../../../../../../../core/services/user.service';
 import { ComentarioSocialService } from '../../../../../../../core/services/comentario-social.service';
 import { FormatFechaPipe } from '../../../../../../../shared/pipes/format-fecha.pipe';
-import { BackgroundComponent } from '../../../../../../../shared/components/background/background.component';
 import { SesionRutina, Comentario } from 'gym-library';
 
 @Component({
@@ -42,21 +39,14 @@ import { SesionRutina, Comentario } from 'gym-library';
     FormatFechaPipe,
     IonItem,
     IonLabel,
-    IonButtons,
     IonButton,
     IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonList,
     IonInput,
-    IonFooter,
-    BackgroundComponent,
     IonCard,
-    IonCardContent,
-    IonNote
-  ],
+    IonCardContent
+],
   templateUrl: './social-comments-modal.component.html'
 })
 export class SocialCommentsModalComponent implements OnInit, OnDestroy {
@@ -98,7 +88,11 @@ export class SocialCommentsModalComponent implements OnInit, OnDestroy {
   });
 
   constructor() {
-    addIcons({ sendOutline, returnDownForwardOutline, heartOutline, heart, trashOutline, createOutline, checkmarkOutline });;
+    addIcons({
+      sendOutline, paperPlaneOutline, returnDownForwardOutline,
+      heartOutline, heart, trashOutline, createOutline,
+      checkmarkOutline, checkmarkCircle, chatbubblesOutline
+    });
   }
 
   ngOnInit() {}

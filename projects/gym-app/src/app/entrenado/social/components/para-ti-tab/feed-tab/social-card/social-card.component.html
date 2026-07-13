@@ -1,96 +1,95 @@
 <ion-card>
-  <!-- Header: Perfil de Usuario -->
-  <ion-item lines="none">
-    @if (userProfilePhoto()) {
-    <ion-avatar slot="start">
-      <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" alt="Foto de perfil">
-    </ion-avatar>
+    <!-- Header: Perfil de Usuario -->
+    <ion-item lines="none">
+        @if (userProfilePhoto()) {
+        <ion-avatar slot="start">
+            <img [src]="userProfilePhoto() || 'assets/images/test-foto.png'" alt="Foto de perfil">
+        </ion-avatar>
+        } @else {
+        <ion-icon aria-hidden="true" name="person-outline" slot="start" color="medium"></ion-icon>
+        }
+
+        <ion-label>
+            @if(isOwnPost()) {
+            <ion-note color="primary">Tú</ion-note>
+            } @else {
+            {{ sesion!.nombreUsuario || 'Usuario' }}
+            }
+        </ion-label>
+
+        <ion-buttons slot="end">
+            @if (!isOwnPost()) {
+            <ion-button (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear">
+                <ion-icon slot="icon-only" [name]="isFollowing() ? 'person-remove' : 'person-add'"></ion-icon>
+            </ion-button>
+            }
+            @if (isOwnPost()) {
+            <ion-button (click)="presentOptions($event)" color="medium">
+                <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
+            </ion-button>
+            }
+        </ion-buttons>
+    </ion-item>
+
+    <!-- Foto de Progreso (Hero style - Edge to edge) -->
+    @if (sesion!.fotoProgreso) {
+    <ion-img [src]="sesion!.fotoProgreso" alt="Foto del entrenamiento" (error)="onImgError($event)"></ion-img>
     } @else {
-    <ion-icon aria-hidden="true" name="person" slot="start" color="medium"></ion-icon>
+    <!-- Sin foto: divider sutil (CSS lo estiliza con :empty + border-top) -->
+    <ion-card-content></ion-card-content>
     }
 
-    <ion-label>
-      @if(isOwnPost()) {
-      <ion-badge color="primary">Tú</ion-badge>
-      } @else {
-      {{ sesion!.nombreUsuario || 'Usuario' }}
-      }
-    </ion-label>
+    <!-- Body: Contenido de la rutina y acciones -->
+    <ion-card-content>
+        <!-- Action buttons (Like, Comment, etc) -->
+        <ion-item lines="none">
+            <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
+                [color]="hasLiked() ? 'danger' : 'medium'">
+                <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
+                @if (likesCount() > 0) {
+                <ion-text>{{ likesCount() }}</ion-text>
+                }
+            </ion-button>
 
+            @if (isCommentsEnabled()) {
+            <ion-button fill="clear" color="medium" id="open-comments-{{ sesion.id }}">
+                <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
+                @if (comentarios().length > 0) {
+                <ion-text>{{ comentarios().length }}</ion-text>
+                } @else {
+                <ion-text>Comentar</ion-text>
+                }
+            </ion-button>
+            }
+        </ion-item>
 
-    <ion-buttons slot="end">
-      @if (!isOwnPost()) {
-      <ion-button  (click)="toggleFollow($event)" [color]="isFollowing() ? 'medium' : 'primary'" fill="clear">
-        <ion-icon slot="icon-only" [name]="isFollowing() ? 'person-remove' : 'person-add'"></ion-icon>
-      </ion-button>
-      }
-      @if (isOwnPost()) {
-      <ion-button (click)="presentOptions($event)" color="medium">
-        <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
-      </ion-button>
-      }
-    </ion-buttons>
-  </ion-item>
+        <!-- Routine Title and Description — nombres en bold via data-bold -->
+        <ion-text>
+            <ion-text [attr.data-bold]="">{{ sesion!.nombreUsuario || 'Usuario' }}</ion-text>
+            completó su sesión de
+            <ion-text [attr.data-bold]="">{{ sesion!.rutinaResumen.nombre || 'Entrenamiento' }}</ion-text>.
+        </ion-text>
 
-  <!-- Foto de Progreso (Hero style - Edge to edge) -->
-  @if (sesion!.fotoProgreso) {
-  <ion-img [src]="sesion!.fotoProgreso" alt="Foto del entrenamiento" (error)="$any($event.target).style.display='none'"></ion-img>
-  } @else {
-  <ion-card-content>
-    <hr>
-  </ion-card-content>
-  }
+        <!-- Secondary stats inline -->
+        <ion-item lines="none">
+            <ion-icon name="time-outline"></ion-icon>
+            <ion-label>{{ redondearMinutos(sesion!.duracion || 0) }} min</ion-label>
 
-  <!-- Body: Contenido de la rutina y acciones -->
-  <ion-card-content>
-    <!-- Action buttons (Like, Comment, etc) -->
-    <ion-item lines="none">
-      <ion-button fill="clear" (click)="toggleLike(); $event.stopPropagation()"
-        [color]="hasLiked() ? 'danger' : 'medium'">
-        <ion-icon slot="start" [name]="hasLiked() ? 'heart' : 'heart-outline'"></ion-icon>
-        @if (likesCount() > 0) {
-          {{ likesCount() }}
-        }
-      </ion-button>
+            <ion-text>•</ion-text>
 
-      @if (isCommentsEnabled()) {
-        <ion-button fill="clear" color="medium" id="open-comments-{{ sesion.id }}">
-          <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
-          @if (comentarios().length > 0) {
-            {{ comentarios().length }}
-          } @else {
-            Comentar
-          }
-        </ion-button>
-      }
-    </ion-item>
+            <ion-icon name="barbell-outline"></ion-icon>
+            <ion-label>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</ion-label>
 
-    <!-- Routine Title and Description -->
-    <p>
-      <b>{{ sesion!.nombreUsuario || 'Usuario' }}</b>
-      completó su sesión de <b>{{ sesion!.rutinaResumen.nombre || 'Entrenamiento' }}</b>.
-    </p>
+            <ion-text>•</ion-text>
 
-    <!-- Secondary stats inline -->
-    <ion-item lines="none">
-      <ion-icon name="time-outline"></ion-icon>
-      <ion-label>{{ redondearMinutos(sesion!.duracion || 0) }} min</ion-label>
+            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-label>{{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}</ion-label>
+        </ion-item>
+    </ion-card-content>
 
-      <ion-label>•</ion-label>
-
-      <ion-icon name="barbell-outline"></ion-icon>
-      <ion-label>{{ sesion!.rutinaResumen.ejercicios.length || 0 }} ejercicios</ion-label>
-
-      <ion-label>•</ion-label>
-
-      <ion-icon name="calendar-outline"></ion-icon>
-      <ion-label>{{ sesion!.fechaInicio | formatFecha: { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' } }}</ion-label>
-    </ion-item>
-  </ion-card-content>
-
-  <!-- Modal de Comentarios -->
-  @if (isCommentsEnabled()) {
+    <!-- Modal de Comentarios -->
+    @if (isCommentsEnabled()) {
     <app-social-comments-modal [sesion]="sesion" [triggerId]="'open-comments-' + sesion.id"></app-social-comments-modal>
-  }
+    }
 
 </ion-card>

@@ -22,7 +22,7 @@ app-encuentro-detalle-modal {
     /* Heading del modal (primer ion-text hijo del ion-content).   */
     > ion-modal ng-template > ion-content > ion-text:first-of-type {
         display: block;
-        margin: 8px 0 16px;
+        margin: 20px 0 24px;
         font-size: 1.5rem;
         font-weight: 800;
         letter-spacing: -0.025em;
@@ -39,40 +39,44 @@ app-encuentro-detalle-modal {
         margin: 8px;
     }
 
-    /* Stats card (fecha / horario) — el único ion-grid del modal. */
+    /* Stats card — patrón stat-cell (mismo que plan-personalizado */
+    /* del dashboard y que rutina-detalle-modal). Label arriba     */
+    /* (uppercase pequeño), valor grande abajo (color secondary). */
+
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row {
         align-items: stretch;
-        padding: 8px 0;
     }
 
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
         text-align: center;
-        padding: 12px 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
+        padding: 16px 12px;
     }
 
-    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-icon {
-        font-size: 36px;
-        margin-bottom: 8px;
-    }
-
-    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
-        font-size: 1.5rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        line-height: 1;
-        color: var(--ion-text-color);
+    /* Divider sutil entre las 2 cols. */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-note {
+        display: block;
+        width: 100%;
+        text-align: center;
         font-size: 0.7rem;
-        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin: 4px 0 0;
+        font-weight: 700;
+        color: var(--ion-color-medium);
+        margin: 0 0 6px;
+    }
+
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--ion-color-secondary);
+        line-height: 1.1;
     }
 
     /* Lista de organizador / interesados. */

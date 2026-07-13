@@ -28,14 +28,14 @@
           }
         </ion-avatar>
         <ion-label>
-          <h2>{{ creatorName() }}</h2>
-          <p>lanzó este desafío</p>
+          <ion-text>{{ creatorName() }}</ion-text>
+          <ion-note>lanzó este desafío</ion-note>
         </ion-label>
       </ion-item>
 
       <ion-card>
         <ion-card-content>
-          <h2>"{{ desafio.titulo }}"</h2>
+          <ion-text>"{{ desafio.titulo }}"</ion-text>
           @if (desafio.logroRelacionado) {
           <ion-chip color="warning">
             <ion-label>Récord</ion-label>
@@ -66,9 +66,11 @@
 
       @if (participaciones().length > 0) {
       <ion-list>
-        <ion-list-header>
-          <ion-label>Participantes</ion-label>
-        </ion-list-header>
+        <ion-item lines="none">
+          <ion-label>
+            <ion-text>Participantes</ion-text>
+          </ion-label>
+        </ion-item>
         @for (p of participaciones(); track p.id) {
         <ion-item>
           <ion-avatar>

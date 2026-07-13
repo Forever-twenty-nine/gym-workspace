@@ -40,7 +40,7 @@ import { DesafioService } from '../../../../../core/services/desafio.service';
     IonButton,
     IonLabel,
     IonText, IonTitle,
-    IonGrid, IonRow, IonCol, IonChip, IonList, IonButtons, IonListHeader],
+    IonGrid, IonRow, IonCol, IonChip, IonList, IonButtons],
   templateUrl: './desafio-modal-stories.component.html'
 })
 export class DesafioModalStoriesComponent implements OnChanges {

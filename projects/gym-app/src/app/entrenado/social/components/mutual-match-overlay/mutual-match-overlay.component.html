@@ -1,55 +1,63 @@
-<ion-modal [isOpen]="true" (ionModalDidDismiss)="onDidDismiss()">
+<ion-modal [isOpen]="true" (ionModalDidDismiss)="onDidDismiss()" [breakpoints]="[0, 0.5, 0.95]" [initialBreakpoint]="0.5" backdropDismiss="true">
   <ng-template>
-    <ion-card>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>¡Conexión!</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="onCerrarMatch()" role="cancel">
+            <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
 
-      <ion-card-header>
-        <ion-card-title>¡Conexión Realizada!</ion-card-title>
-        <ion-card-subtitle>Nueva coincidencia para entrenar</ion-card-subtitle>
-      </ion-card-header>
+    <ion-content>
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>¡Conexión Realizada!</ion-card-title>
+          <ion-card-subtitle>Nueva coincidencia para entrenar</ion-card-subtitle>
+        </ion-card-header>
 
-      <ion-card-content>
-        <!-- Avatares Simples -->
-        <ion-list lines="none">
-          <ion-item>
-            <!-- Mi Foto -->
-            <ion-avatar slot="start">
-              @if (currentUserPhoto) {
-              <img [src]="currentUserPhoto" alt="Mi Foto">
-              } @else {
-              <span>Tú</span>
-              }
-            </ion-avatar>
+        <ion-card-content>
+          <!-- Avatares: tú + partner -->
+          <ion-list lines="none">
+            <ion-item>
+              <ion-avatar slot="start">
+                @if (currentUserPhoto) {
+                <img [src]="currentUserPhoto" alt="Mi Foto">
+                } @else {
+                <ion-icon name="person-outline" color="medium"></ion-icon>
+                }
+              </ion-avatar>
 
-            <ion-label>Y</ion-label>
+              <ion-text>Tú</ion-text>
 
-            <!-- Foto de Partner -->
-            <ion-avatar slot="end">
-              @if (partnerPhoto) {
-              <img [src]="partnerPhoto" [alt]="matchActual.partnerName">
-              } @else {
-              <span>Socio</span>
-              }
-            </ion-avatar>
-          </ion-item>
-        </ion-list>
+              <ion-avatar slot="end">
+                @if (partnerPhoto) {
+                <img [src]="partnerPhoto" [alt]="matchActual.partnerName">
+                } @else {
+                <ion-icon name="person-outline" color="medium"></ion-icon>
+                }
+              </ion-avatar>
+            </ion-item>
+          </ion-list>
 
-        <!-- Mensaje Contextual -->
-        @if (matchMessage) {
-        <ion-label>
-          "{{ matchMessage }}"
-        </ion-label>
-        }
-      </ion-card-content>
+          <!-- Mensaje contextual -->
+          @if (matchMessage) {
+          <ion-text>"{{ matchMessage }}"</ion-text>
+          }
+        </ion-card-content>
 
-
-      <ion-button (click)="onIniciarChat()" fill="outline" color="primary">
-        Coordinar por Chat
-      </ion-button>
-
-      <ion-button (click)="onCerrarMatch()" fill="outline" color="medium">
-        Seguir Buscando
-      </ion-button>
-
-    </ion-card>
+        <ion-card-content>
+          <ion-button expand="block" (click)="onIniciarChat()" fill="solid" color="primary">
+            <ion-icon name="chatbubble-outline" slot="start"></ion-icon>
+            Coordinar por Chat
+          </ion-button>
+          <ion-button expand="block" (click)="onCerrarMatch()" fill="outline" color="medium">
+            Seguir Buscando
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
   </ng-template>
 </ion-modal>

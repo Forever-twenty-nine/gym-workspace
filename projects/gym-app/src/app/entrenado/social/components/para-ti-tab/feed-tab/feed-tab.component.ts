@@ -5,8 +5,6 @@ import {
   IonInfiniteScrollContent,
   IonCard,
   IonCardContent,
-  IonList,
-  IonItem
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { peopleOutline, newspaperOutline } from 'ionicons/icons';
@@ -29,8 +27,6 @@ import { SesionRutina } from 'gym-library';
     SocialCardComponent,
     IonCard,
     IonCardContent,
-    IonList,
-    IonItem,
     EmptyStateComponent
   ]
 })

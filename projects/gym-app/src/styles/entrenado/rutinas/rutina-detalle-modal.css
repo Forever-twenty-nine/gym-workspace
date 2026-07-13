@@ -26,7 +26,7 @@ app-rutina-detalle-modal {
     /* Equivale al antiguo `<h2 class="modal-sheet-title">`.      */
     > ion-modal ng-template > ion-content > ion-text:first-of-type {
         display: block;
-        margin: 8px 0 16px;
+        margin: 20px 0 24px;
         font-size: 1.5rem;
         font-weight: 800;
         letter-spacing: -0.025em;
@@ -38,43 +38,57 @@ app-rutina-detalle-modal {
         margin: 4px 0 20px;
     }
 
-    /* Stats card — único ion-grid del modal.                      */
-    /* Equivale a `.modal-stat-row .modal-stat-cell` de antes.    */
+    /* Stats card — patrón stat-cell (mismo que plan-personalizado */
+    /* del dashboard). Label arriba (uppercase pequeño), valor     */
+    /* grande abajo (color secondary para destacar). Flex column  */
+    /* + align-items: center funciona bien sin ion-icon (en el    */
+    /* dashboard no hay icono y queda perfecto).                  */
+    /* Un divider sutil (border-right) separa las 2 celdas.         */
+
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row {
         align-items: stretch;
-        padding: 8px 0;
     }
 
+    /* Cada col: contenido centrado vertical y horizontalmente.   */
+    /* NO usamos flex column aquí — el ion-text (web component)   */
+    /* no respeta bien el centrado dentro de un flex container.   */
+    /* Cada hijo es display: block con text-align: center para    */
+    /* garantizar el centrado horizontal sin depender del flex.  */
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col {
         text-align: center;
-        padding: 12px 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
+        padding: 16px 12px;
     }
 
-    /* Icono de cada stat (grande).                                 */
-    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-icon {
-        font-size: 36px;
-        margin-bottom: 8px;
+    /* Divider sutil entre las 2 cols (border-right en la 1ra,    */
+    /* la última no). */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Valor del stat (numérico, prominente).                     */
-    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
-        font-size: 1.5rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        line-height: 1;
-        color: var(--ion-text-color);
-    }
-
-    /* Label del stat (uppercase, medium).                         */
+    /* Label del stat — display: block para que ocupe toda la     */
+    /* línea, text-align: center del padre lo centra. */
     > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-note {
+        display: block;
+        width: 100%;
+        text-align: center;
         font-size: 0.7rem;
-        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin: 4px 0 0;
+        font-weight: 700;
+        color: var(--ion-color-medium);
+        margin: 0 0 6px;
+    }
+
+    /* Valor del stat — display: block + width: 100% para forzar  */
+    /* el centrado del contenido (number) sin importar que el     */
+    /* shadow DOM del ion-text no respete el text-align.          */
+    > ion-modal ng-template > ion-content > ion-card > ion-card-content > ion-grid > ion-row > ion-col > ion-text {
+        display: block;
+        width: 100%;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--ion-color-secondary);
+        line-height: 1.1;
     }
 }

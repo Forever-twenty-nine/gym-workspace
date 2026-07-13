@@ -1,60 +1,98 @@
 /* ============================================================ */
 /* Componente: app-social-card                                    */
-/* Card de un post individual en el feed                         */
+/* Card de un post individual en el feed.                         */
+/* Estilo Instagram: edge-to-edge, la imagen ocupa todo el ancho, */
+/* header y footer con padding lateral sutil.                      */
 /* ============================================================ */
 
 app-social-card {
-    ion-item {
+    display: block;
+    margin: 0 0 12px;
+
+    /* El card es edge-to-edge: sin margin lateral, sin border-radius
+       (el global le pone 16px, lo anulamos para el look IG). */
+    > ion-card {
+        margin: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        box-shadow: none;
+    }
+
+    /* Header del card: avatar + nombre + acciones, con padding lateral
+       para que el texto no quede pegado al borde. */
+    > ion-card > ion-item {
+        --padding-start: 12px;
+        --padding-end: 8px;
         --background: transparent;
+        --inner-padding-end: 0;
     }
 
-    ion-item ion-label {
+    > ion-card > ion-item ion-label {
         margin-inline-start: 8px;
+        font-weight: 600;
     }
 
-    /* Foto de progreso */
+    /* Foto de progreso — edge to edge, full width, aspect ratio 4:5 */
     > ion-card > ion-img {
         width: 100%;
-        aspect-ratio: 4/5;
+        aspect-ratio: 4 / 5;
         object-fit: cover;
+        display: block;
     }
 
-    /* Separador cuando no hay foto */
-    > ion-card > ion-card-content > hr {
+    /* Sin foto: divider sutil (border-top en el ion-card-content vacío) */
+    > ion-card > ion-card-content:empty {
         height: 1px;
-        background: var(--ion-color-step-150, #e0e0e0);
-        width: 100%;
-        border: none;
-        margin: 0;
+        padding: 0;
+        margin: 16px 12px;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Body content — padding lateral para que el texto no quede pegado */
+    > ion-card > ion-card-content {
+        padding: 12px;
     }
 
     /* Acciones (Like, Comentar) */
     > ion-card > ion-card-content > ion-item {
-        margin-top: -8px;
-        margin-bottom: 8px;
-        gap: 8px;
+        margin: -4px 0 8px;
+        padding: 0;
+        gap: 4px;
+        --background: transparent;
+        --inner-padding-end: 0;
     }
 
-    > ion-card > ion-card-content > ion-item ion-button > span {
-        font-weight: bold;
-        margin-left: 4px;
-    }
-
-    /* Texto principal del post */
-    > ion-card > ion-card-content > p {
+    /* Caption principal del post */
+    > ion-card > ion-card-content > ion-text {
+        display: block;
         color: var(--ion-text-color);
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    /* Nombres en bold dentro del caption (data-bold es un flag vacío) */
+    > ion-card > ion-card-content > ion-text > ion-text[data-bold] {
+        font-weight: 700;
     }
 
     /* Stats inline (duración, ejercicios, fecha) */
     > ion-card > ion-card-content > ion-item:last-child {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-top: 12px;
+        gap: 4px;
+        margin-top: 4px;
         color: var(--ion-color-medium);
+        font-size: 0.85rem;
+        --background: transparent;
     }
 
     > ion-card > ion-card-content > ion-item:last-child ion-icon {
-        margin-right: 4px;
+        margin-right: 2px;
+        font-size: 1rem;
+    }
+
+    > ion-card > ion-card-content > ion-item:last-child ion-label {
+        margin: 0;
     }
 }

@@ -10,7 +10,8 @@ import {
   IonButton,
   IonAvatar,
   IonCardContent,
-  IonBadge,
+  IonNote,
+  IonText,
   IonImg
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -43,7 +44,8 @@ import { SocialCommentsModalComponent } from './social-comments-modal/social-com
     IonButtons,
     IonButton,
     IonCardContent,
-    IonBadge,
+    IonNote,
+    IonText,
     IonImg,
     SocialCommentsModalComponent
   ],
@@ -169,4 +171,10 @@ export class SocialCardComponent implements OnInit, OnDestroy {
   }
 
   redondearMinutos(segundos: number) { return Math.round((segundos || 0) / 60); }
+
+  /** Oculta la <ion-img> si la URL falla al cargar (en vez de style="display:none" inline en el template). */
+  onImgError(event: Event) {
+    const target = event.target as HTMLElement | null;
+    if (target) target.style.display = 'none';
+  }
 }

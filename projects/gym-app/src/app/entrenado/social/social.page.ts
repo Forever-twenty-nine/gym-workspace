@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import {
   IonContent, IonSegment, IonSegmentButton, IonLabel, IonHeader,
-  SegmentCustomEvent, ModalController, ToastController, IonToolbar, IonCard, IonCardContent } from '@ionic/angular/standalone';
+  SegmentCustomEvent, ModalController, ToastController, IonToolbar } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { BackgroundComponent } from '../../shared/components/background/background.component';
 import { AuthService } from '../../core/services/auth.service';
@@ -12,7 +12,6 @@ import { MatchService } from '../../core/services/match.service';
 import { DescubrirTabComponent } from './components/descubrir-tab/descubrir-tab.component';
 import { MutualMatchOverlayComponent } from './components/mutual-match-overlay/mutual-match-overlay.component';
 import { FeedTabComponent } from './components/para-ti-tab/feed-tab/feed-tab.component';
-import { ParaTiTabComponent } from './components/para-ti-tab/para-ti-tab.component';
 import { ChatDetailModalComponent } from '../../shared/chat/chat-detail-modal/chat-detail-modal.component';
 
 import { Convocatoria, Desafio } from 'gym-library';
@@ -35,13 +34,11 @@ import { DesafioModalStoriesComponent } from './components/para-ti-tab/desafio-m
     DescubrirTabComponent,
     MutualMatchOverlayComponent,
     FeedTabComponent,
-    ParaTiTabComponent,
     IonHeader,
     BackgroundComponent,
     StoriesComponent,
     ConvocatoriaModalStoriesComponent,
     DesafioModalStoriesComponent,
-    IonCard, IonCardContent
   ]
 })
 export class SocialPage {

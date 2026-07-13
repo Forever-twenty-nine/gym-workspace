@@ -321,15 +321,19 @@ ion-content {
 /* ============================================================ */
 
 /* ============================================================ */
-/* App default: tab bar transparente, sin borde superior         */
-/* (En dark mode, --ion-color-step-100 resolvía a un blanco que   */
-/* aparecía como una línea visible — removido para look limpio)  */
+/* App default: tab bar con backdrop blur + bg semi-transparente  */
+/* (iOS-style frosted glass — coherente con el glassmorphism de   */
+/* cards y toolbars. Antes era totalmente transparente y se veía  */
+/* "flotando" sin peso sobre el contenido de cada page.)         */
 /* ============================================================ */
 ion-tab-bar {
   height: 44px;
   min-height: 44px;
-  --background: transparent;
-  border-top: 1px solid transparent;
+  --background: rgba(var(--ion-background-color-rgb, 18, 18, 18), 0.78);
+  background: rgba(var(--ion-background-color-rgb, 18, 18, 18), 0.78);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================================ */

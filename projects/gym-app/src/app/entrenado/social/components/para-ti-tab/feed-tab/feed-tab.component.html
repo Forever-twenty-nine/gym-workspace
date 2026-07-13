@@ -15,15 +15,12 @@
   </ion-card>
 }
 
-<!-- FEED ACTIVO -->
+<!-- FEED ACTIVO — edge to edge, sin list wrapper.
+     Cada <app-social-card> ya es un ion-card con su propio styling. -->
 @else {
-  <ion-list lines="none">
-    @for (item of filteredFeed(); track item.id) {
-      <ion-item>
-        <app-social-card [sesion]="item"></app-social-card>
-      </ion-item>
-    }
-  </ion-list>
+  @for (item of filteredFeed(); track item.id) {
+    <app-social-card [sesion]="item"></app-social-card>
+  }
 
   <!-- Scroll Infinito -->
   @if (hasMoreItems()) {

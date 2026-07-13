@@ -1,6 +1,8 @@
 /* ============================================================ */
 /* Componente: app-feed-tab                                       */
-/* Tab "Feed" — lista de posts de la comunidad                   */
+/* Tab "Feed" — lista de posts de la comunidad.                   */
+/* Edge-to-edge estilo Instagram: cada <app-social-card> directo  */
+/* al ion-content, sin list wrapper.                               */
 /* ============================================================ */
 
 app-feed-tab {
@@ -36,9 +38,9 @@ app-feed-tab {
         text-transform: uppercase;
     }
 
-    /* Lista de cards */
-    > ion-list {
-        background: transparent;
-        padding: 0;
+    /* Separación entre social-cards del feed (edge to edge).
+       Cada card ya trae su propio margin/border del global. */
+    > app-social-card + app-social-card {
+        margin-top: 12px;
     }
 }

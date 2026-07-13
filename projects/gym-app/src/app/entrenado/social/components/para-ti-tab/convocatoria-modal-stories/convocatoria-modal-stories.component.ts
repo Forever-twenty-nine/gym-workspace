@@ -39,8 +39,7 @@ imports: [IonItem, IonCardContent, IonCard, IonText, IonContent, IonButtons, Ion
   IonGrid,
   IonRow,
   IonCol,
-  IonList,
-  IonListHeader],
+  IonList],
   templateUrl: './convocatoria-modal-stories.component.html'
 })
 export class ConvocatoriaModalStoriesComponent {
