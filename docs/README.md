@@ -5,18 +5,11 @@ Esta carpeta contiene toda la documentación del proyecto Gym Workspace, organiz
 ## Estructura
 
 - **architecture/**: Arquitectura del sistema
-  - `overview.md`: Visión general del monorepo y proyectos
-  - `gym-admin.md`: Detalles de la aplicación web administrativa
-  - `gym-app.md`: Detalles de la aplicación móvil
-  - `gym-library.md`: Detalles de la librería compartida
+  - [`gym-admin.md`](./architecture/gym-admin.md): aplicación web administrativa
+  - [`gym-app.md`](./architecture/gym-app.md): aplicación móvil
+  - [`gym-library.md`](./architecture/gym-library.md): librería compartida
 
-- **features/**: Especificaciones funcionales
-  - `README.md`: Estructura de funcionalidades por usuario
-  - `trainees/`: Funcionalidades para usuarios entrenados
-  - `trainers/`: Funcionalidades para entrenadores
-
-- **to-do/**: Tareas pendientes
-  - `security.md`: Recomendaciones de seguridad
-
-- **Future/**: Documentación en desarrollo
-  - `gyms/`: Funcionalidades futuras para gimnasios
+- **features/**: Especificaciones funcionales por tipo de usuario
+  - [`features-traines.md`](./features/features-traines.md): entrenados
+  - [`features-trainers.md`](./features/features-trainers.md): entrenadores
+  - [`features-gyms.md`](./features/features-gyms.md): gimnasios

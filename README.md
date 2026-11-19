@@ -2,10 +2,10 @@
 
 > Plataforma integral para gimnasios: conectando entrenados, entrenadores y gimnasios
 
-[![Angular](https://img.shields.io/badge/Angular-20.1.4-red)](https://angular.dev/)
-[![Ionic](https://img.shields.io/badge/Ionic-8.x-blue)](https://ionicframework.com/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)](https://www.typescriptlang.org/)
-[![Firebase](https://img.shields.io/badge/Firebase-10.x-orange)](https://firebase.google.com/)
+[![Angular](https://img.shields.io/badge/Angular-21.2-red)](https://angular.dev/)
+[![Ionic](https://img.shields.io/badge/Ionic-8.8-blue)](https://ionicframework.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-12-orange)](https://firebase.google.com/)
 
 ## 📱 ¿Qué es Gym Workspace?
 
@@ -33,30 +33,19 @@ npm run dev
 - 🖥️ **gym-admin**: http://localhost:4200
 - 📱 **gym-app**: http://localhost:8100
 
-## 📚 Documentación Completa
+## 📚 Documentación
 
-> Toda la documentación está organizada en `/docs`
-
-### 🎯 Para Empezar
-- **[📖 Guía de Setup](./docs/getting-started/setup.md)** - Instalación paso a paso
-- **[📋 Prerrequisitos](./docs/getting-started/prerequisites.md)** - Herramientas necesarias
+> Toda la documentación está en `/docs` ([índice](./docs/README.md)). Para las IAs: [`AGENTS.md`](./AGENTS.md).
 
 ### 🏗️ Arquitectura
-- **[🔍 Visión General](./docs/architecture/overview.md)** - Estructura del monorepo
 - **[🖥️ Gym Admin](./docs/architecture/gym-admin.md)** - Panel administrativo
-- **[📱 Gym App](./docs/architecture/gym-app.md)** - Aplicación móvil (próximamente)
+- **[📱 Gym App](./docs/architecture/gym-app.md)** - Aplicación móvil
+- **[📦 Gym Library](./docs/architecture/gym-library.md)** - Librería compartida
 
-### 💼 Business
-- **[💰 Modelo de Negocio](./docs/business/model.md)** - Estrategia freemium y monetización
-
-### �� Guías
-- **[🚀 Desarrollo](./docs/guides/development.md)** - Comandos y workflow
-- **[🎨 Estilos](./docs/guides/styles-guide.md)** - Convenciones CSS
-
-### 🔒 Seguridad
-- **[🛡️ Recomendaciones](./docs/security/recommendations.md)** - Mejores prácticas
-
-📖 **[Ver índice completo de documentación →](./docs/README.md)**
+### ✨ Funcionalidades
+- **[🏃 Entrenados](./docs/features/features-traines.md)**
+- **[👨‍🏫 Entrenadores](./docs/features/features-trainers.md)**
+- **[🏢 Gimnasios](./docs/features/features-gyms.md)**
 
 ## 🛠️ Comandos Principales
 
@@ -92,7 +81,7 @@ gym-workspace/
 
 ## 🤝 Contribuir
 
-1. Lee la [Guía de Setup](./docs/getting-started/setup.md)
+1. Instalá todo con `npm run install:all` (ver [Inicio Rápido](#-inicio-rápido))
 2. Crea una rama: `git checkout -b feature/nombre`
 3. Haz commits con [Conventional Commits](https://www.conventionalcommits.org/)
 4. Push: `git push origin feature/nombre`
